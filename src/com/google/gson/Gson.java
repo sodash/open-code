@@ -208,6 +208,7 @@ public final class Gson {
 	 */
 	private static KLoopPolicy loopPolicy;
 
+
 	/**
 	 * How do we handle circular references? never null.
 	 * @since September 2014, added by Daniel
