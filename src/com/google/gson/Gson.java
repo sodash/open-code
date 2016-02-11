@@ -1272,4 +1272,11 @@ public final class Gson {
 		}
 		return (T) fromJson(json, Object.class);
 	}
+
+	public <X> X convert(Map mapFromJson, Class<X> klass) {
+		// inefficient, but should work
+		String json = toJson(mapFromJson);
+		X obj = fromJson(json, klass);
+		return obj;
+	}
 }
