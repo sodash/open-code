@@ -570,6 +570,7 @@ private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
   }
 
   
+  //Added by SoDash
   /**
    * Set the property name used for recording the Java class behind the
    * json. Adding this info to the json output allows us to 
@@ -584,6 +585,7 @@ private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
 	}
 	
 
+	// Added by SoDash
 	/**
 	 * @param loopy The default is {@link KLoopPolicy#QUIET_NULL}. We assume that if you're using this fork of
 	 * the Gson library, then you want robust flexible serialisation. 
