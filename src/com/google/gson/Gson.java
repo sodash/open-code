@@ -1279,4 +1279,15 @@ public final class Gson {
 		X obj = fromJson(json, klass);
 		return obj;
 	}
+
+	private static final Gson SAFE_GSON = new GsonBuilder().setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL).create();
+	
+	/**
+	 * Convenience for a safe robust default just-give-me-some-json convertor.
+	 * @param obj
+	 * @return json
+	 */
+	public static String toJSON(Object obj) {
+		return SAFE_GSON.toJson(obj);
+	}
 }
