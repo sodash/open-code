@@ -1280,7 +1280,7 @@ public final class Gson {
 		return obj;
 	}
 
-	private static final Gson SAFE_GSON = new GsonBuilder().setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL).create();
+	private static final Gson SAFE_GSON = new GsonBuilder().serializeSpecialFloatingPointValues().setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL).create();
 	
 	/**
 	 * Convenience for a safe robust default just-give-me-some-json convertor.
