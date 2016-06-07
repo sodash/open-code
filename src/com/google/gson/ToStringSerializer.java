@@ -2,7 +2,7 @@ package com.google.gson;
 
 import java.lang.reflect.Type;
 
-import winterwell.utils.web.IHasJson;
+import com.winterwell.utils.web.IHasJson;
 
 /**
  * COnvert to JSON -- by just outputting the toString() string.
