@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.winterwell.utils.containers.ArrayMap;
 
 public class FlexiGsonTest {
-
+	
 	@Test
 	public void testConvert() {
 		Gson gson = new GsonBuilder().create();

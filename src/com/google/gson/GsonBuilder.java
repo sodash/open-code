@@ -30,6 +30,7 @@ import com.google.gson.internal.$Gson$Preconditions;
 import com.google.gson.internal.Excluder;
 import com.google.gson.internal.bind.TypeAdapters;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 
 /**
  * <p>Use this builder to construct a {@link Gson} instance when you need to set configuration
@@ -86,6 +87,7 @@ public final class GsonBuilder {
   private boolean generateNonExecutableJson;
   private String classProperty = DEFAULT_CLASS_PROPERTY;
 private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
+	private boolean lenientReader;
 
   /**
    * Creates a GsonBuilder instance that can be used to build Gson with various configuration
@@ -549,7 +551,7 @@ private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
         serializeNulls, complexMapKeySerialization,
         generateNonExecutableJson, escapeHtmlChars, prettyPrinting,
         serializeSpecialFloatingPointValues, longSerializationPolicy, 
-        classProperty, loopPolicy,
+        classProperty, loopPolicy, lenientReader,
         factories);
   }
 
@@ -592,6 +594,17 @@ private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
 	 */
 	public GsonBuilder setLoopPolicy(KLoopPolicy loopy) {
 		loopPolicy = loopy;
+		return this;
+	}
+
+	/**
+	 * Allow comments in json. Comments are not valid in json -- though they are allowed in javascript, and often useful.
+	 * @see JsonReader#setLenient(boolean)
+	 * @param stripComments
+	 * @return this
+	 */
+	public GsonBuilder setLenientReader(boolean stripComments) {
+		this.lenientReader = stripComments;
 		return this;
 	}
 }

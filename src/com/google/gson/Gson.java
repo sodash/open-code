@@ -202,6 +202,8 @@ public final class Gson {
 	// Added by Daniel
 	private final String classProperty;
 
+	private boolean lenientReader;
+
 	/**
 	 * How do we handle circular references? never null. HACK Should not be
 	 * static!!!
@@ -278,6 +280,7 @@ public final class Gson {
 				DEFAULT_JSON_NON_EXECUTABLE, true, false, false,
 				LongSerializationPolicy.DEFAULT,
 				GsonBuilder.DEFAULT_CLASS_PROPERTY, null/* loop policy */,
+				false,
 				Collections.<TypeAdapterFactory> emptyList());
 	}
 
@@ -294,6 +297,7 @@ public final class Gson {
 			boolean serializeSpecialFloatingPointValues,
 			LongSerializationPolicy longSerializationPolicy,
 			String classProperty, KLoopPolicy loopPolicy,
+			boolean lenientReader,
 			List<TypeAdapterFactory> typeAdapterFactories)
     {
 		this.constructorConstructor = new ConstructorConstructor(
@@ -305,6 +309,7 @@ public final class Gson {
 		this.classProperty = classProperty;
 		this.loopPolicy = loopPolicy == null ? KLoopPolicy.NO_CHECKS
 				: loopPolicy;
+		this.lenientReader = lenientReader;
 
 		List<TypeAdapterFactory> factories = new ArrayList<TypeAdapterFactory>();
 
@@ -1038,6 +1043,9 @@ public final class Gson {
 	public <T> T fromJson(Reader json, Type typeOfT) throws JsonIOException,
 			JsonSyntaxException {
 		JsonReader jsonReader = new JsonReader(json);
+		if (lenientReader) {
+			jsonReader.setLenient(true);
+		}
 		T object = (T) fromJson(jsonReader, typeOfT);
 		
 		try {
@@ -1282,14 +1290,31 @@ public final class Gson {
 		return obj;
 	}
 
-	private static final Gson SAFE_GSON = new GsonBuilder().serializeSpecialFloatingPointValues().setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL).create();
+	private static final Gson SAFE_GSON = new GsonBuilder()
+				.setLenientReader(true)
+				.serializeSpecialFloatingPointValues()
+				.setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL)
+				.create();
 	
 	/**
 	 * Convenience for a safe robust default just-give-me-some-json convertor.
 	 * @param obj
 	 * @return json
 	 */
+	// Note: named with capitals to avoid conflict with fromJson()
 	public static String toJSON(Object obj) {
 		return SAFE_GSON.toJson(obj);
 	}
+	
+
+	/**
+	 * Convenience for a safe robust default just-read-me-some-json convertor.
+	 * @param json
+	 * @return object
+	 */
+	// Note: named with capitals to avoid conflict with toJson()
+	public static Map fromJSON(String json) {
+		return SAFE_GSON.fromJson(json, Map.class);
+	}
 }
+
