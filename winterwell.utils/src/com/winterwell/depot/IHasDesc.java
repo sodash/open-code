@@ -1,0 +1,37 @@
+package com.winterwell.depot;
+
+/**
+ * For artifacts which can create a Desc description of themselves.
+ * <p>
+ * NB: Descs can provide a convenient way to define equals & hashcode, since
+ * objects with equals() Descs are probably equivalent.
+ * 
+ * @author daniel
+ *         <p>
+ *         <b>Copyright & license</b>: (c) Winterwell Associates Ltd, all rights
+ *         reserved. This class is NOT formally a part of the winterwell.utils
+ *         library. In particular, licenses for the winterwell.utils library do
+ *         not apply to this file.
+ */
+public interface IHasDesc {
+
+	/**
+	 * @return a description for this artifact. This must not use
+	 *         {@link Desc#getDescription(Object)} as that would generate an
+	 *         infinite loop.
+	 *         <p>
+	 *         Should this bind the object to it's description? No - keep
+	 *         binding as something done by depot, or explicitly.
+	 */
+	Desc getDesc();
+
+	/**
+	 * @return the sub-modules (those parts which implement @ModularXML), or
+	 *         null. This should not recursively collect the sub-sub-modules;
+	 *         the Depot will do that. It is VITAL that this includes all fields
+	 *         which implement @ModularXML, otherwise these parts will not get
+	 *         saved.
+	 */
+	IHasDesc[] getModules();
+
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="test.utils"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" output="bin.test.local" path="test.local"/>
+	<classpathentry kind="src" output="bin.test.dodgy" path="test.dodgy"/>
+	<classpathentry kind="src" output="bin.test" path="test"/>
+	<classpathentry kind="src" output="bin.perf" path="perf"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry exported="true" kind="lib" path="/middleware/xstream/xpp3_min-1.1.4c.jar"/>
+	<classpathentry kind="lib" path="/middleware/xstream/xmlpull-1.1.3.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="/middleware/xstream/xstream.jar"/>
+	<classpathentry kind="lib" path="/middleware/bonecp/bonecp.jar"/>
+	<classpathentry kind="lib" path="/middleware/hibernate/lib/ejb3-persistence.jar" sourcepath="/middleware/hibernate/src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

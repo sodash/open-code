@@ -1,0 +1,149 @@
+<?xml-stylesheet href="/shared/bsp/xsl/rss/nolsol.xsl" type="text/xsl" title="XSL_formatting"?>
+<rss
+  version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>BBC News | Most Popular Stories | UK Edition</title>
+    <link>http://news.bbc.co.uk/go/rss/-/1/shared/bsp/hi/live_stats/html/map.stm</link>
+    <description>The most read stories on the BBC News website right now.</description>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 09 Nov 2016 10:31:16 GMT</lastBuildDate>
+    <copyright>Copyright: (C) British Broadcasting Corporation, see http://news.bbc.co.uk/1/hi/help/rss/4498287.stm for terms and conditions of reuse</copyright>
+    <docs>http://www.bbc.co.uk/syndication/</docs>
+    <ttl>5</ttl>
+    <image>
+      <title>BBC News</title>
+      <url>http://news.bbc.co.uk/nol/shared/img/bbc_news_120x60.gif</url>
+      <link>http://news.bbc.co.uk/go/rss/-/1/shared/bsp/hi/live_stats/html/map.stm</link>
+    </image>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/live/election-us-2016-37899679</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/live/election-us-2016-37899679</guid>
+      <pubDate />
+      <category>US2016</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>Trump beats Clinton to take White House</title>
+      <description>Political outsider Donald Trump beats Hillary Clinton to win the US presidency in a stunning upset. </description>
+      <link>http://www.bbc.co.uk/news/election-us-2016-37920175</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/election-us-2016-37920175</guid>
+      <pubDate />
+      <category>US2016</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.ukhttp://c.files.bbci.co.uk/42B2/production/_92347071_breaking_image_large-3.png" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/election-us-2016-37918303</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/election-us-2016-37918303</guid>
+      <pubDate />
+      <category>US2016</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/uk-england-london-37919658</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/uk-england-london-37919658</guid>
+      <pubDate />
+      <category>London</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>30 things that Donald Trump believes</title>
+      <description>What are the policies and beliefs of Donald Trump?</description>
+      <link>http://www.bbc.co.uk/news/world-us-canada-34903577</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/world-us-canada-34903577</guid>
+      <pubDate />
+      <category>Magazine</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.ukhttp://c.files.bbci.co.uk/35B4/production/_87984731_trumppodium.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/election-us-2016-37918242</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/election-us-2016-37918242</guid>
+      <pubDate />
+      <category>US2016</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/election-us-2016-37862521</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/election-us-2016-37862521</guid>
+      <pubDate />
+      <category>US2016</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/business-37921036</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/business-37921036</guid>
+      <pubDate />
+      <category>Business</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/live/uk-politics-37894337</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/live/uk-politics-37894337</guid>
+      <pubDate />
+      <category>Politics</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/uk-politics-37921086</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/uk-politics-37921086</guid>
+      <pubDate />
+      <category>Politics</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+  </channel>
+</rss>
