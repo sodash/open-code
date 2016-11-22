@@ -23,9 +23,9 @@ import com.winterwell.utils.containers.IntRange;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.CSVReader;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.WeirdException;
-import com.winterwell.utils.log.Log.KErrorPolicy;
 import com.winterwell.utils.web.WebUtils;
 
 
@@ -721,7 +721,7 @@ public class StrUtils {
 	 * @return ascii text
 	 * @testedby {@link StrUtilsTest#testNormalise()}
 	 */
-	public static String normalise(String unicode, Log.KErrorPolicy onUnrecognisableChar) 
+	public static String normalise(String unicode, KErrorPolicy onUnrecognisableChar) 
 			throws IllegalArgumentException 
 	{
 		if (unicode==null) return null;

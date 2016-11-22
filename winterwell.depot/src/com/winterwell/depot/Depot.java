@@ -17,8 +17,8 @@ import java.util.logging.Level;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.gui.GuiUtils;
+import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.reporting.Log.KErrorPolicy;
 import com.winterwell.utils.time.StopWatch;
 
 import com.thoughtworks.xstream.XStreamException;

@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.reporting.Log.KErrorPolicy;
 import com.winterwell.utils.web.XStreamUtils;
 
 import com.thoughtworks.xstream.converters.Converter;

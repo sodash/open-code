@@ -4,12 +4,12 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.reporting.Log.KErrorPolicy;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
+import com.winterwell.utils.log.KErrorPolicy;
 
 /**
  * Depot's configuration params. By default, this is loaded from config/Depot.properties

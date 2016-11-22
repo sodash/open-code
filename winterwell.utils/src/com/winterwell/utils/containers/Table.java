@@ -10,8 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.log.Log;
-import com.winterwell.utils.log.Log.KErrorPolicy;
+import com.winterwell.utils.log.KErrorPolicy;
 
 /**
  * A simple data table, for when a List or HashMap isn't quite good enough. Has
@@ -32,7 +31,7 @@ public class Table<C1, Row> implements Serializable, Iterable<Row> {
 
 	private static final long serialVersionUID = 1L;
 	
-	static Log.KErrorPolicy exceptionPolicy = KErrorPolicy.THROW_EXCEPTION;
+	static KErrorPolicy exceptionPolicy = KErrorPolicy.THROW_EXCEPTION;
 	/**
 	 * Hokey method to make it slightly nicer to write data-processing
 	 * "scripts". Since it's shared across all DataTables, avoid like the plague
@@ -41,7 +40,7 @@ public class Table<C1, Row> implements Serializable, Iterable<Row> {
 	 * @param policy
 	 */
 	@Deprecated
-	public static void setExceptionPolicy(Log.KErrorPolicy policy) {
+	public static void setExceptionPolicy(KErrorPolicy policy) {
 		exceptionPolicy = policy;
 	}
 

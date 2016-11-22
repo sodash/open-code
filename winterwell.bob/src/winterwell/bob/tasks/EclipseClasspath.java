@@ -16,8 +16,8 @@ import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.reporting.Log.KErrorPolicy;
 import com.winterwell.utils.web.WebUtils;
 
 /**

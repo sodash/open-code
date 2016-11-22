@@ -16,7 +16,7 @@ import com.winterwell.utils.IReplace;
 import com.winterwell.utils.Mutable;
 
 import com.winterwell.utils.containers.Pair;
-import com.winterwell.utils.log.Log.KErrorPolicy;
+import com.winterwell.utils.log.KErrorPolicy;
 
 public class StrUtilsTest extends TestCase {
 

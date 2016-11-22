@@ -9,8 +9,8 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.web.LoginDetails;
 
-import winterwell.web.email.SMTPClient;
-import winterwell.web.email.SimpleMessage;
+import com.winterwell.web.email.SMTPClient;
+import com.winterwell.web.email.SimpleMessage;
 
 /**
  * 
