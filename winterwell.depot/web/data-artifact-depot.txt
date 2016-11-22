@@ -1,0 +1,22 @@
+
+# Data Artifact Depot
+
+It's a key-value store with rich keys (e.g. use a POJO), controllable distribution, support for modular artifacts, & versioning. 
+
+It can back-end onto any key-value store -- including the file-system (with scp for distribution).  
+
+Ideal for data-science.
+
+## Features
+
+ - Rich keys: Build keys. 
+ 
+ - Store most any POJO. 
+
+ - Modular artifacts: Big complex artifacts get broken down into smaller modules.
+ 
+ - Artifact Versioning: 
+ 	- Create multiple versions of a model using different setups. 
+ 	- Use sym-links to reference the latest/best version.
+ 	
+ - Nice handling of Files.
