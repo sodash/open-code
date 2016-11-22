@@ -1,7 +1,7 @@
 /**
  * 
  */
-package winterwell.utils;
+package com.winterwell.utils;
 
 /**
  * Implementing {@link Appendable} isn't much use 'cos it throws exceptions all

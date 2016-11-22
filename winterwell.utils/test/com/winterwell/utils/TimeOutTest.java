@@ -1,4 +1,4 @@
-package winterwell.utils;
+package com.winterwell.utils;
 
 import org.junit.Test;
 

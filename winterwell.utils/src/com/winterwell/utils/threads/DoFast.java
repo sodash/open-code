@@ -7,11 +7,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.winterwell.utils.TimeOut;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
 
-import winterwell.utils.Utils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
 
 /**
  * Convenience class for using TimeOut to do something quickly or not at all.

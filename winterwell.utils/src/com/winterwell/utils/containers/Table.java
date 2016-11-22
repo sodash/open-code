@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import winterwell.utils.StrUtils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.reporting.Log.KErrorPolicy;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.Log.KErrorPolicy;
 
 /**
  * A simple data table, for when a List or HashMap isn't quite good enough. Has

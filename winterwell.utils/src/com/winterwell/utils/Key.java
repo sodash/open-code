@@ -1,14 +1,14 @@
 /**
  *
  */
-package winterwell.utils;
+package com.winterwell.utils;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import winterwell.utils.containers.Properties;
+import com.winterwell.utils.containers.Properties;
 
 /**
  * For doing type-safe multi-class maps. Can be sorted by key name.

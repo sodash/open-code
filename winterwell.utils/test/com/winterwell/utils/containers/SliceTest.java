@@ -1,4 +1,4 @@
-package winterwell.utils.containers;
+package com.winterwell.utils.containers;
 
 import org.junit.Test;
 

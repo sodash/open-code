@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.Test;
 
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 
 public class EqualsLockerTest {
 

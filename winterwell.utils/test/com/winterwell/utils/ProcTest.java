@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import winterwell.utils.StrUtils;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.io.FileUtils;
 
 /**

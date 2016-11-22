@@ -1,8 +1,7 @@
 package com.winterwell.datalog;
 
-import winterwell.utils.time.Dt;
-
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
+import com.winterwell.utils.time.Dt;
 
 /**
  * 

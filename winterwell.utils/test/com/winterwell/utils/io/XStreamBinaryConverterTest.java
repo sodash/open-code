@@ -1,14 +1,14 @@
-package winterwell.utils.io;
+package com.winterwell.utils.io;
 
 import java.io.Serializable;
 import java.util.Arrays;
 
 import org.junit.Test;
 
-import winterwell.utils.io.XStreamBinaryConverter.BinaryXML;
-import winterwell.utils.web.XStreamUtils;
+import com.winterwell.utils.io.XStreamBinaryConverter.BinaryXML;
 
 import com.thoughtworks.xstream.XStream;
+import com.winterwell.utils.web.XStreamUtils;
 
 public class XStreamBinaryConverterTest {
 

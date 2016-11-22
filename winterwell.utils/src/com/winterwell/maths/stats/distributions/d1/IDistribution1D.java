@@ -1,7 +1,7 @@
 package com.winterwell.maths.stats.distributions.d1;
 
 import com.winterwell.maths.stats.distributions.IDistributionBase;
-import winterwell.utils.containers.Range;
+import com.winterwell.utils.containers.Range;
 
 /**
  * 

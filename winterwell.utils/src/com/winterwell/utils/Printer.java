@@ -18,19 +18,17 @@ import java.util.regex.Pattern;
 
 import org.w3c.dom.Node;
 
-import winterwell.utils.IFn;
-import winterwell.utils.PrinterTest;
+import com.winterwell.utils.IFn;
+import com.winterwell.utils.PrinterTest;
 
 import com.winterwell.utils.ReflectionUtils;
 
-import winterwell.utils.StrUtils;
-import winterwell.utils.WrappedException;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.WrappedException;
 
 import com.winterwell.utils.containers.ArrayMap;
-
-import winterwell.utils.containers.ArraySet;
-import winterwell.utils.containers.Containers;
-
+import com.winterwell.utils.containers.ArraySet;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 
 

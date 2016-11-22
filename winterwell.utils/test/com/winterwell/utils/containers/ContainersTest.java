@@ -17,10 +17,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import winterwell.utils.IFn;
+import com.winterwell.utils.IFn;
 
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.containers.Containers.Changes;
 import com.winterwell.utils.threads.SafeExecutor;
 
 public class ContainersTest {
@@ -194,7 +195,7 @@ public class ContainersTest {
 		Set<String> set1 = new HashSet<String>(Arrays.asList("1", "2", "1",
 				"3", "4"));
 		Set<String> set2 = new HashSet<String>(Arrays.asList("1", "4", "7"));
-		Containers.Changes<String> diffs = Containers.differences(set1, set2);
+		Changes<String> diffs = Containers.differences(set1, set2);
 		Assert.assertEquals(Arrays.asList("3", "2"), diffs.getAdded()); // Not
 																		// happy
 																		// about

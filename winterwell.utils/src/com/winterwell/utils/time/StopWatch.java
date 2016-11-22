@@ -2,9 +2,7 @@ package com.winterwell.utils.time;
 
 import com.winterwell.utils.time.StopWatchTest;
 
-import winterwell.utils.StrUtils;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
+import com.winterwell.utils.StrUtils;
 
 /**
  * Simple timer utility. Can be paused and restarted.

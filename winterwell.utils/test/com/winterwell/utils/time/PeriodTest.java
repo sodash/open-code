@@ -2,9 +2,6 @@ package com.winterwell.utils.time;
 
 import org.junit.Test;
 
-import winterwell.utils.time.Period;
-import winterwell.utils.time.Time;
-
 public class PeriodTest {
 
 	@Test

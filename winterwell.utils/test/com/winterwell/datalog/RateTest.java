@@ -2,7 +2,7 @@ package com.winterwell.datalog;
 
 import org.junit.Test;
 
-import winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.TUnit;
 
 public class RateTest {
 

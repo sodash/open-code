@@ -3,8 +3,9 @@ package com.winterwell.utils.web;
 import java.util.Collection;
 import java.util.Map;
 
-import winterwell.utils.IFn;
-import winterwell.utils.containers.Containers;
+import com.winterwell.utils.containers.Containers;
+
+import com.winterwell.utils.IFn;
 
 /**
  * I can has dynamic ajax action! Call toJson() to get a JSON String

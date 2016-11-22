@@ -7,10 +7,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Stack;
 
-import winterwell.utils.IProperties;
-import winterwell.utils.Key;
-import winterwell.utils.Utils;
-import winterwell.utils.io.ISerialize;
+import com.winterwell.utils.io.ISerialize;
+
+import com.winterwell.utils.IProperties;
+import com.winterwell.utils.Key;
+import com.winterwell.utils.Utils;
 
 /**
  * Store global (default) and background (thread-local) properties. A background

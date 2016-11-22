@@ -14,21 +14,18 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import winterwell.utils.FailureException;
-import winterwell.utils.IFn;
-import winterwell.utils.IReplace;
-import winterwell.utils.reporting.Log.KErrorPolicy;
-import winterwell.utils.reporting.WeirdException;
-
+import com.winterwell.utils.FailureException;
+import com.winterwell.utils.IFn;
+import com.winterwell.utils.IReplace;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
-
-import winterwell.utils.containers.IntRange;
-
+import com.winterwell.utils.containers.IntRange;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.CSVReader;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.WeirdException;
+import com.winterwell.utils.log.Log.KErrorPolicy;
 import com.winterwell.utils.web.WebUtils;
 
 
@@ -36,7 +33,7 @@ import com.winterwell.utils.web.WebUtils;
  * @see WebUtils for XML-related String handling
  * @testedby {@link StrUtilsTest}
  */
-public class StrUtils extends winterwell.utils.StrUtils {
+public class StrUtils {
 
 
 	public static final String APOSTROPHES = "'`’‘’ʼ";

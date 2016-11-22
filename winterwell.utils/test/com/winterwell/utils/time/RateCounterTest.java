@@ -6,9 +6,7 @@ import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.time.RateCounter;
 
-import winterwell.utils.Utils;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
+import com.winterwell.utils.Utils;
 
 /**
  * This is slow!!

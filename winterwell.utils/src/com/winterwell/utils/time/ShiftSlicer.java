@@ -1,9 +1,5 @@
 package com.winterwell.utils.time;
 
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.Time;
-
 public class ShiftSlicer implements IShift {
 
 	IShift base;

@@ -9,10 +9,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import winterwell.utils.NoisyCallableTest;
-import winterwell.utils.TodoException;
-import winterwell.utils.Utils;
-import winterwell.utils.reporting.Log;
+import com.winterwell.utils.NoisyCallableTest;
+import com.winterwell.utils.TodoException;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
 
 /**
  * An executor which will report any exceptions via {@link Log}. You can also

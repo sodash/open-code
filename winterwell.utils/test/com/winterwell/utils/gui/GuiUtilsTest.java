@@ -1,13 +1,13 @@
-package winterwell.utils.gui;
+package com.winterwell.utils.gui;
 
 import java.awt.Color;
 
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.gui.GuiUtils;
+import com.winterwell.utils.web.WebUtils;
 
 import junit.framework.TestCase;
-import winterwell.utils.web.WebUtils;
 
 public class GuiUtilsTest extends TestCase {
 

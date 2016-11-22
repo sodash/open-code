@@ -1,7 +1,7 @@
 /**
  *
  */
-package winterwell.utils.containers;
+package com.winterwell.utils.containers;
 
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
@@ -13,13 +13,13 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import winterwell.utils.Key;
-import winterwell.utils.Utils;
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.Time;
+import com.winterwell.utils.Key;
+import com.winterwell.utils.Utils;
 
 import com.winterwell.datalog.Stat;
 import com.winterwell.utils.threads.SafeExecutor;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 /**
  * @author Joe Halliwell <joe@winterwell.com>

@@ -1,11 +1,11 @@
 /**
  * 
  */
-package winterwell.utils;
+package com.winterwell.utils;
 
 import java.util.Collection;
 
-import winterwell.utils.containers.Containers;
+import com.winterwell.utils.containers.Containers;
 
 /**
  * Like a Map, but with type-safe keys.

@@ -3,8 +3,8 @@ package com.winterwell.utils.threads;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import winterwell.utils.IFn;
-import winterwell.utils.Utils;
+import com.winterwell.utils.IFn;
+import com.winterwell.utils.Utils;
 
 /**
  * Identical to {@link Future}, just replaces the checked exception on get()

@@ -3,8 +3,8 @@ package com.winterwell.utils;
 import java.io.File;
 import java.io.IOException;
 
-import winterwell.utils.FailureException;
-import winterwell.utils.WrappedException;
+import com.winterwell.utils.FailureException;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.io.FileUtils;
 
 /**

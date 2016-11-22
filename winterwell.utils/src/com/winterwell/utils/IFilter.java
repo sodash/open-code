@@ -1,6 +1,6 @@
-package winterwell.utils;
+package com.winterwell.utils;
 
-import winterwell.utils.containers.Containers;
+import com.winterwell.utils.containers.Containers;
 
 /**
  * A filter, because they are useful and it saves having to define this kind of

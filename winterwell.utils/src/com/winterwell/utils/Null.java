@@ -1,4 +1,4 @@
-package winterwell.utils;
+package com.winterwell.utils;
 
 /**
  * Indicates a parameter or return value which can only be null.

@@ -1,8 +1,5 @@
 package com.winterwell.utils.time;
 
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
-
 import com.winterwell.utils.time.TimeUtils;
 
 import junit.framework.TestCase;

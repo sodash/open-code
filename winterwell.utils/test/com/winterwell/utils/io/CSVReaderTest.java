@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.utils.TimeOut;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.time.StopWatch;
 
 import junit.framework.TestCase;
-import winterwell.utils.StrUtils;
-import winterwell.utils.containers.Containers;
+import com.winterwell.utils.StrUtils;
 
 public class CSVReaderTest extends TestCase {
 

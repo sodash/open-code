@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair2;
-import winterwell.utils.reporting.Log;
+import com.winterwell.utils.log.Log;
 
 /**
  * A simple pure-Java Actor implementation. Maintains a queue of messages.

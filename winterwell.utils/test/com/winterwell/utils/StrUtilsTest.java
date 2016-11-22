@@ -12,12 +12,11 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
-import winterwell.utils.IReplace;
-import winterwell.utils.Mutable;
+import com.winterwell.utils.IReplace;
+import com.winterwell.utils.Mutable;
 
 import com.winterwell.utils.containers.Pair;
-
-import winterwell.utils.reporting.Log.KErrorPolicy;
+import com.winterwell.utils.log.Log.KErrorPolicy;
 
 public class StrUtilsTest extends TestCase {
 

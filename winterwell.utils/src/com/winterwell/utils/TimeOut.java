@@ -3,11 +3,10 @@ package com.winterwell.utils;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import winterwell.utils.TimeOutTest;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-
+import com.winterwell.utils.TimeOutTest;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.DoFast;
+import com.winterwell.utils.time.Dt;
 
 /**
  * An interrupter to interrupt the thread that starts this. This typically leads

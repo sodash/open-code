@@ -1,9 +1,5 @@
 package com.winterwell.utils.time;
 
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.Time;
-import winterwell.utils.time.TimeOfDay;
-
 public interface IShift {
 	
 	static final IShift ROUND_THE_CLOCK = new RoundTheClock();

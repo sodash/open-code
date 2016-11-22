@@ -15,8 +15,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 
 /**
  * A map backed by an array. Fast for small collections, lousy for big ones. Has

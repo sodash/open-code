@@ -1,4 +1,4 @@
-package winterwell.utils.web;
+package com.winterwell.utils.web;
 
 import java.io.StringWriter;
 import java.net.URI;

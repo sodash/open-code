@@ -4,11 +4,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import winterwell.utils.time.OfficeHours;
-import winterwell.utils.time.Period;
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.Time;
-
 import com.winterwell.utils.time.IShift;
 import com.winterwell.utils.time.ShiftSlicer;
 import com.winterwell.utils.time.TimeUtils;

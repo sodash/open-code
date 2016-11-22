@@ -14,10 +14,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import com.winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
-import winterwell.utils.io.FastByteArrayInputStream;
-import winterwell.utils.io.FastByteArrayOutputStream;
-import winterwell.utils.io.XStreamBinaryConverterTest;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.io.XStreamBinaryConverterTest;
 
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.core.util.Base64Encoder;

@@ -9,12 +9,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.Time;
-
 import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.Time;
 
 class DummyStat implements IStat {
 	static final String LOGTAG = Stat.LOGTAG;

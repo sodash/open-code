@@ -19,9 +19,9 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import sun.misc.SharedSecrets;
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
-import winterwell.utils.WrappedException;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
 
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;

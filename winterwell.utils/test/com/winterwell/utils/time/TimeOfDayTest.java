@@ -1,12 +1,9 @@
-package winterwell.utils.time;
+package com.winterwell.utils.time;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 
 import org.junit.Test;
-
-import winterwell.utils.time.Time;
-import winterwell.utils.time.TimeOfDay;
 
 import com.winterwell.utils.time.TimeUtils;
 

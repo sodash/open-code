@@ -7,13 +7,7 @@ import org.junit.Test;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.time.TimeUtils;
 
-import winterwell.utils.containers.AbstractIterator;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.OfficeHours;
-import winterwell.utils.time.OfficeHoursPeriod;
-import winterwell.utils.time.Period;
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.Time;
+import com.winterwell.utils.containers.AbstractIterator;
 
 public class OfficeHoursPeriodTest {
 	

@@ -7,18 +7,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import winterwell.utils.FailureException;
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
-import winterwell.utils.containers.Containers;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.Time;
-
+import com.winterwell.utils.FailureException;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Warning;
+import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 /**
  * Vital Statistics: A data-logging & charting service for arbitrary realtime

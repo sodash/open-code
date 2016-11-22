@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import com.winterwell.utils.Printer;
 
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 
 
 public class FileUtilsTest extends TestCase {

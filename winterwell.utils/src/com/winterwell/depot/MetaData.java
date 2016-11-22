@@ -3,9 +3,9 @@ package com.winterwell.depot;
 import java.io.File;
 import java.io.StringWriter;
 
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.Time;
-import winterwell.utils.web.XStreamUtils;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.XStreamUtils;
 
 /**
  * This is always about the local copy. It's essentially file metadata

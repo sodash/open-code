@@ -1,10 +1,9 @@
 package com.winterwell.datalog;
 
-import winterwell.utils.io.DBUtils.DBOptions;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
-
 import com.winterwell.utils.io.Option;
+import com.winterwell.utils.io.DBUtils.DBOptions;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
 
 /**
  * This might include DB connection options -- but it does not have to, provided those are set

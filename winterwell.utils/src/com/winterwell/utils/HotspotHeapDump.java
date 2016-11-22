@@ -1,7 +1,7 @@
 ///**
 // *
 // */
-//package winterwell.utils;
+//package com.winterwell.utils;
 //
 //import java.lang.management.ManagementFactory;
 //

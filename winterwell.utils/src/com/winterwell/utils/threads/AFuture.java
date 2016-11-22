@@ -9,13 +9,12 @@ import java.util.concurrent.TimeoutException;
 
 import com.winterwell.utils.TimeOut;
 
-import winterwell.utils.IFn;
-import winterwell.utils.Utils;
+import com.winterwell.utils.IFn;
+import com.winterwell.utils.Utils;
 
 import com.winterwell.utils.containers.Pair2;
-
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
 
 /**
  * Helper class for implementing IFuture / {@link Future}

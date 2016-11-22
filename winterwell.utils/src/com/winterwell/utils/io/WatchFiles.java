@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import winterwell.utils.reporting.Log;
+import com.winterwell.utils.log.Log;
 
 
 public class WatchFiles implements Runnable {

@@ -1,8 +1,8 @@
-package winterwell.utils.containers;
+package com.winterwell.utils.containers;
 
 import org.junit.Test;
 
-import winterwell.utils.web.XStreamUtils;
+import com.winterwell.utils.web.XStreamUtils;
 
 public class PropertiesTest {
 

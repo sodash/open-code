@@ -1,7 +1,8 @@
-package winterwell.utils.containers;
+package com.winterwell.utils.containers;
+
+import com.winterwell.utils.containers.Tree.DepthFirst;
 
 import junit.framework.TestCase;
-import winterwell.utils.containers.Tree.DepthFirst;
 
 public class TreeTest extends TestCase {
 

@@ -34,17 +34,17 @@ import javax.swing.WindowConstants;
 
 import com.winterwell.utils.MathUtils;
 
-import winterwell.utils.IFilter;
-import winterwell.utils.Mutable;
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
-import winterwell.utils.WrappedException;
+import com.winterwell.utils.IFilter;
+import com.winterwell.utils.Mutable;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
 
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.WebUtils;
 
-import winterwell.utils.gui.GuiUtilsTest;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.web.WebUtils;
+import com.winterwell.utils.gui.GuiUtilsTest;
 
 class BlockingImageObserver implements ImageObserver {
 

@@ -16,7 +16,7 @@ import java.util.Map.Entry;
  * @param <K>
  * @param <V>
  */
-public class MapEntry<K, V> implements Entry<K, V> {
+public final class MapEntry<K, V> implements Entry<K, V> {
 
 	@Override
 	public int hashCode() {

@@ -1,16 +1,9 @@
-package winterwell.utils.time;
+package com.winterwell.utils.time;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 
 import org.junit.Test;
-
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.OfficeHours;
-import winterwell.utils.time.OfficeHoursPeriod;
-import winterwell.utils.time.SimpleOfficeHours;
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.Time;
 
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;

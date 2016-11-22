@@ -2,7 +2,7 @@ package com.winterwell.utils.threads;
 
 import org.junit.Test;
 
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 
 public class ActorTest {
 

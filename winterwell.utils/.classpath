@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="test.utils"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" output="bin.test.local" path="test.local"/>
-	<classpathentry kind="src" output="bin.test.dodgy" path="test.dodgy"/>
 	<classpathentry kind="src" output="bin.test" path="test"/>
 	<classpathentry kind="src" output="bin.perf" path="perf"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
