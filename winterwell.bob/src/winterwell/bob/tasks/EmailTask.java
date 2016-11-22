@@ -5,9 +5,10 @@ import java.util.Date;
 import javax.mail.PasswordAuthentication;
 
 import winterwell.bob.BuildTask;
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.web.LoginDetails;
+import com.winterwell.web.LoginDetails;
+
 import winterwell.web.email.SMTPClient;
 import winterwell.web.email.SimpleMessage;
 

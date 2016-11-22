@@ -14,9 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import winterwell.bob.BuildTask;
-import winterwell.utils.reporting.Log;
-import winterwell.web.LoginDetails;
-
+import com.winterwell.utils.log.Log;
+import com.winterwell.web.LoginDetails;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;

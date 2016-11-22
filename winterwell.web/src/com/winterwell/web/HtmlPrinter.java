@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import winterwell.utils.containers.Containers;
-import winterwell.utils.web.IHasHtml;
+import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.web.IHasHtml;
 
 import com.winterwell.utils.Printer;
 

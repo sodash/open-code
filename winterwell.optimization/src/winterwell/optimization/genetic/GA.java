@@ -16,16 +16,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import winterwell.optimization.IEvaluate;
 import winterwell.optimization.IOptimize;
-import winterwell.utils.Utils;
-import winterwell.utils.WrappedException;
-import winterwell.utils.containers.ArraySet;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.StopWatch;
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.TimeUtils;
-import winterwell.utils.web.XStreamUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.StopWatch;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.TimeUtils;
+import com.winterwell.utils.web.XStreamUtils;
 
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.threads.ATask;

@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import winterwell.utils.Utils;
-import winterwell.utils.containers.Containers;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Containers;
 
 import com.winterwell.depot.Desc;
 import com.winterwell.utils.ReflectionUtils;

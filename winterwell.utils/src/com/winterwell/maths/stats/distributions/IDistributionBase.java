@@ -17,8 +17,8 @@ import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
  *            <p>
  *            <b>Copyright & license</b>: (c) Winterwell Associates Ltd, all
  *            rights reserved. This class is NOT formally a part of the
- *            winterwell.utils library. In particular, licenses for the
- *            winterwell.utils library do not apply to this file.
+ *            com.winterwell.utils library. In particular, licenses for the
+ *            com.winterwell.utils library do not apply to this file.
  *            </p>
  */
 public interface IDistributionBase<X> {

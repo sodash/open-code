@@ -15,28 +15,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import winterwell.utils.IBuildStrings;
-import winterwell.utils.IProperties;
-import winterwell.utils.Key;
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
-import winterwell.utils.containers.Containers;
+import com.winterwell.utils.IBuildStrings;
+import com.winterwell.utils.IProperties;
+import com.winterwell.utils.Key;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.StopWatch;
-import winterwell.utils.web.WebUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.StopWatch;
+import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
-import winterwell.web.WebInputException;
-import winterwell.web.app.WebRequestTest;
-import winterwell.web.fields.AField;
-import winterwell.web.fields.Checkbox;
-import winterwell.web.fields.FileUploadField;
-import winterwell.web.fields.MissingFieldException;
-import winterwell.web.fields.SField;
+
+import com.winterwell.web.fields.AField;
+import com.winterwell.web.fields.Checkbox;
+import com.winterwell.web.fields.FileUploadField;
+import com.winterwell.web.fields.MissingFieldException;
+import com.winterwell.web.fields.SField;
 
 import com.thoughtworks.xstream.core.util.Fields;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.Printer;
+import com.winterwell.web.WebInputException;
 import com.winterwell.web.ajax.AjaxMsg;
 
 /**
@@ -281,7 +281,7 @@ public class WebRequest implements IProperties, Closeable {
 	/**
 	 * @return The last WebRequest in the current thread. Which might be an old closed one. Or null.
 	 */
-	public static Object getCurrent() { // TODO type -- but the com/no-com versions of this class are an issue
+	public static WebRequest getCurrent() {
 		return Environment.get().get(KEY_REQUEST_STATE);
 	}
 
@@ -343,8 +343,9 @@ public class WebRequest implements IProperties, Closeable {
 	}
 
 	/**
-	 * @see winterwell.utils.IProperties#containsKey(winterwell.utils.Key) This
-	 *      checks both the local properties bag and the http request parameters
+	 * @see com.winterwell.utils.IProperties#containsKey(winterwell.utils.Key) This
+	 *      checks both the local properties bag and the http request parameters.
+	 *      It will return true for explicit null parameters -- eg the query foo=&bar=1 would contain both the foo and bar keys. 
 	 */
 	@Override
 	public final <T> boolean containsKey(Key<T> key) {
@@ -435,7 +436,7 @@ public class WebRequest implements IProperties, Closeable {
 	 * 
 	 * @param key
 	 *            This should usually be an AField!
-	 * @see winterwell.utils.IProperties#get(winterwell.utils.Key)
+	 * @see com.winterwell.utils.IProperties#get(winterwell.utils.Key)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -541,7 +542,7 @@ public class WebRequest implements IProperties, Closeable {
 	 * Retrieve the keyset associated with the property bag. This
 	 * <b>excludes</b> request fields ('cos we don't know how to convert them).
 	 * 
-	 * @see winterwell.utils.IProperties#getKeys()
+	 * @see com.winterwell.utils.IProperties#getKeys()
 	 * @see HttpServletRequest#getParameterNames()
 	 * @see HttpServletRequest#getParameterMap()
 	 * @Deprecated dangerous - provided for interface compatibility only
@@ -971,12 +972,14 @@ public class WebRequest implements IProperties, Closeable {
 		return new BrowserType(ua);
 	}
 
+	String body;
+	
 	/**
 	 * 
 	 * @return
 	 */
 	public String getPostBody() {
-		String body = null;
+		if (body!=null) return body;
 		try {
 			body = FileUtils.read(request.getInputStream());
 			if (body!=null && ! body.isEmpty()) return body;

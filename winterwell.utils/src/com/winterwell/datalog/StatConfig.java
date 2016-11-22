@@ -12,8 +12,8 @@ import com.winterwell.utils.time.TUnit;
  * @author daniel
  *         <p>
  *         <b>Copyright & license</b>: (c) Winterwell Associates Ltd, all rights
- *         reserved. This class is NOT formally a part of the winterwell.utils
- *         library. In particular, licenses for the winterwell.utils library do
+ *         reserved. This class is NOT formally a part of the com.winterwell.utils
+ *         library. In particular, licenses for the com.winterwell.utils library do
  *         not apply to this file.
  */
 public class StatConfig extends DBOptions {

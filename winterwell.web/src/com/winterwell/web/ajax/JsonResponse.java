@@ -10,13 +10,13 @@ import java.util.Map;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.web.ajax.AjaxMsg.KNoteType;
-
-import winterwell.utils.IProperties;
-import winterwell.utils.Key;
-import winterwell.utils.containers.Containers;
+import com.winterwell.web.app.WebRequest;
+import com.winterwell.utils.IProperties;
+import com.winterwell.utils.Key;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.web.WebUtils2;
-import winterwell.web.app.WebRequest;
-import winterwell.web.fields.SafeString;
+
+import com.winterwell.web.fields.SafeString;
 
 /**
  * Use with

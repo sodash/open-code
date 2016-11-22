@@ -8,11 +8,11 @@ import java.util.regex.Pattern;
 
 import winterwell.maths.timeseries.Datum;
 import winterwell.maths.timeseries.ListDataStream;
-import winterwell.utils.Utils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.Time;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 import com.winterwell.datalog.Stat.KInterpolate;
 import com.winterwell.depot.Desc;

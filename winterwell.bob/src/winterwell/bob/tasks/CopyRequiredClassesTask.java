@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
 import com.winterwell.utils.Printer;
 
 import winterwell.bob.BuildTask;
-import winterwell.utils.IFilter;
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
-import winterwell.utils.containers.Tree;
+import com.winterwell.utils.IFilter;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Tree;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.utils.reporting.Log;
+import com.winterwell.utils.log.Log;
 
 /**
  * Copy in the Winterwell java files needed by a project.

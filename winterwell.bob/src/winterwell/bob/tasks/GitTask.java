@@ -6,13 +6,13 @@ import java.util.Map;
 import com.winterwell.utils.Proc;
 import com.winterwell.utils.ShellScript;
 
-import winterwell.utils.FailureException;
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
+import com.winterwell.utils.FailureException;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 
 import com.winterwell.utils.containers.ArrayMap;
 
-import winterwell.utils.time.Time;
+import com.winterwell.utils.time.Time;
 
 /**
  * This is just a wrapper for calling git via the command line. You must have

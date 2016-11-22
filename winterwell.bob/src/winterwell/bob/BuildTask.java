@@ -12,10 +12,10 @@ import org.junit.Test;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.TimeOut;
 
-import winterwell.utils.Utils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TimeUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TimeUtils;
 
 /**
  * A task forming part or all of a build process. Subclass this to create build

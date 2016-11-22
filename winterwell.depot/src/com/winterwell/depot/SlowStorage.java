@@ -8,10 +8,10 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
-import winterwell.utils.time.TimeUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.TimeUtils;
 
 import com.winterwell.datalog.Stat;
 import com.winterwell.utils.ReflectionUtils;

@@ -30,8 +30,8 @@ public class OfficeHoursTest {
 	
 	@Test
 	public void testBug36973() {
-//		at winterwell.utils.time.OfficeHours.nextOn(OfficeHours.java:96)
-//        at winterwell.utils.time.OfficeHoursPeriod$OHIt.next2(OfficeHoursPeriod.java:53)
+//		at com.winterwell.utils.time.OfficeHours.nextOn(OfficeHours.java:96)
+//        at com.winterwell.utils.time.OfficeHoursPeriod$OHIt.next2(OfficeHoursPeriod.java:53)
         
 //		6 Apr 2016 08:00:00 GMT v 6 Apr 2016 23:56:46 GMT w SimpleOfficeHours[mon,tue,wed,thu,fri 9:00-17:00] from 
 //		spec:mon,tue,wed,thu,fri 9:00-17:00 

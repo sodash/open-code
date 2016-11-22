@@ -3,7 +3,7 @@ package winterwell.optimization.genetic;
 import java.util.Random;
 
 import winterwell.maths.stats.distributions.discrete.IDiscreteDistribution;
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 
 /**
  * Simple GA operator created by wrapping a discrete distribution.

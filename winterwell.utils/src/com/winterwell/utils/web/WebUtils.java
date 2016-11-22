@@ -916,7 +916,7 @@ public class WebUtils {
 
 	public static void main(String[] args) {
 		if (args == null || args.length == 0) {
-			Printer.out("Usage: java -jar winterwell.utils.jar COMMAND PARAMS");
+			Printer.out("Usage: java -jar com.winterwell.utils.jar COMMAND PARAMS");
 			Printer.out("Where COMMAND = render, PARAMS = html-input-file pdf-output-file ");
 			System.exit(0);
 		}

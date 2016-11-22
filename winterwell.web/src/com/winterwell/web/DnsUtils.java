@@ -15,7 +15,7 @@ import org.xbill.DNS.Type;
 import org.xbill.DNS.ZoneTransferException;
 import org.xbill.DNS.ZoneTransferIn;
 
-import winterwell.utils.reporting.Log;
+import com.winterwell.utils.log.Log;
 
 /**
  * DNS utilities. Basically wrappers around the antique JavaDNS library.

@@ -396,7 +396,7 @@ public class ReflectionUtils {
 	/**
 	 * Output manifest info on jar files.
 	 * E.g.
-	 * java -cp winterwell-utils.jar winterwell.utils.ReflectionUtils MyJarFile.jar
+	 * java -cp winterwell-utils.jar com.winterwell.utils.ReflectionUtils MyJarFile.jar
 	 * 
 	 * @param args
 	 *            jar filenames

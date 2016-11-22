@@ -13,10 +13,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import winterwell.utils.Utils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.reporting.Log.KErrorPolicy;
-import winterwell.utils.web.XStreamUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.reporting.Log.KErrorPolicy;
+import com.winterwell.utils.web.XStreamUtils;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;

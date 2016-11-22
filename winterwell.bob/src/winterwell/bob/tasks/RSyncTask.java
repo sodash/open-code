@@ -6,7 +6,7 @@ package winterwell.bob.tasks;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 
 /**
  * RSync a local directory to a remote directory or vice versa

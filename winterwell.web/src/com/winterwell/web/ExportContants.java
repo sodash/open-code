@@ -11,11 +11,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.web.WebUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.WebUtils;
 
 import com.winterwell.utils.Printer;
 

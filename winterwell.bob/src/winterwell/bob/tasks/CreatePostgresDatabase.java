@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import winterwell.bob.BuildTask;
-import winterwell.utils.reporting.Log;
+import com.winterwell.utils.log.Log;
 
 /**
  * Create a PS database.

@@ -5,8 +5,8 @@ package com.winterwell.web;
 
 import java.io.IOException;
 
-import winterwell.utils.IBuildStrings;
-import winterwell.utils.containers.ArraySet;
+import com.winterwell.utils.IBuildStrings;
+import com.winterwell.utils.containers.ArraySet;
 
 /**
  * Helper class for putting together html pages.

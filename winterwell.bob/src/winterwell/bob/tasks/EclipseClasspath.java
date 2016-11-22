@@ -11,14 +11,14 @@ import java.util.logging.Level;
 
 import org.w3c.dom.Node;
 
-import winterwell.utils.StrUtils;
-import winterwell.utils.TodoException;
-import winterwell.utils.Utils;
-import winterwell.utils.WrappedException;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.TodoException;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.reporting.Log.KErrorPolicy;
-import winterwell.utils.web.WebUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.reporting.Log.KErrorPolicy;
+import com.winterwell.utils.web.WebUtils;
 
 /**
  * HACK Interrogate an Eclipse .classpath file (which is where

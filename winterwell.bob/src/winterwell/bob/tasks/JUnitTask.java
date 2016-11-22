@@ -18,7 +18,7 @@ import junit.framework.TestListener;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import winterwell.bob.BuildTask;
-import winterwell.utils.FailureException;
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.io.FileUtils;
 
 /**

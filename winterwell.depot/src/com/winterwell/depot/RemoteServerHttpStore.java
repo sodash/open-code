@@ -4,10 +4,10 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
-import winterwell.utils.TodoException;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.containers.ArrayMap;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.web.XStreamUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.XStreamUtils;
 import com.winterwell.web.FakeBrowser;
 
 /**

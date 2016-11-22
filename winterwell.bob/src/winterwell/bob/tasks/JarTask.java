@@ -16,11 +16,11 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import winterwell.bob.BuildTask;
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Time;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Time;
 
 /**
  * Create a jar file. Can also create .zip files since these are the same thing.

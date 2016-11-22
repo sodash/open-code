@@ -3,7 +3,7 @@ package com.winterwell.depot.merge;
 import java.util.ArrayList;
 import java.util.List;
 
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 
 /**
  * Diff and merge for lists.

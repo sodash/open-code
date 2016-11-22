@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import winterwell.utils.containers.ListMap;
-import winterwell.utils.reporting.Log;
+import com.winterwell.utils.containers.ListMap;
+import com.winterwell.utils.log.Log;
 
 /**
  * Use weak-references to manage the desc-artifact linking.

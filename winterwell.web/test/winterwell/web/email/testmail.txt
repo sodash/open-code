@@ -1,0 +1,80 @@
+From fork.mcguffin@googlemail.com  Thu May 28 12:47:20 2009
+Return-path: <fork.mcguffin@googlemail.com>
+Envelope-to: miles@assyrian.org.uk
+Delivery-date: Thu, 28 May 2009 12:47:20 +0100
+Received: from haggis.mythic-beasts.com ([93.93.131.52])
+	by sphinx.mythic-beasts.com with esmtp (Exim 4.62)
+	(envelope-from <fork.mcguffin@googlemail.com>)
+	id 1M9e4p-000667-D3
+	for miles@assyrian.org.uk; Thu, 28 May 2009 12:47:15 +0100
+Received: from sphinx-newrange.mythic-beasts.com ([93.93.130.49] helo=sphinx.mythic-beasts.com)
+	by haggis.mythic-beasts.com with esmtps (TLS-1.0:DHE_RSA_3DES_EDE_CBC_SHA1:24)
+	(Exim 4.63)
+	(envelope-from <fork.mcguffin@googlemail.com>)
+	id 1M9e4p-0005YL-1X
+	for miles@assyrian.org.uk; Thu, 28 May 2009 12:47:15 +0100
+Received: from mail-ew0-f173.google.com ([209.85.219.173])
+	by sphinx.mythic-beasts.com with esmtp (Exim 4.62)
+	(envelope-from <fork.mcguffin@googlemail.com>)
+	id 1M9e4g-0005zy-S6
+	for miles@assyrian.org.uk; Thu, 28 May 2009 12:47:12 +0100
+Received: by ewy21 with SMTP id 21so5331183ewy.41
+        for <miles@assyrian.org.uk>; Thu, 28 May 2009 04:47:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=gamma;
+        h=domainkey-signature:received:received:message-id:date:from
+         :user-agent:mime-version:to:subject:content-type;
+        bh=9zYjShopX//TtyH+sIIQpVIQUm5k3l0zdnpePR9s4+4=;
+        b=VkuyfAsJHUmr2ao4+Vucyxl8MphCsXi9Ix+yRE484bpimvQNbUSXmfuOgJ1ajtCp1H
+         WeNCgLXWuFUycHD59/82wulAYDTJn9pzJJKwAMR1d4ECVX2l+mzwFUYIY3U8cpXzkLOA
+         GdPp4i5Y7qAs993OCR0ltkfUrmJwhpOQ52MhY=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=googlemail.com; s=gamma;
+        h=message-id:date:from:user-agent:mime-version:to:subject
+         :content-type;
+        b=wBRG9LdIsdXlZTP49kKcoO5rFN566WhoAR2+W3wsUv9NdX38m4LGdPEo+xH4gS9OF6
+         nngBefZg2MwXa6tFOBaXI+D5RgtLt6Ym/xBSAf7ob3ML0Cl9wO+YZ8wCGHavFYDud0G/
+         xpUo5XZy7+PVVjHABK3Gxma7Qu5O8HVbR9HI0=
+Received: by 10.210.35.17 with SMTP id i17mr896402ebi.58.1243511220681;
+        Thu, 28 May 2009 04:47:00 -0700 (PDT)
+Received: from ?129.215.226.50? (epis3.ace.ed.ac.uk [129.215.226.50])
+        by mx.google.com with ESMTPS id 5sm17641084ewy.52.2009.05.28.04.47.00
+        (version=TLSv1/SSLv3 cipher=RC4-MD5);
+        Thu, 28 May 2009 04:47:00 -0700 (PDT)
+Message-ID: <4A1E7A1F.8090500@googlemail.com>
+Date: Thu, 28 May 2009 12:48:47 +0100
+From: Fork McGuffin <fork.mcguffin@googlemail.com>
+User-Agent: Thunderbird 2.0.0.21 (X11/20090318)
+MIME-Version: 1.0
+To: miles@assyrian.org.uk
+Subject: This is a test
+Content-Type: multipart/alternative;
+ boundary="------------050201080809010408070108"
+X-Mythic-Sender-Verify: + host 216.239.59.27 accepted RCPT TO with '250 2.1.5 OK j8si2080245gvb.11'
+X-Spam-Status: No, score=0.0
+X-BlackCat-Spam-Score: 0
+Received-SPF: pass (sphinx.mythic-beasts.com: domain of fork.mcguffin@googlemail.com designates 209.85.219.173 as permitted sender) client-ip=209.85.219.173 envelope-from=fork.mcguffin@googlemail.com helo=mail-ew0-f173.google.com
+X-Redirect: miles@assyrian.org.uk to mrg@mythic-beasts.com
+
+This is a multi-part message in MIME format.
+--------------050201080809010408070108
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+*Do not be alarmed.*
+
+--------------050201080809010408070108
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<b>Do not be alarmed.</b><br>
+</body>
+</html>
+
+--------------050201080809010408070108--
+

@@ -14,7 +14,7 @@ import java.util.Map;
 import winterwell.bob.Bob;
 import winterwell.bob.BuildTask;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.utils.reporting.Log;
+import com.winterwell.utils.log.Log;
 
 /**
  * Copy files from one directory to another.

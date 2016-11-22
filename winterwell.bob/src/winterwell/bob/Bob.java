@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-import winterwell.utils.StrUtils;
-import winterwell.utils.Utils;
-import winterwell.utils.io.ArgsParser;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.utils.reporting.Log;
+import com.winterwell.utils.log.Log;
 
 /**
  * Bob the Builder, a Java based build utility.

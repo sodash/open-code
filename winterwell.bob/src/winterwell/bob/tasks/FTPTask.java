@@ -15,9 +15,9 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
 import winterwell.bob.BuildTask;
-import winterwell.utils.TodoException;
-import winterwell.utils.reporting.Log;
-import winterwell.web.LoginDetails;
+import com.winterwell.utils.TodoException;
+import com.winterwell.utils.log.Log;
+import com.winterwell.web.LoginDetails;
 
 /**
  * @author daniel

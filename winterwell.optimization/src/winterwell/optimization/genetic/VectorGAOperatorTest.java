@@ -18,7 +18,7 @@ import winterwell.maths.chart.HighchartsRenderer;
 import winterwell.maths.stats.distributions.GridDistribution2D;
 import winterwell.maths.timeseries.DataUtils;
 import winterwell.optimization.AEvaluate;
-import winterwell.utils.gui.GuiUtils;
+import com.winterwell.utils.gui.GuiUtils;
 
 /**
  * 

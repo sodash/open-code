@@ -8,10 +8,10 @@ import java.util.logging.Level;
 
 import winterwell.bob.tasks.RemoteTask;
 import winterwell.bob.tasks.SCPTask;
-import winterwell.utils.IFn;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
+import com.winterwell.utils.IFn;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
 
 import com.winterwell.utils.io.FileUtils;
 

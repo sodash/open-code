@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test.dodgy"/>
-	<classpathentry kind="src" path="test.utils"/>
 	<classpathentry kind="src" output="bin.test" path="test"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-fileupload-1.2.1.jar" sourcepath="/middleware/jakarta/commons-fileupload-1.2.1-sources.jar"/>

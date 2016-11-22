@@ -57,8 +57,8 @@ import com.winterwell.utils.web.XStreamUtils;
  *           <p>
  *           <b>Copyright & license</b>: (c) Winterwell Associates Ltd, all
  *           rights reserved. This class is NOT formally a part of the
- *           winterwell.utils library. In particular, licenses for the
- *           winterwell.utils library do not apply to this file.
+ *           com.winterwell.utils library. In particular, licenses for the
+ *           com.winterwell.utils library do not apply to this file.
  */
 public final class Desc<X> implements IProperties, Serializable, Comparable<Desc> {
 

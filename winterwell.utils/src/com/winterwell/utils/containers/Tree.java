@@ -155,7 +155,7 @@ public class Tree<X> implements Iterable<X>, ITree<X> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see winterwell.utils.containers.ITree#getOnlyChild()
+	 * @see com.winterwell.utils.containers.ITree#getOnlyChild()
 	 */
 	@Override
 	public ITree<X> getOnlyChild() {
@@ -176,7 +176,7 @@ public class Tree<X> implements Iterable<X>, ITree<X> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see winterwell.utils.containers.ITree#isLeaf()
+	 * @see com.winterwell.utils.containers.ITree#isLeaf()
 	 */
 	@Override
 	public boolean isLeaf() {
@@ -211,7 +211,7 @@ public class Tree<X> implements Iterable<X>, ITree<X> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see winterwell.utils.containers.ITree#setValue(X)
+	 * @see com.winterwell.utils.containers.ITree#setValue(X)
 	 */
 	@Override
 	public void setValue(X value) {

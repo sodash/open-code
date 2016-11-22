@@ -16,12 +16,12 @@ import javax.tools.ToolProvider;
 
 import winterwell.bob.Bob;
 import winterwell.bob.BuildTask;
-import winterwell.utils.FailureException;
+import com.winterwell.utils.FailureException;
 
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Proc;
-import winterwell.utils.Utils;
-import winterwell.utils.WrappedException;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.io.FileUtils;
 
 /**

@@ -14,12 +14,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
-import winterwell.utils.Utils;
-import winterwell.utils.WrappedException;
-import winterwell.utils.gui.GuiUtils;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.reporting.Log.KErrorPolicy;
-import winterwell.utils.time.StopWatch;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.gui.GuiUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.reporting.Log.KErrorPolicy;
+import com.winterwell.utils.time.StopWatch;
 
 import com.thoughtworks.xstream.XStreamException;
 import com.winterwell.datalog.Stat;

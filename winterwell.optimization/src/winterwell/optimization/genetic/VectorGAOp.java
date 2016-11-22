@@ -9,7 +9,7 @@ import winterwell.maths.stats.distributions.ExponentialBall;
 import winterwell.maths.stats.distributions.IDistribution;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import winterwell.maths.stats.distributions.discrete.RandomChoice;
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 
 /**
  * Generate, mutate and crossover for real-valued vectors.

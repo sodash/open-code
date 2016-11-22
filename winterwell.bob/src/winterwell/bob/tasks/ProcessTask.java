@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import winterwell.bob.BuildTask;
-import winterwell.utils.FailureException;
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Proc;
-import winterwell.utils.reporting.Log;
-import winterwell.utils.time.Dt;
-import winterwell.utils.time.TUnit;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
 
 /**
  * Run external processes. Warning: This is not the same as a shell command!

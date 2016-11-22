@@ -1,0 +1,40 @@
+Return-Path: <fork.mcguffin@googlemail.com>
+X-Original-To: spoon@localhost
+Delivered-To: spoon@localhost
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by verne (Postfix) with ESMTP id 6278B13C7F7
+	for <spoon@localhost>; Tue, 26 May 2009 14:15:44 +0100 (BST)
+Message-ID: <4A1BEB80.7070709@googlemail.com>
+Date: Tue, 26 May 2009 14:15:44 +0100
+From: Fork McGuffin <fork.mcguffin@googlemail.com>
+User-Agent: Thunderbird 2.0.0.21 (X11/20090318)
+MIME-Version: 1.0
+To: spoon@localhost
+Subject: Test email with attachment
+Content-Type: multipart/mixed;
+ boundary="------------060809050408010704030608"
+
+This is a multi-part message in MIME format.
+--------------060809050408010704030608
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Dear Spoon,
+
+Please find attached a short homily on the Second Noble Truth.
+
+Love,
+Fork.
+
+--------------060809050408010704030608
+Content-Type: text/plain;
+ name="attachment"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="attachment"
+
+This is an attachment.
+
+The Buddha would probably not approve.
+
+--------------060809050408010704030608--

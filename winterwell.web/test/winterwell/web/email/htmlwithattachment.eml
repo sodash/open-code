@@ -1,0 +1,43 @@
+Return-Path: <spoon@winterwellassociates.com>
+X-Original-To: spoon@localhost
+Delivered-To: spoon@localhost
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by verne (Postfix) with ESMTP id 8925C13C929
+	for <spoon@localhost>; Mon,  1 Jun 2009 18:16:43 +0100 (BST)
+Message-ID: <4A240CFB.8090101@winterwellassociates.com>
+Date: Mon, 01 Jun 2009 18:16:43 +0100
+From: Spoon McGuffin <spoon@winterwellassociates.com>
+User-Agent: Thunderbird 2.0.0.21 (X11/20090318)
+MIME-Version: 1.0
+To: spoon@localhost
+Subject: HTML email with plain text attachment
+Content-Type: multipart/mixed;
+ boundary="------------010405070502070407000407"
+
+This is a multi-part message in MIME format.
+--------------010405070502070407000407
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<b>This is a test.<br>
+</b>
+</body>
+</html>
+
+--------------010405070502070407000407
+Content-Type: text/plain;
+ name="attachment"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="attachment"
+
+This is an attachment.
+
+The Buddha would probably not approve.
+
+--------------010405070502070407000407--

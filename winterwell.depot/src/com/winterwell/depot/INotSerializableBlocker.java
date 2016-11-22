@@ -1,6 +1,6 @@
 package com.winterwell.depot;
 
-import winterwell.utils.web.XStreamUtils;
+import com.winterwell.utils.web.XStreamUtils;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;

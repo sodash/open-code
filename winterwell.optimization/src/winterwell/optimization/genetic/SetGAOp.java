@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
-import winterwell.utils.Utils;
+import com.winterwell.utils.Utils;
 
 /**
  * Generate, mutate and crossover for selection-from-a-fixed-set.

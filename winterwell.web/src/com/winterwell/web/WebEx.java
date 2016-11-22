@@ -1,7 +1,7 @@
 package com.winterwell.web;
 
-import winterwell.utils.StrUtils;
-import creole.data.XId;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.web.data.XId;
 
 public class WebEx extends RuntimeException {
 	private static final long serialVersionUID = 1L;

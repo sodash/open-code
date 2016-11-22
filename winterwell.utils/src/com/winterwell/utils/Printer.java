@@ -413,7 +413,7 @@ public class Printer {
 
 	/**
 	 * To get a nice str() function:<br>
-	 * <code>import static winterwell.utils.Printer.str;</code> 
+	 * <code>import static com.winterwell.utils.Printer.str;</code> 
 	 * 
 	 * <p>
 	 * Equivalent to {@link #toString()}, but with a Python/javascript style of name.

@@ -2,7 +2,7 @@ package com.winterwell.depot.merge;
 
 import java.util.List;
 
-import winterwell.utils.containers.Containers;
+import com.winterwell.utils.containers.Containers;
 
 /**
  * Diff and merge for arrays. Just wraps {@link ListMerger}
