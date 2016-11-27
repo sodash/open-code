@@ -1293,6 +1293,7 @@ public final class Gson {
 	private static final Gson SAFE_GSON = new GsonBuilder()
 				.setLenientReader(true)
 				.serializeSpecialFloatingPointValues()
+				.setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 				.setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL)
 				.create();
 	
