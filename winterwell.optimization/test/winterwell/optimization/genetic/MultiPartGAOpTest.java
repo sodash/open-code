@@ -2,6 +2,9 @@ package winterwell.optimization.genetic;
 
 import java.util.List;
 
+import com.winterwell.optimization.genetic.MultiPartGAOp;
+import com.winterwell.optimization.genetic.VectorGAOp;
+
 import junit.framework.TestCase;
 
 public class MultiPartGAOpTest extends TestCase {

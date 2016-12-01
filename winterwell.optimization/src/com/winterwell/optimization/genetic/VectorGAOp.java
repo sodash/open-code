@@ -1,15 +1,15 @@
-package winterwell.optimization.genetic;
+package com.winterwell.optimization.genetic;
 
 import java.util.Random;
 
 import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.VectorEntry;
-import winterwell.maths.stats.distributions.BiDiExponentialDistribution1D;
-import winterwell.maths.stats.distributions.ExponentialBall;
-import winterwell.maths.stats.distributions.IDistribution;
+import com.winterwell.maths.stats.distributions.BiDiExponentialDistribution1D;
+import com.winterwell.maths.stats.distributions.ExponentialBall;
+import com.winterwell.maths.stats.distributions.IDistribution;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
-import winterwell.maths.stats.distributions.discrete.RandomChoice;
-import winterwell.utils.Utils;
+import com.winterwell.maths.stats.distributions.discrete.RandomChoice;
+import com.winterwell.utils.Utils;
 
 /**
  * Generate, mutate and crossover for real-valued vectors.

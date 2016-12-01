@@ -18,11 +18,17 @@ import com.winterwell.utils.time.Time;
  *
  */
 public class BuildWinterwellProject extends BuildTask {
+	private String mainClass;
+
 	/**
 	 * @return the jar file (after building!)
 	 */
 	public File getJar() {
 		return jarFile;
+	}
+	
+	public void setMainClass(String mainClass) {
+		this.mainClass = mainClass;
 	}
 	
 	protected boolean incGitInManifest;
@@ -57,6 +63,9 @@ public class BuildWinterwellProject extends BuildTask {
 		jar.setAppend(false);
 		jar.setManifestProperty(JarTask.MANIFEST_TITLE, 
 				projectDir.getName()+" library (c) Winterwell. All rights reserved.");
+		if (mainClass!=null) {
+			jar.setManifestProperty(JarTask.MANIFEST_MAIN_CLASS, mainClass);
+		}
 		// Version = date Is this good or bogus?
 		Time vt = new Time();
 		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, vt.ddMMyyyy());

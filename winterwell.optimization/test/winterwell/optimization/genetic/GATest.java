@@ -13,12 +13,14 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import winterwell.optimization.AEvaluate;
-import winterwell.optimization.IEvaluate;
-import winterwell.optimization.genetic.GA.Generation;
-import winterwell.utils.Utils;
+import com.winterwell.optimization.AEvaluate;
+import com.winterwell.optimization.IEvaluate;
+import com.winterwell.optimization.genetic.GA;
+import com.winterwell.optimization.genetic.IBreeder;
+import com.winterwell.optimization.genetic.GA.Generation;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
-import winterwell.utils.web.XStreamUtils;
+import com.winterwell.utils.web.XStreamUtils;
 
 /**
  * @author Joe Halliwell <joe@winterwell.com>

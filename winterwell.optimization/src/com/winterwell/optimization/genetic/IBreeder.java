@@ -1,7 +1,7 @@
 /**
  * 
  */
-package winterwell.optimization.genetic;
+package com.winterwell.optimization.genetic;
 
 import java.util.Random;
 

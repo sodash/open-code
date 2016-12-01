@@ -1,4 +1,4 @@
-package winterwell.optimization;
+package com.winterwell.optimization;
 
 /**
  * Simple interface for optimization drivers.

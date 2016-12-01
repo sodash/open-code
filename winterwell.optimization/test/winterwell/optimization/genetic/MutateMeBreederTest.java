@@ -2,7 +2,10 @@ package winterwell.optimization.genetic;
 
 import org.junit.Test;
 
-import winterwell.optimization.AEvaluate;
+import com.winterwell.optimization.AEvaluate;
+import com.winterwell.optimization.genetic.GA;
+import com.winterwell.optimization.genetic.MutateMe;
+import com.winterwell.optimization.genetic.MutateMeBreeder;
 
 public class MutateMeBreederTest {
 

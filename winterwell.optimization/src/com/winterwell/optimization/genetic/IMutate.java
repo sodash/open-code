@@ -1,7 +1,7 @@
 /**
  * 
  */
-package winterwell.optimization.genetic;
+package com.winterwell.optimization.genetic;
 
 /**
  * Interface for mutation operators

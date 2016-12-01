@@ -1,7 +1,7 @@
-package winterwell.maths.stats.distributions;
+package com.winterwell.maths.stats.distributions;
 
-import winterwell.maths.stats.distributions.d1.ADistribution1D;
-import winterwell.maths.stats.distributions.d1.ExponentialDistribution1D;
+import com.winterwell.maths.stats.distributions.d1.ADistribution1D;
+import com.winterwell.maths.stats.distributions.d1.ExponentialDistribution1D;
 
 
 /**

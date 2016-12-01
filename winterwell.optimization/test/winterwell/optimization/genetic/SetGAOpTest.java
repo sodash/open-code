@@ -2,6 +2,8 @@ package winterwell.optimization.genetic;
 
 import java.util.Arrays;
 
+import com.winterwell.optimization.genetic.SetGAOp;
+
 import junit.framework.TestCase;
 
 public class SetGAOpTest extends TestCase {

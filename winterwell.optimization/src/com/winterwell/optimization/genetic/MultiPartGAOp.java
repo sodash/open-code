@@ -1,11 +1,13 @@
 /**
  * 
  */
-package winterwell.optimization.genetic;
+package com.winterwell.optimization.genetic;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import winterwell.optimization.genetic.MultiPartGAOpTest;
 
 /**
  * A mutator for things made up of several smaller mutatable things.

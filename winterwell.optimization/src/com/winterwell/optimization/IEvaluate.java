@@ -1,7 +1,7 @@
 /**
  * 
  */
-package winterwell.optimization;
+package com.winterwell.optimization;
 
 import com.winterwell.depot.Desc;
 

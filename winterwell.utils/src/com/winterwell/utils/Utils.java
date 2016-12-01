@@ -641,5 +641,10 @@ public class Utils {
 		return true;
 	}
 
+	public static String getExceptionMessage(Throwable ex) {
+		if (ex==null || ex.getMessage()==null) return "";
+		return ex.getMessage();
+	}
+
 
 }

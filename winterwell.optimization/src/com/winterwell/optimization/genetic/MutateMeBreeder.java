@@ -1,17 +1,17 @@
-package winterwell.optimization.genetic;
+package com.winterwell.optimization.genetic;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
 
-import winterwell.maths.stats.distributions.GaussianBall;
-import winterwell.maths.stats.distributions.d1.UniformDistribution1D;
-import winterwell.maths.vector.X;
+import com.winterwell.maths.stats.distributions.GaussianBall;
+import com.winterwell.maths.stats.distributions.d1.UniformDistribution1D;
+import com.winterwell.maths.vector.X;
 import com.winterwell.utils.ReflectionUtils;
-import winterwell.utils.StrUtils;
-import winterwell.utils.TodoException;
-import winterwell.utils.Utils;
-import winterwell.utils.containers.Range;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.TodoException;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Range;
 
 /**
  * Use with {@link MutateMe} annotated classes.

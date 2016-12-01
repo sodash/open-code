@@ -1,7 +1,7 @@
 /**
  * 
  */
-package winterwell.optimization.genetic;
+package com.winterwell.optimization.genetic;
 
 import java.awt.Image;
 
@@ -13,12 +13,12 @@ import com.winterwell.utils.gui.GuiUtils;
 
 import junit.framework.TestCase;
 import no.uib.cipr.matrix.Vector;
-import winterwell.maths.GridInfo;
-import winterwell.maths.chart.Distribution2DChart;
-import winterwell.maths.chart.HighchartsRenderer;
-import winterwell.maths.stats.distributions.GridDistribution2D;
-import winterwell.maths.timeseries.DataUtils;
-import winterwell.optimization.AEvaluate;
+import com.winterwell.maths.GridInfo;
+import com.winterwell.maths.chart.Distribution2DChart;
+import com.winterwell.maths.chart.HighchartsRenderer;
+import com.winterwell.maths.stats.distributions.GridDistribution2D;
+import com.winterwell.maths.timeseries.DataUtils;
+import com.winterwell.optimization.AEvaluate;
 
 /**
  * 
@@ -27,7 +27,7 @@ import winterwell.optimization.AEvaluate;
 public class VectorGAOperatorTest extends TestCase {
 
 	/**
-	 * Test method for {@link winterwell.optimization.genetic.VectorGAOp#generate()}.
+	 * Test method for {@link com.winterwell.optimization.genetic.VectorGAOp#generate()}.
 	 */
 	public void testGenerate() {
 		VectorGAOp vop = new VectorGAOp(2);		
@@ -38,7 +38,7 @@ public class VectorGAOperatorTest extends TestCase {
 		dist.normalise();
 		Distribution2DChart chart = new Distribution2DChart(dist);
 		HighchartsRenderer r = new HighchartsRenderer();
-		Image img = r.renderToImage(chart, winterwell.maths.chart.ImageFormat.PNG);
+		Image img = r.renderToImage(chart, com.winterwell.maths.chart.ImageFormat.PNG);
 		JFrame frame = GuiUtils.popup(img, "Generated Points");
 		GuiUtils.blockWhileOpen(frame);
 	}
@@ -68,7 +68,7 @@ public class VectorGAOperatorTest extends TestCase {
 		dist.normalise();
 		Distribution2DChart chart = new Distribution2DChart(dist);
 		HighchartsRenderer r = new HighchartsRenderer();
-		Image img = r.renderToImage(chart, winterwell.maths.chart.ImageFormat.PNG);
+		Image img = r.renderToImage(chart, com.winterwell.maths.chart.ImageFormat.PNG);
 		JFrame frame = GuiUtils.popup(img, "Mutated Points");
 		GuiUtils.blockWhileOpen(frame);
 	}

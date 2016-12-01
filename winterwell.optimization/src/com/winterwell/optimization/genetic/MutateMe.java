@@ -1,4 +1,4 @@
-package winterwell.optimization.genetic;
+package com.winterwell.optimization.genetic;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

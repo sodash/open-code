@@ -891,5 +891,13 @@ public class FakeBrowser {
 		setProxy(proxy);
 	}
 
+	public void setCooldown(Cooldown cooldown) {
+		this.cooldown = cooldown;
+	}
+
+	public Cooldown getCooldown() {
+		return cooldown;
+	}
+
 }
 
