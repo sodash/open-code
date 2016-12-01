@@ -361,6 +361,7 @@ public class GuiUtils {
 	}
 
 	public static void popupAndBlock(Image img) {
+		if ( ! isInteractive()) return;
 		JFrame f = popup(img, "");
 		blockWhileOpen(f);
 	}

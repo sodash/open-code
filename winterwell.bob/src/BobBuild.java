@@ -6,6 +6,6 @@
  */
 public class BobBuild {
 	public static void main(String[] args) {
-		winterwell.bob.Bob.main(args);
+		com.winterwell.bob.Bob.main(args);
 	}
 }

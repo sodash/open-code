@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,7 +171,8 @@ public class WebUtils2 extends WebUtils {
 	 * Convenience for creating cookies. Uses the "/" path
 	 * 
 	 * @param response
-	 * @param name
+	 * @param name This will be url-encoded. 
+	 * NB: The actual spec for cookie names is vague (c.f. http://stackoverflow.com/questions/1969232/allowed-characters-in-cookies#1969339)
 	 * @param value
 	 *            This will be converted using toString()
 	 * @param timeTolive
@@ -179,13 +181,15 @@ public class WebUtils2 extends WebUtils {
 	 */
 	public static void addCookie(HttpServletResponse response, String name,
 			Object value, Dt timeTolive, String cookieDomain) {
-		Cookie cookie = new Cookie(name, value.toString());
+		String cname = urlEncode(name);
+		Cookie cookie = new Cookie(cname, value.toString());
 		cookie.setMaxAge((int) (timeTolive.getMillisecs() / 1000));
 		if (cookieDomain != null) {
 			cookie.setDomain(cookieDomain);
 		}
 		// make the cookie available across the server
 		cookie.setPath("/");
+		// FIXME WHy is Jetty sometimes wrapping names in quotes? It seems to happen if the name uses a % encoding.		
 		response.addCookie(cookie);
 	}
 
@@ -397,7 +401,9 @@ public class WebUtils2 extends WebUtils {
 			return Collections.emptyMap();
 		Map<String, String> map = new HashMap();
 		for (Cookie cookie : cookies) {
-			map.put(cookie.getName(), cookie.getValue());
+			String cname = urlDecode(cookie.getName());
+			String cvalue = cookie.getValue();
+			map.put(cname, cvalue);
 		}
 		return map;
 	}
@@ -493,6 +499,10 @@ public class WebUtils2 extends WebUtils {
 		String val = m.group(1);
 		// convert "" to null for simplicity
 		if (val.isEmpty()) return null;
+		// Hack: Should we convert "null" and "undefined" to null? Yes, that's probably best.
+		if (val.equals("undefined") || val.equals("null")) {
+			return null;
+		}
 		val = WebUtils.urlDecode(val);
 		return val;
 	}
@@ -1160,25 +1170,34 @@ public class WebUtils2 extends WebUtils {
 	 * Cross Origin Resource Sharing
 	 * See http://www.html5rocks.com/en/tutorials/cors/
 	 * @param state
-	 * @param forceSet If true, then an Access-Control-Allow-Origin header will always be set, 
+	 * @param forceSet Do we need this?? Why not always set CORS, using Origin if we can??
+	 * If true, then an Access-Control-Allow-Origin header will always be set (unless it is already set), 
 	 * even if we have no incoming Origin header ("*" will be used as a fallback).
+	 * Due to security restrictions this does NOT work for withCredentials (ie with cookies) requests!
 	 */
 	public static void CORS(WebRequest state, boolean forceSet) {
 		if (state.getRequest()==null) {
 //			Log.d("CORS", "No request? "+state);
 			return;
 		}
+		
+		// TODO see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i
+//		'Access-Control-Allow-Credentials', true		
+		Enumeration<String> headers = state.getRequest().getHeaderNames();
+		Cookie[] cookies = state.getRequest().getCookies();
+		String ref = state.getReferer();
+		
 		String o = state.getRequest().getHeader("Origin");
-		if (o==null || o.equals("null") || forceSet) {
+		if (o==null || o.equals("null")) {
 			o = "*"; //URI(state.getRequestUrl()).getHost();
 		}
-//		if (o != null) {
-			//	set matching resp header
-//		Log.d("CORS", "set "+o+" for "+state.getRequestUrl());
+		if (forceSet && Utils.isBlank(state.getResponse().getHeader("Access-Control-Allow-Origin"))) {
+			o = "*"; // Do we need this??
+		}
+		if ( ! "*".equals(o)) {
+			state.getResponse().setHeader("Access-Control-Allow-Credentials", "true");
+		}
 		state.getResponse().setHeader("Access-Control-Allow-Origin", o);
-//		} else {
-//			Log.d("CORS", "not set");
-//		}
 	}
 
 	/**

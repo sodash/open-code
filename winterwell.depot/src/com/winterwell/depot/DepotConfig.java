@@ -28,6 +28,16 @@ public class DepotConfig {
 		return defaultRemoteHost;
 	}
 
+	
+	public DepotConfig() {
+		// default directory - the winterwell one if present, otherwise local depot
+		try {
+			dir = new File(FileUtils.getWinterwellDir(), "datastore");
+		} catch(Exception ex) {
+			dir = new File("depot");
+		}
+	}
+	
 	@Option
 	String remoteUser = "winterwell";
 
@@ -48,7 +58,7 @@ public class DepotConfig {
 	Dt writeBehind = new Dt(60, TUnit.SECOND);
 
 	@Option
-	File dir = new File(FileUtils.getWinterwellDir(), "datastore");
+	File dir;
 
 	@Option
 	KErrorPolicy errorPolicy = KErrorPolicy.DELETE_CAUSE; // !!

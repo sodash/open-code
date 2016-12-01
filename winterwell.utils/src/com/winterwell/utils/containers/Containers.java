@@ -985,7 +985,10 @@ public class Containers  {
 				int comp = Containers.compare(v1, v2);
 				if (comp == 0) {
 					int kc = Containers.compare(k1, k2);
-					if (kc == 0) throw new IllegalStateException("Cant sort equals keys "+k1+" in "+map+"?!");
+					if (kc == 0) {
+						Log.e("sort", new IllegalStateException("Cant sort equals keys "+k1+"="+k2+" & values "+v1+"="+v2+"in "+map+"?!"));
+						return 0;						
+					}
 					return kc;
 				}
 				return comp;
@@ -1209,18 +1212,7 @@ public class Containers  {
 		return new Or(filterA, filterB);
 	}
 
-	/**
-	 * Convenience for plucking values from a list. This will skip nulls in both the input list and the output value.
-	 * @param list Can be null, and can contain nulls
-	 * @param fn
-	 * @return "truthy" outputs from fn
-	 * @see Utils#truthy(Object)
-	 */
-	public static <A,B> List<B> pluckNotNull(List<A> list, Function<A,B> fn) {
-		if (list==null) return Collections.EMPTY_LIST;
-		// Java 8 streams + lambdas for the win
-		return list.stream().filter(a -> a != null).map(fn).filter(b -> Utils.truthy(b)).collect(Collectors.toList());
-	}
+	
 
 	public static <X> double plus(IProperties obj, Key<Double> key, double dx) {
 		Double x = obj.get(key);
@@ -1533,6 +1525,30 @@ public class Containers  {
 		return MathUtils.toIntArray(values);
 	}
 
+	/**
+	 * Convenience for plucking values from a list. This will skip nulls in both the input list and the output value.
+	 * @param list Can be null, and can contain nulls
+	 * @param fn
+	 * @return "truthy" outputs from fn
+	 * @see Utils#truthy(Object)
+	 */
+	public static <A,B> List<B> pluckNotNull(List<A> list, Function<A,B> fn) {
+		if (list==null) return Collections.EMPTY_LIST;
+		// Java 8 streams + lambdas for the win
+		return list.stream().filter(a -> a != null).map(fn).filter(b -> Utils.truthy(b)).collect(Collectors.toList());
+	}
+	
+
+	/**
+	 * By class and sub-class
+	 * @param klass
+	 * @param list
+	 * @return
+	 */
+	public static List filterByClass(Class klass, List list) {
+		return filter(IFilter.byClass(klass), list);
+	}
+	
 	/**
 	 * Turn a NxM list of lists into MxN. Must all be same length, or
 	 * IllegalArgumentException will be thrown (this is checked early with

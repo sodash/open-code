@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.IHasJson;
 import com.winterwell.web.LoginDetails;
 import com.winterwell.utils.ReflectionUtils;
 
@@ -22,7 +23,7 @@ import com.winterwell.utils.ReflectionUtils;
  * @author daniel
  * @testedby XIdTest
  */
-public final class XId implements Serializable {
+public final class XId implements Serializable, IHasJson {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -334,6 +335,16 @@ public final class XId implements Serializable {
 	public static XId xid(Object xid) {
 		if (xid==null) return null;
 		return xid instanceof XId? (XId) xid : new XId((String)xid, false);
+	}
+	
+	@Override
+	public String toJSONString() {
+		return toString();
+	}
+
+	@Override
+	public Object toJson2() throws UnsupportedOperationException {
+		return toString();
 	}
 	
 }

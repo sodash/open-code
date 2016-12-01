@@ -41,8 +41,10 @@ import com.winterwell.utils.WrappedException;
 
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.FileUtils;
-
+import com.winterwell.utils.web.Cooldown;
 import com.winterwell.utils.web.WebUtils;
+import com.winterwell.web.data.XId;
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.log.Log;
 
@@ -739,6 +741,8 @@ public class FakeBrowser {
 	public void setRequestHeader(String header, Object value) {
 		reqHeaders.put(header, value);
 	}
+	
+	Cooldown cooldown;
 
 	/**
 	 * Create a connection and set it up (authentication, cookies) - but do not
@@ -750,12 +754,20 @@ public class FakeBrowser {
 	 * @throws IOException
 	 */
 	HttpURLConnection setupConnection(String uri, int timeOutMilliSecs)
-			throws IOException {
+			throws IOException 
+	{
+		URL url = new URL(uri);
+		if (cooldown!=null) {
+			String host = url.getHost();
+			if (cooldown.isCoolingDown(new XId(host, "domain", false))) {
+				throw new WebEx.E50X(new FailureException("Pre-emptive fail: "+host+" is in Cooldown"));
+			}
+		}
 		assert connection == null : connection.getURL();
 		if (proxy==null) {
-			connection = (HttpURLConnection) new URL(uri).openConnection();
+			connection = (HttpURLConnection) url.openConnection();
 		} else {
-			connection = (HttpURLConnection) new URL(uri).openConnection(proxy);
+			connection = (HttpURLConnection) url.openConnection(proxy);
 		}
 		// GET or POST
 		if (requestMethod!=null) {

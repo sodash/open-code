@@ -12,6 +12,10 @@ import com.winterwell.utils.containers.Containers;
  */
 public interface IFilter<X> {
 
+	public static <X> IFilter<X> byClass(Class klass) {
+		return new ClassFilter(klass);		
+	}
+	
 	/**
 	 * Filter returning true if x is not null.
 	 */
@@ -57,5 +61,18 @@ class NotNullFilter implements IFilter {
 	@Override
 	public boolean accept(Object x) {
 		return x!=null;
+	}	
+}
+
+final class ClassFilter implements IFilter {
+	private final Class klass;
+
+	public ClassFilter(Class klass) {
+		this.klass = klass;
+	}
+
+	@Override
+	public boolean accept(Object x) {
+		return x!=null && ReflectionUtils.isa(x.getClass(), klass);
 	}	
 }

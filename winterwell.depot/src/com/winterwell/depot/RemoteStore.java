@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import winterwell.bob.tasks.RemoteTask;
-import winterwell.bob.tasks.SCPTask;
+import com.winterwell.bob.tasks.RemoteTask;
+import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.utils.IFn;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;

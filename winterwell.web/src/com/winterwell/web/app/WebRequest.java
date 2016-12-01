@@ -972,14 +972,12 @@ public class WebRequest implements IProperties, Closeable {
 		return new BrowserType(ua);
 	}
 
-	String body;
-	
 	/**
 	 * 
 	 * @return
 	 */
 	public String getPostBody() {
-		if (body!=null) return body;
+		String body = null;
 		try {
 			body = FileUtils.read(request.getInputStream());
 			if (body!=null && ! body.isEmpty()) return body;

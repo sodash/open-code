@@ -11,9 +11,11 @@ import com.winterwell.utils.IFn;
  * I can has dynamic ajax action! Call toJson() to get a JSON String
  * @author daniel
  */
-public interface IHasJson {
-
-	void appendJson(StringBuilder sb);
+public interface IHasJson {	
+	
+	default void appendJson(StringBuilder sb) {
+		sb.append(toJSONString());
+	}
 	
 	/**
 	 * Matches JSONString#toJSONString()
