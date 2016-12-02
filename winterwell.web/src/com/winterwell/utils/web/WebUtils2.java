@@ -823,18 +823,6 @@ public class WebUtils2 extends WebUtils {
 		}
 		c1.setMaxAge(0);
 		response.addCookie(c1);
-
-		// // also nuke the value
-		// Cookie c2 = new Cookie(cookieName, "");
-		// if (domain!=null) c2.setDomain(domain);
-		// if (path!=null) c2.setPath(path);
-		// c2.setMaxAge(-1);
-		// response.addCookie(c2);
-		//
-		// // also nuke the / path
-		// if (path==null) {
-		// removeCookie(cookieName, response, domain, "/");
-		// }
 	}
 
 	/**
