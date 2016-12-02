@@ -8,16 +8,15 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.winterwell.utils.BestOne;
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.containers.IOneShot;
-import com.winterwell.utils.log.Log;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.containers.IOneShot;
+import com.winterwell.utils.log.Log;
 
 /**
  * Support for reading comma (etc.) separated values. This aims to be

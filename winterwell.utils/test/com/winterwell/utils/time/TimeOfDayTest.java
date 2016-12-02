@@ -5,8 +5,6 @@ import java.util.TimeZone;
 
 import org.junit.Test;
 
-import com.winterwell.utils.time.TimeUtils;
-
 public class TimeOfDayTest {
 
 

@@ -12,14 +12,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import com.winterwell.bob.BuildTask;
+import com.winterwell.utils.FailureException;
+import com.winterwell.utils.io.FileUtils;
+
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestListener;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
-import com.winterwell.bob.BuildTask;
-import com.winterwell.utils.FailureException;
-import com.winterwell.utils.io.FileUtils;
 
 /**
  * Class for creating a HTML JUnit test report.

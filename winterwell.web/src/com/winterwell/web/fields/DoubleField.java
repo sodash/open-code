@@ -3,8 +3,6 @@
  */
 package com.winterwell.web.fields;
 
-import com.winterwell.utils.MathUtils;
-
 /**
  * A text-entry field whose values are interpreted as doubles.
  * 

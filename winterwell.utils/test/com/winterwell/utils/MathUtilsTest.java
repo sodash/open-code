@@ -6,13 +6,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
-import com.winterwell.utils.MathUtils;
-
 import com.winterwell.utils.containers.Pair2;
+
+import junit.framework.TestCase;
 
 public class MathUtilsTest extends TestCase {
 

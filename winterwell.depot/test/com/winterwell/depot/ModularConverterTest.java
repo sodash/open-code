@@ -7,11 +7,10 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-import com.winterwell.utils.web.XStreamUtils;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.winterwell.depot.ModularConverter.ModularXML;
+import com.winterwell.utils.web.XStreamUtils;
 
 /**
  * @tested {@link ModularConverter}

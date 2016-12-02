@@ -2,9 +2,9 @@ package com.winterwell.web.fields;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
 import com.winterwell.utils.Printer;
+
+import junit.framework.TestCase;
 
 public class SelectFieldTest extends TestCase {
 

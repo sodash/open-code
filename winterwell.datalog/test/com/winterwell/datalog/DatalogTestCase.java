@@ -3,8 +3,6 @@ package com.winterwell.datalog;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.winterwell.utils.time.TimeUtils;
-
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.ListDataStream;
@@ -14,6 +12,7 @@ import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.time.TimeUtils;
 
 /**
  * Super class that initialises the db connection for SQL tests

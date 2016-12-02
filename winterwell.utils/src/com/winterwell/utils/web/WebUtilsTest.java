@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 
-import junit.framework.TestCase;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -22,13 +20,13 @@ import org.xml.sax.XMLReader;
 
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Proc;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ITree;
 import com.winterwell.utils.containers.Tree;
-
-import com.winterwell.utils.StrUtils;
-
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.time.TUnit;
+
+import junit.framework.TestCase;
 
 /**
  * @tested {@link WebUtils}

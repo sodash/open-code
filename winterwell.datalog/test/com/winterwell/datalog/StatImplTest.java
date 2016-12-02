@@ -13,9 +13,8 @@ import org.junit.Test;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.time.Time;
-
 import com.winterwell.utils.threads.IFuture;
+import com.winterwell.utils.time.Time;
 
 /**
  * @tested {@link StatImpl}

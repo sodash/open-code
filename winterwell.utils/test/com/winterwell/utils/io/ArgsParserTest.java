@@ -7,10 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.io.Option;
+
+import junit.framework.TestCase;
 
 public class ArgsParserTest extends TestCase {
 

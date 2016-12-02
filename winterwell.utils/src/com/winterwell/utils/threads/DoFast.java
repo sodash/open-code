@@ -1,17 +1,14 @@
 package com.winterwell.utils.threads;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.winterwell.utils.TimeOut;
-import com.winterwell.utils.time.Dt;
-import com.winterwell.utils.time.TUnit;
-
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
 
 /**
  * Convenience class for using TimeOut to do something quickly or not at all.

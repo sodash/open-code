@@ -3,13 +3,11 @@ package com.winterwell.utils.time;
 import java.util.List;
 
 import com.winterwell.utils.Printer;
-
-import junit.framework.TestCase;
 import com.winterwell.utils.containers.AbstractIterator;
-
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
-import com.winterwell.utils.time.TimeIterator;
+
+import junit.framework.TestCase;
 
 public class TimeIteratorTest extends TestCase {
 

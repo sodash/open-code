@@ -11,9 +11,11 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.winterwell.utils.Environment;
 import com.winterwell.utils.IBuildStrings;
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -24,8 +26,6 @@ import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.IWidget;
 import com.winterwell.web.WebInputException;
-import com.winterwell.utils.Environment;
-import com.winterwell.utils.Printer;
 
 /**
  * Describes a form field. toString() returns the field's name.

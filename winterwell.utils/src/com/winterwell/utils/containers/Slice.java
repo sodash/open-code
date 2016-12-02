@@ -1,7 +1,5 @@
 package com.winterwell.utils.containers;
 
-import org.w3c.dom.ls.LSLoadEvent;
-
 /**
  * A slice or region of a String
  * 

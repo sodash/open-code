@@ -9,17 +9,16 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
+import com.winterwell.datalog.Stat;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
-
-import com.winterwell.datalog.Stat;
 import com.winterwell.utils.threads.SafeExecutor;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+
+import junit.framework.Assert;
 
 /**
  * @author Joe Halliwell <joe@winterwell.com>

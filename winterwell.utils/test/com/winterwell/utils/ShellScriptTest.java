@@ -2,10 +2,9 @@ package com.winterwell.utils;
 
 import java.io.File;
 
-import com.winterwell.utils.ShellScript;
+import com.winterwell.utils.io.FileUtils;
 
 import junit.framework.TestCase;
-import com.winterwell.utils.io.FileUtils;
 
 public class ShellScriptTest extends TestCase {
 

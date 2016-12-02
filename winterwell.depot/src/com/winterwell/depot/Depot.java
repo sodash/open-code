@@ -14,13 +14,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.WrappedException;
-import com.winterwell.utils.gui.GuiUtils;
-import com.winterwell.utils.log.KErrorPolicy;
-import com.winterwell.utils.log.Log;
-import com.winterwell.utils.time.StopWatch;
-
 import com.thoughtworks.xstream.XStreamException;
 import com.winterwell.datalog.Stat;
 import com.winterwell.depot.merge.ClassMap;
@@ -28,9 +21,15 @@ import com.winterwell.depot.merge.IMerger;
 import com.winterwell.depot.merge.MapMerger;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.KErrorPolicy;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.EqualsLocker;
+import com.winterwell.utils.time.StopWatch;
 
 /**
  * Cache and supply data artifacts.

@@ -13,12 +13,10 @@ import java.nio.charset.Charset;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.io.XStreamBinaryConverterTest;
-
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.core.util.Base64Encoder;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 
 /**
  * XStream does a good job with most classes, but it is lousy for e.g. matrices,

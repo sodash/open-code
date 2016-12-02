@@ -3,14 +3,13 @@ package com.winterwell.utils.reporting;
 import java.io.File;
 
 import com.winterwell.utils.Printer;
-
-import junit.framework.TestCase;
 import com.winterwell.utils.Utils;
-
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
+
+import junit.framework.TestCase;
 
 public class LogFileTest extends TestCase {
 

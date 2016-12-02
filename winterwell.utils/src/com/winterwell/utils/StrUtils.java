@@ -14,9 +14,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.winterwell.utils.FailureException;
-import com.winterwell.utils.IFn;
-import com.winterwell.utils.IReplace;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.IntRange;

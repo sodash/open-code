@@ -4,11 +4,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.CopyRequiredClassesTask;
 import com.winterwell.bob.tasks.JarTask;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.io.FileUtils;
 
 /**

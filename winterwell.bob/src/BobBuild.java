@@ -1,3 +1,4 @@
+import com.winterwell.bob.Bob;
 
 /**
  * Just a convenience for calling {@link Bob} from the command line.

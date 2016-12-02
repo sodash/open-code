@@ -13,16 +13,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.winterwell.utils.IFn;
-
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers.Changes;
 import com.winterwell.utils.threads.SafeExecutor;
+
+import junit.framework.Assert;
 
 public class ContainersTest {
 

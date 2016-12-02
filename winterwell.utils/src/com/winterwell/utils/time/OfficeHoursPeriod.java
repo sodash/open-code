@@ -1,7 +1,5 @@
 package com.winterwell.utils.time;
 
-import com.winterwell.utils.time.OfficeHoursPeriodTest;
-
 import com.winterwell.utils.containers.AbstractIterator;
 
 /**

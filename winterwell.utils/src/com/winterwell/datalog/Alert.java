@@ -1,10 +1,9 @@
 package com.winterwell.datalog;
 
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
-
-import com.winterwell.utils.Utils;
 
 /**
  * Volume alerts.

@@ -5,17 +5,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.cache.CacheBuilder;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
-
 import com.winterwell.utils.containers.AbstractMap2;
 import com.winterwell.utils.containers.Pair2;
-
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
-import com.google.common.cache.CacheBuilder;
-import com.winterwell.utils.ReflectionUtils;
 
 /**
  * If expiry is the same for all -- use a guava cache.

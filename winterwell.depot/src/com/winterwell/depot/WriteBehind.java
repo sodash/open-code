@@ -8,13 +8,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 
+import com.winterwell.datalog.Stat;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.StopWatch;
 import com.winterwell.utils.time.Time;
-
-import com.winterwell.datalog.Stat;
 
 /**
  * A {@link WriteBehind} system -- shove stuff in, & it doesn't get saved

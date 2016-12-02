@@ -1,7 +1,7 @@
 package com.winterwell.datalog;
 
-import com.winterwell.utils.io.Option;
 import com.winterwell.utils.io.DBUtils.DBOptions;
+import com.winterwell.utils.io.Option;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 

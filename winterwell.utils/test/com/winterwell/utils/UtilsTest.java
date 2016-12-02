@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.utils.Printer;
+import com.winterwell.utils.containers.ArrayMap;
 
 import junit.framework.TestCase;
-
-import com.winterwell.utils.containers.ArrayMap;
 
 public class UtilsTest extends TestCase {
 

@@ -14,12 +14,12 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
+import com.sun.mail.imap.IMAPFolder;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
-import com.sun.mail.imap.IMAPFolder;
 import com.winterwell.web.ExternalServiceException;
 import com.winterwell.web.LoginDetails;
 

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.winterwell.bob.BuildTask;
-import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.utils.io.FileUtils;
 
 public class BuildStat extends BuildWinterwellProject {

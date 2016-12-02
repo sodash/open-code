@@ -1,7 +1,5 @@
 package com.winterwell.utils;
 
-import com.winterwell.utils.Environment;
-
 import junit.framework.TestCase;
 
 //NOTE: Environment is a static class, so the changes in the class made by a test might 

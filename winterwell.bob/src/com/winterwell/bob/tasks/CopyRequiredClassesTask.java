@@ -10,10 +10,9 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.IFilter;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Tree;

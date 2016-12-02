@@ -9,7 +9,6 @@ import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.Containers;
 
 import junit.framework.TestCase;
-import com.winterwell.utils.io.FileUtils;
 
 public class CSVWriterTest extends TestCase {
 

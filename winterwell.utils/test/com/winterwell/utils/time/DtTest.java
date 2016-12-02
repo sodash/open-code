@@ -5,7 +5,6 @@ package com.winterwell.utils.time;
 
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.time.TimeUtils;
 
 import junit.framework.TestCase;
 

@@ -2,8 +2,6 @@ package com.winterwell.utils;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.winterwell.utils.Printer;
-
 /**
  * Mutable wrappers for the primitive types. These can be used as arguments to a
  * method, allowing multiple optional return values.

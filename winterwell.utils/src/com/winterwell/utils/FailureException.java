@@ -1,7 +1,5 @@
 package com.winterwell.utils;
 
-import com.winterwell.utils.ReflectionUtils;
-
 /**
  * Exception indicating that although your request was reasonable,
  * <i>something</i> has gone wrong, often with a 3rd party system.

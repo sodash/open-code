@@ -4,11 +4,10 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.winterwell.utils.Constant;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
-
-import com.winterwell.utils.Constant;
 
 /**
  * TODO Like DateField, adding relative-time answers such as "last week"

@@ -2,11 +2,9 @@ package com.winterwell.web.fields;
 
 import java.util.regex.Matcher;
 
-import com.winterwell.utils.web.WebUtils2;
-
 import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebInputException;
 
 public class UrlField extends AField<String> {

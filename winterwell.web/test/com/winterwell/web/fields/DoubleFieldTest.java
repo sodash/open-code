@@ -1,7 +1,5 @@
 package com.winterwell.web.fields;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 public class DoubleFieldTest {

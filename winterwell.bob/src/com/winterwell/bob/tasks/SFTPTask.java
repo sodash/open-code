@@ -13,14 +13,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.winterwell.bob.BuildTask;
-import com.winterwell.utils.log.Log;
-import com.winterwell.web.LoginDetails;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import com.winterwell.bob.BuildTask;
+import com.winterwell.utils.log.Log;
+import com.winterwell.web.LoginDetails;
 
 /**
  * SFTP is a pain. Probably the easiest way is to shell out to lftp.

@@ -22,14 +22,18 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.ReflectionUtils;
-import com.winterwell.utils.log.Log;
+import com.winterwell.utils.IFilter;
+import com.winterwell.utils.IFn;
 import com.winterwell.utils.IProperties;
-import com.winterwell.utils.*;
+import com.winterwell.utils.Key;
+import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Printer;
+import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.TodoException;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
 
 final class And<X> implements IFilter<X> {
 	private final IFilter<X> a;

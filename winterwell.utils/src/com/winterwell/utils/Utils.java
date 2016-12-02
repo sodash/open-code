@@ -13,10 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.Proc;
-import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.FastByteArrayInputStream;

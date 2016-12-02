@@ -8,8 +8,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.web.ScriptBlock;
-import com.winterwell.utils.web.ScriptExtractor;
 
 public class ScriptExtractorTest {
 	private String getOpeningTag(String name) {

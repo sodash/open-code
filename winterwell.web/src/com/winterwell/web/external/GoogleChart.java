@@ -5,10 +5,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.web.FakeBrowser;
-
-import com.winterwell.utils.Printer;
 
 /**
  * Use the Google chart API: http://code.google.com/apis/chart/

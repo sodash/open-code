@@ -8,10 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.web.IHasHtml;
-
-import com.winterwell.utils.Printer;
 
 /**
  * Produce HTML representation for objects such as maps and lists. Strings

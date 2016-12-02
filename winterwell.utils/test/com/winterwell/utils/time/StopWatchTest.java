@@ -1,9 +1,8 @@
 package com.winterwell.utils.time;
 
-import com.winterwell.utils.time.StopWatch;
+import com.winterwell.utils.Utils;
 
 import junit.framework.TestCase;
-import com.winterwell.utils.Utils;
 
 public class StopWatchTest extends TestCase {
 

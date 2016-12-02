@@ -4,8 +4,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
 import com.winterwell.utils.io.FileUtils;
+
+import junit.framework.TestCase;
 
 /**
  * Superclass for testcases which act on the Bob source itself.

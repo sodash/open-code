@@ -2,9 +2,8 @@ package com.winterwell.depot;
 
 import org.junit.Test;
 
-import com.winterwell.utils.Utils;
-
 import com.winterwell.depot.INotOverwritable.OverWriteException;
+import com.winterwell.utils.Utils;
 
 public class INotOverwritableTest {
 

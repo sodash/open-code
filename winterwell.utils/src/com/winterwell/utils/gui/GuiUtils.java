@@ -33,18 +33,13 @@ import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
 import com.winterwell.utils.MathUtils;
-
-import com.winterwell.utils.IFilter;
 import com.winterwell.utils.Mutable;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
-
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
-
-import com.winterwell.utils.gui.GuiUtilsTest;
 
 class BlockingImageObserver implements ImageObserver {
 

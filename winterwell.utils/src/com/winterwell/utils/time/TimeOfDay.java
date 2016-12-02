@@ -2,13 +2,11 @@ package com.winterwell.utils.time;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 
 /**

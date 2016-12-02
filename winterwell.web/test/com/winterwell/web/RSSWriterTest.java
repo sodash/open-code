@@ -4,8 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Date;
 
-import com.winterwell.web.RSSWriter;
-
 import junit.framework.TestCase;
 
 public class RSSWriterTest extends TestCase {

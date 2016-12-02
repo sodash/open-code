@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.winterwell.web.HtmlPrinter;
-
 import junit.framework.TestCase;
 
 public class HtmlPrinterTest extends TestCase {

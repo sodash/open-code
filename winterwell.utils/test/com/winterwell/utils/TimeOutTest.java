@@ -2,8 +2,6 @@ package com.winterwell.utils;
 
 import org.junit.Test;
 
-import com.winterwell.utils.TimeOut;
-
 public class TimeOutTest {
 
 	@Test

@@ -8,10 +8,9 @@ import java.util.regex.Matcher;
 
 import org.junit.Test;
 
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Slice;
-import com.winterwell.utils.web.HashTagger;
-import com.winterwell.utils.Printer;
 
 public class HashTaggerTest {
 

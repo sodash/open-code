@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Pair;
-import com.winterwell.utils.time.TimeUtilsTest;
 
 /**
  * Because Date and Calendar both have problems, but JodaTime is

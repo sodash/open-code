@@ -6,13 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import com.winterwell.utils.Printer;
-
 import com.winterwell.utils.Utils;
+
+import junit.framework.TestCase;
 
 
 public class FileUtilsTest extends TestCase {

@@ -7,16 +7,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.winterwell.utils.IReplace;
-import com.winterwell.utils.Mutable;
-
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.log.KErrorPolicy;
+
+import junit.framework.TestCase;
 
 public class StrUtilsTest extends TestCase {
 

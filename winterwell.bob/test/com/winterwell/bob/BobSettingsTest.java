@@ -2,8 +2,9 @@ package com.winterwell.bob;
 
 import java.io.File;
 
-import junit.framework.TestCase;
 import com.winterwell.bob.tasks.CompileTask;
+
+import junit.framework.TestCase;
 
 public class BobSettingsTest extends TestCase {
 

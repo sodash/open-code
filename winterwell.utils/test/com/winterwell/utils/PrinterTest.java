@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.utils.Printer;
-
 import junit.framework.TestCase;
 
 public class PrinterTest extends TestCase {

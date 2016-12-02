@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.winterwell.utils.web.ScriptBlock;
-
 public class ScriptBlockTest {
 	private String createBlock(String name, String contents) {
 		return "<!--[<compile to=\"" + name + "\">]-->" + contents + "<!--[</compile>]-->";

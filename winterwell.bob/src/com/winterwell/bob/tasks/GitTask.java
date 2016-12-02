@@ -3,15 +3,12 @@ package com.winterwell.bob.tasks;
 import java.io.File;
 import java.util.Map;
 
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Proc;
 import com.winterwell.utils.ShellScript;
-
-import com.winterwell.utils.FailureException;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
-
 import com.winterwell.utils.containers.ArrayMap;
-
 import com.winterwell.utils.time.Time;
 
 /**

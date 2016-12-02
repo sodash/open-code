@@ -3,7 +3,6 @@ package com.winterwell.utils.web;
 import org.junit.Test;
 
 import com.winterwell.utils.containers.Tree;
-import com.winterwell.utils.web.HtmlParser;
 
 public class HtmlParserTest {
 

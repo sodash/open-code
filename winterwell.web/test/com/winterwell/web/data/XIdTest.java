@@ -4,8 +4,6 @@ import java.util.regex.Matcher;
 
 import org.junit.Test;
 
-import com.winterwell.web.data.XId;
-
 public class XIdTest {
 
 	

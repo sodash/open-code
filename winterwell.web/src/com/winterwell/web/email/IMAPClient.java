@@ -19,28 +19,26 @@ import javax.mail.search.ComparisonTerm;
 import javax.mail.search.ReceivedDateTerm;
 import javax.mail.search.SearchTerm;
 
-import org.eclipse.jetty.util.ajax.JSON;
-
-import sun.security.provider.certpath.AdjacencyList;
-import sun.security.provider.certpath.SunCertPathBuilderException;
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPMessage;
+import com.sun.mail.imap.IMAPStore;
+import com.sun.mail.util.MailSSLSocketFactory;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Key;
-import com.winterwell.utils.TodoException;
+import com.winterwell.utils.Printer;
+import com.winterwell.utils.TimeOut;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.XStreamUtils;
-import com.sun.mail.imap.IMAPFolder;
-import com.sun.mail.imap.IMAPMessage;
-import com.sun.mail.imap.IMAPStore;
-import com.sun.mail.util.MailSSLSocketFactory;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.TimeOut;
 import com.winterwell.web.ConfigException;
 import com.winterwell.web.ExternalServiceException;
 import com.winterwell.web.LoginDetails;
+
+import sun.security.provider.certpath.AdjacencyList;
+import sun.security.provider.certpath.SunCertPathBuilderException;
 
 /**
  * Access an IMAP mail account.

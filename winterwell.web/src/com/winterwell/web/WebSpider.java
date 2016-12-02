@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.winterwell.utils.web.WebUtils;
-
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.web.WebUtils;
 
 /**
  * TODO spider a website looking for broken links

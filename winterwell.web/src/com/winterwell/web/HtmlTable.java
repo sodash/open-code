@@ -7,12 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.winterwell.utils.IBuildStrings;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.web.WebUtils;
-
-import com.winterwell.utils.Printer;
 
 /**
  * Helper class for producing tables in HTML.

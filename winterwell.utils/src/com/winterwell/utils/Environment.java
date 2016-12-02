@@ -9,10 +9,6 @@ import java.util.Stack;
 
 import com.winterwell.utils.io.ISerialize;
 
-import com.winterwell.utils.IProperties;
-import com.winterwell.utils.Key;
-import com.winterwell.utils.Utils;
-
 /**
  * Store global (default) and background (thread-local) properties. A background
  * property being one that would be clumsy to pass round as a method argument.

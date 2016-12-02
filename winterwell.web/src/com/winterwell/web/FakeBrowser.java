@@ -30,23 +30,22 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import lgpl.haustein.Base64Encoder;
-
 import org.apache.http.client.RedirectException;
 
+import com.winterwell.utils.FailureException;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
-
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.Cooldown;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.web.data.XId;
-import com.winterwell.utils.FailureException;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.log.Log;
+
+import lgpl.haustein.Base64Encoder;
 
 /**
  * A pretend web browser. Stores cookies so it can step through sessions.

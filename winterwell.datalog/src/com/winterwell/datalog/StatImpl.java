@@ -16,29 +16,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
+import com.winterwell.datalog.Stat.KInterpolate;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.ExtraDimensionsDataStream;
 import com.winterwell.maths.timeseries.ExtraDimensionsDataStream.KMatchPolicy;
 import com.winterwell.maths.timeseries.IDataStream;
-
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
-
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.SqlUtils;
-import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.KErrorPolicy;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.FixedFuture;
+import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
-
-import com.winterwell.datalog.Stat.KInterpolate;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.threads.FixedFuture;
-import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.TimeUtils;
 
 /**

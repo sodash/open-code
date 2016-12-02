@@ -4,7 +4,6 @@
 package com.winterwell.utils.time;
 
 import com.winterwell.utils.containers.Pair;
-import com.winterwell.utils.time.PeriodTest;
 
 /**
  * A specific time-period - this is just a pair of Times with some convenience

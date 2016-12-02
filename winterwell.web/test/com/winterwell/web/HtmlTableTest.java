@@ -3,9 +3,9 @@ package com.winterwell.web;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
 import com.winterwell.utils.web.WebUtils;
-import com.winterwell.web.HtmlTable;
+
+import junit.framework.TestCase;
 
 public class HtmlTableTest extends TestCase {
 

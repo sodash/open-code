@@ -13,11 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.log.KErrorPolicy;
-import com.winterwell.utils.log.Log;
-import com.winterwell.utils.web.XStreamUtils;
-
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -29,7 +24,11 @@ import com.thoughtworks.xstream.io.path.PathTracker;
 import com.thoughtworks.xstream.io.path.PathTrackingWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.XStreamBinaryConverter.BinaryXML;
+import com.winterwell.utils.log.KErrorPolicy;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.XStreamUtils;
 
 /**
  * Alter XStream to save IHasDesc objects as their Descs,

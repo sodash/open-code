@@ -3,10 +3,10 @@ package com.winterwell.bob.tasks;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
+
+import junit.framework.TestCase;
 
 public class SCPTaskTest extends TestCase {
 

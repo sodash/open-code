@@ -8,7 +8,6 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.time.TimeTest;
 
 /**
  * A simple immutable alternative to the built-in mess of Date. This just holds

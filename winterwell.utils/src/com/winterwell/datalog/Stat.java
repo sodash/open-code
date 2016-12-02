@@ -8,9 +8,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.Printer;
 import com.winterwell.utils.Warning;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;

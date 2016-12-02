@@ -19,16 +19,15 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import com.winterwell.datalog.Stat;
 import com.winterwell.utils.IFn;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.XStreamUtils;
-
-import com.winterwell.datalog.Stat;
-import com.winterwell.utils.io.FileUtils;
 
 /**
  * A simple file-based depot.

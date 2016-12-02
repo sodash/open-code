@@ -4,7 +4,6 @@ import java.awt.Color;
 
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.web.WebUtils;
 
 import junit.framework.TestCase;

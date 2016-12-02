@@ -11,13 +11,12 @@ import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.time.Dt;
-import com.winterwell.utils.time.TUnit;
-import com.winterwell.utils.time.Time;
-
 import com.winterwell.utils.threads.SafeExecutor;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.RateCounter;
 import com.winterwell.utils.time.StopWatch;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 
 public class DataLogStressTest extends DatalogTestCase {

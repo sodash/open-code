@@ -5,9 +5,8 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import com.winterwell.utils.io.XStreamBinaryConverter.BinaryXML;
-
 import com.thoughtworks.xstream.XStream;
+import com.winterwell.utils.io.XStreamBinaryConverter.BinaryXML;
 import com.winterwell.utils.web.XStreamUtils;
 
 public class XStreamBinaryConverterTest {

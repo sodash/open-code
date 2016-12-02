@@ -6,9 +6,7 @@ import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
-
 import com.winterwell.utils.io.FileUtils;
-
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
 

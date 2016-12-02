@@ -9,8 +9,6 @@ import javax.mail.internet.MimeMessage;
 
 import com.winterwell.utils.Utils;
 
-import com.winterwell.web.ExternalServiceException;
-
 /**
  * Make sense of bounce messages (aka DSN, Delivery Status Notification, messages).
  * 

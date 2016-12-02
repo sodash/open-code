@@ -3,10 +3,8 @@ package com.winterwell.utils.time;
 import java.util.Calendar;
 import java.util.List;
 
-import com.winterwell.utils.containers.Containers;
-import com.winterwell.utils.time.TimeIteratorTest;
-
 import com.winterwell.utils.containers.AbstractIterator;
+import com.winterwell.utils.containers.Containers;
 
 /**
  * Iterate through a range of dates.

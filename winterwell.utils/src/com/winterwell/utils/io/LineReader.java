@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.util.Iterator;
 
 import com.winterwell.utils.WrappedException;
-import com.winterwell.utils.io.FileUtils;
 
 /**
  * Read a file one line at a time. Can be used directly in for-each loops.

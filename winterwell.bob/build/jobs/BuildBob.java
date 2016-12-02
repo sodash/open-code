@@ -4,10 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
-import com.winterwell.bob.tasks.CompileTask;
-import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.utils.io.FileUtils;
 
 /**

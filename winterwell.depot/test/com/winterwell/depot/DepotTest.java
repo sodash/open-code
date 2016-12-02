@@ -8,13 +8,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
+import com.winterwell.depot.DepotTest.IInner;
+import com.winterwell.depot.ModularConverter.ModularXML;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
-
-import com.winterwell.depot.DepotTest.IInner;
-import com.winterwell.depot.ModularConverter.ModularXML;
 import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.threads.TaskRunner;
 

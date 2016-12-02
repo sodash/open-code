@@ -5,12 +5,12 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TimeOut;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.time.StopWatch;
 
 import junit.framework.TestCase;
-import com.winterwell.utils.StrUtils;
 
 public class CSVReaderTest extends TestCase {
 

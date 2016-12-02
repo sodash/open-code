@@ -1,7 +1,5 @@
 package com.winterwell.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;

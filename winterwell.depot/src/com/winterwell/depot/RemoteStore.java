@@ -9,11 +9,10 @@ import java.util.logging.Level;
 import com.winterwell.bob.tasks.RemoteTask;
 import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.utils.IFn;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
-
-import com.winterwell.utils.io.FileUtils;
 
 /**
  * This has a local FileStore, combined with an SCP feature.

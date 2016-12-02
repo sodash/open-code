@@ -8,10 +8,10 @@ import java.util.Map;
 
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.log.Log;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
 
 /**
  * A type-safe multi-class sort-of-map. NB This backends onto a {@link HashMap}

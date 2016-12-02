@@ -12,11 +12,10 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 
-import com.winterwell.utils.containers.Containers;
-
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.containers.Containers;
 
 /**
  * Support for creating .csv files.

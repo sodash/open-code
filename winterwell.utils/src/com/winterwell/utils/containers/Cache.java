@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.winterwell.utils.IFilter;
-import com.winterwell.utils.IFn;
-
 import com.winterwell.datalog.Doc;
 import com.winterwell.datalog.Stat;
 import com.winterwell.datalog.StatTag;
+import com.winterwell.utils.IFilter;
+import com.winterwell.utils.IFn;
 
 /**
  * A thread-safe in-memory cache which keeps the most recently used values.

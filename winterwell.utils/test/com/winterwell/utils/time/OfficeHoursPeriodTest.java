@@ -5,8 +5,6 @@ import java.util.List;
 import org.junit.Test;
 
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.time.TimeUtils;
-
 import com.winterwell.utils.containers.AbstractIterator;
 
 public class OfficeHoursPeriodTest {

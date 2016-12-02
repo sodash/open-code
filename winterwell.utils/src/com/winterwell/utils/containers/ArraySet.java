@@ -1,21 +1,15 @@
 package com.winterwell.utils.containers;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.AbstractList;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.SortedSet;
 
-import com.winterwell.utils.TodoException;
-import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 
 /**

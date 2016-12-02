@@ -4,10 +4,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.winterwell.utils.time.IShift;
-import com.winterwell.utils.time.ShiftSlicer;
-import com.winterwell.utils.time.TimeUtils;
-
 public class ShiftSlicerTest {
 
 	@Test

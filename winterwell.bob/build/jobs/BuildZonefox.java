@@ -4,9 +4,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import com.winterwell.utils.io.FileUtils;
-
 import com.winterwell.bob.BuildTask;
+import com.winterwell.utils.io.FileUtils;
 
 public class BuildZonefox extends BuildTask {
 

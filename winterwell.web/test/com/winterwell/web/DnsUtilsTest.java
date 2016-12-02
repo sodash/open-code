@@ -9,7 +9,6 @@ import org.xbill.DNS.Record;
 import org.xbill.DNS.ZoneTransferException;
 
 import com.winterwell.utils.Printer;
-import com.winterwell.web.DnsUtils;
 
 public class DnsUtilsTest {
 

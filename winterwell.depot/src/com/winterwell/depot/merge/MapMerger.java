@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.containers.Containers;
-
 import com.winterwell.depot.Desc;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Containers;
 
 /**
  * Diff and merge for maps

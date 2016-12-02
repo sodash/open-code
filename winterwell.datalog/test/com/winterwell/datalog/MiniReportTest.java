@@ -5,11 +5,10 @@ import org.junit.Test;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.TimeSlicer;
+import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
-
-import com.winterwell.utils.threads.IFuture;
 
 public class MiniReportTest extends DatalogTestCase {
 

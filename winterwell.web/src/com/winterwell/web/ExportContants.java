@@ -11,13 +11,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
-
-import com.winterwell.utils.Printer;
 
 /**
  * Take the constants from a Java class and export them for use in javascript.
