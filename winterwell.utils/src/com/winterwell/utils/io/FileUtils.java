@@ -820,7 +820,7 @@ public class FileUtils {
 	}
 
 	public static BufferedReader getReader(File file) {
-		assert file != null;
+		if (file==null) throw new NullPointerException("No file for getReader()");
 		try {
 			// TODO handle .gz here??
 			return getReader(new FileInputStream(file));
