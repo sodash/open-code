@@ -7,16 +7,17 @@ import com.winterwell.utils.Constant;
  * TODO merge with {@link Constant}
  */
 public final class FixedFuture<V> extends AFuture<V> implements IFuture<V> {
-	private final V v;
 	
+	private final V _v;
+
 	public FixedFuture(V v) {
-		this.v = v;
+		this._v = v;
 		resolve();
 	}
 	
 	@Override
 	public String toString() {
-		return v==null? "" : String.valueOf(v);
+		return get()==null? "" : String.valueOf(get());
 	}
 	
 	@Override
@@ -36,7 +37,7 @@ public final class FixedFuture<V> extends AFuture<V> implements IFuture<V> {
 
 	@Override
 	public V get2() throws RuntimeException {
-		return v;
+		return _v;
 	}
 	
 }
