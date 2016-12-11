@@ -221,7 +221,7 @@ public final class XId implements Serializable, IHasJson {
 			return false;
 		if (getClass() != obj.getClass()) {
 			// Probably a bug!
-			Log.d("xid", "XId.equals() "+this+" to "+obj.getClass()+" "+ReflectionUtils.getSomeStack(8));
+//			Log.d("xid", "XId.equals() "+this+" to "+obj.getClass()+" "+ReflectionUtils.getSomeStack(8));
 			return false;
 		}
 		XId other = (XId) obj;
