@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.AbstractSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -80,12 +81,19 @@ public final class ArraySet<T> extends AbstractSet<T>
 		if (elements.length == 1
 				&& elements[0] != null
 				&& (elements[0].getClass().isArray() || elements[0] instanceof Number)) {
-			Log.w("ArraySet", "Probable bug! elements=[" + elements[0] + "]");
+			Log.w("ArraySet", "Probable bug! elements=[" + elements[0] + "] Use ArraySet.fromArray() instead.");
 		}
 		backing = new ArrayList<T>(elements.length);
 		for (T e : elements) {
 			add(e);
 		}
+	}
+	
+	public static ArraySet<String> fromArray(String[] array) {
+		return new ArraySet(Arrays.asList(array));
+	}
+	public static ArraySet<Object> fromArray(Object[] array) {
+		return new ArraySet(Arrays.asList(array));
 	}
 
 	@Override

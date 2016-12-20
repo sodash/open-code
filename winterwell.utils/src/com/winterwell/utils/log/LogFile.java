@@ -3,6 +3,7 @@ package com.winterwell.utils.log;
 import java.io.Closeable;
 import java.io.File;
 
+import com.winterwell.utils.IFilter;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.reporting.LogFileTest;
@@ -41,6 +42,14 @@ public class LogFile implements ILogListener, Closeable {
 	public LogFile() {
 		this(new File(ReflectionUtils.getCaller().getClassName() + ".log"));
 	}
+	
+	IFilter<Report> filter;
+	
+	public LogFile setFilter(IFilter<Report> filter) {
+		this.filter = filter;
+		return this;
+	}
+	
 
 	/**
 	 * Create a log-listener and attach it to the Log.
@@ -77,6 +86,9 @@ public class LogFile implements ILogListener, Closeable {
 
 	@Override
 	public void listen(Report report) {
+		if (filter!=null && ! filter.accept(report)) {
+			return; // skip it
+		}
 		// a single line for each report to make it easier to grep
 		String line = report.toString().replaceAll("[\r\n]", " ") + "\n";
 		listen2(line, report.getTime());

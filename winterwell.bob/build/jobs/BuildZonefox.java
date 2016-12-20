@@ -19,8 +19,8 @@ public class BuildZonefox extends BuildTask {
 				new BuildMaths(),
 				new BuildNLP(),
 				new BuildDepot(),
-				new BuildStat()
-//				new BuildBob()
+				new BuildStat(),
+				new BuildBob()
 				);
 		for (BuildWinterwellProject buildWinterwellProject : projects) {
 			buildWinterwellProject.setIncSrc(true);
