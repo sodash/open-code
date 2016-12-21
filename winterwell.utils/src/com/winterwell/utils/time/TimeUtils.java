@@ -25,13 +25,6 @@ import com.winterwell.utils.containers.Pair;
  */
 public class TimeUtils {
 	/**
-	 * 0 = Sunday, 1=Monday ... 6=Saturday
-	 */
-	public static enum KDay {
-		Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
-	}
-
-	/**
 	 * The GMT standard timezone. 
 	 * To get your own timezone, use TimeZone.getTimeZone(name);
 	 */
@@ -155,7 +148,7 @@ public class TimeUtils {
 	 */
 	public static KDay getDayOfWeek(Time t) {
 		int dow = t.getCalendar().get(Calendar.DAY_OF_WEEK);
-		return TimeUtils.KDay.values()[dow - 1];
+		return KDay.values()[dow - 1];
 	}
 
 	/**
