@@ -27,6 +27,18 @@ public class LogFileTest extends TestCase {
 		lf.close();
 	}
 
+
+	public void testLogAutoTag() {
+		File f = new File("test-output/test1.txt");
+		FileUtils.delete(f);
+		LogFile lf = new LogFile(f);
+		Log.d("Hello 1");
+		Log.d("Hello 2");
+		String log = FileUtils.read(f);
+		Printer.out(log);
+		lf.close();
+	}
+
 	public void testRotation() {
 		{
 			File f = new File("test-output/rotate-test.txt");

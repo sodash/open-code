@@ -696,4 +696,12 @@ public class ReflectionUtils {
 		}
 	}
 
+	public static String getCallingClassSimpleName() {
+		StackTraceElement caller = ReflectionUtils.getCaller();
+		String cn = caller.getClassName();
+		int ldot = cn.lastIndexOf('.');
+		if (ldot != -1) cn = cn.substring(ldot);
+		return cn;
+	}
+
 }

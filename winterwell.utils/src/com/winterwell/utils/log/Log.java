@@ -18,6 +18,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.ArgsParser;
+import com.winterwell.utils.reporting.LogFileTest;
 
 /**
  * Yet another logging system. We use Android LogCat style commands, e.g.
@@ -26,11 +27,20 @@ import com.winterwell.utils.io.ArgsParser;
  * Simpler than Log4J, but without features such as /crashes when it fails to
  * find it's config file/.
  *
- *
+ * @testedby {@link LogFileTest}
  * @author daniel
  */
 public class Log {
-
+	
+	/**
+	 * tag = calling class's name
+	 * @param msg
+	 */
+	public static void d(Object msg) {
+		String cn = ReflectionUtils.getCallingClassSimpleName();
+		d(cn, msg);
+	}
+	
 	/**
 	 * An extra string which can be accessed by log listeners. Added to
 	 * {@link LogFile}s. Usage: e.g. a high-level process wishes to include info
