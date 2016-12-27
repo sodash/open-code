@@ -151,26 +151,26 @@ public class JettyLauncher {
 
 	private Server server;
 
-	private final File webAppDir;
+	/**
+	 * The folder that is served up to anyone over http.
+	 */
 	private File webRootDir;
-	File webXmlFile = new File("web/WEB-INF/web.xml");
+	File webXmlFile = null; //new File("web/WEB-INF/web.xml");
 
 	/**
 	 * 
 	 * @param webAppDir
 	 * 			  Can be null (=> use the working directory, but don't look for web.xml).<br>
-	 * 				
-	 *            Expects to find web.xml in the sub-dir web/WEB-INF. If you are
-	 *            not using a web.xml file, call {@link #setWebXmlFile(File)}
+	 *            Will look for the optional web.xml in the sub-dir WEB-INF.
 	 *            with null.
 	 * @param port
 	 */
-	public JettyLauncher(File webAppDir, int port) {
-		if (webAppDir==null) {
+	public JettyLauncher(File webRootDir, int port) {
+		if (webRootDir==null) {
 			setWebXmlFile(null);
-			webAppDir = FileUtils.getWorkingDirectory();
+			webRootDir = FileUtils.getWorkingDirectory();
 		}
-		this.webAppDir = webAppDir;		
+		setWebRootDir(webRootDir);
 		this.port = port;
 	}
 	
@@ -228,7 +228,7 @@ public class JettyLauncher {
 	public void run() {
 		setup();
 		// Add a catch-all web server
-		if (!catchAllServletDefined) {
+		if ( ! catchAllServletDefined) {
 			FileServlet fs = new FileServlet();
 			fs.setBaseDir(webRootDir);
 			String path = "/";
@@ -343,10 +343,7 @@ public class JettyLauncher {
 
 		// Switch off jsessionid-in-the-url badness
 		root.getSessionHandler().getSessionManager()
-				.setSessionIdPathParameterName("none");
-		if (webRootDir==null) {
-			webRootDir = new File(webAppDir, "web");
-		}
+				.setSessionIdPathParameterName("none");		
 		root.setResourceBase(webRootDir.getAbsolutePath());
 
 		// Attempted fix for Egan's transfer bug, Doesn't work :(
@@ -354,9 +351,9 @@ public class JettyLauncher {
 
 		// Add servlets from web.xml
 		if (webXmlFile != null) {
-			if ( ! webXmlFile.exists())
-				throw new IllegalArgumentException(webXmlFile.getAbsolutePath()
-						+ " does not exist");
+			if ( ! webXmlFile.exists()) {
+				throw new IllegalArgumentException(webXmlFile.getAbsolutePath()+ " does not exist.");
+			}
 			run2_webXml();
 		}
 	}

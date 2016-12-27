@@ -19,6 +19,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.HtmlTable;
+import com.winterwell.web.WebPage;
 
 /**
  * A basic bare-bones web server.
@@ -86,6 +87,18 @@ public class FileServlet extends HttpServlet {
 		setBaseDir(baseDir);
 	}
 
+	boolean listDir = true;
+	
+	/**
+	 * If true (default), provide a dynamic index
+	 * @param listDir
+	 * @return 
+	 */
+	public FileServlet setListDir(boolean listDir) {
+		this.listDir = listDir;
+		return this;
+	}
+	
 	/**
 	 * By default, uses {@link #serveFile(File, HttpServletResponse)} to send
 	 * the file out. Subclasses can override.
@@ -159,8 +172,13 @@ public class FileServlet extends HttpServlet {
 
 	protected void serveDirectory(String servletPath, File file, HttpServletResponse resp)
 			throws IOException {
+		if ( ! listDir) {
+			throw new SecurityException();
+		}
 		resp.setContentType(WebUtils.MIME_TYPE_HTML);
 		BufferedWriter writer = FileUtils.getWriter(resp.getOutputStream());
+//		WebPage page = new WebPage();
+		writer.write("<h1>"+file+"</h1>\n");
 		HtmlTable table = new HtmlTable(Arrays.asList("Filename"));
 		for (File f : file.listFiles()) {
 			String path = FileUtils.getRelativePath(f, baseDir);
