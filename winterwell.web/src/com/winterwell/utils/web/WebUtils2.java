@@ -568,7 +568,7 @@ public class WebUtils2 extends WebUtils {
 				&& ! new File(webDir, "static").exists()
 				&& ! new File(webDir, "index.html").exists()) 
 		{
-			Log.w("web", webDir.getAbsolutePath()+" does not appear to be valid: no WEB-INF or static sub-directories or index.html");
+			Log.w("web", webDir.getAbsolutePath()+" might not be valid: no WEB-INF or static sub-directories or index.html");
 		}
 		return webDir;
 	}

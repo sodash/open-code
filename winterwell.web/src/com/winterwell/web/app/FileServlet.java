@@ -117,14 +117,15 @@ public class FileServlet extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException 
 	{
+		WebRequest request = new WebRequest(this, req, resp);
 		try {
 			File file = getFile(req);
+			file = file.getCanonicalFile();
 			// Serve it
 			if (file.isDirectory()) {
-				String servletPath = req.getServletPath();
-				serveDirectory(servletPath, file, resp);
+				serveDirectory(file, request);
 			} else {
-				doFile(file, new WebRequest(this, req, resp));
+				doFile(file, request);
 			}
 		} catch (Throwable e) {
 			Log.report("file", e, Level.SEVERE);
@@ -170,15 +171,15 @@ public class FileServlet extends HttpServlet {
 		}
 	}
 
-	protected void serveDirectory(String servletPath, File file, HttpServletResponse resp)
+	protected void serveDirectory(File file, WebRequest request)
 			throws IOException {
 		if ( ! listDir) {
 			throw new SecurityException();
 		}
-		resp.setContentType(WebUtils.MIME_TYPE_HTML);
-		BufferedWriter writer = FileUtils.getWriter(resp.getOutputStream());
+		request.getResponse().setContentType(WebUtils.MIME_TYPE_HTML);		
+		WebPage page = new WebPage();
 //		WebPage page = new WebPage();
-		writer.write("<h1>"+file+"</h1>\n");
+		page.append("<h1>"+file+"</h1>\n");
 		HtmlTable table = new HtmlTable(Arrays.asList("Filename"));
 		for (File f : file.listFiles()) {
 			String path = FileUtils.getRelativePath(f, baseDir);
@@ -186,8 +187,9 @@ public class FileServlet extends HttpServlet {
 		}
 		String html = table.toHTML();
 		html = WebUtils.stripScripts(html);
-		writer.append(html);
-		writer.close();
+		page.append(html);
+		request.setPage(page);
+		request.sendPage();
 	}
 
 	/**
