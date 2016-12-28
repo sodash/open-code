@@ -423,7 +423,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 		// If that's not good enough, the user should do the conversion
 		// themselves
 		// and put in the String.
-		return Printer.toString(v);
+		String sv = Printer.toString(v);
+		return sv;
 	}
 
 	/**
@@ -554,6 +555,12 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 		}
 	}
 
+	transient boolean checkValueFlag = true;
+	
+	public void setCheckValueFlag(boolean checkValueFlag) {
+		this.checkValueFlag = checkValueFlag;
+	}
+	
 	/**
 	 * TODO be more lenient, or delete this altogether. This is just for smoking
 	 * out bad practice. It currently blocks plenty of no-problem cases (e.g.
@@ -562,6 +569,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 * @param value
 	 */
 	private void put2_checkValue(String key, Object value) {
+		if ( ! checkValueFlag) return;
 		Class<? extends Object> vc = value.getClass();
 		assert vc.isPrimitive() || vc == Class.class || vc == String.class
 				|| vc == Double.class || vc == Long.class
@@ -586,6 +594,12 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	public void putAll(IProperties props) {
 		for (Key k : props.getKeys()) {
 			put(k, props.get(k));
+		}
+	}
+
+	public void putAll(Map props) {
+		for (Object k : props.keySet()) {
+			put(k.toString(), props.get(k));
 		}
 	}
 

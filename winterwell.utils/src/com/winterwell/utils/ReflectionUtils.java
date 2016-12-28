@@ -505,12 +505,27 @@ public class ReflectionUtils {
 	 * @see #getSomeStack(int, String...)
 	 */
 	public static StackTraceElement getCaller(String... ignore) {
+		return getCaller(0, ignore);
+	}
+
+
+	/**
+	 * Who called this method?
+	 * 
+	 * @param ignore
+	 *            list of fully-qualified-class or method names to ignore (will
+	 *            then search higher up the stack)
+	 * @return Can be a dummy entry if the filters exclude everything. Never
+	 *         null.
+	 * @see #getSomeStack(int, String...)
+	 */
+	public static StackTraceElement getCaller(int up, String... ignore) {
 		List<String> ignoreNames = Arrays.asList(ignore);
 		try {
 			throw new Exception();
 		} catch (Exception e) {
 			StackTraceElement[] trace = e.getStackTrace();
-			for (int i = 2; i < trace.length; i++) {
+			for (int i = 2+up; i < trace.length; i++) {
 				String clazz = trace[i].getClassName();
 				String method = trace[i].getMethodName();
 				if (ignoreNames.contains(clazz) || ignoreNames.contains(method)) {
@@ -696,11 +711,17 @@ public class ReflectionUtils {
 		}
 	}
 
-	public static String getCallingClassSimpleName() {
-		StackTraceElement caller = ReflectionUtils.getCaller();
+	/**
+	 * 
+	 * @param up Number of steps up the stacktrace to look. 0=the class which calls this, 1=the method before, etc.
+	 * 1 is probably the most commonly wanted value.
+	 * @return
+	 */
+	public static String getCallingClassSimpleName(int up) {
+		StackTraceElement caller = ReflectionUtils.getCaller(up);
 		String cn = caller.getClassName();
 		int ldot = cn.lastIndexOf('.');
-		if (ldot != -1) cn = cn.substring(ldot);
+		if (ldot != -1) cn = cn.substring(ldot+1);
 		return cn;
 	}
 

@@ -37,8 +37,16 @@ public class Log {
 	 * @param msg
 	 */
 	public static void d(Object msg) {
-		String cn = ReflectionUtils.getCallingClassSimpleName();
+		String cn = ReflectionUtils.getCallingClassSimpleName(1);
 		d(cn, msg);
+	}
+	/**
+	 * tag = calling class's name
+	 * @param msg
+	 */
+	public static void i(Object msg) {
+		String cn = ReflectionUtils.getCallingClassSimpleName(1);
+		i(cn, msg);
 	}
 	
 	/**
@@ -364,14 +372,6 @@ public class Log {
 				"class", sn,
 				"method", c.getMethodName());
 		return Printer.format(s, vars);
-	}
-
-	public static void d(String msg) {
-		StackTraceElement caller = ReflectionUtils.getCaller();
-		String tag = caller.getClassName();
-		int i = tag.lastIndexOf('.');
-		if (i!=-1) tag = tag.substring(i+1);
-		d(tag, msg);
 	}
 
 	/**
