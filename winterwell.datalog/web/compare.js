@@ -1,28 +1,66 @@
 
+function flattenObject(object) {
+	let out = {};
+	flattenObject2(object, false, out);
+	return out;
+}
+
+function flattenObject2(object, key, out) {
+	if ( ! _.isObject(object)) {
+		if ( ! key) key = 'no-key';
+		out[key] = object;
+		return;
+	}
+	// Hack for prettier output: avoid extra nesting in key if we can do so without potential clashes
+	let prevKey = key+' ';
+	if (true || ! key || Object.keys(object).length === 1 || _.isArray(object)) {
+		prevKey = '';
+	}
+	_.forIn(object, function(value, key2) {
+		flattenObject2(value, prevKey+key2, out);
+	});
+}
+
+$('#filterInput').change(function(e) {
+	const val = $('#filterInput').val();
+	console.log('change',e,val);
+	$('tr').each(function(){
+		const text = $(this).text().toLowerCase();
+		if (text.contains(val)) {
+			$(this).show();
+			return;
+		}
+		$(this).hide();
+	});
+});
+
 $(function(){
 	
 	$.get('http://localhost:8765/project/assist?action=get')
 	.then(function(results){
 		console.log("results",results);
-		let scoreNames = pivot(results, "'cargo' -> i -> '_source' -> 'scores' -> scoreName -> scoreValue", 'scoreName', {mode:'set'});
+		let scores = pivot(results, "'cargo' -> i -> '_source' -> 'results' -> scores", 'scores');
+		scores = flattenObject(scores);
+		let scoreNames = Object.keys(scores);
 		console.log("scoreNames", scoreNames);
 		let expIds = pivot(results, "'cargo' -> i -> '_id' -> id", 'id');
 		console.log("expIds", expIds);
 		// Build a table of results
-		const $tbl = $('<table class="table"></table>');
+		const $tbl = $('<table class="table table-striped"></table>');
 		{	// header
 			let $tr = $('<tr></tr>');
 			$tr.append('<th></th>'); // exp name
 			$tr.append('<th></th>'); // exp controls
 			for(let i=0; i<scoreNames.length; i++) {
-				$tr.append('<th>'+scoreNames[i]+'</th>');
+				$tr.append('<th>'+scoreNames[i].replace(/[_\-]/g, ' ')+'</th>');
 			}
 			$tbl.append($tr);
 		}
 		let experiments = results.cargo;
 		for(let ri=0; ri<experiments.length; ri++) {
 			const e = experiments[ri];
-			const scores = e._source.scores;
+			const scores = e._source.results;
+			let flatScores = flattenObject(scores);
 			const spec = e._source.spec;
 			let $tr = $('<tr></tr>');
 			let ename = spec.name;
@@ -46,7 +84,8 @@ $(function(){
 			$td.append($delBtn);
 			$tr.append($td);
 			for(let si=0; si<scoreNames.length; si++) {
-				let score = scores[scoreNames[si]];
+				let score = flatScores[scoreNames[si]];
+				console.log('flatScores', flatScores, scoreNames[si]);
 				let klass = judge(scoreNames[si], score);
 				$tr.append('<td class="'+klass+'">'+(_.isNumber(score)? printer.prettyNumber(score) : printer.str(score))+'</td>');
 			}
@@ -58,7 +97,7 @@ $(function(){
 });
 
 function judge(scoreName, score) {
-	const GOOD = 'good', WARNING='warning', BAD='bad';
+	const GOOD = 'success', WARNING='warning', BAD='danger';
 	if (scoreName==='R2' || scoreName==='adjusted_R2') {
 		if (score>0.8) return GOOD;
 		if (score<0.5) return BAD;

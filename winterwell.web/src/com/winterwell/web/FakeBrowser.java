@@ -184,6 +184,7 @@ public class FakeBrowser {
 
 	/**
 	 * Only allow 10 mb?!
+	 * -1 => unlimited
 	 */
 	private long MAX_DOWNLOAD = 10 * 1024 * 1024;
 
@@ -507,7 +508,9 @@ public class FakeBrowser {
 			inStream = new GZIPInputStream(inStream);
 		}
 		// ...defend against giant files
-		inStream = new LimitedInputStream(inStream, MAX_DOWNLOAD);
+		if (MAX_DOWNLOAD>0) {
+			inStream = new LimitedInputStream(inStream, MAX_DOWNLOAD);
+		}
 		
 		// Interpret as text by default
 		String type = "text";
@@ -706,7 +709,16 @@ public class FakeBrowser {
 		ignoreBinaryFiles = b;
 	}
 
+
+	/**
+	 * max 10 mb by default. -1 for unlimited
+	 */
 	public void setMaxDownload(int mb) {
+		if (mb==-1) {
+			MAX_DOWNLOAD = -1; //unlimited
+			return;
+		}
+		assert mb > 0 : mb;
 		MAX_DOWNLOAD = mb * 1024L * 1024L;
 	}
 
