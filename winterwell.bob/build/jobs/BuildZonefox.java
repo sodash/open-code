@@ -14,7 +14,7 @@ public class BuildZonefox extends BuildTask {
 		File zflibs = new File(FileUtils.getWinterwellDir(), "zonefox/libs");
 		assert zflibs.isDirectory() : zflibs;
 		List<BuildWinterwellProject> projects = Arrays.asList(				
-//				new BuildWeb(),
+				new BuildWeb(),
 //				new BuildMaths(),
 //				new BuildNLP(),
 //				new BuildDepot(),

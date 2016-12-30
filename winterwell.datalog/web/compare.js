@@ -21,21 +21,8 @@ function flattenObject2(object, key, out) {
 	});
 }
 
-$('#filterInput').change(function(e) {
-	const val = $('#filterInput').val();
-	console.log('change',e,val);
-	$('tr').each(function(){
-		const text = $(this).text().toLowerCase();
-		if (text.contains(val)) {
-			$(this).show();
-			return;
-		}
-		$(this).hide();
-	});
-});
-
 $(function(){
-	
+
 	$.get('http://localhost:8765/project/assist?action=get')
 	.then(function(results){
 		console.log("results",results);
@@ -46,31 +33,34 @@ $(function(){
 		let expIds = pivot(results, "'cargo' -> i -> '_id' -> id", 'id');
 		console.log("expIds", expIds);
 		// Build a table of results
-		const $tbl = $('<table class="table table-striped"></table>');
+		const $tbl = $('<table class="table compact table-striped"></table>');
 		{	// header
 			let $tr = $('<tr></tr>');
-			$tr.append('<th></th>'); // exp name
+			$tr.append('<th>Experiment Name</th>'); // exp name
 			$tr.append('<th></th>'); // exp controls
 			for(let i=0; i<scoreNames.length; i++) {
 				$tr.append('<th>'+scoreNames[i].replace(/[_\-]/g, ' ')+'</th>');
 			}
-			$tbl.append($tr);
+			const $thead = $("<thead></thead>"); 
+			$thead.append($tr);
+			$tbl.append($thead);
 		}
 		let experiments = results.cargo;
+		const $tbody = $("<tbody></tbody>"); 
 		for(let ri=0; ri<experiments.length; ri++) {
 			const e = experiments[ri];
 			const scores = e._source.results;
 			let flatScores = flattenObject(scores);
 			const spec = e._source.spec;
-			let $tr = $('<tr></tr>');
-			let ename = spec.name;
-			if ( ! ename) {
+			let $tr = $('<tr class="result"></tr>');
+			let ename = e._source.name;
+			if ( ! ename && spec) {
 				ename = spec.planname;
 			}
 			if ( ! ename) {
 				ename = e._id;
 			} //data_source			
-			$tr.append('<th title="'+printer.str(spec).replace(/["']/g,'')+'">'+ename.substr(0,60)+'</th>');
+			$tr.append('<th title="">'+ename.substr(0,60)+'</th>');
 			let $td = $('<td></td>');
 			let $delBtn = $('<button><span class="glyphicon glyphicon-trash"></span></button>');
 			$delBtn.click(function() {
@@ -89,16 +79,18 @@ $(function(){
 				let klass = judge(scoreNames[si], score);
 				$tr.append('<td class="'+klass+'">'+(_.isNumber(score)? printer.prettyNumber(score) : printer.str(score))+'</td>');
 			}
-			$tbl.append($tr);
+			$tbody.append($tr);
 		}
+		$tbl.append($tbody);
 		$('#results').append($tbl);
+		setTimeout(function(){$tbl.DataTable();},50);
 	});
 	
 });
 
 function judge(scoreName, score) {
 	const GOOD = 'success', WARNING='warning', BAD='danger';
-	if (scoreName==='R2' || scoreName==='adjusted_R2') {
+	if (scoreName.indexOf('R2') !== -1) {
 		if (score>0.8) return GOOD;
 		if (score<0.5) return BAD;
 		if (score<0.65) return WARNING;
