@@ -416,15 +416,25 @@ public class WebUtils2 extends WebUtils {
 		return getMimeType(file.getPath());
 	}
 
+	
+	/**
+	 * @param fileName
+	 * @return can (rarely) return null
+	 */
 	public static String getMimeType(String fileName) {
-		// Workaround for bug in MimeUtil re css
-		String type = FileUtils.getType(fileName);
-		if (type.equals("css"))
-			return "text/css";
-		// csv is text/csv c.f. http://tools.ietf.org/html/rfc4180
-		if (type.equals("csv")) return "text/csv";
-		// Ugly library, but hopefully effective
-		return MimeUtil.getMimeType(fileName);
+		try {
+			// Workaround for bug in MimeUtil re css
+			String type = FileUtils.getType(fileName);
+			if (type.equals("css"))
+				return "text/css";
+			// csv is text/csv c.f. http://tools.ietf.org/html/rfc4180
+			if (type.equals("csv")) return "text/csv";
+			// Ugly library, but hopefully effective
+			return MimeUtil.getMimeType(fileName);
+		} catch(Throwable ex) { // get mimetype can fail on a missing jar
+			Log.e("FileServlet", ex);
+			return null;
+		}
 	}
 
 	/**

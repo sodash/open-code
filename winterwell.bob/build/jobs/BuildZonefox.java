@@ -15,11 +15,11 @@ public class BuildZonefox extends BuildTask {
 		assert zflibs.isDirectory() : zflibs;
 		List<BuildWinterwellProject> projects = Arrays.asList(				
 				new BuildWeb(),
-//				new BuildMaths(),
-//				new BuildNLP(),
-//				new BuildDepot(),
-//				new BuildStat(),
-//				new BuildBob(),
+				new BuildMaths(),
+				new BuildNLP(),
+				new BuildDepot(),
+				new BuildStat(),
+				new BuildBob(),
 				new BuildUtils()
 				);
 		for (BuildWinterwellProject buildWinterwellProject : projects) {

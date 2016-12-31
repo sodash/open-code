@@ -65,7 +65,7 @@ public class FileServlet extends HttpServlet {
 			// Note: Can cause issues if someone edits the
 			// file whilst we are piping it out
 			FileUtils.copy(in, out);
-			Log.v("file","Served "+file+" as "+mime );
+//			Log.v("file","Served "+file+" as "+mime );
 		} finally {
 			FileUtils.close(in);
 			FileUtils.close(resp.getOutputStream());
