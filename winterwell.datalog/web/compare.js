@@ -60,7 +60,8 @@ $(function(){
 			if ( ! ename) {
 				ename = e._id;
 			} //data_source			
-			$tr.append('<th title="">'+ename.substr(0,60)+'</th>');
+			let link = 'http://localhost:8766/assist/experiment/'+e._id;
+			$tr.append('<th title=""><a href="'+link+'">'+ename.substr(0,60)+'</a></th>');
 			let $td = $('<td></td>');
 			let $delBtn = $('<button><span class="glyphicon glyphicon-trash"></span></button>');
 			$delBtn.click(function() {
@@ -77,7 +78,7 @@ $(function(){
 				let score = flatScores[scoreNames[si]];
 				console.log('flatScores', flatScores, scoreNames[si]);
 				let klass = judge(scoreNames[si], score);
-				$tr.append('<td class="'+klass+'">'+(_.isNumber(score)? printer.prettyNumber(score) : printer.str(score))+'</td>');
+				$tr.append('<td class="'+klass+'">'+(_.isNumber(score)? printer.prettyNumber(score) : _.isUndefined(score)? -1 : printer.str(score))+'</td>');
 			}
 			$tbody.append($tr);
 		}
@@ -106,5 +107,30 @@ function judge(scoreName, score) {
 		if (score > 2.25) return BAD; // successive error terms are negatively correlated		
 		if (score>=1 && score <= 2) return GOOD;
 	}
+	if (scoreName==='stopwatch') {
+		// NB: kfold will slow stuff down
+		if (score<60) return GOOD;
+		if (score>200) return BAD;
+		if (score>120) return WARNING;		
+	}
+	if (scoreName.indexOf('uplift ratio mean') != -1) {
+		if (score<0 || score >20) return BAD;
+		if (score < 0.5 || score>10) return WARNING;
+		if (score > 2 && score <10) return GOOD;		
+	}
+	if (scoreName.indexOf('caused by')!=-1) {
+		if (score<0 || score >0.8) return BAD;
+		if (score<0.1 || score>0.7) return WARNING;				
+	}
+	if (scoreName.indexOf('correlation')!=-1) {
+		let as = Math.abs(score);
+		if (as < 0.4 || as>1.1) return BAD;
+		if (as < 0.6) return WARNING;				
+	}
+	if (scoreName==='NRMSE') {
+		if (score<0.1) return GOOD;
+		if (score>0.6) return BAD;
+		if (score>0.4) return WARNING;		
+	}
 	return '';
-}1
+}
