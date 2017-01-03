@@ -40,6 +40,7 @@ $(function(){
 			let $tr = $('<tr></tr>');
 			$tr.append('<th>Experiment Name</th>'); // exp name
 			$tr.append('<th></th>'); // exp controls
+			$tr.append('<th>Time</th>'); // time
 			for(let i=0; i<scoreNames.length; i++) {
 				$tr.append('<th>'+scoreNames[i].replace(/[_\-]/g, ' ')+'</th>');
 			}
@@ -84,6 +85,10 @@ $(function(){
 			});
 			$td.append($delBtn);
 			$tr.append($td);
+			// time
+			let etime = new Date(e._source.storageTime);
+			let $tdtime = $('<td>'+etime+'</td>');
+			$tr.append($tdtime);
 			for(let si=0; si<scoreNames.length; si++) {
 				let score = flatScores[scoreNames[si]];
 //				console.log('flatScores', flatScores, scoreNames[si]);
@@ -98,14 +103,14 @@ $(function(){
 			let table = $tbl.DataTable({
 				fixedColumns: true,
 				scrollX:true,
-				scrollY:700,				
+				scrollY:600,				
 				scrollCollapse:true
 			});
 			for(let i=0; i<scoreNames.length; i++) {
 				let $a = $('<a style="margin-right:4px;">'+scoreNames[i]+'</a>;')
 				$a.on('click', function (e) {
 			        e.preventDefault();
-			        var column = table.column(i+2);
+			        var column = table.column(i+3);
 			        // Toggle the visibility
 			        if (column.visible()) {
 			        	column.visible( false );

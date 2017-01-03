@@ -35,6 +35,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Range;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.AField;
@@ -51,6 +52,7 @@ import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.IndexRequestBuilder;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
+import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
@@ -123,9 +125,12 @@ public class MasterHttpServlet extends HttpServlet {
 		request.sendPage();
 	}
 
-	private JsonResponse doAction(WebRequest request) {
+	private JsonResponse doAction(WebRequest request) {		
 		if (request.actionIs("record")) {
 			return doReport(request, true);
+		}
+		if (request.actionIs("upload")) {
+			return doUpload(request);
 		}
 		if (request.actionIs("check")) {
 			return doReport(request, false);
@@ -140,7 +145,28 @@ public class MasterHttpServlet extends HttpServlet {
 		return null;
 	}
 
-	
+	private JsonResponse doUpload(WebRequest request) {
+		request.processMultipartIncoming(null);
+		String id = request.getSlugBits(2);		
+		Map<String, Object> pmap = request.getParameterMap();
+		Object files = request.getParameterMap().get("files");
+		Object filenames = request.getParameterMap().get("files-filename");		
+		if (files instanceof File) {
+			File dest = new File("uploads/"+request.getSlug(), filenames.toString());
+			// save the file into ES??
+//			if ("model.json".equals(filenames)) {
+//				ESHttpClient ec = new ESHttpClient(DataExperimentServer.esconfig);
+//				UpdateRequestBuilder up = ec.prepareUpdate("assist", "experiment", id);
+//				up.setDoc(json)
+//				IESResponse r = up.get();
+//				System.out.println(r);
+//			}
+			dest.mkdirs();
+			FileUtils.move((File)files, dest);
+		}
+		return new JsonResponse(request, null);
+	}
+
 	private void doOpenFile(WebRequest request) {
 		String f = request.get("file");
 		File file;
@@ -174,7 +200,7 @@ public class MasterHttpServlet extends HttpServlet {
 		ESHttpClient ec = new ESHttpClient(DataExperimentServer.esconfig);
 		SearchRequestBuilder search = ec.prepareSearch(request.get("project"));
 		search.setType(request.get(TYPE, "experiment"));
-		search.setSourceInclude("name","results","hash", "spec.hash", "spec.output_dir");
+		search.setSourceInclude("name","results","storageTime", "hash", "spec.hash", "spec.output_dir");
 		search.setSize(10000);
 		// no trash
 		if ( ! "trash".equals(request.get("status"))) {
@@ -206,7 +232,7 @@ public class MasterHttpServlet extends HttpServlet {
 			IndexRequestBuilder ir = ec.prepareIndex(project, type, id);
 			ir.setSource(map);
 			IESResponse resp = ir.get();
-			Object cargo = resp.getParsedJson();
+			Map<String, Object> cargo = resp.getParsedJson();
 			if (request.get(new Checkbox("purge"), false)) {
 				doPurgeOthers(id, map);
 			}
