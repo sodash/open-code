@@ -95,7 +95,12 @@ $(function(){
 		$tbl.append($tbody);
 		$('#results').append($tbl);
 		setTimeout(function(){
-			let table = $tbl.DataTable();
+			let table = $tbl.DataTable({
+				fixedColumns: true,
+				scrollX:true,
+				scrollY:700,				
+				scrollCollapse:true
+			});
 			for(let i=0; i<scoreNames.length; i++) {
 				let $a = $('<a style="margin-right:4px;">'+scoreNames[i]+'</a>;')
 				$a.on('click', function (e) {
