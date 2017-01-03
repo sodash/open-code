@@ -404,7 +404,7 @@ public class StrUtils {
 		try {
 			java.security.MessageDigest md = java.security.MessageDigest
 					.getInstance(hashAlgorithm);
-			StringBuffer result = new StringBuffer();
+			StringBuilder result = new StringBuilder();
 			try {
 				for (byte b : md.digest(txt.getBytes(ENCODING_UTF8))) {
 					result.append(Integer.toHexString((b & 0xf0) >>> 4));

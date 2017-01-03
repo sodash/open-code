@@ -761,8 +761,18 @@ public class WebRequest implements IProperties, Closeable {
 		String slug = getSlug();
 		if (slug == null)
 			return StrUtils.ARRAY;
-		String[] bits = slug.split("/");
+		String[] bits = slug.split("/"); // SHould we split on // as well?
 		return bits;
+	}
+	
+	/**
+	 * Convenience for might-be-null
+	 * @param i
+	 * @return slug-bit i or null
+	 */
+	public final String getSlugBits(int i) {
+		String[] bits = getSlugBits();
+		return bits.length > i && ! Utils.isBlank(bits[i])? bits[i] : null;
 	}
 
 	public StopWatch getStopWatch() {

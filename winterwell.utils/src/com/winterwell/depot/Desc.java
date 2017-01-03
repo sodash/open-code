@@ -393,6 +393,12 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 			sb.append('/');
 		}
 
+		// too long? hash daft ids (but leave the name alone, so do that next)
+		if (sb.length() > 512) {
+			String partId = sb.toString();
+			sb = new StringBuilder(partId.substring(0, 140)+StrUtils.md5(partId));
+		}
+		
 		// name
 		sb.append(name);
 		// version (almost) last of all
@@ -411,7 +417,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 			sb.append(".ser");
 		if (gzip)
 			sb.append(".gz");
-		id = sb.toString();
+		id = sb.toString();		
 		return id;
 	}
 
