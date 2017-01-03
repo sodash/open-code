@@ -28,11 +28,13 @@ $(function(){
 		console.log("results",results);
 		let scores = pivot(results, "'cargo' -> i -> '_source' -> 'results' -> scores", 'scores');
 		scores = flattenObject(scores);
-		let scoreNames = Object.keys(scores);
+		const scoreNames = Object.keys(scores).sort();
 		console.log("scoreNames", scoreNames);
 		let expIds = pivot(results, "'cargo' -> i -> '_id' -> id", 'id');
 		console.log("expIds", expIds);
 		// Build a table of results
+		const $toggles = $('<div class="well">Toggle columns: </div>');
+		$('#results').append($toggles);
 		const $tbl = $('<table class="table compact table-striped"></table>');
 		{	// header
 			let $tr = $('<tr></tr>');
@@ -60,8 +62,16 @@ $(function(){
 			if ( ! ename) {
 				ename = e._id;
 			} //data_source			
+			console.log(ename, e);			
 			let link = 'http://localhost:8766/assist/experiment/'+e._id;
-			$tr.append('<th title=""><a href="'+link+'">'+ename.substr(0,60)+'</a></th>');
+			if (spec) {
+				let odir = spec.output_dir;
+				
+				link = '/project/assist/view'+odir+'/html/output-viewer.html';
+//				"/home/daniel/winterwell/tv2/assist/test-data-out/AssistData_Expedia_start_KFL_Attrib_cols=all_columns_v1"
+//				file:///home/daniel/winterwell/tv2/assist/test-data-out/AssistData_Expedia_season_LR2_Spend/html/output-viewer.html					
+			}
+			$tr.append('<th title=""><a target="_new" href="'+link+'">'+ename.substr(0,140)+'</a></th>');
 			let $td = $('<td></td>');
 			let $delBtn = $('<button><span class="glyphicon glyphicon-trash"></span></button>');
 			$delBtn.click(function() {
@@ -76,7 +86,7 @@ $(function(){
 			$tr.append($td);
 			for(let si=0; si<scoreNames.length; si++) {
 				let score = flatScores[scoreNames[si]];
-				console.log('flatScores', flatScores, scoreNames[si]);
+//				console.log('flatScores', flatScores, scoreNames[si]);
 				let klass = judge(scoreNames[si], score);
 				$tr.append('<td class="'+klass+'">'+(_.isNumber(score)? printer.prettyNumber(score) : _.isUndefined(score)? -1 : printer.str(score))+'</td>');
 			}
@@ -84,7 +94,28 @@ $(function(){
 		}
 		$tbl.append($tbody);
 		$('#results').append($tbl);
-		setTimeout(function(){$tbl.DataTable();},50);
+		setTimeout(function(){
+			let table = $tbl.DataTable();
+			for(let i=0; i<scoreNames.length; i++) {
+				let $a = $('<a style="margin-right:4px;">'+scoreNames[i]+'</a>;')
+				$a.on('click', function (e) {
+			        e.preventDefault();
+			        var column = table.column(i+2);
+			        // Toggle the visibility
+			        if (column.visible()) {
+			        	column.visible( false );
+			        	$a.addClass('off').removeClass('on');
+					} else {
+						column.visible( true);
+			        	$a.addClass('on').removeClass('off');
+					}
+			    } );
+				$toggles.append($a);
+				if (scoreNames[i].indexOf('stddev') !== -1) {
+					$a.click();
+				}
+			}
+		}, 50);
 	});
 	
 });
@@ -123,6 +154,7 @@ function judge(scoreName, score) {
 		if (score<0.1 || score>0.7) return WARNING;				
 	}
 	if (scoreName.indexOf('correlation')!=-1) {
+		if ( ! _.isNumber(score)) return '';
 		let as = Math.abs(score);
 		if (as < 0.4 || as>1.1) return BAD;
 		if (as < 0.6) return WARNING;				
