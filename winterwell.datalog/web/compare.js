@@ -112,7 +112,7 @@ $(function(){
 				scrollCollapse:true
 			});
 			for(let i=0; i<scoreNames.length; i++) {
-				let $a = $('<a style="margin-right:4px;">'+scoreNames[i]+'</a>;')
+				let $a = $('<a style="margin-left:4px;">'+scoreNames[i]+'</a>')
 				$a.on('click', function (e) {
 			        e.preventDefault();
 			        var column = table.column(i+3);
@@ -126,6 +126,7 @@ $(function(){
 					}
 			    } );
 				$toggles.append($a);
+				$toggles.append("<span>, </span>");
 				if (scoreNames[i].indexOf('stddev') !== -1) {
 					$a.click();
 				}
