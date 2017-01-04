@@ -86,8 +86,13 @@ $(function(){
 			$td.append($delBtn);
 			$tr.append($td);
 			// time
-			let etime = new Date(e._source.storageTime);
-			let $tdtime = $('<td>'+etime+'</td>');
+			let etime = '';
+			try {
+				etime = new Date(e._source.storageTime);
+			} catch(ex) {
+				console.warn(e._source.storageTime, ex)
+			}
+			let $tdtime = $('<td>'+(etime+"").substr(0,"Wed Jan 04 2017 18:00".length)+'</td>');
 			$tr.append($tdtime);
 			for(let si=0; si<scoreNames.length; si++) {
 				let score = flatScores[scoreNames[si]];
@@ -160,6 +165,9 @@ function judge(scoreName, score) {
 		if (score > 2 && score <10) return GOOD;		
 	}
 	if (scoreName.indexOf('caused by')!=-1) {
+		if (scoreName=='% caused by TV') {
+			score = score/100;
+		}
 		if (score<0 || score >0.8) return BAD;
 		if (score<0.1 || score>0.7) return WARNING;				
 	}

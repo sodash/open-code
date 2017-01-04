@@ -28,6 +28,7 @@ import com.winterwell.maths.datastorage.HalfLifeMap;
 import com.winterwell.maths.stats.distributions.cond.Cntxt;
 import com.winterwell.maths.stats.distributions.cond.FrequencyCondDistribution;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
+import com.winterwell.utils.BestOne;
 import com.winterwell.utils.IBuildStrings;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
@@ -54,6 +55,8 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ListMap;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.WebInputException;
@@ -208,6 +211,41 @@ public class MasterHttpServlet extends HttpServlet {
 			search.setQuery(fb);
 		}		
 		SearchResponse results = search.get();
+		
+		// purge
+		int delcnt=0;
+		ListMap<String,Map> named2rs = new ListMap();
+		for(Map hit : results.getHits()) {
+			String name = SimpleJson.get(hit, "_source", "name");
+			if (name==null) continue;
+			named2rs.add(name, hit);
+		}
+		for(String name : named2rs.keySet()) {
+			List<Map> rs = named2rs.get(name);
+			if (rs.size() < 1) continue;
+			BestOne<Map> latest = new BestOne<>();
+			for (Map map : rs) {
+				String st = SimpleJson.get(map, "_source", "storageTime");
+				if (st==null) continue;
+				Time t = new Time(st);
+				double score = t.getTime();
+				latest.maybeSet(map, score);
+			}
+			rs.remove(latest.getBest());
+			for (Map map : rs) {
+				DeleteRequestBuilder del = new DeleteRequestBuilder(ec);
+				String id = (String) map.get("_id");
+				if (id==null) continue;
+				del.setIndex("assist");
+				del.setType("experiment");
+				del.setId(id);
+				IESResponse delr = del.get();
+				String j = delr.getJson();
+				delcnt++;
+			}
+		}
+		System.out.println("DELCNT: "+delcnt);
+		
 		System.out.println("JSON length: "+Printer.prettyNumber(results.getJson().length())+" Total: "+results.getTotal()+" Hits: "+results.getHits().size());
 		return new JsonResponse(request, results.getHits());
 	}
@@ -250,6 +288,7 @@ public class MasterHttpServlet extends HttpServlet {
 		if (name==null) return;
 		ESHttpClient ec = new ESHttpClient(DataExperimentServer.esconfig);
 		DeleteByQueryRequestBuilder del = new DeleteByQueryRequestBuilder(ec, "assist");
+		del.setType("experiment");
 		QueryBuilder fb = 
 				new BoolQueryBuilder()
 					.mustNot(new IdsQueryBuilder().ids(id))
