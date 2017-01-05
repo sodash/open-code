@@ -497,6 +497,8 @@ public class ReflectionUtils {
 	/**
 	 * Who called this method?
 	 * 
+	 * NB: This always skips the actual calling method, stacktrace #-0
+	 * 
 	 * @param ignore
 	 *            list of fully-qualified-class or method names to ignore (will
 	 *            then search higher up the stack)
@@ -505,7 +507,7 @@ public class ReflectionUtils {
 	 * @see #getSomeStack(int, String...)
 	 */
 	public static StackTraceElement getCaller(String... ignore) {
-		return getCaller(0, ignore);
+		return getCaller(1, ignore);
 	}
 
 
@@ -515,6 +517,7 @@ public class ReflectionUtils {
 	 * @param ignore
 	 *            list of fully-qualified-class or method names to ignore (will
 	 *            then search higher up the stack)
+	 * @param up 0 = get the method directly above the one calling this.           
 	 * @return Can be a dummy entry if the filters exclude everything. Never
 	 *         null.
 	 * @see #getSomeStack(int, String...)
@@ -713,7 +716,9 @@ public class ReflectionUtils {
 
 	/**
 	 * 
-	 * @param up Number of steps up the stacktrace to look. 0=the class which calls this, 1=the method before, etc.
+	 * @param up Number of steps up the stacktrace to look. 
+	 * 0=the class which calls this (ie equiv to getClass().getSimpleName() but slower), 
+	 * 1=the method before, etc.
 	 * 1 is probably the most commonly wanted value.
 	 * @return
 	 */
