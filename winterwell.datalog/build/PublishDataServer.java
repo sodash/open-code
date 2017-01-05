@@ -45,6 +45,7 @@ import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
 
 import jobs.BuildBob;
+import jobs.BuildFlexiGson;
 import jobs.BuildMaths;
 import jobs.BuildStat;
 import jobs.BuildUtils;
@@ -76,7 +77,9 @@ public class PublishDataServer extends BuildTask {
 				new BuildMaths(),
 				new BuildBob(),
 				new BuildWeb(),
-				new BuildStat()
+				new BuildStat(),
+				new BuildESJavaClient(),
+				new BuildFlexiGson()
 				);
 	}
 
@@ -191,9 +194,11 @@ public class PublishDataServer extends BuildTask {
 			}
 			
 			// Do the rsync!
-			String dest = rsyncDest("lib");
-			RSyncTask task = new RSyncTask(localLib.getAbsolutePath(), dest, true);
+			String from = localLib.getAbsolutePath();
+			String dest = rsyncDest("lib");			
+			RSyncTask task = new RSyncTask(from, dest, true).setDirToDir();
 			task.run();
+			task.close();
 			System.out.println(task.getOutput());
 		}
 		{	// web
@@ -202,6 +207,7 @@ public class PublishDataServer extends BuildTask {
 			RSyncTask rsyncCode = new RSyncTask(
 					new File(localWebAppDir,"web").getAbsolutePath(),
 					rsyncDest("web"), true);
+			rsyncCode.setDirToDir();
 			rsyncCode.run();
 			String out = rsyncCode.getOutput();
 			rsyncCode.close();

@@ -20,7 +20,17 @@ public class RSyncTask extends ProcessTask {
 	String srcPath;
 	String destPath;
 
-	private String rargs = "-rLpzP";
+	/**
+	 * -r: recursive
+	 * -L: copy the contents of symlinks
+	 * -p: preserve permissions
+	 * -v: verbose
+	 * -z: compress for transmission
+	 * -P: Keep partially transmitted files and show progress during
+	 *  
+	 *  ?? -a = -rlptgoD -- we should maybe switch
+	 */
+	private String rargs = "-rLpzPt";
 	private final boolean delete;
 
 	/**
@@ -61,6 +71,18 @@ public class RSyncTask extends ProcessTask {
 		}
 		this.destPath = destPath;
 		this.delete = delete;
+	}
+	
+	/**
+	 * Convenience for setting srcPath and destPath to have trailing /s 
+	 * Which I think is the right setup for 
+	 * "please sync directory srcPath with directory destPath, no don't put it into destPath as a sub-dir"
+	 * @return this
+	 */
+	public RSyncTask setDirToDir() {
+		if ( ! srcPath.endsWith("/")) srcPath+="/";
+		if ( ! destPath.endsWith("/")) destPath+="/";
+		return this;
 	}
 	
 	@Override
