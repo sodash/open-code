@@ -127,7 +127,7 @@ $(function(){
 			    } );
 				$toggles.append($a);
 				$toggles.append("<span>, </span>");
-				if (scoreNames[i].indexOf('stddev') !== -1) {
+				if (scoreNames[i].indexOf('stddev') !== -1 || scoreNames[i].indexOf('local') !== -1 || scoreNames[i].indexOf('attribresponse') !== -1) {
 					$a.click();
 				}
 			}
@@ -150,9 +150,10 @@ function judge(scoreName, score) {
 	}
 	if (scoreName==='durbin_watson') {
 		// 1 to 2 is the good range
-		if (score < 0.75) return BAD; // successive error terms are positively correlated
-		if (score > 2.25) return BAD; // successive error terms are negatively correlated		
-		if (score>=1 && score <= 2) return GOOD;
+		if (score < 0.8) return BAD; // successive error terms are positively correlated
+		if (score > 3.0) return BAD; // successive error terms are negatively correlated
+		if (score < 1.5 || score > 2.5) return WARNING;
+		if (score>=1.75 && score <= 2.25) return GOOD;
 	}
 	if (scoreName==='stopwatch') {
 		// NB: kfold will slow stuff down

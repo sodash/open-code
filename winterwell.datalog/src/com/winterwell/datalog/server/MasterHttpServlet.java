@@ -215,7 +215,8 @@ public class MasterHttpServlet extends HttpServlet {
 		// purge
 		int delcnt=0;
 		ListMap<String,Map> named2rs = new ListMap();
-		for(Map hit : results.getHits()) {
+		List<Map> hits = results.getHits();
+		for(Map hit : hits) {
 			String name = SimpleJson.get(hit, "_source", "name");
 			if (name==null) continue;
 			named2rs.add(name, hit);
@@ -242,12 +243,13 @@ public class MasterHttpServlet extends HttpServlet {
 				IESResponse delr = del.get();
 				String j = delr.getJson();
 				delcnt++;
+				hits.remove(map);
 			}
 		}
 		System.out.println("DELCNT: "+delcnt);
 		
 		System.out.println("JSON length: "+Printer.prettyNumber(results.getJson().length())+" Total: "+results.getTotal()+" Hits: "+results.getHits().size());
-		return new JsonResponse(request, results.getHits());
+		return new JsonResponse(request, hits);
 	}
 
 	private JsonResponse doReport(WebRequest request, boolean doReport) {
