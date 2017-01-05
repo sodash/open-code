@@ -23,7 +23,8 @@ function flattenObject2(object, key, out) {
 
 $(function(){
 
-	$.get('http://localhost:8765/project/assist?action=get')
+		// http://localhost:8765
+	$.get('/project/assist?action=get')
 	.then(function(results){
 		console.log("results",results);
 		let scores = pivot(results, "'cargo' -> i -> '_source' -> 'results' -> scores", 'scores');
@@ -64,7 +65,7 @@ $(function(){
 				ename = e._id;
 			} //data_source			
 			console.log(ename, e);			
-			let link = 'http://localhost:8766/assist/experiment/'+e._id;
+			let link = '/assist/experiment/'+e._id;
 			if (spec) {
 				let odir = spec.output_dir;
 				
@@ -78,7 +79,8 @@ $(function(){
 			$delBtn.click(function() {
 				let ok = confirm("Trash this experiment?");
 				if ( ! ok) return;
-				$.get('http://localhost:8765/project/assist?action=delete&id='+escape(e._id))
+				// http://localhost:8765
+				$.get('/project/assist?action=delete&id='+escape(e._id))
 				.then(function(){
 					$tr.fadeOut();
 				});
