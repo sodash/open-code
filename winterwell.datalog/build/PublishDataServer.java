@@ -77,7 +77,7 @@ public class PublishDataServer extends BuildTask {
 				new BuildMaths(),
 				new BuildBob(),
 				new BuildWeb(),
-				new BuildStat(),
+				new BuildStat(), // This!
 				new BuildESJavaClient(),
 				new BuildFlexiGson()
 				);

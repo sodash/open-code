@@ -179,7 +179,11 @@ public class MasterHttpServlet extends HttpServlet {
 			System.out.println(path);
 			f = path;
 		}
-		file = new File(f);		
+		// HACK: modify old file paths
+		f = f.replace("/home/daniel/winterwell/", "");
+		file = new File(f).getAbsoluteFile();
+		Log.d("Serve file: "+file);
+		assert file.getPath().startsWith(FileUtils.getWorkingDirectory().getAbsolutePath()) : file;
 		try {
 			FileServlet.serveFile(file, request);
 		} catch (IOException e) {
