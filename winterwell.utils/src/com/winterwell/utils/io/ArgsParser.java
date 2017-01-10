@@ -28,6 +28,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.time.TimeUtils;
 
 /**
  * Parse Unix style command line arguments. Also handles Java properties objects
@@ -170,6 +171,9 @@ public class ArgsParser {
 			// Date
 			if (type == Date.class)
 				return DateFormat.getInstance().parse(string);
+			if (type==Dt.class) {
+				return TimeUtils.parseDt(string);
+			}
 			// File
 			if (type == File.class)
 				return new File(string);
