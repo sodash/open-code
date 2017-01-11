@@ -16,39 +16,6 @@ import com.winterwell.utils.web.WebUtils;
  */
 public class RSSWriter {
 
-	public static class RSSItem {
-
-		private String author;
-		private Date date;
-		private String desc;
-		private URI link;
-		private String title;
-
-		public RSSItem(String title, URI link, String desc, Date date) {
-			if (date == null) {
-				date = new Date();
-			}
-			this.title = title;
-			this.link = link;
-			this.desc = desc;
-			this.date = date;
-		}
-
-		public void appendTo(StringBuilder rss) {
-			rss.append("<item>");
-			titleLinkDesc(rss, title, link, desc);
-			if (author != null) {
-				rss.append("<author>" + author + "</author>\n");
-			}
-			rss.append("<pubDate>" + date.toGMTString() + "</pubDate>\n");
-			rss.append("</item>\n");
-		}
-
-		public void setAuthor(String author) {
-			this.author = author;
-		}
-	}
-
 	static String encode(String string) {
 		string = string.replace("&", "&amp;");
 		string = string.replace("<", "&lt;");
