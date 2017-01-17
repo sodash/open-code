@@ -23,7 +23,7 @@ public class EmailField extends AField<InternetAddress> {
 			InternetAddress ia = new InternetAddress(v.toLowerCase());
 			// safety check, since new InternetAddress("bob") will succeed
 			if (ia.getAddress().indexOf('@')==-1) {
-				throw new WebInputException("Local-only email like \""+v+"\" is not supported.");	
+				throw new WebInputException("Not a valid email: "+v);	
 			}
 			return ia;
 		} catch (AddressException e) {
