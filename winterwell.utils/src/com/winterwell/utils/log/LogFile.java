@@ -86,8 +86,17 @@ public class LogFile implements ILogListener, Closeable {
 
 	@Override
 	public void listen(Report report) {
-		if (filter!=null && ! filter.accept(report)) {
-			return; // skip it
+		if (filter!=null) {
+			try {
+				if ( ! filter.accept(report)) {
+					return; // skip it
+				}
+			} catch(Throwable ex) {
+				// bugger!
+				if ( ! report.toString().contains("Filter failed!")) {
+					Log.e("log", "Filter failed! "+ex+" from "+filter+" for "+report);
+				}
+			}
 		}
 		// a single line for each report to make it easier to grep
 		String line = report.toString().replaceAll("[\r\n]", " ") + "\n";
