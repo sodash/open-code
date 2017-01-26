@@ -43,6 +43,10 @@ import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
+
+import creole.plugins.admin.LogServlet;
+import creole.plugins.track.Img0Servlet;
+
 import com.winterwell.datalog.Stat;
 import com.winterwell.datascience.Experiment;
 import com.winterwell.depot.Desc;
@@ -81,6 +85,24 @@ public class MasterHttpServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		WebRequest request = new WebRequest(null, req, resp);
+		String path = req.getServletPath();
+		String rpath = req.getRealPath("");
+		String ptrans = req.getPathTranslated();
+		String pathu = req.getRequestURI();
+		StringBuffer pathu2 = req.getRequestURL();
+		String cpath = req.getContextPath();
+		String pi = req.getPathInfo();
+		// Log (low overhead)
+		if (path.startsWith("/lg")) {
+			LogServlet.fastLog(new WebRequest(null, req, resp));
+			return;
+		}
+		// Tripwire (low overhead)
+		if (path.startsWith("/trk")) {
+			new Img0Servlet().doGet(req, resp);
+			return;
+		}
+
 		WebUtils2.CORS(request, true);		
 		try {
 			// Project
