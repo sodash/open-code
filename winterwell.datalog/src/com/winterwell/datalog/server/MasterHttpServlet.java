@@ -11,14 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.util.ajax.JSON;
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.BoolFilterParser;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.IdsFilterBuilder;
 import org.elasticsearch.index.query.IdsQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.TermFilterBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 
 import com.winterwell.utils.log.Log;
@@ -43,9 +38,6 @@ import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
-
-import creole.plugins.admin.LogServlet;
-import creole.plugins.track.Img0Servlet;
 
 import com.winterwell.datalog.Stat;
 import com.winterwell.datascience.Experiment;
@@ -233,7 +225,7 @@ public class MasterHttpServlet extends HttpServlet {
 		search.setSize(10000);
 		// no trash
 		if ( ! "trash".equals(request.get("status"))) {
-			FilterBuilder fb = new BoolFilterBuilder().mustNot(new TermFilterBuilder("status", "trash"));
+			QueryBuilder fb = new BoolQueryBuilder().mustNot(new TermQueryBuilder("status", "trash"));
 			search.setQuery(fb);
 		}		
 		SearchResponse results = search.get();
@@ -319,7 +311,7 @@ public class MasterHttpServlet extends HttpServlet {
 		del.setType("experiment");
 		QueryBuilder fb = 
 				new BoolQueryBuilder()
-					.mustNot(new IdsQueryBuilder().ids(id))
+					.mustNot(new IdsQueryBuilder().addIds(id))
 					.must(new TermQueryBuilder("name", name));
 		del.setQuery(fb);
 		IESResponse response = del.get();
