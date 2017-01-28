@@ -1290,12 +1290,20 @@ public final class Gson {
 		return obj;
 	}
 
-	private static final Gson SAFE_GSON = new GsonBuilder()
+	private static Gson SAFE_GSON = new GsonBuilder()
 				.setLenientReader(true)
 				.serializeSpecialFloatingPointValues()
 				.setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 				.setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL)
 				.create();
+	
+	/**
+	 * This is the GSON used by {@link #toJSON(Object)} and {@link #fromJSON(String)}.
+	 * @param gson
+	 */
+	public static void setDefaultGSON(Gson gson) {
+		SAFE_GSON = gson;
+	}
 	
 	/**
 	 * Convenience for a safe robust default just-give-me-some-json convertor.
