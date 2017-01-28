@@ -48,7 +48,7 @@ public class TrackingPixelServlet extends HttpServlet {
 		String uid = WebUtils2.getCookie(state.getRequest(), "trkid");		
 		if (uid!=null) return uid;
 		boolean dnt = state.isDoNotTrack();
-		if (dnt) return null;
+//		if (dnt) return null; FIXME
 		uid = Utils.getRandomString(20)+"@trk";
 		WebUtils2.addCookie(state.getResponse(), "trkid", uid, TUnit.YEAR.dt, DataLogServer.settings.COOKIE_DOMAIN);
 		return uid;

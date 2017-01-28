@@ -79,6 +79,7 @@ public class LogServlet {
 		String ds = state.getRequired(DATASPACE);
 		String tag = state.getRequired(TAG);
 		String via = req.getParameter("via");
+		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		Map params = (Map) state.get(PARAMS);
 		
 		// write to log file
