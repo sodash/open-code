@@ -4,8 +4,10 @@ import java.io.File;
 
 import org.elasticsearch.node.Node;
 
+import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
@@ -14,44 +16,46 @@ import com.winterwell.web.app.JettyLauncher;
 import com.winterwell.es.ESUtils;
 import com.winterwell.es.client.ESConfig;
 
-public class DataExperimentServer {
+public class DataLogServer {
 
 	private static JettyLauncher jl;
 	
 	public static ESConfig esconfig;
 	
-	static LogFile logfile = new LogFile().setLogRotation(TUnit.DAY.dt, 10);
+	public static LogFile logFile;
 	
-	private static Node node;
+	public static Node node;
+
+	public static DataLogSettings settings;
 
 	public static void main(String[] args) {
+		settings = ArgsParser.getConfig(new DataLogSettings(), args, new File("config/datalog.properties"), null);
+		logFile = new LogFile(DataLogServer.settings.logFile)
+					// keep 8 weeks of 1 week log files ??revise this??
+					.setLogRotation(TUnit.WEEK.dt, 8);
+
 		Log.i("Go!");
 		assert jl==null;
-		jl = new JettyLauncher(new File("web"), 8765);
+		jl = new JettyLauncher(new File("web"), settings.port);
 		jl.setup();
-		jl.addServlet("/project/*", new MasterHttpServlet());
-		jl.addServlet("/*", new FileServlet() {
-			public void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp) throws javax.servlet.ServletException ,java.io.IOException {
-				if (WebUtils2.getRequestURL(req).contains("compare.html") && ! "uoivf78".equals(req.getParameter("key"))) {
-					WebUtils2.sendError(401, "Please provide a valid key in the url", resp);
-					return;
-				}
-				super.doGet(req, resp);
-			};
-			
-		}.setListDir(true));
+		jl.addServlet("/*", new MasterHttpServlet());
 		Log.i("web", "...Launching Jetty web server on port "+jl.getPort());
 		jl.run();
 		
 		// start up ES
-		initES();
+		try {
+			initES();
+		} catch(Exception ex) {
+			Log.e("init", ex);
+			// swallow! At least we'll have log files
+		}
 		Log.i("Running...");
 	}
 
 	static void initES() {
 		esconfig = new ESConfig();
 		esconfig.port = 8766;
-		File dataDir = new File("DataExperimentServer-data");
+		File dataDir = new File("DataLogServer-data");
 		node = ESUtils.startLocalES(esconfig.port, true, dataDir);	
 	}
 

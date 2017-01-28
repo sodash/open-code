@@ -121,10 +121,6 @@ public class ArgsParser {
 		return settings;
 	}
 	
-	@Deprecated //backwards compat
-	public static <S> S parse(S settings, String[] args, File propertiesFile, List<String> nonOptions) {
-		return getConfig(settings, args, propertiesFile, nonOptions);
-	}
 	/**
 	 * Create an instance of type from a string representation.
 	 * 
@@ -516,7 +512,7 @@ public class ArgsParser {
 	}
 
 	/**
-	 * Convenience for using {@link #setFromSystemProperties(String)}.
+	 * Convenience for {@link #getConfig(Object, String[], File, List)} with just a file.
 	 * Suggested usage:
 	 * <code>
 	 * MyConfig myconfig = ArgsParser.getConfig(new MyConfig(), new File("myconfig.properties")); // simples :)

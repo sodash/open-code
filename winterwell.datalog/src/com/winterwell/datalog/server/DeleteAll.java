@@ -12,8 +12,8 @@ import com.winterwell.utils.Utils;
 public class DeleteAll {
 
 	public static void main(String[] args) {
-		DataExperimentServer.initES();
-		ESHttpClient ec = new ESHttpClient(DataExperimentServer.esconfig);
+		DataLogServer.initES();
+		ESHttpClient ec = new ESHttpClient(DataLogServer.esconfig);
 		DeleteRequestBuilder del = new DeleteRequestBuilder(ec);
 		del.setIndex("assist");
 		del.setType("experiment");

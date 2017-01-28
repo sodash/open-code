@@ -643,6 +643,7 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	public String getRequestPath() {
 		String pi = request.getPathInfo();
+		// possibly equivalent?? request.getRequestURI()
 		// StringBuffer link = request.getRequestURL();
 		return pi;
 	}

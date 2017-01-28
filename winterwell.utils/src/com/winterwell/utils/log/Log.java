@@ -62,9 +62,9 @@ public class Log {
 	private static ILogListener[] listeners = new ILogListener[0];
 
 	/**
-	 * Maximum length (in chars) of a single log report: 5k
+	 * Maximum length (in chars) of a single log report: 4k
 	 */
-	public static final int MAX_LENGTH = 2048 * 5;
+	public static final int MAX_LENGTH = 1048 * 4;
 
 	public static final Level WARNING = Level.WARNING;
 	public static final Level ERROR = Level.SEVERE;

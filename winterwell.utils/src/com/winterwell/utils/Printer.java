@@ -259,7 +259,7 @@ public class Printer {
 			sb.append(toString(x.get(k)));
 			sb.append(entrySeparator);
 		}
-		if (keys.size() > 1) {
+		if ( ! keys.isEmpty()) {
 			StrUtils.pop(sb, entrySeparator.length());
 		}
 		if (startEnd != null && startEnd.length() > 1) {
