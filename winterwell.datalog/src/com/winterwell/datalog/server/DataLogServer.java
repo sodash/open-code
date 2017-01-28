@@ -30,6 +30,8 @@ public class DataLogServer {
 
 	public static void main(String[] args) {
 		settings = ArgsParser.getConfig(new DataLogSettings(), args, new File("config/datalog.properties"), null);
+		esconfig = ArgsParser.getConfig(new ESConfig(), args, new File("config/datalog.properties"), null);
+
 		logFile = new LogFile(DataLogServer.settings.logFile)
 					// keep 8 weeks of 1 week log files ??revise this??
 					.setLogRotation(TUnit.WEEK.dt, 8);
@@ -41,22 +43,9 @@ public class DataLogServer {
 		jl.addServlet("/*", new MasterHttpServlet());
 		Log.i("web", "...Launching Jetty web server on port "+jl.getPort());
 		jl.run();
-		
-		// start up ES
-		try {
-			initES();
-		} catch(Exception ex) {
-			Log.e("init", ex);
-			// swallow! At least we'll have log files
-		}
+
 		Log.i("Running...");
 	}
 
-	static void initES() {
-		esconfig = new ESConfig();
-		esconfig.port = 8766;
-		File dataDir = new File("DataLogServer-data");
-		node = ESUtils.startLocalES(esconfig.port, true, dataDir);	
-	}
 
 }

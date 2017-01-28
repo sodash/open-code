@@ -39,6 +39,7 @@ public class TrackingPixelServlet extends HttpServlet {
 	
 	
 
+
 	/**
 	 * @param state
 	 * @return can be null for do-not-track
