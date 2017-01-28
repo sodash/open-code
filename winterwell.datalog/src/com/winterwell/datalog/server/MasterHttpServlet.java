@@ -11,10 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.util.ajax.JSON;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.IdsQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
 
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -90,8 +86,8 @@ public class MasterHttpServlet extends HttpServlet {
 			return;
 		}
 		// Tripwire (low overhead)
-		if (path.startsWith("/trk")) {
-			new Img0Servlet().doGet(req, resp);
+		if (path.startsWith("/pxl")) {
+			new TrackingPixelServlet().doGet(req, resp);
 			return;
 		}
 
