@@ -27,6 +27,7 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.fields.AField;
@@ -58,14 +59,14 @@ import com.winterwell.depot.Desc;
  */
 public class LogServlet {
 
-	private static final SField TAG = new SField("tag");
-	private static final SField DATASPACE = new SField("dataspace");
+	private static final SField TAG = new SField("t");
+	private static final SField DATASPACE = new SField("d");
 
 	public LogServlet() {		
 	}
 		
 	
-	static JsonField PARAMS = new JsonField("params");
+	static JsonField PARAMS = new JsonField("p");
 	
 	/**
 	 * Log msg to fast.log file.  
@@ -81,13 +82,24 @@ public class LogServlet {
 		String via = req.getParameter("via");
 		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		Map params = (Map) state.get(PARAMS);
-		
+		// Replace $user with tracking-id
+		if (params!=null) {
+			Object user = params.get("user");
+			if ("$user".equals(user)) {
+				params.put("user", trckId);
+			}
+		}
 		// write to log file
 		doLogToFile(ds, tag, params, via, state);
 		
 		// TODO write to ES
 		
 		// Reply
+		// .gif?
+		if (state.getResponseType()==KResponseType.image) {
+			FileServlet.serveFile(TrackingPixelServlet.PIXEL, state);
+			return;
+		}
 		WebUtils2.CORS(state, false);
 		WebUtils2.sendText("OK", resp);
 	}
@@ -109,9 +121,9 @@ public class LogServlet {
 		// Add in referer and IP
 		// Tab-separating elements on this line is useless, as Report.toString() will immediately convert \t to space.
 		String msgPlus = msg+" ENDMSG "+state.getReferer()+" "+state.getRemoteAddr();
-		Report rep = new Report(tag, null, msgPlus, Level.INFO);
-		DataLogServer.logFile.listen2(rep.toStringShort(), rep.getTime());
-
+//		Report rep = new Report(tag, null, msgPlus, Level.INFO);
+		Log.i(tag, msgPlus);
+//		DataLogServer.logFile.listen2(rep.toStringShort(), rep.getTime());
 	}
 
 }

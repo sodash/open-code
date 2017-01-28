@@ -71,39 +71,44 @@ public class MasterHttpServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		WebRequest request = new WebRequest(null, req, resp);
-		String path = request.getRequestPath();
-
-		// Tracking pixel
-		if (path.startsWith("/pxl")) {
-			new TrackingPixelServlet().doGet(req, resp);
-			return;
-		}		
-		// Log
-		if (path.startsWith("/lg")) {
-			LogServlet.fastLog(request);
-			return;
+		try {
+			WebRequest request = new WebRequest(null, req, resp);
+			String path = request.getRequestPath();
+	
+			// Tracking pixel
+			if (path.startsWith("/pxl")) {
+				new TrackingPixelServlet().doGet(req, resp);
+				return;
+			}		
+			// Log
+			if (path.startsWith("/lg")) {
+				LogServlet.fastLog(request);
+				return;
+			}
+	
+			// cors on
+			WebUtils2.CORS(request, true);
+			
+			// which dataspace?
+			if (request.getSlug()==null) {
+				throw new WebEx.E404(request.getRequestUrl(), "You must specify a project");
+			}
+			String project = request.getSlugBits()[0];
+			request.put(new Key("project"), project);
+			
+			// TODO stats explorer
+			
+			// TODO experiment reports table
+			
+			// TODO experiment reports details
+			
+			// TODO dataspace admin
+			
+			WebUtils2.sendError(500, "TODO", resp);
+		} catch(Throwable ex) {
+			Log.e("error", ex);
+			WebUtils2.sendError(500, "Server Error: "+ex, resp);
 		}
-
-		// cors on
-		WebUtils2.CORS(request, true);
-		
-		// which dataspace?
-		if (request.getSlug()==null) {
-			throw new WebEx.E404(request.getRequestUrl(), "You must specify a project");
-		}
-		String project = request.getSlugBits()[0];
-		request.put(new Key("project"), project);
-		
-		// TODO stats explorer
-		
-		// TODO experiment reports table
-		
-		// TODO experiment reports details
-		
-		// TODO dataspace admin
-		
-		WebUtils2.sendError(500, "TODO", resp);
 	}
 
 }

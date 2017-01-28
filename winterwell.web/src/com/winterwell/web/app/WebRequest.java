@@ -105,6 +105,8 @@ public class WebRequest implements IProperties, Closeable {
 		jsonp(WebUtils.MIME_TYPE_JSONP),
 		/** a pdf file */
 		pdf("application/pdf"),
+		/** images (gif, png, jpeg*/
+		image("image"),
 		/** an RSS feed */
 		rss(WebUtils.MIME_TYPE_RSS),
 		/**
