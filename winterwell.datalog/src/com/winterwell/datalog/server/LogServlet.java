@@ -59,8 +59,8 @@ import com.winterwell.depot.Desc;
  */
 public class LogServlet {
 
-	private static final SField TAG = new SField("t");
-	private static final SField DATASPACE = new SField("d");
+	static final SField TAG = new SField("t");
+	public static final SField DATASPACE = new SField("d");
 
 	public LogServlet() {		
 	}
