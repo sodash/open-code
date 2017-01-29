@@ -315,6 +315,24 @@ public class Stat {
 		tagBits = check(tagBits);
 		dflt.count(dx, (Object[]) tagBits);
 	}
+	
+	public static void countEvent(double dx, String dataspace, Map event) {
+		// turn event into a tag
+		String stag = event2tag(dataspace, event);
+		count(dx, stag);
+	}
+
+	public static String event2tag(String dataspace, Map<String,?> event) {
+		assert ! event.isEmpty();
+		assert ! Utils.isBlank(dataspace);
+		StringBuilder stag = new StringBuilder(dataspace);
+		event.keySet().stream().sorted().forEach(k -> {
+			Object v = event.get(k);
+			if ( ! Utils.truthy(v)) return;
+			stag.append("_"+k+"="+Printer.str(v));
+		});
+		return stag.toString();
+	}
 
 	/**
 	 * Count historical -- edit an old Stat entry.
