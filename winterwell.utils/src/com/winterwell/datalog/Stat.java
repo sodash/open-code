@@ -439,4 +439,9 @@ public class Stat {
 		return dflt.getMeanData(start, end, fn, bucketSize, tagbits);
 	}
 
+	public static void setEventCount(double cnt, String dataspace, Map<String, ?> event) {
+		String stag = event2tag(dataspace, event);
+		set(cnt, stag);
+	}
+
 }
