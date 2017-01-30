@@ -324,7 +324,7 @@ public class Stat {
 
 	public static String event2tag(String dataspace, Map<String,?> event) {
 		assert ! event.isEmpty();
-		assert ! Utils.isBlank(dataspace);
+		assert ! Utils.isBlank(dataspace) : "no dataspace?! event:"+event;
 		StringBuilder stag = new StringBuilder(dataspace);
 		event.keySet().stream().sorted().forEach(k -> {
 			Object v = event.get(k);
