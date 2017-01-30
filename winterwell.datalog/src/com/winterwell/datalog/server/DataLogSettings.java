@@ -11,7 +11,7 @@ public class DataLogSettings {
 	String COOKIE_DOMAIN = ".good-loop.com";
 
 	@Option
-	int port = 8765;
+	int port = 8585;
 
 	@Option
 	public File logFile = new File(FileUtils.getWorkingDirectory(), "lg.txt"); 

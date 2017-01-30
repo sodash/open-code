@@ -58,14 +58,14 @@ import jobs.BuildWinterwellProject;
  */
 public class PublishDataServer extends BuildTask {
 
-	String server = "datalog.soda.sh";
+	String server = "lg.good-loop.com"; // datalog.soda.sh
 	String remoteUser;
 	private String remoteWebAppDir;
 	private File localWebAppDir;
 			
 	public PublishDataServer() throws Exception {
 		this.remoteUser = "winterwell";
-		this.remoteWebAppDir = "/home/winterwell/datalog";
+		this.remoteWebAppDir = "/home/winterwell/"+server;
 		// local
 		this.localWebAppDir = FileUtils.getWorkingDirectory();
 	}
@@ -121,13 +121,17 @@ public class PublishDataServer extends BuildTask {
 		if (localProps.exists()) {
 			FileUtils.move(localProps, localPropsOff);
 		}
+		
+		// rsync the directory
 		try {
 			assert localConfigDir.isDirectory() : localConfigDir;
 			Log.d("publish","Sending config dir files: "+Printer.toString(localConfigDir.list()));
 			String remoteConfig = remoteUser+"@"+server+":"+remoteWebAppDir+"/config";
 			RSyncTask task = new RSyncTask(localConfigDir.getAbsolutePath()+"/", remoteConfig, true);
-			task.run();			
+			task.run();		
+			
 		} finally {
+			// put local-props back
 			if (localPropsOff.exists()) {
 				FileUtils.move(localPropsOff, localProps);
 			}

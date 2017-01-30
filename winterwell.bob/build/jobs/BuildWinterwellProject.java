@@ -31,7 +31,7 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	protected boolean incGitInManifest;
 
-	protected File projectDir;
+	public final File projectDir;
 	protected boolean incSrc;
 	protected File jarFile;
 	
