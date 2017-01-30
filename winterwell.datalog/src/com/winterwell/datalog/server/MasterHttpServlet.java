@@ -82,7 +82,7 @@ public class MasterHttpServlet extends HttpServlet {
 			}		
 			// Log
 			if (path.startsWith("/lg")) {
-				LogServlet.fastLog(request);
+				LgServlet.fastLog(request);
 				return;
 			}
 	
