@@ -25,6 +25,12 @@ public class ShellScript extends Proc {
 
 	private File shellScript;
 
+	
+	@Override
+	public Proc start() {
+		return super.start();
+	}
+	
 	public ShellScript(String unixShellCommand) {
 		super(getScriptFile().getAbsolutePath());
 		shellScript = new File(getCommand());
@@ -38,4 +44,8 @@ public class ShellScript extends Proc {
 					"Could not create an executable shell script");
 	}
 
+	
+	public File getShellScript() {
+		return shellScript;
+	}
 }
