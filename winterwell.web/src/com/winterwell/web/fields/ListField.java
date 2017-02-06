@@ -114,8 +114,11 @@ public class ListField<X> extends AField<List<X>> {
 	@Override
 	public String getStringValue(HttpServletRequest request) {
 		String[] values = request.getParameterValues(getName());
-		if (values == null)
-			return null;
+		if (values == null) {
+			// hack: jquery sends multiple values by adding [] to the parameter name
+			values = request.getParameterValues(getName()+"[]");
+			if (values==null) return null;
+		}
 		if (values.length == 1)
 			return values[0];
 		// handle multiple values if we have them
