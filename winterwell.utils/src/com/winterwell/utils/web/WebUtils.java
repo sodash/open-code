@@ -408,6 +408,19 @@ public class WebUtils {
 	}
 	
 	/**
+	 * Convert a link as found in social media (e.g. full links or fragments) into definitely a full link
+	 * @param urlOrDomain e.g. google.com or https://fo.bar/yeah?whatever
+	 * @return
+	 */
+	public static String getFullUrl(String urlOrDomain) {
+		if (Utils.isBlank(urlOrDomain)) return null;
+		if (urlOrDomain.startsWith("http")) return urlOrDomain;
+		String u2 = "https://"+urlOrDomain;
+		return u2;		
+	}
+	
+	
+	/**
 	 * The host domain, including sub-domain
 	 * @param url
 	 * @return E.g. "blah.soda.sh" from "http://blah.soda.sh/foo", or null on fail
