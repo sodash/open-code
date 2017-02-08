@@ -37,6 +37,7 @@ import com.winterwell.utils.IProperties;
 import com.winterwell.utils.IReplace;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Mutable;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
@@ -1184,6 +1185,7 @@ public class WebUtils2 extends WebUtils {
 		}
 		// see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i		
 		if ( ! "*".equals(o)) {
+			Log.d("cors", "Access-Control-Allow-Credentials from "+ReflectionUtils.getSomeStack(8));
 			// Bug seen in good-loop
 			if (state.getResponse().getHeader("Access-Control-Allow-Credentials") != null) {
 				Log.escalate(new WeirdException(
