@@ -46,6 +46,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.WeirdException;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebEx;
@@ -1170,8 +1171,6 @@ public class WebUtils2 extends WebUtils {
 			return;
 		}
 		
-		// TODO see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i
-//		'Access-Control-Allow-Credentials', true		
 		Enumeration<String> headers = state.getRequest().getHeaderNames();
 		Cookie[] cookies = state.getRequest().getCookies();
 		String ref = state.getReferer();
@@ -1183,7 +1182,17 @@ public class WebUtils2 extends WebUtils {
 		if (forceSet && Utils.isBlank(state.getResponse().getHeader("Access-Control-Allow-Origin"))) {
 			o = "*"; // Do we need this??
 		}
+		// see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i		
 		if ( ! "*".equals(o)) {
+			// Bug seen in good-loop
+			if (state.getResponse().getHeader("Access-Control-Allow-Credentials") != null) {
+				Log.escalate(new WeirdException(
+						"2x?! Access-Control-Allow-Credentials: "
+						+state.getResponse().getHeader("Access-Control-Allow-Credentials")
+						+" header-names:"+
+						state.getResponse().getHeaderNames()
+						));
+			}
 			state.getResponse().setHeader("Access-Control-Allow-Credentials", "true");
 		}
 		state.getResponse().setHeader("Access-Control-Allow-Origin", o);
