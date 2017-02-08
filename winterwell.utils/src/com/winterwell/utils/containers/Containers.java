@@ -35,6 +35,7 @@ import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 
+
 final class And<X> implements IFilter<X> {
 	private final IFilter<X> a;
 	private final IFilter<X> b;
@@ -1583,6 +1584,21 @@ public class Containers  {
 
 	protected Containers() {
 		// static
+	}
+
+
+	/**
+	 * 
+	 * @param items Can be null (-> false)
+	 * @param filter
+	 * @return true if filter matches any item
+	 */
+	public static <X> boolean contains(Collection<X> items, IFilter<X> filter) {
+		if (items==null) return false;
+		for (X x : items) {
+			if (filter.accept(x)) return true;
+		}
+		return false;
 	}
 
 }
