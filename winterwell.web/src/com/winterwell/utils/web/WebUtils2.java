@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1185,7 +1186,7 @@ public class WebUtils2 extends WebUtils {
 		}
 		// see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i		
 		if ( ! "*".equals(o)) {
-			Log.d("cors", "Access-Control-Allow-Credentials from "+ReflectionUtils.getSomeStack(8));
+//			Log.d("cors", "Access-Control-Allow-Credentials from "+ReflectionUtils.getSomeStack(8));
 			// Bug seen in good-loop
 			if (state.getResponse().getHeader("Access-Control-Allow-Credentials") != null) {
 				Log.escalate(new WeirdException(
@@ -1198,6 +1199,8 @@ public class WebUtils2 extends WebUtils {
 			state.getResponse().setHeader("Access-Control-Allow-Credentials", "true");
 		}
 		state.getResponse().setHeader("Access-Control-Allow-Origin", o);
+		// debug
+		Collection<String> hnames = state.getResponse().getHeaderNames();		
 	}
 
 	/**
