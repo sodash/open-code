@@ -136,6 +136,9 @@ public class PublishDataServer extends BuildTask {
 				FileUtils.move(localPropsOff, localProps);
 			}
 		}
+		
+		
+		// How to restart??
 	}
 
 	@Override
