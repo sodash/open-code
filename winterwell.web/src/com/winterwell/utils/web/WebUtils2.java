@@ -1180,9 +1180,9 @@ public class WebUtils2 extends WebUtils {
 			assert ach==null || ach.size() < 2 : ach+" all-response-headers:"+responseheaders+" "+state;
 		}
 		
-		Enumeration<String> headers = state.getRequest().getHeaderNames();
-		Cookie[] cookies = state.getRequest().getCookies();
-		String ref = state.getReferer();
+//		Enumeration<String> headers = state.getRequest().getHeaderNames();
+//		Cookie[] cookies = state.getRequest().getCookies();
+//		String ref = state.getReferer();
 		
 		String o = state.getRequest().getHeader("Origin");
 		if (o==null || o.equals("null")) {
@@ -1193,23 +1193,23 @@ public class WebUtils2 extends WebUtils {
 		}
 		// see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i		
 		if ( ! "*".equals(o)) {
-			// Bug seen in good-loop
-			if (state.getResponse().getHeader("Access-Control-Allow-Credentials") != null) {
-				Log.escalate(new WeirdException(
-						"2x?! Access-Control-Allow-Credentials: "
-						+state.getResponse().getHeader("Access-Control-Allow-Credentials")
-						+" header-names:"+
-						state.getResponse().getHeaderNames()
-						));
-			}
-			Log.d("cors", "set Access-Control-Allow-Credentials: true from "+ReflectionUtils.getSomeStack(8));			
+//			// Bug seen in good-loop -- It's a mystery! This logging did not shed any light :(
+//			if (state.getResponse().getHeader("Access-Control-Allow-Credentials") != null) {
+//				Log.escalate(new WeirdException(
+//						"2x?! Access-Control-Allow-Credentials: "
+//						+state.getResponse().getHeader("Access-Control-Allow-Credentials")
+//						+" header-names:"+
+//						state.getResponse().getHeaderNames()
+//						));
+//			}
+//			Log.d("cors", "set Access-Control-Allow-Credentials: true from "+ReflectionUtils.getSomeStack(8));			
 			state.getResponse().setHeader(ALLOW_CREDENTIALS_HEADER, "true");
 		}
 		state.getResponse().setHeader("Access-Control-Allow-Origin", o);
-		// debug
-		Collection<String> responseheaders2 = state.getResponse().getHeaderNames();
-		Collection<String> ach = state.getResponse().getHeaders(ALLOW_CREDENTIALS_HEADER);
-		assert ach==null || ach.size() < 2 : ach+" all-response-headers:"+responseheaders2+" "+state;
+		// debug - no light :(
+//		Collection<String> responseheaders2 = state.getResponse().getHeaderNames();
+//		Collection<String> ach = state.getResponse().getHeaders(ALLOW_CREDENTIALS_HEADER);
+//		assert ach==null || ach.size() < 2 : ach+" all-response-headers:"+responseheaders2+" "+state;
 	}
 
 	/**
