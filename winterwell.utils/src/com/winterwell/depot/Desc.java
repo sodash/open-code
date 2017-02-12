@@ -603,10 +603,11 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 		}
 	}
 
-	public void putAll(Map props) {
+	public Desc<X> putAll(Map props) {
 		for (Object k : props.keySet()) {
 			put(k.toString(), props.get(k));
 		}
+		return this;
 	}
 
 	/**
