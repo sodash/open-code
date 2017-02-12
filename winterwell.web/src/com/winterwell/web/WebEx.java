@@ -29,7 +29,7 @@ public class WebEx extends RuntimeException {
 		}
 
 		public E40X(int code, String url, String msg) {
-			super(code, msg==null? url : url+"\t"+msg);
+			super(code, StrUtils.joinWithSkip(" ", url, msg));
 		}
 		
 		public E40X(int code, String msg, Exception e) {
