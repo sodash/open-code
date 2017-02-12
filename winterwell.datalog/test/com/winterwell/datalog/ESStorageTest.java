@@ -12,6 +12,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.ListDataStream;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
@@ -34,21 +35,28 @@ public class ESStorageTest extends DatalogTestCase {
 		// ref:http://www.good-loop.com/live-demo 
 		// ip:88.98.205.94 
 		// ENDMSG http://www.good-loop.com/live-demo 88.98.205.94
-		Map event = new ArrayMap(
+		DataLogEvent event = new DataLogEvent(1, "testevent", new ArrayMap(
 				"publisher", "egpub",
 				"tracker", "szkpogoeegglvcszwtao@trk"
-				);
-		ListenableFuture<ESHttpResponse> res = storage.saveEvent(1, "testdataspace", event);
+				));
+		Period period = new Period(new Time().minus(TUnit.MINUTE), new Time());
+		ListenableFuture<ESHttpResponse> res = storage.saveEvent(
+				"testdataspace", event, period);
 		ESHttpResponse r = res.get();
 		r.check();
-		
+		// pause for ES
+		Utils.sleep(2000);
+		// get it
 		Time start = new Time().minus(TUnit.DAY.dt);
 		Time end = new Time();
-		double total = storage.getEventTotal(start, end, "testdataspace");
+		DataLogEvent event2 = new DataLogEvent(1, "testevent", new ArrayMap(
+				"publisher", "egpub"
+				));
+		double total = storage.getEventTotal(start, end, "testdataspace", event2);
 	}
 
 	
-	@Test
+//	@Test
 	public void testIO() {
 		Time start = new Time();
 		Time end = start.plus(10, TUnit.SECOND);

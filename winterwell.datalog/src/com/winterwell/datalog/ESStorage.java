@@ -15,6 +15,8 @@ import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.IndexRequestBuilder;
+import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
@@ -106,11 +108,11 @@ public class ESStorage implements IStatStorage {
 			}
 		}
 		client = new ESHttpClient(settings);
-		initDataspace("gen");
+		initIndex(indexFromDataspace("gen"));
 	}
 
-	private void initDataspace(String dataspace) {
-		String index = indexFromDataspace(dataspace);
+	
+	private void initIndex(String index) {
 		if (client.admin().indices().indexExists(index)) {
 			return;
 		}
@@ -127,7 +129,9 @@ public class ESStorage implements IStatStorage {
 
 	private String indexFromDataspace(String dataspace) {
 		assert ! Utils.isBlank(dataspace);
-		return "datalog."+dataspace;
+		String idx = "datalog."+dataspace;
+		initIndex(idx);
+		return idx;
 	}
 
 	/**
@@ -136,21 +140,38 @@ public class ESStorage implements IStatStorage {
 	 * @param cnt
 	 * @param dataspace
 	 * @param event
+	 * @param period 
 	 * @return 
 	 */
-	public ListenableFuture<ESHttpResponse> saveEvent(double cnt, String dataspace, Map event) {
+	public ListenableFuture<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period period) {
 		String index = indexFromDataspace(dataspace);
-		String type = "event";
-		String id = new Desc("event", Map.class).putAll(event).getId();
+		String type = event.eventType;
+		// put a time marker on it -- the end in seconds is enough
+		long secs = period.getEnd().getTime() % 1000;
+		String id = event.getId()+"_"+secs;
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
-		event.put("count", cnt);
-		prepIndex.setSource(event);
+		prepIndex.setSource(event.toJson2());
 		return prepIndex.execute();
 	}
 
-	public double getEventTotal(Time start, Time end, String string) {
-		// TODO Auto-generated method stub
-		throw new TodoException();
+	public double getEventTotal(String dataspace, Time start, Time end, DataLogEvent spec) {
+		String index = indexFromDataspace(dataspace);
+		SearchRequestBuilder search = client.prepareSearch(index);
+		search.setType(spec.eventType);
+		search.addAggregation("event_total", "stats", "count");
+		SearchResponse sr = search.get();
+//		{
+//		    "aggs" : {
+//		        "grades_stats" : { "stats" : { "field" : "grade" } }
+//		    }
+//		}
+//		
+//		or
+//		
+//	    "aggs" : {
+//	        "intraday_return" : { "sum" : { "field" : "change" } }
+//	    }
+		throw new TodoException(sr);
 	}
 	
 }
