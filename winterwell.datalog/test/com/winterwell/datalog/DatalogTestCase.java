@@ -41,8 +41,8 @@ public class DatalogTestCase {
 		config.dbUser = "worker";
 		config.dbPassword = "winterwell";
 		
-		Stat.dflt = new StatImpl(config);
-		Stat.setConfig(config);
+		DataLog.dflt = new StatImpl(config);
+		DataLog.setConfig(config);
 	}
 	
 	private void setupDB() {
@@ -61,8 +61,8 @@ public class DatalogTestCase {
 		StatConfig config = new StatConfig();
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = CSVStorage.class;
-		Stat.dflt = new StatImpl(config);
-		Stat.setConfig(config);
+		DataLog.dflt = new StatImpl(config);
+		DataLog.setConfig(config);
 	}
 	
 	/**

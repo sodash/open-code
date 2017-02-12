@@ -9,18 +9,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
 
-class DummyStat implements IStat {
-	static final String LOGTAG = Stat.LOGTAG;
+class DummyDataLog implements IDataLog {
+	static final String LOGTAG = DataLog.LOGTAG;
 	int warnings = 0;
 	private final String err;
 
-	public DummyStat(Exception e) {
+	public DummyDataLog(Exception e) {
 		err = "" + e;
 	}
 
@@ -55,7 +55,7 @@ class DummyStat implements IStat {
 	}
 
 	@Override
-	public IStatReq<Double> getTotal(Time start, Time end, String... tagBits) {
+	public IDataLogReq<Double> getTotal(Time start, Time end, String... tagBits) {
 		if (warnings < 3)
 			Log.w(LOGTAG, err);
 		warnings++;
@@ -122,7 +122,7 @@ class DummyStat implements IStat {
 		if (warnings < 3)
 			Log.w(LOGTAG, err);
 		warnings++;
-		return Rate.ZERO(Stat.tag(tag));
+		return Rate.ZERO(DataLog.tag(tag));
 	}
 
 	@Override
@@ -147,7 +147,7 @@ class DummyStat implements IStat {
 	}
 
 	@Override
-	public void setListener(IListenStat listener, String... tagBits) {
+	public void setListener(IListenDataLog listener, String... tagBits) {
 	}
 
 	@Override
@@ -156,7 +156,7 @@ class DummyStat implements IStat {
 
 
 	@Override
-	public Map<String, IListenStat> getListeners() {
+	public Map<String, IListenDataLog> getListeners() {
 		return Collections.EMPTY_MAP;
 	}
 
@@ -189,7 +189,7 @@ class DummyStat implements IStat {
 
 }
 
-class DummyFuture<V> implements IStatReq<V> {
+class DummyFuture<V> implements IDataLogReq<V> {
 
 	final V v;
 
@@ -224,7 +224,7 @@ class DummyFuture<V> implements IStatReq<V> {
 	}
 
 	@Override
-	public IStatReq<V> setServer(String server) {
+	public IDataLogReq<V> setServer(String server) {
 		return this;
 	}
 

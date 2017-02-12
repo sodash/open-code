@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
@@ -22,7 +22,7 @@ import com.winterwell.utils.time.Time;
  *         library. In particular, licenses for the com.winterwell.utils library do
  *         not apply to this file.
  */
-public interface IStat extends Closeable, Flushable {
+public interface IDataLog extends Closeable, Flushable {
 	
 	/**
 	 * The memory used by the JVM -- this should be saved by IStat implementations, so it can also be used as a heartbeat for Stat.
@@ -127,9 +127,9 @@ public interface IStat extends Closeable, Flushable {
 	 * @param start
 	 * @param end
 	 * @return
-	 * @see Stat#getTotal(Time, Time, String...)
+	 * @see DataLog#getTotal(Time, Time, String...)
 	 */
-	IStatReq<Double> getTotal(Time start, Time end, String... tagBits);
+	IDataLogReq<Double> getTotal(Time start, Time end, String... tagBits);
 
 	void setEvent(String event, String... tags);
 
@@ -139,11 +139,11 @@ public interface IStat extends Closeable, Flushable {
 	 * @param listener
 	 * Probably an {@link Alert}
 	 */
-	void setListener(IListenStat listener, String... tagBits);
+	void setListener(IListenDataLog listener, String... tagBits);
 
 	void removeListener(String... tagBits);
 
-	Map<String, IListenStat> getListeners();
+	Map<String, IListenDataLog> getListeners();
 
 	/**
 	 * Set historical -- edit an old Stat entry.

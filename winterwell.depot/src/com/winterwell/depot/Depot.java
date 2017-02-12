@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
 import com.thoughtworks.xstream.XStreamException;
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.depot.merge.ClassMap;
 import com.winterwell.depot.merge.IMerger;
 import com.winterwell.depot.merge.MapMerger;
@@ -408,7 +408,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		} finally { 
 			locker.unlock(desc);
 		}
-		Stat.mean(sw.getTime(), "Depot.get");
+		DataLog.mean(sw.getTime(), "Depot.get");
 		return x;
 	}
 	
@@ -456,7 +456,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 			return (X2) get((Desc)bv);
 		}
 		assert ReflectionUtils.isa(bv.getClass(), desc.getType()) : bv.getClass()+" not a "+desc.getType()+" for "+desc;
-		Stat.count(1,"Depot","cache_hit","bound");
+		DataLog.count(1,"Depot","cache_hit","bound");
 //		Log.v("depot.got.bound", desc); //verbose get log (normally ignored)
 		return bv;
 	}
@@ -474,7 +474,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 			}
 		}
 		assert ReflectionUtils.isa(bv.getClass(), desc.getType()) : bv.getClass()+" not a "+desc.getType()+" for "+desc;
-		Stat.count(1,"Depot","cache_hit","DescCache");
+		DataLog.count(1,"Depot","cache_hit","DescCache");
 //		Log.v("depot.got.cache", desc); //verbose get log (normally ignored)				
 		return bv;		
 	}
@@ -531,7 +531,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 					}
 				}
 //				Log.w(TAG, "Could not locate " + desc);
-				Stat.count(1,"Depot","fail");
+				DataLog.count(1,"Depot","fail");
 				return null;
 			}
 			

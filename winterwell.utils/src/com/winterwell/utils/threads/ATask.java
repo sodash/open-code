@@ -3,7 +3,7 @@ package com.winterwell.utils.threads;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TimeOut;
@@ -142,7 +142,7 @@ public abstract class ATask<V> implements Callable<V>, IProgress {
 			// save runtime stats
 			if (runner != null && runner.stats) {
 				Dt dt = getQueueTime();
-				Stat.mean(dt.getMillisecs(), "TaskRunner_qdt",
+				DataLog.mean(dt.getMillisecs(), "TaskRunner_qdt",
 						runner.getName(), getClass().getSimpleName());
 			}
 			// set a timer running

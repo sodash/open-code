@@ -19,16 +19,16 @@ public class MiniReportTest extends DatalogTestCase {
 		Time b = new Time(2014, 1, 5); // 2 days later
 		TimeSlicer ts = new TimeSlicer(a, b, TUnit.HOUR.dt);
 		for (Period period : ts) {
-			Stat.set(period.getStart(), period.getStart().getDayOfMonth(), "test","repdata");
+			DataLog.set(period.getStart(), period.getStart().getDayOfMonth(), "test","repdata");
 		}		
-		Stat.flush();
+		DataLog.flush();
 		
 		// read it
 		getMiniReport(b, TUnit.DAY, "test","repdata");
 	}
 
 	private void getMiniReport(Time now, TUnit day, String... tagBits) {
-		IFuture<Iterable> _data = Stat.getData(now.minus(2, day), now, null, day.dt, tagBits);
+		IFuture<Iterable> _data = DataLog.getData(now.minus(2, day), now, null, day.dt, tagBits);
 		IDataStream data = (IDataStream) _data.get();
 		for (Datum datum : data) {
 			System.out.println(datum.getTime()+"\t"+datum.x());

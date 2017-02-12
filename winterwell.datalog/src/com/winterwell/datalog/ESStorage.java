@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.depot.Desc;
 import com.winterwell.es.ESType;

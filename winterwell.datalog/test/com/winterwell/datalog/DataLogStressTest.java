@@ -26,8 +26,8 @@ public class DataLogStressTest extends DatalogTestCase {
 		StatConfig config = new StatConfig();
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = CSVStorage.class;
-		Stat.dflt = new StatImpl(config);
-		Stat.setConfig(config);
+		DataLog.dflt = new StatImpl(config);
+		DataLog.setConfig(config);
 		stress();
 	}
 	
@@ -37,8 +37,8 @@ public class DataLogStressTest extends DatalogTestCase {
 		new SQLStorage(config).initStatDB();		
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = SQLStorage.class;
-		Stat.dflt = new StatImpl(config);
-		Stat.setConfig(config);
+		DataLog.dflt = new StatImpl(config);
+		DataLog.setConfig(config);
 		stress();
 	}
 	
@@ -60,21 +60,21 @@ public class DataLogStressTest extends DatalogTestCase {
 				@Override
 				public void run() {
 					rc.plus(1);
-					Stat.count(1, "stress", "1");
-					Stat.set(g.sample(), "stress", "2");	
+					DataLog.count(1, "stress", "1");
+					DataLog.set(g.sample(), "stress", "2");	
 				}
 			});
 		}
 		se.shutdown();
 		se.awaitTermination(10, TimeUnit.SECONDS);
 		
-		Stat.flush();
+		DataLog.flush();
 		
 		Time end = new Time();		
 		sw.print();
 		
 		String[] tagBits = {"stress", "1"};
-		ListDataStream data = (ListDataStream) Stat.getData(start, start.plus(TUnit.MINUTE), null, null, tagBits).get();
+		ListDataStream data = (ListDataStream) DataLog.getData(start, start.plus(TUnit.MINUTE), null, null, tagBits).get();
 		System.out.println(data);
 		assert ! data.isEmpty();
 		for (Datum datum : data) {
@@ -82,7 +82,7 @@ public class DataLogStressTest extends DatalogTestCase {
 			System.out.println("stress/1\t"+datum);
 		}
 		
-		IDataStream data2 = (IDataStream) Stat.getData(start, end, null, null, "stress.2").get();
+		IDataStream data2 = (IDataStream) DataLog.getData(start, end, null, null, "stress.2").get();
 		System.out.println(data2);
 		for (Datum datum : data2) {
 			assert datum != null;

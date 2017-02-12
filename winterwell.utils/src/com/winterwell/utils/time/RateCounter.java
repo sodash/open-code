@@ -4,12 +4,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.winterwell.datalog.Rate;
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
 
 /**
- * @see Stat which largely replaces this with low-cost persistent rates.
+ * @see DataLog which largely replaces this with low-cost persistent rates.
  * <p>
  * Counter eg. to measure throughput or throttle rate-limited operations. Also
  * keeps a global running total. Should be thread-safe.

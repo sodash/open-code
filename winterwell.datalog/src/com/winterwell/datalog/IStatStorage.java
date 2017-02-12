@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;

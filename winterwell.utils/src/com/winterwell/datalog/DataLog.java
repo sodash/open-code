@@ -46,7 +46,7 @@ import com.winterwell.utils.time.Time;
  *         library. In particular, licenses for the com.winterwell.utils library do
  *         not apply to this file.
  */
-public class Stat {
+public class DataLog {
 
 	/**
 	 *
@@ -54,12 +54,12 @@ public class Stat {
 	 * @param listener
 	 *            Probably an {@link Alert}
 	 */
-	public static void setListener(IListenStat listener, String... tagBits) {
+	public static void setListener(IListenDataLog listener, String... tagBits) {
 		tagBits = check(tagBits);
 		dflt.setListener(listener, tagBits);
 	}
 
-	public static Map<String, IListenStat> getListeners() {
+	public static Map<String, IListenDataLog> getListeners() {
 		return dflt.getListeners();
 	}
 	/**
@@ -96,17 +96,17 @@ public class Stat {
 		dflt.flush();
 	}
 
-	static IStat dflt = initDflt();
+	static IDataLog dflt = initDflt();
 
-	private static IStat initDflt() {
+	private static IDataLog initDflt() {
 		try {
-			return (IStat) Class.forName("com.winterwell.datalog.StatImpl")
+			return (IDataLog) Class.forName("com.winterwell.datalog.StatImpl")
 					.newInstance();
 		} catch (Exception e) {
 			// Bad!
 			Log.e(LOGTAG, e.getMessage());
 			// Let stuff continue without exceptions elsewhere
-			return new DummyStat(e);
+			return new DummyDataLog(e);
 		}
 	}
 
@@ -288,7 +288,7 @@ public class Stat {
 		try {
 			Class<?> klass = Class.forName("com.winterwell.datalog.StatImpl");
 			Constructor<?> cons = klass.getConstructor(StatConfig.class);
-			dflt = (IStat) cons.newInstance(myConfig);
+			dflt = (IDataLog) cons.newInstance(myConfig);
 		} catch (Exception ex) {
 			throw Utils.runtime(ex);
 		}
@@ -354,7 +354,7 @@ public class Stat {
 	 *            Can be null
 	 * @return the total for the period. Never null. Can be zero.
 	 */
-	public static IStatReq<Double> getTotal(Time start, Time end, String... tagBits) {
+	public static IDataLogReq<Double> getTotal(Time start, Time end, String... tagBits) {
 		tagBits = check(tagBits);
 		return dflt.getTotal(start, end, tagBits);
 	}
@@ -399,14 +399,14 @@ public class Stat {
 	 * @throws Warning
 	 */
 	public static void test() throws FailureException, Warning {
-		IStat impl = Stat.getImplementation();
-		if (impl==null || impl instanceof DummyStat) {
+		IDataLog impl = DataLog.getImplementation();
+		if (impl==null || impl instanceof DummyDataLog) {
 			throw new FailureException("Stat implementation not set! Check StatImpl class loaded OK.");
 		}
 		// Try this test a few times, to allow for the race condition around bucket changes.
 		for(int i=0; i<5; i++) {
-			Stat.count(1, "test");
-			Rate cnt = Stat.get("test");
+			DataLog.count(1, "test");
+			Rate cnt = DataLog.get("test");
 			if (cnt.x >= 1) break; // OK
 			if (i==4) {
 				throw new FailureException("Stat count/get test failed! Check that the StatImpl started OK.");
@@ -414,16 +414,16 @@ public class Stat {
 			Utils.sleep(50);
 		}
 		// Try a flush
-		Stat.flush();
+		DataLog.flush();
 		// Check something which should have stored data -- e.g. the Stat heartbeat free_mem
-		IFuture<Iterable> heartbeat = Stat.getData(new Time().minus(TUnit.MONTH), new Time().minus(TUnit.HOUR), null, null, IStat.STAT_MEM_USED);
+		IFuture<Iterable> heartbeat = DataLog.getData(new Time().minus(TUnit.MONTH), new Time().minus(TUnit.HOUR), null, null, IDataLog.STAT_MEM_USED);
 		List data = Containers.getList(heartbeat.get());
 		if (data.isEmpty()) {
 			throw new Warning("Stat heartbeat missing. This could be a clean install (not a bug), or it could be a storage issue.");
 		}
 	}
 
-	public static IStat getImplementation() {
+	public static IDataLog getImplementation() {
 		return dflt;
 	}
 

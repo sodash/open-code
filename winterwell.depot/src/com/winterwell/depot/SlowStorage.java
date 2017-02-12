@@ -8,7 +8,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.Actor;
@@ -128,7 +128,7 @@ implements IStore , Flushable, Closeable
 	public final <X> X get(Desc<X> desc) {
 		Object v = map.get(desc);
 		if (v!=null) {
-			Stat.count(1,"Depot","cache_hit","SlowStorage");
+			DataLog.count(1,"Depot","cache_hit","SlowStorage");
 			return v==NULL? null : (X) v;
 		}
 		return base.get(desc);

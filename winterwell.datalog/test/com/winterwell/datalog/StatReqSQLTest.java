@@ -21,7 +21,7 @@ public class StatReqSQLTest extends DatalogTestCase {
 	
 	@Test
 	public void testSave() throws InterruptedException {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 		
 		Period p1 = saveData(si, 2.0, "hello");
 		Thread.sleep(1000);
@@ -38,7 +38,7 @@ public class StatReqSQLTest extends DatalogTestCase {
 	
 	@Test
 	public void testSave2() throws InterruptedException {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 		String tag = "StatReqSqlTestTag_" + Utils.getRandomString(10);
 		
 		Period p1 = saveData(si, 2.0, tag);
@@ -61,7 +61,7 @@ public class StatReqSQLTest extends DatalogTestCase {
 	
 	@Test
 	public void testStream() throws InterruptedException {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 
 		Time start = new Time();
 		Time end = start.plus(TUnit.SECOND.dt);
@@ -78,7 +78,7 @@ public class StatReqSQLTest extends DatalogTestCase {
 	
 	@Test
 	public void testSaveHistory() {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 
 		String mar = "martag";
 		Time t1 = new Time(2012, 3, 25);
@@ -111,7 +111,7 @@ public class StatReqSQLTest extends DatalogTestCase {
 	 */
 	@Test (expected=IllegalArgumentException.class)
 	public void testDatastream() {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 
 		Time start = new Time(2013, 01, 01);
 		Time end = new Time(2013, 01, 20);
@@ -152,16 +152,16 @@ public class StatReqSQLTest extends DatalogTestCase {
 	
 	@Test
 	public void testBucket() {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 		
 		String tag = "test_tag";
 		String delete = "delete from " + SQLStorage.TABLE + " where tag = '" + tag + "';";
 		SqlUtils.executeUpdate(delete, null);
 		
-		Stat.count(1, tag);
+		DataLog.count(1, tag);
 		Time start = si.start;
 		Time at = start.plus(10, TUnit.MINUTE);
-		Stat.count(at, 2, tag);
+		DataLog.count(at, 2, tag);
 		
 		StatReqSQL statreq = new StatReqSQL(KStatReq.DATA, tag, start.minus(1, TUnit.SECOND), start.plus(15, TUnit.MINUTE), null, null);
 		StatReq.initV(statreq);

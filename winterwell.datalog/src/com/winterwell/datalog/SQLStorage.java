@@ -8,7 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
+import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.Utils;
@@ -117,7 +118,7 @@ public class SQLStorage implements IStatStorage {
 		if ( ! initFlag) {
 			// Can't save!
 			if (warnings < 3) {
-				Log.e(Stat.LOGTAG, "Cannot save! Database not initialised. Losing counts for: "+tag2count.keySet()+" "+tag2mean.keySet());
+				Log.e(DataLog.LOGTAG, "Cannot save! Database not initialised. Losing counts for: "+tag2count.keySet()+" "+tag2mean.keySet());
 				warnings++;
 			}			
 			return;
@@ -188,7 +189,7 @@ public class SQLStorage implements IStatStorage {
 		initStatDB();
 		if ( ! initFlag) {
 			// Can't save!
-			Log.e(Stat.LOGTAG, "Cannot save history! Database not initialised. Losing counts for: "+tag2time2count.keySet());
+			Log.e(DataLog.LOGTAG, "Cannot save history! Database not initialised. Losing counts for: "+tag2time2count.keySet());
 			return;
 		}
 		if (tag2time2count.isEmpty()) return;
@@ -236,7 +237,7 @@ public class SQLStorage implements IStatStorage {
 					insert.executeBatch();
 					insert.clearBatch();
 					
-					Log.d(Stat.LOGTAG, "saving batch of " + BATCH_SIZE + " rows");
+					Log.d(DataLog.LOGTAG, "saving batch of " + BATCH_SIZE + " rows");
 				}
 			}
 			
@@ -244,9 +245,9 @@ public class SQLStorage implements IStatStorage {
 			update.executeBatch();
 			insert.executeBatch();
 			conn.commit();
-			Log.d(Stat.LOGTAG, "saveHistory " + rowCount + " rows "+tag2time2count);			
+			Log.d(DataLog.LOGTAG, "saveHistory " + rowCount + " rows "+tag2time2count);			
 		} catch (SQLException e) {
-			Log.e(Stat.LOGTAG, Utils.getRootCause(e));
+			Log.e(DataLog.LOGTAG, Utils.getRootCause(e));
 			throw Utils.runtime(e);
 		} finally {
 			SqlUtils.close(conn);
@@ -342,6 +343,13 @@ public class SQLStorage implements IStatStorage {
 			where += clause;
 		}
 		return where;
+	}
+
+
+	@Override
+	public IStatStorage setSettings(DataLogSettings settings) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 

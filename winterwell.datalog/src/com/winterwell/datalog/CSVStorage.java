@@ -9,7 +9,8 @@ import java.nio.channels.FileLock;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
+import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.depot.Depot;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.MetaData;
@@ -67,7 +68,7 @@ public class CSVStorage implements IStatStorage {
 	@Override
 	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {
 		File csv = getFile(period.getStart());
-		Log.d(Stat.LOGTAG, "saving "+tag2count.size()+" to "+csv+": "+tag2count);
+		Log.d(DataLog.LOGTAG, "saving "+tag2count.size()+" to "+csv+": "+tag2count);
 		csv.getParentFile().mkdirs();
 		FileLock lock = null;
 		FileOutputStream fout = null;
@@ -113,7 +114,7 @@ public class CSVStorage implements IStatStorage {
 			} catch (ClosedChannelException ex) {
 				// ignore
 			} catch (IOException e) {
-				Log.e(Stat.LOGTAG, e);
+				Log.e(DataLog.LOGTAG, e);
 			}
 		}
 	}
@@ -206,5 +207,11 @@ public class CSVStorage implements IStatStorage {
 			KInterpolate fn, Dt bucketSize) {
 		// TODO Auto-generated method stub
 		throw new TodoException();
+	}
+
+	@Override
+	public IStatStorage setSettings(DataLogSettings settings) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

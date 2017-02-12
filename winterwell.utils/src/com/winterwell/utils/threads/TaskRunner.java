@@ -18,7 +18,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.NotUniqueException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
@@ -71,7 +71,7 @@ public class TaskRunner {
 		this.stats = stats;
 		// check that we have datalog on the classpath
 		if (stats)
-			Stat.get("TaskRunner_todo");
+			DataLog.get("TaskRunner_todo");
 		return this;
 	}
 
@@ -173,7 +173,7 @@ public class TaskRunner {
 		// save runtime stats
 		if (stats) {
 			Dt dt = task.getRunningTime();
-			Stat.mean(dt.getMillisecs(), "TaskRunner_dt", name, task.getClass()
+			DataLog.mean(dt.getMillisecs(), "TaskRunner_dt", name, task.getClass()
 					.getSimpleName());
 		}
 	}
@@ -259,7 +259,7 @@ public class TaskRunner {
 
 		// Stats
 		if (stats) {
-			Stat.set(todo.size(), "TaskRunner_todo", name);
+			DataLog.set(todo.size(), "TaskRunner_todo", name);
 		}
 
 		return f;

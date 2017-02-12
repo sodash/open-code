@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.threads.SafeExecutor;
@@ -118,8 +118,8 @@ public class CacheTest {
 		}
 		ex.shutdown();
 		ex.awaitTermination(TUnit.HOUR.getMillisecs(), TimeUnit.MILLISECONDS);
-		System.out.println("Hits:\t" + Stat.get("Cache_hit")); // c.getHitCounter());
-		System.out.println("Misses:\t" + Stat.get("Cache_miss")); // c.getMissCounter());
+		System.out.println("Hits:\t" + DataLog.get("Cache_hit")); // c.getHitCounter());
+		System.out.println("Misses:\t" + DataLog.get("Cache_miss")); // c.getMissCounter());
 		Assert.assertEquals(cacheSize, c.size());
 	}
 

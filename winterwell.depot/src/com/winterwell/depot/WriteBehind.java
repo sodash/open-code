@@ -8,7 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
@@ -104,11 +104,11 @@ public abstract class WriteBehind<K, V> implements Flushable, Closeable {
 			Pair2<V, Time> vt = queue.get(key);
 			// Note: if remove was called, we may (correctly) return null here
 			if (vt!=null) {
-				Stat.count(1, "WriteBehind_hit");
+				DataLog.count(1, "WriteBehind_hit");
 				return vt.first;
 			}
 		}
-		Stat.count(1, "WriteBehind_miss");
+		DataLog.count(1, "WriteBehind_miss");
 		return getFromStorage(key);
 	}
 	
@@ -215,7 +215,7 @@ public abstract class WriteBehind<K, V> implements Flushable, Closeable {
 		}
 		
 		// TODO delete memory leak hunt
-		Stat.set(queue.size(),"mem", "WriteBehind", toString());
+		DataLog.set(queue.size(),"mem", "WriteBehind", toString());
 	}
 
 	/**

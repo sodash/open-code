@@ -1,6 +1,6 @@
 package com.winterwell.datalog;
 
-public interface IListenStat {
+public interface IListenDataLog {
 
 	void handleCount(double x, double dx, String tag);
 

@@ -15,15 +15,15 @@ import com.winterwell.utils.time.Time;
  * 
  * @author daniel
  */
-public class Alert implements IListenStat {
+public class Alert implements IListenDataLog {
 
-	private IListenStat handler;
+	private IListenDataLog handler;
 
 	public void setBelow(boolean below) {
 		this.below = below;
 	}
 	
-	public IListenStat getHandler() {
+	public IListenDataLog getHandler() {
 		return handler;
 	}
 
@@ -76,7 +76,7 @@ public class Alert implements IListenStat {
 	}
 	
 
-	public void setHandler(IListenStat handler) {
+	public void setHandler(IListenDataLog handler) {
 		this.handler = handler;
 	}
 	
@@ -132,7 +132,7 @@ public class Alert implements IListenStat {
 			return;
 		}
 		// Count Alert firing
-		Stat.count(1, getFiringStatTag());
+		DataLog.count(1, getFiringStatTag());
 		setLastAlert(new Time());
 		// handle it
 		handler.handleCount(x, 0, threshold.tag);

@@ -46,15 +46,15 @@ public class SQLStorageTest extends DatalogTestCase {
 		{
 			// Test 1, 5 results, out of order.
 			String testTag= "statTestTag" + Utils.getRandomString(10);
-			Stat.count(t1, 2, testTag);
-			Stat.count(t3, 3, testTag);
-			Stat.count(t5, 5, testTag);
-			Stat.count(t2, 7, testTag);
-			Stat.count(t4, 11, testTag);
+			DataLog.count(t1, 2, testTag);
+			DataLog.count(t3, 3, testTag);
+			DataLog.count(t5, 5, testTag);
+			DataLog.count(t2, 7, testTag);
+			DataLog.count(t4, 11, testTag);
 
-			Stat.flush();
+			DataLog.flush();
 
-			ListDataStream l = (ListDataStream) Stat.getData(new Time().minus(TUnit.HOUR), new Time(), null, null, testTag).get();
+			ListDataStream l = (ListDataStream) DataLog.getData(new Time().minus(TUnit.HOUR), new Time(), null, null, testTag).get();
 			System.out.println(l);
 			// If these are coming back in order, the time will be higher each time, and the 
 			// results will match the array below. Note: The list returns a final zero. 
@@ -65,20 +65,20 @@ public class SQLStorageTest extends DatalogTestCase {
 			// Test 2, 7 results, out of order, and some at same time.
 			String testTag = "statTestTag" + Utils.getRandomString(10);
 			System.out.println("stat test tag "+testTag);
-			Stat.count(t1, 1, testTag);
-			Stat.count(t3, 2, testTag);
-			Stat.count(t5, 4, testTag);
+			DataLog.count(t1, 1, testTag);
+			DataLog.count(t3, 2, testTag);
+			DataLog.count(t5, 4, testTag);
 			
-			Stat.flush();
+			DataLog.flush();
 			
-			Stat.count(t5, 8, testTag);
-			Stat.count(t3, 16, testTag);
-			Stat.count(t1, 32, testTag);
-			Stat.count(t2, 64, testTag);
+			DataLog.count(t5, 8, testTag);
+			DataLog.count(t3, 16, testTag);
+			DataLog.count(t1, 32, testTag);
+			DataLog.count(t2, 64, testTag);
 			
-			Stat.flush();			
+			DataLog.flush();			
 			
-			ListDataStream l = (ListDataStream) Stat.getData(new Time().minus(TUnit.HOUR), new Time(), null, null, testTag).get();
+			ListDataStream l = (ListDataStream) DataLog.getData(new Time().minus(TUnit.HOUR), new Time(), null, null, testTag).get();
 			System.out.println(l);
 			
 			// If these are coming back in order, the time will be higher each time, and the 
@@ -89,27 +89,27 @@ public class SQLStorageTest extends DatalogTestCase {
 		
 		{	// Same test, multiple runs
 			String testTag = "statTestTagRepeat" + Utils.getRandomString(10);
-			Stat.set(t1, 1, testTag);
-			Stat.set(t2, 2, testTag);
-			Stat.set(t3, 3, testTag);
-			Stat.set(t4, 4, testTag);
-			Stat.set(t5, 5, testTag);			
+			DataLog.set(t1, 1, testTag);
+			DataLog.set(t2, 2, testTag);
+			DataLog.set(t3, 3, testTag);
+			DataLog.set(t4, 4, testTag);
+			DataLog.set(t5, 5, testTag);			
 
-			Stat.flush();
-			ListDataStream l = (ListDataStream) Stat.getData(new Time().minus(TUnit.HOUR), new Time(), null, null, testTag).get();
+			DataLog.flush();
+			ListDataStream l = (ListDataStream) DataLog.getData(new Time().minus(TUnit.HOUR), new Time(), null, null, testTag).get();
 			System.out.println("12345:	"+ l);
-			Stat.flush();
+			DataLog.flush();
 			
-			Stat.count(t1, 1, testTag);
-			Stat.count(t2, 2, testTag);
-			Stat.count(t3, 3, testTag);
-			Stat.count(t4, 4, testTag);
-			Stat.count(t5, 5, testTag);
+			DataLog.count(t1, 1, testTag);
+			DataLog.count(t2, 2, testTag);
+			DataLog.count(t3, 3, testTag);
+			DataLog.count(t4, 4, testTag);
+			DataLog.count(t5, 5, testTag);
 			
-			Stat.flush();
-			ListDataStream l2 = (ListDataStream) Stat.getData(new Time().minus(TUnit.HOUR), new Time(), null, null, testTag).get();
+			DataLog.flush();
+			ListDataStream l2 = (ListDataStream) DataLog.getData(new Time().minus(TUnit.HOUR), new Time(), null, null, testTag).get();
 			System.out.println("12345x2:	"+ l2);
-			Stat.flush();
+			DataLog.flush();
 			
 			// If these are coming back in order, the time will be higher each time, and the 
 			// results will match the array below. Note: The list returns a final zero. 
@@ -125,14 +125,14 @@ public class SQLStorageTest extends DatalogTestCase {
 		Time t1 = new Time().minus(2, TUnit.MINUTE);
 		
 		String testTag = "statTestTagHistoric" + Utils.getRandomString(10);
-		Stat.count(t1, 1, testTag);
-		Stat.count(t2, 2, testTag);
-		Stat.flush();
+		DataLog.count(t1, 1, testTag);
+		DataLog.count(t2, 2, testTag);
+		DataLog.flush();
 		
-		Stat.set(t1, 2, testTag);
-		Stat.set(t2, 3, testTag);
+		DataLog.set(t1, 2, testTag);
+		DataLog.set(t2, 3, testTag);
 		
-		ListDataStream l = (ListDataStream) Stat.getData(new Time().minus(5, TUnit.MINUTE), new Time(), null, null, testTag).get();
+		ListDataStream l = (ListDataStream) DataLog.getData(new Time().minus(5, TUnit.MINUTE), new Time(), null, null, testTag).get();
 		System.out.println(l);
 		double [] resultArray = {2,3,0};
 		assert isDataStreamValid(l, resultArray);
@@ -148,50 +148,50 @@ public class SQLStorageTest extends DatalogTestCase {
 		String testTag = "statTestTagHistoric" + Utils.getRandomString(10);
 		{
 			
-			Stat.count(t1, 1, testTag);
-			Stat.count(t2, 2, testTag);
-			Stat.flush();
+			DataLog.count(t1, 1, testTag);
+			DataLog.count(t2, 2, testTag);
+			DataLog.flush();
 		
-			Stat.set(t1, 2, testTag);
-			Stat.set(t2, 3, testTag);
-			Stat.count(t1, 10, testTag);
-			Stat.count(t2, 10, testTag);
+			DataLog.set(t1, 2, testTag);
+			DataLog.set(t2, 3, testTag);
+			DataLog.count(t1, 10, testTag);
+			DataLog.count(t2, 10, testTag);
 		
-			Stat.flush();
+			DataLog.flush();
 		
-			ListDataStream l = (ListDataStream) Stat.getData(new Time().minus(3, TUnit.MINUTE), new Time(), null, null, testTag).get();
+			ListDataStream l = (ListDataStream) DataLog.getData(new Time().minus(3, TUnit.MINUTE), new Time(), null, null, testTag).get();
 			double [] resultArray = {12,13,0};
 			assert isDataStreamValid(l, resultArray);
 	
 		}
 		{
 			String badTestTag = sqlNightmare + Utils.getRandomString(10);
-			Stat.set(t1, 2, badTestTag);
-			Stat.set(t2, 3, badTestTag);
-			Stat.count(t1, 10, badTestTag);
-			Stat.count(t2, 10, badTestTag);
-			Stat.set(t1, 4, badTestTag);
-			Stat.set(t2, 5, badTestTag);
-			Stat.flush();
-			ListDataStream l = (ListDataStream) Stat.getData(new Time().minus(3, TUnit.MINUTE), new Time(), null, null, badTestTag).get();
+			DataLog.set(t1, 2, badTestTag);
+			DataLog.set(t2, 3, badTestTag);
+			DataLog.count(t1, 10, badTestTag);
+			DataLog.count(t2, 10, badTestTag);
+			DataLog.set(t1, 4, badTestTag);
+			DataLog.set(t2, 5, badTestTag);
+			DataLog.flush();
+			ListDataStream l = (ListDataStream) DataLog.getData(new Time().minus(3, TUnit.MINUTE), new Time(), null, null, badTestTag).get();
 			double [] resultArray = {4,5,0};
 			assert isDataStreamValid(l, resultArray);
 		}
 		{
-			Stat.set(t1, 2, testTag);
-			Stat.flush();
-			Stat.set(t2, 3, testTag);
-			Stat.flush();
-			Stat.count(t1, 10, testTag);
-			Stat.flush();
-			Stat.count(t2, 10, testTag);
-			Stat.flush();
-			Stat.set(t1, 4, testTag);
-			Stat.flush();
-			Stat.set(t2, 5, testTag);
-			Stat.flush();
+			DataLog.set(t1, 2, testTag);
+			DataLog.flush();
+			DataLog.set(t2, 3, testTag);
+			DataLog.flush();
+			DataLog.count(t1, 10, testTag);
+			DataLog.flush();
+			DataLog.count(t2, 10, testTag);
+			DataLog.flush();
+			DataLog.set(t1, 4, testTag);
+			DataLog.flush();
+			DataLog.set(t2, 5, testTag);
+			DataLog.flush();
 			
-			ListDataStream l = (ListDataStream) Stat.getData(new Time().minus(3, TUnit.MINUTE), new Time(), null, null, testTag).get();
+			ListDataStream l = (ListDataStream) DataLog.getData(new Time().minus(3, TUnit.MINUTE), new Time(), null, null, testTag).get();
 			double [] resultArray = {4,5,0};
 			assert isDataStreamValid(l, resultArray);
 		}
@@ -212,32 +212,32 @@ public class SQLStorageTest extends DatalogTestCase {
 		Time t1 = new Time().minus(4 , TUnit.MINUTE);
 		
 		Time t0 = new Time().minus(10 , TUnit.DAY);
-		Stat.flush();
-		Stat.count(t0, 100, badTestTag);
-		Stat.flush();
-		Stat.count(t1, 2, badTestTag);
-		Stat.flush();
-		Stat.count(t3, 3, badTestTag);
-		Stat.flush();
-		Stat.count(t5, 5, badTestTag);
-		Stat.flush();
-		Stat.count(t2, 7, badTestTag);
-		Stat.flush();
-		Stat.count(t4, 11, badTestTag);	
+		DataLog.flush();
+		DataLog.count(t0, 100, badTestTag);
+		DataLog.flush();
+		DataLog.count(t1, 2, badTestTag);
+		DataLog.flush();
+		DataLog.count(t3, 3, badTestTag);
+		DataLog.flush();
+		DataLog.count(t5, 5, badTestTag);
+		DataLog.flush();
+		DataLog.count(t2, 7, badTestTag);
+		DataLog.flush();
+		DataLog.count(t4, 11, badTestTag);	
 		
-		Stat.count(t0, 1, badTestTag, "hello");
-		Stat.flush();
-		Stat.set(t1, 0, badTestTag);
-		Stat.flush();
-		Stat.count(t2, 3, badTestTag);
-		Stat.flush();
-		Stat.count(t3, 4, badTestTag);
-		Stat.flush();
-		Stat.count(t4, 6, badTestTag);
-		Stat.flush();
-		Stat.count(t5, 6, badTestTag);
+		DataLog.count(t0, 1, badTestTag, "hello");
+		DataLog.flush();
+		DataLog.set(t1, 0, badTestTag);
+		DataLog.flush();
+		DataLog.count(t2, 3, badTestTag);
+		DataLog.flush();
+		DataLog.count(t3, 4, badTestTag);
+		DataLog.flush();
+		DataLog.count(t4, 6, badTestTag);
+		DataLog.flush();
+		DataLog.count(t5, 6, badTestTag);
 
-		ListDataStream l = (ListDataStream) Stat.getData(new Time().minus(11, TUnit.DAY), new Time(), null, null, badTestTag).get();
+		ListDataStream l = (ListDataStream) DataLog.getData(new Time().minus(11, TUnit.DAY), new Time(), null, null, badTestTag).get();
 		double [] resultArray = {101,0,10,7,17,11,0};
 		assert isDataStreamValid(l, resultArray);
 	}

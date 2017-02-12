@@ -11,9 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.winterwell.datalog.Doc;
-import com.winterwell.datalog.Stat;
-import com.winterwell.datalog.StatTag;
+import com.winterwell.datalog.DataLog;
+
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.IFn;
 
@@ -170,12 +169,11 @@ public class Cache<Key, Value> extends AbstractMap2<Key, Value> {
 	 * @param statTag Stats will be logged under "Cache_hit/statTag", "Cache_miss/statTag" and "Cache_size/statTag" 
 	 * @return this
 	 */
-	@Doc({ @StatTag(tag = "Cache_hit/tag", doc = "Count all Cache hits (i.e. how often the get request was found in cache) with the given tag.") })
 	public Cache<Key, Value> setStats(String statTag) {
 		this.stats = statTag;
 		// check that we have datalog on the classpath
 		if (stats != null)
-			Stat.get("Cache_hit", stats);
+			DataLog.get("Cache_hit", stats);
 		return this;
 	}
 
@@ -190,12 +188,12 @@ public class Cache<Key, Value> extends AbstractMap2<Key, Value> {
 		Value v = ref == null ? null : ref.get();
 		if (v == null) {
 			if (stats != null) {
-				Stat.count(1, "Cache_miss", stats);
+				DataLog.count(1, "Cache_miss", stats);
 			}
 			return null;
 		} else {
 			if (stats != null) {
-				Stat.count(1, "Cache_hit", stats);
+				DataLog.count(1, "Cache_hit", stats);
 			}
 		}
 		return v;
@@ -246,7 +244,7 @@ public class Cache<Key, Value> extends AbstractMap2<Key, Value> {
 				v));
 		// maybePersist();
 		if (stats != null) {
-			Stat.mean(size(), "Cache_size", stats);
+			DataLog.mean(size(), "Cache_size", stats);
 		}
 		return old == null ? null : old.get();
 	}

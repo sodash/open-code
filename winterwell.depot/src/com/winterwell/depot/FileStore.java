@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.IFn;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -313,7 +313,7 @@ public class FileStore implements IStore {
 		}
 		assert f.isFile() : f;
 		
-		Stat.count(1,"Depot","load", config.getType().getSimpleName());
+		DataLog.count(1,"Depot","load", config.getType().getSimpleName());
 		InputStream in = null;
 		try {
 			in = new FileInputStream(f);

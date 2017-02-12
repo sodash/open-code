@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.depot.Desc;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.utils.Printer;
@@ -70,18 +70,18 @@ public class StatReqCSV<X> extends StatReq<X> {
 	}
 	
 	private static void runBatch() {
-		stat = (StatImpl) Stat.dflt;
+		stat = (StatImpl) DataLog.dflt;
 		List<StatReq> _batch = todo.get();
 		// This can happen with repeated calls to the same get()
 		if (_batch.isEmpty()) return;
 		// copy & clear out (otherwise we get threading issues from the toString / debugger interaction)
 		ArrayList<StatReq> batch = new ArrayList(_batch);
 		_batch.clear();
-		Log.d(Stat.LOGTAG, "runBatch "+batch.size());
+		Log.d(DataLog.LOGTAG, "runBatch "+batch.size());
 		
 		// Do from cache
 		List<StatReq> done = runBatch2_fromCache(batch);
-		Log.d(Stat.LOGTAG, "runBatch cache-hit: "+done.size()+" of "+batch.size());
+		Log.d(DataLog.LOGTAG, "runBatch cache-hit: "+done.size()+" of "+batch.size());
 		batch.removeAll(done);
 		if (batch.isEmpty()) {
 			return; // all done from cache :)
@@ -99,7 +99,7 @@ public class StatReqCSV<X> extends StatReq<X> {
 			try {
 				runBatch2_(_server, batch2);
 			} catch(Throwable ex) {
-				Log.w(Stat.LOGTAG, ex);
+				Log.w(DataLog.LOGTAG, ex);
 				// "give" this error to all affected
 				for (StatReq statReq : batch2) {
 					statReq.error = ex;
@@ -203,7 +203,7 @@ public class StatReqCSV<X> extends StatReq<X> {
 		// timestamp, tag, value
 		for (String[] row : r) {
 			if (row.length < 3) {
-				Log.w(Stat.LOGTAG, "getData bogus row: "+Printer.toString(row));
+				Log.w(DataLog.LOGTAG, "getData bogus row: "+Printer.toString(row));
 				continue; // an error??
 			}
 			// Which if any claim it?
@@ -221,7 +221,7 @@ public class StatReqCSV<X> extends StatReq<X> {
 				}
 				// report the error, but carry on
 				// FIXME: we currently can get ordering errors around Stat flush & restart 
-				Log.e(Stat.LOGTAG, "row: "+Printer.toString(row)+": "+e);
+				Log.e(DataLog.LOGTAG, "row: "+Printer.toString(row)+": "+e);
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 package com.winterwell.datalog;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
 

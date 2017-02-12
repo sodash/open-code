@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.ExtraDimensionsDataStream;
@@ -54,9 +54,9 @@ import com.winterwell.utils.time.TimeUtils;
  *
  * @testedby {@link StatImplTest}
  * @author daniel
- * @see Stat
+ * @see DataLog
  */
-public class StatImpl implements Closeable, IStat {
+public class StatImpl implements Closeable, IDataLog {
 
 	@Override
 	public StatConfig getConfig() {
@@ -64,26 +64,26 @@ public class StatImpl implements Closeable, IStat {
 	}
 
 	@Override
-	public synchronized void setListener(IListenStat listener, String... tagBits) {
-		String tag = Stat.tag(tagBits);
-		HashMap<String , IListenStat> map = new HashMap<String , IListenStat>(listeners);
+	public synchronized void setListener(IListenDataLog listener, String... tagBits) {
+		String tag = DataLog.tag(tagBits);
+		HashMap<String , IListenDataLog> map = new HashMap<String , IListenDataLog>(listeners);
 		map.put(tag, listener);
 		listeners = map;
 	}
 
-	public Map<String, IListenStat> getListeners() {
+	public Map<String, IListenDataLog> getListeners() {
 		return Collections.unmodifiableMap(listeners);
 	}
 
 	@Override
 	public synchronized void removeListener(String... tagBits) {
-		String tag = Stat.tag(tagBits);
-		HashMap<String , IListenStat> map = new HashMap<String , IListenStat>(listeners);
+		String tag = DataLog.tag(tagBits);
+		HashMap<String , IListenDataLog> map = new HashMap<String , IListenDataLog>(listeners);
 		map.remove(tag);
 		listeners = map;
 	}
 
-	HashMap<String,IListenStat> listeners = new HashMap<String , IListenStat>(0);
+	HashMap<String,IListenDataLog> listeners = new HashMap<String , IListenDataLog>(0);
 
 
 	@Deprecated // A test only method??
@@ -98,26 +98,26 @@ public class StatImpl implements Closeable, IStat {
 	
 	@Override
 	public IFuture<MeanRate> getMean(Time start, Time end, String... tagBits) {
-		String tag = Stat.tag(tagBits);
+		String tag = DataLog.tag(tagBits);
 		return new FixedFuture(getMean(tagBits)); // Wrong! But returns plausible lies
 //		FIXME return storage.getMean(start, end, tag);
 	}
 
 	@Override
 	public StatReq<IDataStream> getData(Time start, Time end, KInterpolate fn, Dt bucketSize, String... tagBits) {
-		String tag = Stat.tag(tagBits);
+		String tag = DataLog.tag(tagBits);
 		return storage.getData(tag, start, end, fn, bucketSize);
 	}
 	
 	@Override
 	public StatReq<IDataStream> getMeanData(Time start, Time end, KInterpolate fn, Dt bucketSize, String... tagBits) {
-		String tag = Stat.tag(tagBits);
+		String tag = DataLog.tag(tagBits);
 		return storage.getMeanData(tag, start, end, fn, bucketSize);
 	}
 
 	@Override
-	public IStatReq<Double> getTotal(Time start, Time end, String... tagBits) {
-		String tag = Stat.tag(tagBits);
+	public IDataLogReq<Double> getTotal(Time start, Time end, String... tagBits) {
+		String tag = DataLog.tag(tagBits);
 		return storage.getTotal(tag, start, end);
 	}
 
@@ -131,7 +131,7 @@ public class StatImpl implements Closeable, IStat {
 		Period bucket = getCurrentBucket();
 		if (end != null && ! end.isAfter(bucket.first)) return null;
 		// TODO What if the bucket overlaps with the loaded data? This can happen if flush is used
-		Rate x = Stat.get(tag);
+		Rate x = DataLog.get(tag);
 		Time t = doSave3_time(bucket);
 		return new Datum(t, x.x, tag);
 	}
@@ -245,13 +245,13 @@ public class StatImpl implements Closeable, IStat {
 		}
 		// shutdown the old
 		if (saveThread!=null) {
-			Log.e(Stat.LOGTAG, "WTF reinitialising stat?");
+			Log.e(DataLog.LOGTAG, "WTF reinitialising stat?");
 			saveThread.cancel();
 		}
 		// start-up the new
 		saveThread = new Timer("DataLog.save", true);
 		saveThread.scheduleAtFixedRate(new SystemStatsTask(), first.getDate(), config.interval.getMillisecs());
-		Log.i(Stat.LOGTAG, "1st save at "+first+" ("+TimeUtils.toString(new Time().dt(first))+")");
+		Log.i(DataLog.LOGTAG, "1st save at "+first+" ("+TimeUtils.toString(new Time().dt(first))+")");
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class StatImpl implements Closeable, IStat {
 
 	@Override
 	public String label(String label, String... tagBits) {
-		String tag = Stat.tag(tagBits);
+		String tag = DataLog.tag(tagBits);
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -287,12 +287,12 @@ public class StatImpl implements Closeable, IStat {
 		Time now = new Time();
 		if (period.second.isAfter(now)) {
 			// Nope -- this is a premature flush
-			Log.d(Stat.LOGTAG, "save but no advance.");
+			Log.d(DataLog.LOGTAG, "save but no advance.");
 		} else {
 			start = period.second;
 		}
 		// save the counters!
-		Log.d(Stat.LOGTAG, "Saving "+old.size()+" simple + "+oldMean.size()+" dist + "+oldTagTimeCount.size()+" historical "+oldTagTimeSet.size()+"...");
+		Log.d(DataLog.LOGTAG, "Saving "+old.size()+" simple + "+oldMean.size()+" dist + "+oldTagTimeCount.size()+" historical "+oldTagTimeSet.size()+"...");
 		storage.save(period, old, oldMean);
 		storage.saveHistory(oldTagTimeCount);
 		storage.setHistory(oldTagTimeSet);
@@ -322,7 +322,7 @@ public class StatImpl implements Closeable, IStat {
 	public  void set(double x, Object... tagBits) {
 		if (closed) throw new ClosedException();
 //		init();
-		String tag = Stat.tag(tagBits);
+		String tag = DataLog.tag(tagBits);
 		tag2count.put(tag, x);
 
 		// track our own size
@@ -346,13 +346,13 @@ public class StatImpl implements Closeable, IStat {
 
 			double x = Containers.plus(tag2count, stag, dx);
 			// alerts?
-			IListenStat listener = listeners.get(stag);
+			IListenDataLog listener = listeners.get(stag);
 			if (listener!=null) {
 				try {
 					listener.handleCount(x, dx, stag);
 				} catch(Throwable ex) {
 					// don't throw an exception here
-					Log.e(Stat.LOGTAG, ex);
+					Log.e(DataLog.LOGTAG, ex);
 				}
 			}
 		}
@@ -388,14 +388,14 @@ public class StatImpl implements Closeable, IStat {
 
 	@Override
 	public MeanRate getMean(String... tagBits) {
-		String tag = Stat.tag(tagBits);
+		String tag = DataLog.tag(tagBits);
 		return new MeanRate(tag2dist.get(tag), getPeriod());
 	}
 
 	@Override
 	public Rate get(String... tags) {
 		// make the tag
-		String stag = Stat.tag(tags);
+		String stag = DataLog.tag(tags);
 		Double v = tag2count.get(stag);
 		if (v != null) {
 			return new Rate(v, getPeriod(), stag);
@@ -419,7 +419,7 @@ public class StatImpl implements Closeable, IStat {
 	@Deprecated
 	@Override
 	public final void close() {
-		Log.i(Stat.LOGTAG, "CLOSE!");
+		Log.i(DataLog.LOGTAG, "CLOSE!");
 		flush();
 		closed = true;
 		tag2count = null;
@@ -440,7 +440,7 @@ public class StatImpl implements Closeable, IStat {
 	public void setEvent(String event, String... tagBits) {
 		if (closed) throw new ClosedException();
 		if (Utils.isBlank(event)) {
-			throw new IllegalArgumentException(event+" for "+Stat.tag(tagBits));
+			throw new IllegalArgumentException(event+" for "+DataLog.tag(tagBits));
 		}
 		// loop over tag.heiriarchy
 		StringBuilder tag = new StringBuilder();
@@ -483,7 +483,7 @@ public class StatImpl implements Closeable, IStat {
 //			return;
 //		}
 
-		String stag = Stat.tag(tags);					
+		String stag = DataLog.tag(tags);					
 		Pair2<String, Time> tag2time = new Pair2<String, Time>(stag, at);
 		tagTime2count.remove(tag2time);
 		tagTime2set.put(tag2time, x);
@@ -518,7 +518,7 @@ public class StatImpl implements Closeable, IStat {
 	 */
 	private String parseTag(Object tg, StringBuilder tag) {
 		if (tag.length() != 0) {
-			tag.append(Stat.HIERARCHY_CHAR);
+			tag.append(DataLog.HIERARCHY_CHAR);
 		}
 		
 		// TODO Defence against likely bug after v14c branches off
@@ -526,7 +526,7 @@ public class StatImpl implements Closeable, IStat {
 //			TODO throw new IllegalArgumentException(Printer.toString(tg)+" onto "+tag);
 //		}
 		
-		tg = Stat.tag2_escape(tg.toString());
+		tg = DataLog.tag2_escape(tg.toString());
 		tag.append(tg);
 
 		String stag = tag.toString();
@@ -543,15 +543,15 @@ public class StatImpl implements Closeable, IStat {
 				if (closed) cancel();
 				else doSave();
 				// heart beat: check things are working by storing some useful stats
-				Stat.set(ReflectionUtils.getUsedMemory(), STAT_MEM_USED);
-				Stat.set(ReflectionUtils.getAvailableMemory(), "mem_free");
+				DataLog.set(ReflectionUtils.getUsedMemory(), STAT_MEM_USED);
+				DataLog.set(ReflectionUtils.getAvailableMemory(), "mem_free");
 				
 				int[] info = SqlUtils.getPostgresThreadInfo("sodash");
-				Stat.set(info[0], "postgres_sodash_processes");
-				Stat.set(info[1], "postgres_sodash_idle");
+				DataLog.set(info[0], "postgres_sodash_processes");
+				DataLog.set(info[1], "postgres_sodash_idle");
 			} catch(Throwable t) {
 				try {
-					Log.e(Stat.LOGTAG, t);
+					Log.e(DataLog.LOGTAG, t);
 				}
 				catch(Throwable ex) {
 					ex.printStackTrace(); // Yeah, this is ridiculous, but we're still seeing outages

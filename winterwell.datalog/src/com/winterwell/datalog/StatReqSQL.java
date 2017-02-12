@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.depot.Desc;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.ListDataStream;
@@ -52,7 +52,7 @@ public class StatReqSQL<X> extends StatReq<X> {
 
 
 	public void run() {
-		stat = (StatImpl) Stat.dflt;
+		stat = (StatImpl) DataLog.dflt;
 		String srv = server == null? Desc.MY_SERVER() : server; // MY_SERVER() not LOCAL!
 		SQLStorage storage = (SQLStorage) stat.storage;
 
@@ -169,7 +169,7 @@ public class StatReqSQL<X> extends StatReq<X> {
 			String tag = row[1].toString();
 
 			if (row.length < 3) {
-				Log.w(Stat.LOGTAG, "getData bogus row: "+Printer.toString(row));
+				Log.w(DataLog.LOGTAG, "getData bogus row: "+Printer.toString(row));
 				continue; // an error??
 			}
 			addDatum(new Time(timestamp), Double.valueOf(mean_count), tag);

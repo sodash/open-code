@@ -26,23 +26,23 @@ public class StatImplTest extends DatalogTestCase {
 	@Test
 	public void testCount() throws InterruptedException {
 		// force an init
-		Stat.count(1, "dummy");		
-		StatImpl si = (StatImpl) Stat.dflt;
+		DataLog.count(1, "dummy");		
+		StatImpl si = (StatImpl) DataLog.dflt;
 		
 		si.count(1, "hello", "world");
 		Rate c = si.get("hello", "world");
 		assert c.x >= 1 : c;
 		
 		// multi-thread
-		Stat.set(0, "test", "foo");
+		DataLog.set(0, "test", "foo");
 		ExecutorService exe = Executors.newFixedThreadPool(20);
 		final AtomicInteger done = new AtomicInteger();
 		for(int i=0; i<1000; i++) {
 			exe.submit(new Runnable() {				
 				@Override
 				public void run() {
-					Stat.count(1, "test", "foo");
-					Rate fc = Stat.get("test", "foo");
+					DataLog.count(1, "test", "foo");
+					Rate fc = DataLog.get("test", "foo");
 //					System.err.println(fc+" "+done);
 					done.incrementAndGet();
 					assert fc.x > 0 ;
@@ -52,12 +52,12 @@ public class StatImplTest extends DatalogTestCase {
 		exe.shutdown();
 		exe.awaitTermination(1000, TimeUnit.MILLISECONDS);
 		assert done.get() == 1000 : done;
-		Rate foos = Stat.get("test", "foo");
+		Rate foos = DataLog.get("test", "foo");
 		assert foos.get() == 1000 : foos;
-		Stat.flush();
+		DataLog.flush();
 		
 		String[] tagBits = {"test", "foo"};
-		IFuture<Double> fd = Stat.getTotal(null, null, tagBits);
+		IFuture<Double> fd = DataLog.getTotal(null, null, tagBits);
 		double total = fd.get();
 		System.out.println(total);
 		assert total >= 1000;		
@@ -65,7 +65,7 @@ public class StatImplTest extends DatalogTestCase {
 	
 	@Test
 	public void testCache() {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 		si.count(3, "tag1");
 		Rate r = si.get("tag1");
 		assert r.get() == 3.0 : r.get();
@@ -73,21 +73,21 @@ public class StatImplTest extends DatalogTestCase {
 	
 	@Test
 	public void testGetTotal() throws IOException {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 		Time s = new Time();
 		for(int i=0; i<10; i++) {
 			Utils.sleep(300);
 			si.count(1, "testTotal");
 		}
 
-		IStatReq<Double> total = si.getTotal(s, new Time(), "testTotal");
+		IDataLogReq<Double> total = si.getTotal(s, new Time(), "testTotal");
 		Double v = total.get();
 		assert v == 10 : v;
 	}
 	
 	@Test
 	public void testCountHistoricData() {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 		Time at = new Time(2012, 7, 18);
 		si.count(at, 7.0, "hello", "world");
 		si.count(at, 3.0, "hello");
@@ -103,7 +103,7 @@ public class StatImplTest extends DatalogTestCase {
 	
 	@Test
 	public void testCurrentHistoricData() {
-		StatImpl si = (StatImpl) Stat.dflt;
+		StatImpl si = (StatImpl) DataLog.dflt;
 		Time at = new Time(2012, 8, 18);
 		si.count(at, 7.0, "hello2", "world2");
 				
@@ -124,7 +124,7 @@ public class StatImplTest extends DatalogTestCase {
 			String topTag = "testTag" + Utils.getRandomString(10);
 			String childTag = "testTag2";
 			String[] tagBits = {topTag, childTag};
-			StatImpl si = (StatImpl) Stat.dflt;
+			StatImpl si = (StatImpl) DataLog.dflt;
 			si.count(5, tagBits);
 			
 			si.set(10, topTag);
@@ -142,7 +142,7 @@ public class StatImplTest extends DatalogTestCase {
 			String topTag = "testTag" + Utils.getRandomString(10);
 			String childTag = "testTag2";
 			String[] tagBits = {topTag, childTag};
-			StatImpl si = (StatImpl) Stat.dflt;
+			StatImpl si = (StatImpl) DataLog.dflt;
 			si.count(5, tagBits);
 			
 			si.set(10, tagBits);

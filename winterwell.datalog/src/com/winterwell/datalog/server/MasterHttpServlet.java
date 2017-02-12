@@ -35,7 +35,7 @@ import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
 
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.datascience.Experiment;
 import com.winterwell.depot.Desc;
 import com.winterwell.es.client.DeleteByQueryRequestBuilder;

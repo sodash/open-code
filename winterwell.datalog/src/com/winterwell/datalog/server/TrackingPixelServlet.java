@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.winterwell.datalog.Stat;
+import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.web.WebUtils2;
 
 import com.winterwell.utils.Utils;
@@ -76,7 +76,7 @@ public class TrackingPixelServlet extends HttpServlet {
 		if (ref!=null) {
 			// remove gumpf??
 			cref = WebUtils2.cleanUp(ref);
-			Stat.count(1, "track_page", grp, cref);
+			DataLog.count(1, "track_page", grp, cref);
 		}
 		// log it
 		Log.d("track", cref+" via: "+via+" uid: "+uid);		

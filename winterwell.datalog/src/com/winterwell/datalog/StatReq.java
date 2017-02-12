@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
-import com.winterwell.datalog.Stat.KInterpolate;
+import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.depot.Desc;
 import com.winterwell.maths.timeseries.BucketedDataStream;
 import com.winterwell.maths.timeseries.DataUtils;
@@ -26,7 +26,7 @@ import com.winterwell.utils.web.SimpleJson;
  *
  * @param <X>
  */
-public class StatReq<X> implements IStatReq<X>, IHasJson {		
+public class StatReq<X> implements IDataLogReq<X>, IHasJson {		
 	
 	
 	/**
