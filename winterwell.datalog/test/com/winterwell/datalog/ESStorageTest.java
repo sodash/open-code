@@ -52,7 +52,8 @@ public class ESStorageTest extends DatalogTestCase {
 		DataLogEvent event2 = new DataLogEvent(1, "testevent", new ArrayMap(
 				"publisher", "egpub"
 				));
-		double total = storage.getEventTotal(start, end, "testdataspace", event2);
+		double total = storage.getEventTotal("testdataspace", start, end, event2);
+		assert total > 0;
 	}
 
 	
