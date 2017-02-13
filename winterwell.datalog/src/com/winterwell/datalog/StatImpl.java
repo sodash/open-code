@@ -222,8 +222,8 @@ public class StatImpl implements Closeable, IDataLog {
 			config.storageClass = SQLStorage.class;
 		}
 		try {
-			Constructor<?> cons = config.storageClass.getConstructor(StatConfig.class);
-			storage = (IStatStorage) cons.newInstance(config);
+			storage = (IStatStorage) config.storageClass.newInstance();
+			storage.init(config);
 		} catch (Exception ex) {
 			throw Utils.runtime(ex);
 		}

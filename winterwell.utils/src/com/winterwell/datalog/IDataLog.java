@@ -165,7 +165,7 @@ public interface IDataLog extends Closeable, Flushable {
 	void count(Time at, double dx, Object... tags);
 
 	/**
-	 * @return The config object (never null, usually StatConfig).
+	 * @return The config object (can be null, must be StatConfig).
 	 * This might include DB connection options -- but it does not have to, provided those are set
 	 * elsewhere.
 	 */
