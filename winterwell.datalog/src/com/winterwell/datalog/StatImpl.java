@@ -565,7 +565,18 @@ public class StatImpl implements Closeable, IDataLog {
 	}
 
 	public static String event2tag(String dataspace, Map event) {
-		
+		assert ! event.isEmpty();
+		assert ! Utils.isBlank(dataspace) : "no dataspace?! event:"+event;
+		StringBuilder stag = new StringBuilder(dataspace);
+		event.keySet().stream().sorted().forEach(k -> {
+			if ("count".equals(k)) return;
+			if ("dataspace".equals(k)) return;
+			Object v = event.get(k);
+			if ( ! Utils.truthy(v)) return;
+			stag.append("_"+k+"="+Printer.str(v));
+		});
+		return stag.toString();
+
 	}
 
 	@Override
