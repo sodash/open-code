@@ -6,7 +6,7 @@ import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 
 /**
- * @deprecated Merge with DatalogSettings, and move out of utils
+ * Why is this in utils? Because the interface references it.
  * 
  * This might include DB connection options -- but it does not have to, provided those are set
 	 * elsewhere.

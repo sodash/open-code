@@ -560,8 +560,8 @@ public class MathUtils {
 	}
 
 	/**
-	 * Lenient convertor -- accepts String or any Number subclass.
-	 * @param object Can be null (returns 0). Must be a simple number format - this method does not try
+	 * Lenient but vanilla convertor -- accepts String or any Number subclass.
+	 * @param object Can be null (returns 0). Must be a simple number format - this method does NOT try
 	 * to read e.g. "10%" or "5k".
 	 * @return
 	 * @see #getNumber(Object)

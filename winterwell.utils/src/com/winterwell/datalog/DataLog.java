@@ -136,19 +136,6 @@ public class DataLog {
 	}
 
 	/**
-	 * Set an event for now
-	 *
-	 * @param x
-	 *            Replace the existing value
-	 * @param tag
-	 *            Use . for heirarchical tags
-	 */
-	public static void setEvent(String event, String... tagBits) {
-		tagBits = check(tagBits);
-		dflt.setEvent(event, tagBits);
-	}
-
-	/**
 	 * TODO Label the current data point (not supported yet)
 	 *
 	 * @return old-label for the current time-bucket, or null
@@ -316,22 +303,7 @@ public class DataLog {
 		dflt.count(dx, (Object[]) tagBits);
 	}
 	
-	public static void countEvent(double dx, String dataspace, Map event) {
-		// turn event into a tag
-		String stag = event2tag(dataspace, event);
-		count(dx, stag);
-	}
-
-	public static String event2tag(String dataspace, Map<String,?> event) {
-		assert ! event.isEmpty();
-		assert ! Utils.isBlank(dataspace) : "no dataspace?! event:"+event;
-		StringBuilder stag = new StringBuilder(dataspace);
-		event.keySet().stream().sorted().forEach(k -> {
-			Object v = event.get(k);
-			if ( ! Utils.truthy(v)) return;
-			stag.append("_"+k+"="+Printer.str(v));
-		});
-		return stag.toString();
+	public static void count(DataLogEvent event) {
 	}
 
 	/**
@@ -363,6 +335,7 @@ public class DataLog {
 		String[] arr = new String[tagBits.length];
 		for(int i=0; i<tagBits.length; i++) {
 			Object ti = tagBits[i];
+			assert ! (ti instanceof DataLogEvent) : ti; // wrong method!
 			arr[i] = ti==null? null : ti.toString(); 
 		}
 		return check(arr);
@@ -439,9 +412,17 @@ public class DataLog {
 		return dflt.getMeanData(start, end, fn, bucketSize, tagbits);
 	}
 
-	public static void setEventCount(double cnt, String dataspace, Map<String, ?> event) {
-		String stag = event2tag(dataspace, event);
-		set(cnt, stag);
+	private static final ThreadLocal<String> dataspace = new ThreadLocal();
+	public static final String DEFAULT_DATASPACE = "default";
+	
+	public static String getDataspace() {
+		String ds = dataspace.get();
+		return ds==null? DEFAULT_DATASPACE : ds; 
 	}
+
+	public static void setEventCount(DataLogEvent event) {
+		dflt.setEventCount(event);
+	}
+
 
 }

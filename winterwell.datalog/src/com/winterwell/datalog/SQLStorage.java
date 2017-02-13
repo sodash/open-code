@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -12,6 +13,7 @@ import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.DBUtils.DBOptions;
@@ -44,7 +46,7 @@ public class SQLStorage implements IStatStorage {
 	
 	private static int BATCH_SIZE = 100;
 	
-	private final StatConfig config;
+	private StatConfig config;
 
 	/**
 	 * FIXME: This constructor is called at sodash startup. It can't call initStatDB,
@@ -54,10 +56,16 @@ public class SQLStorage implements IStatStorage {
 	 *
 	 * @param config
 	 */
-	public SQLStorage(StatConfig config) {
-		this.config = config;
-		initStatDB();
+	public SQLStorage() {
 	}
+	
+	@Override
+	public IStatStorage init(StatConfig settings) {
+		this.config = settings;
+		initStatDB();
+		return this;
+	}
+	
 
 	private boolean initFlag;
 
@@ -65,7 +73,7 @@ public class SQLStorage implements IStatStorage {
 	 * Check the db table exists and if not, create it.
 	 * FIXME add "if not exists" if psql version > 9.1
 	 */
-	public void initStatDB() {
+	private void initStatDB() {
 		if (initFlag) return;
 		// ready?		
 		if (SqlUtils.options == null && config.dbUrl==null) {
@@ -345,11 +353,16 @@ public class SQLStorage implements IStatStorage {
 		return where;
 	}
 
+	@Override
+	public Object saveEvent(String dataspace, DataLogEvent event, Period period) {
+		throw new TodoException();
+	}
+
 
 	@Override
-	public IStatStorage setSettings(DataLogSettings settings) {
+	public void saveEvents(Collection<DataLogEvent> values, Period period) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 }
 

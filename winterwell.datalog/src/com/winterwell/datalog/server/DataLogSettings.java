@@ -4,9 +4,15 @@ import java.io.File;
 
 import com.winterwell.datalog.ESStorage;
 import com.winterwell.datalog.IStatStorage;
+import com.winterwell.datalog.StatConfig;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
 
+/**
+ * @deprecated TODO Merge with {@link StatConfig}
+ * @author daniel
+ *
+ */
 public class DataLogSettings {
 	
 	@Option

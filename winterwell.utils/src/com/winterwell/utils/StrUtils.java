@@ -1165,6 +1165,8 @@ public class StrUtils {
 		boolean spaced = false;
 		for (int i = 0, n = string.length(); i < n; i++) {
 			char c = string.charAt(i);
+			// sanitise bogus chars
+			if (c==0) continue;			
 			// lowercase letters
 			if (Character.isLetterOrDigit(c)) {
 				spaced = false;

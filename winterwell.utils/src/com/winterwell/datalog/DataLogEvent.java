@@ -24,7 +24,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	
 	public final double count;
 	public final String eventType;
-	private final Map<String, ?> props;
+	final Map<String, ?> props;
 
 	/**
 	 * Does NOT include time-period or dataspace. This is added by the DataLog based on how
@@ -40,12 +40,15 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		return id;
 	}
 
-	/**
-	 * Optional. This is a convenience for passing dataspace into DataLog.
-	 */
-	public String dataspace;
+	public final String dataspace;
 	
-	public DataLogEvent(double count, String eventType, Map<String,?> properties) {
+	public DataLogEvent(String eventType, Map<String,?> properties) {
+		this(DataLog.getDataspace(), 1, eventType, properties);
+	}
+	
+	public DataLogEvent(String dataspace, double count, String eventType, Map<String,?> properties) {
+		this.dataspace = dataspace;
+		assert ! dataspace.isEmpty() && dataspace.equals(StrUtils.toCanonical(dataspace)) && ! dataspace.contains("/") : dataspace;
 		this.count = count;
 		this.eventType = eventType;
 		this.props = properties;
@@ -73,7 +76,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			sb.append('&');
 		}
 		String txt = sb.toString();
-		return eventType+"_"+StrUtils.md5(txt);
+		return dataspace+"/"+eventType+"_"+StrUtils.md5(txt);
 	}
 
 	@Override
@@ -85,6 +88,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	public Map<String,?> toJson2() {
 		Map map = new ArrayMap();
 		map.putAll(props);
+		map.put("dataspace", dataspace);
 		map.put("eventType", eventType);
 		map.put("count", count);
 		return map;

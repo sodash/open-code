@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileLock;
+import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -48,14 +49,20 @@ public class CSVStorage implements IStatStorage {
 	
 	// FIXME any reason to use Depot?
 	Depot depot = Depot.getDefault();
-	final StatConfig config;
+	StatConfig config;
 	
 	public CSVStorage() {
 		this(new StatConfig());
 	}
 	
 	public CSVStorage(StatConfig config) {
+		init(config);
+	}
+	
+	@Override
+	public IStatStorage init(StatConfig config) {
 		this.config = config;
+		return this;
 	}
 		
 	/**
@@ -210,8 +217,13 @@ public class CSVStorage implements IStatStorage {
 	}
 
 	@Override
-	public IStatStorage setSettings(DataLogSettings settings) {
+	public Object saveEvent(String dataspace, DataLogEvent event, Period period) {
+		throw new TodoException();
+	}
+
+	@Override
+	public void saveEvents(Collection<DataLogEvent> values, Period period) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 }

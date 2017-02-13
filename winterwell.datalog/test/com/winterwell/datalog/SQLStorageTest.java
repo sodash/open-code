@@ -260,8 +260,8 @@ public class SQLStorageTest extends DatalogTestCase {
 		tag2mean.put("world", mv);
 		tag2mean.put(sqlNightmare, mv);
 		
-		SQLStorage storage = new SQLStorage(newStatConfig());
-		storage.initStatDB();
+		SQLStorage storage = new SQLStorage();
+		storage.init(newStatConfig());
 		storage.save(p, tag2count, tag2mean);
 		
 		assertEquals(4.0, storage.selectSum(null, p.first, p.second, null, "hello"));
@@ -290,8 +290,8 @@ public class SQLStorageTest extends DatalogTestCase {
 		tag2time2count.put(key2, 2.0);
 		tag2time2count.put(key3, 3.0);
 
-		SQLStorage storage = new SQLStorage(newStatConfig());
-		storage.initStatDB();
+		SQLStorage storage = new SQLStorage();
+		storage.init(newStatConfig());
 		storage.saveHistory(tag2time2count);
 		
 		Time s = new Time(0);

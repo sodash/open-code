@@ -41,14 +41,14 @@ class DummyDataLog implements IDataLog {
 	}
 
 	@Override
-	public void set(double x, Object... tagBits) {
+	public void count(DataLogEvent event) {
 		if (warnings < 3)
 			Log.w(LOGTAG, err);
 		warnings++;
 	}
-
+	
 	@Override
-	public void setEvent(String event, String... tagBits) {
+	public void set(double x, Object... tagBits) {
 		if (warnings < 3)
 			Log.w(LOGTAG, err);
 		warnings++;
@@ -174,8 +174,8 @@ class DummyDataLog implements IDataLog {
 
 
 	@Override
-	public StatConfig getConfig() {
-		return new StatConfig();
+	public Object getConfig() {
+		return new Object();
 	}
 
 	@Override
@@ -185,6 +185,13 @@ class DummyDataLog implements IDataLog {
 			Log.w(LOGTAG, err);
 		warnings++;
 		return new DummyFuture<Iterable>(Collections.EMPTY_LIST);
+	}
+
+	@Override
+	public void setEventCount(DataLogEvent event) {
+		if (warnings < 3)
+			Log.w(LOGTAG, err);
+		warnings++;
 	}
 
 }

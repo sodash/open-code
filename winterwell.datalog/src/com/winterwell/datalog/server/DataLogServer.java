@@ -14,15 +14,17 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.JettyLauncher;
+import com.winterwell.datalog.DataLog;
+import com.winterwell.datalog.ESStorage;
 import com.winterwell.datalog.IStatStorage;
+import com.winterwell.datalog.StatConfig;
+import com.winterwell.datalog.StatImpl;
 import com.winterwell.es.ESUtils;
 import com.winterwell.es.client.ESConfig;
 
 public class DataLogServer {
 
 	private static JettyLauncher jl;
-
-	static IStatStorage storage;
 	
 	public static LogFile logFile;
 	
@@ -39,7 +41,7 @@ public class DataLogServer {
 		
 		Log.i("Go!");
 		// storage layer (eg ES)
-		initStorage();
+		init();
 		assert jl==null;
 		jl = new JettyLauncher(new File("web"), settings.port);
 		jl.setup();
@@ -50,12 +52,10 @@ public class DataLogServer {
 		Log.i("Running...");
 	}
 
-	private static void initStorage() {
-		try {
-			storage = settings.storageClass.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw Utils.runtime(e);
-		}
+	private static void init() {
+		StatConfig myConfig = (StatConfig) DataLog.getImplementation().getConfig();
+		myConfig.storageClass = settings.storageClass;
+		DataLog.setConfig(myConfig);
 	}
 
 

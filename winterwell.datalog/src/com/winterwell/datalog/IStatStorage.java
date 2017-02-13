@@ -1,11 +1,14 @@
 package com.winterwell.datalog;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.datalog.server.DataLogSettings;
+import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.containers.Pair2;
@@ -16,7 +19,7 @@ import com.winterwell.utils.time.Time;
 
 public interface IStatStorage {
 	
-	IStatStorage setSettings(DataLogSettings settings);
+	IStatStorage init(StatConfig settings);
 
 	/**
 	 * Use IDataStream csv format: timestamp, tag, value.
@@ -77,4 +80,8 @@ public interface IStatStorage {
 			Time end, KInterpolate fn, Dt bucketSize);
 
 	void setHistory(Map<Pair2<String, Time>, Double> tagTime2set);
+
+	Object saveEvent(String dataspace, DataLogEvent event, Period period);
+
+	void saveEvents(Collection<DataLogEvent> values, Period period);
 }

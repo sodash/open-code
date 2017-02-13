@@ -119,6 +119,8 @@ public interface IDataLog extends Closeable, Flushable {
 	 * @param tag 
 	 */
 	void count(double dx, Object... tags);
+	
+	void count(DataLogEvent event);
 
 	String label(String label, String... tagBits);
 
@@ -130,8 +132,6 @@ public interface IDataLog extends Closeable, Flushable {
 	 * @see DataLog#getTotal(Time, Time, String...)
 	 */
 	IDataLogReq<Double> getTotal(Time start, Time end, String... tagBits);
-
-	void setEvent(String event, String... tags);
 
 	/**
 	 * 
@@ -165,13 +165,15 @@ public interface IDataLog extends Closeable, Flushable {
 	void count(Time at, double dx, Object... tags);
 
 	/**
-	 * @return The config object (never null).
+	 * @return The config object (never null, usually StatConfig).
 	 * This might include DB connection options -- but it does not have to, provided those are set
 	 * elsewhere.
 	 */
-	StatConfig getConfig();
+	Object getConfig();
 
 	IFuture<MeanRate> getMean(Time start, Time end, String... tagBits);
+
+	void setEventCount(DataLogEvent event);
 
 	
 }

@@ -37,7 +37,8 @@ import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
 import com.winterwell.web.fields.SafeString;
 import com.winterwell.web.fields.SelectField;
-
+import com.winterwell.datalog.DataLog;
+import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.depot.Depot;
 import com.winterwell.depot.Desc;
 
@@ -78,11 +79,12 @@ public class LgServlet {
 		HttpServletRequest req = state.getRequest();
 		HttpServletResponse resp = state.getResponse();
 		String ds = state.getRequired(DATASPACE);
+		// TODO security check the dataspace?
 		String tag = state.getRequired(TAG);
 		String via = req.getParameter("via");
 		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		Map params = (Map) state.get(PARAMS);
-		// Replace $user with tracking-id
+		// Replace $user with tracking-id, and $
 		if (params!=null) {
 			Object user = params.get("user");
 			if ("$user".equals(user)) {
@@ -91,8 +93,10 @@ public class LgServlet {
 		}
 		// write to log file
 		doLogToFile(ds, tag, params, trckId, via, state);
-		
-		// TODO write to ES
+				
+		// write to Stat / ES
+		DataLogEvent event = new DataLogEvent(ds, 1, tag, params);
+		DataLog.count(event);
 		
 		// Reply
 		// .gif?

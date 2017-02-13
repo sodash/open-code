@@ -1,7 +1,9 @@
 package com.winterwell.datalog;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -22,6 +24,8 @@ import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
+import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -35,16 +39,8 @@ import com.winterwell.utils.time.Time;
 public class ESStorage implements IStatStorage {
 
 	private ESConfig settings;
-	private File configFile;
 	private ESHttpClient client;
-	DataLogSettings dlsettings;
 	
-	@Override
-	public IStatStorage setSettings(DataLogSettings settings) {
-		this.dlsettings = settings;
-		return this;
-	}
-
 	@Override
 	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {
 		// TODO Auto-generated method stub
@@ -99,16 +95,13 @@ public class ESStorage implements IStatStorage {
 		
 	}
 
-	public void init() {
+	public IStatStorage init(StatConfig config) {
 		if (settings == null) {
-			if (configFile!=null) {
-				settings = ArgsParser.getConfig(new ESConfig(), configFile);
-			} else {
-				settings = new ESConfig();
-			}
+			settings = new ESConfig();			
 		}
 		client = new ESHttpClient(settings);
 		initIndex(indexFromDataspace("gen"));
+		return this;
 	}
 
 	
@@ -134,6 +127,9 @@ public class ESStorage implements IStatStorage {
 		return idx;
 	}
 
+	public ESStorage() {
+	}
+	
 	/**
 	 * 
 	 * 
@@ -143,9 +139,10 @@ public class ESStorage implements IStatStorage {
 	 * @param period 
 	 * @return 
 	 */
+	@Override
 	public ListenableFuture<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period period) {
 		String index = indexFromDataspace(dataspace);
-		String type = event.eventType;
+		String type = typeFromEventType(event.eventType);
 		// put a time marker on it -- the end in seconds is enough
 		long secs = period.getEnd().getTime() % 1000;
 		String id = event.getId()+"_"+secs;
@@ -154,24 +151,38 @@ public class ESStorage implements IStatStorage {
 		return prepIndex.execute();
 	}
 
+	/**
+	 * 
+	 * @param eventType Could come from the wild, so lets not use it directly.
+	 * Lets insist on latin chars and protect the base namespace.
+	 * @return
+	 */
+	private String typeFromEventType(String eventType) {
+		return "evt."+StrUtils.toCanonical(eventType);
+	}
+
 	public double getEventTotal(String dataspace, Time start, Time end, DataLogEvent spec) {
 		String index = indexFromDataspace(dataspace);
 		SearchRequestBuilder search = client.prepareSearch(index);
-		search.setType(spec.eventType);
+		search.setType(typeFromEventType(spec.eventType));
+		// stats or just sum??
 		search.addAggregation("event_total", "stats", "count");
+		search.setSize(0);
 		SearchResponse sr = search.get();
-//		{
-//		    "aggs" : {
-//		        "grades_stats" : { "stats" : { "field" : "grade" } }
-//		    }
-//		}
-//		
-//		or
-//		
-//	    "aggs" : {
-//	        "intraday_return" : { "sum" : { "field" : "change" } }
-//	    }
-		throw new TodoException(sr);
+		Map<String, Object> jobj = sr.getParsedJson();
+		List<Map> hits = sr.getHits();
+		Map aggs = sr.getAggregations();
+		Map stats = (Map) aggs.get("event_total");
+		Object sum = stats.get("sum");
+		return MathUtils.toNum(sum);
+	}
+
+	@Override
+	public void saveEvents(Collection<DataLogEvent> events, Period period) {
+		// TODO use a batch-save for speed
+		for (DataLogEvent e : events) {
+			saveEvent(e.dataspace, e, period);
+		}
 	}
 	
 }

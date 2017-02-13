@@ -34,7 +34,7 @@ public class DataLogStressTest extends DatalogTestCase {
 	@Test
 	public void testStressSQL() throws IOException, InterruptedException {
 		StatConfig config = new StatConfig();
-		new SQLStorage(config).initStatDB();		
+		new SQLStorage().init(config);		
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = SQLStorage.class;
 		DataLog.dflt = new StatImpl(config);

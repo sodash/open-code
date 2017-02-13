@@ -28,14 +28,14 @@ public class ESStorageTest extends DatalogTestCase {
 	@Test
 	public void testSaveEvent() throws InterruptedException, ExecutionException {		
 		ESStorage storage = new ESStorage();
-		storage.init();
+		storage.init(new StatConfig());
 //		{charity: Alzheimers Research UK, 
 		// publisher: www.good-loop.com} 
 		// tracker:szkpogoeegglvcszwtao@trk 
 		// ref:http://www.good-loop.com/live-demo 
 		// ip:88.98.205.94 
 		// ENDMSG http://www.good-loop.com/live-demo 88.98.205.94
-		DataLogEvent event = new DataLogEvent(1, "testevent", new ArrayMap(
+		DataLogEvent event = new DataLogEvent("testdataspace", 3.5, "testevent", new ArrayMap(
 				"publisher", "egpub",
 				"tracker", "szkpogoeegglvcszwtao@trk"
 				));
@@ -49,7 +49,7 @@ public class ESStorageTest extends DatalogTestCase {
 		// get it
 		Time start = new Time().minus(TUnit.DAY.dt);
 		Time end = new Time();
-		DataLogEvent event2 = new DataLogEvent(1, "testevent", new ArrayMap(
+		DataLogEvent event2 = new DataLogEvent("testdataspace", 0, "testevent", new ArrayMap(
 				"publisher", "egpub"
 				));
 		double total = storage.getEventTotal("testdataspace", start, end, event2);
@@ -73,7 +73,7 @@ public class ESStorageTest extends DatalogTestCase {
 		tag2mean.put("world", mv);
 		
 		ESStorage storage = new ESStorage();
-		storage.init();
+		storage.init(new StatConfig());
 		storage.save(p, tag2count, tag2mean);
 		assertEquals(4.0, storage.getTotal("hello", p.first, p.second).get());
 		ListDataStream stream = (ListDataStream) storage.getData("world", p.first, p.second, null, null).get();

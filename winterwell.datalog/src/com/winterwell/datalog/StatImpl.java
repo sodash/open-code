@@ -185,7 +185,7 @@ public class StatImpl implements Closeable, IDataLog {
 
 	ConcurrentMap<String,MeanVar1D> tag2dist = newMap();
 
-	ConcurrentMap<String,String> tag2event = new ConcurrentHashMap<String, String>(4, 0.75f, 2);
+	ConcurrentMap<String, DataLogEvent> id2event = newMap();
 
 	/**
 	 * Map for holding historical data of the form tag+time -> count 
@@ -269,6 +269,7 @@ public class StatImpl implements Closeable, IDataLog {
 	protected synchronized void doSave() {
 		Map<String, Double> old = tag2count;		
 		Map<String, MeanVar1D> oldMean = tag2dist;
+		Map<String, DataLogEvent> oldid2event = id2event;
 		Map<Pair2<String, Time>, Double> oldTagTimeCount = tagTime2count;
 		Map<Pair2<String, Time>, Double> oldTagTimeSet = tagTime2set;
 		old.put("stat_bucket_count", 1.0*old.size());
@@ -280,7 +281,7 @@ public class StatImpl implements Closeable, IDataLog {
 		// new buckets
 		tag2count = newMap();
 		tag2dist = newMap();
-		tag2event =  new ConcurrentHashMap<String, String>(4, 0.75f, 2);
+		id2event =  newMap();
 		tagTime2count = newMap();
 		tagTime2set = newMap();
 		// Advance the bucket time?
@@ -296,6 +297,7 @@ public class StatImpl implements Closeable, IDataLog {
 		storage.save(period, old, oldMean);
 		storage.saveHistory(oldTagTimeCount);
 		storage.setHistory(oldTagTimeSet);
+		storage.saveEvents(id2event.values(), period);
 	}
 
 	Period getCurrentBucket() {
@@ -436,20 +438,6 @@ public class StatImpl implements Closeable, IDataLog {
 	}
 
 
-	@Override
-	public void setEvent(String event, String... tagBits) {
-		if (closed) throw new ClosedException();
-		if (Utils.isBlank(event)) {
-			throw new IllegalArgumentException(event+" for "+DataLog.tag(tagBits));
-		}
-		// loop over tag.heiriarchy
-		StringBuilder tag = new StringBuilder();
-		for(Object tg : tagBits) {
-			String stag = parseTag(tg, tag);
-			tag2event.put(stag, event);
-		}
-	}
-
 	/**
 	 * Convenience method for converting a list of Future data-streams into one data-stream in the
 	 * here & now.
@@ -558,6 +546,32 @@ public class StatImpl implements Closeable, IDataLog {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void count(DataLogEvent event) {
+		// bucket??
+		DataLogEvent oldValue = id2event.putIfAbsent(event.getId(), event);		
+		if (oldValue==null) return;
+		// TODO merge non-ID props, when we have non-ID props
+		DataLogEvent sum = new DataLogEvent(event.dataspace, event.count+oldValue.count, event.eventType, event.props);
+		assert sum.getId().equals(event.getId());
+		for(int i=0; i<10; i++) {			
+			boolean done = id2event.replace(event.getId(), oldValue, sum);
+			if (done) return;
+		}		
+		// drop it :(
+		Log.e("datalog", "Could not count "+event);
+	}
+
+	public static String event2tag(String dataspace, Map event) {
+		
+	}
+
+	@Override
+	public void setEventCount(DataLogEvent event) {
+		String stag = event2tag(event.dataspace, event.toJson2());
+		set(event.count, stag);
 	}
 
 }
