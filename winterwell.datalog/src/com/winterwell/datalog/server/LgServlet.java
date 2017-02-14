@@ -82,21 +82,9 @@ public class LgServlet {
 		// TODO security check the dataspace?
 		String tag = state.getRequired(TAG);
 		String via = req.getParameter("via");
-		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		Map params = (Map) state.get(PARAMS);
-		// Replace $user with tracking-id, and $
-		if (params!=null) {
-			Object user = params.get("user");
-			if ("$user".equals(user)) {
-				params.put("user", trckId);
-			}
-		}
-		// write to log file
-		doLogToFile(ds, tag, params, trckId, via, state);
-				
-		// write to Stat / ES
-		DataLogEvent event = new DataLogEvent(ds, 1, tag, params);
-		DataLog.count(event);
+		
+		doLog(state, ds, tag, via, params);
 		
 		// Reply
 		// .gif?
@@ -108,6 +96,38 @@ public class LgServlet {
 		WebUtils2.sendText("OK", resp);
 	}
 
+	static void doLog(WebRequest state, String dataspace, String tag, String via, Map params) {
+		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
+		// special vars
+		if (params!=null) {
+			// Replace $user with tracking-id, and $
+			Object user = params.get("user");
+			if ("$user".equals(user)) {
+				params.put("user", trckId);
+			}
+			// ip: $ip
+			if (params.get("ip").equals("$ip")) {
+				params.put("ip", state.getRemoteAddr());
+			}
+			if (params.get("useragent").equals("$useragent")) {
+				params.put("useragent", state.getUserAgent());
+			}
+			// url: $url
+			if (params.get("url").equals("$url")) {
+				// remove some gumpf (UTM codes)
+				String cref = WebUtils2.cleanUp(state.getReferer());
+				params.put("url", cref);
+			}
+		}
+		// write to log file
+		doLogToFile(dataspace, tag, params, trckId, via, state);
+				
+		// write to Stat / ES
+		DataLogEvent event = new DataLogEvent(dataspace, 1, tag, params);
+		DataLog.count(event);
+	}
+
+	
 	private static void doLogToFile(String dataspace, String tag, Map params, String trckId, String via, WebRequest state) {
 		String msg = params == null? "" : Printer.toString(params, ", ", ": ");
 		msg += "\ttracker:"+trckId+"\tref:"+state.getReferer()+"\tip:"+state.getRemoteAddr();

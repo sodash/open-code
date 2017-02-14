@@ -583,6 +583,7 @@ public class StatImpl implements Closeable, IDataLog {
 	public void setEventCount(DataLogEvent event) {
 		String stag = event2tag(event.dataspace, event.toJson2());
 		set(event.count, stag);
+		// TODO is there a way to square this with ?
 	}
 
 }

@@ -147,6 +147,8 @@ public class ESStorage implements IStatStorage {
 		long secs = period.getEnd().getTime() % 1000;
 		String id = event.getId()+"_"+secs;
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
+		if (event.time==null) event.time = period.getEnd();
+		// set doc
 		prepIndex.setSource(event.toJson2());
 		return prepIndex.execute();
 	}

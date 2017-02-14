@@ -2,6 +2,7 @@ package com.winterwell.datalog.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,6 +13,7 @@ import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.web.WebUtils2;
 
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.app.FileServlet;
@@ -49,6 +51,7 @@ public class TrackingPixelServlet extends HttpServlet {
 		String uid = WebUtils2.getCookie(state.getRequest(), "trkid");		
 		if (uid!=null) return uid;
 		boolean dnt = state.isDoNotTrack();
+		// TODO if this user has opted-in, we can ignore DNT 
 //		if (dnt) return null; FIXME
 		uid = Utils.getRandomString(20)+"@trk";
 		WebUtils2.addCookie(state.getResponse(), "trkid", uid, TUnit.YEAR.dt, DataLogServer.settings.COOKIE_DOMAIN);
@@ -70,16 +73,20 @@ public class TrackingPixelServlet extends HttpServlet {
 		} catch (IOException e) {
 			Log.w("img0", e);
 		}
+		String tag = "pixel";
+		String dataspace = "good-loop"; // ??
+		// log some stuff
+		Map params = new ArrayMap(
+				"user", "$user", 
+				"useragent", "$useragent",
+				"ip", "$ip",
+				"url", "$url");
 		// Count it
-		String grp = state.getSubDomain(); // TODO dataspace??		
-		String cref = null;
-		if (ref!=null) {
-			// remove gumpf??
-			cref = WebUtils2.cleanUp(ref);
-			DataLog.count(1, "track_page", grp, cref);
-		}
+		LgServlet.doLog(state, dataspace, tag, via, params);
+
+		
 		// log it
-		Log.d("track", cref+" via: "+via+" uid: "+uid);		
+		Log.d("track", state.getReferer()+" via: "+via+" uid: "+uid);		
 
 //		// TODO Tag the email / tweet
 //		XId xid = state.get(Fields.XID);

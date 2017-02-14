@@ -978,9 +978,23 @@ public class WebRequest implements IProperties, Closeable {
 				+ Printer.toString(request.getParameterMap(), ", ", "=");
 	}
 
+	/**
+	 * Interprets the user-agent header.
+	 * @return
+	 */
 	public BrowserType getBrowserType() {		
-		String ua = request.getHeader("User-Agent");
+		String ua = getUserAgent();
 		return new BrowserType(ua);
+	}
+
+	/**
+	 * e.g. Firefox on Windows, but more cryptic than that. 
+	 * @return never null (in the rare case that we don't have this, return "unknown")
+	 * @see #getBrowserType()
+	 */
+	public String getUserAgent() {
+		String ua = request.getHeader("User-Agent");
+		return ua==null? "unknown" : ua;
 	}
 
 	/**

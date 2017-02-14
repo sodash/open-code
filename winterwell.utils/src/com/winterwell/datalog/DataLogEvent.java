@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.SimpleJson;
 
@@ -41,6 +42,11 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	}
 
 	public final String dataspace;
+
+	/**
+	 * When should this be set?? This may be the bucket rather than the exact time.
+	 */
+	public Time time = new Time();
 	
 	public DataLogEvent(String eventType, Map<String,?> properties) {
 		this(DataLog.getDataspace(), 1, eventType, properties);
@@ -56,8 +62,14 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		assert ! Utils.isBlank(eventType);
 	}
 
+	@Override
+	public String toString() {
+		return "DataLogEvent[count=" + count + ", eventType=" + eventType + ", props=" + props + ", id=" + id
+				+ ", dataspace=" + dataspace + "]";
+	}
+
 	/**
-	 * Unique based on eventType and properties
+	 * Unique based on eventType and properties. Does NOT include time though!
 	 * @param dataLogEvent
 	 */
 	private String makeId() {
@@ -90,6 +102,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		map.putAll(props);
 		map.put("dataspace", dataspace);
 		map.put("eventType", eventType);
+		map.put("time", time);
 		map.put("count", count);
 		return map;
 	}	

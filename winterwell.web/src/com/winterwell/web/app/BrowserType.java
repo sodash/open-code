@@ -43,6 +43,9 @@ public class BrowserType {
 		return os;
 	}
 	
+	/**
+	 * Lower-case version of userAgent
+	 */
 	private final String ua;
 	/**
 	 * Can be "", never null
@@ -56,6 +59,36 @@ public class BrowserType {
 	public BrowserType(String userAgent) {
 		this.userAgent = userAgent == null ? "" : userAgent;
 		this.ua = this.userAgent.toLowerCase();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((ua == null) ? 0 : ua.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BrowserType other = (BrowserType) obj;
+		if (ua == null) {
+			if (other.ua != null)
+				return false;
+		} else if (!ua.equals(other.ua))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "BrowserType[os=" + os + ", make=" + make + ", version=" + version + ", isMobile()=" + isMobile() + "]";
 	}
 
 	/**

@@ -304,6 +304,7 @@ public class DataLog {
 	}
 	
 	public static void count(DataLogEvent event) {
+		dflt.count(event);
 	}
 
 	/**
