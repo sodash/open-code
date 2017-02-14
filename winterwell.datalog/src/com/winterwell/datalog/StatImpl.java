@@ -297,7 +297,7 @@ public class StatImpl implements Closeable, IDataLog {
 		storage.save(period, old, oldMean);
 		storage.saveHistory(oldTagTimeCount);
 		storage.setHistory(oldTagTimeSet);
-		storage.saveEvents(id2event.values(), period);
+		storage.saveEvents(oldid2event.values(), period);
 	}
 
 	Period getCurrentBucket() {
