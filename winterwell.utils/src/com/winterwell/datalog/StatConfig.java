@@ -26,6 +26,9 @@ public class StatConfig extends DBOptions {
 	@Option(description = "Bucket size. Also the gap between saves.")
 	public Dt interval = new Dt(15, TUnit.MINUTE);
 
+	/**
+	 * This sets {@link DataLog#DEFAULT_DATASPACE}
+	 */
 	@Option(description = "namespace: if set, use a separate namespace (to avoid race-condition overwriting of stats with another JVM).")
 	public String namespace;
 

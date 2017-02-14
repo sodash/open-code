@@ -13,7 +13,7 @@ public class TestSetWhen extends DatalogTestCase {
 	
 	@Test
 	public void testWhenInsert() {
-		StatImpl si = (StatImpl) DataLog.dflt;
+		DataLogImpl si = (DataLogImpl) DataLog.dflt;
 		String salt = Utils.getRandomString(6);
 		si.set(new Time(2015,1,1), 10, "test", salt);
 		si.set(new Time(2015,1,1,6,0,0), 15, "test", salt);
@@ -36,7 +36,7 @@ public class TestSetWhen extends DatalogTestCase {
 	
 	@Test
 	public void testWhenUpdate() {
-		StatImpl si = (StatImpl) DataLog.dflt;
+		DataLogImpl si = (DataLogImpl) DataLog.dflt;
 		String salt = Utils.getRandomString(6);
 		si.set(new Time(2015,1,1), 10, "test", salt);
 		DataLog.set(new Time(2015,1,2), 20, "test", salt);		

@@ -14,7 +14,7 @@ public class StatStorageTest extends DatalogTestCase {
 		// force an init
 		DataLog.count(1, "dummy");
 
-		StatImpl ss = (StatImpl) DataLog.dflt;
+		DataLogImpl ss = (DataLogImpl) DataLog.dflt;
 		StatReq<IDataStream> dr = ss.getData(new Time().minus(TUnit.WEEK), new Time(), null, null, "Cache_hit");
 		IDataStream data = dr.get();
 		
@@ -30,7 +30,7 @@ public class StatStorageTest extends DatalogTestCase {
 		// force an init
 		DataLog.count(1, "dummy");
 
-		StatImpl ss = (StatImpl) DataLog.dflt;
+		DataLogImpl ss = (DataLogImpl) DataLog.dflt;
 		String[] tagBits = {"test", "foo"};
 		StatReq<IDataStream> bg = ss.getData(null, new Time().plus(TUnit.DAY), null, null, tagBits);
 		IDataStream data = bg.get();

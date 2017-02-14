@@ -36,7 +36,7 @@ import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 
-public class ESStorage implements IStatStorage {
+public class ESStorage implements IDataLogStorage {
 
 	private ESConfig settings;
 	private ESHttpClient client;
@@ -95,12 +95,13 @@ public class ESStorage implements IStatStorage {
 		
 	}
 
-	public IStatStorage init(StatConfig config) {
+	public IDataLogStorage init(StatConfig config) {
 		if (settings == null) {
 			settings = new ESConfig();			
 		}
 		client = new ESHttpClient(settings);
-		initIndex(indexFromDataspace("gen"));
+		String idx = indexFromDataspace(DataLog.getDataspace());
+		initIndex(idx);
 		return this;
 	}
 
@@ -114,16 +115,12 @@ public class ESStorage implements IStatStorage {
 		pc.setDefaultAnalyzer(Analyzer.keyword);
 		IESResponse res = pc.get();
 		res.check();
-//		// TODO map it
-//		PutMappingRequestBuilder pm = client.admin().indices().preparePutMapping(index);
-//		Map mapping = new ArrayMap();
-//		pm.setSource(mapping);
+		// register some standard event types??
 	}
 
 	private String indexFromDataspace(String dataspace) {
 		assert ! Utils.isBlank(dataspace);
 		String idx = "datalog."+dataspace;
-		initIndex(idx);
 		return idx;
 	}
 
@@ -163,6 +160,20 @@ public class ESStorage implements IStatStorage {
 		return "evt."+StrUtils.toCanonical(eventType);
 	}
 
+	@Override
+	public void registerEventType(String dataspace, String eventType) {
+		String index = indexFromDataspace(dataspace);
+		String type = typeFromEventType(eventType);
+		PutMappingRequestBuilder putMapping = client.admin().indices().preparePutMapping(index, type);
+		// Set the time property as time. The rest it can auto-figure
+		Map msrc = new ESType()
+						.property("time", new ESType().date());
+		putMapping.setSource(msrc);
+		IESResponse res = putMapping.get();
+		res.check();
+		Map<String, Object> jout = res.getParsedJson();
+	}
+	
 	public double getEventTotal(String dataspace, Time start, Time end, DataLogEvent spec) {
 		String index = indexFromDataspace(dataspace);
 		SearchRequestBuilder search = client.prepareSearch(index);
@@ -185,6 +196,11 @@ public class ESStorage implements IStatStorage {
 		for (DataLogEvent e : events) {
 			saveEvent(e.dataspace, e, period);
 		}
+	}
+
+	public void registerDataspace(String dataspace) {
+		String index = indexFromDataspace(dataspace);
+		initIndex(index);
 	}
 	
 }

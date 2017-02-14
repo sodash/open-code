@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
@@ -36,7 +38,7 @@ import com.winterwell.utils.time.Time;
  * @testedby {@link SQLStorageTest}
  * @author Agis Chartsias <agis@winterwell.com>
  */
-public class SQLStorage implements IStatStorage {
+public class SQLStorage implements IDataLogStorage {
 
 	int warnings;
 	
@@ -60,7 +62,7 @@ public class SQLStorage implements IStatStorage {
 	}
 	
 	@Override
-	public IStatStorage init(StatConfig settings) {
+	public IDataLogStorage init(StatConfig settings) {
 		this.config = settings;
 		initStatDB();
 		return this;
@@ -119,7 +121,10 @@ public class SQLStorage implements IStatStorage {
 		SqlUtils.executeCommand("create index stats_tag_idx on stats (tag);", null, true);
 	}
 
-
+	@Override
+	public void registerEventType(String dataspace, String eventType) {
+	}
+	
 	@Override
 	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {		
 		initStatDB();
@@ -136,7 +141,7 @@ public class SQLStorage implements IStatStorage {
 		String sqlPrefix = "insert into " + TABLE;
 
 		// Save as the middle of the period?!
-		Time mid = StatImpl.doSave3_time(period);
+		Time mid = DataLogImpl.doSave3_time(period);
 
 		Connection conn = null;
 		try {

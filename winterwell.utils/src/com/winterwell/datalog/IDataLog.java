@@ -175,5 +175,7 @@ public interface IDataLog extends Closeable, Flushable {
 
 	void setEventCount(DataLogEvent event);
 
+	IDataLogAdmin getAdmin();
+
 	
 }

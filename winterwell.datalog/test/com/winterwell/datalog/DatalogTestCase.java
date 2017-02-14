@@ -41,7 +41,7 @@ public class DatalogTestCase {
 		config.dbUser = "worker";
 		config.dbPassword = "winterwell";
 		
-		DataLog.dflt = new StatImpl(config);
+		DataLog.dflt = new DataLogImpl(config);
 		DataLog.setConfig(config);
 	}
 	
@@ -61,14 +61,14 @@ public class DatalogTestCase {
 		StatConfig config = new StatConfig();
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = CSVStorage.class;
-		DataLog.dflt = new StatImpl(config);
+		DataLog.dflt = new DataLogImpl(config);
 		DataLog.setConfig(config);
 	}
 	
 	/**
-	 * This is similar to {@link StatImpl#doSave()}, without the time filtering.
+	 * This is similar to {@link DataLogImpl#doSave()}, without the time filtering.
 	 */
-	public static Period saveData(StatImpl si, double count, Object... tags) throws InterruptedException {
+	public static Period saveData(DataLogImpl si, double count, Object... tags) throws InterruptedException {
 		long s1 = System.currentTimeMillis();
 		Thread.sleep(10);
 		si.count(count, tags);

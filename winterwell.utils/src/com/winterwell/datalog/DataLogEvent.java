@@ -100,9 +100,9 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	public Map<String,?> toJson2() {
 		Map map = new ArrayMap();
 		map.putAll(props);
-		map.put("dataspace", dataspace);
+//		map.put("dataspace", dataspace); This is given by the index
 		map.put("eventType", eventType);
-		map.put("time", time);
+		map.put("time", time.toISOString()); //getTime()); // This is for ES -- which works with epoch millisecs
 		map.put("count", count);
 		return map;
 	}	

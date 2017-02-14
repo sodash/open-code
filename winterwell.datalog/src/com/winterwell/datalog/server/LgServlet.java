@@ -97,23 +97,23 @@ public class LgServlet {
 	}
 
 	static void doLog(WebRequest state, String dataspace, String tag, String via, Map params) {
+		assert dataspace != null;
 		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		// special vars
 		if (params!=null) {
 			// Replace $user with tracking-id, and $
-			Object user = params.get("user");
-			if ("$user".equals(user)) {
+			if ("$user".equals(params.get("user"))) {
 				params.put("user", trckId);
 			}
 			// ip: $ip
-			if (params.get("ip").equals("$ip")) {
+			if ("$ip".equals(params.get("ip"))) {
 				params.put("ip", state.getRemoteAddr());
 			}
-			if (params.get("useragent").equals("$useragent")) {
+			if ("$useragent".equals(params.get("useragent"))) {
 				params.put("useragent", state.getUserAgent());
 			}
 			// url: $url
-			if (params.get("url").equals("$url")) {
+			if ("$url".equals(params.get("url"))) {
 				// remove some gumpf (UTM codes)
 				String cref = WebUtils2.cleanUp(state.getReferer());
 				params.put("url", cref);

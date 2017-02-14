@@ -194,6 +194,21 @@ class DummyDataLog implements IDataLog {
 		warnings++;
 	}
 
+	@Override
+	public IDataLogAdmin getAdmin() {
+		return new DummyDataLogAdmin();
+	}
+
+}
+
+class DummyDataLogAdmin implements IDataLogAdmin {
+	@Override
+	public void registerEventType(String dataspace, String eventType) {		
+	}
+
+	@Override
+	public void registerDataspace(String dataspace) {		
+	}	
 }
 
 class DummyFuture<V> implements IDataLogReq<V> {

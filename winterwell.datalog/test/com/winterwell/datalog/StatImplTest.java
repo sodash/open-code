@@ -17,7 +17,7 @@ import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Time;
 
 /**
- * @tested {@link StatImpl}
+ * @tested {@link DataLogImpl}
  * @author daniel
  *
  */
@@ -27,7 +27,7 @@ public class StatImplTest extends DatalogTestCase {
 	public void testCount() throws InterruptedException {
 		// force an init
 		DataLog.count(1, "dummy");		
-		StatImpl si = (StatImpl) DataLog.dflt;
+		DataLogImpl si = (DataLogImpl) DataLog.dflt;
 		
 		si.count(1, "hello", "world");
 		Rate c = si.get("hello", "world");
@@ -65,7 +65,7 @@ public class StatImplTest extends DatalogTestCase {
 	
 	@Test
 	public void testCache() {
-		StatImpl si = (StatImpl) DataLog.dflt;
+		DataLogImpl si = (DataLogImpl) DataLog.dflt;
 		si.count(3, "tag1");
 		Rate r = si.get("tag1");
 		assert r.get() == 3.0 : r.get();
@@ -73,7 +73,7 @@ public class StatImplTest extends DatalogTestCase {
 	
 	@Test
 	public void testGetTotal() throws IOException {
-		StatImpl si = (StatImpl) DataLog.dflt;
+		DataLogImpl si = (DataLogImpl) DataLog.dflt;
 		Time s = new Time();
 		for(int i=0; i<10; i++) {
 			Utils.sleep(300);
@@ -87,7 +87,7 @@ public class StatImplTest extends DatalogTestCase {
 	
 	@Test
 	public void testCountHistoricData() {
-		StatImpl si = (StatImpl) DataLog.dflt;
+		DataLogImpl si = (DataLogImpl) DataLog.dflt;
 		Time at = new Time(2012, 7, 18);
 		si.count(at, 7.0, "hello", "world");
 		si.count(at, 3.0, "hello");
@@ -103,7 +103,7 @@ public class StatImplTest extends DatalogTestCase {
 	
 	@Test
 	public void testCurrentHistoricData() {
-		StatImpl si = (StatImpl) DataLog.dflt;
+		DataLogImpl si = (DataLogImpl) DataLog.dflt;
 		Time at = new Time(2012, 8, 18);
 		si.count(at, 7.0, "hello2", "world2");
 				
@@ -124,7 +124,7 @@ public class StatImplTest extends DatalogTestCase {
 			String topTag = "testTag" + Utils.getRandomString(10);
 			String childTag = "testTag2";
 			String[] tagBits = {topTag, childTag};
-			StatImpl si = (StatImpl) DataLog.dflt;
+			DataLogImpl si = (DataLogImpl) DataLog.dflt;
 			si.count(5, tagBits);
 			
 			si.set(10, topTag);
@@ -142,7 +142,7 @@ public class StatImplTest extends DatalogTestCase {
 			String topTag = "testTag" + Utils.getRandomString(10);
 			String childTag = "testTag2";
 			String[] tagBits = {topTag, childTag};
-			StatImpl si = (StatImpl) DataLog.dflt;
+			DataLogImpl si = (DataLogImpl) DataLog.dflt;
 			si.count(5, tagBits);
 			
 			si.set(10, tagBits);

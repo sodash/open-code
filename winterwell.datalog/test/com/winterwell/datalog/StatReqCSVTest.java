@@ -19,7 +19,7 @@ public class StatReqCSVTest extends DatalogTestCase {
 	
 	@Test
 	public void testSave() throws InterruptedException {
-		StatImpl si = (StatImpl) DataLog.dflt;
+		DataLogImpl si = (DataLogImpl) DataLog.dflt;
 		Period p1 = saveData(si, 2.0, "hello", "world");
 		Thread.sleep(2000);
 		Period p2 = saveData(si, 5.0, "hello", "world");
@@ -36,7 +36,7 @@ public class StatReqCSVTest extends DatalogTestCase {
 	
 	@Test
 	public void testGetData() throws InterruptedException {		
-		StatImpl si = (StatImpl) DataLog.dflt;
+		DataLogImpl si = (DataLogImpl) DataLog.dflt;
 		Period p1 = saveData(si, 1.0, "tag1");
 		Thread.sleep(1000);
 		Period p2 = saveData(si, 3.0, "tag1");

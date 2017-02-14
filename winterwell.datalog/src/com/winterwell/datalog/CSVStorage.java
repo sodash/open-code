@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.depot.Depot;
@@ -36,7 +38,7 @@ import com.winterwell.utils.time.Time;
  * @author Agis Chartsias <agis@winterwell.com>
  *
  */
-public class CSVStorage implements IStatStorage {
+public class CSVStorage implements IDataLogStorage {
 
 	@Override @Deprecated
 	public void setHistory(Map<Pair2<String, Time>, Double> tagTime2set) {
@@ -60,7 +62,7 @@ public class CSVStorage implements IStatStorage {
 	}
 	
 	@Override
-	public IStatStorage init(StatConfig config) {
+	public IDataLogStorage init(StatConfig config) {
 		this.config = config;
 		return this;
 	}
@@ -87,7 +89,7 @@ public class CSVStorage implements IStatStorage {
 			CSVWriter w = new CSVWriter(bw, ',', '"'); // append to existing
 			
 			// Save as the middle of the period?!
-			Time mid = StatImpl.doSave3_time(period);
+			Time mid = DataLogImpl.doSave3_time(period);
 	//		Set<String> written = new HashSet(); guard against count & mean??
 			for(Map.Entry<String,Double> e : tag2count.entrySet()) {			
 				csv.getParentFile().mkdirs();
@@ -225,5 +227,9 @@ public class CSVStorage implements IStatStorage {
 	public void saveEvents(Collection<DataLogEvent> values, Period period) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void registerEventType(String dataspace, String eventType) {
 	}
 }

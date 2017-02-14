@@ -14,11 +14,14 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.JettyLauncher;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.ESStorage;
-import com.winterwell.datalog.IStatStorage;
+import com.winterwell.datalog.IDataLog;
+import com.winterwell.datalog.IDataLogAdmin;
+import com.winterwell.datalog.IDataLogStorage;
 import com.winterwell.datalog.StatConfig;
-import com.winterwell.datalog.StatImpl;
+import com.winterwell.datalog.DataLogImpl;
 import com.winterwell.es.ESUtils;
 import com.winterwell.es.client.ESConfig;
 
@@ -34,7 +37,8 @@ public class DataLogServer {
 
 	public static void main(String[] args) {
 		settings = ArgsParser.getConfig(new DataLogSettings(), args, new File("config/datalog.properties"), null);
-
+		assert settings != null;
+		
 		logFile = new LogFile(DataLogServer.settings.logFile)
 					// keep 8 weeks of 1 week log files ??revise this??
 					.setLogRotation(TUnit.WEEK.dt, 8);
@@ -53,9 +57,15 @@ public class DataLogServer {
 	}
 
 	private static void init() {
-		StatConfig myConfig = (StatConfig) DataLog.getImplementation().getConfig();
+		IDataLog dli = DataLog.getImplementation();
+		StatConfig myConfig = (StatConfig) dli.getConfig();
 		myConfig.storageClass = settings.storageClass;
 		DataLog.setConfig(myConfig);
+		
+		// register the tracking event
+		IDataLogAdmin admin = DataLog.getAdmin();
+		admin.registerDataspace(DataLog.getDataspace());
+		admin.registerEventType(DataLog.getDataspace(), TrackingPixelServlet.DATALOG_EVENT_TYPE);
 	}
 
 

@@ -34,7 +34,7 @@ public class StatReq<X> implements IDataLogReq<X>, IHasJson {
 	 */
 	protected volatile X v;
 
-	protected static StatImpl stat;// = (StatImpl) Stat.dflt;
+	protected static DataLogImpl stat;// = (StatImpl) Stat.dflt;
 
 	@Override
 	public Object toJson2() throws UnsupportedOperationException {

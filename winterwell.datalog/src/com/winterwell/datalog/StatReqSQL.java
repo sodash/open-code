@@ -52,7 +52,7 @@ public class StatReqSQL<X> extends StatReq<X> {
 
 
 	public void run() {
-		stat = (StatImpl) DataLog.dflt;
+		stat = (DataLogImpl) DataLog.dflt;
 		String srv = server == null? Desc.MY_SERVER() : server; // MY_SERVER() not LOCAL!
 		SQLStorage storage = (SQLStorage) stat.storage;
 

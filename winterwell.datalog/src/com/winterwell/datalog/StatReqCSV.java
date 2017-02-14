@@ -70,7 +70,7 @@ public class StatReqCSV<X> extends StatReq<X> {
 	}
 	
 	private static void runBatch() {
-		stat = (StatImpl) DataLog.dflt;
+		stat = (DataLogImpl) DataLog.dflt;
 		List<StatReq> _batch = todo.get();
 		// This can happen with repeated calls to the same get()
 		if (_batch.isEmpty()) return;

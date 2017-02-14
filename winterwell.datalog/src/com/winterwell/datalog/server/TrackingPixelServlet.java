@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.datalog.DataLog;
+import com.winterwell.datalog.StatConfig;
 import com.winterwell.utils.web.WebUtils2;
 
 import com.winterwell.utils.Utils;
@@ -32,6 +33,7 @@ import com.winterwell.web.data.XId;
  */
 public class TrackingPixelServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	static final String DATALOG_EVENT_TYPE = "pixel";
 
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -73,8 +75,12 @@ public class TrackingPixelServlet extends HttpServlet {
 		} catch (IOException e) {
 			Log.w("img0", e);
 		}
-		String tag = "pixel";
-		String dataspace = "good-loop"; // ??
+		String tag = DATALOG_EVENT_TYPE;
+		// we always need a dataspace
+		String dataspace = state.get(LgServlet.DATASPACE);
+		if (dataspace==null) {
+			dataspace = DataLog.getDataspace();
+		}
 		// log some stuff
 		Map params = new ArrayMap(
 				"user", "$user", 

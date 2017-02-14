@@ -23,7 +23,7 @@ import com.winterwell.utils.time.Time;
  * Vital Statistics: A data-logging & charting service for arbitrary realtime
  * stats.
  * <p>
- * The code behind this is in com.winterwell.datalog.StatImpl, but loaded
+ * The code behind this is in com.winterwell.datalog.DataLogImpl, but loaded
  * dynamically & used via the IStat interface to avoid a hard dependency.
  * <p>
  * Requirements: 1. Writes must be very cheap. 2. The keys aren't known in
@@ -38,7 +38,7 @@ import com.winterwell.utils.time.Time;
  * documentation or STATID: tag/subtag documentation to allow coders to find &
  * understand the definitions using a file-search.
  *
- * @see StatImpl
+ * @see DataLogImpl
  * @author daniel
  *         <p>
  *         <b>Copyright & license</b>: (c) Winterwell Associates Ltd, all rights
@@ -48,6 +48,13 @@ import com.winterwell.utils.time.Time;
  */
 public class DataLog {
 
+	/**
+	 * Access admin functions.
+	 */
+	public static IDataLogAdmin getAdmin() {
+		return dflt.getAdmin();
+	}
+	
 	/**
 	 *
 	 * @param tag
@@ -80,6 +87,8 @@ public class DataLog {
 
 	public static final char HIERARCHY_CHAR = '/';
 	static final String LOGTAG = "DataLog";
+	private static final String CLASS_DATALOGIMPL = "com.winterwell.datalog.DataLogImpl";
+	private static final String CLASS_DATALOGADMIN = "com.winterwell.datalog.DataLogAdmin";
 
 	/**
 	 * @return the tags with active counts in the current time-window.
@@ -100,7 +109,7 @@ public class DataLog {
 
 	private static IDataLog initDflt() {
 		try {
-			return (IDataLog) Class.forName("com.winterwell.datalog.StatImpl")
+			return (IDataLog) Class.forName(CLASS_DATALOGIMPL)
 					.newInstance();
 		} catch (Exception e) {
 			// Bad!
@@ -272,8 +281,13 @@ public class DataLog {
 				Log.e(LOGTAG, e);
 			}
 		}
+		// default dataspace
+		if ( ! Utils.isBlank(myConfig.namespace)) {
+			DEFAULT_DATASPACE = myConfig.namespace;
+		}
+		// make it
 		try {
-			Class<?> klass = Class.forName("com.winterwell.datalog.StatImpl");
+			Class<?> klass = Class.forName(CLASS_DATALOGIMPL);
 			Constructor<?> cons = klass.getConstructor(StatConfig.class);
 			dflt = (IDataLog) cons.newInstance(myConfig);
 		} catch (Exception ex) {
@@ -375,7 +389,7 @@ public class DataLog {
 	public static void test() throws FailureException, Warning {
 		IDataLog impl = DataLog.getImplementation();
 		if (impl==null || impl instanceof DummyDataLog) {
-			throw new FailureException("Stat implementation not set! Check StatImpl class loaded OK.");
+			throw new FailureException("Stat implementation not set! Check "+CLASS_DATALOGIMPL+" class loaded OK.");
 		}
 		// Try this test a few times, to allow for the race condition around bucket changes.
 		for(int i=0; i<5; i++) {
@@ -383,7 +397,7 @@ public class DataLog {
 			Rate cnt = DataLog.get("test");
 			if (cnt.x >= 1) break; // OK
 			if (i==4) {
-				throw new FailureException("Stat count/get test failed! Check that the StatImpl started OK.");
+				throw new FailureException("Stat count/get test failed! Check that the "+CLASS_DATALOGIMPL+" started OK.");
 			}
 			Utils.sleep(50);
 		}
@@ -414,7 +428,7 @@ public class DataLog {
 	}
 
 	private static final ThreadLocal<String> dataspace = new ThreadLocal();
-	public static final String DEFAULT_DATASPACE = "default";
+	public static String DEFAULT_DATASPACE = "default";
 	
 	public static String getDataspace() {
 		String ds = dataspace.get();
