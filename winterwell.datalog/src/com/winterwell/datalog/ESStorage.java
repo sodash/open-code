@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.depot.Desc;
@@ -31,6 +32,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.ArgsParser;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
@@ -138,6 +140,7 @@ public class ESStorage implements IDataLogStorage {
 	 */
 	@Override
 	public ListenableFuture<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period period) {
+		Log.d("datalog.es", "saveEvent: "+event);
 		String index = indexFromDataspace(dataspace);
 		String type = typeFromEventType(event.eventType);
 		// put a time marker on it -- the end in seconds is enough
@@ -147,7 +150,18 @@ public class ESStorage implements IDataLogStorage {
 		if (event.time==null) event.time = period.getEnd();
 		// set doc
 		prepIndex.setSource(event.toJson2());
-		return prepIndex.execute();
+		ListenableFuture<ESHttpResponse> f = prepIndex.execute();
+		// log stuff
+		f.addListener(() -> {			
+			try {
+				ESHttpResponse response = f.get();
+				response.check();
+				Log.d("datalog.es", "...saveEvent done :) event: "+event);
+			} catch(Throwable ex) {
+				Log.d("datalog.es", "...saveEvent FAIL :( "+ex+" from event: "+event);
+			}
+		}, MoreExecutors.directExecutor());
+		return f;
 	}
 
 	/**
