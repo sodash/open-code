@@ -294,7 +294,11 @@ public class XStreamUtils {
 
 	static final List<IFn<String, String>> preprocessors = new ArrayList();
 	
-	
+	/**
+	 * HACK alter the xml before feeding it into XStream.
+	 * Note: this only works if XStreamUtils.serialiseFromXml() is used
+	 * @param xmlPreProcessor
+	 */
 	public static void addPreProcessor(IFn<String, String> xmlPreProcessor) {
 		preprocessors.add(xmlPreProcessor);
 	}
