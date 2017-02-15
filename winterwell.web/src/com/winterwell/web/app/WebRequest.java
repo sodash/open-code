@@ -48,7 +48,8 @@ public class WebRequest implements IProperties, Closeable {
 
 	
 	public String getFullDomain() {
-		String url = request.getRequestURI();
+		String url = getRequestUrl();
+		assert(url.contains("://")) : url+" "+this;
 		return WebUtils.getHost(url);
 	}
 	
