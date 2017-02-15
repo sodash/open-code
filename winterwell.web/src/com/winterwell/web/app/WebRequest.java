@@ -46,6 +46,12 @@ import com.winterwell.web.fields.SField;
  */
 public class WebRequest implements IProperties, Closeable {
 
+	
+	public String getFullDomain() {
+		String url = request.getRequestURI();
+		return WebUtils.getHost(url);
+	}
+	
 	/**
 	 * Get the IP address of the remote connection. This method (unlike {@link HttpServletRequest#getRemoteAddr()})
 	 * is proxy aware and retrieve the <b>assumed true</b> remote IP from proxy headers, if present.
