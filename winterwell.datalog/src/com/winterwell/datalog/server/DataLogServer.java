@@ -30,8 +30,6 @@ public class DataLogServer {
 	private static JettyLauncher jl;
 	
 	public static LogFile logFile;
-	
-	public static Node node;
 
 	public static DataLogSettings settings;
 
