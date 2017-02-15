@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,12 +22,14 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
+import com.winterwell.utils.IFn;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.XStreamBinaryConverter;
 import com.winterwell.utils.io.XStreamBinaryConverter.BinaryXML;
 import com.winterwell.utils.log.Log;
@@ -137,6 +140,10 @@ public class XStreamUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <X> X serialiseFromXml(InputStream xml) {
+		if ( ! preprocessors.isEmpty()) {
+			String sxml = FileUtils.read(xml);
+			return serialiseFromXml(sxml);
+		}
 		X x = (X) xstream().fromXML(xml);
 		return x;
 	}
@@ -149,12 +156,21 @@ public class XStreamUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <X> X serialiseFromXml(Reader xml) {
+		if ( ! preprocessors.isEmpty()) {
+			String sxml = FileUtils.read(xml);
+			return serialiseFromXml(sxml);
+		}
 		X x = (X) xstream().fromXML(xml);
 		return x;
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <X> X serialiseFromXml(String xml) {
+		if (xml == null) return null;
+		for(IFn<String,String> prepro : preprocessors) {
+			xml = prepro.apply(xml);
+			assert xml != null;
+		}
 		try {
 			return (X) xstream().fromXML(xml);
 		} catch(Throwable ex) {
@@ -274,6 +290,13 @@ public class XStreamUtils {
 			setupXStream();
 		}
 		return _xstream;
+	}
+
+	static final List<IFn<String, String>> preprocessors = new ArrayList();
+	
+	
+	public static void addPreProcessor(IFn<String, String> xmlPreProcessor) {
+		preprocessors.add(xmlPreProcessor);
 	}
 
 }
