@@ -69,7 +69,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	}
 
 	/**
-	 * Unique based on eventType and properties. Does NOT include time though!
+	 * Unique based on dataspace, eventType and properties. Does NOT include time though!
 	 * @param dataLogEvent
 	 */
 	private String makeId() {
