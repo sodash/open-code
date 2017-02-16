@@ -580,8 +580,10 @@ public class DataLogImpl implements Closeable, IDataLog {
 		assert ! Utils.isBlank(dataspace) : "no dataspace?! event:"+event;
 		StringBuilder stag = new StringBuilder(dataspace);
 		event.keySet().stream().sorted().forEach(k -> {
+			// exclude the non-params
 			if ("count".equals(k)) return;
 			if ("dataspace".equals(k)) return;
+			if ("time".equals(k)) return;			
 			Object v = event.get(k);
 			if ( ! Utils.truthy(v)) return;
 			stag.append("_"+k+"="+Printer.str(v));
