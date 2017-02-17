@@ -319,11 +319,15 @@ public class Printer {
 		System.out.println(fm);
 	}
 
-	public static void out(Object... x) {
-		System.out.println(toString(x));
+	public static String out(Object... x) {
+		String s = toString(x);
+		System.out.println(s);
+		return s;
 	}
-	public static void out(String... x) {
+	public static String out(String... x) {
+		String s = toString(x);
 		System.out.println(toString(x));
+		return s;
 	}
 
 	/**

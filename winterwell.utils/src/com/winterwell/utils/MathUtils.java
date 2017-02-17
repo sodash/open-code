@@ -285,7 +285,7 @@ public class MathUtils {
 	 * @testedby {@link MathUtilsTest#testIsFinite()}
 	 */
 	public static boolean isFinite(double x) {
-		return !(Double.isNaN(x) || Double.isInfinite(x));
+		return ! (Double.isNaN(x) || Double.isInfinite(x));
 	}
 	/**
 	 * @param x
@@ -645,6 +645,14 @@ public class MathUtils {
 		}
 		return ds;
 	}
+
+	public static boolean isFinite(double[] xs) {
+		for (double d : xs) {
+			if ( ! isFinite(d)) return false;
+		}
+		return true;
+	}
+	
 }
 
 

@@ -216,15 +216,16 @@ public class ArgsParser {
 		assert settings != null;
 		this.settings = settings;
 		// Setup token->field map
-		parseSettingsObject(); // settings);
+		parseSettingsObject("", settings);
 	}
 
-	private void checkField(Class<?> type) {
-		if (convertors.containsKey(type)) return;
+	private boolean checkField(Class<?> type) {
+		if (convertors.containsKey(type)) return true;
 		for(Class k : recognisedTypes) {
-			if (ReflectionUtils.isa(type, k)) return;
+			if (ReflectionUtils.isa(type, k)) return true;
 		}
-		throw new IllegalArgumentException("Unrecognised type: " + type);
+		// TODO is it a recursive thing?
+		return false;
 	}
 
 	private void checkRequiredSettings() {
@@ -433,18 +434,22 @@ public class ArgsParser {
 	 * @param settings
 	 * @throws IllegalArgumentException
 	 */
-	private void parseSettingsObject() throws IllegalArgumentException {
+	private void parseSettingsObject(String prefix, Object settingsObj) throws IllegalArgumentException {
 		// Get annotated fields
-		List<Field> fields = ReflectionUtils.getAnnotatedFields(settings,
+		List<Field> fields = ReflectionUtils.getAnnotatedFields(settingsObj,
 				Option.class, true);
 		// Get tokens
 		for (Field field : fields) {
 			// Is this OK?
-			checkField(field.getType());
+			boolean ok = checkField(field.getType());
+			if ( ! ok) {
+				// TODO support recursive settings
+				throw new IllegalArgumentException("Unrecognised type: " + field.getType()+" "+field.getName());
+			}
 			// Get tokens
 			Option arg = field.getAnnotation(Option.class);
 			for (String t : tokens(field, arg).split(",")) {
-				if (!t.startsWith("-"))
+				if ( ! t.startsWith("-"))
 					throw new IllegalArgumentException(
 							"Invalid token (all tokens must begin with a -): "
 									+ t);
@@ -461,7 +466,7 @@ public class ArgsParser {
 					if (!field.isAccessible()) {
 						field.setAccessible(true);
 					}
-					Object d = field.get(settings);
+					Object d = field.get(settingsObj);
 					field2default.put(field, d);
 				} catch (IllegalAccessException e) {
 					throw new IllegalArgumentException(e);

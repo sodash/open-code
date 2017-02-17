@@ -7,12 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.junit.Test;
+
 import com.winterwell.utils.containers.ArrayMap;
 
 import junit.framework.TestCase;
 
 public class ArgsParserTest extends TestCase {
 
+	@Test
 	public void testArgsSet() throws IOException {
 		TestSettings settings = new TestSettings();
 		ArgsParser parser = new ArgsParser(settings);
@@ -27,6 +30,7 @@ public class ArgsParserTest extends TestCase {
 		assert settings.n == 7;				
 	}
 	
+	@Test
 	public void testMap() throws IOException {
 		TestSettings settings = new TestSettings();
 		ArgsParser parser = new ArgsParser(settings);
@@ -36,23 +40,46 @@ public class ArgsParserTest extends TestCase {
 		assert settings.map.get("a").equals("Alice") : settings.map;
 	}
 
-	
-	class TestSettings {
-
-		@Option
-		public Map map = new ArrayMap("a","b");
-		
-		@Option(tokens = "-logdir", description = "Directory to write log files to", required = true)
-		public File loggingDir = new File("boblog");
-
-		@Option(tokens = "-n", description = "Number of things")
-		public int n = 5;
-
-		@Option(tokens = "-nolog", description = "Switch off logging")
-		public boolean noLogging;
-
-		@Option(tokens = "-v")
-		public boolean verbose;
-
+	@Test
+	public void TODOtestNest() throws IOException {
+		NestedTestSettings settings = new NestedTestSettings();
+		ArgsParser parser = new ArgsParser(settings);
+		Properties props = new Properties();
+		props.put("n", "2");
+		props.put("ts.n", "3");
+		List<Field> set = parser.set(props);
+		assert settings.n == 2;
+		assert settings.ts.n == 3;
 	}
+	
+
+}
+
+
+class TestSettings {
+
+	@Option
+	public Map map = new ArrayMap("a","b");
+	
+	@Option(tokens = "-logdir", description = "Directory to write log files to", required = true)
+	public File loggingDir = new File("boblog");
+
+	@Option(tokens = "-n", description = "Number of things")
+	public int n = 5;
+
+	@Option(tokens = "-nolog", description = "Switch off logging")
+	public boolean noLogging;
+
+	@Option(tokens = "-v")
+	public boolean verbose;
+
+}
+
+class NestedTestSettings {
+	
+	@Option
+	TestSettings ts = new TestSettings();
+	
+	@Option
+	int n = 5;
 }
