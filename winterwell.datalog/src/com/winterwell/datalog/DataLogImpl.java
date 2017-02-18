@@ -561,24 +561,31 @@ public class DataLogImpl implements Closeable, IDataLog {
 			storage.saveEvent(event.dataspace, event, getCurrentBucket());
 			return;
 		}
-		// bucket??
-		DataLogEvent oldValue = id2event.putIfAbsent(event.getId(), event);		
-		if (oldValue==null) return;
-		// TODO merge non-ID props, when we have non-ID props
-		DataLogEvent sum = new DataLogEvent(event.dataspace, event.count+oldValue.count, event.eventType, event.props);
-		assert sum.getId().equals(event.getId());
-		for(int i=0; i<10; i++) {			
-			boolean done = id2event.replace(event.getId(), oldValue, sum);
-			if (done) return;
-		}		
-		// drop it :(
-		Log.e("datalog", "Could not count "+event);
+		// turn it into a plain stag
+		String stag = event2tag(event.dataspace, event.toJson2());
+		count(event.count, stag);
+//		// bucket??
+//		DataLogEvent oldValue = id2event.putIfAbsent(event.getId(), event);		
+//		if (oldValue==null) return;
+//		// TODO merge non-ID props, when we have non-ID props
+//		DataLogEvent sum = new DataLogEvent(event.dataspace, event.count+oldValue.count, event.eventType, event.props);
+//		assert sum.getId().equals(event.getId());
+//		for(int i=0; i<10; i++) {			
+//			boolean done = id2event.replace(event.getId(), oldValue, sum);
+//			if (done) return;
+//		}		
+//		// drop it :(
+//		Log.e("datalog", "Could not count "+event);
 	}
 
 	public static String event2tag(String dataspace, Map event) {
 		assert ! event.isEmpty();
 		assert ! Utils.isBlank(dataspace) : "no dataspace?! event:"+event;
+		// dataspace_eventType=$eventType
 		StringBuilder stag = new StringBuilder(dataspace);
+		String eventType = (String) event.remove(DataLogEvent.EVENTTYPE);
+		stag.append("_eventType="+eventType);
+		// a-z params
 		event.keySet().stream().sorted().forEach(k -> {
 			// exclude the non-params
 			if ("count".equals(k)) return;

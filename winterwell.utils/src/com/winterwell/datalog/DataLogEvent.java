@@ -23,6 +23,8 @@ import com.winterwell.utils.web.SimpleJson;
  */
 public final class DataLogEvent implements Serializable, IHasJson {
 	private static final long serialVersionUID = 1L;
+
+	public static final String EVENTTYPE = "eventType";
 	
 	public final double count;
 	public final String eventType;
@@ -101,9 +103,9 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	@Override
 	public Map<String,?> toJson2() {
 		Map map = new ArrayMap();
-		map.putAll(props);
+		if (props!=null) map.putAll(props);
 //		map.put("dataspace", dataspace); This is given by the index
-		map.put("eventType", eventType);
+		map.put(EVENTTYPE, eventType);
 		map.put("time", time.toISOString()); //getTime()); // This is for ES -- which works with epoch millisecs
 		map.put("count", count);
 		return map;
