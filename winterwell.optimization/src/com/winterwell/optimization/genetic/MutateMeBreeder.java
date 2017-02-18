@@ -26,7 +26,7 @@ public class MutateMeBreeder<T> implements IBreeder<T> {
 
 	public MutateMeBreeder(T original) {
 		this.original = original;
-		fields = ReflectionUtils.getAnnotatedFields(original, MutateMe.class, true);
+		fields = ReflectionUtils.getAnnotatedFields(original.getClass(), MutateMe.class, true);
 		mutation = Math.pow(0.75, fields.size());
 	}
 	
