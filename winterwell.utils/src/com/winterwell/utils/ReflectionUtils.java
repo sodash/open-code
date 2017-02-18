@@ -247,10 +247,10 @@ public class ReflectionUtils {
 	 * @return (All fields / accessible public fields) in object which are
 	 *         annotated with annotation
 	 */
-	public static List<Field> getAnnotatedFields(Object object,
+	public static List<Field> getAnnotatedFields(Class klass,
 			Class<? extends Annotation> annotation, boolean incPrivate) {
-		List<Field> allFields = incPrivate ? getAllFields(object.getClass())
-				: Arrays.asList(object.getClass().getFields());
+		List<Field> allFields = incPrivate ? getAllFields(klass)
+				: Arrays.asList(klass.getFields());
 		List<Field> fields = new ArrayList<Field>();
 		for (Field f : allFields) {
 			if (f.isAnnotationPresent(annotation)) {

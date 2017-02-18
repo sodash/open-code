@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -202,9 +203,11 @@ public class ArgsParser {
 	private final Object settings;
 
 	/**
-	 * The tokens include the leading "-"
+	 * The tokens do NOT include the leading "-"
 	 */
-	Map<String, Field> token2field = new HashMap<String, Field>();
+	final Map<String, Field> token2field = new HashMap<String, Field>();
+
+	private Map<Field, ArgsParser> field2subparser = new HashMap();
 
 	/**
 	 * Create an ArgsParser which will set {@link Option} fields in the given
@@ -216,7 +219,19 @@ public class ArgsParser {
 		assert settings != null;
 		this.settings = settings;
 		// Setup token->field map
-		parseSettingsObject("", settings);
+		parseSettingsObject(settings.getClass());
+	}
+	
+	/** @deprecated better to provide an object*/
+	ArgsParser(Class settingsClass) {
+		Object obj = null; 
+		try {
+			obj = settingsClass.newInstance();			
+		} catch (Exception ex) {
+		}
+		this.settings = obj;
+		// Setup token->field map
+		parseSettingsObject(settingsClass);
 	}
 
 	private boolean checkField(Class<?> type) {
@@ -374,45 +389,57 @@ public class ArgsParser {
 			keys = properties.keySet();
 		}
 		// Look for settings
-		for (Object a : keys) {
-			String as = "-"+a;
+		for (String a : keys) {
 			String v = StrUtils.str(properties.get(a));
-			if (v==null) continue;
-			
-			Field field = token2field.get(as);
-			if (field == null) {	
-				// a map field?
-				if (as.contains(".")) {
-					String[] bits = as.split("\\.");
-					if (bits.length==1) continue;
-					field = token2field.get(bits[0]);
-					if (field!=null && ReflectionUtils.isa(field.getType(), Map.class)) {
-						if (bits.length > 2) {
-							errors.add(new IllegalArgumentException("Cannot set nested map key: "+as));
-							continue;
-						}
-						try {
-							Map map = (Map) field.get(settings);
-							if (map==null) {
-								map = (Map) (field.getType().isInterface()? new ArrayMap() : field.getType().newInstance());
-								field.set(settings, map);
-							}
-							map.put(bits[1], v);
-						} catch (Exception e) {
-							throw Utils.runtime(e);
-						}						
-					}
-				}
-				continue;
-			}
-			set2(field, v, set, errors);
-		}
+			if (v==null) continue;			
+			setOneKeyValue(a, v, set, errors);
+		} // ./loop
 		
 		// OK?
 		if (errors.size() != 0) {
 			throw Utils.runtime(errors.get(0));
 		}
 		return set;
+	}
+
+	private boolean setOneKeyValue(String a, String v, List<Field> set, List<Exception> errors) {
+		// normal case?
+		Field field = token2field.get(a);
+		if (field != null) {
+			set2(field, v, set, errors);
+			return true;
+		}
+		// a map or recursive field?
+		if ( ! a.contains(".")) return false;
+		String[] bits = a.split("\\.");
+		if (bits.length==1) return false;
+		field = token2field.get(bits[0]);
+		if (field==null) return false;
+		// recursive?
+		ArgsParser ap2 = field2subparser.get(field);
+		if (ap2!=null) {
+			ap2.setOneKeyValue(bits[1], v, set, errors);
+			return true;
+		}
+		// map?
+		if (ReflectionUtils.isa(field.getType(), Map.class)) {
+			if (bits.length > 2) {
+				errors.add(new IllegalArgumentException("Cannot set nested map key: "+a));
+				return false;
+			}
+			try {
+				Map map = (Map) field.get(settings);
+				if (map==null) {
+					map = (Map) (field.getType().isInterface()? new ArrayMap() : field.getType().newInstance());
+					field.set(settings, map);
+				}
+				map.put(bits[1], v);
+				return true;
+			} catch (Exception e) {
+				throw Utils.runtime(e);
+			}						
+		}			
+		return false;
 	}
 
 	private boolean set2(Field f, String prop, List<Field> set, List<Exception> errors) {
@@ -434,17 +461,28 @@ public class ArgsParser {
 	 * @param settings
 	 * @throws IllegalArgumentException
 	 */
-	private void parseSettingsObject(String prefix, Object settingsObj) throws IllegalArgumentException {
-		// Get annotated fields
-		List<Field> fields = ReflectionUtils.getAnnotatedFields(settingsObj,
+	 Map<String,Field> parseSettingsObject(Class settingsClass) throws IllegalArgumentException {
+		 HashMap classToken2field = new HashMap();
+		 // Get annotated fields
+		 List<Field> fields = ReflectionUtils.getAnnotatedFields(settingsClass,
 				Option.class, true);
-		// Get tokens
-		for (Field field : fields) {
+		 // Get tokens
+		 for (Field field : fields) {
 			// Is this OK?
 			boolean ok = checkField(field.getType());
 			if ( ! ok) {
-				// TODO support recursive settings
-				throw new IllegalArgumentException("Unrecognised type: " + field.getType()+" "+field.getName());
+				// Support recursive settings
+				ArgsParser ap2 = null;
+				try {
+					Object v = field.get(settings);
+					if (v!=null) ap2 = new ArgsParser(v);					
+				} catch (IllegalAccessException e) {
+				}				
+				if (ap2==null) ap2 = new ArgsParser(field.getType());
+				if (ap2.token2field.isEmpty()) {
+					throw new IllegalArgumentException("Unrecognised type: " + field.getType()+" "+field.getName());
+				}
+				field2subparser.put(field, ap2);
 			}
 			// Get tokens
 			Option arg = field.getAnnotation(Option.class);
@@ -453,20 +491,23 @@ public class ArgsParser {
 					throw new IllegalArgumentException(
 							"Invalid token (all tokens must begin with a -): "
 									+ t);
-				token2field.put(t, field);
+				// chop the -
+				t = t.substring(1).trim();
+				assert ! t.isEmpty();
+				classToken2field.put(t, field);
 			}
 			// Required?
 			if (arg.required()) {
 				requiredArgs.add(field);
 			}
 			// Default
-			if (field.getType() != Boolean.class
+			if (settings!=null && field.getType() != Boolean.class
 					&& field.getType() != boolean.class) {
 				try {
-					if (!field.isAccessible()) {
+					if ( ! field.isAccessible()) {
 						field.setAccessible(true);
 					}
-					Object d = field.get(settingsObj);
+					Object d = field.get(settings);
 					field2default.put(field, d);
 				} catch (IllegalAccessException e) {
 					throw new IllegalArgumentException(e);
@@ -474,8 +515,11 @@ public class ArgsParser {
 			}
 			// ok
 		}
+		 token2field.putAll(classToken2field);
+		return classToken2field;
 	}
 
+	 
 	private String tokens(Field f, Option arg) {
 		String tokens = arg.tokens();
 		if (tokens == null || tokens.length() == 0) {

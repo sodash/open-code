@@ -41,7 +41,7 @@ public class ArgsParserTest extends TestCase {
 	}
 
 	@Test
-	public void TODOtestNest() throws IOException {
+	public void testNest() throws IOException {
 		NestedTestSettings settings = new NestedTestSettings();
 		ArgsParser parser = new ArgsParser(settings);
 		Properties props = new Properties();
