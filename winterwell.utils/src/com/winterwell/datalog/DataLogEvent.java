@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.SimpleJson;
@@ -53,8 +54,9 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	}
 	
 	public DataLogEvent(String dataspace, double count, String eventType, Map<String,?> properties) {
-		this.dataspace = dataspace;
-		assert ! dataspace.isEmpty() && dataspace.equals(StrUtils.toCanonical(dataspace)) && ! dataspace.contains("/") : dataspace;
+		this.dataspace = StrUtils.normalise(dataspace, KErrorPolicy.ACCEPT).toLowerCase().trim();
+		assert ! dataspace.isEmpty() && ! dataspace.contains("/") : dataspace;
+//		assert dataspace.equals(StrUtils.toCanonical(dataspace)) : dataspace +" v "+StrUtils.toCanonical(dataspace); 
 		this.count = count;
 		this.eventType = eventType;
 		this.props = properties;
