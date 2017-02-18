@@ -32,6 +32,10 @@ import com.google.gson.internal.LazilyParsedNumber;
  */
 public final class JsonPrimitive extends JsonElement {
 
+	public Object getValue() {
+		return value;
+	}
+	
   private static final Class<?>[] PRIMITIVE_TYPES = { int.class, long.class, short.class,
       float.class, double.class, byte.class, boolean.class, char.class, Integer.class, Long.class,
       Short.class, Float.class, Double.class, Byte.class, Boolean.class, Character.class };

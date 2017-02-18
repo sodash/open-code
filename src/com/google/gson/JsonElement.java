@@ -328,4 +328,5 @@ public abstract class JsonElement {
       throw new AssertionError(e);
     }
   }
+
 }

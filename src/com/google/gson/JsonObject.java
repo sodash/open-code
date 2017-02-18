@@ -16,6 +16,7 @@
 
 package com.google.gson;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,6 +34,23 @@ public final class JsonObject extends JsonElement {
   private final LinkedTreeMap<String, JsonElement> members =
       new LinkedTreeMap<String, JsonElement>();
 
+
+//  	/**
+//  	 * TODO @return copy out into a map object. Note: Does not preserve key order.
+//  	 */
+//  	public Map<String,?> getAsMap() {
+//		HashMap map = new HashMap();
+//		for(Map.Entry<String, JsonElement> e : entrySet()) {
+//			JsonElement ve = e.getValue();
+//			if (ve.isJsonNull()) continue;
+//			Object v;
+//			if (ve.isJsonPrimitive()) v = ve.getValue();
+//			map.put(e.getKey(), v);
+//		}
+//		return map;
+//	}
+
+  
   @Override
   JsonObject deepCopy() {
     JsonObject result = new JsonObject();
