@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -34,6 +35,7 @@ import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
+
 
 
 final class And<X> implements IFilter<X> {
@@ -220,12 +222,12 @@ public class Containers  {
 		return new IterableFn<I, O>(list, fn);
 	}
 	/**
-	 * Produces a new Map of key/values by mapping each value in list through a
+	 * Produces a new Map of key/values by mapping each entry value through a
 	 * transformation function.
 	 * 
 	 * @param fn Can return null, which will remove that entry.
-	 * @param list
-	 * @return [fn applied to each member of list]
+	 * @param map
+	 * @return {key: fn applied to each value}
 	 */
 	public static <K, I, O> Map<K,O> applyToValues(IFn<I, O> fn, Map<? extends K, ? extends I> map) {
 		HashMap after = new HashMap(map.size());
@@ -240,6 +242,31 @@ public class Containers  {
 			}
 		}
 		return after;
+	}
+	
+
+
+	/**
+	 * Produces a new Map of key/values by mapping each key through a
+	 * transformation function.
+	 * 
+	 * @param fn Can return null, which will remove that entry.
+	 */
+	public static <K, V, KO> Map<KO, V> applyToKeys(
+			Map<? extends K, V> map, IFn<K, KO> fn) 
+	{
+		HashMap after = new HashMap(map.size());
+		for (Entry<? extends K, V> e : map.entrySet()) {
+			try {
+				K k = e.getKey();
+				KO o = fn.apply(k);
+				if (o==null) continue;
+				after.put(o, e.getValue());
+			} catch(Exception ex) {
+				throw Utils.runtime(ex);
+			}
+		}
+		return after;		
 	}
 
 	public static List<Boolean> asList(final boolean[] xs) {
@@ -1600,6 +1627,7 @@ public class Containers  {
 		}
 		return false;
 	}
+
 
 }
 
