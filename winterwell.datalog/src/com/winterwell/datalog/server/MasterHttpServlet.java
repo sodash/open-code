@@ -104,6 +104,11 @@ public class MasterHttpServlet extends HttpServlet {
 			
 			// TODO dataspace admin
 			
+			if (path.equals("/ping")) {
+				new PingServlet(request).doGet();
+				return;
+			}
+			
 			WebUtils2.sendError(500, "TODO", resp);
 		} catch(Throwable ex) {
 			Log.e("error", ex);
