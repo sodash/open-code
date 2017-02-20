@@ -566,7 +566,7 @@ public class Utils {
 			return Boolean.TRUE;
 		// "off" shouldn't happen, but just in case
 		if (s.isEmpty() || s.equals("false") || s.equals("off")
-				|| s.equals("0") || s.equals("null"))
+				|| s.equals("0") || s.equals("null") || s.equals("undefined"))
 			return Boolean.FALSE;
 		if (strict)
 			throw new IllegalArgumentException("Invalid boolean value: " + s);

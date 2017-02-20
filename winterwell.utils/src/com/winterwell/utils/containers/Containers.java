@@ -1629,6 +1629,19 @@ public class Containers  {
 	}
 
 
+	public static <X, X2 extends X> List<X2> filter(X[] list, IFilter<X> filter) {
+		if (list==null) return null;
+		assert filter != null : list;
+		ArrayList<X2> out = new ArrayList();
+		for (X x : list) {
+			if (filter.accept(x)) {
+				out.add((X2) x);
+			}
+		}
+		return out;
+	}
+
+
 }
 
 final class EasyList<X> extends AbstractList<X> {
