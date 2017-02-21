@@ -530,7 +530,7 @@ public class Utils {
 	 * A lenient boolean parser, similar to JavaScript's if() test (but even
 	 * more lenient).<p>
 	 * 
-	 * false: boolean false, the Strings "", false, off, null, 0, the
+	 * false: boolean false, the Strings "", false, off, no, null, 0, (& case insensitive) the
 	 * number 0, an empty list, an empty array, an empty map.<br>
 	 * true: anything else (see the strict parameter)
 	 * 
@@ -559,14 +559,14 @@ public class Utils {
 		if (on instanceof Map) {
 			return ! ((Map) on).isEmpty();
 		}
-		String s = on.toString().trim();
+		String s = on.toString().trim().toLowerCase();
 		// "on" will be sent by a value-less checkbox
 		// - eg if the sending form is hand-written html
-		if (s.equals("true") || s.equals("on") || s.equals("1"))
+		if (s.equals("true") || s.equals("on") || s.equals("1") || s.equals("yes"))
 			return Boolean.TRUE;
 		// "off" shouldn't happen, but just in case
 		if (s.isEmpty() || s.equals("false") || s.equals("off")
-				|| s.equals("0") || s.equals("null") || s.equals("undefined"))
+				|| s.equals("0") || s.equals("null") || s.equals("undefined")|| s.equals("no"))
 			return Boolean.FALSE;
 		if (strict)
 			throw new IllegalArgumentException("Invalid boolean value: " + s);
