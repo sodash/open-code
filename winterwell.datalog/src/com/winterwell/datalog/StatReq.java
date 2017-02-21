@@ -28,7 +28,25 @@ import com.winterwell.utils.web.SimpleJson;
  */
 public class StatReq<X> implements IDataLogReq<X>, IHasJson {		
 	
+
+	@Override
+	public final X get() {
+		X value = getValue();
+		if (value != null) return value;
+		else if (error != null) {
+			// remote fetches can fail
+			throw Utils.runtime(error);
+		}
+
+		run();
+
+		return getValue();
+	}
 	
+	protected void run() {
+		throw new TodoException();
+	}
+
 	/**
 	 * Double or ListDataStream
 	 */
@@ -201,10 +219,6 @@ public class StatReq<X> implements IDataLogReq<X>, IHasJson {
 		return v!=null;
 	}
 
-	@Override
-	public X get() {
-		throw new TodoException();
-	}
 	
 	@Override
 	public X get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {

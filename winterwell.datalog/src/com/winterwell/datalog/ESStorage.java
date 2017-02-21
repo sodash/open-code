@@ -1,10 +1,12 @@
 package com.winterwell.datalog;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -45,8 +47,20 @@ public class ESStorage implements IDataLogStorage {
 	
 	@Override
 	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {
-		// TODO Auto-generated method stub
-		
+		Collection<DataLogEvent> events = new ArrayList();
+		String ds = DataLog.getDataspace();
+		for(Entry<String, Double> tc : tag2count.entrySet()) {
+			DataLogEvent event = new DataLogEvent(ds, tc.getValue(), "simple", new ArrayMap("tag", tc.getKey()));
+			events.add(event);
+		}
+		for(Entry<String, MeanVar1D> tm : tag2mean.entrySet()) {
+			DataLogEvent event = new DataLogEvent(ds, tm.getValue().getMean(), "simple", new ArrayMap("tag", tm.getKey()));
+			event.setExtraResults(new ArrayMap(
+					tm.getValue().toJson2()
+					));
+			events.add(event);
+		}
+		saveEvents(events, period);
 	}
 
 	@Override
@@ -69,8 +83,10 @@ public class ESStorage implements IDataLogStorage {
 
 	@Override
 	public StatReq<Double> getTotal(String tag, Time start, Time end) {
-		// TODO Auto-generated method stub
-		return null;
+		String ds = DataLog.getDataspace(); 
+		DataLogEvent spec = new DataLogEvent(ds, 0, "simple", new ArrayMap("tag", tag));
+		double total = getEventTotal(ds, start, end, spec);
+		return new StatReqFixed<Double>(total);
 	}
 
 	@Override
@@ -195,6 +211,7 @@ public class ESStorage implements IDataLogStorage {
 		// stats or just sum??
 		search.addAggregation("event_total", "stats", "count");
 		search.setSize(0);
+//		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
 		SearchResponse sr = search.get();
 		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();

@@ -85,6 +85,11 @@ public class MasterHttpServlet extends HttpServlet {
 				LgServlet.fastLog(request);
 				return;
 			}
+			// No favicon ??and block other common requests??
+			if (path.startsWith("/favicon")) {
+				WebUtils2.sendError(404, "", resp);
+				return;
+			}
 	
 			// cors on
 			WebUtils2.CORS(request, true);

@@ -34,21 +34,6 @@ public class StatReqSQL<X> extends StatReq<X> {
 	public StatReqSQL(String cmd, Pattern tagMatcher, Time start, Time end) {
 		super(cmd, tagMatcher, start, end);
 	}
-	
-	@Override
-	public X get() {
-		X value = getValue();
-		if (value != null) return value;
-		else if (error != null) {
-			// remote fetches can fail
-			throw Utils.runtime(error);
-		}
-
-		run();
-
-		return getValue();
-	}
-
 
 
 	public void run() {

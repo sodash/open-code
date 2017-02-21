@@ -57,16 +57,8 @@ public class StatReqCSV<X> extends StatReq<X> {
 	}
 	
 	@Override
-	public X get() {
-		X value = getValue();
-		if (value != null) return value;
-		else if (error!=null) {
-			// remote fetches can fail
-			throw Utils.runtime(error);
-		}
-		runBatch();		
-		
-		return getValue();
+	protected void run() {
+		runBatch();
 	}
 	
 	private static void runBatch() {
