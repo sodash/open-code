@@ -18,6 +18,15 @@ import junit.framework.TestCase;
 public class StrUtilsTest extends TestCase {
 
 	@Test
+	public void testToCamelCase() {
+		Assert.assertEquals("whatTheDickens", StrUtils.toCamelCase("What the 	Dickens "));
+		Assert.assertEquals("", StrUtils.toCamelCase(""));
+		Assert.assertEquals("f", StrUtils.toCamelCase("f"));
+		Assert.assertEquals("xa", StrUtils.toCamelCase("XA"));
+	}
+
+	
+	@Test
 	public void testTrimPunctuation() {
 		Assert.assertEquals("hello, world", StrUtils.trimPunctuation("[hello, world]"));
 		Assert.assertEquals("hello, world] what", StrUtils.trimPunctuation("[hello, world] what"));

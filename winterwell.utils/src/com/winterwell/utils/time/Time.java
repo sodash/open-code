@@ -475,4 +475,20 @@ public class Time implements Serializable, Comparable<Time> {
 		return getDate().toGMTString();
 	}
 
+	/**
+	 * Lenient constructor - never throws an Exception.
+	 * Use-case parsing input data, discarding "junk"
+	 * @param string
+	 * @return Time or null
+	 */
+	public static Time of(String string) {
+		if (string==null) return null;
+		try {
+			Time time = new Time(string);
+			return time;
+		} catch(Exception ex) {
+			return null;
+		}
+	}
+
 }

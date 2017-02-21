@@ -1755,6 +1755,12 @@ public class StrUtils {
 		return list;
 	}
 
+	public static String toCamelCase(String string) {
+		if (string==null || string.length() < 2) return string;
+		String cc = Character.toLowerCase(string.charAt(0)) + toTitleCase(string).substring(1).replaceAll("\\s+", "");
+		return cc;
+	}
+
 }
 
 /**

@@ -817,16 +817,20 @@ public class Containers  {
 
 
 	/**
+	 * Convenience for "get if collection is long enough"
 	 * @param collection
 	 * @param n
-	 * @return the nth element in the collection.
+	 * @return the nth element in the collection, or null
 	 */
-	public static <X> X get(Iterable<X> collection, int n)
-			throws NoSuchElementException {
-		if (collection instanceof List)
-			return ((List<X>) collection).get(n);
+	public static <X> X get(Iterable<X> collection, int n) {
+		if (collection instanceof List) {
+			List<X> list = (List<X>) collection;
+			if (list.size() <= n) return null;
+			return list.get(n);
+		}
 		Iterator<X> it = collection.iterator();
 		for (int i = 0; i < n - 1; i++) {
+			if ( ! it.hasNext()) return null;
 			it.next();
 		}
 		return it.next();
@@ -1639,6 +1643,14 @@ public class Containers  {
 			}
 		}
 		return out;
+	}
+
+
+	public static <X> int indexOf(List<X> list, IFilter<X> filter) {
+		for (int i = 0; i < list.size(); i++) {
+			if (filter.accept(list.get(i))) return i;
+		}
+		return -1;
 	}
 
 
