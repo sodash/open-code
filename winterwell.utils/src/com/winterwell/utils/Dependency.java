@@ -28,8 +28,15 @@ public final class Dependency {
 		factory.put(klass, supplier);
 	}
 
-	public static <X> void set(Class<X> klass, X value) {
+	/**
+	 * 
+	 * @param klass
+	 * @param value
+	 * @return value
+	 */
+	public static <X> X set(Class<X> klass, X value) {
 		stash.put(klass, value);
+		return value;
 	}
 	
 
