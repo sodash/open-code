@@ -92,7 +92,9 @@ public class MasterHttpServlet extends HttpServlet {
 			}
 	
 			// cors on
-			WebUtils2.CORS(request, true);
+			if (DataLogServer.settings.CORS) {
+				WebUtils2.CORS(request, true);
+			}
 			
 			// which dataspace?
 			if (request.getSlug()==null) {

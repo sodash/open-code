@@ -31,6 +31,7 @@ import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebInputException;
 import com.winterwell.web.ajax.AjaxMsg;
+import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.FileUploadField;
@@ -1042,4 +1043,18 @@ public class WebRequest implements IProperties, Closeable {
 		if ("1".equals(dnt.trim())) return true;
 		return false;
 	}
+
+	/**
+	 * This is NOT auto-set. It relies on {@link #setUserId()}
+	 * @return
+	 */
+	public XId getUserId() {
+		return uxid;
+	}
+	
+	public void setUserId(XId uxid) {
+		this.uxid = uxid;
+	}
+	
+	XId uxid;
 }

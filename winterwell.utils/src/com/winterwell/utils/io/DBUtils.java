@@ -3,6 +3,8 @@ package com.winterwell.utils.io;
 import com.winterwell.utils.ReflectionUtils;
 
 /**
+ * @deprecated Prefer DBOptions, ESConfig - there isn't much common ground here
+ * 
  * This class exists to contain generics from SqlUtils which might also exist in ElasticSearch.
  * @author alexn
  *
@@ -21,7 +23,7 @@ public class DBUtils{
 				|| ReflectionUtils.equalish(options, newOptions)) : "Incompatible setup for SqlUtils static db connection.";
 		options = newOptions;
 		if (newOptions!=null) {
-			assert (newOptions.dbUrl != null || newOptions.esIndex != null): newOptions;
+			assert (newOptions.dbUrl != null): newOptions;
 		}
 	}
 	
@@ -32,16 +34,7 @@ public class DBUtils{
 		public String dbUser;
 		@Option
 		public String dbPassword;		
-		
-		// ES options
-		@Option
-		public String esIndex;
-		@Option
-		public String esType;
-		@Option
-		public String server;
-		
-		
+				
 		@Override
 		public String toString() {
 			return getClass().getSimpleName()+"["+dbUser+"@"+dbUrl+"]";

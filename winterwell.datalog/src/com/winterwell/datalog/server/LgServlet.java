@@ -92,7 +92,9 @@ public class LgServlet {
 			FileServlet.serveFile(TrackingPixelServlet.PIXEL, state);
 			return;
 		}
-		WebUtils2.CORS(state, false);
+		if (DataLogServer.settings.CORS) {
+			WebUtils2.CORS(state, false);
+		}
 		WebUtils2.sendText("OK", resp);
 	}
 

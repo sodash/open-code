@@ -26,4 +26,8 @@ public class DataLogSettings {
 
 	@Option
 	Class<? extends IDataLogStorage> storageClass = ESStorage.class;
+
+	@Option(description="If true, Java will set CORS cross-domain access headers. Note that this can cause bugs if NGinx is also setting them.")
+	public boolean CORS;
+	
 }
