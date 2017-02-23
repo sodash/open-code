@@ -119,7 +119,7 @@ import com.google.gson.stream.MalformedJsonException;
  * @author Jesse Wilson
  * @author Daniel Winterstein
  */
-public final class Gson {
+public class Gson {
 	
 	
 	/**
