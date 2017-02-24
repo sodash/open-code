@@ -206,10 +206,10 @@ public class Log {
 		// Guard against giant objects getting put into log, which is almost
 		// certainly a careless error
 		if (msgText.length() > MAX_LENGTH) {
-			msgText = msgText.substring(0, MAX_LENGTH / 2)
+			msgText = msgText.substring(0, MAX_LENGTH - 100)
 					+ "... (message is too long for Log!)";
-			System.err.println(new IllegalArgumentException(
-					"Log message too long: " + msgText));
+//			System.err.println(new IllegalArgumentException(
+//					"Log message too long: " + msgText));
 		}
 		Report report = new Report(tag, msg, msgText, error);
 		// Note: using an array for listeners avoids any concurrent-mod
