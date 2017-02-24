@@ -566,7 +566,7 @@ public class MathUtils {
 	 * @return
 	 * @see #getNumber(Object)
 	 */
-	public static double toNum(Object object) {
+	public static double toNum(Object object) throws NumberFormatException {
 		if (object==null) return 0;
 		if (object instanceof Number) return ((Number) object).doubleValue();
 		return Double.valueOf((String)object);
