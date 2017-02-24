@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 
 /**
  * A simple immutable alternative to the built-in mess of Date. This just holds
@@ -482,7 +483,7 @@ public class Time implements Serializable, Comparable<Time> {
 	 * @return Time or null
 	 */
 	public static Time of(String string) {
-		if (string==null) return null;
+		if (Utils.isBlank(string)) return null;
 		try {
 			Time time = new Time(string);
 			return time;
