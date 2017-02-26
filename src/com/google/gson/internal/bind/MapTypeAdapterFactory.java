@@ -195,28 +195,32 @@ public final class MapTypeAdapterFactory implements TypeAdapterFactory {
 			}
 
 			Map<K, V> map = constructor.construct();
-
+			// array or object?
 			if (peek == JsonToken.BEGIN_ARRAY) {
+				// array
 				in.beginArray();
 				while (in.hasNext()) {
 					in.beginArray(); // entry array
 					K key = keyTypeAdapter.read(in);
 					V value = valueTypeAdapter.read(in);
 					V replaced = map.put(key, value);
-					if (replaced != null) {
+					if (replaced != null && ! in.isLenient()) {
+						// NB: If the map constructor sets values, this can lead to a "duplicate key" effect
 						throw new JsonSyntaxException("duplicate key: " + key);
 					}
 					in.endArray();
 				}
 				in.endArray();
 			} else {
+				// object
 				in.beginObject();
 				while (in.hasNext()) {
 					JsonReaderInternalAccess.INSTANCE.promoteNameToValue(in);
 					K key = keyTypeAdapter.read(in);
 					V value = valueTypeAdapter.read(in);
 					V replaced = map.put(key, value);
-					if (replaced != null) {
+					if (replaced != null && ! in.isLenient()) {
+						// NB: If the map constructor sets values, this can lead to a "duplicate key" effect
 						throw new JsonSyntaxException("duplicate key: " + key);
 					}
 				}
