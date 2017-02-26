@@ -1045,7 +1045,8 @@ public class WebRequest implements IProperties, Closeable {
 	}
 
 	/**
-	 * This is NOT auto-set. It relies on {@link #setUserId()}
+	 * This is NOT auto-set. It relies on {@link #setUserId()}.
+	 * It is NOT linked with {@link #setUser(IProperties)}.
 	 * @return
 	 */
 	public XId getUserId() {
