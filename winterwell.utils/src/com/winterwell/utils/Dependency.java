@@ -40,6 +40,11 @@ public final class Dependency {
 	}
 	
 
+	/**
+	 * This can create a new instance! Use #contains() to test for whether we have one.
+	 * @param class1
+	 * @return
+	 */
 	public static <X> X get(Class<X> class1) {
 		X x = (X) stash.get(class1);
 		if (x!=null) return x;
@@ -58,6 +63,12 @@ public final class Dependency {
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw Utils.runtime(e);
 		}
+	}
+	
+	public static boolean isSet(Class klass) {
+		if (stash.containsKey(klass)) return true;
+		if (factory.containsKey(klass)) return true;
+		return false;
 	}
 
 }
