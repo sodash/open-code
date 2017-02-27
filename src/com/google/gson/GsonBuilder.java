@@ -66,7 +66,7 @@ import com.google.gson.stream.JsonReader;
  * @author Joel Leitch
  * @author Jesse Wilson
  */
-public final class GsonBuilder {
+public class GsonBuilder {
   public static final String DEFAULT_CLASS_PROPERTY = "@class";	
   private Excluder excluder = Excluder.DEFAULT;
   private LongSerializationPolicy longSerializationPolicy = LongSerializationPolicy.DEFAULT;
