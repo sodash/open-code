@@ -8,6 +8,8 @@ import com.winterwell.web.WebInputException;
 /**
  * Form field for an integer. Supports the special value: "max"
  * 
+ * WARNING: Do you need a Long? See {@link LongField}.
+ * 
  * @author Daniel
  */
 public final class IntField extends AField<Integer> {
