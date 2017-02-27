@@ -1761,6 +1761,39 @@ public class StrUtils {
 		return cc;
 	}
 
+	/**
+	 * Replace 's "s and other characters with safe versions
+	 * Does not otherwise alter whitespace.
+	 * @param text
+	 * @return
+	 */
+	public static String normalisePunctuation(String text) {
+		if (text==null) return null;
+		StringBuilder clean = new StringBuilder(text.length());
+		for (int i = 0, n = text.length(); i < n; i++) {
+			char c = text.charAt(i);
+			if (c == 0) continue; // rarely needed, but can be a life-saver when it is
+			if (APOSTROPHES.indexOf(c) != -1) {
+				clean.append('\'');
+				continue;
+			}
+			if (QUOTES.indexOf(c) != -1) {
+				clean.append('"');
+				continue;
+			}
+			if (DASHES.indexOf(c) != -1) {
+				clean.append('-');
+				continue;
+			}
+			if (SPACES.indexOf(c) != -1) {
+				clean.append(' ');
+				continue;
+			}
+			clean.append(c);
+		}		
+		return clean.toString();
+	}
+
 }
 
 /**
