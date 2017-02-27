@@ -57,6 +57,7 @@ public class BuildWinterwellProject extends BuildTask {
 		doTask2_compile(srcDir, binDir);
 		
 		// Jar		
+		FileUtils.delete(jarFile);
 		JarTask jar = new JarTask(jarFile, new File(projectDir, "bin"));
 		jar.setAppend(false);
 		jar.setManifestProperty(JarTask.MANIFEST_TITLE, 

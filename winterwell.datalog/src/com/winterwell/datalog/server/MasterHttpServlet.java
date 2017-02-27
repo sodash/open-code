@@ -72,7 +72,7 @@ public class MasterHttpServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			WebRequest request = new WebRequest(null, req, resp);
+			WebRequest request = new WebRequest(null, req, resp);			
 			String path = request.getRequestPath();
 	
 			// Tracking pixel
