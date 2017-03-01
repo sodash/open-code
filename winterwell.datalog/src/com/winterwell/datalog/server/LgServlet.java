@@ -18,6 +18,7 @@ import com.winterwell.web.ajax.JsonResponse;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.log.Report;
@@ -31,6 +32,7 @@ import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.fields.AField;
+import com.winterwell.web.fields.BoolField;
 import com.winterwell.web.fields.Form;
 import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.JsonField;
@@ -84,7 +86,8 @@ public class LgServlet {
 		String via = req.getParameter("via");
 		Map params = (Map) state.get(PARAMS);
 		
-		doLog(state, ds, tag, via, params);
+		boolean stdTrackerParams = state.get(new BoolField("track"), true);
+		doLog(state, ds, tag, via, params, stdTrackerParams);
 		
 		// Reply
 		// .gif?
@@ -98,28 +101,21 @@ public class LgServlet {
 		WebUtils2.sendText("OK", resp);
 	}
 
-	static void doLog(WebRequest state, String dataspace, String tag, String via, Map params) {
+	static void doLog(WebRequest state, String dataspace, String tag, String via, Map params, boolean stdTrackerParams) {
 		assert dataspace != null;
 		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		// special vars
-		if (params!=null) {
+		if (stdTrackerParams) {
+			// TODO allow the caller to explicitly set some of these if they want to
+			if (params==null) params = new ArrayMap();
 			// Replace $user with tracking-id, and $
-			if ("$user".equals(params.get("user"))) {
-				params.put("user", trckId);
-			}
+			params.put("user", trckId);			
 			// ip: $ip
-			if ("$ip".equals(params.get("ip"))) {
-				params.put("ip", state.getRemoteAddr());
-			}
-			if ("$useragent".equals(params.get("useragent"))) {
-				params.put("useragent", state.getUserAgent());
-			}
-			// url: $url
-			if ("$url".equals(params.get("url"))) {
-				// remove some gumpf (UTM codes)
-				String cref = WebUtils2.cleanUp(state.getReferer());
-				params.put("url", cref);
-			}
+			params.put("ip", state.getRemoteAddr());			
+			params.put("useragent", state.getUserAgent());			
+			// remove some gumpf (UTM codes)
+			String cref = WebUtils2.cleanUp(state.getReferer());
+			params.put("url", cref);
 		}
 		// write to log file
 		doLogToFile(dataspace, tag, params, trckId, via, state);

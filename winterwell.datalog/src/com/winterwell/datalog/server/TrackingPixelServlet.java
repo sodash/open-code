@@ -81,14 +81,8 @@ public class TrackingPixelServlet extends HttpServlet {
 		if (dataspace==null) {
 			dataspace = DataLog.getDataspace();
 		}
-		// log some stuff
-		Map params = new ArrayMap(
-				"user", "$user", 
-				"useragent", "$useragent",
-				"ip", "$ip",
-				"url", "$url");
 		// Count it
-		LgServlet.doLog(state, dataspace, tag, via, params);
+		LgServlet.doLog(state, dataspace, tag, via, null, true);
 
 		
 		// log it
