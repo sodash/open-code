@@ -425,6 +425,7 @@ public class WebUtils {
 	 * @param url
 	 * @return E.g. "blah.soda.sh" from "http://blah.soda.sh/foo", or null on fail
 	 * (which should only happen if url is a relative or bogus url).
+	 * @see #getDomain(String)
 	 */
 	public static String getHost(String url) {
 		Matcher m = URL_REGEX.matcher(url);

@@ -25,6 +25,7 @@ import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.RSyncTask;
 import com.winterwell.bob.tasks.RemoteTask;
 import com.winterwell.bob.tasks.SCPTask;
+import com.winterwell.es.BuildESJavaClient;
 import com.winterwell.maths.datastorage.DataTable;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.FailureException;
