@@ -63,6 +63,8 @@ public class JsonResponse implements IProperties {
 
 	private final Map properties = new HashMap();
 
+	private String cargoJson;
+
 
 	/**
 	 * A blank response.
@@ -104,6 +106,14 @@ public class JsonResponse implements IProperties {
 	}
 
 	
+	public JsonResponse(WebRequest state) {
+		this(state, null);
+	}
+
+	/**
+	 * If you've encoded the object into json yourself, use {@link #setCargoJson(String)} instead. 
+	 * @param cargo 
+	 */
 	public void setCargo(Object cargo) {
 		properties.put(JSON_CARGO, cargo);
 	}
@@ -157,7 +167,11 @@ public class JsonResponse implements IProperties {
 	}
 	
 	public String toJSON() {
-		return JSON.toString(Containers.getMap(this));
+		String json = JSON.toString(Containers.getMap(this));
+		if (cargoJson==null) return json;
+		// HACK direct json cargo
+		String json2 = "{\"cargo\":"+cargoJson+","+json.substring(1);
+		return json2;
 	}
 
 	public void setSuccess(boolean b) {
@@ -167,6 +181,12 @@ public class JsonResponse implements IProperties {
 	@Deprecated // AjaxMsg is preferred to raw Strings
 	public void setMessage(String msg) {
 		properties.put(JSON_MESSAGES, Arrays.asList(msg));
+	}
+
+	public JsonResponse setCargoJson(String json) {
+		assert properties.get(JSON_CARGO) == null : this;
+		cargoJson = json;
+		return this;
 	}
 
 }
