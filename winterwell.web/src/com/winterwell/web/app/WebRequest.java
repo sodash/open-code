@@ -47,7 +47,19 @@ import com.winterwell.web.fields.SField;
  */
 public class WebRequest implements IProperties, Closeable {
 
+
+	/**
+	 * Without the subdomain, e.g. sodash.com from http://foo.sodash.com/bar
+	 */
+	public String getDomain() {
+		String url = getRequestUrl();
+		assert(url.contains("://")) : url+" "+this;
+		return WebUtils.getHost(url);
+	}
 	
+	/**
+	 * aka the host part of the url, e.g. foo.sodash.com from http://foo.sodash.com/bar
+	 */
 	public String getFullDomain() {
 		String url = getRequestUrl();
 		assert(url.contains("://")) : url+" "+this;

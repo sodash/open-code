@@ -389,8 +389,12 @@ public class WebUtils {
 	 * (which should only happen if url is a relative or bogus url).
 	 */
 	public static String getDomain(String url) {
+		if (url==null) return null;
+		url = url.trim();
 		Matcher m = URL_REGEX.matcher(url);
 		if ( ! m.find()) {
+			// is it a domain already?
+			if (URL_WEB_DOMAIN_REGEX.matcher(url).matches()) return url;
 			return null;
 		}
 		String domain = m.group(1);

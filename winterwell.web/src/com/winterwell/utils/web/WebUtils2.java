@@ -964,9 +964,8 @@ public class WebUtils2 extends WebUtils {
 	 */
 	public static void sendJson(JsonResponse output, WebRequest req) throws IOException {
 		HttpServletResponse response = req.getResponse();
-		// convert to JSON (this could be a little more efficient)
-		Map<String, Object> outMap = Containers.getMap(output);
-		String json = JSON.toString(outMap);
+		// convert to JSON
+		String json = output.toJSON();
 		BufferedWriter out = null;
 		try {
 			// set mime and character encoding

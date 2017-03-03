@@ -909,7 +909,9 @@ public class Containers  {
 		Collection<Key> keys = props.getKeys();
 		Map<String, Object> map = new HashMap<String, Object>(keys.size());
 		for (Key k : keys) {
-			map.put(k.getName(), props.get(k));
+			Object v = props.get(k);
+			if (v==null) continue;
+			map.put(k.getName(), v);
 		}
 		return map;
 	}
