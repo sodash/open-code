@@ -1236,7 +1236,8 @@ public class Gson {
 	@Override
 	public String toString() {
 		return new StringBuilder("{serializeNulls:").append(serializeNulls)
-				.append("factories:").append(factories)
+				.append(",classProperty:").append(classProperty)
+				.append(",factories:").append(factories)
 				.append(",instanceCreators:").append(constructorConstructor)
 				.append("}").toString();
 	}
