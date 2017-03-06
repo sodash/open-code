@@ -165,7 +165,7 @@ public class ESStorage implements IDataLogStorage {
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
 		if (event.time==null) event.time = period.getEnd();
 		// set doc
-		prepIndex.setSource(event.toJson2());
+		prepIndex.setBodyMap(event.toJson2());
 		ListenableFuture<ESHttpResponse> f = prepIndex.execute();
 		// log stuff
 		f.addListener(() -> {			
@@ -198,7 +198,7 @@ public class ESStorage implements IDataLogStorage {
 		// Set the time property as time. The rest it can auto-figure
 		Map msrc = new ESType()
 						.property("time", new ESType().date());
-		putMapping.setSource(msrc);
+		putMapping.setBodyMap(msrc);
 		IESResponse res = putMapping.get();
 		res.check();
 		Map<String, Object> jout = res.getParsedJson();
