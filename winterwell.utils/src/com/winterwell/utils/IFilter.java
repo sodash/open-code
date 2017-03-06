@@ -6,8 +6,8 @@ import com.winterwell.utils.containers.Containers;
  * A filter, because they are useful and it saves having to define this kind of
  * interface in many places.
  * 
- * @see Containers#filter(IFilter, java.util.Collection)
- * @see Containers#first(IFilter, java.util.Collection)
+ * @see Containers#filter(java.util.Collection, IFilter)
+ * @see Containers#first(java.util.Collection, IFilter)
  * @author daniel
  */
 public interface IFilter<X> {
@@ -41,8 +41,8 @@ public interface IFilter<X> {
 	 * @return true if x passes the filter, false if it is rejected.
 	 *         <p>
 	 *         Can be used with
-	 *         {@link Containers#filter(IFilter, java.util.Collection)} and
-	 *         {@link Containers#first(IFilter, java.util.Collection)}
+	 *         {@link Containers#filter(java.util.Collection, IFilter)} and
+	 *         {@link Containers#first(java.util.Collection, IFilter)}
 	 */
 	public abstract boolean accept(X x);
 

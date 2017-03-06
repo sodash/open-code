@@ -276,8 +276,8 @@ public class Cache<Key, Value> extends AbstractMap2<Key, Value> {
 	@Override
 	public Collection<Value> values() {
 		Collection<SoftReference<Value>> values = backing.values();
-		List<Object> vals = Containers.apply(GET, values);
-		return (Collection) Containers.filter(IFilter.NOT_NULL, vals);
+		List<Object> vals = Containers.apply(values, GET);
+		return (Collection) Containers.filter(vals, IFilter.NOT_NULL);
 	}
 
 }

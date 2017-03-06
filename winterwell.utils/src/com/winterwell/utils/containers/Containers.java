@@ -190,12 +190,12 @@ public class Containers  {
 	/**
 	 * Produces a new List of values by mapping each value in list through a
 	 * transformation function.
-	 * 
-	 * @param fn
 	 * @param list
+	 * @param fn
+	 * 
 	 * @return [fn applied to each member of list]
 	 */
-	public static <I, O> List<O> apply(IFn<I, O> fn, Collection<? extends I> list) {
+	public static <I, O> List<O> apply(Collection<? extends I> list, IFn<I, O> fn) {
 		ArrayList after = new ArrayList(list.size());
 		for (I object : list) {
 			try {
@@ -215,7 +215,7 @@ public class Containers  {
 	 * @param fn
 	 * @param list
 	 * @return [fn applied to each member of list]
-	 * @see #filterLazy(IFilter, Iterable)
+	 * @see #filterLazy(Iterable, IFilter)
 	 */
 	public static <I, O> Iterable<O> applyLazy(Iterable<? extends I> list,
 			IFn<I, O> fn) {
@@ -709,14 +709,14 @@ public class Containers  {
 	}
 
 	/**
-	 * @param filter Must not be null
 	 * @param list Can be null (returns null)
+	 * @param filter Must not be null
 	 * @return a new list, which contains those elements that the filter
 	 *         accepts. Can contain null if the filter accepts it! TODO should
 	 *         we always filter out null??
 	 */
-	public static <X, X2 extends X> List<X2> filter(IFilter<X> filter,
-			Collection<X2> list) {
+	public static <X, X2 extends X> List<X2> filter(Collection<X2> list,
+			IFilter<X> filter) {
 		if (list==null) return null;
 		assert filter != null : list;
 		ArrayList<X2> out = new ArrayList();
@@ -731,14 +731,14 @@ public class Containers  {
 	
 	/**
 	 * Lazy filtering of a stream.
-	 * @param filter
 	 * @param stream
 	 *            Cannot contain acceptable nulls
+	 * @param filter
 	 * @return a filtered version of stream
 	 * @see #applyLazy(Iterable, IFn)
 	 */
 	public static <X, X2 extends X> Iterable<X2> filterLazy(
-			IFilter<X> filter, Iterable<X2> stream) {
+			Iterable<X2> stream, IFilter<X> filter) {
 		return new FilterStream<X, X2>(filter, stream);
 	}
 
@@ -752,11 +752,11 @@ public class Containers  {
 	}
 
 	/**
-	 * @param filter
 	 * @param tree
+	 * @param filter
 	 * @return first node in tree which passes the filter
 	 */
-	public static <T extends Tree> T first(IFilter<T> filter, T tree) {
+	public static <T extends Tree> T first(T tree, IFilter<T> filter) {
 		List<T> nodes = tree.flatten();
 		for (T tree2 : nodes) {
 			if (filter.accept(tree2))
@@ -767,15 +767,15 @@ public class Containers  {
 
 	/**
 	 * Lenient access to the start of a collection
-	 * 
+	 * @param collection
+	 *            can be null.
 	 * @param filter
 	 *            can be null. If set, the method will pick the first element to
 	 *            pass filter.accept().
-	 * @param collection
-	 *            can be null.
+	 * 
 	 * @return the first element, if there is one, or null.
 	 */
-	public static <X> X first(IFilter<X> filter, Collection<X> collection) {
+	public static <X> X first(Collection<X> collection, IFilter<X> filter) {
 		if (collection == null || collection.isEmpty())
 			return null;
 		if (filter == null)
@@ -859,13 +859,13 @@ public class Containers  {
 	}
 
 	/**
-	 * @param klass
-	 *            This covers sub-classes too
 	 * @param list
 	 *            Can be empty, must not be null
+	 * @param klass
+	 *            This covers sub-classes too
 	 * @return The first object of the given class, or null
 	 */
-	public static <X> X getByClass(Class<X> klass, List<?> list) {
+	public static <X> X firstClass(List<?> list, Class<X> klass) {
 		for (Object object : list) {
 			if (ReflectionUtils.isa(object.getClass(), klass))
 				return (X) object;
@@ -1002,7 +1002,7 @@ public class Containers  {
 
 	/**
 	 * Useful function for working with lists-of-pairs, or lists-of-lists. Use
-	 * this with {@link #apply(IFn, Collection)} to do, e.g. given a list of
+	 * this with {@link #apply(Collection, IFn)} to do, e.g. given a list of
 	 * pairs, get the first of each pair.
 	 * 
 	 * @param i
@@ -1579,12 +1579,12 @@ public class Containers  {
 
 	/**
 	 * By class and sub-class
-	 * @param klass
 	 * @param list
+	 * @param klass
 	 * @return
 	 */
-	public static List filterByClass(Class klass, List list) {
-		return filter(IFilter.byClass(klass), list);
+	public static List filterByClass(List list, Class klass) {
+		return filter(list, IFilter.byClass(klass));
 	}
 	
 	/**

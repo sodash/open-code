@@ -157,7 +157,7 @@ public class WebRequest implements IProperties, Closeable {
 			this.mimeType = mimeType;
 		}
 		
-		public static final List<String> strings = Containers.apply(StrUtils.STR, Arrays.asList(KResponseType.values()));		
+		public static final List<String> strings = Containers.apply(Arrays.asList(KResponseType.values()), StrUtils.STR);		
 	}
 
 	public static final String ACTION_PARAMETER = "action";

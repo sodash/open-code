@@ -54,8 +54,8 @@ public class ContainersTest {
 		IFn first = Containers.getter(0);
 		IFn second = Containers.getter(1);
 		List<Pair> ab = Arrays.asList(new Pair("a", 1), new Pair("b", 2));
-		List abc = Containers.apply(first, ab);
-		List num = Containers.apply(second, ab);
+		List abc = Containers.apply(ab, first);
+		List num = Containers.apply(ab, second);
 		assert abc.equals(Arrays.asList("a", "b")) : abc;
 		assert num.equals(Arrays.asList(1, 2)) : num;
 	}
@@ -216,16 +216,16 @@ public class ContainersTest {
 		List<String> list1 = new ArrayList<String>();
 		list1.add("first");
 		list1.add("second");
-		assert Containers.first(null, list1).equals("first");
+		assert Containers.first(list1, null).equals("first");
 
-		assert Containers.first(null, new ArrayList()) == null;
+		assert Containers.first(new ArrayList(), null) == null;
 	}
 
 	@Test
 	public void testFirst2() {
 		List<String> list1 = new ArrayList<String>();
 		list1.add("first");
-		assert Containers.first(null, list1).equals("first");
+		assert Containers.first(list1, null).equals("first");
 	}
 
 	@Test

@@ -41,7 +41,7 @@ public interface IHasJson {
 				return ((com.winterwell.utils.web.IHasJson) value).toJson2();
 			}
 			if (value instanceof Collection) {
-				return Containers.apply(this, (Collection)value);
+				return Containers.apply((Collection)value, this);
 			}
 			if (value instanceof Map) {
 				return Containers.applyToValues(this, (Map)value);
