@@ -141,14 +141,14 @@ public class StrUtils {
 	}
 
 	/**
-	 * @param pageTitle
+	 * @param text
 	 * @param snippet
 	 * @return true if text contains snippet ignoring all capitalisation
 	 */
-	public static boolean containsIgnoreCase(CharSequence pageTitle,
+	public static boolean containsIgnoreCase(CharSequence text,
 			String snippet) {
 		// TODO more efficient -- avoid the copy(s)?
-		String pt = pageTitle.toString().toLowerCase();
+		String pt = text.toString().toLowerCase();
 		return pt.contains(snippet.toLowerCase());
 	}
 

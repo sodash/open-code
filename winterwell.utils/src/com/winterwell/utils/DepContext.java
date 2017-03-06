@@ -3,11 +3,19 @@ package com.winterwell.utils;
 import java.io.Closeable;
 import java.io.IOException;
 
-public class DepContext implements Closeable {
+/**
+ * Context object for {@link Dep}. This allows having several contexts active within one JVM.
+ * Contexts are hierarchical (there's a parent context) and thread-local by default -- but you can
+ * pass them between threads. 
+ * 
+ * @author daniel
+ *
+ */
+public final class DepContext implements Closeable {
 
-	boolean closed;
-	DepContext parent;
-	private Object ckey;
+	volatile boolean closed;
+	final DepContext parent;
+	final private Object ckey;
 
 	public DepContext(DepContext parent, Object contextKey) {
 		this.ckey = contextKey;

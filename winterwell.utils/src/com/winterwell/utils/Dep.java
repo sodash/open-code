@@ -4,20 +4,23 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import com.winterwell.utils.log.Log;
+
 /**
- * Store common dependencies, like settings, database access objects, etc.
+ * Dependency: Store common dependencies, like settings, database access objects, etc.
  * Stuff you might otherwise put in a static field somewhere.
  * A simple form of dependency injection - without forcing your code into a framework.
  * @author daniel
- *
+ * @testedby DepTest
  */
-public final class Dependency {
+public final class Dep {
 
 	static ConcurrentHashMap<DKey, Object> stash = new ConcurrentHashMap<>();
 	
 	static ConcurrentHashMap<DKey, Supplier> factory = new ConcurrentHashMap<>();
 	
 	public static <X> void setSupplier(Class<X> klass, boolean singleton, Supplier<X> supplier) {
+		Log.d("dep", "set "+klass+" = <supplier> "+ReflectionUtils.getSomeStack(6, Dep.class.getName()));
 		DepContext ctxt = getContext();
 		if (singleton) {
 			Supplier supplier2 = () -> {
@@ -45,6 +48,7 @@ public final class Dependency {
 	 * @return value
 	 */
 	public static <X> X set(Class<X> klass, X value) {
+		Log.d("dep", "set "+klass+" = "+value+" "+ReflectionUtils.getSomeStack(6, Dep.class.getName()));
 		DepContext ctxt = getContext();
 		stash.put(key(klass, ctxt), value);
 		return value;
@@ -56,12 +60,12 @@ public final class Dependency {
 	 * @param class1
 	 * @return
 	 */
-	public static <X> X get(Class<X> class1) {
+	public static <X> X get(Class<X> class1) throws DepNotSetException {
 		DepContext ctxt = getContext();
 		return get(class1, ctxt);
 	}
 
-	public static <X> X get(Class<X> class1, DepContext ctxt) {
+	public static <X> X get(Class<X> class1, DepContext ctxt) throws DepNotSetException {
 		assert ! ctxt.closed;
 		while(ctxt!=null) {			
 			X x = (X) stash.get(key(class1, ctxt));
@@ -72,15 +76,27 @@ public final class Dependency {
 				// don't store factory output. make it fresh.
 				return x;
 			}
+			ctxt = ctxt.parent;
 		}
-		// try a vanilla constructor		
-		try {
-			X x = class1.newInstance();
-			set(class1, x);
-			return x;
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw Utils.runtime(e);
+//		// try a vanilla constructor - no someone should knowingly set the value		
+//		try {
+//			X x = class1.newInstance();
+//			set(class1, x);
+//			return x;
+//		} catch (InstantiationException | IllegalAccessException e) {
+//			throw Utils.runtime(e);
+//		}
+		// should we return null? Typical use case is for key config objects where a null might be problematic.
+		throw new DepNotSetException("No value set for "+class1+". Note: you can use Dep.has() to check.");
+	}
+	
+	public static final class DepNotSetException extends IllegalStateException {
+		private static final long serialVersionUID = 1L;
+
+		public DepNotSetException(String string) {
+			super(string);
 		}
+		
 	}
 	
 	private static ThreadLocal<DepContext> context = new ThreadLocal<DepContext>() {
@@ -106,7 +122,12 @@ public final class Dependency {
 		}
 	}
 	
-	public static boolean isSet(Class class1) {
+	/**
+	 * 
+	 * @param class1
+	 * @return true if set, either by value or a supplier
+	 */
+	public static boolean has(Class class1) {
 		DepContext ctxt = getContext();
 		while(ctxt != null) {
 			DKey klass = key(class1, ctxt);
@@ -119,7 +140,10 @@ public final class Dependency {
 
 }
 
-
+/**
+ * Key on class+context
+ * @author daniel
+ */
 final class DKey {
 
 	private final DepContext context;
