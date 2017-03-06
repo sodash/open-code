@@ -60,6 +60,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import com.google.gson.stream.MalformedJsonException;
+import com.winterwell.gson.StandardAdapters;
 
 /**
  * This is the main class for using Gson. Gson is typically used by first
@@ -1290,11 +1291,11 @@ public class Gson {
 		return obj;
 	}
 
-	private static Gson SAFE_GSON = new GsonBuilder()
-				.setLenientReader(true)
+	private static Gson SAFE_GSON = new GsonBuilder()			
+				.setLenientReader(true)				
 				.serializeSpecialFloatingPointValues()
 				.setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-				.setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL)
+				.setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL)				
 				.create();
 	
 	/**

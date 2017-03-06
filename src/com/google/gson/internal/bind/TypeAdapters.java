@@ -42,6 +42,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.RawJson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.annotations.SerializedName;
@@ -764,7 +765,8 @@ public final class TypeAdapters {
 					write(out, e.getValue());
 				}
 				out.endObject();
-
+			} else if (value instanceof RawJson) {
+				out.raw((RawJson) value);
 			} else {
 				throw new IllegalArgumentException("Couldn't write "
 						+ value.getClass());

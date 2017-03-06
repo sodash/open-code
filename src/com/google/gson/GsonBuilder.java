@@ -541,6 +541,9 @@ private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
    * @return an instance of Gson configured with the options currently set in this builder
    */
   public Gson create() {
+	  // always add this RawJson serialisrer. Hack by DW
+	  registerTypeAdapter(RawJson.class, new RawJsonSerializer());
+	
     List<TypeAdapterFactory> factories = new ArrayList<TypeAdapterFactory>();
     factories.addAll(this.factories);
     Collections.reverse(factories);

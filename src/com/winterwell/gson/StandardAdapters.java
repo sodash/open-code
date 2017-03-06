@@ -19,6 +19,10 @@ import com.winterwell.utils.time.Time;
 public class StandardAdapters {
 
 
+
+
+	
+
 /**
  * Time <-> iso-string
  * Warning: This loses the type info! 

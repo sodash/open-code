@@ -32,7 +32,9 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 
+import com.google.gson.JsonElement;
 import com.google.gson.KLoopPolicy;
+import com.google.gson.RawJson;
 
 /**
  * Writes a JSON (<a href="http://www.ietf.org/rfc/rfc4627.txt">RFC 4627</a>)
@@ -435,6 +437,13 @@ public class JsonWriter implements Closeable, Flushable {
 		string(value);
 		return this;
 	}
+	
+	public JsonWriter raw(RawJson value) throws IOException {
+		writeDeferredName();
+		beforeValue(false);
+		out.write(value.json);
+		return this;
+	}
 
 	/**
 	 * Encodes {@code null}.
@@ -717,4 +726,6 @@ public class JsonWriter implements Closeable, Flushable {
 		if (loopy.peek() == source)
 			loopy.pop();
 	}
+
+	
 }

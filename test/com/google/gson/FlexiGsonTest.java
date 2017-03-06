@@ -12,6 +12,23 @@ import com.winterwell.utils.containers.ArrayMap;
 public class FlexiGsonTest {
 	
 	@Test
+	public void testESBug() {
+		{
+			Gson gson = new GsonBuilder().create();
+			ArrayMap map = new ArrayMap("a", "Hello");
+			String json = gson.toJson(map);		
+			assert json.contains("Hello");
+		}
+		{
+			Gson gson = new GsonBuilder().create();
+			ArrayMap map = new ArrayMap("a", new RawJson("\"Hello\""));
+			String json = gson.toJson(map);		
+			assert json.contains("Hello");
+			System.out.println(json);
+		}
+	}
+	
+	@Test
 	public void testConvert() {
 		Gson gson = new GsonBuilder().create();
 		DummyObject dummy1 = new DummyObject();
