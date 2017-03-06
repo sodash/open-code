@@ -69,12 +69,18 @@ public final class Dependency {
 			Supplier<X> s = factory.get(key(class1, ctxt));
 			if (s!=null) {
 				x = s.get();
-				// don't store factory output. make it fresh. ??
-	//			stash.put(class1, x);
+				// don't store factory output. make it fresh.
 				return x;
 			}
 		}
-		return null;
+		// try a vanilla constructor		
+		try {
+			X x = class1.newInstance();
+			set(class1, x);
+			return x;
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw Utils.runtime(e);
+		}
 	}
 	
 	private static ThreadLocal<DepContext> context = new ThreadLocal<DepContext>() {
