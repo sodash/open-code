@@ -123,11 +123,17 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		// others as a list (to avoid hitting the field limit in ES which could happen with dynamic fields)
 		List propslist = new ArrayList();
 		for(Entry<String, ?> pv : props.entrySet()) {
-			propslist.add(new ArrayMap(
+			if ( ! Utils.truthy(pv.getValue())) continue;
+			String sv = pv.getValue().toString();
+			ArrayMap prop = new ArrayMap(
 					"k", pv.getKey(),
-					"v", pv.getValue(),
-					"kv", pv.getKey()+"="+pv.getValue()
-					));
+					"sv", sv,
+					"kv", pv.getKey()+"="+sv
+					);		
+			if (pv.getValue() instanceof Number) {
+				prop.put("n", pv.getValue());				
+			} 
+			propslist.add(prop);
 		}
 		map.put("props", propslist);
 		return map;
