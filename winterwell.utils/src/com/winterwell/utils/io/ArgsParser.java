@@ -403,6 +403,11 @@ public class ArgsParser {
 	}
 
 	private boolean setOneKeyValue(String a, String v, List<Field> set, List<Exception> errors) {
+		// special case: config is a Properties object
+		if (settings instanceof Properties) {
+			((Properties)settings).setProperty(a, v);
+			return true;
+		}
 		// normal case?
 		Field field = token2field.get(a);
 		if (field != null) {

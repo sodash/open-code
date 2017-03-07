@@ -100,9 +100,9 @@ public final class Dep {
 	}
 	
 	private static ThreadLocal<DepContext> context = new ThreadLocal<DepContext>() {
-		protected DepContext initialValue() {
-			return new DepContext(null, null);
-		};
+//		protected DepContext initialValue() {
+//			return new DepContext(null, null);
+//		};
 	};
 	
 	public static DepContext setContext(Object contextKey) {
@@ -112,8 +112,11 @@ public final class Dep {
 		return newContext;
 	}
 	
+	static final DepContext root = new DepContext(null, null);
+	
 	public static DepContext getContext() {
 		DepContext ctxt = context.get();
+		if (ctxt==null) return root;
 		while(true) {			
 			if ( ! ctxt.closed) return ctxt;
 			ctxt = ctxt.parent;
