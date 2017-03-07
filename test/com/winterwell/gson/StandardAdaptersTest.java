@@ -6,8 +6,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.Time;
 
