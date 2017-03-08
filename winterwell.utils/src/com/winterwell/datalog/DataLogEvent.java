@@ -107,6 +107,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		return new SimpleJson().toJson(toJson2());
 	}
 
+	/**
+	 * Because this has to handle big data, we economise and store either n or v, not both.
+	 * {k: string, n: ?number, v: ?string}
+	 */
 	@Override
 	public Map<String,?> toJson2() {
 		Map map = new ArrayMap();		
@@ -123,16 +127,20 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		// others as a list (to avoid hitting the field limit in ES which could happen with dynamic fields)
 		List propslist = new ArrayList();
 		for(Entry<String, ?> pv : props.entrySet()) {
-			if ( ! Utils.truthy(pv.getValue())) continue;
-			String sv = pv.getValue().toString();
-			ArrayMap prop = new ArrayMap(
-					"k", pv.getKey(),
-					"sv", sv,
-					"kv", pv.getKey()+"="+sv
-					);		
-			if (pv.getValue() instanceof Number) {
-				prop.put("n", pv.getValue());				
-			} 
+			Object v = pv.getValue();
+			ArrayMap<String,Object> prop;
+			if (v instanceof Number) {
+				prop = new ArrayMap(
+						"k", pv.getKey(),
+						"n", v
+						);		
+			} else {
+				if ( ! Utils.truthy(pv.getValue())) continue;
+				prop = new ArrayMap(
+						"k", pv.getKey(),
+						"v", v.toString()
+						);
+			}
 			propslist.add(prop);
 		}
 		map.put("props", propslist);
