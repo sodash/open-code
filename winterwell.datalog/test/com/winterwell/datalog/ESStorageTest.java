@@ -92,7 +92,8 @@ public class ESStorageTest {
 			Utils.sleep(300);
 			DataLog.count(1, "testTotal"+salt);
 		}
-		Utils.sleep(2000);
+		DataLog.flush();
+		Utils.sleep(10000);
 		IDataLogReq<Double> total = DataLog.getTotal(s, new Time(), "testTotal"+salt);
 		Double v = total.get();
 		assert v == 10 : v;

@@ -99,13 +99,17 @@ public final class Dep {
 		
 	}
 	
-	private static ThreadLocal<DepContext> context = new ThreadLocal<DepContext>() {
-//		protected DepContext initialValue() {
-//			return new DepContext(null, null);
-//		};
-	};
+	private static ThreadLocal<DepContext> context = new ThreadLocal<DepContext>();
 	
+	/**
+	 * Create a new context for this thread. The context must be closed when finished.
+	 * The new context has get() access to parent key/values as a fallback.
+	 *  
+	 * @param contextKey A non-null identifier for this context. E.g. a String name.
+	 * @return the new context (which can be passed between threads).
+	 */
 	public static DepContext setContext(Object contextKey) {
+		assert contextKey != null;
 		DepContext ctxt = getContext();
 		DepContext newContext = new DepContext(ctxt, contextKey);
 		context.set(newContext);

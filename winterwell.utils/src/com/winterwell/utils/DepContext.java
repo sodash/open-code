@@ -28,7 +28,7 @@ public final class DepContext implements Closeable {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		if (parent==null) throw new IllegalStateException("Cannot close top-level context");
 		this.closed = true;
 	}
