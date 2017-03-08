@@ -28,7 +28,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 
 	public static final String EVENTTYPE = "eventType";
 
-	public static final List<String> COMMON_PROPS = Arrays.asList("ip","user","url");
+	public static final List<String> COMMON_PROPS = Arrays.asList("tag","ip","user","url");
 	
 	public final double count;
 	public final String eventType;
@@ -149,6 +149,6 @@ public final class DataLogEvent implements Serializable, IHasJson {
 
 	public void setExtraResults(ArrayMap arrayMap) {
 		// TODO store extra outputs		
-	}	
+	}
 	
 }

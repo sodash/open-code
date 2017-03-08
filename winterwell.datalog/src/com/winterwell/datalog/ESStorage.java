@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -85,16 +87,7 @@ public class ESStorage implements IDataLogStorage {
 	@Override
 	public StatReq<IDataStream> getData(String tag, Time start, Time end, KInterpolate fn, Dt bucketSize) {
 		DataLogEvent spec = eventspec4tag(tag);
-		StatConfig config = Dep.get(StatConfig.class);
-		String index = indexFromDataspace(spec.dataspace);
-		SearchRequestBuilder search = client.prepareSearch(index);
-		search.setType(typeFromEventType(spec.eventType));		
-		search.setSize(config.maxDataPoints);
-		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time").from(start.toISOString(), true).to(end.toISOString(), true);
-		search.setFilter(timeFilter);
-		search.addSort("time", SortOrder.DESC);
-//		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
-		SearchResponse sr = search.get();
+		SearchResponse sr = getData2(spec, start, end, true);
 		List<Map> hits = sr.getSearchResults();
 		ListDataStream list = new ListDataStream(1);
 		for (Map hit : hits) {
@@ -104,13 +97,14 @@ public class ESStorage implements IDataLogStorage {
 			Datum d = new Datum(time, count.doubleValue(), tag);
 			list.add(d);
 		}
+		// TODO interpolate and buckets
 		return new StatReqFixed<IDataStream>(list);
 	}
 
 	@Override
 	public StatReq<Double> getTotal(String tag, Time start, Time end) {
 		DataLogEvent spec = eventspec4tag(tag);
-		double total = getEventTotal(spec.dataspace, start, end, spec);
+		double total = getEventTotal(start, end, spec);
 		return new StatReqFixed<Double>(total);
 	}
 
@@ -235,21 +229,45 @@ public class ESStorage implements IDataLogStorage {
 		Map<String, Object> jout = res.getParsedJson();
 	}
 	
-	public double getEventTotal(String dataspace, Time start, Time end, DataLogEvent spec) {
-		String index = indexFromDataspace(dataspace);
-		SearchRequestBuilder search = client.prepareSearch(index);
-		search.setType(typeFromEventType(spec.eventType));
-		// stats or just sum??
-		search.addAggregation("event_total", "stats", "count");
-		search.setSize(0);
-//		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
-		SearchResponse sr = search.get();
+	public double getEventTotal(Time start, Time end, DataLogEvent spec) {
+		SearchResponse sr = getData2(spec, start, end, false);
 		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();
 		Map aggs = sr.getAggregations();
 		Map stats = (Map) aggs.get("event_total");
 		Object sum = stats.get("sum");
 		return MathUtils.toNum(sum);
+	}
+	
+	SearchResponse getData2(DataLogEvent spec, Time start, Time end, boolean sortByTime) {
+		StatConfig config = Dep.get(StatConfig.class);		
+		String index = indexFromDataspace(spec.dataspace);
+		SearchRequestBuilder search = client.prepareSearch(index);
+		search.setType(typeFromEventType(spec.eventType));
+		search.setSize(config.maxDataPoints);
+		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time").from(start.toISOString(), true).to(end.toISOString(), true);
+		
+		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
+				.must(timeFilter);
+		
+		// HACK tag match
+		String tag = (String) spec.props.get("tag");
+		if (tag!=null) {
+			QueryBuilder tagFilter = QueryBuilders.termQuery("tag", tag);
+			filter = filter.must(tagFilter);
+		}		
+		
+		search.setFilter(filter);
+		if (sortByTime) {
+			search.addSort("time", SortOrder.DESC);
+		}
+
+		// stats or just sum??
+		search.addAggregation("event_total", "stats", "count");
+		search.setSize(0);
+//		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
+		SearchResponse sr = search.get();
+		return sr;
 	}
 
 	@Override

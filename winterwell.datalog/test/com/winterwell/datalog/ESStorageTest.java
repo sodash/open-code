@@ -60,7 +60,7 @@ public class ESStorageTest {
 		DataLogEvent event2 = new DataLogEvent("testdataspace", 0, "testevent", new ArrayMap(
 				"publisher", "egpub"
 				));
-		double total = storage.getEventTotal("testdataspace", start, end, event2);
+		double total = storage.getEventTotal(start, end, event2);
 		assert total > 0;
 	}
 
