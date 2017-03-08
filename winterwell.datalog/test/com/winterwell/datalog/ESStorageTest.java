@@ -27,7 +27,7 @@ public class ESStorageTest {
 	@BeforeClass
 	public static void setup() {
 		StatConfig config = new StatConfig();
-		config.interval = new Dt(5, TUnit.SECOND);
+		config.interval = new Dt(1, TUnit.SECOND);
 		config.storageClass = ESStorage.class;
 		DataLog.dflt = new DataLogImpl(config);
 		DataLog.setConfig(config);
@@ -79,6 +79,7 @@ public class ESStorageTest {
 			Utils.sleep(300);
 			DataLog.count(1, "testTotal"+salt);
 		}
+		Utils.sleep(2000);
 		IDataLogReq<Double> total = DataLog.getTotal(s, new Time(), "testTotal"+salt);
 		Double v = total.get();
 		assert v == 10 : v;

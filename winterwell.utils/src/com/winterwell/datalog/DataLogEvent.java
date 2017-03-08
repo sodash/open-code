@@ -127,6 +127,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		// others as a list (to avoid hitting the field limit in ES which could happen with dynamic fields)
 		List propslist = new ArrayList();
 		for(Entry<String, ?> pv : props.entrySet()) {
+			if (COMMON_PROPS.contains(pv.getKey())) continue;
 			Object v = pv.getValue();
 			ArrayMap<String,Object> prop;
 			if (v instanceof Number) {

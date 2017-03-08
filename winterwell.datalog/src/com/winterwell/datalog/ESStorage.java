@@ -51,19 +51,19 @@ import com.winterwell.utils.time.Time;
 
 public class ESStorage implements IDataLogStorage {
 
+	private static final String simple = "simple";
 	private ESConfig settings;
 	private ESHttpClient client;
 	
 	@Override
 	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {
 		Collection<DataLogEvent> events = new ArrayList();
-		String ds = DataLog.getDataspace();
 		for(Entry<String, Double> tc : tag2count.entrySet()) {
-			DataLogEvent event = new DataLogEvent(ds, tc.getValue(), "simple", new ArrayMap("tag", tc.getKey()));
+			DataLogEvent event = event4tag(tc.getKey(), tc.getValue());
 			events.add(event);
 		}
 		for(Entry<String, MeanVar1D> tm : tag2mean.entrySet()) {
-			DataLogEvent event = new DataLogEvent(ds, tm.getValue().getMean(), "simple", new ArrayMap("tag", tm.getKey()));
+			DataLogEvent event = event4tag(tm.getKey(), tm.getValue().getMean());
 			event.setExtraResults(new ArrayMap(
 					tm.getValue().toJson2()
 					));
@@ -109,8 +109,11 @@ public class ESStorage implements IDataLogStorage {
 	}
 
 	private DataLogEvent eventspec4tag(String tag) {
+		return event4tag(tag, 0);
+	}
+	private DataLogEvent event4tag(String tag, double count) {
 		String ds = DataLog.getDataspace(); 
-		DataLogEvent spec = new DataLogEvent(ds, 0, "simple", new ArrayMap("tag", tag));
+		DataLogEvent spec = new DataLogEvent(ds, count, simple, new ArrayMap("tag", tag));
 		return spec;
 	}
 
@@ -150,15 +153,28 @@ public class ESStorage implements IDataLogStorage {
 
 	
 	private void initIndex(String index) {
-		if (client.admin().indices().indexExists(index)) {
-			return;
+		if ( ! client.admin().indices().indexExists(index)) {
+			// make it
+			CreateIndexRequest pc = client.admin().indices().prepareCreate(index);
+			pc.setDefaultAnalyzer(Analyzer.keyword);
+			IESResponse res = pc.get();
+			res.check();
 		}
-		// make it
-		CreateIndexRequest pc = client.admin().indices().prepareCreate(index);
-		pc.setDefaultAnalyzer(Analyzer.keyword);
-		IESResponse res = pc.get();
-		res.check();
 		// register some standard event types??
+		try {
+			PutMappingRequestBuilder pm = client.admin().indices().preparePutMapping(index, typeFromEventType(simple));
+			ESType simpleEvent = new ESType()
+					.property("count", new ESType().DOUBLE())
+					.property("time", new ESType().date())
+					.property("tag", new ESType().text().analyzer("keyword"))
+					;
+			pm.setMapping(simpleEvent);
+			IESResponse res = pm.get();
+			res.check();
+		} catch(Throwable ex) {
+			Log.e("datalog.init", ex);
+			// swallow and carry on -- an out of date schema may not be a serious issue
+		}
 	}
 
 	private String indexFromDataspace(String dataspace) {
@@ -181,7 +197,7 @@ public class ESStorage implements IDataLogStorage {
 	 */
 	@Override
 	public ListenableFuture<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period period) {
-		Log.d("datalog.es", "saveEvent: "+event);
+//		Log.d("datalog.es", "saveEvent: "+event);
 		String index = indexFromDataspace(dataspace);
 		String type = typeFromEventType(event.eventType);
 		// put a time marker on it -- the end in seconds is enough
@@ -197,7 +213,7 @@ public class ESStorage implements IDataLogStorage {
 			try {
 				ESHttpResponse response = f.get();
 				response.check();
-				Log.d("datalog.es", "...saveEvent done :) event: "+event);
+//				Log.d("datalog.es", "...saveEvent done :) event: "+event);
 			} catch(Throwable ex) {
 				Log.d("datalog.es", "...saveEvent FAIL :( "+ex+" from event: "+event);
 			}
@@ -263,10 +279,16 @@ public class ESStorage implements IDataLogStorage {
 		}
 
 		// stats or just sum??
-		search.addAggregation("event_total", "stats", "count");
-		search.setSize(0);
+		if (sortByTime) {
+			
+		} else {
+			search.addAggregation("event_total", "stats", "count");
+			search.setSize(0);
+		}
 //		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
+		client.debug = true;
 		SearchResponse sr = search.get();
+		client.debug = false;
 		return sr;
 	}
 
