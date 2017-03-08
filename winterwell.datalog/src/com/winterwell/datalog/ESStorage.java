@@ -9,6 +9,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.search.sort.SortOrder;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.winterwell.datalog.DataLog.KInterpolate;
@@ -26,7 +30,10 @@ import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
+import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.IDataStream;
+import com.winterwell.maths.timeseries.ListDataStream;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
@@ -77,16 +84,40 @@ public class ESStorage implements IDataLogStorage {
 
 	@Override
 	public StatReq<IDataStream> getData(String tag, Time start, Time end, KInterpolate fn, Dt bucketSize) {
-		// TODO Auto-generated method stub
-		return null;
+		DataLogEvent spec = eventspec4tag(tag);
+		StatConfig config = Dep.get(StatConfig.class);
+		String index = indexFromDataspace(spec.dataspace);
+		SearchRequestBuilder search = client.prepareSearch(index);
+		search.setType(typeFromEventType(spec.eventType));		
+		search.setSize(config.maxDataPoints);
+		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time").from(start.toISOString(), true).to(end.toISOString(), true);
+		search.setFilter(timeFilter);
+		search.addSort("time", SortOrder.DESC);
+//		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
+		SearchResponse sr = search.get();
+		List<Map> hits = sr.getSearchResults();
+		ListDataStream list = new ListDataStream(1);
+		for (Map hit : hits) {
+			Object t = hit.get("time");
+			Time time = Time.of(t.toString());
+			Number count = (Number) hit.get("count");
+			Datum d = new Datum(time, count.doubleValue(), tag);
+			list.add(d);
+		}
+		return new StatReqFixed<IDataStream>(list);
 	}
 
 	@Override
 	public StatReq<Double> getTotal(String tag, Time start, Time end) {
+		DataLogEvent spec = eventspec4tag(tag);
+		double total = getEventTotal(spec.dataspace, start, end, spec);
+		return new StatReqFixed<Double>(total);
+	}
+
+	private DataLogEvent eventspec4tag(String tag) {
 		String ds = DataLog.getDataspace(); 
 		DataLogEvent spec = new DataLogEvent(ds, 0, "simple", new ArrayMap("tag", tag));
-		double total = getEventTotal(ds, start, end, spec);
-		return new StatReqFixed<Double>(total);
+		return spec;
 	}
 
 	@Override

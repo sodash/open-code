@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
@@ -109,8 +110,10 @@ public class DataLog {
 
 	private static IDataLog initDflt() {
 		try {
-			return (IDataLog) Class.forName(CLASS_DATALOGIMPL)
+			IDataLog dl = (IDataLog) Class.forName(CLASS_DATALOGIMPL)
 					.newInstance();
+			Dep.set(StatConfig.class, dl.getConfig());
+			return dl;
 		} catch (Exception e) {
 			// Bad!
 			Log.e(LOGTAG, e.getMessage());
@@ -281,6 +284,7 @@ public class DataLog {
 				Log.e(LOGTAG, e);
 			}
 		}
+		Dep.set(StatConfig.class, myConfig);
 		// default dataspace
 		if ( ! Utils.isBlank(myConfig.namespace)) {
 			DEFAULT_DATASPACE = myConfig.namespace;

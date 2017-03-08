@@ -20,6 +20,8 @@ import com.winterwell.utils.time.TUnit;
  */
 public class StatConfig extends DBOptions {
 
+	public int maxDataPoints = 10000;
+
 	/**
 	 * Bucket size. Also the gap between saves.
 	 */

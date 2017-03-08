@@ -2,10 +2,13 @@ package com.winterwell.datalog;
 
 import static junit.framework.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -14,16 +17,21 @@ import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 
-public class ESStorageTest extends DatalogTestCase {
+public class ESStorageTest {
 
-	{
-		initCSV();
+	@BeforeClass
+	public static void setup() {
+		StatConfig config = new StatConfig();
+		config.interval = new Dt(5, TUnit.SECOND);
+		config.storageClass = ESStorage.class;
+		DataLog.dflt = new DataLogImpl(config);
+		DataLog.setConfig(config);
 	}
-
 	
 	@Test
 	public void testSaveEvent() throws InterruptedException, ExecutionException {		
@@ -56,8 +64,59 @@ public class ESStorageTest extends DatalogTestCase {
 		assert total > 0;
 	}
 
+
 	
-//	@Test
+	@Test
+	public void testTest() {
+		DataLog.test();
+	}
+	
+	@Test
+	public void testGetTotal() throws IOException {
+		Time s = new Time();
+		String salt = Utils.getRandomString(4);
+		for(int i=0; i<10; i++) {
+			Utils.sleep(300);
+			DataLog.count(1, "testTotal"+salt);
+		}
+		IDataLogReq<Double> total = DataLog.getTotal(s, new Time(), "testTotal"+salt);
+		Double v = total.get();
+		assert v == 10 : v;
+	}
+	
+	/**
+	 * This is meaningful for the CSV-backed Stat
+	 * where a Cache is used for batch operations 
+	 * and we have Cache_hit and Cache_miss statistics.
+	 * @throws IOException
+	 */
+	@Test
+	public void testGet() throws IOException {
+//		assert Stat.saveThread != null;
+		Time start = new Time();
+		Utils.sleep(1000); // wait for it to start saving
+		String salt = Utils.getRandomString(4);
+		for(int i=0; i<10; i++) {
+			DataLog.count(1, "test", salt);
+			Utils.sleep(300);
+		}
+		Time end = new Time();
+		// flush the data
+		DataLog.flush();
+
+		for(int i=0; i<5; i++) {
+			String[] tagBits = {"test", salt};
+			Future<Double> ttl1 = DataLog.getTotal(null, null, tagBits);
+			Rate h = DataLog.get("Cache_hit", "Stat");
+			Rate m = DataLog.get("Cache_miss", "Stat");
+			System.out.println(ttl1+"\thits:"+h+"\tmisses:"+DataLog.get("Cache_miss", "Stat"));
+			Utils.sleep(i*10);
+		}
+	}
+
+	
+	
+	@Test
 	public void testIO() {
 		Time start = new Time();
 		Time end = start.plus(10, TUnit.SECOND);

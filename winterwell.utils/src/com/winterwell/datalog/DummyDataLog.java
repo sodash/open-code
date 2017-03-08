@@ -174,7 +174,7 @@ class DummyDataLog implements IDataLog {
 
 
 	@Override
-	public Object getConfig() {
+	public StatConfig getConfig() {
 		return null;
 	}
 
