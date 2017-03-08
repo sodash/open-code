@@ -177,5 +177,7 @@ public interface IDataLog extends Closeable, Flushable {
 
 	IDataLogAdmin getAdmin();
 
+	Object getStorage();
+
 	
 }

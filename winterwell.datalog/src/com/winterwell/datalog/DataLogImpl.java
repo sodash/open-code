@@ -235,6 +235,11 @@ public class DataLogImpl implements Closeable, IDataLog {
 		// init
 		init();
 	}
+	
+	@Override
+	public IDataLogStorage getStorage() {
+		return storage;
+	}
 
 	private void init() {
 		if (init) return;

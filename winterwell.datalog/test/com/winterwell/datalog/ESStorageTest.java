@@ -14,6 +14,7 @@ import org.junit.Test;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
+import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -31,6 +32,18 @@ public class ESStorageTest {
 		config.storageClass = ESStorage.class;
 		DataLog.dflt = new DataLogImpl(config);
 		DataLog.setConfig(config);
+	}
+	
+	
+	@Test
+	public void testGetData() throws InterruptedException, ExecutionException {		
+		ESStorage storage = (ESStorage) DataLog.getImplementation().getStorage();
+		
+		StatReq<Double> total = storage.getTotal("mem_used", new Time().minus(TUnit.DAY), new Time());
+		assert total.get() != null;
+		
+		StatReq<IDataStream> data = storage.getData("mem_used", new Time().minus(TUnit.DAY), new Time(), null, null);
+		assert ! data.get().isEmpty();
 	}
 	
 	@Test
