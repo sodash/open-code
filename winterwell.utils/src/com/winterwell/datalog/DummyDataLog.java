@@ -199,6 +199,11 @@ class DummyDataLog implements IDataLog {
 		return new DummyDataLogAdmin();
 	}
 
+	@Override
+	public Object getStorage() {
+		return null;
+	}
+
 }
 
 class DummyDataLogAdmin implements IDataLogAdmin {
