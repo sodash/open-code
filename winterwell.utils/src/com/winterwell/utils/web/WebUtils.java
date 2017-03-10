@@ -374,11 +374,12 @@ public class WebUtils {
 			Pattern p = (Pattern) f.get(null);
 			return p;
 		} catch(Throwable ex) {
+			assert true; // in case you want to breakpoint
 			// oh well
 		}
 		// Fallback to a simpler one (which will catch most cases)
 		Pattern p = Pattern.compile(
-			URL_REGEX.pattern()+"|[a-z0-9_\\-\\.]+\\.(com|gov|org|net|edu|mobi|uk|fr|de|in|us)"); // TODO use some of the Twitter Regex list
+			URL_REGEX.pattern()+"|[a-z0-9_\\-\\.]+\\.(\\w{2,24})");
 		return p;
 	}
 
@@ -394,11 +395,23 @@ public class WebUtils {
 		Matcher m = URL_REGEX.matcher(url);
 		if ( ! m.find()) {
 			// is it a domain already?
-			if (URL_WEB_DOMAIN_REGEX.matcher(url).matches()) return url;
+			if (URL_WEB_DOMAIN_REGEX.matcher(url).matches()) {
+				// chop
+				return getDomain2_chop(url);
+			}
 			return null;
 		}
 		String domain = m.group(1);
 		// Chop the front off to give the domain (hopefully)
+		return getDomain2_chop(domain);
+	}
+	
+	/**
+	 * Chop the front off to give the domain (hopefully)
+	 * @param domain
+	 * @return
+	 */
+	private static String getDomain2_chop(String domain) {
 		int i = domain.lastIndexOf('.');
 		if (i==-1) return domain;
 		i = domain.lastIndexOf('.', i-1);
@@ -409,8 +422,9 @@ public class WebUtils {
 			if (i==-1) return domain;
 		}
 		return domain.substring(i+1);
+
 	}
-	
+
 	/**
 	 * Convert a link as found in social media (e.g. full links or fragments) into definitely a full link
 	 * @param urlOrDomain e.g. google.com or https://fo.bar/yeah?whatever

@@ -35,6 +35,14 @@ import junit.framework.TestCase;
  */
 public class WebUtilsTest extends TestCase {
 
+
+	public void testGetHost() {
+		String u1 = "https://lookup.london/philpot-lane-mice-londons-tiniest-sculpture/";
+		String u3 = WebUtils.getHost(u1);
+		System.out.println(u3);
+	}
+	
+	
 	public void testResolveUrl_issue4180() {
 		String u1 = "http://www.bestofyoutube.com/story.php?title=screaming-frog";
 		String u2 = "/video.php?id=2366";
@@ -518,6 +526,18 @@ public class WebUtilsTest extends TestCase {
 		{
 			String d = WebUtils.getDomain("http://www.runnersworld.co.uk/gear/gear-pick-merrell-barefoot-road-glove-dash-2/9500.html");
 			assert d.equals("runnersworld.co.uk") : d;
+		}
+		{
+			String d = WebUtils.getDomain("www.foobar.com");
+			assert d.equals("foobar.com") : d;
+		}
+		{
+			String d = WebUtils.getDomain("https://lookup.london/philpot-lane-mice-londons-tiniest-sculpture/");
+			assert d.equals("lookup.london") : d;
+		}
+		{
+			String d = WebUtils.getDomain("lookup.london");
+			assert d.equals("lookup.london") : d;
 		}
 	}
 	
