@@ -80,7 +80,7 @@ public class SQLStorage implements IDataLogStorage {
 		// ready?		
 		if (SqlUtils.options == null && config.dbUrl==null) {
 			// Not setup yet
-			Log.w("SQLStorage", "Stat cannot access the DB yet.");
+			Log.w(DataLog.LOGTAG, "SQLStorage: Stat cannot access the DB yet.");
 			return;
 		}		
 		if (config.dbUrl!=null) {
@@ -112,7 +112,7 @@ public class SQLStorage implements IDataLogStorage {
 			try {
 				boolean out = SqlUtils.executeCommand("drop INDEX stats_timestamp_idx"+i+";", null, false);
 			} catch(Exception ex) {
-				Log.d("init.stat.cleanup", ex); // hopefully all done
+				Log.d(DataLog.LOGTAG, "init.stat.cleanup "+ex); // hopefully all done
 				break;
 			}
 		}

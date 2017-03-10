@@ -174,7 +174,7 @@ public class StatReqCSV<X> extends StatReq<X> {
 		if (shortEnd.isAfter(bucket.first)) {
 			shortEnd = bucket.first;
 			if (s.isAfter(shortEnd)) {
-				Log.w("stat.wtf", shortEnd+"? ["+s+" - "+batchGet.end+"]");
+				Log.w(DataLog.LOGTAG, "wtf? "+shortEnd+"? ["+s+" - "+batchGet.end+"]");
 				s = shortEnd;
 			}
 		}

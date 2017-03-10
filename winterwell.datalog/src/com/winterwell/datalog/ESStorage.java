@@ -172,7 +172,7 @@ public class ESStorage implements IDataLogStorage {
 			IESResponse res = pm.get();
 			res.check();
 		} catch(Throwable ex) {
-			Log.e("datalog.init", ex);
+			Log.e(DataLog.LOGTAG, ex);
 			// swallow and carry on -- an out of date schema may not be a serious issue
 		}
 	}
@@ -215,7 +215,7 @@ public class ESStorage implements IDataLogStorage {
 				response.check();
 //				Log.d("datalog.es", "...saveEvent done :) event: "+event);
 			} catch(Throwable ex) {
-				Log.d("datalog.es", "...saveEvent FAIL :( "+ex+" from event: "+event);
+				Log.d(DataLog.LOGTAG, "...saveEvent FAIL :( "+ex+" from event: "+event);
 			}
 		}, MoreExecutors.directExecutor());
 		return f;

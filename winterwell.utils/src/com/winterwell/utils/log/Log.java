@@ -106,7 +106,7 @@ public class Log {
 
 		// config
 		try {
-			LogConfig config = ArgsParser.getConfig(new LogConfig(), new File("config/log.properties"));
+			config = ArgsParser.getConfig(new LogConfig(), new File("config/log.properties"));
 			if (config.ignoretags!=null) {
 				for(String tag : config.ignoretags) {
 					setMinLevel(tag, OFF);
@@ -121,6 +121,12 @@ public class Log {
 			// How can we report this bad config issue? Only to std-error :(
 			System.err.println(ex);
 		}
+	}
+	
+	static LogConfig config;
+	
+	public static void setConfig(LogConfig config) {
+		Log.config = config;
 	}
 
 	/**
