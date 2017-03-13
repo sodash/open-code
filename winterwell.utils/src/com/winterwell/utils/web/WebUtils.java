@@ -362,9 +362,12 @@ public class WebUtils {
 	}
 
 	/**
-	 * Match either a url or a domain (e.g. "sodash.com")
+	 * Match either a url or a domain (e.g. "sodash.com").
+	 * @see #getDomain(String)
 	 */
 	public static final Pattern URL_WEB_DOMAIN_REGEX = URL_WEB_DOMAIN_REGEX();
+
+	private static final Pattern URL_WEB_DOMAIN_REGEX_FALLBACK = Pattern.compile(URL_REGEX.pattern()+"|[a-z0-9_\\-\\.]+\\.(\\w{2,24})");
 	
 	private static Pattern URL_WEB_DOMAIN_REGEX() {
 		// Use the Twitter-provided one if we can
@@ -378,9 +381,7 @@ public class WebUtils {
 			// oh well
 		}
 		// Fallback to a simpler one (which will catch most cases)
-		Pattern p = Pattern.compile(
-			URL_REGEX.pattern()+"|[a-z0-9_\\-\\.]+\\.(\\w{2,24})");
-		return p;
+		return URL_WEB_DOMAIN_REGEX_FALLBACK;
 	}
 
 	/**
@@ -393,17 +394,23 @@ public class WebUtils {
 		if (url==null) return null;
 		url = url.trim();
 		Matcher m = URL_REGEX.matcher(url);
-		if ( ! m.find()) {
-			// is it a domain already?
-			if (URL_WEB_DOMAIN_REGEX.matcher(url).matches()) {
-				// chop
-				return getDomain2_chop(url);
-			}
-			return null;
+		if (m.find()) {
+			String domain = m.group(1);
+			// Chop the front off to give the domain (hopefully)
+			return getDomain2_chop(domain);	
 		}
-		String domain = m.group(1);
-		// Chop the front off to give the domain (hopefully)
-		return getDomain2_chop(domain);
+		// is it a domain already?
+		if (URL_WEB_DOMAIN_REGEX.matcher(url).matches()) {
+			// chop
+			return getDomain2_chop(url);
+		}
+		// try the lenient regex
+		if (URL_WEB_DOMAIN_REGEX != URL_WEB_DOMAIN_REGEX_FALLBACK && URL_WEB_DOMAIN_REGEX_FALLBACK.matcher(url).matches()) {
+			// chop
+			return getDomain2_chop(url);
+		}
+		// not a domain
+		return null;		
 	}
 	
 	/**

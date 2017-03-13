@@ -17,6 +17,7 @@ import com.winterwell.utils.io.ISerialize;
  * {@link #push(Key, Object)} and {@link #pop(Key)}.
  * <p>
  * This is NOT linked to the OS's environment! For that, use {@link System#getProperty(String)} 
+ * @see Dep ??Should we merge this with Dep??
  * @author daniel
  */
 public final class Environment implements IProperties {
@@ -108,15 +109,15 @@ public final class Environment implements IProperties {
 
 	public <X> void push(Key<X> key, X value) {
 		assert key != null && value != null;
-		Map<Key, Object> properties = localVars.get();
+		Map<Key, Object> localProperties = localVars.get();
 		// set top value
 		put(key, value);
 		// adjust stack
 		Key<Stack<X>> stackKey = new StackKey(key);
-		Stack<X> stack = (Stack<X>) properties.get(stackKey);
+		Stack<X> stack = (Stack<X>) localProperties.get(stackKey);
 		if (stack == null) {
 			stack = new Stack<X>();
-			properties.put(stackKey, stack);
+			localProperties.put(stackKey, stack);
 		}
 		stack.push(value);
 	}

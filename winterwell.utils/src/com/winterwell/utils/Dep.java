@@ -10,6 +10,8 @@ import com.winterwell.utils.log.Log;
  * Dependency: Store common dependencies, like settings, database access objects, etc.
  * Stuff you might otherwise put in a static field somewhere.
  * A simple form of dependency injection - without forcing your code into a framework.
+ * 
+ * @see Environment ?? Should we merge these two classes?
  * @author daniel
  * @testedby DepTest
  */
