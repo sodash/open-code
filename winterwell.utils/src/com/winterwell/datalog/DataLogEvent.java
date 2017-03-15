@@ -28,7 +28,16 @@ public final class DataLogEvent implements Serializable, IHasJson {
 
 	public static final String EVENTTYPE = "eventType";
 
-	public static final List<String> COMMON_PROPS = Arrays.asList("tag","ip","user","url");
+	/**
+	 * these get special treatment - as direct properties not key/value props
+	 */
+	public static final List<String> COMMON_PROPS = Arrays.asList(
+			// tracking
+			"ip","user","url",
+			// common event-defining properties
+			"tag", "action", "verb", "as",
+			// a few XId properties
+			"xid", "oxid", "txid", "uxid", "su");
 	
 	public final double count;
 	public final String eventType;
