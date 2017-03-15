@@ -27,11 +27,15 @@ public interface IHasDesc {
 
 	/**
 	 * @return the sub-modules (those parts which implement @ModularXML), or
-	 *         null. This should not recursively collect the sub-sub-modules;
+	 *         null (the default). 
+	 *         This should not recursively collect the sub-sub-modules;
 	 *         the Depot will do that. It is VITAL that this includes all fields
 	 *         which implement @ModularXML, otherwise these parts will not get
 	 *         saved.
+	 * @see @ModularXML
 	 */
-	IHasDesc[] getModules();
+	default IHasDesc[] getModules() {
+		return null;
+	}
 
 }
