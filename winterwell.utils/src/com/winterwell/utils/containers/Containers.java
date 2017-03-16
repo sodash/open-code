@@ -190,6 +190,10 @@ public class Containers  {
 	/**
 	 * Produces a new List of values by mapping each value in list through a
 	 * transformation function.
+	 * <p>
+	 * This is equivalent to <code>list.stream().map(fn).collect(Collectors.toList())</code> 
+	 * -- but less typing, easier to debug, and faster!
+	 * 
 	 * @param list
 	 * @param fn
 	 * 
