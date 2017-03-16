@@ -27,6 +27,21 @@ public final class Environment implements IProperties {
 	private final static Environment dflt = new Environment();
 
 	/**
+	 * Convenience for class-based keys
+	 * @param class1 
+	 * @return object or null
+	 */
+	public <X> X get(Class<X> klass) {		
+		return (X) get(new Key(klass.getName()));
+	}
+	
+	public <X> X put(Class<X> klass, X value) {
+		// NB we don't use value.getClass() in case of sub-classing then breaking the get().
+		return (X) put(new Key(klass.getName()), value);
+	}
+	
+	
+	/**
 	 * @return never null
 	 */
 	public static Environment get() {
