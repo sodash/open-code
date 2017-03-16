@@ -3,8 +3,10 @@ package com.winterwell.datalog;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,15 +31,20 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	public static final String EVENTTYPE = "eventType";
 
 	/**
-	 * these get special treatment - as direct properties not key/value props
+	 * these get special treatment - as direct properties not key/value props.
+	 * Which means nicer json + they can have a type in ES.
 	 */
-	public static final List<String> COMMON_PROPS = Arrays.asList(
+	public static final Collection<String> COMMON_PROPS = new HashSet(Arrays.asList(
 			// tracking
-			"ip","user","url",
+			"ip","user","url", "domain",
 			// common event-defining properties
 			"tag", "action", "verb", "as",
 			// a few XId properties
-			"xid", "oxid", "txid", "uxid", "su");
+			"id", "xid", "oxid", "txid", "uxid", "su",
+			// a few scoring/results properties
+			"start", "end", "dt", "note", "notes", "score", "x", "y", "z",
+			"lat", "lng"
+			));
 	
 	public final double count;
 	public final String eventType;
@@ -53,7 +60,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	public final String id;
 	
 	/**
-	 * Does NOT include time-period or dataspace. This is added by the DataLog based on how
+	 * Does NOT include time-period. This is added by the DataLog based on how
 	 * it buckets stuff.
 	 */
 	public String getId() {
