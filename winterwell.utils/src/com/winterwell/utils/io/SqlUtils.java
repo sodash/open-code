@@ -314,7 +314,7 @@ public class SqlUtils {
 	 */
 	public static Iterable<Object[]> asIterable(final ResultSet rs,
 			final Runnable closeFn) {
-		return new Iterable<Object[]>() {
+		return new Iterable<Object[]>() {			
 			boolean fresh = true;
 
 			@Override

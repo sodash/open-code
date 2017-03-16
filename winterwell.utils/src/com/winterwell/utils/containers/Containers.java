@@ -199,15 +199,15 @@ public class Containers  {
 	 * 
 	 * @return [fn applied to each member of list]
 	 */
-	public static <I, O> List<O> apply(Collection<? extends I> list, IFn<I, O> fn) {
-		ArrayList after = new ArrayList(list.size());
-		for (I object : list) {
-			try {
+	public static <I, O> List<O> apply(Iterable<? extends I> list, IFn<I, O> fn) {
+		ArrayList after = list instanceof Collection? new ArrayList(((Collection) list).size()) : new ArrayList();
+		try {
+			for (I object : list) {
 				O o = fn.apply(object);
-				after.add(o);
-			} catch(Exception ex) {
-				throw Utils.runtime(ex);
+				after.add(o);			
 			}
+		} catch(Exception ex) {
+			throw Utils.runtime(ex);
 		}
 		return after;
 	}
