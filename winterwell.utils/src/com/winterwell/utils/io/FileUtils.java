@@ -771,7 +771,7 @@ public class FileUtils {
 	 * period. Always lower case. Can be "", never null e.g. foo.tar.gz ->
 	 * ".tar.gz" foo/.bar/baz.tgz -> ".tgz" baz -> ""
 	 * <p>
-	 * This is identical to {@link #getType(File)} but with the "." included.
+	 * This is identical to {@link #getType(String)} but with the "." included.
 	 */
 	public static String getExtension(File f) {
 		String ftype = getType(f);
@@ -779,7 +779,7 @@ public class FileUtils {
 	}
 
 	/**
-	 * Convenience wrapper for {@link #getExtension(File)}
+	 * This is identical to {@link #getType(String)} but with the "." included. 
 	 */
 	public static String getExtension(String filename) {
 		String ftype = getType(filename);
