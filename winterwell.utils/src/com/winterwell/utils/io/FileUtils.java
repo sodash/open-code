@@ -767,9 +767,9 @@ public class FileUtils {
 	}
 
 	/**
+	 * @deprecated Generally prefer {@link #getType(File)}.
 	 * Return the full extension of the given file. This includes the leading
-	 * period. Always lower case. Can be "", never null e.g. foo.tar.gz ->
-	 * ".tar.gz" foo/.bar/baz.tgz -> ".tgz" baz -> ""
+	 * period. Always lower case. Can be "", never null.
 	 * <p>
 	 * This is identical to {@link #getType(String)} but with the "." included.
 	 */
@@ -779,6 +779,7 @@ public class FileUtils {
 	}
 
 	/**
+	 * @deprecated Generally prefer {@link #getType(File)}.
 	 * This is identical to {@link #getType(String)} but with the "." included. 
 	 */
 	public static String getExtension(String filename) {
@@ -890,10 +891,8 @@ public class FileUtils {
 	}
 
 	/**
-	 * Check that you don't want {@link #getExtension(File)}
-	 *
 	 * @param f
-	 * @return "txt", or "". Never null. Always lowercase
+	 * @return "txt", or "". Never null. Always lowercase. Does not include the "."
 	 */
 	public static String getType(File f) {
 		String fs = f.getName();
@@ -901,8 +900,6 @@ public class FileUtils {
 	}
 
 	/**
-	 * Check that you don't want {@link #getExtension(File)}
-	 *
 	 * @param filename
 	 * @return E.g. "txt" Maybe "", never null.
 	 */
