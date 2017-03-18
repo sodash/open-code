@@ -770,20 +770,20 @@ public class FileUtils {
 	 * Return the full extension of the given file. This includes the leading
 	 * period. Always lower case. Can be "", never null e.g. foo.tar.gz ->
 	 * ".tar.gz" foo/.bar/baz.tgz -> ".tgz" baz -> ""
+	 * <p>
+	 * This is identical to {@link #getType(File)} but with the "." included.
 	 */
 	public static String getExtension(File f) {
-		String filename = f.getName();
-		int i = filename.indexOf('.');
-		if (i == -1)
-			return "";
-		return filename.substring(i).toLowerCase();
+		String ftype = getType(f);
+		return ftype.length()==0? "" : "."+ftype;
 	}
 
 	/**
 	 * Convenience wrapper for {@link #getExtension(File)}
 	 */
 	public static String getExtension(String filename) {
-		return getExtension(new File(filename));
+		String ftype = getType(filename);
+		return ftype.length()==0? "" : "."+ftype;
 	}
 
 	/**
@@ -896,7 +896,7 @@ public class FileUtils {
 	 * @return "txt", or "". Never null. Always lowercase
 	 */
 	public static String getType(File f) {
-		String fs = f.toString();
+		String fs = f.getName();
 		return getType(fs);
 	}
 
@@ -908,6 +908,9 @@ public class FileUtils {
 	 */
 	public static String getType(String filename) {
 		int i = filename.lastIndexOf(".");
+		int slashi = Math.max(filename.lastIndexOf("/"), filename.lastIndexOf("\\"));
+		// e.g. foo.bar/wibble
+		if (i < slashi) return "";
 		if (i == -1 || i == filename.length() - 1)
 			return "";
 		return filename.substring(i + 1).toLowerCase();
