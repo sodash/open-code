@@ -38,7 +38,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			// tracking
 			"ip","user","url", "domain",
 			// common event-defining properties
-			"tag", "action", "verb", "as",
+			"tag", "action", "verb", "as", "turl", "href", "to", "src", "from", "place", "locn", "location",
 			// a few XId properties
 			"id", "xid", "oxid", "txid", "uxid", "su",
 			// a few scoring/results properties
