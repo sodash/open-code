@@ -240,17 +240,6 @@ public class FileUtilsTest extends TestCase {
 		}
 	}
 
-	public void testFind_hidden() {
-		// bug from PS builder
-		File winterwellCodeDir = new File(FileUtils.getWinterwellDir(), "code");
-		File puppetStringsDir = new File(winterwellCodeDir, "sodash");
-		File psTemplates = new File(puppetStringsDir, "templates");
-		List<File> files = FileUtils.find(psTemplates, FileUtils.TRUE_FILTER,
-				false);
-		for (File file : files) {
-			assert !file.getName().contains("svn") : file;
-		}
-	}
 
 	public void testGetBasenameCautious() {
 		{
@@ -269,11 +258,12 @@ public class FileUtilsTest extends TestCase {
 
 	public void testGetExtension() {
 		assertEquals("", FileUtils.getExtension("baz"));
-		assertEquals(".", FileUtils.getExtension("bar."));
 		assertEquals(".tar", FileUtils.getExtension("foo.tar"));
-		assertEquals(".tar.gz", FileUtils.getExtension("foo.tar.gz"));
-		assertEquals(".tar.gz", FileUtils.getExtension("/foo/.bar/baz.tar.gz"));
-		assertEquals(".tar.gz", FileUtils.getExtension("FOO.TAR.GZ"));
+		assertEquals(".gz", FileUtils.getExtension("foo.tar.gz"));
+		assertEquals(".gz", FileUtils.getExtension("/foo/.bar/baz.tar.gz"));
+		assertEquals(".gz", FileUtils.getExtension("FOO.TAR.GZ"));
+		// what should this return??
+//		assertEquals(".", FileUtils.getExtension("bar."));
 	}
 
 	public void testGetNewFile() throws IOException {
@@ -320,6 +310,12 @@ public class FileUtilsTest extends TestCase {
 		assert t.equals("txt");
 		t = FileUtils.getType(new File("whatever.stuff/dummy.old.txt"));
 		assert t.equals("txt");
+		t = FileUtils.getType(new File("whatever.stuff/dummy"));
+		assert t.equals("");
+		t = FileUtils.getType(new File("C:\\whatever.stuff\\dummy"));
+		assert t.equals("");
+		t = FileUtils.getType(new File("C:\\whatever.stuff\\txt.pdf"));
+		assert t.equals("pdf");
 	}
 
 	public void testIsSymLink() throws IOException {
