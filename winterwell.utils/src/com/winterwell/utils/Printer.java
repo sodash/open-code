@@ -2,6 +2,7 @@ package com.winterwell.utils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -449,6 +450,10 @@ public class Printer {
 		// Don't generally unwrap, but do unwrap our own wrapper
 		if (x instanceof WrappedException) {
 			x = x.getCause();
+		}
+		// SQLException is a horrible class which hides the actual cause
+		if (x instanceof SQLException) {
+			x = Utils.getRootCause(x);
 		}
 		if ( ! stacktrace)
 			return x.getMessage() == null ? x.getClass().getSimpleName() : x
