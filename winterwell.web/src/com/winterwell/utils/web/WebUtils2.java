@@ -124,6 +124,18 @@ public class WebUtils2 extends WebUtils {
 				break;
 			}
 		}
+		// also Digital Analytix as used by the BBC
+		// see http://www.about-digitalanalytics.com/comscore-digital-analytix-url-campaign-generator
+		Pattern NS_PARAMETERS = Pattern.compile("([&?])ns_(source|mchannel|linkname|campaign|fee)=.*?(&|$)");
+		while (true) {
+			Matcher m = NS_PARAMETERS.matcher(path);
+			int len = path.length();
+			path = m.replaceFirst("$1");
+			if (path.length() == len) {
+				break;
+			}
+		}
+		// clean up the url end
 		if (path.endsWith("&")) {
 			path = path.substring(0, path.length() - 1);
 		}
