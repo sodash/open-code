@@ -22,7 +22,7 @@ import com.winterwell.utils.Utils;
  */
 public class OfficeHours implements IShift {
 
-	private static final String ALWAYS_ON = "24/7";
+	public static final String ALWAYS_ON = "24/7";
 
 	List<IShift> shifts = new ArrayList();
 	
