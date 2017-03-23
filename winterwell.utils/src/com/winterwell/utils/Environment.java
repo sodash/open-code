@@ -75,8 +75,8 @@ public final class Environment implements IProperties {
 	@Override
 	public <T> T get(Key<T> key) {
 		assert key != null;
-		Map<Key, Object> properties = localVars.get();
-		Object v = properties.get(key);
+		Map<Key, Object> _properties = localVars.get();
+		Object v = _properties.get(key);
 		if (v == null) {
 			v = defaultProperties.get(key);
 		}
@@ -86,9 +86,9 @@ public final class Environment implements IProperties {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Key> getKeys() {
-		Map<Key, Object> properties = localVars.get();
+		Map<Key, Object> _properties = localVars.get();
 		HashSet<Key> keys = new HashSet<Key>();
-		keys.addAll(properties.keySet());
+		keys.addAll(_properties.keySet());
 		keys.addAll(defaultProperties.keySet());
 		// TODO remove stack keys
 		return keys;
@@ -110,10 +110,10 @@ public final class Environment implements IProperties {
 	 */
 	public <X> X pop(Key<X> key) {
 		assert key != null;
-		Map<Key, Object> properties = localVars.get();
+		Map<Key, Object> _properties = localVars.get();
 		// adjust stack
 		Key<Stack<X>> stackKey = new StackKey(key);
-		Stack<X> stack = (Stack<X>) properties.get(stackKey);
+		Stack<X> stack = (Stack<X>) _properties.get(stackKey);
 		assert stack != null;
 		X oldValue = stack.pop();
 		X newValue = stack.peek();
@@ -141,11 +141,11 @@ public final class Environment implements IProperties {
 	@Override
 	public <T> T put(Key<T> key, T value) {
 		assert key != null;
-		Map<Key, Object> properties = localVars.get();
+		Map<Key, Object> _properties = localVars.get();
 		if (value == null)
-			return (T) properties.remove(key);
+			return (T) _properties.remove(key);
 		else
-			return (T) properties.put(key, value);
+			return (T) _properties.put(key, value);
 	}
 
 	/**
@@ -188,13 +188,13 @@ public final class Environment implements IProperties {
 	/**
 	 * Keep a global static property store.
 	 * @param field
-	 * @param dflt
+	 * @param dfltValue
 	 * @return value or null
 	 */
-	public static <T> T getProperty(Key<T> field, T dflt) throws RuntimeException {
+	public static <T> T getProperty(Key<T> field, T dfltValue) throws RuntimeException {
 		String name = field.getName();
 		String prop = properties.getProperty(name);
-		if (prop==null) return dflt;
+		if (prop==null) return dfltValue;
 		if (field instanceof ISerialize) {
 			try {
 				return ((ISerialize<T>) field).fromString(prop);

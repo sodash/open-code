@@ -110,12 +110,12 @@ public class TimeOfDay implements Serializable {
 	
 	/**
 	 * add 0 padding if needed, e.g. 6am and 5 minutes = 06:05
-	 * @param hr
+	 * @param hour
 	 * @return
 	 */
-	private String oh(int hr) {
-		if (hr>=10) return String.valueOf(hr);
-		return "0"+hr;
+	private String oh(int hour) {
+		if (hour>=10) return String.valueOf(hour);
+		return "0"+hour;
 	}
 
 	public Time advance(Time time) {

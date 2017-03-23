@@ -74,9 +74,9 @@ public final class XId implements Serializable, IHasJson {
 	public XId(String name, Object kind, String service, IDoCanonical plugin) {
 		name = plugin.canonical(name, kind);
 		this.name = name;
-		// null@twitter is a real user :( c.f. bug #14109 
-		assert notNullNameCheck(name,service) : name;
 		this.service = service;
+		// null@twitter is a real user :( c.f. bug #14109 
+		assert notNullNameCheck() : name;		
 		assert name != null;
 		assert ! service.contains("@") : service;
 	}
@@ -112,11 +112,11 @@ public final class XId implements Serializable, IHasJson {
 	 * {@link #XId(String, String)}.
 	 */
 	public XId(String name, String service, boolean checkName) {
-		assert notNullNameCheck(name,service) : name+"@"+service;
-		assert ! checkName;
-		assert ! service.contains("@") : service;
 		this.service = service;
 		this.name = name;
+		assert notNullNameCheck() : name+"@"+service;
+		assert ! checkName;
+		assert ! service.contains("@") : service;
 		return;
 	}
 
@@ -145,7 +145,7 @@ public final class XId implements Serializable, IHasJson {
 		// HACK: canonicalise here for main service (helps with boot-strapping)
 		if (isMainService()) {
 			this.name = id.substring(0, i).toLowerCase();
-			assert notNullNameCheck(name,service) : id;
+			assert notNullNameCheck() : id;
 			return;
 		}
 		// a database object?
@@ -156,16 +156,16 @@ public final class XId implements Serializable, IHasJson {
 //				throw Utils.runtime(e);
 //			}
 			this.name = id.substring(0, i);
-			assert notNullNameCheck(name, service) : id;
+			assert notNullNameCheck() : id;
 			return;
 		}
 		
 		IDoCanonical plugin = service2canonical.get(service);
 		this.name = plugin.canonical(id.substring(0, i), kind);
-		assert notNullNameCheck(name, service) : id;
+		assert notNullNameCheck() : id;
 	}
 	
-	private boolean notNullNameCheck(String name, String service) {
+	private boolean notNullNameCheck() {
 		if (name.length()==0) return false;
 		if (name.equals("null") && ! "twitter".equals(service)) return false;
 		return true;
@@ -183,7 +183,7 @@ public final class XId implements Serializable, IHasJson {
 		assert i>0 : id;
 		this.service = id.substring(i+1);
 		this.name = id.substring(0, i);
-		assert notNullNameCheck(name,service) : id;
+		assert notNullNameCheck() : id;
 	}
 
 	public XId(String name, IDoCanonical plugin) {
@@ -276,8 +276,8 @@ public final class XId implements Serializable, IHasJson {
 	 * @param other
 	 * @return true if the services match
 	 */
-	public boolean isService(String service) {
-		return this.service.equals(service);
+	public boolean isService(String _service) {
+		return this.service.equals(_service);
 	}
 
 

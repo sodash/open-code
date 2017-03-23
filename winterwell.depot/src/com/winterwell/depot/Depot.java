@@ -345,8 +345,8 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		}
 	}
 
-	public boolean contains(Desc config) {
-		return base.contains(config);
+	public boolean contains(Desc itemDesc) {
+		return base.contains(itemDesc);
 	}
 
 	/**
