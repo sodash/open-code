@@ -395,7 +395,8 @@ public class MathUtils {
 	/**
 	 * 
 	 * @param values
-	 *            Must not be zero-length or null
+	 *            Must not be zero-length or null. Cannot contain nulls (because: double), but see
+	 *            {@link #max(Collection)} which can.
 	 * @return max of values
 	 */
 	public static double max(double... values) {
