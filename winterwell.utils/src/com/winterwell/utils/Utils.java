@@ -492,8 +492,8 @@ public class Utils {
 	}
 
 	/**
-	 * A fairly lenient boolean parser. Accepts booleans, the Strings true, on,
-	 * 1 as true, and false, off, 0 as false.
+	 * A fairly lenient boolean parser. Accepts booleans, the Strings true, on, yes,
+	 * 1 as true, and false, off, no, 0 as false.
 	 * 
 	 * Convenience for {@link #yes(Object, boolean)} with strict=true
 	 * 
@@ -566,7 +566,8 @@ public class Utils {
 			return Boolean.TRUE;
 		// "off" shouldn't happen, but just in case
 		if (s.isEmpty() || s.equals("false") || s.equals("off")
-				|| s.equals("0") || s.equals("null") || s.equals("undefined")|| s.equals("no"))
+				|| s.equals("0") || s.equals("null") || s.equals("undefined")
+				|| s.equals("no"))
 			return Boolean.FALSE;
 		if (strict)
 			throw new IllegalArgumentException("Invalid boolean value: " + s);
