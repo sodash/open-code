@@ -1028,7 +1028,7 @@ public class Containers  {
 				if (comp == 0) {
 					int kc = Containers.compare(k1, k2);
 					if (kc == 0) {
-						Log.e("sort", new IllegalStateException("Cant sort equals keys "+k1+"="+k2+" & values "+v1+"="+v2+"in "+map+"?!"));
+						Log.e("sort", "Error: Cant sort equals keys "+k1+"="+k2+" & values "+v1+"="+v2+"in "+map+"?!");
 						return 0;						
 					}
 					return kc;
