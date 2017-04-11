@@ -25,6 +25,11 @@ import com.winterwell.datalog.DataLogImpl;
 import com.winterwell.es.ESUtils;
 import com.winterwell.es.client.ESConfig;
 
+/**
+ * Runs this for a standalone DataLog micro-service server.
+ * @author daniel
+ *
+ */
 public class DataLogServer {
 
 	private static JettyLauncher jl;
