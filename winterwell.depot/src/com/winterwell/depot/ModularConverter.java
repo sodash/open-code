@@ -36,6 +36,8 @@ import com.winterwell.utils.web.XStreamUtils;
  * <p>
  * To use this, mark your class with @ModularXML
  * 
+ * {@link XStreamUtils#setupXStream()} will try to set this up within its XStream.
+ * 
  * @author daniel
  * @testedby {@link ModularConverterTest}
  */
