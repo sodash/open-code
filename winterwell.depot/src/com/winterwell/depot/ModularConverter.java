@@ -70,8 +70,8 @@ public class ModularConverter implements Converter {
 			if (ms==null) return Collections.EMPTY_LIST;
 			// correct usage check
 			for (IHasDesc m : ms) {
-				if ( ! m.getClass().isAnnotationPresent(ModularXML.class)) {
-					throw new IllegalStateException("in "+artifact.getClass()+" "+m.getClass()+" is not a module");
+				if ( ! (m instanceof ModularXML)) { //.getClass().isAnnotationPresent(ModularXML.class)) {
+					throw new IllegalStateException("in "+artifact.getClass()+" "+m.getClass()+" is not a module. Implement ModularXML?");
 				}
 			}
 			return Arrays.asList(ms); 
@@ -107,7 +107,7 @@ public class ModularConverter implements Converter {
 					if (v==null) continue;
 					if (seen.contains(v)) continue;
 					seen.add(v);
-					if (v.getClass().isAnnotationPresent(ModularXML.class)) {
+					if (v instanceof ModularXML) { //.getClass().isAnnotationPresent(ModularXML.class)) {
 						found.add((IHasDesc) v);
 						// don't recurse into modules -- assume they'll be examined as part of their own Depot.put
 					} else {

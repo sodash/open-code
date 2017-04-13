@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
-import com.winterwell.depot.ModularConverter.ModularXML;
+import com.winterwell.depot.ModularXML;
 import com.winterwell.utils.web.XStreamUtils;
 
 /**
@@ -83,8 +83,8 @@ public class ModularConverterTest {
 		assert obj2.sub == null;
 	}
 
-	@ModularXML
-	class MyTopLevel implements IHasDesc {
+//	@ModularXML
+	class MyTopLevel implements IHasDesc, com.winterwell.depot.ModularXML {
 
 		public IHasDesc[] getModules() { return new IHasDesc[]{sub}; }
 
@@ -105,8 +105,8 @@ public class ModularConverterTest {
 		MySubLevel sub;
 	}
 
-	@ModularXML
-	class MySubLevel implements IHasDesc {
+//	@ModularXML
+	class MySubLevel implements IHasDesc, com.winterwell.depot.ModularXML {
 		
 		String subVal;
 		
