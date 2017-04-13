@@ -1,0 +1,16 @@
+# Phrases whose meaning cannot be determined from their parts
+# (also includes used as a hack for now to improve certain key phrases)
+shit hot
+the dog's bollocks
+the dogs bollocks
+oh really
+yeah yeah
+!?
+?!
+??
+?
+!!!!!
+!!!!
+!!!
+!!
+!

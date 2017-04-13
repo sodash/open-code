@@ -1,0 +1,45 @@
+# ShortForm CanonicalForm, e.g. Bob	Robert
+# Use ShortNameDictionaryTest to put this in it's rightful Depot place
+# Alphabetical ordering by long-form Case does not matter
+
+Cat	Catherine
+Kat	Katherine
+Cathy	Catherine	
+
+Dan	Daniel
+Dani	Danielle
+
+Betty	Elizabeth
+Liz	Elizabeth
+Lizzie	Elizabeth
+
+Jim	James
+Jimmy	James
+Jimmie	James
+Jenny	Jennifer
+Jess	Jessica
+Johnnie	John
+Johnny	John
+Jon	Jonathan
+Jonny	Jonathan
+
+Mike	Michael
+
+Phil	Philip
+
+Becky	Rebecca
+Becca	Rebecca
+Bob	Robert
+Bobby	Robert
+
+Sam	Samantha
+Sam	Samuel
+Steve	Stephen
+Sue	Susan
+Suzy	Susan
+
+Tom	Thomas
+Tommy	Thomas
+
+Bill	William
+Billy	William

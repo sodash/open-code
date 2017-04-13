@@ -1,0 +1,2 @@
+# lowercase Twitter-specific stopwords, 1 per line
+rt
