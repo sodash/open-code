@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src='Swearing.js'></script>
+</head>
+<body>
+
+<script type="text/javascript">
+var words = ["hello world", "fuck you", "hello fucking world", "blah ** blah", "blah sh*t", "SH*T"];
+for(var i=0; i<words.length; i++) {
+	var txt = words[i];
+	document.write("<div>"+txt+": "+isSweary(txt)+"</div>\n");
+}
+</script>
+
+</body>
+</html>

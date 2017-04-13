@@ -1,0 +1,108 @@
+# Emoticons Dictionary adapted from Wikipedia list with a few additions
+:-)	happy
+:)	happy
+:o)	happy
+:D	happy
+:]	happy
+:3	happy
+:c)	happy
+:>	happy
+:>)	happy
+=]	happy
+8)	happy
+=)	happy
+C:	happy
+:-D	grin
+:D	grin
+8D	grin
+XD	grin
+=D	grin
+=3	grin
+<=3	penis
+<=8	penis
+8==D	penis
+(o)(o)	breasts
+:-(	sad
+:(	sad
+:c	sad
+:-c	sad
+:<	sad
+:-<	sad
+:[	sad
+D:	disgust
+D8	disgust
+D;	disgust
+D=	disgust
+DX	disgust
+:-9	licking lips
+;-)	wink
+;)	wink
+*)	wink
+;]	wink
+;D	wink
+:-P	cheeky
+:P	cheeky
+XP	cheeky
+:-p	cheeky
+:p	cheeky
+=p	cheeky
+:-Þ	cheeky
+:Þ	cheeky
+:-b	cheeky
+:b	cheeky
+:-O	surprised
+:-0	surprised
+:O	surprised
+:o	surprised
+:-o	surprised
+O_O	surprised
+:-/	unsure
+:/	unsure
+:\	unsure
+=/	unsure
+=\	unsure
+:S	unsure
+:|	no comment
+:-|	no comment
+d:-)	cap
+qB-)	cap
+:)~	drooling
+:-X	sealed lips
+:X	sealed lips
+:-x	sealed lips
+:x	sealed lips
+:-#	embarrassed
+:#	embarrassed
+O:-)	angel
+0:3	angel
+O:)	angel
+:'(	crying
+:')	crying
+;*(	crying
+;'(	crying
+T_T	crying
+T.T	crying
+:-*	kiss
+:*	kiss
+>:)	evil
+>;)	evil
+B)	shades
+B-)	shades
+8)	shades
+8-)	shades
+D:<	angry
+>:(	angry
+D-:<	angry
+>:-(	angry
+;(	angry
+;-(	angry
+`_´	angry
+D<	angry
+<3	love
+\o/	joy
+o/\o	high five
+:&	fail
+\,,/	rock on
+\m/	rock on
+:u	rock on
+@}-;-'---	rose
