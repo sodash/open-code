@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" output="bin.test.demo" path="test.demo"/>
+	<classpathentry kind="src" path="test.utils"/>
+	<classpathentry kind="src" output="bin.test" path="test"/>
+	<classpathentry kind="src" path="demo"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/middleware/mtj/arpack_combo-0.1.jar"/>
+	<classpathentry kind="lib" path="/middleware/mtj/netlib-java.jar"/>
+	<classpathentry exported="true" kind="lib" path="/middleware/mtj/mtj.jar" sourcepath="/middleware/mtj/src.zip"/>
+	<classpathentry kind="lib" path="/middleware/guava/guava.jar" sourcepath="/middleware/guava/src.zip"/>
+	<classpathentry kind="lib" path="/middleware/jakarta/commons-math3.jar" sourcepath="/home/daniel/winterwell/code/middleware/jakarta/commons-math3-3.6.1-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.web"/>
+	<classpathentry exported="true" kind="lib" path="/middleware/trove/trove-2.0.4.jar" sourcepath="/middleware/trove/trove-src-2.0.4.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

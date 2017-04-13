@@ -1,0 +1,70 @@
+
+http://math.stackexchange.com/questions/157172/product-of-two-multivariate-gaussians-distributions
+
+
+def _smooth_update(transition_matrix, filtered_state_mean,
+                   filtered_state_covariance, predicted_state_mean,
+                   predicted_state_covariance, next_smoothed_state_mean,
+                   next_smoothed_state_covariance):
+    r"""Correct a predicted state with a Kalman Smoother update
+
+    Calculates posterior distribution of the hidden state at time `t` given the
+    observations all observations via Kalman Smoothing.
+
+    Parameters
+    ----------
+    transition_matrix : [n_dim_state, n_dim_state] array
+        state transition matrix from time t to t+1
+    filtered_state_mean : [n_dim_state] array
+        mean of filtered state at time t given observations from
+        times [0...t]
+    filtered_state_covariance : [n_dim_state, n_dim_state] array
+        covariance of filtered state at time t given observations from
+        times [0...t]
+    predicted_state_mean : [n_dim_state] array
+        mean of filtered state at time t+1 given observations from
+        times [0...t]
+    predicted_state_covariance : [n_dim_state, n_dim_state] array
+        covariance of filtered state at time t+1 given observations from
+        times [0...t]
+    next_smoothed_state_mean : [n_dim_state] array
+        mean of smoothed state at time t+1 given observations from
+        times [0...n_timesteps-1]
+    next_smoothed_state_covariance : [n_dim_state, n_dim_state] array
+        covariance of smoothed state at time t+1 given observations from
+        times [0...n_timesteps-1]
+
+    Returns
+    -------
+    smoothed_state_mean : [n_dim_state] array
+        mean of smoothed state at time t given observations from times
+        [0...n_timesteps-1]
+    smoothed_state_covariance : [n_dim_state, n_dim_state] array
+        covariance of smoothed state at time t given observations from
+        times [0...n_timesteps-1]
+    kalman_smoothing_gain : [n_dim_state, n_dim_state] array
+        correction matrix for Kalman Smoothing at time t
+    """
+    kalman_smoothing_gain = (
+        np.dot(filtered_state_covariance,
+               np.dot(transition_matrix.T,
+                      linalg.pinv(predicted_state_covariance)))
+    )
+
+    smoothed_state_mean = (
+        filtered_state_mean
+        + np.dot(kalman_smoothing_gain,
+                 next_smoothed_state_mean - predicted_state_mean)
+    )
+    smoothed_state_covariance = (
+        filtered_state_covariance
+        + np.dot(kalman_smoothing_gain,
+                 np.dot(
+                    (next_smoothed_state_covariance
+                        - predicted_state_covariance),
+                    kalman_smoothing_gain.T
+                 ))
+    )
+
+    return (smoothed_state_mean, smoothed_state_covariance,
+            kalman_smoothing_gain)
