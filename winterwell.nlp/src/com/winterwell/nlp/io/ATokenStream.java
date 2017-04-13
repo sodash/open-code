@@ -11,7 +11,7 @@ import com.winterwell.utils.containers.AbstractIterator;
 
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasDesc;
-import com.winterwell.depot.ModularConverter.ModularXML;
+import com.winterwell.depot.ModularXML;
 
 /**
  * A stream of word/sentence tokens.
@@ -40,7 +40,7 @@ public abstract class ATokenStream implements ITokenStream {
 	@Override
 	public IHasDesc[] getModules() {	
 		if (base==null) return null;
-		if (base.getClass().isAnnotationPresent(ModularXML.class)) {
+		if (base instanceof ModularXML) {
 			return new IHasDesc[]{base};
 		}
 		return base.getModules();

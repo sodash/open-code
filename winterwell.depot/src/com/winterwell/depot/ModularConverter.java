@@ -175,10 +175,13 @@ public class ModularConverter implements Converter {
 	
 	@Override
 	public boolean canConvert(Class type) {
-		java.lang.annotation.Annotation a = type.getAnnotation(ModularXML.class);
-		if (a==null) return false;
+		if ( ! ReflectionUtils.isa(type, ModularXML.class)) {
+			return false;
+		}
+//		java.lang.annotation.Annotation a = type.getAnnotation(ModularXML.class);
+//		if (a==null) return false;
 		// Safety checks
-		assert ReflectionUtils.isa(type, IHasDesc.class) : type;
+//		assert ReflectionUtils.isa(type, IHasDesc.class) : type;
 		assert type.getAnnotation(BinaryXML.class) == null : type;		
 		return true;
 	}
