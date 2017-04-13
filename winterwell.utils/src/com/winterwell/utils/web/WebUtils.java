@@ -83,6 +83,138 @@ public class WebUtils {
 
 
 	
+	private static String _RENDER_WEBPAGE_JS;
+	
+	private static DocumentBuilderFactory docBuilderFactory;
+
+	private static String fqdn;
+
+	private static String hostname; // Cache for hostname
+
+	private static final String HTTP_PREFIX = "http://";
+
+	private static final String HTTPS_PREFIX = "https://";
+
+	public static final Pattern IP4_ADDRESS = Pattern
+			.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+
+	/**
+	 * [js, css]
+	 */
+	public static final String[] JQUERY_UI_URLS = new String[] {
+			"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js",
+			"http://soda.sh/static/style/jquery-ui-1.8.5.custom.css" // Bleurgh
+																		// - a
+																		// sodash
+																		// url
+	};
+
+	public static final String JQUERY_URL = "http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js";
+
+	public static final String MIME_TYPE_HTML = "text/html";
+
+	/**
+	 * HTML, utf-8 encoded
+	 */
+	// NB: charset is case-insensitive, c.f. http://stackoverflow.com/questions/10888929/should-html-meta-charset-be-lowercase-or-uppercase
+	public static final String MIME_TYPE_HTML_UTF8 = "text/html; charset=utf-8";
+
+	/**
+	 * application/javascript text/javascript is officially obsolete but still
+	 * the most widely used.
+	 */
+	public static final String MIME_TYPE_JAVASCRIPT = "application/javascript";
+
+	/**
+	 * Official mime-type for json: application/json.
+	 * <p>
+	 * But older IE ( < 9) needs plain/text instead. See bug #4537.
+	 * There is a hack for this in WebUtils2.sendJson()
+	 */
+	public static final String MIME_TYPE_JSON = "application/json";
+	public static final String MIME_TYPE_JSONP = "application/javascript";
+	
+	public static final String MIME_TYPE_MULTIPART_ALT = "multipart/alternative";
+	
+	public static final String MIME_TYPE_MULTIPART_MIXED = "multipart/mixed";
+	public static final String MIME_TYPE_RSS = "application/rss+xml";
+	/**
+	 * Apparently there is no official markdown MIME type :(
+	 */
+	public static final String MIME_TYPE_TXT_MARKDOWN = "text/x-web-markdown";
+
+	/**
+	 * Plain text, utf-8 encoded
+	 */
+	public static final String MIME_TYPE_TXT_UTF8 = "text/plain; charset=utf-8";
+
+	public static final String MIME_TYPE_XML = "application/xml";
+	
+	/**
+	 * Matches an xml comment - including some bad versions
+	 */
+	public static final Pattern pComment = Pattern.compile("<!-+.*?-+>",
+			Pattern.DOTALL);
+
+	/**
+	 * Matches a doctype element.
+	 */
+	public static final Pattern pDocType = Pattern.compile("<!DOCTYPE.*?>",
+			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+	/**
+	 * Matches href="whatever" and variants. Group 1 = the url.
+	 */
+	public static final Pattern pHref = Pattern.compile(
+			"href=['\"]?([^'\"> \r\n\t]+)['\"]?", Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * Used in strip tags to get rid of scripts and css style blocks altogether.
+	 */
+	public static final Pattern pScript = Pattern.compile(
+			"<(script)[^<>]*>.+?</(script)>",
+			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+	public static final Pattern pStyle = Pattern.compile(
+			"<(style)[^<>]*>.+?</(style)>",
+			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+	private static final String RELATIVE_PREFIX = "//";
+	static SAXParserFactory saxParserFactory = null;
+	/**
+	 * Matches an xml tag, e.g. &lt;a>, &lt;br/>, or &lt;/a>.
+	 */
+	public static final Pattern TAG_REGEX = Pattern.compile(
+			"<(/?[a-zA-Z][a-zA-Z0-9]*)[^>]*>", Pattern.DOTALL);
+
+	/**
+	 * Matches urls. Note: Excludes any trailing .	<br>
+	 * Group 1: the host/domain (including subdomain)	<br>
+	 * Urls must contain the http(s) or ftp protocol (compare with Twitter's regex which doesn't rrequire a protocol).
+	 * @testedy {@link WebUtilsTest#testUrlRegex()}
+	 * 
+	 * See #URL {@link winterwell.jtwitter.Regex#VALID_URL}, which is more flexible */
+	public static final Pattern URL_REGEX = Pattern
+			.compile("[hf]tt?ps?://([a-zA-Z0-9_\\-\\.]+)\\/?([a-zA-Z0-9_%\\-\\.,\\?&\\/=\\+'~#!\\*:]+[a-zA-Z0-9_%\\-&\\/=\\+])?");
+
+	private static final Pattern URL_WEB_DOMAIN_FALLBACK_REGEX = Pattern.compile(URL_REGEX.pattern()+"|[a-z0-9_\\-\\.]+\\.(\\w{2,24})");
+
+	/**
+	 * Match either a url or a domain (e.g. "sodash.com").
+	 * @see #getDomain(String)
+	 */
+	public static final Pattern URL_WEB_DOMAIN_REGEX = URL_WEB_DOMAIN_REGEX();
+
+	/**
+	 * Note: XPaths are not thread safe, so best to create new ones as needed
+	 */
+	public static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
+
+	
+	public static <X> String addQueryParameter(String url, Key<X> param, X value) {
+		return addQueryParameter(url, param.getName(), value);
+	}
+	
 	/**
 	 * Set a parameter in a GET request. This will add the parameter or replace
 	 * it's current value as necessary. I.e. if you add the same param twice,
@@ -101,10 +233,6 @@ public class WebUtils {
 		StringBuilder sb = new StringBuilder(url);
 		addQueryParameter(sb, param, value);
 		return sb.toString();
-	}
-	
-	public static <X> String addQueryParameter(String url, Key<X> param, X value) {
-		return addQueryParameter(url, param.getName(), value);
 	}
 
 	/**
@@ -139,67 +267,8 @@ public class WebUtils {
 		url.append(param);
 		url.append('=');
 		url.append(v);
-	}
-
-	/**
-	 * Remove a parameter setting. E.g. go from "http:mysite.com/foo?bar=1" to
-	 * "http:mysite.com/foo"
-	 *
-	 * @param path
-	 * @param params If they are not present, no problem, no edits are made.
-	 * @return path without params
-	 * @testedby {@link WebUtils2Test#testRemoveQueryParameter()}
-	 */
-	public static String removeQueryParameter(final String path, String... params) {
-		// Patterns	
-		String path2 = StrUtils.replace(path, Pattern.compile("("+StrUtils.join(params,"|")+")=[^#&]*(#|&|$)"), new IReplace() {			
-			@Override
-			public void appendReplacementTo(StringBuilder sb, Matcher match) {
-				if (match.start()==0) {
-					return; // wtf?
-				}
-				char s = path.charAt(match.start()-1);
-				if (s!='?' && s!='&') {
-					// not a valid match
-					sb.append(match.group());
-					return;
-				}
-				// final parameter?
-				if (match.end() >= path.length()) {
-					if (s=='?' || s=='&')
-						StrUtils.pop(sb, 1);
-					return;
-				}				
-				char e = path.charAt(match.end()-1);
-				if (e=='#') {
-					StrUtils.pop(sb, 1);
-					sb.append('#');
-					return; 
-				}
-			}
-		});
-		// Corner case: a blank path, which never gets edited by the replace
-		if (path2.endsWith("?")) {
-			return path2.substring(0, path2.length()-1);
-		}
-		return path2;
-	}
-
-	/**
-	 * @deprecated Use {@link #removeQueryParameter(String, String...)}
-	 * Is this just a convenience method? Looks slightly less efficient than
-	 * working with Strings.
-	 *
-	 * @param url
-	 * @param param
-	 */
-	public static void removeQueryParameter(StringBuilder url, String param) {
-		String urlString = url.toString();
-		urlString = removeQueryParameter(urlString, param);
-		url.delete(0, url.length());
-		url.append(urlString);
-	}
-
+	}	
+	
 	/**
 	 * Wrapper around {@link #addQueryParameters(String, Map)}
 	 * @param url
@@ -244,244 +313,7 @@ public class WebUtils {
 			}
 		}
 	}
-
-	private static DocumentBuilderFactory docBuilderFactory;
-
-	private static String hostname; // Cache for hostname
-
-	public static final Pattern IP4_ADDRESS = Pattern
-			.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
-
-	/**
-	 * [js, css]
-	 */
-	public static final String[] JQUERY_UI_URLS = new String[] {
-			"http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js",
-			"http://soda.sh/static/style/jquery-ui-1.8.5.custom.css" // Bleurgh
-																		// - a
-																		// sodash
-																		// url
-	};
-
-	public static final String JQUERY_URL = "http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js";
-
-	public static final String MIME_TYPE_HTML = "text/html";
-	/**
-	 * application/javascript text/javascript is officially obsolete but still
-	 * the most widely used.
-	 */
-	public static final String MIME_TYPE_JAVASCRIPT = "application/javascript";
 	
-	public static final String MIME_TYPE_JSONP = "application/javascript";
-	
-	/**
-	 * Official mime-type for json: application/json.
-	 * <p>
-	 * But older IE ( < 9) needs plain/text instead. See bug #4537.
-	 * There is a hack for this in WebUtils2.sendJson()
-	 */
-	public static final String MIME_TYPE_JSON = "application/json";
-	public static final String MIME_TYPE_MULTIPART_ALT = "multipart/alternative";
-	public static final String MIME_TYPE_MULTIPART_MIXED = "multipart/mixed";
-
-	public static final String MIME_TYPE_RSS = "application/rss+xml";
-
-	/**
-	 * Plain text, utf-8 encoded
-	 */
-	public static final String MIME_TYPE_TXT_UTF8 = "text/plain; charset=utf-8";
-	
-	/**
-	 * HTML, utf-8 encoded
-	 */
-	// NB: charset is case-insensitive, c.f. http://stackoverflow.com/questions/10888929/should-html-meta-charset-be-lowercase-or-uppercase
-	public static final String MIME_TYPE_HTML_UTF8 = "text/html; charset=utf-8";
-
-	/**
-	 * Apparently there is no official markdown MIME type :(
-	 */
-	public static final String MIME_TYPE_TXT_MARKDOWN = "text/x-web-markdown";
-
-	public static final String MIME_TYPE_XML = "application/xml";
-
-	/**
-	 * Matches an xml comment - including some bad versions
-	 */
-	public static final Pattern pComment = Pattern.compile("<!-+.*?-+>",
-			Pattern.DOTALL);
-
-	/**
-	 * Matches a doctype element.
-	 */
-	public static final Pattern pDocType = Pattern.compile("<!DOCTYPE.*?>",
-			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-
-	/**
-	 * Matches href="whatever" and variants. Group 1 = the url.
-	 */
-	public static final Pattern pHref = Pattern.compile(
-			"href=['\"]?([^'\"> \r\n\t]+)['\"]?", Pattern.CASE_INSENSITIVE);
-	/**
-	 * Used in strip tags to get rid of scripts and css style blocks altogether.
-	 */
-	public static final Pattern pScript = Pattern.compile(
-			"<(script)[^<>]*>.+?</(script)>",
-			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-	public static final Pattern pStyle = Pattern.compile(
-			"<(style)[^<>]*>.+?</(style)>",
-			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-
-	static SAXParserFactory saxParserFactory = null;
-
-	private static String fqdn;
-
-	/**
-	 * Matches an xml tag, e.g. &lt;a>, &lt;br/>, or &lt;/a>.
-	 */
-	public static final Pattern TAG_REGEX = Pattern.compile(
-			"<(/?[a-zA-Z][a-zA-Z0-9]*)[^>]*>", Pattern.DOTALL);
-
-	/**
-	 * Matches urls. Note: Excludes any trailing .	<br>
-	 * Group 1: the host/domain (including subdomain)	<br>
-	 * Urls must contain the http(s) or ftp protocol (compare with Twitter's regex which doesn't rrequire a protocol).
-	 * @testedy {@link WebUtilsTest#testUrlRegex()}
-	 * 
-	 * See #URL {@link winterwell.jtwitter.Regex#VALID_URL}, which is more flexible */
-	public static final Pattern URL_REGEX = Pattern
-			.compile("[hf]tt?ps?://([a-zA-Z0-9_\\-\\.]+)\\/?([a-zA-Z0-9_%\\-\\.,\\?&\\/=\\+'~#!\\*:]+[a-zA-Z0-9_%\\-&\\/=\\+])?");
-
-	
-	public static List<String> findUrls(String text) {
-		Matcher m = URL_REGEX.matcher(text);
-		List<String> urls = new ArrayList();
-		while(m.find()) {
-			urls.add(m.group());
-		}
-		return urls;
-	}
-
-	/**
-	 * Match either a url or a domain (e.g. "sodash.com").
-	 * @see #getDomain(String)
-	 */
-	public static final Pattern URL_WEB_DOMAIN_REGEX = URL_WEB_DOMAIN_REGEX();
-
-	private static final Pattern URL_WEB_DOMAIN_REGEX_FALLBACK = Pattern.compile(URL_REGEX.pattern()+"|[a-z0-9_\\-\\.]+\\.(\\w{2,24})");
-	
-	private static Pattern URL_WEB_DOMAIN_REGEX() {
-		// Use the Twitter-provided one if we can
-		try {
-			Class<?> regex = Class.forName("winterwell.jtwitter.Regex");
-			Field f = regex.getField("VALID_URL");
-			Pattern p = (Pattern) f.get(null);
-			return p;
-		} catch(Throwable ex) {
-			assert true; // in case you want to breakpoint
-			// oh well
-		}
-		// Fallback to a simpler one (which will catch most cases)
-		return URL_WEB_DOMAIN_REGEX_FALLBACK;
-	}
-
-	/**
-	 * The domain, excluding sub-domain
-	 * @param url
-	 * @return E.g. "soda.sh" from "http://blah.soda.sh/foo", or null on fail
-	 * (which should only happen if url is a relative or bogus url).
-	 */
-	public static String getDomain(String url) {
-		if (url==null) return null;
-		url = url.trim();
-		Matcher m = URL_REGEX.matcher(url);
-		if (m.find()) {
-			String domain = m.group(1);
-			// Chop the front off to give the domain (hopefully)
-			return getDomain2_chop(domain);	
-		}
-		// is it a domain already?
-		if (URL_WEB_DOMAIN_REGEX.matcher(url).matches()) {
-			// chop
-			return getDomain2_chop(url);
-		}
-		// try the lenient regex
-		if (URL_WEB_DOMAIN_REGEX != URL_WEB_DOMAIN_REGEX_FALLBACK && URL_WEB_DOMAIN_REGEX_FALLBACK.matcher(url).matches()) {
-			// chop
-			return getDomain2_chop(url);
-		}
-		// not a domain
-		return null;		
-	}
-	
-	/**
-	 * Chop the front off to give the domain (hopefully)
-	 * @param domain
-	 * @return
-	 */
-	private static String getDomain2_chop(String domain) {
-		int i = domain.lastIndexOf('.');
-		if (i==-1) return domain;
-		i = domain.lastIndexOf('.', i-1);
-		if (i==-1) return domain;
-		int di = domain.length() - i;
-		if (di < 7) {// .co.uk
-			i = domain.lastIndexOf('.', i-1);
-			if (i==-1) return domain;
-		}
-		return domain.substring(i+1);
-
-	}
-
-	/**
-	 * Convert a link as found in social media (e.g. full links or fragments) into definitely a full link
-	 * @param urlOrDomain e.g. google.com or https://fo.bar/yeah?whatever
-	 * @return
-	 */
-	public static String getFullUrl(String urlOrDomain) {
-		if (Utils.isBlank(urlOrDomain)) return null;
-		if (urlOrDomain.startsWith("http")) return urlOrDomain;
-		String u2 = "https://"+urlOrDomain;
-		return u2;		
-	}
-	
-	
-	/**
-	 * The host domain, including sub-domain
-	 * @param url
-	 * @return E.g. "blah.soda.sh" from "http://blah.soda.sh/foo", or null on fail
-	 * (which should only happen if url is a relative or bogus url).
-	 * @see #getDomain(String)
-	 */
-	public static String getHost(String url) {
-		Matcher m = URL_REGEX.matcher(url);
-		if ( ! m.find()) {
-			return null;
-		}
-		String domain = m.group(1);
-		return domain;
-	}
-
-	/**
-	 * Note: XPaths are not thread safe, so best to create new ones as needed
-	 */
-	public static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
-
-	private static String _RENDER_WEBPAGE_JS;
-	private static String renderWebpage() {
-		if (_RENDER_WEBPAGE_JS==null || true) {
-			_RENDER_WEBPAGE_JS = Environment.getProperty(new Key("WebUtils.render-webpage.js"), "render-webpage.js");
-			// Looks like a local filepath? resolve it 
-			if (_RENDER_WEBPAGE_JS.contains("/")) {
-				File rw = new File(FileUtils.getWorkingDirectory(), _RENDER_WEBPAGE_JS);
-				if ( ! rw.exists()) {
-					Log.e("render.pdf", "Cannot find render-webpage.js script at "+rw);
-				}
-				_RENDER_WEBPAGE_JS = rw.getAbsolutePath();
-			}
-		}
-		return _RENDER_WEBPAGE_JS;
-	}
-
 	public static List<Node> asList(final NodeList scripts) {
 		return new AbstractList<Node>() {
 			@Override
@@ -508,7 +340,8 @@ public class WebUtils {
 		}
 		return map;
 	}
-
+	
+	
 	/**
 	 * Encode text so that it can be used as the value of an XML attribute. Does
 	 * not add surrounding quote marks.
@@ -577,7 +410,6 @@ public class WebUtils {
 		color2html2_hex(b, html);
 		return html.toString();
 	}
-
 	private static void color2html2_hex(int r, StringBuilder html) {
 		String hr = Integer.toHexString(r);
 		if (hr.length() == 1) {
@@ -586,6 +418,23 @@ public class WebUtils {
 			assert hr.length() == 2;
 		}
 		html.append(hr);
+	}
+
+	/**
+	 * Basic function is to translate the checked exception into an unchecked so
+	 * that this can be used to initialise static fields.
+	 *
+	 * @param expression
+	 * @return
+	 */
+	public static XPathExpression compileXPathExpression(String expression) {
+		try {
+			return XPATH_FACTORY.newXPath().compile(expression);
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw Utils.runtime(e);
+		}
 	}
 
 	/**
@@ -657,6 +506,16 @@ public class WebUtils {
 	 * @param page
 	 *            This is an HTML page. It is not a url!
 	 */
+	public static void display(File file) {
+		display(file.toURI());
+	}
+
+	/**
+	 * Open an html page in a web browser.
+	 *
+	 * @param page
+	 *            This is an HTML page. It is not a url!
+	 */
 	public static void display(String page) {
 		try {
 			File f = File.createTempFile("temp", ".html");
@@ -667,17 +526,6 @@ public class WebUtils {
 			throw new WrappedException(e);
 		}
 	}
-	
-	/**
-	 * Open an html page in a web browser.
-	 *
-	 * @param page
-	 *            This is an HTML page. It is not a url!
-	 */
-	public static void display(File file) {
-		display(file.toURI());
-	}
-
 
 	/**
 	 * Open a URI in a system web browser.
@@ -757,6 +605,57 @@ public class WebUtils {
 		return list;
 	}
 
+	public static List<String> findUrls(String text) {
+		Matcher m = URL_REGEX.matcher(text);
+		List<String> urls = new ArrayList();
+		while(m.find()) {
+			urls.add(m.group());
+		}
+		return urls;
+	}
+	
+	/**
+	 * The hostname or empty string if it could not be determined.
+	 *
+	 * @return e.g. "egan.soda.sh", or null if the lookup fails Note: this is
+	 *         cached
+	 */
+	public static String fullHostname() {
+		if (fqdn != null)
+			return fqdn;
+
+		// Calling out to hostname --fqdn is more likely to do something
+		// sensible
+		for (int i = 0; i < 3; i++) { // Try a few times
+			Proc cmd = new Proc("hostname --fqdn");
+			cmd.run();
+			cmd.waitFor();
+			fqdn = cmd.getOutput().trim();
+			Log.i("init.web", "Retrieved FQDN: " + fqdn);
+			if (!Utils.isBlank(fqdn))
+				return fqdn;
+		}
+
+
+		// Alas, the following is not a reliable means of determining the
+		// hostname
+		// In OpenJDK (at least) it returns a guess based on parsing /etc/hosts
+		// It also appears to behave non-deterministically sometimes returing
+		// the hostname
+		// rather than the FQDN.
+		try {
+			fqdn = InetAddress.getByName(hostname()).getCanonicalHostName()
+					.trim();
+			assert !Utils.isBlank(fqdn);
+			Log.w("init.web", "Using dodgy FQDN method: " + fqdn);
+			return fqdn;
+		} catch (UnknownHostException e) {
+			Log.e("init.web", e);
+			return null;
+		}
+	}
+
+
 	/**
 	 * Convenience for accessing an attribute value (the Node interface is
 	 * rather ugly)
@@ -820,6 +719,83 @@ public class WebUtils {
 	}
 
 	/**
+	 * The domain, excluding sub-domain
+	 * @param url
+	 * @return E.g. "soda.sh" from "http://blah.soda.sh/foo", or null on fail
+	 * (which should only happen if url is a relative or bogus url).
+	 */
+	public static String getDomain(String url) {
+		if (url==null) return null;
+		url = url.trim();
+		Matcher m = URL_REGEX.matcher(url);
+		if (m.find()) {
+			String domain = m.group(1);
+			// Chop the front off to give the domain (hopefully)
+			return getDomain2_chop(domain);	
+		}
+		// is it a domain already?
+		assert URL_WEB_DOMAIN_REGEX != null;
+		if (URL_WEB_DOMAIN_REGEX.matcher(url).matches()) {
+			// chop
+			return getDomain2_chop(url);
+		}
+		// try the lenient regex
+		if (URL_WEB_DOMAIN_REGEX != URL_WEB_DOMAIN_FALLBACK_REGEX && URL_WEB_DOMAIN_FALLBACK_REGEX.matcher(url).matches()) {
+			// chop
+			return getDomain2_chop(url);
+		}
+		// not a domain
+		return null;		
+	}
+
+	/**
+	 * Chop the front off to give the domain (hopefully)
+	 * @param domain
+	 * @return
+	 */
+	private static String getDomain2_chop(String domain) {
+		int i = domain.lastIndexOf('.');
+		if (i==-1) return domain;
+		i = domain.lastIndexOf('.', i-1);
+		if (i==-1) return domain;
+		int di = domain.length() - i;
+		if (di < 7) {// .co.uk
+			i = domain.lastIndexOf('.', i-1);
+			if (i==-1) return domain;
+		}
+		return domain.substring(i+1);
+
+	}
+
+	/**
+	 * Convert a link as found in social media (e.g. full links or fragments) into definitely a full link
+	 * @param urlOrDomain e.g. google.com or https://fo.bar/yeah?whatever
+	 * @return
+	 */
+	public static String getFullUrl(String urlOrDomain) {
+		if (Utils.isBlank(urlOrDomain)) return null;
+		if (urlOrDomain.startsWith("http")) return urlOrDomain;
+		String u2 = "https://"+urlOrDomain;
+		return u2;		
+	}
+
+	/**
+	 * The host domain, including sub-domain
+	 * @param url
+	 * @return E.g. "blah.soda.sh" from "http://blah.soda.sh/foo", or null on fail
+	 * (which should only happen if url is a relative or bogus url).
+	 * @see #getDomain(String)
+	 */
+	public static String getHost(String url) {
+		Matcher m = URL_REGEX.matcher(url);
+		if ( ! m.find()) {
+			return null;
+		}
+		String domain = m.group(1);
+		return domain;
+	}
+
+	/**
 	 * Try to get the IP address(es) of the local machine. Unix only at present.
 	 *
 	 * @return
@@ -865,6 +841,23 @@ public class WebUtils {
 		} catch (Exception ex) {
 			throw Utils.runtime(ex);
 		}
+	}
+
+	/**
+	 * Note: There is no official need for urls to have file-type endings. But often they do, and it can
+	 * be handy to check.
+	 * @param url
+	 * @return e.g. ".html" or ".pdf" -- or ""
+	 */
+	public static String getType(String url) {
+		int e = url.indexOf('?');
+		if (e==-1) e = url.indexOf('#');
+		if (e==-1) e = url.length();
+		int s = url.lastIndexOf('.', e);
+		if (s==-1) {
+			return "";
+		}
+		return url.substring(s, e);
 	}
 
 	/**
@@ -929,6 +922,28 @@ public class WebUtils {
 			return reader;
 		} catch (Exception e) {
 			throw Utils.runtime(e);
+		}
+	}
+
+	/**
+	 * The hostname or empty string if it could not be determined.
+	 *
+	 * @return e.g. "egan" not "egan.soda.sh", or null if the lookup fails Note:
+	 *         this is cached.
+	 */
+	public static String hostname() {
+		if (hostname != null)
+			return hostname;
+		try {
+			hostname = InetAddress.getLocalHost().getHostName();
+			assert !hostname.contains("_") : hostname
+					+ " will cause problems with internal XIds";
+			// assert ! here.contains(".") : here;
+			Log.d("network", "Retrieved hostname: " + hostname);
+			return hostname;
+		} catch (Exception e) {
+			Log.e("network", e);
+			return null;
 		}
 	}
 
@@ -998,7 +1013,7 @@ public class WebUtils {
 			throw Utils.runtime(e);
 		}
 	}
-
+	
 	private static void parseXml2_getFactory() {
 		if (docBuilderFactory != null)
 			return;
@@ -1043,7 +1058,6 @@ public class WebUtils {
 		// factory.setXIncludeAware(false); unnecessary and causes errors
 		Log.i("init", "Using XML parser " + docBuilderFactory);
 	}
-
 	/**
 	 * A lighter-weight alternative to using Document and XPath
 	 *
@@ -1070,14 +1084,122 @@ public class WebUtils {
 		// xmlReader2.parse(new StringReader(xml));
 		// return treeBuilder.getTree();
 	}
+	
+	/**
+	 * Change the protocol prefix of a URL.
+	 * @param url A URL with any protocol prefix from "http://", "https://" and "//".
+	 * @param protocolPrefix The string to prepend to the URL in place of the original protocol
+	 * @return The supplied URL, with its protocol prefix replaced with protocolPrefix, or null if the supplied URL had no valid prefix.
+	 */
+	private static String protocolTo(String url, String protocolPrefix) {
+		String toReturn = null;
+		if (url.startsWith(HTTP_PREFIX)) {
+			toReturn = url.substring(HTTP_PREFIX.length());
+		} else if (url.startsWith(HTTPS_PREFIX)) {
+			toReturn = url.substring(HTTPS_PREFIX.length());
+		} else if (url.startsWith(RELATIVE_PREFIX)) {
+			toReturn = url.substring(RELATIVE_PREFIX.length());
+		} else return null;
+		
+		return protocolPrefix + toReturn;
+	}
+
+	/**
+	 * Change the protocol prefix of a URL to "http://"
+	 * @param url A URL with any protocol prefix from "http://", "https://" and "//".
+	 * @return The supplied URL, with its protocol prefix changed to "http://", or null if the supplied URL had no valid prefix.
+	 */
+	public static String protocolToHttp(String url) {
+		return protocolTo(url, HTTP_PREFIX);
+	}
+
+	/**
+	 * Change the protocol prefix of a URL to "https://"
+	 * @param url A URL with any protocol prefix from "http://", "https://" and "//".
+	 * @return The supplied URL, with its protocol prefix changed to "https://", or null if the supplied URL had no valid prefix.
+	 */
+	public static String protocolToHttps(String url) {
+		
+		return protocolTo(url, HTTPS_PREFIX);
+	}
+
+	/**
+	 * Change the protocol prefix of a URL to "//" (the protocol-relative prefix, meaning "whatever the referring page's protocol is")
+	 * @param url A URL with any protocol prefix from "http://", "https://" and "//".
+	 * @return The supplied URL, with its protocol prefix changed to "//", or null if the supplied URL had no valid prefix.
+	 */
+	public static String protocolToRelative(String url) {		
+		return protocolTo(url, RELATIVE_PREFIX);
+	}
+
+	/**
+	 * Remove a parameter setting. E.g. go from "http:mysite.com/foo?bar=1" to
+	 * "http:mysite.com/foo"
+	 *
+	 * @param path
+	 * @param params If they are not present, no problem, no edits are made.
+	 * @return path without params
+	 * @testedby {@link WebUtils2Test#testRemoveQueryParameter()}
+	 */
+	public static String removeQueryParameter(final String path, String... params) {
+		// Patterns	
+		String path2 = StrUtils.replace(path, Pattern.compile("("+StrUtils.join(params,"|")+")=[^#&]*(#|&|$)"), new IReplace() {			
+			@Override
+			public void appendReplacementTo(StringBuilder sb, Matcher match) {
+				if (match.start()==0) {
+					return; // wtf?
+				}
+				char s = path.charAt(match.start()-1);
+				if (s!='?' && s!='&') {
+					// not a valid match
+					sb.append(match.group());
+					return;
+				}
+				// final parameter?
+				if (match.end() >= path.length()) {
+					if (s=='?' || s=='&')
+						StrUtils.pop(sb, 1);
+					return;
+				}				
+				char e = path.charAt(match.end()-1);
+				if (e=='#') {
+					StrUtils.pop(sb, 1);
+					sb.append('#');
+					return; 
+				}
+			}
+		});
+		// Corner case: a blank path, which never gets edited by the replace
+		if (path2.endsWith("?")) {
+			return path2.substring(0, path2.length()-1);
+		}
+		return path2;
+	}
+
+	/**
+	 * @deprecated Use {@link #removeQueryParameter(String, String...)}
+	 * Is this just a convenience method? Looks slightly less efficient than
+	 * working with Strings.
+	 *
+	 * @param url
+	 * @param param
+	 */
+	@Deprecated
+	public static void removeQueryParameter(StringBuilder url, String param) {
+		String urlString = url.toString();
+		urlString = removeQueryParameter(urlString, param);
+		url.delete(0, url.length());
+		url.append(urlString);
+	}
 
 	public static void renderToPdf(String html, File file) {
 		renderToPdf(html, file, null, true);
 	}
-	
+
 	public static void renderToPdf(String html, File file, String waitFor, boolean printStyle) {
 		renderToPdf(html, file, waitFor, printStyle, null);
 	}
+
 	/**
 	 * This relies on: linux, and PhantomJS and render-webpage.js (see config/bin) being installed and on the path.
 	 * 
@@ -1106,9 +1228,38 @@ public class WebUtils {
 //			FileUtils.delete(temp1);			
 		}
 	}
-	
-	private static String URI(File file) {
-		return "file://"+file.getAbsolutePath();
+
+	/**
+	 * This relies on: linux, and wkhtmltopdf and convert (imagemagick) being
+	 * installed
+	 *
+	 * @param html
+	 * @param file
+	 */
+	public static void renderToPng(String html, File file) {
+		File temp1 = null;
+		try {
+			temp1 = File.createTempFile("chart", ".pdf");
+			renderToPdf(html, temp1, "--javascript-delay 1000", false); // FIXME
+			assert temp1.exists() && temp1.length() > 0;
+
+			// 2. Render, trim and convert to PNG with convert
+			Proc p2 = new Proc("convert -trim -antialias -density 300 "
+					+ temp1.getAbsolutePath() + " " + file.getAbsolutePath());
+			p2.run();
+			p2.waitFor(TUnit.MINUTE.getMillisecs());
+
+			if (!file.exists())
+				throw new IOException("Failed to create " + file + "\t"
+						+ p2.getError());
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		} finally {
+			// clean up
+			if (temp1 != null) {
+				FileUtils.delete(temp1);
+			}
+		}
 	}
 
 	/**
@@ -1169,37 +1320,19 @@ public class WebUtils {
 		}
 	}
 
-	/**
-	 * This relies on: linux, and wkhtmltopdf and convert (imagemagick) being
-	 * installed
-	 *
-	 * @param html
-	 * @param file
-	 */
-	public static void renderToPng(String html, File file) {
-		File temp1 = null;
-		try {
-			temp1 = File.createTempFile("chart", ".pdf");
-			renderToPdf(html, temp1, "--javascript-delay 1000", false); // FIXME
-			assert temp1.exists() && temp1.length() > 0;
-
-			// 2. Render, trim and convert to PNG with convert
-			Proc p2 = new Proc("convert -trim -antialias -density 300 "
-					+ temp1.getAbsolutePath() + " " + file.getAbsolutePath());
-			p2.run();
-			p2.waitFor(TUnit.MINUTE.getMillisecs());
-
-			if (!file.exists())
-				throw new IOException("Failed to create " + file + "\t"
-						+ p2.getError());
-		} catch (Exception e) {
-			throw Utils.runtime(e);
-		} finally {
-			// clean up
-			if (temp1 != null) {
-				FileUtils.delete(temp1);
+	private static String renderWebpage() {
+		if (_RENDER_WEBPAGE_JS==null || true) {
+			_RENDER_WEBPAGE_JS = Environment.getProperty(new Key("WebUtils.render-webpage.js"), "render-webpage.js");
+			// Looks like a local filepath? resolve it 
+			if (_RENDER_WEBPAGE_JS.contains("/")) {
+				File rw = new File(FileUtils.getWorkingDirectory(), _RENDER_WEBPAGE_JS);
+				if ( ! rw.exists()) {
+					Log.e("render.pdf", "Cannot find render-webpage.js script at "+rw);
+				}
+				_RENDER_WEBPAGE_JS = rw.getAbsolutePath();
 			}
 		}
+		return _RENDER_WEBPAGE_JS;
 	}
 
 	/**
@@ -1242,18 +1375,6 @@ public class WebUtils {
 	}
 
 	/**
-	 * Encode text so that it can be used as a string in JavaScript. We encode
-	 * ', &quot; and &amp;. All other chars are left alone. Does not add
-	 * surrounding quote marks.
-	 *
-	 * @param msg
-	 */
-	public static String scriptEncode(String msg) {
-		// ?? Is this correct?
-		return attributeEncode(msg);
-	}
-
-	/**
 	 * Sanitize a string for inclusion in a JSON string Because most browsers
 	 * will interpret HTML tags e.g. </script> that appear in Javascript as
 	 * document level elements. Works by replacing angle brackets with their
@@ -1268,6 +1389,18 @@ public class WebUtils {
 		// UI-destroying LINE-SEPERATOR character of doom. It's really rare, so lets just replace it.
 		data = data.replace("\u2028", "");
 		return data;
+	}
+
+	/**
+	 * Encode text so that it can be used as a string in JavaScript. We encode
+	 * ', &quot; and &amp;. All other chars are left alone. Does not add
+	 * surrounding quote marks.
+	 *
+	 * @param msg
+	 */
+	public static String scriptEncode(String msg) {
+		// ?? Is this correct?
+		return attributeEncode(msg);
 	}
 
 	/**
@@ -1346,6 +1479,10 @@ public class WebUtils {
 		return txt3;
 	}
 
+	private static String URI(File file) {
+		return "file://"+file.getAbsolutePath();
+	}
+
 	public static URI URI(String uri) {
 		try {
 			// HACK: Spaces are not permitted in URIs, but:
@@ -1375,6 +1512,21 @@ public class WebUtils {
 		}
 	}
 
+	private static Pattern URL_WEB_DOMAIN_REGEX() {
+		// Use the Twitter-provided one if we can
+		try {
+			Class<?> regex = Class.forName("winterwell.jtwitter.Regex");
+			Field f = regex.getField("VALID_URL");
+			Pattern p = (Pattern) f.get(null);
+			return p;
+		} catch(Throwable ex) {
+			Log.d("WebUtils.init", "url regex: Oh well, using fallback instead of Twitter's version: "+ex);
+		}
+		// Fallback to a simpler one (which will catch most cases)
+		Pattern fallback = URL_WEB_DOMAIN_FALLBACK_REGEX;
+		return fallback;
+	}
+	
 	public static String urlDecode(String s) {
 		try {
 			s = URLDecoder.decode(s, "UTF-8");
@@ -1383,7 +1535,6 @@ public class WebUtils {
 		}
 		return s;
 	}
-
 	/**
 	 *
 	 * @param vars
@@ -1405,7 +1556,6 @@ public class WebUtils {
 		if (encodedData.length()!=0) StrUtils.pop(encodedData, 1);
 		return encodedData.toString();
 	}
-
 	/**
 	 * URL encode
 	 *
@@ -1455,7 +1605,7 @@ public class WebUtils {
 		text = StrUtils.LINEENDINGS.matcher(text).replaceAll("\n");
 		return text;
 	}
-
+	
 	/**
 	 * @see #xpathQuery(String, String, boolean)
 	 * @param xpathQuery
@@ -1484,24 +1634,7 @@ public class WebUtils {
 			throw Utils.runtime(e);
 		}
 	}
-
-	/**
-	 * Basic function is to translate the checked exception into an unchecked so
-	 * that this can be used to initialise static fields.
-	 *
-	 * @param expression
-	 * @return
-	 */
-	public static XPathExpression compileXPathExpression(String expression) {
-		try {
-			return XPATH_FACTORY.newXPath().compile(expression);
-		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw Utils.runtime(e);
-		}
-	}
-
+	
 	/**
 	 * Convenience for {@link xpathQuery} without namespace aware parsing
 	 *
@@ -1511,7 +1644,7 @@ public class WebUtils {
 	public static List<Node> xpathQuery(String xpathQuery, String xml) {
 		return xpathQuery(xpathQuery, xml, false);
 	}
-
+	
 	/**
 	 * Run an XPath query over an xml document.
 	 * <p>
@@ -1561,137 +1694,6 @@ public class WebUtils {
 		} catch (XPathExpressionException e) {
 			throw Utils.runtime(e);
 		}
-	}
-
-	/**
-	 * The hostname or empty string if it could not be determined.
-	 *
-	 * @return e.g. "egan" not "egan.soda.sh", or null if the lookup fails Note:
-	 *         this is cached.
-	 */
-	public static String hostname() {
-		if (hostname != null)
-			return hostname;
-		try {
-			hostname = InetAddress.getLocalHost().getHostName();
-			assert !hostname.contains("_") : hostname
-					+ " will cause problems with internal XIds";
-			// assert ! here.contains(".") : here;
-			Log.d("network", "Retrieved hostname: " + hostname);
-			return hostname;
-		} catch (Exception e) {
-			Log.e("network", e);
-			return null;
-		}
-	}
-
-	/**
-	 * The hostname or empty string if it could not be determined.
-	 *
-	 * @return e.g. "egan.soda.sh", or null if the lookup fails Note: this is
-	 *         cached
-	 */
-	public static String fullHostname() {
-		if (fqdn != null)
-			return fqdn;
-
-		// Calling out to hostname --fqdn is more likely to do something
-		// sensible
-		for (int i = 0; i < 3; i++) { // Try a few times
-			Proc cmd = new Proc("hostname --fqdn");
-			cmd.run();
-			cmd.waitFor();
-			fqdn = cmd.getOutput().trim();
-			Log.i("init.web", "Retrieved FQDN: " + fqdn);
-			if (!Utils.isBlank(fqdn))
-				return fqdn;
-		}
-
-
-		// Alas, the following is not a reliable means of determining the
-		// hostname
-		// In OpenJDK (at least) it returns a guess based on parsing /etc/hosts
-		// It also appears to behave non-deterministically sometimes returing
-		// the hostname
-		// rather than the FQDN.
-		try {
-			fqdn = InetAddress.getByName(hostname()).getCanonicalHostName()
-					.trim();
-			assert !Utils.isBlank(fqdn);
-			Log.w("init.web", "Using dodgy FQDN method: " + fqdn);
-			return fqdn;
-		} catch (UnknownHostException e) {
-			Log.e("init.web", e);
-			return null;
-		}
-	}
-
-	/**
-	 * Note: There is no official need for urls to have file-type endings. But often they do, and it can
-	 * be handy to check.
-	 * @param url
-	 * @return e.g. ".html" or ".pdf" -- or ""
-	 */
-	public static String getType(String url) {
-		int e = url.indexOf('?');
-		if (e==-1) e = url.indexOf('#');
-		if (e==-1) e = url.length();
-		int s = url.lastIndexOf('.', e);
-		if (s==-1) {
-			return "";
-		}
-		return url.substring(s, e);
-	}
-	
-	private static final String HTTP_PREFIX = "http://";
-	private static final String HTTPS_PREFIX = "https://";
-	private static final String RELATIVE_PREFIX = "//";
-
-	/**
-	 * Change the protocol prefix of a URL to "http://"
-	 * @param url A URL with any protocol prefix from "http://", "https://" and "//".
-	 * @return The supplied URL, with its protocol prefix changed to "http://", or null if the supplied URL had no valid prefix.
-	 */
-	public static String protocolToHttp(String url) {
-		return protocolTo(url, HTTP_PREFIX);
-	}
-	
-	/**
-	 * Change the protocol prefix of a URL to "https://"
-	 * @param url A URL with any protocol prefix from "http://", "https://" and "//".
-	 * @return The supplied URL, with its protocol prefix changed to "https://", or null if the supplied URL had no valid prefix.
-	 */
-	public static String protocolToHttps(String url) {
-		
-		return protocolTo(url, HTTPS_PREFIX);
-	}
-	
-	/**
-	 * Change the protocol prefix of a URL to "//" (the protocol-relative prefix, meaning "whatever the referring page's protocol is")
-	 * @param url A URL with any protocol prefix from "http://", "https://" and "//".
-	 * @return The supplied URL, with its protocol prefix changed to "//", or null if the supplied URL had no valid prefix.
-	 */
-	public static String protocolToRelative(String url) {		
-		return protocolTo(url, RELATIVE_PREFIX);
-	}
-	
-	/**
-	 * Change the protocol prefix of a URL.
-	 * @param url A URL with any protocol prefix from "http://", "https://" and "//".
-	 * @param protocolPrefix The string to prepend to the URL in place of the original protocol
-	 * @return The supplied URL, with its protocol prefix replaced with protocolPrefix, or null if the supplied URL had no valid prefix.
-	 */
-	private static String protocolTo(String url, String protocolPrefix) {
-		String toReturn = null;
-		if (url.startsWith(HTTP_PREFIX)) {
-			toReturn = url.substring(HTTP_PREFIX.length());
-		} else if (url.startsWith(HTTPS_PREFIX)) {
-			toReturn = url.substring(HTTPS_PREFIX.length());
-		} else if (url.startsWith(RELATIVE_PREFIX)) {
-			toReturn = url.substring(RELATIVE_PREFIX.length());
-		} else return null;
-		
-		return protocolPrefix + toReturn;
 	}
 
 
