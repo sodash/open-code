@@ -36,6 +36,8 @@ public class StreamClassifierWidgetTest {
 				"porn", new UnConditional(pornModel));
 		
 		StreamClassifier<Tkn> c = new StreamClassifier<Tkn>(tokeniser, models);
+		c.setTopTokensFocus(1);
+		c.setTopTokensTag("cats");
 		c.resetup();
 
 		SimpleDocument doc1 = new SimpleDocument("cat being cute");

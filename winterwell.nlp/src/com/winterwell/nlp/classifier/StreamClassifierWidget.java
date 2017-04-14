@@ -85,10 +85,13 @@ public class StreamClassifierWidget implements IWidget {
 		int sitnCnt = 0;
 		for (Pair2<Sitn, IFiniteDistribution<String>> pair2 : tokenProbs.tokenProbs) {
 			// did we skip a stop word or two??
+			ExplnOfDist subexpln = tokenProbs.map().get(pair2.first.toString());
 			Tkn tkn = (Tkn) pair2.first.outcome;
 			String word = tkn.getText();
 			if (e != tkn.start && tkn.start != -1) {
 				assert tkn.start > 0 : tkn;
+				// Text which was skipped by the tokeniser. 
+				// NB: tokens can also be skipped
 				String skipped = StrUtils.substring(alltext, e, tkn.start);
 				sb.append("<span style='color:rgba(128,128,128,128);'>"+skipped+"</span>");				
 			}
@@ -118,6 +121,9 @@ public class StreamClassifierWidget implements IWidget {
 						WebUtils.attributeEncode(jsonData)+"'>");
 			// the word!
 			sb.append(tkn.getText());
+			if (subexpln !=null && subexpln.skipped) {
+				sb.append("<span title='skipped'>_</span>");
+			}
 			if (tkn.getPOS()!=null) {
 				sb.append("<sub>"+tkn.getPOS()+"</sub>");
 			}

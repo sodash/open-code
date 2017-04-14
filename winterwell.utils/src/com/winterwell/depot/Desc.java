@@ -343,7 +343,11 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 		// Have a reliable starting form, suitable for directory structuring.
 		sb.append(tag);
 		sb.append('/');
-		sb.append(type.getSimpleName());
+		String sname = type.getSimpleName();
+		if (Utils.isBlank(sname)) {
+			sname = type.getSuperclass().getSimpleName();
+		}
+		sb.append(sname);
 		sb.append('/');
 		if (server != null) {
 			sb.append(server);

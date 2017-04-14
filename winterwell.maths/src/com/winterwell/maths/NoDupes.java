@@ -12,15 +12,19 @@ import com.google.common.cache.CacheBuilder;
  */
 public class NoDupes<Key> {
 
-	private Map seen;
+	/**
+	 * TODO make this non-transient 
+	 *  => saner serialisation for the google cache
+	 */
+	private transient Map seen;
+	private int memorySize;
 
 	/**
 	 * 
 	 * @param memorySize e.g. 10000
 	 */
 	public NoDupes(int memorySize) {
-		// TODO if we used a BloomFilter we could fit more in		
-		seen = (Map) CacheBuilder.newBuilder().maximumSize(memorySize).build().asMap();
+		this.memorySize = memorySize;
 	}
 	
 	/**
@@ -30,7 +34,7 @@ public class NoDupes<Key> {
 	 * @return true if this is a duplicate
 	 */
 	public boolean isDuplicate(Key e) {
-		boolean oldNews = seen.containsKey(e);
+		boolean oldNews = seen().containsKey(e);
 		seen.put(e, true);
 		return oldNews;		
 	}
@@ -41,7 +45,15 @@ public class NoDupes<Key> {
 	 * @param item
 	 */
 	public boolean containsKey(Key item) {
-		return seen.containsKey(item);
+		return seen().containsKey(item);
+	}
+
+	private Map seen() {
+		if (seen==null) {
+			// TODO if we used a BloomFilter we could fit more in		
+			seen = (Map) CacheBuilder.newBuilder().maximumSize(memorySize).build().asMap();
+		}
+		return seen;
 	}
 	
 }

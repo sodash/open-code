@@ -164,6 +164,17 @@ public class StreamClassifier<Tok> implements ITextClassifier<String>, IStreamCl
 	double skipThreshold;
 	
 	int topTokensFocus = 20;
+	/**
+	 * normally null. If set, it will pick top-tokens based on maximising P(topTokensTag)
+	 */
+	String topTokensTag;
+	
+	/**
+	 * normally null. If set, it will pick top-tokens based on maximising P(topTokensTag)
+	 */
+	public void setTopTokensTag(String topTokensTag) {
+		this.topTokensTag = topTokensTag;
+	}
 
 	/**
 	 * If set (not 0), then only use the top situations -- those that give the highest entropy from the models.
@@ -275,8 +286,25 @@ public class StreamClassifier<Tok> implements ITextClassifier<String>, IStreamCl
 			
 			// Focus on the top-n tokens? Another way to skip less interesting tokens, better suited to longer docs.
 			if (top_tokens!=null) {
-				if (Double.isNaN(distFromUniform)) distFromUniform = distanceFromUniform(tag2pSitn, nanMask, nans);				
-				top_tokens.maybeAdd(new Pair2(sitn, tag2pSitn), distFromUniform); 
+				double top_token_score; 
+				if (topTokensTag==null) {
+					// calculate if we didn't already
+					if (Double.isNaN(distFromUniform)) distFromUniform = distanceFromUniform(tag2pSitn, nanMask, nans);
+					top_token_score = distFromUniform;
+				} else {
+					int tagi = Containers.indexOf(topTokensTag, tags);
+					double ptagi = tag2pSitn[tagi];
+					if (Double.isNaN(ptagi)) {
+						continue; // the focal tag passed? Then skpi this token.
+					}
+					double total = 0;
+					for(int i=0; i<tag2pSitn.length; i++) {
+						if (nanMask[i]) continue;
+						total += tag2pSitn[i];
+					}
+					top_token_score = ptagi / total;
+				}
+				top_tokens.maybeAdd(new Pair2(sitn, tag2pSitn), top_token_score); 
 				continue; // do the incorporation and normalisation later
 			}
 			
@@ -375,19 +403,25 @@ public class StreamClassifier<Tok> implements ITextClassifier<String>, IStreamCl
 	 * 
 	 * What metric should we use here? Euclidean? KL divergence? Earth-mover's distance? Entropy?
 	 * TODO probably entropy is the "right" metric, but anything sensible will do.
-	 * @param tag2pSitn
+	 * @param tag2pSitn array of probabilities NB: This might not be normalised
 	 * @param nans number of trues in nanMask
 	 * @param nanMask true => this tag passed by returning nan 
-	 * @return a measure in [0,1] of how non-uniform this is
+	 * @return a measure in [0,1] of how non-uniform this is, where 1 is non-uniform.
 	 */
 	double distanceFromUniform(double[] tag2pSitn, boolean[] nanMask, int nans) {
 		// This measures the Earth-mover's distance L1
+		double total = 0;
+		for(int i=0; i<tag2pSitn.length; i++) {
+			if (nanMask[i]) continue;
+			total += tag2pSitn[i];
+		}
+		if (total==0) return 0;
 		// The uniform probability
 		double u = 1.0 / (tag2pSitn.length - nans);
 		double sum = 0;
 		for(int i=0; i<tag2pSitn.length; i++) {
 			if (nanMask[i]) continue;
-			double d = tag2pSitn[i];
+			double d = tag2pSitn[i] / total;
 			assert MathUtils.isFinite(d) : d;
 			sum += Math.abs(d-u);
 		}

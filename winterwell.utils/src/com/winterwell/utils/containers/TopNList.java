@@ -126,10 +126,13 @@ public class TopNList<X> extends AbstractList<X>
 	 * You CANNOT mix this and {@link #maybeAdd(Object)} within a single list.
 	 * 
 	 * @param obj
-	 * @param score
+	 * @param score NaN => ignore
 	 * @return true if added
 	 */
 	public boolean maybeAdd(X obj, double score) {
+		if (Double.isNaN(score)) {
+			return false;
+		}
 		// defend against mis-use
 		assert scored == null || scored==true;
 		scored = true;
