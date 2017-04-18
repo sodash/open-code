@@ -19,6 +19,7 @@ import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.log.Report;
@@ -113,16 +114,28 @@ public class LgServlet {
 			// ip: $ip
 			params.put("ip", state.getRemoteAddr());			
 			params.put("useragent", state.getUserAgent());			
+			// what page?
+			String ref = state.getReferer();
+			if (ref==null) ref = state.get("site"); // DfP hack
 			// remove some gumpf (UTM codes)
-			String cref = WebUtils2.cleanUp(state.getReferer());
+			String cref = WebUtils2.cleanUp(ref);
 			params.put("url", cref);
 		}
 		// write to log file
 		doLogToFile(dataspace, tag, params, trckId, via, state);
 				
 		// write to Stat / ES
-		DataLogEvent event = new DataLogEvent(dataspace, 1, tag, params);
-		DataLog.count(event);
+		// ...which dataspaces?
+		// Info should be stored to named dataspace + user + publisher + advertiser
+		// TODO upgrade DatalogEvent to have several dataspaces??
+		ArraySet<String> dataspaces = new ArraySet(
+			dataspace, params.get("user") // publisher, advertiser			
+		);
+		for(String ds : dataspaces) {
+			if (ds==null) continue;
+			DataLogEvent event = new DataLogEvent(ds, 1, tag, params);
+			DataLog.count(event);
+		}
 	}
 
 	

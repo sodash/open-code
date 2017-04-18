@@ -16,7 +16,7 @@ import com.winterwell.utils.log.Log;
 /**
  * A Set implementation backed by an {@link ArrayList}. Fast for small
  * collections, lousy for big ones. Has a convenient constructor. Another nice
- * property is that insertion order is preserved. 
+ * property is that insertion order is preserved. Skips `null`.
  * 
  * FIXME {@link #equals(Object)} is List equals!
  * 
@@ -98,7 +98,7 @@ public final class ArraySet<T> extends AbstractSet<T>
 
 	@Override
 	public boolean add(T e) {
-		if (backing.contains(e))
+		if (backing.contains(e) || e==null)
 			return false;
 		return backing.add(e);
 	}
