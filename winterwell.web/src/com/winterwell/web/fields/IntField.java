@@ -3,6 +3,7 @@ package com.winterwell.web.fields;
 import java.math.BigInteger;
 
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.web.WebInputException;
 
 /**
@@ -10,6 +11,7 @@ import com.winterwell.web.WebInputException;
  * 
  * WARNING: Do you need a Long? See {@link LongField}.
  * 
+ * @testedby IntFieldTest
  * @author Daniel
  */
 public final class IntField extends AField<Integer> {
@@ -17,6 +19,8 @@ public final class IntField extends AField<Integer> {
 	private static final long serialVersionUID = 1L;
 
 	private int max;
+
+	private Boolean rounding;
 
 	public IntField(String name) {
 		this(name, "number");
@@ -31,6 +35,7 @@ public final class IntField extends AField<Integer> {
 		// special case: "max"
 		if ("max".equals(v))
 			return max == 0 ? Integer.MAX_VALUE : max;
+		if (v.endsWith(".0")) v = v.substring(0, v.length()-2);
 		try {
 			Integer i = Integer.valueOf(v);
 			if (max != 0 && i > max)
@@ -40,6 +45,18 @@ public final class IntField extends AField<Integer> {
 			if (StrUtils.isInteger(v)) {
 				BigInteger l = new BigInteger(v);
 				throw new WebInputException(v+" is too big!");
+			}
+			// round a decimal?
+			if (Utils.yes(rounding)) {
+				try {
+					double d = Double.valueOf(v);
+					int i = (int) Math.round(d);
+					if (max != 0 && i > max)
+						return max;
+					return i;
+				} catch(Exception ex2) {
+					// oh well, we tried
+				}
 			}
 			throw new WebInputException(v
 					+ " is not in the correct form (a number)");
@@ -64,6 +81,10 @@ public final class IntField extends AField<Integer> {
 	public IntField setMax(int max) {
 		this.max = max;
 		return this;
+	}
+
+	public void setRounding(boolean b) {
+		rounding = b;
 	}
 
 }
