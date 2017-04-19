@@ -83,8 +83,9 @@ public final class IntField extends AField<Integer> {
 		return this;
 	}
 
-	public void setRounding(boolean b) {
+	public IntField setRounding(boolean b) {
 		rounding = b;
+		return this;
 	}
 
 }
