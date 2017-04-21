@@ -136,8 +136,7 @@ public class PublishDataServer extends BuildTask {
 			if (localPropsOff.exists()) {
 				FileUtils.move(localPropsOff, localProps);
 			}
-		}
-		
+		}		
 		
 		// How to restart??
 	}
