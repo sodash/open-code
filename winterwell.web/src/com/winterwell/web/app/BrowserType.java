@@ -52,6 +52,9 @@ public class BrowserType {
 	 */
 	private final String userAgent;
 
+	/**
+	 * e.g. "ie"
+	 */
 	private String make;
 
 	private double version;

@@ -3,6 +3,7 @@ package com.winterwell.datalog;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -252,7 +253,16 @@ public class ESStorage implements IDataLogStorage {
 		Map aggs = sr.getAggregations();
 		Map stats = (Map) aggs.get("event_total");
 		Object sum = stats.get("sum");
-		return MathUtils.toNum(sum);
+		double total = MathUtils.toNum(sum);
+		// Add in the last bucket
+		// If you request data up to the present moment, then the last data-point is not in the database -- so we add it from memory.
+		DataLogImpl impl = (DataLogImpl) DataLog.getImplementation();
+		String tag = DataLogImpl.event2tag(spec.dataspace, spec.toJson2());
+		Datum latest = impl.currentBucket(tag, end);
+		// TODO
+//		List<Datum> curHistData = stat.currentHistoric(tag, start, end);
+		if (latest!=null) total += latest.x();
+		return total;
 	}
 	
 	SearchResponse getData2(DataLogEvent spec, Time start, Time end, boolean sortByTime) {

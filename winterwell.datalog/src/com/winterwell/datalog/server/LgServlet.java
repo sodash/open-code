@@ -29,6 +29,7 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.app.BrowserType;
 import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.app.WebRequest.KResponseType;
@@ -112,8 +113,13 @@ public class LgServlet {
 			// Replace $user with tracking-id, and $
 			params.put("user", trckId);			
 			// ip: $ip
-			params.put("ip", state.getRemoteAddr());			
-			params.put("useragent", state.getUserAgent());			
+			params.put("ip", state.getRemoteAddr());
+			// Browser info
+			String ua = state.getUserAgent();			
+			params.put("ua", ua);
+			BrowserType bt = new BrowserType(ua);
+			boolean mobile = bt.isMobile();
+			params.put("mbl", mobile);
 			// what page?
 			String ref = state.getReferer();
 			if (ref==null) ref = state.get("site"); // DfP hack

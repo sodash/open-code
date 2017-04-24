@@ -537,7 +537,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 	class SystemStatsTask extends TimerTask {
 		@Override
 		public void run() {
-			try {
+			try {				
 				if (closed) cancel();
 				else doSave();
 				// heart beat: check things are working by storing some useful stats
