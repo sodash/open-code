@@ -50,6 +50,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.XStreamUtils;
 
+
 /**
  * Static file-related utility functions.
  *
@@ -1079,6 +1080,17 @@ public class FileUtils {
 		return true;
 	}
 
+	/**
+	 * Covers the most common video file types -- but this is NOT a complete list or a rigourous test.
+	 * @param attachment
+	 * @return
+	 */
+	public static boolean isVideo(File attachment) {		
+		String ftype = getType(attachment);
+		// NB: Facebook supports a longer list: https://developers.facebook.com/docs/graph-api/video-uploads
+		return Arrays.asList("mpg", "mpeg", "mpeg4", "divx", "mov", "wmv", "m4v", "avi").contains(ftype);
+	}	
+	
 	/**
 	 * @param f
 	 * @return true if f is a sym-link. Note: returns false if f is not itself a
