@@ -1090,6 +1090,14 @@ public class FileUtils {
 		// NB: Facebook supports a longer list: https://developers.facebook.com/docs/graph-api/video-uploads
 		return Arrays.asList("mpg", "mpeg", "mpeg4", "divx", "mov", "wmv", "m4v", "avi").contains(ftype);
 	}	
+
+	/**
+	 * Covers the most common image file types -- but this is NOT a complete list or a rigourous test.
+	 */
+	public static boolean isImage(File file) {
+		String ftype = getType(file);
+		return Arrays.asList("png", "jpg", "jpeg", "gif", "bmp", "tiff", "svg").contains(ftype);
+	}
 	
 	/**
 	 * @param f
@@ -1648,6 +1656,7 @@ public class FileUtils {
 			return new File(path.replace('\\', File.separatorChar));
 		}
 	}
+
 
 
 }
