@@ -506,6 +506,8 @@ public class WebUtils2 extends WebUtils {
 	 * @param url
 	 * @param param
 	 * @return the value of parameter, or null if unset/blank.
+	 * 
+	 * ??How to send "please delete this setting" vs null??
 	 */
 	public static String getQueryParameter(String url, String param) {
 		assert WebUtils.urlEncode(param).equals(param) : param;
