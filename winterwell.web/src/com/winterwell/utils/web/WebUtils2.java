@@ -38,6 +38,7 @@ import com.winterwell.utils.IProperties;
 import com.winterwell.utils.IReplace;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Mutable;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
@@ -58,6 +59,7 @@ import com.winterwell.web.app.BrowserType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.email.SimpleMessage;
 import com.winterwell.web.fields.AField;
+import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.MissingFieldException;
 import com.winterwell.web.test.TestHttpServletRequest;
 
@@ -1187,25 +1189,34 @@ public class WebUtils2 extends WebUtils {
 //			Log.d("CORS", "No request? "+state);
 			return;
 		}
-		{
+		{ // debug weird stuff
 			Collection<String> responseheaders = state.getResponse().getHeaderNames();
 			Collection<String> ach = state.getResponse().getHeaders(ALLOW_CREDENTIALS_HEADER);
 			assert ach==null || ach.size() < 2 : ach+" all-response-headers:"+responseheaders+" "+state;
+
+			List<String> headers = Containers.getList(state.getRequest().getHeaderNames());
+//			System.out.println(headers);
+			Cookie[] cookies = state.getRequest().getCookies();		
+			String ref = state.getReferer();
+			String caller = state.get("caller");
+//			Printer.out(ref);
+//			Printer.out(caller);
 		}
 		
-//		Enumeration<String> headers = state.getRequest().getHeaderNames();
-//		Cookie[] cookies = state.getRequest().getCookies();
-//		String ref = state.getReferer();
-		
-		String o = state.getRequest().getHeader("Origin");
-		if (o==null || o.equals("null")) {
-			o = "*"; //URI(state.getRequestUrl()).getHost();
+		// Note: wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header 
+		// when the credentials flag is true (ie with cookies).
+		// We rely on the caller to explicitly tell us this (see hooru.js). By default ajax does not!
+		Boolean wc = state.get(new Checkbox("withCredentials"));
+		String origin = state.getRequest().getHeader("Origin");
+		String originOut = origin; 
+		if (origin==null || origin.equals("null")) {
+			if ( ! wc) originOut= "*"; //URI(state.getRequestUrl()).getHost();
 		}
 		if (forceSet && Utils.isBlank(state.getResponse().getHeader("Access-Control-Allow-Origin"))) {
-			o = "*"; // Do we need this??
+			originOut = "*"; // Do we need this??
 		}
 		// see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i		
-		if ( ! "*".equals(o)) {
+		if ( ! "*".equals(originOut)) {
 //			// Bug seen in good-loop -- It's a mystery! This logging did not shed any light :(
 //			if (state.getResponse().getHeader("Access-Control-Allow-Credentials") != null) {
 //				Log.escalate(new WeirdException(
@@ -1218,7 +1229,7 @@ public class WebUtils2 extends WebUtils {
 //			Log.d("cors", "set Access-Control-Allow-Credentials: true from "+ReflectionUtils.getSomeStack(8));			
 			state.getResponse().setHeader(ALLOW_CREDENTIALS_HEADER, "true");
 		}
-		state.getResponse().setHeader("Access-Control-Allow-Origin", o);
+		state.getResponse().setHeader("Access-Control-Allow-Origin", originOut);
 		// debug - no light :(
 //		Collection<String> responseheaders2 = state.getResponse().getHeaderNames();
 //		Collection<String> ach = state.getResponse().getHeaders(ALLOW_CREDENTIALS_HEADER);
