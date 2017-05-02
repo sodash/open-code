@@ -4,6 +4,7 @@
 package com.winterwell.utils;
 
 import java.util.Collection;
+import java.util.Map;
 
 import com.winterwell.utils.containers.Containers;
 
@@ -24,10 +25,6 @@ import com.winterwell.utils.containers.Containers;
 		if (v==null) v = defaultProperties.get(key); 
 		return (T) v; 
 	}
-	public boolean isTrue(Key<Boolean> key) {
-		Boolean v = get(key);
-		return v!=null && v;
-	}
 
 	public Collection<Key> getKeys() {
 		return properties.keySet(); 
@@ -38,21 +35,24 @@ import com.winterwell.utils.containers.Containers;
 		else return (T) properties.put(key, value); 
 	}
 
-	public static <T> void putDefault(Key<T> key, T value) { 
-		if (value==null) defaultProperties.remove(key); 
-		else defaultProperties.put(key, value); 
-	}          
-	
-	public <T> boolean containsKey(Key<T> key) {
-		return get(key) != null;
-	}
-	
 	</pre></code>
  * 
  * @author daniel
  */
 public interface IProperties {
 
+	/**
+	 * Convenience for (value!=null && value), to make boolean properties easier
+	 * to work with.
+	 * 
+	 * @param key
+	 * @return true if key is set and true, false if unset or false
+	 */
+	public default boolean isTrue(Key<Boolean> key) {
+		Boolean v = get(key);
+		return v!=null && v;
+	}
+	
 	/**
 	 * Determine whether or not a value is set for this key.
 	 * For some implementations, this is equivalent to get()!=null
@@ -63,7 +63,9 @@ public interface IProperties {
 	 * @param key
 	 * @return
 	 */
-	<T> boolean containsKey(Key<T> key);
+	public default <T> boolean containsKey(Key<T> key) {
+		return get(key) != null;
+	}
 
 	/**
 	 * @param key
@@ -76,14 +78,6 @@ public interface IProperties {
 	 */
 	Collection<Key> getKeys();
 
-	/**
-	 * Convenience for (value!=null && value), to make boolean properties easier
-	 * to work with.
-	 * 
-	 * @param key
-	 * @return true if key is set and true, false if unset or false
-	 */
-	boolean isTrue(Key<Boolean> key);
 
 	/**
 	 * Set (or remove) the value for key

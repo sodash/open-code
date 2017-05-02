@@ -48,6 +48,10 @@ import com.winterwell.web.fields.SField;
 public class WebRequest implements IProperties, Closeable {
 
 
+	public String getCookie(String name) {
+		return WebUtils2.getCookie(getRequest(), name);
+	}
+
 	/**
 	 * Without the subdomain, e.g. sodash.com from http://foo.sodash.com/bar
 	 */
@@ -1070,4 +1074,8 @@ public class WebRequest implements IProperties, Closeable {
 	}
 	
 	XId uxid;
+
+	public void addMessage(String text) {
+		addMessage(new AjaxMsg(text));
+	}
 }
