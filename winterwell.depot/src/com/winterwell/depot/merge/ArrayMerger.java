@@ -11,12 +11,11 @@ import com.winterwell.utils.containers.Containers;
  */
 public class ArrayMerger extends AMerger<Object> {
 
-	private static final Object NULL = "null";
-	private ListMerger lm;
+	private IMerger lm;
 
-	public ArrayMerger(ClassMap<IMerger> mergers) {
-		super(mergers);
-		lm = new ListMerger(mergers);
+	public ArrayMerger(Merger merger) {
+		super(merger);
+		lm = merger.getMerger(List.class);
 	}
 	
 	@Override
@@ -46,7 +45,7 @@ public class ArrayMerger extends AMerger<Object> {
 	@Override
 	public Object stripDiffs(Object v) {
 		List<Object> lv = Containers.asList(v);
-		List lclean = lm.stripDiffs(lv);
+		List lclean = (List) lm.stripDiffs(lv);
 		for(int i=0; i<lclean.size(); i++) {
 			lv.set(i, lclean.get(i));
 		}

@@ -14,11 +14,15 @@ import com.winterwell.depot.Desc;
  */
 public abstract class AMerger<X> implements IMerger<X> {
 
+	protected IMerger recursiveMerger;
+
 	/**
-	 * Create a merger with it's own (initially empty) set of recursive mergers.
+	 * Create a merger with NO recursive mergers.
+	 * This is generally NOT the constructor you want.
+	 * @see #AMerger(ClassMap)
 	 */
 	public AMerger() {
-		this(new ClassMap());
+		this(null);
 	}
 	
 	/**
@@ -29,7 +33,7 @@ public abstract class AMerger<X> implements IMerger<X> {
 	 */
 	protected <Y> Y applySubDiff(Y abit, Diff rDiff) {
 		if (rDiff==null) return abit;
-		IMerger m = getMerger(rDiff.mergerClass);
+		IMerger m = recursiveMerger;
 		return (Y) m.applyDiff(abit, rDiff);
 	}
 	
@@ -37,34 +41,12 @@ public abstract class AMerger<X> implements IMerger<X> {
 	 * Create a merger with a shared set of recursive mergers.
 	 * This constructor does not add any mergers to those provided -- not even
 	 * itself. E.g. if you pass in an empty map, it will not recurse.
-	 * @param mergers
+	 * @param recursiveMerger Can be null (unusual)
 	 */
-	public AMerger(ClassMap<IMerger> mergers) {
-		this.mergers = mergers;
+	public AMerger(IMerger recursiveMerger) {
+		this.recursiveMerger = recursiveMerger;
 	}
 	
-	/**
-	 * Number, Map and List
-	 */
-	protected void initStdMergers() {
-		if (mergers.get(Number.class)==null) {
-			addMerge(Number.class, new NumMerger());
-		}
-		if (mergers.get(Map.class)==null) {
-			addMerge(Map.class, new MapMerger(mergers));
-		}
-		if (mergers.get(List.class)==null) {
-			addMerge(List.class, new ListMerger(mergers));
-		}
-		if (mergers.get(Array.class)==null) {
-			addMerge(Array.class, new ArrayMerger(mergers));
-		}
-	}
-
-	public void addMerge(Class handles, IMerger merger) {
-		mergers.put(handles, merger);
-		mergers.put(merger.getClass(), merger);
-	}
 
 	@Override
 	public boolean useMerge(Desc<? extends X> desc) {
@@ -82,10 +64,4 @@ public abstract class AMerger<X> implements IMerger<X> {
 		return merged;
 	}
 	
-	protected final ClassMap<IMerger> mergers;
-	
-	protected IMerger getMerger(Class klass) {
-		IMerger m = mergers.get(klass);
-		return m;		
-	}
 }

@@ -32,6 +32,12 @@ public interface IMerger<X> {
 	 */
 	X doMerge(X before, X after, X latest);
 	
+	/**
+	 * 
+	 * @param before
+	 * @param after
+	 * @return Diff or null if no difference
+	 */
 	Diff diff(X before, X after);
 	
 	/**

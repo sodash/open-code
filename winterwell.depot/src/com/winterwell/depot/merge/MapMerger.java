@@ -30,15 +30,9 @@ public class MapMerger<K,V> extends AMerger<Map<K,V>> implements IMerger<Map<K,V
 	private static final Class SINGLETON_MAP = Collections.singletonMap("k", "v").getClass();
 	private static final Class EMPTY_MAP = Collections.emptyMap().getClass();
 	
-	public MapMerger(ClassMap<IMerger> mergers) {
-		super(mergers);
+	public MapMerger(Merger merger) {
+		super(merger);
 	}
-	
-	public MapMerger() {
-		addMerge(Map.class, this);
-		initStdMergers();
-	}
-
 
 
 	@Override
@@ -95,7 +89,7 @@ public class MapMerger<K,V> extends AMerger<Map<K,V>> implements IMerger<Map<K,V
 			}			
 			
 			// recurse?
-			IMerger m = getMerger(vClass);
+			IMerger m = recursiveMerger;
 			if (m!=null) {
 				Diff rDiff = m.diff(bv, v);				
 				if (rDiff==null) continue;
@@ -204,7 +198,7 @@ public class MapMerger<K,V> extends AMerger<Map<K,V>> implements IMerger<Map<K,V
 			}
 			// recurse?			
 			Class<? extends Object> vClass = v.getClass();
-			IMerger m = getMerger(vClass);
+			IMerger m = recursiveMerger;
 			if (m!=null) {
 				v = m.stripDiffs(v);
 			}

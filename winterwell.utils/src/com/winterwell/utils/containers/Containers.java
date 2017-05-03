@@ -82,6 +82,84 @@ final class BooleanArray extends AbstractList<Boolean> {
 	}
 }
 
+
+final class DoubleArray extends AbstractList<Double> {
+	private final double[] xs;
+
+	public DoubleArray(double[] xs) {
+		this.xs = xs;
+	}
+
+	@Override
+	public Double get(int index) {
+		return xs[index];
+	}
+
+	@Override
+	public Double set(int index, Double element) {
+		double old = xs[index];
+		xs[index] = element;
+		return old;
+	}
+
+	@Override
+	public int size() {
+		return xs.length;
+	}
+}
+
+
+final class FloatArray extends AbstractList<Float> {
+	private final float[] xs;
+
+	public FloatArray(float[] xs) {
+		this.xs = xs;
+	}
+
+	@Override
+	public Float get(int index) {
+		return xs[index];
+	}
+
+	@Override
+	public Float set(int index, Float element) {
+		float old = xs[index];
+		xs[index] = element;
+		return old;
+	}
+
+	@Override
+	public int size() {
+		return xs.length;
+	}
+}
+
+
+final class CharArray extends AbstractList<Character> {
+	private final char[] xs;
+
+	public CharArray(char[] xs) {
+		this.xs = xs;
+	}
+
+	@Override
+	public Character get(int index) {
+		return xs[index];
+	}
+
+	@Override
+	public Character set(int index, Character element) {
+		char old = xs[index];
+		xs[index] = element;
+		return old;
+	}
+
+	@Override
+	public int size() {
+		return xs.length;
+	}
+}
+
 final class CompareAny implements Comparator {
 	@Override
 	public int compare(Object o1, Object o2) {
@@ -276,26 +354,15 @@ public class Containers  {
 	public static List<Boolean> asList(final boolean[] xs) {
 		return new BooleanArray(xs);	
 	}
+	public static List<Character> asList(final char[] xs) {
+		return new CharArray(xs);	
+	}
 	
 	public static List<Double> asList(final double[] xs) {
-		return new AbstractList<Double>() {
-			@Override
-			public Double get(int index) {
-				return xs[index];
-			}
-
-			@Override
-			public Double set(int index, Double element) {
-				double old = xs[index];
-				xs[index] = element;
-				return old;
-			}
-
-			@Override
-			public int size() {
-				return xs.length;
-			}
-		};
+		return new DoubleArray(xs);
+	}
+	public static List<Float> asList(final float[] xs) {
+		return new FloatArray(xs);
 	}
 	
 	public static List<Integer> asList(final int[] xs) {
@@ -349,19 +416,25 @@ public class Containers  {
 	public static List<Object> asList(final Object array) {
 		if ( ! array.getClass().isArray())
 			throw new IllegalArgumentException("Backing object is not an array");
-				
+		// the primitive types
 		if (array instanceof int[]) {
 			return (List) asList((int[])array);
 		}
 		if (array instanceof double[]) {
 			return (List) asList((double[])array);
 		}
+		if (array instanceof float[]) {
+			return (List) asList((float[])array);
+		}
 		if (array instanceof long[]) {
 			return (List) asList((long[])array);
 		}
 		if (array instanceof boolean[]) {
 			return (List) asList((boolean[])array);
-		}		
+		}
+		if (array instanceof char[]) {
+			return (List) asList((char[])array);
+		}
 		return Arrays.asList((Object[])array);
 	}
 
@@ -1938,8 +2011,8 @@ final class ObjectMap extends AbstractMap2<String, Object> {
 
 	@Override
 	public Set<String> keySet() throws UnsupportedOperationException {
-		Field[] fields = klass.getFields();
-		Set<String> keys = new HashSet<String>(fields.length);
+		List<Field> fields = ReflectionUtils.getAllFields(klass); //klass.getFields();
+		Set<String> keys = new HashSet<String>(fields.size());
 		for (Field field : fields) {
 			int mods = field.getModifiers();
 			if (Modifier.isTransient(mods)) continue;

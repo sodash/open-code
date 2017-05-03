@@ -14,15 +14,10 @@ public class ListMerger<X> extends AMerger<List<X>> {
 
 	private static final Object NULL = "null";
 
-	public ListMerger(ClassMap<IMerger> mergers) {
-		super(mergers);		
+	public ListMerger(Merger merger) {
+		super(merger);		
 	}
 	
-	public ListMerger() {
-		addMerge(List.class, this);
-		initStdMergers();		
-	}
-
 	@Override
 	public Diff<List> diff(List<X> before, List<X> after) {
 		List diff = new ArrayList();
@@ -51,7 +46,7 @@ public class ListMerger<X> extends AMerger<List<X>> {
 				continue;
 			}
 			// recurse
-			IMerger m = getMerger(ai.getClass());
+			IMerger m = recursiveMerger;
 			if (m!=null) {
 				Object rDiff = m.diff(bi, ai);
 				if (rDiff==null) {
@@ -109,9 +104,8 @@ public class ListMerger<X> extends AMerger<List<X>> {
 				clean.add(null);
 				continue;				
 			}
-			// recurse?			
-			Class<? extends Object> vClass = v.getClass();
-			IMerger m = getMerger(vClass);
+			// recurse?
+			IMerger m = recursiveMerger;
 			if (m!=null) {
 				v = m.stripDiffs(v);
 			}
