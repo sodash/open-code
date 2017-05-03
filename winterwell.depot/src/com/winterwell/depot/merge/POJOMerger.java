@@ -25,7 +25,9 @@ public class POJOMerger extends AMerger<Object> implements IMerger<Object> {
 
 	@Override
 	public Object applyDiff(Object a, Diff diff) {
-		// TODO Auto-generated method stub
+		Map<String, Object> amap = Containers.objectAsMap(a);
+		Object mmap = recursiveMerger.applyDiff(amap, (Diff) diff.diff);
+		if (mmap==amap) return a;
 		throw new TodoException();
 	}
 

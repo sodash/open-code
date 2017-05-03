@@ -14,8 +14,12 @@ public final class Best<T> {
 	private final List<T> best = new ArrayList<T>();
 	private double bestScore = Double.NEGATIVE_INFINITY;
 
+	public boolean isEmpty() {
+		return best.isEmpty();
+	}
+	
 	/**
-	 * @return the highest-scoring item. Ties are broken at random
+	 * @return the highest-scoring item. Ties are broken at random. null if empty
 	 */
 	public T getBest() {
 		if (best.size() == 1) return best.get(0);
