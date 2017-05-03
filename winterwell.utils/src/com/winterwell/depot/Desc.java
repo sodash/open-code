@@ -719,9 +719,13 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	transient com.winterwell.depot.MetaData metadata;
 
 	/**
-	 * Set if an IMerger is to be used.
+	 * Set if an IMerger is to be used. Normally null (don't use a merger)
 	 */
-	transient X before;
+	private transient X before;
+	
+	X getBefore() {
+		return before;
+	}
 
 	/**
 	 * Use gzip compression when saving this object? false by default
@@ -763,7 +767,6 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 * Used by Depot. Not threadsafe.
 	 */
 	protected void unbind() {
-		// if (boundValue==null) return;
 		getDescCache().unbind(getBoundValue(), this);
 		boundValue = null;
 		before = null;

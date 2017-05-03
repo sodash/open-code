@@ -63,6 +63,9 @@ implements IStore , Flushable, Closeable
 	
 	Dt delay;
 
+	/**
+	 * marker for "yes it should be null"
+	 */
 	static final Object NULL = new Object();
 
 	private static final String LOGTAG = "SlowStorage";
@@ -152,8 +155,8 @@ implements IStore , Flushable, Closeable
 
 	@Override
 	protected void receive(Desc desc, Actor sender) {
-		// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map
-		// remove any other requests for msg
+		// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map.
+		// Remove any other requests for msg
 		for(Packet p : getQ().toArray(new Packet[0])) {
 			if (desc.equals(p.msg)) {
 				getQ().remove(p);
@@ -168,11 +171,11 @@ implements IStore , Flushable, Closeable
 		} else if (v==NULL) {
 			base.remove(desc);
 		} else {
-			// merge?
-			if (desc.before!=null) {
+			// merge? NB: dec.before is normally null
+			if (desc.getBefore() != null) {
 				Object latest = base.get(desc);
 				if (latest!=null) {
-					Object vMerge = depot.doMerge(desc, desc.before, v, latest);
+					Object vMerge = depot.doMerge(desc, desc.getBefore(), v, latest);
 					v = vMerge;
 					// update the binding
 					desc.bind(vMerge);
@@ -183,7 +186,7 @@ implements IStore , Flushable, Closeable
 			base.put(desc, v);
 			
 			// take a new snapshot for further updates?
-			if (desc.before!=null) {
+			if (desc.getBefore() != null) {
 				desc.remarkForMerge();
 			}
 		}

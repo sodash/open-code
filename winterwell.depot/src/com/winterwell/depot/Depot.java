@@ -235,7 +235,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 			return;
 		}
 		// Is it a merge? So not an overwrite
-		if (desc.before!=null) {
+		if (desc.getBefore()!=null) {
 			return;
 		}
 		// Note: we've already done a get if ! overwrite. This method assumes you're trying to overwrite
@@ -842,6 +842,14 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		return config;
 	}
 
+	/**
+	 * 
+	 * @param desc
+	 * @param before
+	 * @param after
+	 * @param latest
+	 * @return The merged version of the artifact: the latest from the depot + the diff of (after - before).
+	 */
 	Object doMerge(Desc desc, Object before, Object after, Object latest) {
 		assert after != null;
 		IMerger m = mergers.get(desc.getType());
@@ -869,7 +877,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 	 * @param copy
 	 */
 	public <Y> void update(Desc<Y> desc, Y artifact) {
-		assert desc.before != null : desc;
+		assert desc.getBefore() != null : desc;
 		put2(desc, artifact, KOverwrite.MERGE);
 	}
 	
