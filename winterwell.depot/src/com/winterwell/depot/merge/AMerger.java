@@ -18,7 +18,7 @@ public abstract class AMerger<X> implements IMerger<X> {
 	 * Create a merger with it's own (initially empty) set of recursive mergers.
 	 */
 	public AMerger() {
-		mergers = new ClassMap();
+		this(new ClassMap());
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public abstract class AMerger<X> implements IMerger<X> {
 		}
 	}
 
-	protected void addMerge(Class handles, IMerger merger) {
+	public void addMerge(Class handles, IMerger merger) {
 		mergers.put(handles, merger);
 		mergers.put(merger.getClass(), merger);
 	}

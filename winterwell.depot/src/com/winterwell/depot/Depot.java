@@ -19,6 +19,7 @@ import com.winterwell.datalog.DataLog;
 import com.winterwell.depot.merge.ClassMap;
 import com.winterwell.depot.merge.IMerger;
 import com.winterwell.depot.merge.MapMerger;
+import com.winterwell.depot.merge.Merger;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
@@ -305,8 +306,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		
 		this.config = config;
 		base = config.getStore(this);
-		// a default merger for maps
-		setMerger(Map.class, new MapMerger());
+		// TODO load mergers
 		Log.i(TAG+".init", "Depot "+base);
 	}
 
@@ -851,24 +851,11 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 	 * @return The merged version of the artifact: the latest from the depot + the diff of (after - before).
 	 */
 	Object doMerge(Desc desc, Object before, Object after, Object latest) {
-		assert after != null;
-		IMerger m = mergers.get(desc.getType());
-		if (m==null) {
-			Log.e(TAG, "No merger! "+desc.getType()+" "+desc);
-			return after;
-		}
-		return m.doMerge(before, after, latest);
+		// Used to pass in desc.getType(), but why not just use after.getClass()? 
+		return merger.doMerge(before, after, latest);
 	}
 	
-	ClassMap<IMerger> mergers = new ClassMap();
-
-	public void setMerger(Class klass, IMerger m) {
-		mergers.put(klass, m);
-	}
-	
-	public ClassMap<IMerger> getMergers() {
-		return mergers;
-	}
+	Merger merger = new Merger();
 
 	/**
 	 * Like put(), but this will perform a merge if it can.
