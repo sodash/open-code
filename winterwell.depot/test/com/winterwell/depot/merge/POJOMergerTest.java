@@ -100,6 +100,23 @@ public class POJOMergerTest {
 		assert m.sub.x == 9 : m.sub;
 	}
 
+	
+
+	@Test
+	public void testDiffNumPOJO_NewSubObject() {
+		// what shall we test on? how about a WebPage?
+		NumThing before = new NumThing();
+		
+		NumThing after = new NumThing();
+		after.sub = new NumThing();
+		after.sub.x = 8;
+		
+		POJOMerger merger = new POJOMerger(new Merger());
+		Diff diff = merger.diff(before, after);
+		
+		System.out.println(diff);
+	}
+
 
 }
 

@@ -34,8 +34,8 @@ public interface IMerger<X> {
 	
 	/**
 	 * 
-	 * @param before
-	 * @param after
+	 * @param before Can be null
+	 * @param after Can be null
 	 * @return Diff or null if no difference
 	 */
 	Diff diff(X before, X after);

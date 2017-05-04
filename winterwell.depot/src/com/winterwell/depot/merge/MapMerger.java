@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.crypto.CipherInputStream;
+
 import com.winterwell.depot.Desc;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
@@ -26,6 +28,9 @@ public class MapMerger<K,V> extends AMerger<Map<K,V>> implements IMerger<Map<K,V
 	 * TODO use equals() with protection.
 	 */
 	private static final String REMOVE = "!remove!";
+	/**
+	 * ?? Why a regex??
+	 */
 	static final Pattern REMOVEREGEX = Pattern.compile("_*"+REMOVE);
 	private static final Class SINGLETON_MAP = Collections.singletonMap("k", "v").getClass();
 	private static final Class EMPTY_MAP = Collections.emptyMap().getClass();
@@ -45,7 +50,10 @@ public class MapMerger<K,V> extends AMerger<Map<K,V>> implements IMerger<Map<K,V
 
 	@Override
 	public Diff<Map> diff(Map<K,V> before, Map<K,V> after) {
-		if (before==null) return null;
+		if (Utils.equals(before, after)) return null;
+		if (before==null) {
+			return new Diff<Map>(NullMerger.class, after);
+		}
 		HashMap diff = new HashMap();
 		// removals?
 		for(Object k : before.keySet()) {
@@ -158,18 +166,25 @@ public class MapMerger<K,V> extends AMerger<Map<K,V>> implements IMerger<Map<K,V
 					v = sv.substring(1);
 				}
 			} 
-//			// add numbers Should we have this here? Using Containers.plus is a bit more thread safe.
+			
+			// If v is a number, shall we use Containers.plus which is a bit more thread safe??
 			// But no: if you need thread safety, you must not do it half-heartedly.
 
+			Object incumbent = a.get(k);
 			// recurse on others?
-			if (v instanceof Diff) {
-				Object incumbent = a.get(k);
+			if (v instanceof Diff) {				
 				Object i2 = applySubDiff(incumbent, (Diff)v);
 				a.put(k, i2);
 				continue;
 			}			
-			// otherwise set
-			a.put(k, v);
+			if (incumbent == null) {
+				a.put(k, v);
+				continue;
+			}
+			// Case: a new key-value was added to both branches of the artifact. 
+			// merge v and incumbent
+			Object mergedIncumbent = recursiveMerger.doMerge(null, v, incumbent);
+			a.put(k, mergedIncumbent);			
 		}
 		return a;
 	}
