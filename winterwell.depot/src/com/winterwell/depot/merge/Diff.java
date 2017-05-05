@@ -18,7 +18,7 @@ public final class Diff<DType> {
 
 	public Diff(Class<? extends IMerger> mergerClass, DType diff) {
 		this.mergerClass = mergerClass;
-		assert mergerClass.getName().equals(ReflectionUtils.getCaller().getClassName());
+		assert mergerClass==NullMerger.class || mergerClass.getName().equals(ReflectionUtils.getCaller().getClassName());
 		this.diff = diff;
 	}
 
