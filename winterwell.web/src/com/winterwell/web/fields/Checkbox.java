@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebInputException;
 
 /**
@@ -131,9 +132,16 @@ public class Checkbox extends AField<Boolean> {
 	 * @param req
 	 * @return true if a value was sent
 	 */
-	public boolean isSet(HttpServletRequest req) {
-		String v = req.getParameter(getName());
-		return v != null;
+	public boolean isSet(HttpServletRequest req) {		
+		try {
+			String v = req.getParameter(getName());
+			return v != null;
+		} catch (Exception ex) {
+			// a bogus url, e.g. /foo?site=%%SITIE%% can break the above :(
+			String qs = req.getQueryString();
+			String p = WebUtils2.getQueryParameter(qs, getName());
+			return p != null;
+		}
 	}
 
 	/**

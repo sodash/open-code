@@ -505,7 +505,7 @@ public class WebUtils2 extends WebUtils {
 
 
 	/**
-	 * @param url
+	 * @param url A full url, or just the query string
 	 * @param param
 	 * @return the value of parameter, or null if unset/blank.
 	 * 
@@ -513,12 +513,12 @@ public class WebUtils2 extends WebUtils {
 	 */
 	public static String getQueryParameter(String url, String param) {
 		assert WebUtils.urlEncode(param).equals(param) : param;
-		Pattern keyVal = Pattern.compile("[&?]" + param + "=(.*?)(&|$)");
+		Pattern keyVal = Pattern.compile("([&?]|^)" + param + "=(.*?)(&|$)");
 		Matcher m = keyVal.matcher(url);
 		boolean found = m.find();
 		if (!found)
 			return null;
-		String val = m.group(1);
+		String val = m.group(2);
 		// convert "" to null for simplicity
 		if (val.isEmpty()) return null;
 		// Hack: Should we convert "null" and "undefined" to null? Yes, that's probably best.
