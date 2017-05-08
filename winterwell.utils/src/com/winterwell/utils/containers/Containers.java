@@ -410,10 +410,11 @@ public class Containers  {
 	/**
 	 * Wrapper for {@link Arrays#asList(Object...)} which can handle arrays of primitives,
 	 * e.g. int[] or double[].
-	 * Throws an IllegalArgumentException if 'array' is not an array (eg. an int
+	 * Throws an IllegalArgumentException if 'array' is not an array or a List (eg. an int
 	 * value)
 	 */
-	public static List<Object> asList(final Object array) {
+	public static <X> List<X> asList(final Object array) {
+		if (array instanceof List) return (List) array;
 		if ( ! array.getClass().isArray())
 			throw new IllegalArgumentException("Backing object is not an array");
 		// the primitive types
@@ -435,7 +436,7 @@ public class Containers  {
 		if (array instanceof char[]) {
 			return (List) asList((char[])array);
 		}
-		return Arrays.asList((Object[])array);
+		return (List) Arrays.asList((Object[])array);
 	}
 
 	
