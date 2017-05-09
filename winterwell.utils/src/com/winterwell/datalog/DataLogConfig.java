@@ -17,6 +17,18 @@ import com.winterwell.utils.time.TUnit;
  * This might include DB connection options -- but it does not have to, provided those are set
 	 * elsewhere.
 	 * 
+	 * 
+	 * 
+We can send different datalog namespaces to different ES.
+
+E.g. we might send tracking (which is in the default namespace, using ES index datalog.default) to one ES, 
+whilst the lower volume advert watching (namespace=goodloop, ES index=datalog.goodloop -- spot the pattern) goes to a different one.
+
+This is setup via the file `config/datalog.{namespace}.properties`, changing the defaults:
+port=9200
+server=localhost
+
+	 * 
  * @author daniel
  *         <p>
  *         <b>Copyright & license</b>: (c) Winterwell Associates Ltd, all rights
