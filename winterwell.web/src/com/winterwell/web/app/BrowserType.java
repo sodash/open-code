@@ -27,6 +27,8 @@ public class BrowserType {
 	 */
 	public static final String MAKE_IE = "ie";
 
+	public static final String FACEBOOK = "facebook";
+
 	private String os;
 	
 	public String getOS() {
@@ -111,6 +113,17 @@ public class BrowserType {
 				return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Is it a Facebook-app embedded browser?
+	 * @return
+	 */
+	public String getApp() {
+		// see https://mobiforge.com/research-analysis/webviews-and-user-agent-strings
+		if (ua.contains("FBAV")) return FACEBOOK;
+		// Are there others we could recognise? 
+		return null;
 	}
 
 	private static final Pattern MSIE = Pattern.compile("\\bMSIE (\\d+\\.\\d+)");

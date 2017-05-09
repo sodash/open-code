@@ -739,7 +739,7 @@ public class ObjectDistribution<X> extends AFiniteDistribution<X> implements
 	public Set<X> sample(int num) {
 		if (num >= size()) {
 			// the lot
-			return new HashSet<X>(this);
+			return new HashSet<X>(super.asList());
 		}
 		if (num < 0)
 			throw new IllegalArgumentException(num+" must be >= 0");

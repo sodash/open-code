@@ -3,6 +3,7 @@ package com.winterwell.maths.stats.distributions.cond;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.winterwell.maths.ITrainable;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
@@ -27,15 +28,26 @@ public class FrequencyCondDistribution<X, C> extends
 	 * secondary marginal->prob map.
 	 * @return a new Map
 	 */
-	protected Map newMap() {
-		return new HashMap();
-	}
+	protected final Supplier<Map> newMap;
 	
-	protected final Map<C, ObjectDistribution<X>> dists = newMap();
+	protected final Map<C, ObjectDistribution<X>> dists;
 
-	protected final ObjectDistribution<X> generic = new ObjectDistribution<X>(newMap(), false).setPseudoCount(2);
+	protected final ObjectDistribution<X> generic;
 
 	public FrequencyCondDistribution() {
+		this(HashMap::new);
+	}
+	
+	/**
+	 * Override to use e.g. HalfLifeMap. This is used for both the top-level context->marginal map, and the
+	 * secondary marginal->prob map.
+	 * @return a new Map
+	 */
+	public FrequencyCondDistribution(Supplier<Map> newMap) {
+		this.newMap = newMap;
+		assert newMap!=null;
+		dists = newMap.get();
+		generic = new ObjectDistribution<X>(newMap.get(), false).setPseudoCount(2);
 	}
 
 	@Override
@@ -95,7 +107,7 @@ public class FrequencyCondDistribution<X, C> extends
 	public void train1(C context, X x, double weight) {
 		ObjectDistribution<X> dist = dists.get(context);
 		if (dist == null) {
-			dist = new ObjectDistribution<X>(newMap(), false);
+			dist = new ObjectDistribution<X>(newMap.get(), false);
 			dist.setPseudoCount(2);
 			dists.put(context, dist);
 		}

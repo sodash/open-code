@@ -1,9 +1,11 @@
 package com.winterwell.maths.stats.distributions.discrete;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,7 +29,9 @@ import com.winterwell.utils.log.Log;
  * 
  */
 public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
-		implements IFiniteDistribution<T>, Collection<T> {
+		implements IFiniteDistribution<T>
+//, Collection<T> causes problems with serialisers :( Use asList() instead 
+{
 	
 	/**
 	 * If >0, the total weight (i.e. the sum of values).<br>
@@ -67,7 +71,7 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 		// Build list of candidate terms
 		HashSet<Term> terms = new HashSet();
 		for (AFiniteDistribution<Term> dm : classifier.values()) {
-			terms.addAll(dm);
+			terms.addAll(dm.asList());
 		}
 		// what is each one like?
 		Map<Label,TopNList<Term>> topTerms = new ArrayMap();
@@ -97,18 +101,6 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 	public AFiniteDistribution() {
 	}
 
-	@Deprecated
-	@Override
-	public boolean add(T e) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Deprecated
-	@Override
-	public boolean addAll(Collection<? extends T> c)
-			throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
 
 	/**
 	 * Add another distribution to this one (editing this), so afterwards<br>
@@ -149,19 +141,19 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 		setProb(obj, p);
 	}
 
-	@Override
+//	@Override
 	public void clear() {
 		for (Object x : toArray()) {
 			setProb((T) x, 0);
 		}
 	}
 
-	@Override
+//	@Override
 	public boolean contains(Object o) {
 		return prob((T) o) != 0;
 	}
 
-	@Override
+//	@Override
 	public boolean containsAll(Collection<?> c) {
 		for (Object object : c) {
 			if (!contains(object))
@@ -239,7 +231,7 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 		return wt;
 	}
 
-	@Override
+//	@Override
 	public boolean isEmpty() {
 		return size() == 0;
 	}
@@ -271,14 +263,14 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 	 * Equivalent to {@link #setProb(Object, double)} with p=0, but a bit less
 	 * efficient (uses an extra hashmap lookup).
 	 */
-	@Override
+//	@Override
 	public boolean remove(Object o) {
 		double p = prob((T) o);
 		setProb((T) o, 0);
 		return p != 0;
 	}
 
-	@Override
+//	@Override
 	public boolean removeAll(Collection<?> c) {
 		for (Object x : c) {
 			setProb((T) x, 0);
@@ -290,7 +282,7 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 	/**
 	 * WARNING: beware of the class! e.g. String != Tkn ever
 	 */
-	@Override
+//	@Override
 	public boolean retainAll(Collection<?> c) {
 		ArrayList remove = new ArrayList();
 		for (T object : this) {
@@ -335,7 +327,7 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
+//	@Override
 	public Object[] toArray() {
 		// inefficient - but doesn't need to know about how data is stored
 		ArrayList<T> list = new ArrayList<T>();
@@ -345,7 +337,7 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 		return list.toArray();
 	}
 
-	@Override
+//	@Override
 	public <T2> T2[] toArray(T2[] a) {
 		// inefficient - but doesn't need to know about how data is stored
 		ArrayList<T> list = new ArrayList<T>();
@@ -355,6 +347,33 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 		return list.toArray(a);
 	}
 
+	public Collection<T> asList() {
+		return new CollectionWrapper(this);
+	}
+
+}
+
+class CollectionWrapper<T> extends AbstractCollection<T> {
+
+	private final AFiniteDistribution<T> dist;
+
+	public CollectionWrapper(AFiniteDistribution<T> aFiniteDistribution) {
+		this.dist = aFiniteDistribution; 
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+		return dist.iterator();
+	}
+
+	@Override
+	public int size() {
+		return dist.size();
+	}
+	
+	public boolean contains(Object o) {
+		return dist.contains(o);
+	}
 }
 
 
@@ -377,6 +396,6 @@ final class DistroMap<T> extends AbstractMap2<T, Double> {
 	}
 	@Override
 	public Set<T> keySet() throws UnsupportedOperationException {
-		return new HashSet(dist); 
+		return new HashSet(dist.asList()); 
 	}
 }
