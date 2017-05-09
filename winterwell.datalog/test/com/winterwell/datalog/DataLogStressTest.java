@@ -23,7 +23,7 @@ public class DataLogStressTest extends DatalogTestCase {
 
 	@Test
 	public void testStressCSV() throws IOException, InterruptedException {
-		StatConfig config = new StatConfig();
+		DataLogConfig config = new DataLogConfig();
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = CSVStorage.class;
 		DataLog.dflt = new DataLogImpl(config);
@@ -33,7 +33,7 @@ public class DataLogStressTest extends DatalogTestCase {
 	
 	@Test
 	public void testStressSQL() throws IOException, InterruptedException {
-		StatConfig config = new StatConfig();
+		DataLogConfig config = new DataLogConfig();
 		new SQLStorage().init(config);		
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = SQLStorage.class;

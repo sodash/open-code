@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.winterwell.datalog.DataLog.KInterpolate;
-import com.winterwell.datalog.server.DataLogSettings;
+import com.winterwell.datalog.server.LgServlet;
 import com.winterwell.depot.Desc;
 import com.winterwell.es.ESType;
 import com.winterwell.es.client.ESConfig;
@@ -42,6 +43,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.log.Log;
@@ -53,8 +55,8 @@ import com.winterwell.utils.time.Time;
 public class ESStorage implements IDataLogStorage {
 
 	private static final String simple = "simple";
-	private ESConfig settings;
-	private ESHttpClient client;
+	private ESConfig esConfig;
+	private DataLogConfig config;
 	
 	@Override
 	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {
@@ -76,7 +78,7 @@ public class ESStorage implements IDataLogStorage {
 	@Override
 	public void saveHistory(Map<Pair2<String, Time>, Double> tag2time2count) {
 		// TODO Auto-generated method stub
-		
+		Log.e("TODO", "saveHistory "+tag2time2count);
 	}
 
 	@Override
@@ -139,31 +141,51 @@ public class ESStorage implements IDataLogStorage {
 	@Override
 	public void setHistory(Map<Pair2<String, Time>, Double> tagTime2set) {
 		// TODO Auto-generated method stub
-		
 	}
 
-	public IDataLogStorage init(StatConfig config) {
-		if (settings == null) {
-			settings = new ESConfig();			
+	public IDataLogStorage init(DataLogConfig config) {
+		this.config = config;
+		// ES config
+		if (esConfig == null) {
+			esConfig = ArgsParser.getConfig(new ESConfig(), new File("config/datalog.properties"));
 		}
-		client = new ESHttpClient(settings);
-		String idx = indexFromDataspace(DataLog.getDataspace());
-		initIndex(idx);
+		// Support per-namespace ESConfigs
+		if (config.namespaceConfigs!=null) {
+			synchronized (config4dataspace) {
+				for (String n : config.namespaceConfigs) {
+					File f = new File("config/datalog."+n.toLowerCase()+".properties");
+					Log.d("DataLog.init", "Looking for special namespace "+n+" config in "+f+" file-exists: "+f.exists());
+					ESConfig esConfig4n = ArgsParser.getConfig(new ESConfig(), f);
+					config4dataspace.put(n, esConfig4n);
+				}
+			}
+		}
+		// init
+		ArraySet<String> dataspaces = new ArraySet();
+		if (config.namespace!=null) dataspaces.add(config.namespace);
+		if (config.namespaceConfigs!=null) {
+			dataspaces.addAll(config.namespaceConfigs);
+		}
+		for (String d : dataspaces) {
+			String idx = indexFromDataspace(d);
+			initIndex(d, idx);			
+		}
 		return this;
 	}
 
 	
-	private void initIndex(String index) {
-		if ( ! client.admin().indices().indexExists(index)) {
+	private void initIndex(String dataspace, String index) {
+		ESHttpClient _client = client(dataspace);
+		if ( ! _client.admin().indices().indexExists(index)) {
 			// make it
-			CreateIndexRequest pc = client.admin().indices().prepareCreate(index);
+			CreateIndexRequest pc = _client.admin().indices().prepareCreate(index);
 			pc.setDefaultAnalyzer(Analyzer.keyword);
 			IESResponse res = pc.get();
 			res.check();
 		}
 		// register some standard event types??
 		try {
-			PutMappingRequestBuilder pm = client.admin().indices().preparePutMapping(index, typeFromEventType(simple));
+			PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, typeFromEventType(simple));
 			ESType simpleEvent = new ESType()
 					.property("count", new ESType().DOUBLE())
 					.property("time", new ESType().date())
@@ -204,6 +226,7 @@ public class ESStorage implements IDataLogStorage {
 		// put a time marker on it -- the end in seconds is enough
 		long secs = period.getEnd().getTime() % 1000;
 		String id = event.getId()+"_"+secs;
+		ESHttpClient client = client(dataspace);
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
 		if (event.time==null) event.time = period.getEnd();
 		// set doc
@@ -236,7 +259,7 @@ public class ESStorage implements IDataLogStorage {
 	public void registerEventType(String dataspace, String eventType) {
 		String index = indexFromDataspace(dataspace);
 		String type = typeFromEventType(eventType);
-		PutMappingRequestBuilder putMapping = client.admin().indices().preparePutMapping(index, type);
+		PutMappingRequestBuilder putMapping = client(dataspace).admin().indices().preparePutMapping(index, type);
 		// Set the time property as time. The rest it can auto-figure
 		Map msrc = new ESType()
 						.property("time", new ESType().date());
@@ -266,9 +289,9 @@ public class ESStorage implements IDataLogStorage {
 	}
 	
 	SearchResponse getData2(DataLogEvent spec, Time start, Time end, boolean sortByTime) {
-		StatConfig config = Dep.get(StatConfig.class);		
+		DataLogConfig config = Dep.get(DataLogConfig.class);		
 		String index = indexFromDataspace(spec.dataspace);
-		SearchRequestBuilder search = client.prepareSearch(index);
+		SearchRequestBuilder search = client(spec.dataspace).prepareSearch(index);
 		search.setType(typeFromEventType(spec.eventType));
 		search.setSize(config.maxDataPoints);
 		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time").from(start.toISOString(), true).to(end.toISOString(), true);
@@ -296,10 +319,17 @@ public class ESStorage implements IDataLogStorage {
 			search.setSize(0);
 		}
 //		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
-		client.debug = true;
+//		client.debug = true;
 		SearchResponse sr = search.get();
-		client.debug = false;
+//		client.debug = false;
 		return sr;
+	}
+
+	static Map<String, ESConfig> config4dataspace = new HashMap();
+	
+	private ESHttpClient client(String dataspace) {		
+		ESConfig _config = Utils.or(config4dataspace.get(dataspace), esConfig);
+		return new ESHttpClient(_config);
 	}
 
 	@Override
@@ -312,7 +342,7 @@ public class ESStorage implements IDataLogStorage {
 
 	public void registerDataspace(String dataspace) {
 		String index = indexFromDataspace(dataspace);
-		initIndex(index);
+		initIndex(dataspace, index);
 	}
 	
 }

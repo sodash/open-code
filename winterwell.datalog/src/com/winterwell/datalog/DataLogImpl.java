@@ -64,7 +64,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 	}
 	
 	@Override
-	public StatConfig getConfig() {
+	public DataLogConfig getConfig() {
 		return config;
 	}
 
@@ -205,7 +205,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 
 	static Timer saveThread;
 
-	final StatConfig config;
+	final DataLogConfig config;
 	final IDataLogStorage storage;
 
 	/**
@@ -217,10 +217,10 @@ public class DataLogImpl implements Closeable, IDataLog {
 	 * @throws InstantiationException
 	 */
 	public DataLogImpl() {
-		this(new StatConfig());
+		this(new DataLogConfig());
 	}
 
-	public DataLogImpl(StatConfig config) {
+	public DataLogImpl(DataLogConfig config) {
 		this.config = config;
 		// Create the storage
 		if (config.storageClass == null) {

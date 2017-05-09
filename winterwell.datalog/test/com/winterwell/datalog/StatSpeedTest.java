@@ -16,7 +16,7 @@ public class StatSpeedTest extends DatalogTestCase {
 	
 	@Test
 	public void testSmoke() throws IOException {
-		StatConfig config = new StatConfig();
+		DataLogConfig config = new DataLogConfig();
 		config.interval = TUnit.SECOND.dt;
 		DataLog.setConfig(config);
 //		assert Stat.saveThread != null;

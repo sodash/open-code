@@ -33,7 +33,7 @@ public class DatalogTestCase {
 	public void initSQL() {
 		setupDB();
 		
-		StatConfig config = new StatConfig();
+		DataLogConfig config = new DataLogConfig();
 		config.storageClass = SQLStorage.class;
 		config.interval = new Dt(5, TUnit.SECOND);
 		
@@ -58,7 +58,7 @@ public class DatalogTestCase {
 	 * Init a CSV-backed stat
 	 */
 	public void initCSV() {
-		StatConfig config = new StatConfig();
+		DataLogConfig config = new DataLogConfig();
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = CSVStorage.class;
 		DataLog.dflt = new DataLogImpl(config);

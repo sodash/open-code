@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.datalog.DataLog;
-import com.winterwell.datalog.StatConfig;
+import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.utils.web.WebUtils2;
 
 import com.winterwell.utils.Utils;

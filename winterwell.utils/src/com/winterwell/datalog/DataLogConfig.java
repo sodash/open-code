@@ -1,6 +1,12 @@
 package com.winterwell.datalog;
 
 import com.winterwell.utils.io.DBUtils.DBOptions;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
@@ -18,7 +24,7 @@ import com.winterwell.utils.time.TUnit;
  *         library. In particular, licenses for the com.winterwell.utils library do
  *         not apply to this file.
  */
-public class StatConfig extends DBOptions {
+public class DataLogConfig extends DBOptions {
 
 	public int maxDataPoints = 10000;
 
@@ -29,14 +35,40 @@ public class StatConfig extends DBOptions {
 	public Dt interval = new Dt(15, TUnit.MINUTE);
 
 	/**
-	 * This sets {@link DataLog#DEFAULT_DATASPACE}
+	 * Normally "default", This sets {@link DataLog#DEFAULT_DATASPACE}
 	 */
 	@Option(description = "namespace: if set, use a separate namespace (to avoid race-condition overwriting of stats with another JVM).")
-	public String namespace;
+	public String namespace = "default";
+	
+	/**
+	 * These namespaces have their own config overrides.
+	 */
+	@Option
+	public List<String> namespaceConfigs = Arrays.asList("default");
 
 	public Dt filePeriod = TUnit.DAY.dt;
 	
 	@Option
 	public Class storageClass;
+	
+
+	/**
+	 * Jetty server port for incoming logging
+	 */
+	@Option
+	public int port = 8585;
+	
+	
+	@Option
+	public String COOKIE_DOMAIN = ".good-loop.com";
+
+
+	@Option
+	public File logFile = new File(FileUtils.getWorkingDirectory(), "lg.txt"); 
+
+
+	@Option(description="If true, Java will set CORS cross-domain access headers. Note that this can cause bugs if NGinx is also setting them.")
+	public boolean CORS;
+
 
 }

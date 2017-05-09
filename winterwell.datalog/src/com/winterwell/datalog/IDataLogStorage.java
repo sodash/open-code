@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.datalog.DataLog.KInterpolate;
-import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
@@ -19,7 +18,7 @@ import com.winterwell.utils.time.Time;
 
 public interface IDataLogStorage {
 	
-	IDataLogStorage init(StatConfig settings);
+	IDataLogStorage init(DataLogConfig settings);
 
 	/**
 	 * Use IDataStream csv format: timestamp, tag, value.

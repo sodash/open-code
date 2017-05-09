@@ -12,7 +12,7 @@ import com.winterwell.utils.time.Time;
 public class StatTest extends DatalogTestCase {
 
 	public StatTest() {
-		StatConfig config = new StatConfig();
+		DataLogConfig config = new DataLogConfig();
 		config.interval = TUnit.MINUTE.dt;
 		DataLog.setConfig(config);
 	}

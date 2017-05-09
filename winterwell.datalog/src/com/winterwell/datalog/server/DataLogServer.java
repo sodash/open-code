@@ -20,7 +20,7 @@ import com.winterwell.datalog.ESStorage;
 import com.winterwell.datalog.IDataLog;
 import com.winterwell.datalog.IDataLogAdmin;
 import com.winterwell.datalog.IDataLogStorage;
-import com.winterwell.datalog.StatConfig;
+import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.DataLogImpl;
 import com.winterwell.es.ESUtils;
 import com.winterwell.es.client.ESConfig;
@@ -36,10 +36,10 @@ public class DataLogServer {
 	
 	public static LogFile logFile;
 
-	public static DataLogSettings settings;
+	public static DataLogConfig settings;
 
 	public static void main(String[] args) {
-		settings = ArgsParser.getConfig(new DataLogSettings(), args, new File("config/datalog.properties"), null);
+		settings = ArgsParser.getConfig(new DataLogConfig(), args, new File("config/datalog.properties"), null);
 		assert settings != null;
 		
 		logFile = new LogFile(DataLogServer.settings.logFile)
@@ -61,8 +61,7 @@ public class DataLogServer {
 
 	private static void init() {
 		IDataLog dli = DataLog.getImplementation();
-		StatConfig myConfig = (StatConfig) dli.getConfig();
-		myConfig.storageClass = settings.storageClass;
+		DataLogConfig myConfig = (DataLogConfig) dli.getConfig();
 		DataLog.setConfig(myConfig);
 		
 		// register the tracking event

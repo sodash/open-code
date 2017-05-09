@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.datalog.DataLog.KInterpolate;
-import com.winterwell.datalog.server.DataLogSettings;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.TodoException;
@@ -48,7 +47,7 @@ public class SQLStorage implements IDataLogStorage {
 	
 	private static int BATCH_SIZE = 100;
 	
-	private StatConfig config;
+	private DataLogConfig config;
 
 	/**
 	 * FIXME: This constructor is called at sodash startup. It can't call initStatDB,
@@ -62,7 +61,7 @@ public class SQLStorage implements IDataLogStorage {
 	}
 	
 	@Override
-	public IDataLogStorage init(StatConfig settings) {
+	public IDataLogStorage init(DataLogConfig settings) {
 		this.config = settings;
 		initStatDB();
 		return this;

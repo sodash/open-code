@@ -301,7 +301,7 @@ public class SQLStorageTest extends DatalogTestCase {
 		assertTrue(storage.selectSum(null, s, e, null, smarch) >= 3.0);
 	}
 
-	private StatConfig newStatConfig() {
-		return new StatConfig();
+	private DataLogConfig newStatConfig() {
+		return new DataLogConfig();
 	}
 }

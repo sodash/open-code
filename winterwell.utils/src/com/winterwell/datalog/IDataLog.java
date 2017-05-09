@@ -169,7 +169,7 @@ public interface IDataLog extends Closeable, Flushable {
 	 * This might include DB connection options -- but it does not have to, provided those are set
 	 * elsewhere.
 	 */
-	StatConfig getConfig();
+	DataLogConfig getConfig();
 
 	IFuture<MeanRate> getMean(Time start, Time end, String... tagBits);
 

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.datalog.DataLog.KInterpolate;
-import com.winterwell.datalog.server.DataLogSettings;
+
 import com.winterwell.depot.Depot;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.MetaData;
@@ -51,18 +51,18 @@ public class CSVStorage implements IDataLogStorage {
 	
 	// FIXME any reason to use Depot?
 	Depot depot = Depot.getDefault();
-	StatConfig config;
+	DataLogConfig config;
 	
 	public CSVStorage() {
-		this(new StatConfig());
+		this(new DataLogConfig());
 	}
 	
-	public CSVStorage(StatConfig config) {
+	public CSVStorage(DataLogConfig config) {
 		init(config);
 	}
 	
 	@Override
-	public IDataLogStorage init(StatConfig config) {
+	public IDataLogStorage init(DataLogConfig config) {
 		this.config = config;
 		return this;
 	}

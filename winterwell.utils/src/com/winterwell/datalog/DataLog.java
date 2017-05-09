@@ -112,7 +112,7 @@ public class DataLog {
 		try {
 			IDataLog dl = (IDataLog) Class.forName(CLASS_DATALOGIMPL)
 					.newInstance();
-			Dep.set(StatConfig.class, dl.getConfig());
+			Dep.set(DataLogConfig.class, dl.getConfig());
 			return dl;
 		} catch (Exception e) {
 			// Bad!
@@ -275,7 +275,7 @@ public class DataLog {
 	 *
 	 * @param myConfig
 	 */
-	public static void setConfig(StatConfig myConfig) {
+	public static void setConfig(DataLogConfig myConfig) {
 		if (dflt != null) {
 			try {
 				dflt.close();
@@ -284,7 +284,7 @@ public class DataLog {
 				Log.e(LOGTAG, e);
 			}
 		}
-		Dep.set(StatConfig.class, myConfig);
+		Dep.set(DataLogConfig.class, myConfig);
 		// default dataspace
 		if ( ! Utils.isBlank(myConfig.namespace)) {
 			DEFAULT_DATASPACE = myConfig.namespace;
@@ -292,7 +292,7 @@ public class DataLog {
 		// make it
 		try {
 			Class<?> klass = Class.forName(CLASS_DATALOGIMPL);
-			Constructor<?> cons = klass.getConstructor(StatConfig.class);
+			Constructor<?> cons = klass.getConstructor(DataLogConfig.class);
 			dflt = (IDataLog) cons.newInstance(myConfig);
 		} catch (Exception ex) {
 			throw Utils.runtime(ex);
@@ -433,6 +433,9 @@ public class DataLog {
 	}
 
 	private static final ThreadLocal<String> dataspace = new ThreadLocal();
+
+	/** Use {@link DataLogConfig#namespace} */
+	@Deprecated 
 	public static String DEFAULT_DATASPACE = "default";
 	
 	public static String getDataspace() {

@@ -27,7 +27,7 @@ public class ESStorageTest {
 
 	@BeforeClass
 	public static void setup() {
-		StatConfig config = new StatConfig();
+		DataLogConfig config = new DataLogConfig();
 		config.interval = new Dt(1, TUnit.SECOND);
 		config.storageClass = ESStorage.class;
 		DataLog.dflt = new DataLogImpl(config);
@@ -49,7 +49,7 @@ public class ESStorageTest {
 	@Test
 	public void testSaveEvent() throws InterruptedException, ExecutionException {		
 		ESStorage storage = new ESStorage();
-		storage.init(new StatConfig());
+		storage.init(new DataLogConfig());
 //		{charity: Alzheimers Research UK, 
 		// publisher: www.good-loop.com} 
 		// tracker:szkpogoeegglvcszwtao@trk 
@@ -147,7 +147,7 @@ public class ESStorageTest {
 		tag2mean.put("world", mv);
 		
 		ESStorage storage = new ESStorage();
-		storage.init(new StatConfig());
+		storage.init(new DataLogConfig());
 		storage.save(p, tag2count, tag2mean);
 		assertEquals(4.0, storage.getTotal("hello", p.first, p.second).get());
 		ListDataStream stream = (ListDataStream) storage.getData("world", p.first, p.second, null, null).get();
