@@ -3,10 +3,12 @@ package com.winterwell.depot;
 import java.io.File;
 import java.lang.reflect.Constructor;
 
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
 import com.winterwell.utils.log.KErrorPolicy;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 
@@ -56,6 +58,14 @@ public class DepotConfig {
 	@Option
 	Dt writeBehind = new Dt(60, TUnit.SECOND);
 
+	/**
+	 * Add some randomness to the delay -- to help avoid clashes between servers/processes.
+	 * 
+	 * In [0,1] Randomly adjust the writeBehind delay by * this much (so 0.1 = 10% = +/- 5%).
+	 */
+	@Option
+	double writeBehindJitter = 0.1;
+	
 	@Option
 	File dir;
 
@@ -92,6 +102,13 @@ public class DepotConfig {
 		
 		if (writeBehind!=null) {
 			SlowStorage wb = new SlowStorage(s, writeBehind, depot);
+			if (writeBehindJitter!=0) {
+				if ( ! MathUtils.isProb(writeBehindJitter)) {
+					Log.e("DepotConfig", "Invalid jitter "+writeBehindJitter);
+				} else {
+					wb.setDelayJitter(writeBehindJitter);
+				}
+			}
 			return wb;
 		}
 		return s;

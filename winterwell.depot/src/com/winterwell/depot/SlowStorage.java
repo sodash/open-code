@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.Actor;
 import com.winterwell.utils.threads.SlowActor;
@@ -103,11 +104,11 @@ implements IStore , Flushable, Closeable
 		map.put(desc, artifact);
 		// Note: Races don't matter here -- the message is just "do something with desc"
 		
+		Dt dt = delay;
 		// Can we afford a long delay? 
 		// A crude defence against out-of-memory issues.
 		// TODO a SoftReference based map (with save-on-evict) might be better. 
-		long freeMem = ReflectionUtils.getAvailableMemory();
-		Dt dt = delay;
+		long freeMem = ReflectionUtils.getAvailableMemory();		
 		if (freeMem < 20 * MB) { // 20mb
 			Runtime rt = Runtime.getRuntime();
 			long totalMem = rt.totalMemory();
@@ -122,6 +123,12 @@ implements IStore , Flushable, Closeable
 			long totalMem = rt.totalMemory();
 //			Log.w(LOGTAG, "Fast storage with "+(freeMem/MB)+"mb of "+(totalMem/MB)+"mb");
 			dt = TUnit.SECOND.dt;
+		}
+		// jitter
+		if (delayJitter!=0) {
+			double jitter = 1 + ((Utils.getRandom().nextDouble() - 0.5) * delayJitter);
+			assert jitter > 0 && jitter < 2 : jitter;
+			dt = dt.multiply(jitter);
 		}
 		// post ourselves a note to deal with it
 		sendDelayed(desc, null, dt);		
@@ -196,6 +203,11 @@ implements IStore , Flushable, Closeable
 	}
 
 	Depot depot;
+
+	/**
+	 * Add some randomness to the delay -- to help avoid clashes between servers/processes.
+	 */
+	private double delayJitter;
 	
 	public IStore getBase() {
 		return base;
@@ -203,6 +215,10 @@ implements IStore , Flushable, Closeable
 
 	public void setDelay(Dt dt) {
 		this.delay = dt;
+	}
+
+	public void setDelayJitter(double writeBehindJitter) {
+		this.delayJitter = writeBehindJitter;
 	}
 
 }
