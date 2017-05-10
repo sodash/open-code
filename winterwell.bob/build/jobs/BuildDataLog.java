@@ -7,9 +7,9 @@ import java.util.Collection;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.io.FileUtils;
 
-public class BuildStat extends BuildWinterwellProject {
+public class BuildDataLog extends BuildWinterwellProject {
 
-	public BuildStat() {
+	public BuildDataLog() {
 		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.datalog"));
 	}	
 

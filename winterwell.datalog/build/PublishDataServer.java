@@ -48,7 +48,7 @@ import com.winterwell.web.email.SimpleMessage;
 import jobs.BuildBob;
 import jobs.BuildFlexiGson;
 import jobs.BuildMaths;
-import jobs.BuildStat;
+import jobs.BuildDataLog;
 import jobs.BuildUtils;
 import jobs.BuildWeb;
 import jobs.BuildWinterwellProject;
@@ -78,7 +78,7 @@ public class PublishDataServer extends BuildTask {
 				new BuildMaths(),
 				new BuildBob(),
 				new BuildWeb(),
-				new BuildStat(), // This!
+				new BuildDataLog(), // This!
 				new BuildESJavaClient(),
 				new BuildFlexiGson()
 				);

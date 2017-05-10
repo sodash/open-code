@@ -991,8 +991,15 @@ public class WebRequest implements IProperties, Closeable {
 		session.setAttribute(key.getName(), value);
 	}
 
-	public void setUser(IProperties user) {
+	/**
+	 * 
+	 * @param uxid Cannot be null if user is not null.
+	 * @param user Can be null even if uxid is not null.
+	 */
+	public void setUser(XId uxid, IProperties user) {
+		this.uxid = uxid;
 		this.user = user;
+		assert user==null || uxid != null : user;
 		setSessionAttribute(USER, user);
 	}
 
@@ -1067,10 +1074,6 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	public XId getUserId() {
 		return uxid;
-	}
-	
-	public void setUserId(XId uxid) {
-		this.uxid = uxid;
 	}
 	
 	XId uxid;

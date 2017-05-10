@@ -3,8 +3,10 @@ package com.winterwell.utils.containers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
@@ -35,6 +37,31 @@ public final class Properties implements IProperties {
 		return _keys;
 	}
 	
+	Map<String,Object> asMap() {
+		return map;		
+	}
+//	
+//	class PMap extends AbstractMap2<String, Object> {
+//		@Override
+//		public Object get(Object key) {
+//			return Properties.this.get(new Key((String)key));
+//		}
+//
+//		@Override
+//		public Object put(String key, Object value) {
+//			return Properties.this.put(new Key(key), value);
+//		}
+//		@Override
+//		public Set<String> keySet() throws UnsupportedOperationException {
+//			// NOT quite correct - edits don't link up
+//			return new HashSet(Containers.apply(getKeys(), k -> k.name));
+//		}		
+//		@Override
+//		public int size() {
+//			return Properties.this.size();
+//		}
+//	}
+	
 	/**
 	 * This is a lop-sided matching test. The case (1st parameter) must be
 	 * equals() to every property of the description (2nd parameter). E.g. {a:1,
@@ -57,9 +84,6 @@ public final class Properties implements IProperties {
 	}
 	
 	private final HashMap<String, Object> map = new HashMap();
-
-	@Deprecated // old
-	private transient HashMap<Key, Object> properties;
 
 	public Properties() {
 		//
@@ -109,31 +133,12 @@ public final class Properties implements IProperties {
 
 	@Override
 	public <T> boolean containsKey(Key<T> key) {
-		oldCodeCleanup();
 		return map.containsKey(key.getName());
-	}
-
-	private void oldCodeCleanup() {
-		if (properties==null) return;
-		Log.d("deprecated", "Clean up old Properties");
-		synchronized (this) {
-			if (map==null) {
-				ReflectionUtils.setPrivateField(this, "map", new HashMap()); 
-			}
-			for(Key key : properties.keySet()) {
-				Object v = properties.get(key);
-				if (v!=null) {
-					map.put(key.getName(), v);
-				}
-			}
-			properties = null;
-		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(Key<T> key) {
-		oldCodeCleanup();
 		Object v = map.get(key.getName());
 		return (T) v;
 	}
@@ -141,7 +146,6 @@ public final class Properties implements IProperties {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Key> getKeys() {
-		oldCodeCleanup();
 		return strings2keys(map.keySet());
 	}
 
@@ -154,7 +158,6 @@ public final class Properties implements IProperties {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T put(Key<T> key, T value) {
-		oldCodeCleanup();
 		assert key != null;
 		if (value == null)
 			return (T) map.remove(key.getName());
@@ -166,7 +169,6 @@ public final class Properties implements IProperties {
 	 * @return the number of entries in this property bag.
 	 */
 	public int size() {
-		oldCodeCleanup();
 		return map.size();
 	}
 

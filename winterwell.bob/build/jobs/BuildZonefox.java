@@ -18,7 +18,7 @@ public class BuildZonefox extends BuildTask {
 				new BuildMaths(),
 				new BuildNLP(),
 				new BuildDepot(),
-				new BuildStat(),
+				new BuildDataLog(),
 				new BuildBob(),
 				new BuildUtils()
 				);
