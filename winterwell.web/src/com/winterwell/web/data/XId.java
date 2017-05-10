@@ -72,7 +72,7 @@ public final class XId implements Serializable, IHasJson {
 	 * @param plugin
 	 */
 	public XId(String name, Object kind, String service, IDoCanonical plugin) {
-		name = plugin.canonical(name, kind);
+		if (plugin != null) name = plugin.canonical(name, kind);
 		this.name = name;
 		this.service = service;
 		// null@twitter is a real user :( c.f. bug #14109 

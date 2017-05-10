@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import javax.persistence.Entity;
 
 import com.winterwell.utils.IFn;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.Proc;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
@@ -530,9 +531,17 @@ public class SqlUtils {
 		if (ReflectionUtils.isa(type, Enum.class)) {
 			Object[] ks = type.getEnumConstants();
 			assert ks != null : type;
-			assert val instanceof Integer : val;
-			int i = (Integer) val;
-			return ks[i];
+			if (val instanceof Integer || val instanceof Long) {
+				int i = (Integer) val;
+				return ks[i];	
+			}
+			String sval = (String) val;
+			for (Object k : ks) {
+				if (k.toString().equals(sval)) {
+					return k;
+				}
+			}
+			throw new IllegalArgumentException("Unrecognised enum value: "+val+" for "+type);
 		}
 		// exceptions
 		if (ReflectionUtils.isa(type, Throwable.class)) {
@@ -954,5 +963,164 @@ public class SqlUtils {
 			return true;
 		}
 	}
+	
+	
+	
+
+	/**
+	 * upsert = update if exists + insert if new
+	 * 
+	 * @param table
+	 * @param idColumns
+	 *            The columns which identify the row. E.g. the primary key. Must
+	 *            not contain any nulls. Should be a subset of columns.
+	 * @param col2val
+	 *            The values to set for every non-null column. Any missing
+	 *            columns will be set to null.
+	 * @param specialCaseId
+	 *            If true, the "id" column is treated specially --
+	 *            nextval(hibernate_sequence) is used for the insert, and no
+	 *            change is made on update. This is a hack 'cos row ids don't
+	 *            travel across servers.
+	 * @return An upsert query, with it's parameters set.
+	 */
+	public static Object upsert(Connection em, String table,
+			String[] idColumns, Map<String, ?> col2val, boolean specialCaseId) {
+		List<Pair<String>> columnInfo = upsert2_columnInfo(em, table,
+				idColumns, col2val, specialCaseId);
+
+		StringBuilder whereClause = SqlUtils.upsert2_where(idColumns, col2val);
+
+		StringBuilder upsert = new StringBuilder();
+
+		// 1. update where exists
+		SqlUtils.upsert2_update(table, col2val, specialCaseId, columnInfo,
+				whereClause, upsert);
+
+		// 2. insert where not exists
+		SqlUtils.upsert2_insert(table, col2val, specialCaseId, columnInfo,
+				whereClause, upsert);
+
+		// do it
+		return executeUpdate(upsert.toString(), em);
+	}
+
+//	static void upsert2_setParams(Map<String, ?> col2val,
+//			boolean specialCaseId, List<Pair<String>> columnInfo, Query q) {
+//		for (Pair<String> colInfo : columnInfo) {
+//			Object v = col2val.get(colInfo.first);
+//			// did this column get ignored?
+//			if ("oid".equals(colInfo.second) || v == null) {
+//				continue;
+//			}
+//			if (specialCaseId && "id".equals(colInfo.first)) {
+//				continue;
+//			}
+//			// set param
+//			q.setParameter(colInfo.first, v);
+//		}
+//	}
+
+//	/**
+//	 * Half an upsert: update-if-exists Does nothing if the row does not exist.
+//	 * 
+//	 * Yes this is hacky. Got any better ideas?
+//	 * 
+//	 * @param idColumns
+//	 *            The columns which identify the row. E.g. the primary key. Must
+//	 *            not contain any nulls. Should be a subset of columns.
+//	 * @param col2val
+//	 *            The values to set for every non-null column. Any missing
+//	 *            columns will be set to null.
+//	 * @param specialCaseId
+//	 *            If true, the "id" column is treated specially --
+//	 *            nextval(hibernate_sequence) is used for the insert, and no
+//	 *            change is made on update. This is a hack 'cos row ids don't
+//	 *            travel across servers. Normally false.
+//	 * @return An update-where query, with it's parameters set.
+//	 */
+//	public static Query update(Connection em, String table,
+//			String[] idColumns, Map<String, ?> col2val, boolean specialCaseId) {
+//		List<Pair<String>> columnInfo = upsert2_columnInfo(em, table,
+//				idColumns, col2val, specialCaseId);
+//
+//		StringBuilder whereClause = SqlUtils.upsert2_where(idColumns, col2val);
+//
+//		StringBuilder upsert = new StringBuilder();
+//
+//		// 1. update
+//		SqlUtils.upsert2_update(table, col2val, specialCaseId, columnInfo,
+//				whereClause, upsert);
+//
+//		// create query
+//		Query q = em.createNativeQuery(upsert.toString());
+//
+////		// set params
+////		upsert2_setParams(col2val, specialCaseId, columnInfo, q);
+//
+//		return q;
+//	}
+
+//	/**
+//	 * Half an upsert: insert-if-not-there. Does nothing if the row already
+//	 * exists.
+//	 * 
+//	 * @param idColumns
+//	 *            The columns which identify the row. E.g. the primary key. Must
+//	 *            not contain any nulls. Should be a subset of columns.
+//	 * @param col2val
+//	 *            The values to set for every non-null column. Any missing
+//	 *            columns will be set to null.
+//	 * @param specialCaseId
+//	 *            If true, the "id" column is treated specially --
+//	 *            nextval(hibernate_sequence) is used for the insert, and no
+//	 *            change is made on update. This is a hack 'cos row ids don't
+//	 *            travel across servers. Normally false.
+//	 * @return An insert-if-absent query, with it's parameters set.
+//	 */
+//	public static Query insertIfAbsent(Connection em, String table,
+//			String[] idColumns, Map<String, ?> col2val, boolean specialCaseId) {
+//		List<Pair<String>> columnInfo = upsert2_columnInfo(em, table,
+//				idColumns, col2val, specialCaseId);
+//
+//		StringBuilder whereClause = SqlUtils.upsert2_where(idColumns, col2val);
+//
+//		StringBuilder upsert = new StringBuilder();
+//
+//		// 1. insert where not exists
+//		SqlUtils.upsert2_insert(table, col2val, specialCaseId, columnInfo,
+//				whereClause, upsert);
+//
+//		// create query
+//		Query q = em.createNativeQuery(upsert.toString());
+//
+////		// set params
+////		upsert2_setParams(col2val, specialCaseId, columnInfo, q);
+//
+//		return q;
+//	}
+
+	private static List<Pair<String>> upsert2_columnInfo(Connection con,
+			String table, String[] idColumns, Map<String, ?> col2val,
+			boolean specialCaseId) {
+		List<Pair<String>> columnInfo = getTableColumns(con, table);
+		// safety check inputs
+		assert idColumns.length <= columnInfo.size();
+		for (String idc : idColumns) {
+			assert idc != null : Printer.toString(idColumns);
+			int i = SqlUtils.getColumnIndex(idc, columnInfo);
+			assert i != -1 : idc + " vs " + columnInfo;
+		}
+		if (specialCaseId) {
+			assert ! Containers.contains("id", idColumns);
+//			assert getColumnIndex(em, "id", table) != -1 : table + " = "
+//					+ getTableColumns(em, table);
+		} else {
+			assert ! col2val.containsKey("id") : col2val;
+		}
+		return columnInfo;
+	}
+	
+	
 
 }
