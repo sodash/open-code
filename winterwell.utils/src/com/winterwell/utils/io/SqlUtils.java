@@ -240,7 +240,8 @@ public class SqlUtils {
 	 * @return results
 	 */
 	public static boolean executeCommand(String sql, Connection con,
-			boolean swallowExceptions) {
+			boolean swallowExceptions) 
+	{
 		boolean autoClose = false;
 		Statement stmnt = null;
 		try {

@@ -265,10 +265,10 @@ public final class XId implements Serializable, IHasJson {
 	}
 
 	/**
-	 * @return true for rubbish XIds of the form "row-id@soda.sh"
+	 * @return true for rubbish XIds of the form "row-id@soda.sh" or "foo@temp"
 	 */
 	public boolean isTemporary() {
-		return isMainService() && StrUtils.isNumber(name);
+		return isService("temp") || (isMainService() && StrUtils.isNumber(name));
 	}
 
 	/**
