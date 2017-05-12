@@ -161,7 +161,8 @@ public final class XId implements Serializable, IHasJson {
 		}
 		
 		IDoCanonical plugin = service2canonical.get(service);
-		this.name = plugin.canonical(id.substring(0, i), kind);
+		String _name = id.substring(0, i);
+		this.name = plugin==null? _name : plugin.canonical(_name, kind);
 		assert notNullNameCheck() : id;
 	}
 	

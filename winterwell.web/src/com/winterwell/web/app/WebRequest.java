@@ -725,8 +725,31 @@ public class WebRequest implements IProperties, Closeable {
 		return "";
 	}
 
+	/**
+	 * If true, {@link #getSessionAttribute(Key)} and {@link #setSessionAttribute(Key, Object)} become no-ops.
+	 * 
+	 * Why?
+	 * It's a backwards compatible cludge to let us safely switch off sessions.
+	 * 
+	 */
+	static boolean NO_SESSIONS = false;
+
+
+	/**
+	 * If true, {@link #getSessionAttribute(Key)} and {@link #setSessionAttribute(Key, Object)} become no-ops.
+	 * 
+	 * Why?
+	 * It's a backwards compatible cludge to let us safely switch off sessions.
+	 * 
+	 */
+	@Deprecated 
+	public static void setNoSessions(boolean no) {
+		NO_SESSIONS = no;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <X> X getSessionAttribute(Key<X> key) {
+		if (NO_SESSIONS) return null;
 		HttpSession session = getRequest().getSession();
 		Object v = session.getAttribute(key.getName());
 		return (X) v;
@@ -983,6 +1006,7 @@ public class WebRequest implements IProperties, Closeable {
 	 *            If null, the key will be removed
 	 */
 	public <X> void setSessionAttribute(Key<X> key, X value) {
+		if (NO_SESSIONS) return;
 		HttpSession session = getRequest().getSession();
 		if (value == null) {
 			session.removeAttribute(key.getName());
