@@ -121,6 +121,12 @@ import com.winterwell.gson.stream.MalformedJsonException;
  */
 public class Gson {
 	
+	public Map toJsonObject(Object src) {
+		String json = toJson(src);
+		// Don't use a flexi-gson convertor! Because we don't want to interpret class info.
+		return Gson.fromJSON(json);
+	}
+
 	
 	/**
 	 * Allows for LATE setting of an adapter. 

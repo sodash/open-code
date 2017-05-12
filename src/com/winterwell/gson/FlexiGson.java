@@ -24,9 +24,5 @@ import java.util.Map;
  */
 public final class FlexiGson extends Gson {
 
-	public static Map toJSONObject(Object src) {
-		String json = toJSON(src);
-		return fromJSON(json);
-	}
 }
 
