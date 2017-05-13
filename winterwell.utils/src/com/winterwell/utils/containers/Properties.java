@@ -37,7 +37,7 @@ public final class Properties implements IProperties {
 		return _keys;
 	}
 	
-	Map<String,Object> asMap() {
+	public Map<String,Object> asMap() {
 		return map;		
 	}
 //	

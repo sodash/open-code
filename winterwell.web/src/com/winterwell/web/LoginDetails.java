@@ -72,7 +72,7 @@ public class LoginDetails implements IProperties, Serializable {
 		// Utils.check4null(server, loginName, password);
 		// }
 		this.server = server;
-		assert !server.contains(" ") && !server.contains("\n") : server; // whitespace
+		assert ! server.contains(" ") && ! server.contains("\n") : server; // whitespace
 																			// is
 																			// bad
 		this.loginName = loginName;
@@ -95,6 +95,9 @@ public class LoginDetails implements IProperties, Serializable {
 		return (T) v;
 	}
 
+	/**
+	 * DOes NOT include the fields, eg password!
+	 */
 	@Override
 	public Collection<Key> getKeys() {
 		return properties.keySet();
