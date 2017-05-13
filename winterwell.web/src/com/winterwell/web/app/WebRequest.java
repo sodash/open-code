@@ -581,11 +581,13 @@ public class WebRequest implements IProperties, Closeable {
 
 
 	/**
-	 * Returns a parameter map without the garbled empty stuff which can occur.
+	 * Returns a parameter map without the garbled empty stuff which can occur,
+	 * and adding in explicitly set {@link #properties}.
 	 * @return {parameter: String[] if from the request, or Object if poked} 
 	 * @see #getMap() which will convert String[] into String 
 	 */
 	public final Map<String,Object> getParameterMap() {
+		// How does this interact with .getPostBody()??
 		Map params = getRequest().getParameterMap();
 		
 		HashMap modParams = new HashMap();
@@ -1052,30 +1054,35 @@ public class WebRequest implements IProperties, Closeable {
 		return ua==null? "unknown" : ua;
 	}
 
+	String postBody;
+	
 	/**
 	 * 
-	 * @return
+	 * @return the post body, if there was one, or null.
 	 */
 	public String getPostBody() {
-		String body = null;
+		if (postBody!=null) return postBody;
 		try {
-			body = FileUtils.read(request.getInputStream());
-			if (body!=null && ! body.isEmpty()) return body;
+			String body = FileUtils.read(request.getInputStream());
+			if (body!=null && ! body.isEmpty()) {
+				postBody = body;
+				return postBody;
+			}
 		} catch(IOException ex) {
 			throw Utils.runtime(ex);
 		}
 		// getParameterMap -- which may already have been called -- will consume 
-		// the post body!
+		// the post body! But we can recover it as the last blank-valued key.
 		try {
 			Map<String, String[]> map = request.getParameterMap();
 			// Take the last blank-valued key!
 			for(Map.Entry<String, String[]> me : map.entrySet()) {
 				String[] v = me.getValue();
 				if (v==null || v.length==0 || (v.length==1 && v[0].isEmpty())) {
-					body = me.getKey().toString();
+					postBody = me.getKey().toString();
 				}
 			}
-			return body;
+			return postBody;
 		} catch (Exception e) {
 			throw Utils.runtime(e);
 		}
