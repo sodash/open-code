@@ -1046,6 +1046,10 @@ public class WebUtils2 extends WebUtils {
 	public static final void sendError(int code, String output,
 			HttpServletResponse response) {
 		try {
+			// Does this work??
+//			if (output!=null) {
+//				FileUtils.getWriter(response.getOutputStream()).write(output);
+//			}
 			response.sendError(code, output);
 		} catch (IOException e) {
 			Log.e("web", e);
