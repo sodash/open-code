@@ -1047,9 +1047,17 @@ public class WebUtils2 extends WebUtils {
 			HttpServletResponse response) {
 		try {
 			// Does this work??
-//			if (output!=null) {
-//				FileUtils.getWriter(response.getOutputStream()).write(output);
-//			}
+			if (output!=null) {
+				response.setContentType(WebUtils.MIME_TYPE_TXT_UTF8);
+				// TODO use response.getWriter() instead? Does this affect encoding
+				// issues at all?
+				// PrintWriter pw = response.getWriter();
+				BufferedWriter out = FileUtils.getWriter(response.getOutputStream());
+				out.append(output.toString());
+				response.setStatus(code);
+				FileUtils.close(out); // NB: this close does not seem to be needed
+				return;
+			}
 			response.sendError(code, output);
 		} catch (IOException e) {
 			Log.e("web", e);

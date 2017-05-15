@@ -361,9 +361,13 @@ public class WebRequest implements IProperties, Closeable {
 	 * Close the request.input & response.output streams.
 	 */
 	@Override
-	public void close() throws IOException {
-		FileUtils.close(response.getOutputStream());
-		FileUtils.close(request.getInputStream());
+	public void close() {
+		try {
+			FileUtils.close(response.getOutputStream());
+			FileUtils.close(request.getInputStream());
+		} catch(Exception ex) {
+			// oh well
+		}
 	}
 
 	/**

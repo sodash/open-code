@@ -463,7 +463,7 @@ public class SqlUtils {
 		final Field[] fields;
 
 		public InflateFn(Class<X> klass, Field[] fields) throws NoSuchMethodException, SecurityException {
-			con = klass.getConstructor();
+			con = klass.getDeclaredConstructor();
 			con.setAccessible(true);
 			this.fields = fields;
 		}
@@ -542,6 +542,10 @@ public class SqlUtils {
 				}
 			}
 			throw new IllegalArgumentException("Unrecognised enum value: "+val+" for "+type);
+		}
+		// time
+		if (type==Time.class) {
+			return new Time(val.toString());
 		}
 		// exceptions
 		if (ReflectionUtils.isa(type, Throwable.class)) {
