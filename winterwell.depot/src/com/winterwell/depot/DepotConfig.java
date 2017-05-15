@@ -3,6 +3,7 @@ package com.winterwell.depot;
 import java.io.File;
 import java.lang.reflect.Constructor;
 
+import com.winterwell.es.client.ESConfig;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
@@ -28,7 +29,6 @@ public class DepotConfig {
 	public String getDefaultRemoteHost() {
 		return defaultRemoteHost;
 	}
-
 	
 	public DepotConfig() {
 		// default directory - the winterwell one if present, otherwise local depot

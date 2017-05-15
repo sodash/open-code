@@ -5,15 +5,24 @@ import java.util.Set;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasVersion.IHasBefore;
 import com.winterwell.depot.MetaData;
+import com.winterwell.es.client.DeleteRequestBuilder;
+import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
+import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.es.client.GetRequestBuilder;
 import com.winterwell.es.client.GetResponse;
+import com.winterwell.es.client.IESResponse;
+import com.winterwell.es.client.IndexRequestBuilder;
+import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.TodoException;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
 
 /**
  * TODO support for diffs 
@@ -24,23 +33,29 @@ import com.winterwell.utils.TodoException;
  *
  */
 public class ESStore implements IStore {
-
-	boolean diffWherePossible;
 	
 	@Override
 	public String getRaw(Desc desc) {
-		// TODO Auto-generated method stub
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		GetRequestBuilder getter = new GetRequestBuilder(esc).setIndex("").setType("").setId("").setSourceOnly(true);
+		String index = "depot_"+Utils.or(desc.getTag(), "untagged");
+		String type = "artifact";
+		GetRequestBuilder getter = new GetRequestBuilder(esc).setIndex(index).setType(type).setId(desc.getId()).setSourceOnly(true);
 		GetResponse resp = getter.get();
 		String json = resp.getJson();
 		return json;
 	}
 
 	@Override
-	public void remove(Desc arg0) {
-		// TODO Auto-generated method stub
-		
+	public void remove(Desc desc) {
+		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		String index = "depot_"+Utils.or(desc.getTag(), "untagged");
+		String type = "artifact";
+		DeleteRequestBuilder del = esc.prepareDelete(index, type, desc.getId());
+		IESResponse resp = del.get();
+		// bark on failure??
+		if (resp.getError()!=null) {
+			Log.e("ESStore", resp.getError());
+		}
 	}
 
 	@Override
@@ -50,18 +65,14 @@ public class ESStore implements IStore {
 
 	@Override
 	public <X> void put(Desc<X> desc, X artifact) {
-		// TODO Auto-generated method stub
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		String index = "depot_"+Utils.or(desc.getTag(), "untagged");
+		String type = "artifact";
 		FlexiGson gson = Dep.get(FlexiGson.class);
 		String json = gson.toJson(artifact);		
-		if (diffWherePossible && artifact instanceof IHasBefore) {
-			String beforeJson = (String) ((IHasBefore) artifact).getBefore();
-			Object beforeMap = JSON.parse(beforeJson);
-			esc.prepareUpdate(index, type, id);
-			// TODO
-		} else {
-			esc.prepareIndex(index, type, id);	
-		}		
+		IndexRequestBuilder put = esc.prepareIndex(index, type, desc.getId());
+		put.setBodyJson(json);
+		IESResponse resp = put.get().check();		
 	}
 
 	@Override
@@ -69,10 +80,6 @@ public class ESStore implements IStore {
 		String raw = getRaw(desc);
 		FlexiGson gson = Dep.get(FlexiGson.class);
 		Object obj = gson.fromJson(raw);
-		if (diffWherePossible && obj instanceof IHasBefore) {
-			// stash the json
-			((IHasBefore) obj).setBefore(raw);
-		}
 		return (X) obj;
 	}
 
