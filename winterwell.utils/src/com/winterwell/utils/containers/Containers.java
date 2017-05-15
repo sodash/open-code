@@ -1484,6 +1484,23 @@ public class Containers  {
 	public static boolean same(Collection a, Object... b) {
 		return differences(a, Arrays.asList(b)).isEmpty();
 	}
+	
+	
+	public static boolean same(Map a, Map b) {
+		if (a==null) return b==null;
+		if (b==null) return false;
+		for(Object ka : a.keySet()) {
+			if ( ! Utils.equals(a.get(ka), b.get(ka))) {
+				return false;
+			}
+		}
+		for(Object kb : b.keySet()) {
+			if ( ! a.containsKey(kb)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Set difference, current \ old.
