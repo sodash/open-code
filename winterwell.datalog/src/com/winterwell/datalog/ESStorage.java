@@ -186,11 +186,23 @@ public class ESStorage implements IDataLogStorage {
 		// register some standard event types??
 		try {
 			PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, typeFromEventType(simple));
+			// See DataLogEvent.COMMON_PROPS and toJson()
+			ESType keywordy = new ESType().text().analyzer("keyword");
+			ESType props = new ESType()
+					.property("k", keywordy)
+					.property("v", new ESType().text())
+					.property("n", new ESType().DOUBLE());
 			ESType simpleEvent = new ESType()
 					.property("count", new ESType().DOUBLE())
 					.property("time", new ESType().date())
-					.property("tag", new ESType().text().analyzer("keyword"))
-					;
+					.property("tag", keywordy)
+					.property(DataLogEvent.EVENTTYPE, keywordy)
+					.property("id", keywordy)
+					.property("xid", keywordy)
+					.property("oxid", keywordy)
+					.property("uxid", keywordy)
+					.property("ip", keywordy)
+					.property("props", props);
 			pm.setMapping(simpleEvent);
 			IESResponse res = pm.get();
 			res.check();
