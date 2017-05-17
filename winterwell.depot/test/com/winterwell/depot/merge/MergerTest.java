@@ -6,11 +6,15 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.winterwell.gson.FlexiGson;
+import com.winterwell.utils.Dep;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.web.WebPage;
 
 public class MergerTest {
 
+	
 	@Test
 	public void testDoMergePOJO() {
 		// what shall we test on? how about a WebPage?

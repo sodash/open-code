@@ -1,5 +1,10 @@
 package com.winterwell.depot.merge;
 
+/**
+ * merge null with anything -- the result is null + x = x.
+ * @author daniel
+ *
+ */
 public class NullMerger extends AMerger<Object> {
 
 	@Override

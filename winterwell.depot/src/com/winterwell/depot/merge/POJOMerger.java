@@ -6,6 +6,11 @@ import com.winterwell.depot.Desc;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.containers.Containers;
 
+/**
+ * Merge any object!
+ * @author daniel
+ *
+ */
 public class POJOMerger extends AMerger<Object> implements IMerger<Object> {
 
 	public POJOMerger(Merger merger) {
