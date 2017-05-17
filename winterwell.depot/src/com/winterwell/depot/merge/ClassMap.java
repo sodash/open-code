@@ -18,16 +18,16 @@ public class ClassMap<V> extends AbstractMap2<Class, V> {
 
 	@Override
 	public V get(Object key) {
-		Object v = base.get(key);
+		Class klass = (Class) key;
+		Object v = base.get(klass);
 		if (v!=null) {
 			return r(v);
-		}
-		Class klass = (Class) key;
+		}		
 		// by interface
 		Class[] ifaces = klass.getInterfaces();
 		for (Class ik : ifaces) {
 			v = base.get(ik);
-			if (v!=null) {
+			if (v!=null) { // && check(v, klass)) ??do check on all returns??
 				// memoize
 				base.put(klass, v);
 				return r(v);
@@ -45,6 +45,14 @@ public class ClassMap<V> extends AbstractMap2<Class, V> {
 		// memoize fails? Could get big!
 //		base.put(klass, NULL);
 		return null;
+	}
+
+	private boolean check(Object val, Class key) {
+		if (val==NULL) return true;
+		V v = (V) val;
+		// TODO blacklist some class/value combinations?
+		// Or is that best done via adding extra values to intercept a bad result?
+		return true;
 	}
 
 	@Override

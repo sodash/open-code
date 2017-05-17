@@ -41,6 +41,10 @@ public final class Dep {
 		return new DKey(klass, ctxt);
 	}
 
+	public static <X> void setIfAbsent(Class<X> klass, X value) {
+		if (has(klass)) return;
+		set(klass, value);
+	}
 
 
 	/**

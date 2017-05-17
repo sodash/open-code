@@ -76,7 +76,28 @@ public class UtilsTest extends TestCase {
 		Long n1 = Long.MAX_VALUE;
 		Long n2 = n1 - 1;
 		assert n1 != n2;
-		assert !Utils.equals(n1, n2);
+		assert ! Utils.equals(n1, n2);
+	}
+
+
+	public void testEqualsNumber() {
+		Double d = 1.0;
+		Double d2 = 2.0;
+		Double d01 = 1.0000010;
+		Long l = 1L;
+		Integer i = 1;
+		// Java says not the same
+		assert ! d.equals(i);
+		assert ! i.equals(d);
+		assert ! d.equals(l);
+		// we say yes they are
+		assert Utils.equals(d, i);
+		assert Utils.equals(d, l);
+		assert Utils.equals(i, l);
+		
+		assert ! Utils.equals(d, d2);
+		assert ! Utils.equals(d, d01);
+		assert ! Utils.equals(i, d01);
 	}
 
 

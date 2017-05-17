@@ -104,12 +104,9 @@ public class Utils {
 	}
 
 	/**
-	 * Convenience for a==null? b==null : a.equals(b) + special handling for arrays -- using List.equals() rules.
-	 * <p>
-	 * Beware: numerical values of different classes are NOT tested for
-	 * numerical equivalence. E.g. 1 != 1L != 1.0. You must cast them into
-	 * yourself if you need this behaviour. Note: experimented with this, but
-	 * there are issues, e.g. with large longs vs large doubles
+	 * Convenience for a==null? b==null : a.equals(b) 
+	 *  + special handling for arrays using List.equals() rules
+	 *  + special handling for Numbers, so that e.g. int 1 equals double 1.0 equals long 1L
 	 * 
 	 * @param a
 	 * @param b
@@ -125,7 +122,19 @@ public class Utils {
 			boolean el = al.equals(bl);
 			return el;
 		}
-		return a.equals(b);
+		boolean eq = a.equals(b);
+		if (eq) return true;
+		if (a instanceof Number && b instanceof Number) {
+			// Note: there are issues with large long and large double if we try to use doubleValue() or longValue()
+			// Hopefully toString is "perfect" (only lightly tested!)
+			String as = a.toString();
+			String bs = b.toString();
+			// chop trailing .0
+			if (as.endsWith(".0")) as = as.substring(0, as.length()-2);
+			if (bs.endsWith(".0")) bs = bs.substring(0, bs.length()-2);
+			return as.equals(bs);
+		}
+		return false;
 	}
 
 	/**

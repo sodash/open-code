@@ -45,10 +45,11 @@ public class Merger implements IMerger<Object> {
 		if (mergers.get(Array.class)==null) {
 			addMerge(Array.class, new ArrayMerger(this));
 		}
-		if (mergers.get(String.class)==null) {
+		if (false && mergers.get(String.class)==null) {
 			addMerge(String.class, new StringMerger());
 		}
-		if (mergers.get(Object.class)==null) {
+		// TODO POJOMerger can cause problems by intercepting eg Boolean
+		if (false && mergers.get(Object.class)==null) {
 			addMerge(Object.class, new POJOMerger(this));
 		}
 	}
