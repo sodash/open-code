@@ -14,12 +14,12 @@ public class BuildZonefox extends BuildTask {
 		File zflibs = new File(FileUtils.getWinterwellDir(), "zonefox/libs");
 		assert zflibs.isDirectory() : zflibs;
 		List<BuildWinterwellProject> projects = Arrays.asList(				
-				new BuildWeb(),
-				new BuildMaths(),
-				new BuildNLP(),
+//				new BuildWeb(),
+//				new BuildMaths(),
+//				new BuildNLP(),
 				new BuildDepot(),
-				new BuildDataLog(),
-				new BuildBob(),
+//				new BuildDataLog(),
+//				new BuildBob(),
 				new BuildUtils()
 				);
 		for (BuildWinterwellProject buildWinterwellProject : projects) {
