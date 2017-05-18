@@ -78,6 +78,13 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		this(DataLog.getDataspace(), 1, eventType, properties);
 	}
 	
+	/**
+	 * 
+	 * @param dataspace e.g. "default" (which becomes datalog.default in ES)
+	 * @param count e.g. 1
+	 * @param eventType e.g. "evt.pick"
+	 * @param properties e.g. {url, user}
+	 */
 	public DataLogEvent(String dataspace, double count, String eventType, Map<String,?> properties) {
 		this.dataspace = StrUtils.normalise(dataspace, KErrorPolicy.ACCEPT).toLowerCase().trim();
 		assert ! dataspace.isEmpty() && ! dataspace.contains("/") : dataspace;
