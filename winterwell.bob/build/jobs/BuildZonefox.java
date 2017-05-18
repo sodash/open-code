@@ -20,6 +20,8 @@ public class BuildZonefox extends BuildTask {
 				new BuildDepot(),
 //				new BuildDataLog(),
 //				new BuildBob(),
+				new BuildFlexiGson(),
+				new BuildESClient(),
 				new BuildUtils()
 				);
 		for (BuildWinterwellProject buildWinterwellProject : projects) {
