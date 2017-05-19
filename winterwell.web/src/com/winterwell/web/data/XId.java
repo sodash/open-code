@@ -13,6 +13,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.IHasJson;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.web.LoginDetails;
 
 /**
@@ -340,7 +341,7 @@ public final class XId implements Serializable, IHasJson {
 	
 	@Override
 	public String toJSONString() {
-		return toString();
+		return new SimpleJson().toJson(toString());
 	}
 
 	@Override

@@ -148,7 +148,8 @@ public class SimpleJson {
 				sb.append(jk);
 			}
 			sb.append(":");
-			appendJson(sb, map.get(key));
+			Object v = map.get(key);
+			appendJson(sb, v);
 			sb.append(", ");
 		}
 		if (!map.isEmpty()) {
