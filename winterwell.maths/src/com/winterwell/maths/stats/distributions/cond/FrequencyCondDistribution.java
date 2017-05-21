@@ -23,6 +23,8 @@ public class FrequencyCondDistribution<X, C> extends
 		ITrainable.Supervised<C, X> 
 {
 
+	private static final Object GENERIC = new Object();
+
 	/**
 	 * Override to use e.g. HalfLifeMap. This is used for both the top-level context->marginal map, and the
 	 * secondary marginal->prob map.
@@ -32,7 +34,7 @@ public class FrequencyCondDistribution<X, C> extends
 	
 	protected final Map<C, ObjectDistribution<X>> dists;
 
-	protected final ObjectDistribution<X> generic;
+	private double pseudoCount = 2;
 
 	public FrequencyCondDistribution() {
 		this(HashMap::new);
@@ -47,7 +49,13 @@ public class FrequencyCondDistribution<X, C> extends
 		this.newMap = newMap;
 		assert newMap!=null;
 		dists = newMap.get();
-		generic = new ObjectDistribution<X>(newMap.get(), false).setPseudoCount(2);
+//		generic = new ObjectDistribution<X>(newMap.get(), false).setPseudoCount(pseudoCount);
+	}
+	
+	public void setPseudoCount(double pseudoCount) {
+		this.pseudoCount = pseudoCount;
+//		generic.setPseudoCount(pseudoCount);
+		dists.values().forEach(d -> d.setPseudoCount(pseudoCount));
 	}
 
 	@Override
@@ -59,7 +67,22 @@ public class FrequencyCondDistribution<X, C> extends
 	public IFiniteDistribution<X> getMarginal(C context) {
 		ObjectDistribution<X> dist = dists.get(context);
 		if (dist == null)
-			return generic;
+			return getGeneric();
+		return dist;
+	}
+
+	private ObjectDistribution<X> getGeneric() {
+		// cheat and use erasure
+		return getMarginal2((C)GENERIC);
+	}
+
+	private ObjectDistribution<X> getMarginal2(C context) {
+		ObjectDistribution<X> dist = dists.get(context);
+		if (dist == null) {
+			dist = new ObjectDistribution<X>(newMap.get(), false);
+			dist.setPseudoCount(pseudoCount);
+			dists.put(context, dist);
+		}
 		return dist;
 	}
 
@@ -95,25 +118,20 @@ public class FrequencyCondDistribution<X, C> extends
 	public void resetup() {
 		super.resetup();
 		dists.clear();
-		generic.resetup();
+//		generic.resetup();
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + ":" + generic.toString();
+		return getClass().getSimpleName() + ":" + getGeneric().toString();
 	}
 
 	@Override
 	public void train1(C context, X x, double weight) {
-		ObjectDistribution<X> dist = dists.get(context);
-		if (dist == null) {
-			dist = new ObjectDistribution<X>(newMap.get(), false);
-			dist.setPseudoCount(2);
-			dists.put(context, dist);
-		}
+		ObjectDistribution<X> dist = getMarginal2(context);
 		dist.train1(x, weight);
 		// everything trains generic
-		generic.train1(x, weight);
+		getGeneric().train1(x, weight);
 	}
 
 }

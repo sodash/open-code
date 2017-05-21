@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiPredicate;
 
 import org.junit.Test;
 
@@ -25,6 +26,34 @@ import junit.framework.Assert;
 
 public class ContainersTest {
 
+	@Test
+	public void testJsonObjTree() throws InterruptedException {
+		ArrayMap<String,Object> obj = new ArrayMap("a", 1, "b", "bee", 
+				"c", new ArrayMap(
+						"c1", 2.1, 
+						"c2", Arrays.asList(
+							new ArrayMap("c-deep", 17),
+							18
+							),
+						"c3", Arrays.asList()
+						),
+				"d", null,
+				"e", "EEE"
+				);
+		StringBuilder sb = new StringBuilder();
+		BiPredicate<List<String>, Object> fn = (p, v) -> {
+			if (v instanceof String || v instanceof Number) {
+				sb.append(Printer.str(p)+" = "+v+"\n");
+			}
+			return true;
+		};
+		Containers.applyToJsonObject(obj, fn);
+		System.out.println(sb.toString());
+		assert StrUtils.compactWhitespace(sb.toString()).equals(
+				"a = 1 b = bee c, c1 = 2.1 c, c2, 0, c-deep = 17 c, c2, 1 = 18 e = EEE");
+	}
+	
+	
 	@Test
 	public void testMultiThreadPlus() throws InterruptedException {
 		AtomicReference<Throwable> err = new AtomicReference();
@@ -195,13 +224,8 @@ public class ContainersTest {
 				"3", "4"));
 		Set<String> set2 = new HashSet<String>(Arrays.asList("1", "4", "7"));
 		Changes<String> diffs = Containers.differences(set1, set2);
-		Assert.assertEquals(Arrays.asList("3", "2"), diffs.getAdded()); // Not
-																		// happy
-																		// about
-																		// the
-																		// order-sensitivity
-																		// here
-		Assert.assertEquals(Arrays.asList("7"), diffs.getDeleted());
+		assert Containers.same(Arrays.asList("3", "2"), diffs.getAdded()); 
+		assert Containers.same(Arrays.asList("7"), diffs.getDeleted());
 	}
 
 	@Test

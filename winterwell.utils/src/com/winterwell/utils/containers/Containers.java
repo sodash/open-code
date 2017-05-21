@@ -22,6 +22,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -326,6 +328,77 @@ public class Containers  {
 		return after;
 	}
 	
+
+	/**
+	 * Walk the tree.
+	 * 
+	 * @param fn
+	 */
+	public static void applyToJsonObject(
+			Map<String, Object> jsonObject, BiPredicate<List<String>, Object> fn4PathValue) {
+		List<String> path = new ArrayList<>();
+		applyToJsonObject2(path, jsonObject, fn4PathValue);
+	}
+	
+	public static void applyToJsonObject(
+			List jsonArray, BiPredicate<List<String>, Object> fn4PathValue) {
+		List<String> path = new ArrayList<>();
+		applyToJsonObject2(path, jsonArray, fn4PathValue);
+	}
+
+	static void applyToJsonObject2(
+			List<String> path, Map<String, Object> jsonObject, BiPredicate<List<String>, Object> fn4PathValue) 
+	{
+		for (Entry<String, Object> e : jsonObject.entrySet()) {
+			String k = e.getKey();
+			path.add(k);
+			Object v = e.getValue();
+			boolean ok = fn4PathValue.test(path, v);
+			if ( ! ok || v==null) {
+				path.remove(path.size()-1);
+				continue;
+			}
+			if (v instanceof Map) {
+				applyToJsonObject2(path, (Map)v, fn4PathValue);
+			} else if (v instanceof List) {
+				applyToJsonObject2(path, (List)v, fn4PathValue);
+			} else if (v instanceof Object[]) {
+				applyToJsonObject2(path, Arrays.asList((Object[])v), fn4PathValue);
+			} else if (v.getClass().isArray()) {
+				applyToJsonObject2(path, asList(v), fn4PathValue);
+			} else {
+				// no recurse
+			}
+			path.remove(path.size()-1);
+		}
+	}
+
+
+	static void applyToJsonObject2(
+			List<String> path, List jsonArray, BiPredicate<List<String>, Object> fn4PathValue) 
+	{
+		for(int i=0, n=jsonArray.size(); i<n; i++) {
+			Object v = jsonArray.get(i);
+			path.add(Integer.toString(i));	
+			boolean ok = fn4PathValue.test(path, v);
+			if ( ! ok || v==null) {
+				path.remove(path.size()-1);
+				continue;
+			}				
+			if (v instanceof Map) {
+				applyToJsonObject2(path, (Map)v, fn4PathValue);
+			} else if (v instanceof List) {
+				applyToJsonObject2(path, (List)v, fn4PathValue);
+			} else if (v instanceof Object[]) {
+				applyToJsonObject2(path, Arrays.asList((Object[])v), fn4PathValue);
+			} else if (v.getClass().isArray()) {
+				applyToJsonObject2(path, asList(v), fn4PathValue);
+			} else {
+				// no recurse
+			}
+			path.remove(path.size()-1);
+		}
+	}
 
 
 	/**
