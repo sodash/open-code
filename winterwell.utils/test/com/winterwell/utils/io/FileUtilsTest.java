@@ -1,7 +1,9 @@
 package com.winterwell.utils.io;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -16,6 +18,21 @@ import junit.framework.TestCase;
 
 public class FileUtilsTest extends TestCase {
 
+
+
+	public void testChunk() throws IOException {
+		final int CHUNK_SIZE = 1000;
+		File f = new File("");
+		BufferedInputStream stream = new BufferedInputStream(new FileInputStream(f));
+		int offset = 0;
+		while(stream.available() > 0) {
+			offset += CHUNK_SIZE;
+			byte[] b = new byte[CHUNK_SIZE];
+			int r = stream.read(b, offset, CHUNK_SIZE);
+			System.out.println(r);
+		}
+	}
+	
 	public void testToFile() {
 		File f = FileUtils.toFile("c:\\foo\\bar.txt");
 		assert f.getName().equals("bar.txt");

@@ -44,7 +44,7 @@ public final class Base64Encoder {
 				return 0;
 			default:
 				throw new RuntimeException(
-						new StringBuffer("unexpected code: ").append(c)
+						new StringBuilder("unexpected code: ").append(c)
 								.toString());
 			}
 		}
@@ -95,16 +95,16 @@ public final class Base64Encoder {
 
 	/**
 	 * Encodes the part of the given byte array denoted by start and len to the
-	 * Base64 format. The encoded data is appended to the given StringBuffer. If
-	 * no StringBuffer is given, a new one is created automatically. The
-	 * StringBuffer is the return value of this method.
+	 * Base64 format. The encoded data is appended to the given StringBuilder. If
+	 * no StringBuilder is given, a new one is created automatically. The
+	 * StringBuilder is the return value of this method.
 	 */
 
-	public static StringBuffer encode(byte[] data, int start, int len,
-			StringBuffer buf) {
+	public static StringBuilder encode(byte[] data, int start, int len,
+			StringBuilder buf) {
 
 		if (buf == null) {
-			buf = new StringBuffer(data.length * 3 / 2);
+			buf = new StringBuilder(data.length * 3 / 2);
 		}
 
 		int end = len - 3;
