@@ -227,6 +227,7 @@ public class FakeBrowser {
 	private void disconnect() {
 		if (connection == null)
 			return;
+		// Do we also need to call close on the streams??
 		connection.disconnect();
 		connection = null;
 	}
