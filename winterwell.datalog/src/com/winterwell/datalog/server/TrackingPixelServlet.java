@@ -15,6 +15,7 @@ import com.winterwell.utils.web.WebUtils2;
 
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.app.FileServlet;
@@ -37,8 +38,13 @@ public class TrackingPixelServlet extends HttpServlet {
 
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		WebRequest wr = new WebRequest(this, req, resp);
-		processIncoming(wr);			
+		WebRequest wr = null;
+		try {
+			wr = new WebRequest(this, req, resp);
+			processIncoming(wr);
+		} finally {
+			FileUtils.close(wr);
+		}
 	}
 	
 	

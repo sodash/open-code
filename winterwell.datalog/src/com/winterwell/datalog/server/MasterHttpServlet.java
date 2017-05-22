@@ -71,8 +71,9 @@ public class MasterHttpServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		WebRequest request = null;
 		try {
-			WebRequest request = new WebRequest(null, req, resp);			
+			request = new WebRequest(null, req, resp);			
 			String path = request.getRequestPath();
 	
 			// Tracking pixel
@@ -120,6 +121,8 @@ public class MasterHttpServlet extends HttpServlet {
 		} catch(Throwable ex) {
 			Log.e("error", ex);
 			WebUtils2.sendError(500, "Server Error: "+ex, resp);
+		} finally {
+			FileUtils.close(request);
 		}
 	}
 
