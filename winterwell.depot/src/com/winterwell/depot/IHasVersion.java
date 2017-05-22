@@ -18,18 +18,26 @@ public interface IHasVersion {
 	
 	Object getVrsn();
 	
-	public static interface IHasBefore {
+	/**
+	 * Note: This is NOT used by {@link Desc#markForMerge()} - it is a separate before/after
+	 * system for directly managing merges or diffs.
+	 *  
+	 * @author daniel
+	 *
+	 * @param <BC> The before-form might be stored in a format related to the storage system
+	 */
+	public static interface IHasBefore<BC> {
 		/**
 		 * Set a starting state, from which we can measure edits to make a diff.
 		 * @param before
 		 */
-		void setBefore(Object before);
+		void setBefore(BC before);
 		
 		/**
 		 * Get the starting state, from which we can measure edits to make a diff.
 		 * @param before Can be null.
 		 */
-		Object getBefore();
+		BC getBefore();
 	}
 	
 	

@@ -5,6 +5,9 @@ import java.util.Set;
 
 /**
  * This is similar to Map (but type-safe) and to IProperties (but with Desc instead of Key).
+ * 
+ * Implementations should have a constructor that takes in a {@link DepotConfig} object.
+ * A no-argument constructor will also work.
  * @author daniel
  *
  */
@@ -53,5 +56,12 @@ public interface IStore {
 	 * @return path where the local File would be stored. May not exist.
 	 * @throws UnsupportedOperationException if the store just don't swing that way.
 	 */
-	File getLocalPath(Desc desc) throws UnsupportedOperationException;	
+	File getLocalPath(Desc desc) throws UnsupportedOperationException;
+
+	/**
+	 * Initialise database setup, etc.
+	 */
+	default void init() {
+		// do nothing by default
+	}
 }

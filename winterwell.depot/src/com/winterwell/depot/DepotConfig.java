@@ -85,6 +85,9 @@ public class DepotConfig {
 	public Class<? extends IStore> storeClass = 
 									RemoteStore.class;
 
+	@Option
+	public String tags = "untagged";
+
 	public IStore getStore(Depot depot) {
 		IStore s;
 		// Try for a constructor which takes in a DepotConfig object.
@@ -99,6 +102,8 @@ public class DepotConfig {
 				throw Utils.runtime(e1);
 			}
 		}
+		// init
+		s.init();
 		
 		if (writeBehind!=null) {
 			SlowStorage wb = new SlowStorage(s, writeBehind, depot);
