@@ -7,6 +7,7 @@ import java.util.Set;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.thoughtworks.xstream.core.util.Base64Encoder;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasVersion.IHasBefore;
 import com.winterwell.depot.MetaData;
@@ -20,6 +21,7 @@ import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.IndexRequestBuilder;
 import com.winterwell.es.client.UpdateRequestBuilder;
+import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.utils.Dep;
@@ -66,7 +68,10 @@ public class ESStore implements IStore {
 
 	private void initIndex(String index, String type) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		create index
+		// make index
+		CreateIndexRequest pc = esc.admin().indices().prepareCreate(index);
+		pc.get(); // this will fail if it already exists - oh well
+		// mapping
 		PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(index, type);
 		ESType mapping = new ESType()
 				.property("raw", new ESType().text().noIndex());
@@ -137,6 +142,7 @@ class ESStoreWrapper {
 
 	public ESStoreWrapper(Object artifact) {
 		this.artifact = artifact;
+		// Base 64 encode too??
 		this.raw = XStreamUtils.serialiseToXml(artifact);
 	}
 

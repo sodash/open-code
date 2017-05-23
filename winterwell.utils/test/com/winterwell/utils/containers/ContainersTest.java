@@ -26,6 +26,15 @@ import junit.framework.Assert;
 
 public class ContainersTest {
 
+	
+	@Test
+	public void testArrayApply() {
+		String[] bits = new String[]{"a", "a/b", "/foo/"};
+		List<String> ebits = Containers.apply(bits, bit -> StrUtils.escape(bit, '/', '\\'));
+		String e = StrUtils.join(ebits, "/");
+		assert e.equals("a/a\\/b/\\/foo\\/") : e;		
+	}
+	
 	@Test
 	public void testJsonObjTree() throws InterruptedException {
 		ArrayMap<String,Object> obj = new ArrayMap("a", 1, "b", "bee", 
