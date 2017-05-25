@@ -66,7 +66,7 @@ public class ESStore implements IStore {
 
 	private void initIndex(String index, String type) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		create index
+//		FIXME create index
 		PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(index, type);
 		ESType mapping = new ESType()
 				.property("raw", new ESType().text().noIndex());
