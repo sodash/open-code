@@ -54,6 +54,18 @@ public class ProcessTask extends BuildTask {
 
 	private transient Proc p;
 
+	/**
+	 * false by default. If true, also send all output to system out
+	 */
+	private boolean echo;
+
+	/**
+	 * false by default. If true, also send all output to system out
+	 */
+	public void setEcho(boolean echo) {
+		this.echo = echo;
+	}
+
 	public void setEndOfCommand(String endOfCommand) {
 		this.endOfCommand = endOfCommand;
 	}
@@ -113,6 +125,7 @@ public class ProcessTask extends BuildTask {
 		
 		// Do it!
 		Log.d(getClass().getSimpleName(), cmd+"...");
+		p.setEcho(echo);
 		p.run();
 		
 		int code = p.waitFor(); //(timeout);
