@@ -23,7 +23,7 @@ public class FrequencyCondDistribution<X, C> extends
 		ITrainable.Supervised<C, X> 
 {
 
-	private static final Object GENERIC = new Object();
+	static final protected String GENERIC = "!generic";
 
 	/**
 	 * Override to use e.g. HalfLifeMap. This is used for both the top-level context->marginal map, and the
@@ -34,7 +34,7 @@ public class FrequencyCondDistribution<X, C> extends
 	
 	protected final Map<C, ObjectDistribution<X>> dists;
 
-	private double pseudoCount = 2;
+	protected double pseudoCount = 2;
 
 	public FrequencyCondDistribution() {
 		this(HashMap::new);
@@ -73,10 +73,15 @@ public class FrequencyCondDistribution<X, C> extends
 
 	private ObjectDistribution<X> getGeneric() {
 		// cheat and use erasure
-		return getMarginal2((C)GENERIC);
+		return getCreateMarginal((C)GENERIC);
 	}
 
-	private ObjectDistribution<X> getMarginal2(C context) {
+	/**
+	 * get/create marginal distro for context.
+	 * @param context
+	 * @return The distro which holds the data for this context -- edit to train!
+	 */
+	public ObjectDistribution<X> getCreateMarginal(C context) {
 		ObjectDistribution<X> dist = dists.get(context);
 		if (dist == null) {
 			dist = new ObjectDistribution<X>(newMap.get(), false);
@@ -128,7 +133,7 @@ public class FrequencyCondDistribution<X, C> extends
 
 	@Override
 	public void train1(C context, X x, double weight) {
-		ObjectDistribution<X> dist = getMarginal2(context);
+		ObjectDistribution<X> dist = getCreateMarginal(context);
 		dist.train1(x, weight);
 		// everything trains generic
 		getGeneric().train1(x, weight);
