@@ -68,14 +68,10 @@ public class ESStore implements IStore {
 
 	private void initIndex(String index, String type) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-<<<<<<< HEAD
-//		FIXME create index
-=======
 		// make index
 		CreateIndexRequest pc = esc.admin().indices().prepareCreate(index);
 		pc.get(); // this will fail if it already exists - oh well
 		// mapping
->>>>>>> c9460948a369debe71851e5777c8ebaa14dc6082
 		PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(index, type);
 		ESType mapping = new ESType()
 				.property("raw", new ESType().text().noIndex());
