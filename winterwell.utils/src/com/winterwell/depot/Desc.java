@@ -557,11 +557,13 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 * @param value
 	 */
 	public static void putRecursive(IHasDesc artifact, String key, Object value) {
-		artifact.getDesc().put(key, value);		
-		IHasDesc[] subs = ((IHasDesc) artifact).getModules();
-		if (subs==null) return;
-		for (IHasDesc sub : subs) {
-			putRecursive(sub, key, value);
+		artifact.getDesc().put(key, value);	
+		if (artifact instanceof ModularXML) {
+			IHasDesc[] subs = ((ModularXML) artifact).getModules();
+			if (subs==null) return;
+			for (IHasDesc sub : subs) {
+				putRecursive(sub, key, value);
+			}
 		}
 	}
 
@@ -980,8 +982,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 		// NB: copy will skip over modules, via ModularConvertor
 		before = Utils.copy(bv);
 		// recurse on sub-modules
-		if (getBoundValue() instanceof IHasDesc) {
-			IHasDesc[] modules = ((IHasDesc)bv).getModules();
+		if (getBoundValue() instanceof ModularXML) {
+			IHasDesc[] modules = ((ModularXML)bv).getModules();
 			for (IHasDesc module : modules) {
 				module.getDesc().markForMerge();
 			}

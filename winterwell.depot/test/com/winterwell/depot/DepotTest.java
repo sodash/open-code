@@ -466,7 +466,7 @@ final class Inner implements IInner, IHasDesc, com.winterwell.depot.ModularXML {
 	
 }
 
-final class Outer implements IHasDesc {
+final class Outer implements IHasDesc, ModularXML {
 	IInner c;
 	String name;
 	String misc;

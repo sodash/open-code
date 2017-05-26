@@ -177,7 +177,7 @@ final class CompareAny implements Comparator {
  * @author daniel
  * 
  */
-public class Containers  {
+public final class Containers  {
 
 	/**
 	 * More self-documenting version of Pair<Collection<X>> for returning

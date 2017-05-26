@@ -25,6 +25,7 @@ import com.thoughtworks.xstream.io.path.PathTrackingWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.XStreamBinaryConverter.BinaryXML;
 import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
@@ -65,16 +66,11 @@ public class ModularConverter implements Converter {
 		if (artifact.getClass().isAnnotationPresent(SearchForSubModules.class)) {
 			return getModules2_search(artifact);
 		}
-		if (artifact instanceof IHasDesc) {
-			IHasDesc[] ms = ((IHasDesc) artifact).getModules();
+		if (artifact instanceof ModularXML) {
+			IHasDesc[] ms = ((ModularXML) artifact).getModules();
 			if (ms==null) return Collections.EMPTY_LIST;
-			// correct usage check
-			for (IHasDesc m : ms) {
-				if ( ! (m instanceof ModularXML)) { //.getClass().isAnnotationPresent(ModularXML.class)) {
-					throw new IllegalStateException("in "+artifact.getClass()+" "+m.getClass()+" is not a module. Implement ModularXML?");
-				}
-			}
-			return Arrays.asList(ms); 
+			List<IHasDesc> msl = Containers.filterNulls(Arrays.asList(ms));
+			return msl; 
 		}
 		return Collections.EMPTY_LIST;
 	}

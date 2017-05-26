@@ -682,15 +682,19 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 			base.remove(deadConfig);
 			
 			// Recursive purge of sub-modules
-			IHasDesc[] ms = ((IHasDesc) dead).getModules();
-			for (IHasDesc mod : ms) {
-				try {
-					removeAll(mod);
-				} catch(Throwable ex) {
-					if (config.allowModuleExceptions) {
-						Log.e(TAG, ex);
-					} else {
-						throw Utils.runtime(ex);
+			if (dead instanceof ModularXML) {
+				IHasDesc[] ms = ((ModularXML) dead).getModules();
+				if (ms!=null) {
+					for (IHasDesc mod : ms) {
+						try {
+							removeAll(mod);
+						} catch(Throwable ex) {
+							if (config.allowModuleExceptions) {
+								Log.e(TAG, ex);
+							} else {
+								throw Utils.runtime(ex);
+							}
+						}
 					}
 				}
 			}

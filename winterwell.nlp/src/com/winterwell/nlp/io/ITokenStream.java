@@ -9,6 +9,7 @@ import com.winterwell.maths.IFactory;
 import com.winterwell.utils.containers.AbstractIterator;
 
 import com.winterwell.depot.IHasDesc;
+import com.winterwell.depot.ModularXML;
 
 /**
  * {@link ITokenStream}s can be chained together to form a processing pipeline.
@@ -19,7 +20,7 @@ import com.winterwell.depot.IHasDesc;
  * @author daniel
  */
 public interface ITokenStream extends Iterable<Tkn>,
-		IHasDesc, IFactory<String, ITokenStream> 
+		ModularXML, IFactory<String, ITokenStream> 
 {
 
 	@Override
