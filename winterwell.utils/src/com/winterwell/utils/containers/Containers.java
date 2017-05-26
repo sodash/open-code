@@ -880,7 +880,7 @@ public final class Containers  {
 	 *         accepts. Can contain null if the filter accepts it! TODO should
 	 *         we always filter out null??
 	 */
-	public static <X, X2 extends X> List<X2> filter(Collection<X2> list,
+	public static <X, X2 extends X> List<X2> filter(Iterable<X2> list,
 			IFilter<X> filter) {
 		if (list==null) return null;
 		assert filter != null : list;
@@ -1765,7 +1765,7 @@ public final class Containers  {
 	 * @param klass
 	 * @return
 	 */
-	public static List filterByClass(List list, Class klass) {
+	public static <X> List<X> filterByClass(Iterable<X> list, Class klass) {
 		return filter(list, IFilter.byClass(klass));
 	}
 	

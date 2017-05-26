@@ -3,6 +3,8 @@ package com.winterwell.depot;
 /**
  * Marks a class for using {@link ModularConverter} when used with 
  * XStreamUtil's default XStream instance.
+ *
+ * Warning: works with XStream xml via ModularConverter -- which will use Depot.getDefault().
  * 
  * NB: Changed from an annotation, so that it gets inherited by sub-classes.
  */
