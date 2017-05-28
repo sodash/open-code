@@ -14,6 +14,18 @@ import com.winterwell.utils.log.Log;
  */
 public class Merger implements IMerger<Object> {
 
+	/**
+	 * Convenience for use in unit-tests. assert two objects are the same
+	 *  -- and use the diff as a helpful error message if they are not.
+	 * @param a
+	 * @param b
+	 */
+	public void assertSame(Object a, Object b) {
+		Diff diff = diff(a, b);
+		if (diff==null) return;
+		assert false : diff;
+	}
+	
 	final ClassMap<IMerger> mergers = new ClassMap<>();
 	
 	public IMerger getMerger(Class klass) {
@@ -104,7 +116,10 @@ public class Merger implements IMerger<Object> {
 
 	@Override
 	public Object stripDiffs(Object v) {
-		// FIXME this is wrong!!!
+		if (v instanceof Diff) {
+			return stripDiffs(((Diff) v).diff);
+		}
+		// ??Is this right??
 		Class type = v.getClass();
 		IMerger m = mergers.get(type);
 		if (m==null) {

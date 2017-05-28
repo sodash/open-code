@@ -300,6 +300,7 @@ public class StrUtilsTest extends TestCase {
 	public void testSha1() {
 		assert StrUtils.sha1("pankHurst").equals(
 				"914e1ca52f7dd8c59e412521a434e4876202d355");
+		System.out.println(StrUtils.sha1("However long the string, we get back only 40 characters -- try it and see :)").length());
 	}
 
 	public void testNormalise() {

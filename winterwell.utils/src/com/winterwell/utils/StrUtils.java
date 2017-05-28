@@ -32,6 +32,16 @@ import com.winterwell.utils.web.WebUtils;
  */
 public class StrUtils {
 
+	/**
+	 * 
+	 * @param s
+	 * @param len
+	 * @return The last len chars of s, or all of it if s is shorter than len.
+	 */
+	public static String end(String s, int len) {
+		if (s.length()<=len) return s;
+		return s.substring(s.length()-len, s.length());
+	}
 
 	public static final String APOSTROPHES = "'`’‘’ʼ";
 
@@ -654,7 +664,7 @@ public class StrUtils {
 
 	/**
 	 * @param txt
-	 * @return SHA-1 hash of txt
+	 * @return SHA-1 hash of txt (40 characters)
 	 */
 	public static String sha1(String txt) {
 		return hash("SHA1", txt);

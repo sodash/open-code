@@ -182,7 +182,7 @@ implements IStore , Flushable, Closeable
 			if (desc.getBefore() != null) {
 				Object latest = base.get(desc);
 				if (latest!=null) {
-					Object vMerge = depot.doMerge(desc, desc.getBefore(), v, latest);
+					Object vMerge = depot.merger.doMerge(desc.getBefore(), v, latest);
 					v = vMerge;
 					// update the binding
 					desc.bind(vMerge);

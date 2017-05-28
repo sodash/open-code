@@ -965,6 +965,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 * Take a snapshot of this object to be used when saving it to do a merge.
 	 * Repeated calls have no effect.
 	 * Recurses on sub-modules.
+	 * ONLY works with Depot.update() -- not put()
 	 */
 	public void markForMerge() {
 		if (before!=null) return;

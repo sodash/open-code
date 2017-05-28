@@ -846,19 +846,6 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		return config;
 	}
 
-	/**
-	 * 
-	 * @param desc
-	 * @param before
-	 * @param after
-	 * @param latest
-	 * @return The merged version of the artifact: the latest from the depot + the diff of (after - before).
-	 */
-	Object doMerge(Desc desc, Object before, Object after, Object latest) {
-		// Used to pass in desc.getType(), but why not just use after.getClass()? 
-		return merger.doMerge(before, after, latest);
-	}
-	
 	Merger merger = new Merger();
 
 	/**
@@ -870,6 +857,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 	public <Y> void update(Desc<Y> desc, Y artifact) {
 		assert desc.getBefore() != null : desc;
 		put2(desc, artifact, KOverwrite.MERGE);
+		
 	}
 	
 }
