@@ -7,7 +7,8 @@ import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
 import com.winterwell.utils.log.KErrorPolicy;
 
 /**
- * Ignore stop words
+ * Levenshtein edit distance, but with some canonicalisation and ignoring stop words.
+ * This is syntax similarity - NOT semantic similarity.
  * 
  * @author daniel
  * @testedby {@link LenientSimilarityTest}
