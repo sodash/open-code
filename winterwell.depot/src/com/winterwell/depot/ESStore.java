@@ -61,6 +61,7 @@ public class ESStore implements IStore {
 		GetRequestBuilder getter = new GetRequestBuilder(esc).setIndex(index).setType(type).setId(desc.getId()).setSourceOnly(true);
 		GetResponse resp = getter.get();
 		String json = resp.getJson();
+		if (json==null) return null;
 		FlexiGson gson = Dep.get(FlexiGson.class);
 		ESStoreWrapper essw = gson.fromJson(json, ESStoreWrapper.class);
 		return essw.raw;
