@@ -13,6 +13,25 @@ import java.io.IOException;
  */
 public final class DepContext implements Closeable {
 
+	
+	/**
+	 * This allows chaining with Dep.with(). For use in try-with blocks, e.g.
+	 * <code>
+	 * try (DepContext context = Dep.with(MyThing.class, myThing)
+	 * 								.with(OtherThing.class, otherThing)) 
+	 * {
+	 * 
+	 * }
+	 * </code>
+	 * @param klass
+	 * @param value
+	 * @return
+	 */
+	public <X> DepContext with(Class<X> klass, X value) {
+		Dep.set(klass, value);		
+		return this;
+	}
+	
 	volatile boolean closed;
 	final DepContext parent;
 	final private Object ckey;

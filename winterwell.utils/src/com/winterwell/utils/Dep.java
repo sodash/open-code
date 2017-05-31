@@ -41,6 +41,23 @@ public final class Dep {
 		return new DKey(klass, ctxt);
 	}
 
+	/**
+	 * For use in try-with blocks, e.g.
+	 * <code>
+	 * try (DepContext context = Dep.with(MyThing.class, myThing)) {
+	 * 
+	 * }
+	 * </code>
+	 * @param klass
+	 * @param value
+	 * @return
+	 */
+	public static <X> DepContext with(Class<X> klass, X value) {
+		DepContext context = Dep.setContext(Utils.getRandom().nextInt());
+		Dep.set(klass, value);		
+		return context;
+	}
+	
 	public static <X> void setIfAbsent(Class<X> klass, X value) {
 		if (has(klass)) return;
 		set(klass, value);

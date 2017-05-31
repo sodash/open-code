@@ -859,6 +859,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 * @param config
 	 */
 	public void setVersionStamp(Object config) {
+		assert config != null : this;
 		assert ! properties.containsKey(CONFIG_KEY) : config;
 		String vrsn = XStreamUtils.serialiseToXml(config);
 		putHash(CONFIG_KEY, vrsn);
