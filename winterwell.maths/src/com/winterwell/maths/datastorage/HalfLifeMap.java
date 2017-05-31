@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.winterwell.utils.Printer;
@@ -194,10 +195,19 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 	 *            this
 	 */
 	public HalfLifeMap(int idealSize) {
+		this(idealSize, Collections.synchronizedMap(new HashMap<K,HLEntry<K,V>>()));
+	}
+	
+	/**
+	 * Use this to override the default choice of synchronized HashMap
+	 * @param idealSize
+	 * @param map
+	 */
+	public HalfLifeMap(int idealSize, Map map) {
 		assert idealSize > 0 : idealSize;
 		this.idealSize = idealSize;
 		devalueInterval = 10 * idealSize;
-		map = Collections.synchronizedMap(new HashMap<K,HLEntry<K,V>>());
+		this.map = map;		
 	}
 
 	// Status: not used?

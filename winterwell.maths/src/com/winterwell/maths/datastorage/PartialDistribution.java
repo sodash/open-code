@@ -49,20 +49,20 @@ public class PartialDistribution<T> implements IFiniteDistribution<T> {
 
 	@Override
 	public double logProb(T x) {
-		// TODO Auto-generated method stub
+		return Math.log(prob(x));
 	}
 
 	@Override
 	public double normProb(T obj) {
-		// TODO Auto-generated method stub
+		return prob(obj) / getTotalWeight(); 
 	}
 
 	@Override
 	public double prob(T x) {
-		V v = base.get(key);
+		Double v = base.get(x);
 		if (v==null) {
 			switch(errorPolicy) {
-			case THROW_EXCEPTION: throw new IllegalArgumentException("This key is not known: "+key);
+			case THROW_EXCEPTION: throw new IllegalArgumentException("This key is not known: "+x);
 			}
 		}
 		return v;
@@ -71,11 +71,11 @@ public class PartialDistribution<T> implements IFiniteDistribution<T> {
 	@Override
 	public void setProb(T obj, double value) throws UnsupportedOperationException {
 		if (sealed) {
-			if ( ! base.containsKey(key)) {
-				throw new IllegalArgumentException("Cannot add new key to sealed map: "+key);
+			if ( ! base.containsKey(obj)) {
+				throw new IllegalArgumentException("Cannot add new key to sealed map: "+obj);
 			}
 		}
-		return base.put(key, val);	
+		base.put(obj, value);	
 	}
 
 	@Override
