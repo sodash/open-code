@@ -1,34 +1,6 @@
 package com.winterwell.utils.io;
 
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.persistence.Entity;
-
-import com.winterwell.utils.IFn;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.Proc;
-import com.winterwell.utils.ReflectionUtils;
-import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.TodoException;
-import com.winterwell.utils.Utils;
+import com.winterwell.utils.*;
 import com.winterwell.utils.containers.Cache;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
@@ -38,6 +10,21 @@ import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
+
+import javax.persistence.Entity;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class RSIterator implements Iterator<Object[]> {
 
@@ -356,7 +343,7 @@ public class SqlUtils {
 	}
 
 	/**
-	 * Set a connection pool (e.g. use {@link BoneCPPool})
+	 * Set a connection pool (e.g. use BoneCPPool)
 	 *
 	 * @param pool
 	 */
