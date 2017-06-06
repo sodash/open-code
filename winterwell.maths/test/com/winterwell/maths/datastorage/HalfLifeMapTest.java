@@ -219,7 +219,7 @@ public class HalfLifeMapTest {
 	@Test
 	public void testSpeed() {
 		// half-life
-		HalfLifeMap map = new HalfLifeMap<>(100);
+		HalfLifeMap map = new HalfLifeMap<>(25000);
 		Log.setMinLevel(Level.OFF);
 		{
 			double perOp1a = speed2_heavyGet(map);
@@ -247,7 +247,7 @@ public class HalfLifeMapTest {
 		StopWatch sw = new StopWatch();
 		int ops = 0;
 		for(int i=0; i<100000; i++) {
-			int key_length = 2;
+			int key_length = 4;
 			map.put(dist.getRandomString(key_length), i);
 			ops++;
 			for(int j=0; j<1000; j++) {
@@ -263,7 +263,7 @@ public class HalfLifeMapTest {
 		StopWatch sw = new StopWatch();
 		int ops = 0;
 		for(int i=0; i<100000; i++) {
-			int key_length = 2;
+			int key_length = 4;
 			map.get(dist.getRandomString(key_length));
 			ops++;
 			for(int j=0; j<10; j++) {
@@ -312,13 +312,10 @@ public class HalfLifeMapTest {
 
 	@Test
 	public void testItemToString() {
-		HalfLifeMap<String, Object> map = new HalfLifeMap<>(10);
-		map.put("A", 3);
-		Map<String, HLEntry<String, Object>> inner = map.getBaseMap();
-		HLEntry entry = inner.get("A");
+		HLEntry<String, Object> entry = new HLEntry<>("A", 3);
 		String str = entry.toString();
 
-		assert str.equals("HLEntry [count=1.0, val=3]");
+		assert str.equals("HLEntry [count=1.0, val=3]") : str;
 	}
 
 	@Test
