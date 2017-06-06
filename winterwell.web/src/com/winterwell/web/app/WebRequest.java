@@ -53,12 +53,12 @@ public class WebRequest implements IProperties, Closeable {
 	}
 
 	/**
-	 * Without the subdomain, e.g. sodash.com from http://foo.sodash.com/bar
+	 * Without the subdomain, e.g. "sodash.com" from http://foo.sodash.com/bar
 	 */
 	public String getDomain() {
 		String url = getRequestUrl();
 		assert(url.contains("://")) : url+" "+this;
-		return WebUtils.getHost(url);
+		return WebUtils.getDomain(url);
 	}
 	
 	/**
