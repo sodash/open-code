@@ -154,38 +154,48 @@ public class HalfLifeMapTest {
 			double perOp1b = speed2_heavyGet(Collections.synchronizedMap(new HashMap()));
 			double pc = 100*((perOp1a/perOp1b)-1);
 			System.out.println("Mostly Gets: HalfLifeMap "+perOp1a +" vs HashMap "+perOp1b+":\t"+StrUtils.toNSigFigs(pc, 2)+"%");
+			System.out.println("Prunes: " + map.getPrunedCount());
+			System.out.println("Map size: " + map.size());
+			System.out.println("Total count: " + map.getTotalCount());
 		}
 		{
 			double perOp1a = speed2_heavyPut(map);
 			double perOp1b = speed2_heavyPut(Collections.synchronizedMap(new HashMap()));
 			double pc = 100*((perOp1a/perOp1b)-1);
 			System.out.println("Mostly Puts: HalfLifeMap "+perOp1a +" vs HashMap "+perOp1b+":\t"+StrUtils.toNSigFigs(pc, 2)+"%");
+			System.out.println("Prunes: " + map.getPrunedCount());
+			System.out.println("Map size: " + map.size());
+			System.out.println("Total count: " + map.getTotalCount());
 		}
 		assert map.size() <= map.getIdealSize()*2;
 	}
 	
 	private double speed2_heavyGet(Map map) {
+		Utils.PowerLawDistribution dist = new Utils.PowerLawDistribution(0.1);
 		StopWatch sw = new StopWatch();
 		int ops = 0;
-		for(int i=0; i<10000; i++) {
-			map.put(Utils.getRandomString(2), i);
+		for(int i=0; i<100000; i++) {
+			int key_length = 2;
+			map.put(dist.getRandomString(key_length), i);
 			ops++;
 			for(int j=0; j<1000; j++) {
-				map.get(Utils.getRandomString(2));
+				map.get(dist.getRandomString(key_length));
 				ops++;
 			}
 		}
 		return (1.0*sw.getTime())/ops;
 	}
-	
+
 	private double speed2_heavyPut(Map map) {
+		Utils.PowerLawDistribution dist = new Utils.PowerLawDistribution(0.1);
 		StopWatch sw = new StopWatch();
 		int ops = 0;
 		for(int i=0; i<100000; i++) {
-			map.get(Utils.getRandomString(2));
+			int key_length = 2;
+			map.get(dist.getRandomString(key_length));
 			ops++;
 			for(int j=0; j<10; j++) {
-				map.put(Utils.getRandomString(2), j);
+				map.put(dist.getRandomString(key_length), j);
 				ops++;
 			}
 		}
