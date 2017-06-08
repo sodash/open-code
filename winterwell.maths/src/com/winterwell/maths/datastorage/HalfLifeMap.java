@@ -224,17 +224,18 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 	/**
 	 * Lower all the counts. This is triggered periodically by calls to get()
 	 */
-	synchronized void devalue() {
-		if (devalueCount < devalueInterval) {
-			return; // race condition -- someone else has already devalued
+	public void devalue() {
+		synchronized(this) {
+			if (devalueCount < devalueInterval) {
+				return; // race condition -- someone else has already devalued
+			}
+			devalueCount = 0;
 		}
 		// Copy to avoid concurrent mod errors
 		HLEntry<K, V>[] hvs = map.values().toArray(new HLEntry[0]);
 		for (HLEntry<K, V> e : hvs) {
 			e.count *= 0.9;
 		}
-		// ??Could we move this earlier in the method, & limit the synchronized block to just the test-and-set-to-0??  
-		devalueCount = 0;
 	}
 
 	/**
