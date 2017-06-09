@@ -30,6 +30,7 @@ import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Mutable;
 import com.winterwell.utils.Mutable.Dble;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -836,6 +837,96 @@ public class StatsUtils extends MathUtils {
 			m1x += 1/d;
 		}
 		return xs.length / m1x;
+	}
+
+	/**
+	 * Find the median of an array of doubles. Partially sorts the array in-place.
+	 * @param xs
+	 * @return
+	 */
+	public static double median(double[] xs) {
+		double index = (xs.length / 2.0) - 1;
+		if (Math.floor(index) != index) {
+			// odd number of elements
+			return select((int) Math.ceil(index), xs);
+		}
+		// even number of elements
+		double m1 = select((int) index, xs);
+		double m2 = minOfSubRange(xs, (int) index + 1, xs.length);
+		return (m1 + m2) / 2;
+	}
+
+	private static double minOfSubRange(double[] xs, int start, int end) {
+		double min = Double.POSITIVE_INFINITY;
+		for (int i = start; i < end; i++) {
+			if (xs[i] < min) {
+				min = xs[i];
+			}
+		}
+		return min;
+	}
+
+	/**
+	 * Find the index'th-lowest member of xs, counting from zero.
+	 * So select(0, xs) == min(xs) and select(xs.length - 1, xs) == max(xs).
+	 *
+	 * This partially sorts the array in-place.
+	 */
+	public static double select(int index, double[] xs) {
+		int lo = 0;
+		int hi = xs.length;
+		Random r = Utils.getRandom();
+		while (hi - lo > 1) {
+			assert lo <= index : "index " + index + " should be at least " + lo;
+			assert index < hi : "index " + index + " should be less than " + hi;
+			// Pick a random pivot, to prevent quadratic behaviour if the list is already sorted
+			int pivot_index = r.nextInt(hi - lo) + lo;
+			int mid = partition(xs, lo, hi, pivot_index);
+			if (index < mid) {
+				hi = mid;
+			} else {
+				lo = mid;
+			}
+		}
+		return xs[lo];
+	}
+
+	/**
+	 * Partition xs[lo:hi) about the pivot_index'th element.
+	 * Afterwards, it looks like this:
+	 *
+	 *     [x0, x1, x2,..., pivot, y0, y1, y2...]
+	 *
+	 * where x0, x1 etc are all less than pivot, and y0, y1 etc are all >= pivot.
+	 * You might think that [ x <= pivot ] and [ x > pivot ] is the right place to split,
+	 * but then if the array is constant we'll loop forever.
+	 *
+	 * @return the index of the first element after pivot after partitioning (ie y0).
+	 */
+	private static int partition(double[] xs, int lo, int hi, int pivot_index) {
+		double pivot = xs[pivot_index];
+		// ensure xs[lo+1, hi) contains the elts to be partitioned
+		xs[pivot_index] = xs[lo];
+		int i = lo + 1;
+		int mid = hi;
+		while (i < mid) {
+			// invariant: xs[mid:hi] is all >= pivot
+			// invariant: xs[lo+1:i] is all < pivot
+			// We do it this way round so if the array is constant, the pivot moves to the
+			// bottom, and so the array always shrinks by at least one element.
+			double x = xs[i];
+			if (x >= pivot) {
+				mid--;
+				xs[i] = xs[mid];
+				xs[mid] = x;
+			} else {
+				i++;
+			}
+		}
+		assert i == mid;
+		xs[lo] = xs[i-1];
+		xs[i-1] = pivot;
+		return mid;
 	}
 
 }
