@@ -206,6 +206,11 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 	public HalfLifeMap(int idealSize, Map map) {
 		assert idealSize > 0 : idealSize;
 		this.idealSize = idealSize;
+		// NB: Why 10x? Er, it seems like a sensible number that behaves well.
+		// The "best" number would depend on the ratio of gets (which devalue)
+		// and fresh puts (which can trigger prunes).
+		// Every devalueInterval, the decay counts are reduced by 0.9 
+		// (x0.9 gives a half-life of 6-7, ie 65 x idealSize).
 		devalueInterval = 10 * idealSize;
 		this.map = map;		
 	}
