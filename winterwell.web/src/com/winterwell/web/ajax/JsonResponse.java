@@ -169,7 +169,7 @@ public class JsonResponse implements IProperties {
 	public String toJSON() {
 		String json = JSON.toString(Containers.getMap(this));
 		if (cargoJson==null) return json;
-		// HACK direct json cargo
+		// HACK direct json cargo + the json for the response wrapper
 		String json2 = "{\"cargo\":"+cargoJson+","+json.substring(1);
 		return json2;
 	}
