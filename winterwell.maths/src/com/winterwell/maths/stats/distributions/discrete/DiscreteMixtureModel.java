@@ -6,22 +6,32 @@ package com.winterwell.maths.stats.distributions.discrete;
 import java.io.Serializable;
 
 import com.winterwell.maths.stats.distributions.MixtureModelBase;
+import com.winterwell.utils.Printer;
 
 /**
- * A additive (OR) mixture of discrete models.
+ * A additive (OR) mixture of discrete models (ie this is "OrDist").
  * 
  * @author Joe Halliwell <joe@winterwell.com>, Daniel
  * @testedby {@link DiscreteMixtureModelTest}
- *           {@link DiscreteMixtureModelClusteringTest}
  * 
  */
-public class DiscreteMixtureModel<X, D extends IDiscreteDistribution<X>>
-		extends MixtureModelBase<X, D> implements IDiscreteDistribution<X>,
+public class DiscreteMixtureModel<X>
+		extends MixtureModelBase<X, IDiscreteDistribution<X>> implements IDiscreteDistribution<X>,
 		Serializable {
 
 	@Override
 	public int size() {		
 		return -1; // we could try to get the size from the components. Overlaps would be an issue.
+	}
+	
+	public DiscreteMixtureModel() {
+	}
+	public DiscreteMixtureModel(IDiscreteDistribution<X>... parts) {
+		assert parts.length > 0  : Printer.toString(parts);
+		for (IDiscreteDistribution<X> part : parts) {
+			assert part != null;
+			addDistribution(part, 1.0/parts.length);
+		}
 	}
 	
 	private static final long serialVersionUID = 1L;
@@ -40,7 +50,7 @@ public class DiscreteMixtureModel<X, D extends IDiscreteDistribution<X>>
 		double bestProb = -1;
 		X best = null;
 		
-		for (D d : getComponents()) {
+		for (IDiscreteDistribution<X> d : getComponents()) {
 			try {
 				X candidate = d.getMostLikely();
 				double candidateProb = prob(candidate);
@@ -69,7 +79,7 @@ public class DiscreteMixtureModel<X, D extends IDiscreteDistribution<X>>
 	@Override
 	public double normProb(X x) {
 		double prob = 0;
-		for (D d : getComponents()) {
+		for (IDiscreteDistribution<X> d : getComponents()) {
 			prob += getComponents().normProb(d) * d.normProb(x);
 		}
 		return prob;
@@ -78,8 +88,8 @@ public class DiscreteMixtureModel<X, D extends IDiscreteDistribution<X>>
 	@Override
 	public double prob(X x) {
 		double prob = 0;
-		ObjectDistribution<D> dists = getComponents();
-		for (D dist : dists) {
+		ObjectDistribution<IDiscreteDistribution<X>> dists = getComponents();
+		for (IDiscreteDistribution<X> dist : dists) {
 			double px_d = dist.prob(x);
 			double pd = getComponents().prob(dist);
 			prob += pd * px_d;

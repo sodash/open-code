@@ -57,6 +57,8 @@ public abstract class MixtureModelBase<X, D extends IDistributionBase<X>>
 	 *            - greater than zero, does not have to be normalised
 	 */
 	public void addDistribution(D g, double weight) {
+		assert g != null;
+		assert weight >= 0 : weight; // 0 will be ignored
 		//assert (g instanceof Unsupervised) : g;
 		gaussians.setProb(g, weight);
 	}

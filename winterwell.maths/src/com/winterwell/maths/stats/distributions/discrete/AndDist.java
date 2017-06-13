@@ -13,6 +13,8 @@ import com.winterwell.utils.containers.AbstractIterator;
 
 /**
  * For combining independent models: P(X) = P1(X).P2(X)
+ * 
+ * The opposite OrDist is {@link DiscreteMixtureModel}
  * @testedby AndDistTest
  * @author daniel
  */
