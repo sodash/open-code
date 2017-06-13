@@ -29,6 +29,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Range;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.web.app.FileServlet;
+import com.winterwell.web.app.ManifestServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.Checkbox;
@@ -114,6 +115,10 @@ public class MasterHttpServlet extends HttpServlet {
 			
 			if (path.equals("/ping")) {
 				new PingServlet(request).doGet();
+				return;
+			}
+			if (path.equals("/manifest")) {
+				new ManifestServlet().process(request);
 				return;
 			}
 			

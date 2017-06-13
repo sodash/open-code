@@ -60,9 +60,10 @@ public class DataLogServer {
 	}
 
 	private static void init() {
-		IDataLog dli = DataLog.getImplementation();
-		DataLogConfig myConfig = (DataLogConfig) dli.getConfig();
-		DataLog.setConfig(myConfig);
+		// Where does config come from??
+//		IDataLog dli = DataLog.getImplementation();
+//		DataLogConfig myConfig = (DataLogConfig) dli.getConfig();
+		DataLog.setConfig(settings);
 		
 		// register the tracking event
 		IDataLogAdmin admin = DataLog.getAdmin();

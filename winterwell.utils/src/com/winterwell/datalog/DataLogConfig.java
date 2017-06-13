@@ -1,6 +1,7 @@
 package com.winterwell.datalog;
 
 import com.winterwell.utils.io.DBUtils.DBOptions;
+import com.winterwell.utils.log.Log;
 
 import java.io.File;
 import java.util.Arrays;
@@ -38,6 +39,10 @@ server=localhost
  */
 public class DataLogConfig extends DBOptions {
 
+	public DataLogConfig() {
+		Log.d("DataLogConfig");
+	}
+	
 	public int maxDataPoints = 10000;
 
 	/**
