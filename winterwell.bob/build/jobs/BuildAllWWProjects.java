@@ -15,7 +15,7 @@ public class BuildAllWWProjects extends BuildTask {
 				new BuildMaths(),
 				new BuildNLP(),
 				new BuildDepot(),
-				new BuildBob()
+				new BuildBob()				
 				);
 	}
 	

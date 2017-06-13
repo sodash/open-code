@@ -80,7 +80,8 @@ public class PublishDataServer extends BuildTask {
 				new BuildWeb(),
 				new BuildDataLog(), // This!
 				new BuildESJavaClient(),
-				new BuildFlexiGson()
+				new BuildFlexiGson(),
+				new BuildWWAppBase()
 				);
 	}
 
