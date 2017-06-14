@@ -22,6 +22,7 @@ import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
+import com.winterwell.bob.tasks.ProcessTask;
 import com.winterwell.bob.tasks.RSyncTask;
 import com.winterwell.bob.tasks.RemoteTask;
 import com.winterwell.bob.tasks.SCPTask;
@@ -59,14 +60,16 @@ import jobs.BuildWinterwellProject;
  */
 public class PublishDataServer extends BuildTask {
 
-	String server = "lg.good-loop.com"; // datalog.soda.sh
+	String server = 
+//			"lg.good-loop.com"; // datalog.soda.sh
+			"testlg.good-loop.com";
 	String remoteUser;
 	private String remoteWebAppDir;
 	private File localWebAppDir;
 			
 	public PublishDataServer() throws Exception {
 		this.remoteUser = "winterwell";
-		this.remoteWebAppDir = "/home/winterwell/"+server;
+		this.remoteWebAppDir = "/home/winterwell/lg.good-loop.com/";
 		// local
 		this.localWebAppDir = FileUtils.getWorkingDirectory();
 	}
@@ -138,8 +141,8 @@ public class PublishDataServer extends BuildTask {
 				FileUtils.move(localPropsOff, localProps);
 			}
 		}		
-		
-		// How to restart??
+
+
 	}
 
 	@Override
@@ -220,11 +223,20 @@ public class PublishDataServer extends BuildTask {
 			String out = rsyncCode.getOutput();
 			rsyncCode.close();
 		}
+//		// Bash script which restarts the servers 'lg' process
+		ProcessTask pubas = new ProcessTask("./restart.lg.process.sh "+server );
+		pubas.setEcho(true);
+		pubas.run();
+		System.out.println(pubas.getError());
+		pubas.close();
+		Log.d(pubas.getCommand(), pubas.getOutput());
 	}
 
 	private String rsyncDest(String dir) {
 //		if ( ! dir.endsWith("/")) dir += "/";
 		return remoteUser+"@"+server+ ":" + new File(remoteWebAppDir, dir).getAbsolutePath();
+		
+		
 	}
 
 
