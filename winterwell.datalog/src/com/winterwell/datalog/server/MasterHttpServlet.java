@@ -127,7 +127,7 @@ public class MasterHttpServlet extends HttpServlet {
 			Log.e("error", ex);
 			WebUtils2.sendError(500, "Server Error: "+ex, resp);
 		} finally {
-			FileUtils.close(request);
+			WebRequest.close(req, resp);
 		}
 	}
 

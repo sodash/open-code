@@ -41,11 +41,15 @@ public class HelloJetty extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		try {
 		// Set mime type to html
 		resp.setContentType("text/html");
 		// Write a web page
 		PrintWriter writer = resp.getWriter();
 		writer.append("<html><body><h1>Hello World!</h1></body></html>");
 		writer.close();
+		} finally {
+			WebRequest.close(req, resp);
+		}
 	}
 }

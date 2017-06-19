@@ -38,13 +38,13 @@ public class TrackingPixelServlet extends HttpServlet {
 
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		WebRequest wr = null;
 		try {
-			wr = new WebRequest(this, req, resp);
+			WebRequest wr = new WebRequest(this, req, resp);
 			processIncoming(wr);
 		} finally {
-			FileUtils.close(wr);
+			WebRequest.close(req, resp);
 		}
+		
 	}
 	
 	

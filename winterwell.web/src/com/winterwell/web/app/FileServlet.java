@@ -68,7 +68,7 @@ public class FileServlet extends HttpServlet {
 //			Log.v("file","Served "+file+" as "+mime );
 		} finally {
 			FileUtils.close(in);
-			FileUtils.close(resp.getOutputStream());
+			FileUtils.close(state);
 		}
 
 	}

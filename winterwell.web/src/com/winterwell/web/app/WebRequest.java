@@ -255,6 +255,10 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	protected IProperties user;
 
+	public WebRequest(HttpServletRequest request, HttpServletResponse response) {
+		this(null, request, response);
+	}
+	
 	/**
 	 * Create a new WebRequest. Takes care of:
 	 * 
@@ -362,12 +366,7 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	@Override
 	public void close() {
-		try {
-			FileUtils.close(response.getOutputStream());
-			FileUtils.close(request.getInputStream());
-		} catch(Exception ex) {
-			// oh well
-		}
+		close(request, response);
 	}
 
 	/**
@@ -1115,5 +1114,18 @@ public class WebRequest implements IProperties, Closeable {
 
 	public void addMessage(String text) {
 		addMessage(new AjaxMsg(text));
+	}
+
+	public static void close(HttpServletRequest req, HttpServletResponse resp) {
+		try {
+			FileUtils.close(req.getInputStream());		
+		} catch(Exception ex) {
+			// oh well
+		}		
+		try {
+			FileUtils.close(resp.getOutputStream());		
+		} catch(Exception ex) {
+			// oh well
+		}		
 	}
 }

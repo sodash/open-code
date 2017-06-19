@@ -37,18 +37,22 @@ class AdminServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String url3 = WebUtils2.getRequestURL(req);
-		if (!url3.startsWith("http://localhost"))
-			throw new ServletException(
-					"Security Breach: This can only be called from localhost");
 		try {
-			Log.report("SHUTDOWN REQUESTED! from " + url3 + " "
-					+ req.getRemoteAddr());
-			// root. destroy();
-			server.destroy();
+			String url3 = WebUtils2.getRequestURL(req);
+			if (!url3.startsWith("http://localhost"))
+				throw new ServletException(
+						"Security Breach: This can only be called from localhost");
+			try {
+				Log.report("SHUTDOWN REQUESTED! from " + url3 + " "
+						+ req.getRemoteAddr());
+				// root. destroy();
+				server.destroy();
+			} finally {
+				Log.report("Shutdown requested from the web! Shutting down immediately.");
+				System.exit(0);
+			}
 		} finally {
-			Log.report("Shutdown requested from the web! Shutting down immediately.");
-			System.exit(0);
+			WebRequest.close(req, resp);
 		}
 	}
 }
