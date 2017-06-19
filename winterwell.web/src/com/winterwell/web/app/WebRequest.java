@@ -26,6 +26,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.StopWatch;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
@@ -46,6 +47,23 @@ import com.winterwell.web.fields.SField;
  * 
  */
 public class WebRequest implements IProperties, Closeable {
+
+
+	public void removeCookie(String cookieName, String cookieDomain) {
+		String path = "/";;
+		// is null null valid??
+		WebUtils2.removeCookie(cookieName, getResponse(), cookieDomain, path);
+	}
+	
+	/**
+	 * Uses path=/ Call {@link WebUtils2#addCookie(HttpServletResponse, String, Object, Dt, String)} for more options.
+	 * 
+	 * @param cookieDomain .mysite.com means cookies will work across mysite.com, abc.mysite.com and www.mysite.com 
+	 * @see WebUtils2#addCookie(HttpServletResponse, String, Object, Dt, String)
+	 */
+	public void setCookie(String name, String value, Dt timeTolive, String cookieDomain) {
+		WebUtils2.addCookie(getResponse(), name, value, timeTolive, cookieDomain);
+	}
 
 
 	public String getCookie(String name) {

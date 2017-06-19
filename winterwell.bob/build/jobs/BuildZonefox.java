@@ -17,14 +17,14 @@ public class BuildZonefox extends BuildTask {
 		// But to avoid polluting git with lots of binary versions, I often comment some out.
 		List<BuildWinterwellProject> projects = Arrays.asList(				
 //				new BuildWeb(),
-				new BuildMaths(),
+//				new BuildMaths(),
 //				new BuildNLP(),
 //				new BuildDepot(),
-//				new BuildDataLog(),
+				new BuildDataLog()
 //				new BuildBob(),
-				new BuildFlexiGson(),
-				new BuildESClient(),
-				new BuildUtils()
+//				new BuildFlexiGson(),
+//				new BuildESClient(),
+//				new BuildUtils()
 				);
 		for (BuildWinterwellProject buildWinterwellProject : projects) {
 			buildWinterwellProject.setIncSrc(true);
