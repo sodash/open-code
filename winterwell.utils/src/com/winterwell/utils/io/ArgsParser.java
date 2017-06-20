@@ -300,11 +300,13 @@ public class ArgsParser {
 				String a = args[i];
 				// require and chop the leading -
 				if ( ! a.startsWith("-")) {
-					continue;
+					// end or options - return the rest as leftover
+					break;
 				}
 				a = a.substring(1, a.length());
 				Field field = token2field.get(a);
 				if (field == null) {
+					// end or options - return the rest as leftover
 					break;
 				}
 				// set field & advance i appropriately
