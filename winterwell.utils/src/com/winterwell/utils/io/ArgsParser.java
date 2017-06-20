@@ -247,7 +247,7 @@ public class ArgsParser {
 		if (requiredArgs2==null || requiredArgs2.size() == 0)
 			return;
 		missingArgs = requiredArgs2;
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("Missing required arguments: "+Containers.apply(missingArgs, f -> f.getName()));
 	}
 
 	public List<Field> getMissingArguments() {
@@ -298,6 +298,11 @@ public class ArgsParser {
 			int i = 0;
 			for (; i < args.length; i++) {
 				String a = args[i];
+				// require and chop the leading -
+				if ( ! a.startsWith("-")) {
+					continue;
+				}
+				a = a.substring(1, a.length());
 				Field field = token2field.get(a);
 				if (field == null) {
 					break;
@@ -313,7 +318,7 @@ public class ArgsParser {
 			if (missingArgs == null) {
 				missingArgs = new ArrayList<Field>(0);
 			}
-			throw new RuntimeException(getOptionsMessage());
+			throw Utils.runtime(e);
 		}
 	}
 
@@ -467,7 +472,7 @@ public class ArgsParser {
 	 * @throws IllegalArgumentException
 	 */
 	 Map<String,Field> parseSettingsObject(Class settingsClass) throws IllegalArgumentException {
-		 HashMap classToken2field = new HashMap();
+		 final HashMap classToken2field = new HashMap();
 		 // Get annotated fields
 		 List<Field> fields = ReflectionUtils.getAnnotatedFields(settingsClass,
 				Option.class, true);
@@ -520,7 +525,7 @@ public class ArgsParser {
 			}
 			// ok
 		}
-		 token2field.putAll(classToken2field);
+		token2field.putAll(classToken2field);
 		return classToken2field;
 	}
 
