@@ -34,7 +34,7 @@ import com.winterwell.web.data.XId;
  */
 public class TrackingPixelServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	static final String DATALOG_EVENT_TYPE = "pixel";
+	static final String DATALOG_EVENT_TYPE = "pxl";
 
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -82,10 +82,11 @@ public class TrackingPixelServlet extends HttpServlet {
 			Log.w("img0", e);
 		}
 		String tag = DATALOG_EVENT_TYPE;
-		// we always need a dataspace
+		
+		// Default to dataspace "trk" but allow override
 		String dataspace = state.get(LgServlet.DATASPACE);
-		if (dataspace==null) {
-			dataspace = DataLog.getDataspace();
+		if (dataspace == null) {
+			dataspace = "trk";
 		}
 		// Count it
 		LgServlet.doLog(state, dataspace, tag, via, null, true);
