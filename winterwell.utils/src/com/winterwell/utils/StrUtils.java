@@ -1774,7 +1774,7 @@ public class StrUtils {
 	/**
 	 * Replace 's "s and other characters with safe versions
 	 * Does not otherwise alter whitespace.
-	 * @param text
+	 * @param text Can be null (returns null)
 	 * @return
 	 */
 	public static String normalisePunctuation(String text) {
