@@ -161,7 +161,7 @@ public class NLPWorkshop {
 		if ("en".equals(language)) {
 			// The mobyposi dictionary, from datastore
 			File f = getFile("mobyposi-dictionary.csv");
-			Dictionary d = new Dictionary(f, '×');
+			Dictionary d = new Dictionary(f, "\u00d7".charAt(0));
 			// TODO map this to use Brown-style annotations, and store that somewhere
 			return d;
 		}
