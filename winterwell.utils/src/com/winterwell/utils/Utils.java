@@ -45,6 +45,8 @@ public class Utils {
 
 	private static final char[] vowels = "aeiouy".toCharArray();
 
+	private static final char[] letters = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+
 	/**
 	 * Check inputs are all non-null
 	 * 
@@ -290,6 +292,37 @@ public class Utils {
 			s[i] = c;
 		}
 		return new String(s);
+	}
+	
+	public static class PowerLawDistribution {
+		double exponent;
+		double total = 0;
+		Random rnd;
+		double[] partial_sums;
+		
+		public PowerLawDistribution(double exponent) {
+			this.exponent = exponent;
+			rnd = getRandom();
+			partial_sums = new double[26];
+			for (int i = 0; i < 26; i++) {
+				total += Math.pow(i + 1, -exponent);
+				partial_sums[i] = total;
+			}
+		}
+		
+		public String getRandomString(int len) {
+			char[] s = new char[len];
+			for (int j = 0; j < len; j++) {
+				double draw = rnd.nextDouble() * total;
+				for (int i = 0; i < 26; i++) {
+					if (draw < partial_sums[i]) {
+						s[j] = letters[i];
+						break;
+					}
+				}
+			}
+			return new String(s);
+		}
 	}
 
 	/**
