@@ -114,6 +114,11 @@ public class CSVWriter implements Closeable, Flushable {
 		return spec;
 	}
 	
+	/**
+	 * The root constructor, often called via others
+	 * @param out
+	 * @param spec
+	 */
 	public CSVWriter(Writer out, CSVSpec spec) {
 		Utils.check4null(out, spec);
 		file = null;
@@ -126,6 +131,10 @@ public class CSVWriter implements Closeable, Flushable {
 		this.quotedQuote = "" + spec.quote + spec.quote;
 	}
 
+	public CSVWriter(File dest, CSVSpec spec) {
+		this(dest, spec, false);
+	}
+	
 	public CSVWriter(File dest, CSVSpec spec, boolean append) {
 		this(CSVWriter2_fileWriter(dest, append), spec);
 		this.file = dest;
