@@ -201,7 +201,11 @@ public class JarTask extends BuildTask {
 				entry = zin.getNextEntry();
 			}
 			// Delete temp file
-			FileUtils.delete(tempFile);
+			try {
+				FileUtils.delete(tempFile);
+			} catch (Exception e) {
+				Log.w(LOGTAG, e);
+			}
 		}
 		// Add manifest
 		addManifest(out);
