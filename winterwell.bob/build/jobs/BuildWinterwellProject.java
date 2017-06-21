@@ -90,7 +90,7 @@ public class BuildWinterwellProject extends BuildTask {
 		
 		// copy into code/lib
 		File lib = new File(FileUtils.getWinterwellDir(), "code/lib");
-		lib.mkdir();
+		lib.mkdirs();
 		FileUtils.copy(jarFile, lib);
 		Log.d(LOGTAG, "Copied "+jarFile.getName()+" to "+lib);
 	}
