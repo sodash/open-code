@@ -10,9 +10,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.depot"/>
 	<classpathentry kind="lib" path="/middleware/postgresql/postgresql.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/elasticsearch"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.bob"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.webappbase"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/elasticsearch_5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

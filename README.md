@@ -17,10 +17,9 @@ Import projects into Eclipse -- everything in open-code, plus elasticsearch-java
 
 In Eclipse's Java Build Path editor, import a new User Library
 from the file `open-code/userlibraries.userlibraries`
-This will give you the library elasticsearch_5
+This will give you the library `elasticsearch`
 
 You will also need lots of jars in the `middleware` project
  -- get these by copy from Daniel, Miles or Carson.
 
-Step probably not needed (the code should find itself): 
-Set the env variable WINTERWELL_HOME to point to the folder above open-code.
+This step is probably not needed (the code will usually find itself): Set the env variable WINTERWELL_HOME to point to the folder above open-code.
