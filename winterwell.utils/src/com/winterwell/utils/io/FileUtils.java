@@ -50,6 +50,8 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.XStreamUtils;
 
+import sun.security.action.GetLongAction;
+
 
 /**
  * Static file-related utility functions.
@@ -950,6 +952,18 @@ public class FileUtils {
 			File hardcoded = new File("/home/winterwell").getCanonicalFile();
 			if (hardcoded.exists() && hardcoded.isDirectory())
 				return hardcoded;
+			
+			// Does the local folder or its parent or grandparent look OK? 
+			// Let's test for the presence of the open-code repo.
+			File wd = getWorkingDirectory();
+			for(int i=0; i<3; i++) {
+				if (new File(wd, "open-code").isDirectory()) {
+					// yeh :)
+					return wd;
+				}
+				wd = wd.getParentFile();
+				if (wd==null) break;
+			}
 			
 			// Give up
 			throw new FailureException(

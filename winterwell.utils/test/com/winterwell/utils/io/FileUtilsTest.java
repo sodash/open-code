@@ -19,6 +19,11 @@ import junit.framework.TestCase;
 public class FileUtilsTest extends TestCase {
 
 
+	public void testGetWWDir() throws IOException {
+		File wwd = FileUtils.getWinterwellDir();
+		System.out.println(wwd);
+		assert new File(wwd, "open-code").isDirectory();
+	}
 
 	public void testChunk() throws IOException {
 		final int CHUNK_SIZE = 1000;
