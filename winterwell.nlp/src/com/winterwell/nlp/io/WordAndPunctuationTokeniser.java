@@ -204,7 +204,10 @@ public class WordAndPunctuationTokeniser extends ATokenStream {
 	 * @return true if c is any of the (normal) apostrophe characters
 	 */
 	private boolean isApostrophe(char c) {
-		return c == '\'' || c == '`' || c == '‘' || c == '’' || c == '‛';
+		return c == '\'' || c == '`'
+				|| c == "\u2018".charAt(0)  // left single quotation mark
+				|| c == "\u2019".charAt(0)  // right single quotation mark
+				|| c == "\u201b".charAt(0); // single high-reversed-9 quotation mark
 	}
 
 	/**
