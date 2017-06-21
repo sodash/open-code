@@ -11,7 +11,12 @@ public class BuildZonefox extends BuildTask {
 
 	@Override
 	protected void doTask() throws Exception {
-		File zflibs = new File(FileUtils.getWinterwellDir(), "zonefox/libs");
+		// Try to find the right directory
+		File zfDir = new File(FileUtils.getWinterwellDir(), "zonefox");
+		if ( ! zfDir.isDirectory()) {
+			zfDir = new File(FileUtils.getWinterwellDir(), "ilab-ww");
+		}
+		File zflibs = new File(zfDir, "libs");
 		assert zflibs.isDirectory() : zflibs;
 		// NB: all the below are needed. 
 		// But to avoid polluting git with lots of binary versions, I often comment some out.
