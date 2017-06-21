@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<eclipse-userlibraries version="2">
+    <library name="elasticsearch_5" systemlibrary="false">
+        <archive path="/middleware/elasticsearch/lib/elasticsearch-5.1.2.jar"/>
+        <archive path="/middleware/elasticsearch/lib/HdrHistogram-2.1.6.jar"/>
+        <archive path="/middleware/elasticsearch/lib/hppc-0.7.1.jar"/>
+        <archive path="/middleware/elasticsearch/lib/jackson-core-2.8.1.jar"/>
+        <archive path="/middleware/elasticsearch/lib/jackson-dataformat-cbor-2.8.1.jar"/>
+        <archive path="/middleware/elasticsearch/lib/jackson-dataformat-smile-2.8.1.jar"/>
+        <archive path="/middleware/elasticsearch/lib/jackson-dataformat-yaml-2.8.1.jar"/>
+        <archive path="/middleware/elasticsearch/lib/jna-4.2.2.jar"/>
+        <archive path="/middleware/elasticsearch/lib/joda-time-2.9.5.jar"/>
+        <archive path="/middleware/elasticsearch/lib/jopt-simple-5.0.2.jar"/>
+        <archive path="/middleware/elasticsearch/lib/jts-1.13.jar"/>
+        <archive path="/middleware/elasticsearch/lib/log4j-1.2-api-2.7.jar"/>
+        <archive path="/middleware/elasticsearch/lib/log4j-api-2.7.jar"/>
+        <archive path="/middleware/elasticsearch/lib/log4j-core-2.7.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-analyzers-common-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-backward-codecs-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-core-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-grouping-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-highlighter-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-join-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-memory-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-misc-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-queries-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-queryparser-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-sandbox-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-spatial-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-spatial-extras-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-spatial3d-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/lucene-suggest-6.3.0.jar"/>
+        <archive path="/middleware/elasticsearch/lib/securesm-1.1.jar"/>
+        <archive path="/middleware/elasticsearch/lib/snakeyaml-1.15.jar"/>
+        <archive path="/middleware/elasticsearch/lib/spatial4j-0.6.jar"/>
+        <archive path="/middleware/elasticsearch/lib/t-digest-3.0.jar"/>
+    </library>
+</eclipse-userlibraries>
+
