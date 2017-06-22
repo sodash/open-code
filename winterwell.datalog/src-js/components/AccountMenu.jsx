@@ -4,7 +4,7 @@ import Login from 'you-again';
 
 import C from '../C';
 import DataStore from '../plumbing/DataStore';
-import LoginWidget from './LoginWidget/LoginWidget.jsx';
+import LoginWidget from './LoginWidget.jsx';
 
 // import {XId,yessy,uid} from '../js/util/orla-utils.js';
 

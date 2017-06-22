@@ -4,13 +4,13 @@ import Login from 'you-again';
 import {Modal} from 'react-bootstrap';
 import { XId, uid } from 'wwutils';
 import Cookies from 'js-cookie';
-import DataStore from '../../plumbing/DataStore';
-import ActionMan from '../../plumbing/ActionMan';
-import Misc from '../Misc';
-import C from '../../C';
+import DataStore from '../plumbing/DataStore';
+import ActionMan from '../plumbing/ActionMan';
+import Misc from './Misc';
+import C from '../C';
 
 // For testing
-if (window.location.host.indexOf('local') !== -1) {	
+if (false && window.location.host.indexOf('local') !== -1) {	
 	Login.ENDPOINT = 'http://localyouagain.winterwell.com/youagain.json';
 	console.warn("config", "Set you-again Login endpoint to "+Login.ENDPOINT);
 }
@@ -22,21 +22,21 @@ if (window.location.host.indexOf('local') !== -1) {
 */
 
 
-const SocialSignin = ({verb}) => {
+const SocialSignin = ({verb, services}) => {
 	return (
 		<div className="social-signin">
-			<div className="form-group">
-				<button onClick={() => ActionMan.socialLogin('twitter')} className="btn btn-default form-control">
+			<div className={services && services.indexOf('twitter') === -1? "hidden" : "form-group"}>
+				<button onClick={() => socialLogin('twitter')} className="btn btn-default form-control">
 					<Misc.Logo size='small' service='twitter' /> { verb } with Twitter
 				</button>
 			</div>
-			<div className="form-group">
-				<button onClick={() => ActionMan.socialLogin('facebook')} className="btn btn-default form-control">
+			<div className={services && services.indexOf('facebook') === -1? "hidden" : "form-group"}>
+				<button onClick={() => socialLogin('facebook')} className="btn btn-default form-control">
 					<Misc.Logo size="small" service="facebook" /> { verb } with Facebook
 				</button>
 			</div>
 			<div className="form-group hidden">
-				<button onClick={() => ActionMan.socialLogin('instagram')} className="btn btn-default form-control">
+				<button onClick={() => socialLogin('instagram')} className="btn btn-default form-control">
 					<Misc.Logo size='small' service='instagram' /> { verb } with Instagram
 				</button>
 			</div>
@@ -46,6 +46,79 @@ const SocialSignin = ({verb}) => {
 		</div>
 	);
 };
+
+// Annoyingly -- this is likely to fail the first time round! They use a popup which gets blocked :(
+// Possible fixes: Load FB on page load (but then FB track everyone)
+// Use a redirect (i.e. server side login)
+const doFBLogin = function() {	
+	console.warn("FB.login...");
+	FB.login(function(response) {
+		console.warn("FB.login", response);
+		if (response.status === 'connected') {
+			doFBLogin_connected(response);
+		} else {
+			// fail
+		}
+	}); //, {scope: 'public_profile,email,user_friends'}); // what permissions??
+	// see https://developers.facebook.com/docs/facebook-login/permissions
+};
+
+const doFBLogin_connected = (response) => {
+	let ar = response.authResponse;
+	// ar.userID;
+	// ar.accessToken;
+	// ar.expiresIn;	
+	Login.setUser({
+		xid: ar.userID+'@facebook'
+	});
+	// ask for extra data (what you get depends on the permissions, but the ask is harmless)
+	FB.api('/me?fields=name,about,cover,age_range,birthday,email,gender,relationship_status,website', function(meResponse) {
+		console.warn('Successful login for: ' + meResponse.name, meResponse);
+		Login.setUser({
+			xid: ar.userID+'@facebook',
+			name: meResponse.name
+		});
+	});
+	// close the dialog on success
+	DataStore.setShow(C.show.LoginWidget, false);
+};
+
+const socialLogin = (service) => {
+	if (service==='facebook') {
+		if (window.FB) {
+			doFBLogin();
+			return;
+		}
+		window.fbAsyncInit = function() {
+			FB.init({
+				appId            : '1847521215521290', // SoGive FB app-id
+				autoLogAppEvents : false,
+				xfbml            : false,
+				version          : 'v2.9',
+				status           : true // auto-check login
+			});
+			// FB.AppEvents.logPageView();
+			FB.getLoginStatus(function(response) {
+				console.warn("FB.getLoginStatus", response);
+				if (response.status === 'connected') {
+					doFBLogin_connected(response);
+				} else {
+					doFBLogin();
+				}
+			}); // ./login status
+		};
+		(function(d, s, id){
+			let fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) return;
+			let js = d.createElement(s); js.id = id;
+			js.src = "//connect.facebook.net/en_US/sdk.js";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
+		return;
+	} // ./fb
+	Login.auth(service, 'good-loop');
+}; // ./socialLogin
+
 
 const emailLogin = (verb, email, password) => {
 	assMatch(email, String, password, String);
@@ -65,9 +138,6 @@ const emailLogin = (verb, email, password) => {
 	});
 };
 
-const socialLogin = () => {
-
-};
 
 const EmailSignin = ({verb}) => {
 	// we need a place to stash form info. Maybe appstate.widget.LoginWidget.name etc would be better?
@@ -140,13 +210,13 @@ const ResetLink = ({verb}) => {
 		Login.error = null;
 		DataStore.setValue(['widget',C.show.LoginWidget,'verb'], 'reset');
 	};
-		return (
-			<div className='pull-right'>
-				<small>
+	return (
+		<div className='pull-right'>
+			<small>
 				<a onClick={toReset}>Forgotten password?</a>
-				</small>
-			</div>
-		);
+			</small>
+		</div>
+	);
 };
 
 const LoginError = function() {
@@ -172,17 +242,14 @@ const LoginWidget = ({showDialog, logo, title}) => {
 	let verb = DataStore.appstate.widget && DataStore.appstate.widget.LoginWidget && DataStore.appstate.widget.LoginWidget.verb;
 	if ( ! verb) verb = 'login';
 
-	if ( ! title) title = `Welcome ${verb==='login'? '(back)' : ''} to SoGive`;
+	if ( ! title) title = `Welcome ${verb==='login'? '(back)' : ''} to DataLog`;
 
 	const heading = {
 		login: 'Log In',
 		register: 'Register',
 		reset: 'Reset Password'
 	}[verb];
-	
-				/*<div className="col-sm-6">
-							<SocialSignin verb={verb} services={null} />
-						</div>*/
+
 	return (
 		<Modal show={showDialog} className="login-modal" onHide={() => DataStore.setShow(C.show.LoginWidget, false)}>
 			<Modal.Header closeButton>
@@ -194,10 +261,13 @@ const LoginWidget = ({showDialog, logo, title}) => {
 			<Modal.Body>
 				<div className="container-fluid">
 					<div className="row">
-						<div className="col-sm-12">
+						<div className="col-sm-6">
 							<EmailSignin
 								verb={verb}
 							/>
+						</div>
+						<div className="col-sm-6">
+							<SocialSignin verb={verb} services={['facebook']} />
 						</div>
 					</div>
 				</div>

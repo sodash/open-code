@@ -1,44 +1,33 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Login from 'you-again';
 import { assert } from 'sjtest';
 import { getUrlVars } from 'wwutils';
 import _ from 'lodash';
 
 // Plumbing
-import DataStore from '../../plumbing/DataStore';
+import DataStore from '../plumbing/DataStore';
 
 // Templates
-import MessageBar from '../MessageBar';
-import NavBar from '../NavBar';
-import LoginWidget from '../LoginWidget/LoginWidget';
+import MessageBar from './MessageBar';
+import NavBar from './NavBar';
+import LoginWidget from './LoginWidget';
 // Pages
-import DashboardPage from '../DashboardPage';
-import SearchPage from '../SearchPage';
-import AccountPage from '../AccountPage';
-import DonateToCampaignPage from '../DonateToCampaignPage';
-import CharityPage from '../CharityPage';
-import EditCharityPage from '../editor/EditCharityPage';
-import EditorDashboardPage from '../editor/EditorDashboardPage';
+import DashboardPage from './DashboardPage';
+import AccountPage from './AccountPage';
 
 // Actions
 
 
 const PAGES = {
-	search: SearchPage,
 	dashboard: DashboardPage,
-	editordashboard: EditorDashboardPage,
 	account: AccountPage,
-	charity: CharityPage,
-	campaign: DonateToCampaignPage,
-	edit: EditCharityPage
 };
 
-const DEFAULT_PAGE = 'search';
+const DEFAULT_PAGE = 'dashboard';
 
 
 /**
-		Top-level: SoGive tabs
+		Top-level: tabs
 */
 class MainDiv extends Component {
 	constructor(props) {
@@ -52,7 +41,7 @@ class MainDiv extends Component {
 		const updateReact = (mystate) => this.setState({}); //, 1000);
 		DataStore.addListener(updateReact);
 
-		Login.app = 'sogive';
+		Login.app = 'datalog';
 		// Set up login watcher here, at the highest level		
 		Login.change(() => {
 			this.setState({});

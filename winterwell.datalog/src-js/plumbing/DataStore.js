@@ -5,6 +5,7 @@ import C from '../C.js';
 import _ from 'lodash';
 import {getType} from '../data/DataClass';
 import {assert,assMatch} from 'sjtest';
+import {yessy} from 'wwutils';
 
 /**
  * Hold data in a simple json tree, and provide some utility methods to update it - and to attach a listener.
@@ -25,9 +26,17 @@ class Store {
 		this.callbacks.push(callback);
 	}
 
+	/**
+	 * Update and trigger the on-update callbacks.
+	 * @param newState {?Object} This will do an overwrite merge with the existing state.
+	 * Note: This means you cannot delete/clear an object using this - use direct modification instead.
+	 * Can be null, which still triggers the on-update callbacks.
+	 */
 	update(newState) {
-		// console.log('update', newState);
-		_.merge(this.appstate, newState);
+		console.log('update', newState);
+		if (newState) {
+			_.merge(this.appstate, newState);
+		}
 		this.callbacks.forEach(fn => fn(this.appstate));
 	}
 
@@ -62,8 +71,9 @@ class Store {
 	}
 
 	/**
-	 * Update a single path=value
-	 * @param {String[]} path 
+	 * Update a single path=value.
+	 * Unlike update(), this can set {} or null values.
+	 * @param {String[]} path This path will be created if it doesn't exist (except if value===null)
 	 * @param {*} value 
 	 */
 	// TODO handle setValue(pathbit, pathbit, pathbit, value) too
@@ -72,23 +82,25 @@ class Store {
 		assert(this.appstate[path[0]], 
 			path[0]+" is not a node in appstate - As a safety check against errors, the root node must already exist to use setValue()");
 		// console.log('DataStore.setValue', path, value);
-		let newState = {};
-		let tip = newState;	
+		let tip = this.appstate;
 		for(let pi=0; pi < path.length; pi++) {
 			let pkey = path[pi];
-			assert(pkey || pkey===0, "falsy in path "+path.join(" -> ")); // no falsy in a path - except that 0 is a valid key
 			if (pi === path.length-1) {
 				tip[pkey] = value;
 				break;
 			}
-			// When to make an array? Let's leave that for the server to worry about.
-			// Javascript is lenient on array/object for key->value access.
-			let newTip = {};
-			tip[pkey] = newTip;
+			assert(pkey || pkey===0, "falsy in path "+path.join(" -> ")); // no falsy in a path - except that 0 is a valid key
+			let newTip = tip[pkey];
+			if ( ! newTip) {
+				if (value===null) {
+					// don't make path for null values
+					return;
+				}
+				newTip = tip[pkey] = {};
+			}
 			tip = newTip;
 		}
-		// update
-		this.update(newState);
+		this.update();
 	}
 
 	/**

@@ -14,7 +14,7 @@ export default class ChartWidget extends React.Component {
 			labels: ["January", "February", "March", "April", "May", "June", "July"],
 			datasets: [
 				{
-					label: "£s donated",
+					label: "stuff",
 					fill: false,
 					lineTension: 0.1,
 					backgroundColor: "rgba(75,192,192,0.4)",

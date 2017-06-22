@@ -8,72 +8,6 @@ import {SJTest, assert, assMatch} from 'sjtest';
 import C from '../C.js';
 
 import Login from 'you-again';
-import NGO from '../data/charity/NGO';
-
-const ServerIO = {};
-export default ServerIO;
-
-// for debug
-window.ServerIO = ServerIO;
-
-/**
- * @param query {!String} query string
- */
-ServerIO.search = function(query) {
-	assert(_.isString(query), query);
-	return ServerIO.load('/search.json', {data: {q: query}} );
-};
-
-
-ServerIO.getCharity = function(charityId, version) {
-	assMatch(charityId, String);
-	return ServerIO.load('/charity/'+escape(charityId)+'.json', {data: {version: version}});
-};
-
-
-ServerIO.donate = function(data) {
-	// Anything to assert here?
-	return ServerIO.post('/donation', data);
-};
-
-ServerIO.getDonations = function() {
-	return ServerIO.load('/donation/list');
-};
-
-
-ServerIO.saveCharity = function(charity, version) {
-	assert(NGO.isa(charity), charity);
-	let params = {		
-		data: {action: 'save', item: JSON.stringify(charity), version: version},
-		method: 'PUT'};
-	return ServerIO.load('/charity/'+escape(NGO.id(charity))+'.json', params);
-};
-
-ServerIO.publish = function(charity, version) {
-	assert(NGO.isa(charity), charity);
-	let params = {		
-		data: {action: 'publish', version: version}
-	};
-	return ServerIO.load('/charity/'+escape(NGO.id(charity))+'.json', params);
-};
-
-/**
- * @param charity {name:String}
- */
-ServerIO.addCharity = function(charity, version='draft') {
-	let params = {		
-		data: {action: 'add', item: JSON.stringify(charity), version: version},
-		method: 'PUT'};
-	return ServerIO.load('/charity.json', params);
-};
-
-ServerIO.discardEdits = function(charity, version) {
-	assert(NGO.isa(charity), charity);
-	let params = {		
-		data: {action: 'discard-edits', version: version}
-	};
-	return ServerIO.load('/charity/'+escape(NGO.id(charity))+'.json', params);
-};
 
 
 /**
@@ -89,10 +23,10 @@ ServerIO.discardEdits = function(charity, version) {
  *
  * @returns A <a href="http://api.jquery.com/jQuery.ajax/#jqXHR">jqXHR object</a>.
 **/
-ServerIO.load = function(url, params) {
+let load = function(url, params) {
 	assMatch(url,String);
 	console.log("ServerIO.load", url, params);
-	params = ServerIO.addDefaultParams(params);
+	params = params || {};
 	if ( ! params.data) params.data = {};
 	// sanity check: no Objects except arrays
 	_.values(params.data).map(
@@ -127,7 +61,7 @@ ServerIO.load = function(url, params) {
 		return defrd;
 	}
 	defrd = defrd
-			.then(ServerIO.handleMessages)
+			.then(handleMessages)
 			.fail(function(response, huh, bah) {
 				console.error('fail',url,params,response,huh,bah);
 				// ServerIO.ActionMan.perform({
@@ -142,26 +76,19 @@ ServerIO.load = function(url, params) {
 	return defrd;
 };
 
-ServerIO.post = function(url, data) {
-	return ServerIO.load(url, {data, method:'POST'});
+let post = function(url, data) {
+	return load(url, {data, method:'POST'});
 };
 
-ServerIO.saveDraft = function(item) {
-	return ServerIO.post('/charity/'+escape(NGO.id(item))+'.json', item);
+let handleMessages = function(r) {
+	console.log("TODO handleMessages", r);
 };
 
-ServerIO.handleMessages = function(response) {
-	console.log('handleMessages',response);
-	const newMessages = response && response.messages;
-	if ( ! newMessages || newMessages.length===0) {
-		return response;
-	}
-	ServerIO.ActionMan.perform({verb:C.action.notify, messages:newMessages});
-	return response;
+const ServerIO = {
+	post, 
+	load
 };
+export default ServerIO;
 
-ServerIO.addDefaultParams = function(params) {
-	if ( ! params) params = {};
-	if ( ! params.data) params.data = {};
-	return params;
-};
+// for debug
+window.ServerIO = ServerIO;
