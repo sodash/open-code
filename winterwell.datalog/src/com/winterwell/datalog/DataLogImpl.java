@@ -589,7 +589,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 		// dataspace_eventType=$eventType
 		StringBuilder stag = new StringBuilder(dataspace);
 		String eventType = (String) event.remove(DataLogEvent.EVENTTYPE);
-		stag.append("_eventType="+eventType);
+		stag.append("_evt="+eventType);
 		// a-z params
 		event.keySet().stream().sorted().forEach(k -> {
 			// exclude the non-params

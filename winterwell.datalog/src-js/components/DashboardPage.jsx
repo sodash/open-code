@@ -25,7 +25,8 @@ class DashboardPage extends React.Component {
 			);
 		} else {
 			// Where does ad activity data go??
-			// dataspaces: trk for evt.pxl, goodloop for evt.viewable, adview, click, close
+			// dataspaces: trk for evt.pxl, goodloop for evt.viewable, adview, click, close, open, opened
+			// see https://github.com/good-loop/doc/wiki/Canonical-Terminology-for-Logging-Good-Loop-Events
 			ServerIO.getData();
 		}
 

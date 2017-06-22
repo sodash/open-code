@@ -20,7 +20,9 @@ public interface IHasJson {
 	 * Matches JSONString#toJSONString()
 	 * @return A JSON String
 	 */
-	String toJSONString();
+	default String toJSONString() {
+		return new SimpleJson().toJson(toJson2());
+	}
 	
 	/**
 	 * @return An object suitable for conversion to JSON using a standard library (such as Jetty's JSON class).

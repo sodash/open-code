@@ -17,6 +17,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.KErrorPolicy;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.SimpleJson;
@@ -28,22 +29,57 @@ import com.winterwell.utils.web.SimpleJson;
 public final class DataLogEvent implements Serializable, IHasJson {
 	private static final long serialVersionUID = 1L;
 
-	public static final String EVENTTYPE = "eventType";
+	public static final String EVENTTYPE = "evt";
 
 	/**
 	 * these get special treatment - as direct properties not key/value props.
 	 * Which means nicer json + they can have a type in ES.
+	 * 
+	 * HACK: use StringBuilder.class as a marker for "text with tokenisation"
+	 * HACK: use Object.class to mark special-case
 	 */
-	public static final Collection<String> COMMON_PROPS = new HashSet(Arrays.asList(
+	public static final Map<String, Class> COMMON_PROPS = 
+			new HashMap(new ArrayMap(			
 			// tracking
-			"ip","user","url", "domain", "host",
+			"ip", String.class,
+			"user", String.class,
+			"url", String.class,
+			"domain", String.class,
+			"host", String.class,
 			// common event-defining properties
-			"tag", "action", "verb", "as", "turl", "href", "to", "src", "from", "place", "locn", "location",
+			"tag", String.class, 
+			"action", String.class, 
+			"verb", String.class,
+			"as", String.class,
+			"turl", String.class,
+			"href", String.class,
+			"to", String.class,
+			"src", String.class,
+			"from", String.class,
+			// text properties (support tokenisation)
+			"place", StringBuilder.class,
+			"locn", StringBuilder.class,
+			"location", StringBuilder.class,
 			// a few XId properties
-			"id", "xid", "oxid", "txid", "uxid", "su",
+			"id", String.class,
+			"xid", String.class,
+			"oxid", String.class,
+			"txid", String.class,
+			"uxid", String.class,
+			"su",String.class,
 			// a few scoring/results properties
-			"start", "end", "dt", "note", "notes", "score", "x", "y", "z",
-			"lat", "lng"
+			"start", Time.class,
+			"end", Time.class,
+			"dt", Integer.class,
+			"note", StringBuilder.class,
+			"notes", StringBuilder.class, 
+			"score", Double.class, 
+			"x", Double.class,
+			"y", Double.class,
+			"z", Double.class,
+			"geo", Object.class,
+			"lat", Double.class,
+			"lng", Double.class
 			));
 	
 	public final double count;
@@ -142,16 +178,15 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		map.put("time", time.toISOString()); //getTime()); // This is for ES -- which works with epoch millisecs
 		map.put("count", count);
 		if (props.isEmpty()) return map;
-		// privileged props
-		for(String p : COMMON_PROPS) {
-			Object v = props.get(p);
-			if (v!=null) map.put(p, v);
-		}
 		// others as a list (to avoid hitting the field limit in ES which could happen with dynamic fields)
 		List propslist = new ArrayList();
 		for(Entry<String, ?> pv : props.entrySet()) {
-			if (COMMON_PROPS.contains(pv.getKey())) continue;
 			Object v = pv.getValue();
+			if (COMMON_PROPS.containsKey(pv.getKey())) {
+				// privileged props
+				map.put(pv.getKey(), v);
+				continue;
+			}
 			ArrayMap<String,Object> prop;
 			if (v instanceof Number) {
 				prop = new ArrayMap(

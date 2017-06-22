@@ -170,39 +170,58 @@ public class ESStorage implements IDataLogStorage {
 			String idx = indexFromDataspace(d);
 			initIndex(d, idx);			
 		}
+		// share via Dep
+		Dep.setIfAbsent(ESStorage.class, this);
 		return this;
 	}
 
 	
 	private void initIndex(String dataspace, String index) {
 		ESHttpClient _client = client(dataspace);
-		if ( ! _client.admin().indices().indexExists(index)) {
-			// make it
-			CreateIndexRequest pc = _client.admin().indices().prepareCreate(index);
-			pc.setDefaultAnalyzer(Analyzer.keyword);
-			IESResponse res = pc.get();
-			res.check();
+		if (_client.admin().indices().indexExists(index)) {
+			return;
 		}
+		// make it
+		CreateIndexRequest pc = _client.admin().indices().prepareCreate(index);
+		pc.setDefaultAnalyzer(Analyzer.keyword);
+		IESResponse cres = pc.get();
+		cres.check();		
 		// register some standard event types??
 		try {
 			PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, typeFromEventType(simple));
 			// See DataLogEvent.COMMON_PROPS and toJson()
-			ESType keywordy = new ESType().text().analyzer("keyword");
+			ESType keywordy = new ESType().keyword();
+			// Huh? Why were we using type text with keyword analyzer??
+//					.text().analyzer("keyword")					
+//					.fielddata(true);
 			ESType props = new ESType()
 					.property("k", keywordy)
 					.property("v", new ESType().text())
 					.property("n", new ESType().DOUBLE());
 			ESType simpleEvent = new ESType()
-					.property("count", new ESType().DOUBLE())
-					.property("time", new ESType().date())
-					.property("tag", keywordy)
 					.property(DataLogEvent.EVENTTYPE, keywordy)
-					.property("id", keywordy)
-					.property("xid", keywordy)
-					.property("oxid", keywordy)
-					.property("uxid", keywordy)
-					.property("ip", keywordy)
-					.property("props", props);
+					.property("time", new ESType().date())
+					.property("count", new ESType().DOUBLE())
+					.property("props", props);			
+			for(Entry<String, Class> cp : DataLogEvent.COMMON_PROPS.entrySet()) {
+				// HACK to turn Class into ESType
+				ESType est = keywordy;
+				if (cp.getValue()==StringBuilder.class) {
+					est = new ESType().text();
+				} else if (cp.getValue()==Time.class) {
+					est = new ESType().date();
+				} else if (cp.getValue()==Double.class) {
+					est = new ESType().DOUBLE();
+				} else if (cp.getValue()==Integer.class) {
+						est = new ESType().INTEGER();					
+				} else if (cp.getValue()==Object.class) {
+					if ("geo".equals(cp.getKey())) {
+						est = new ESType().geo_point();
+					}
+				}
+				simpleEvent.property(cp.getKey(), est);
+			}
+					
 			pm.setMapping(simpleEvent);
 			IESResponse res = pm.get();
 			res.check();
@@ -212,8 +231,9 @@ public class ESStorage implements IDataLogStorage {
 		}
 	}
 
-	private String indexFromDataspace(String dataspace) {
+	public String indexFromDataspace(String dataspace) {
 		assert ! Utils.isBlank(dataspace);
+		assert ! dataspace.startsWith("datalog.") : dataspace;
 		String idx = "datalog."+dataspace;
 		return idx;
 	}
@@ -232,8 +252,10 @@ public class ESStorage implements IDataLogStorage {
 	 */
 	@Override
 	public ListenableFuture<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period period) {
-//		Log.d("datalog.es", "saveEvent: "+event);
+//		Log.d("datalog.es", "saveEvent: "+event);		
 		String index = indexFromDataspace(dataspace);
+		// init?
+		initIndex(dataspace, index);
 		String type = typeFromEventType(event.eventType);
 		// put a time marker on it -- the end in seconds is enough
 		long secs = period.getEnd().getTime() % 1000;
@@ -263,7 +285,8 @@ public class ESStorage implements IDataLogStorage {
 	 * Lets insist on latin chars and protect the base namespace.
 	 * @return
 	 */
-	private String typeFromEventType(String eventType) {
+	public String typeFromEventType(String eventType) {
+		assert ! eventType.startsWith("evt.");
 		return "evt."+StrUtils.toCanonical(eventType);
 	}
 
@@ -339,7 +362,8 @@ public class ESStorage implements IDataLogStorage {
 
 	static Map<String, ESConfig> config4dataspace = new HashMap();
 	
-	private ESHttpClient client(String dataspace) {		
+	public ESHttpClient client(String dataspace) {
+		assert ! dataspace.startsWith("datalog.") : dataspace;
 		ESConfig _config = Utils.or(config4dataspace.get(dataspace), esConfig);
 		return new ESHttpClient(_config);
 	}

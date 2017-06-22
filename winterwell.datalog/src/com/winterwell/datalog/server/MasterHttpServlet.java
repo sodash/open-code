@@ -105,7 +105,11 @@ public class MasterHttpServlet extends HttpServlet {
 			String project = request.getSlugBits()[0];
 			request.put(new Key("project"), project);
 			
-			// TODO stats explorer
+			// data/stats explorer
+			if (path.startsWith("/data")) {
+				new DataServlet().process(request);
+				return;
+			}
 			
 			// TODO experiment reports table
 			
