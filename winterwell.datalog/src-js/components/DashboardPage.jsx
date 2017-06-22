@@ -15,7 +15,7 @@ import Misc from './Misc';
 class DashboardPage extends React.Component {
 	render() {
 		let user = Login.getUser();
-		let content;
+		let content = null;
 
 		if ( ! user) {
 			content = (
@@ -23,6 +23,10 @@ class DashboardPage extends React.Component {
 					<a href='#' onClick={(e) => DataStore.setShow('LoginWidget', true)}>Login or register</a>.
 				</div>
 			);
+		} else {
+			// Where does ad activity data go??
+			// dataspaces: trk for evt.pxl, goodloop for evt.viewable, adview, click, close
+			ServerIO.getData();
 		}
 
 		// display...

@@ -36,7 +36,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 */
 	public static final Collection<String> COMMON_PROPS = new HashSet(Arrays.asList(
 			// tracking
-			"ip","user","url", "domain",
+			"ip","user","url", "domain", "host",
 			// common event-defining properties
 			"tag", "action", "verb", "as", "turl", "href", "to", "src", "from", "place", "locn", "location",
 			// a few XId properties

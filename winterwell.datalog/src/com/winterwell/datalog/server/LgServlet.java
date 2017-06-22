@@ -126,6 +126,9 @@ public class LgServlet {
 			// remove some gumpf (UTM codes)
 			String cref = WebUtils2.cleanUp(ref);
 			params.put("url", cref);
+			// domain (e.g. sodash.com) & host (e.g. www.sodash.com)
+			params.put("domain", WebUtils2.getDomain(cref)); // matches publisher in adverts
+//			params.put("host", WebUtils2.getHost(cref));
 		}
 		// write to log file
 		doLogToFile(dataspace, tag, params, trckId, via, state);

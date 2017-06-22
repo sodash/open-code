@@ -32,10 +32,6 @@ const NavBar = ({page}) => {
 							<a className="nav-item nav-link" href="#dashboard">
 								My Profile
 							</a></li>
-						<li className={page === 'search'? 'active' : ''}>
-							<a className="nav-item nav-link" href="#search">
-								Search
-							</a></li>
 					</ul>
 					<div>
 						<AccountMenu active={page === 'account'} />
