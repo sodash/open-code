@@ -3,8 +3,10 @@ package com.winterwell.maths.stats;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import com.winterwell.maths.datastorage.DataSet;
 import com.winterwell.maths.stats.distributions.AxisAlignedGaussian;
@@ -277,5 +279,61 @@ public class StatsUtilsTest extends TestCase {
 			assert MathUtils.approx(m, 5) : m;
 			assert MathUtils.approx(v, 2) : v;
 		}
+	}
+	
+	public void testMedian() {
+		double[] vs = new double[] { 9 };
+		double[] ws = new double[] { 9, 10 };
+		double[] xs = new double[] { 1, 2, 3, 4, 5, 6, 7 };
+		double[] ys = new double[] { 1, 2, 3, 4, 5, 6 };
+		double[] zs = new double[] { 5, 4, 3, 2, 1 };
+		assert StatsUtils.median(vs) == 9.0;
+		assert StatsUtils.median(ws) == 9.5;
+		assert StatsUtils.median(xs) == 4.0;
+		assert StatsUtils.median(ys) == 3.5;
+		assert StatsUtils.median(zs) == 3;
+	}
+
+	public void testMedianProperty() {
+		for (int i = 0; i < 100; i++) {
+			double[] xs = randomDoubleArray();
+			double[] ys = Arrays.copyOf(xs, xs.length);
+			double[] zs = Arrays.copyOf(xs, xs.length);
+			assert StatsUtils.median(xs) == slowMedian(ys) : zs;
+		}
+	}
+	
+	public void testSelectMin() {
+		for (int i = 0; i < 100; i++) {
+			double[] xs = randomDoubleArray();
+			double[] ys = Arrays.copyOf(xs, xs.length);
+			assert StatsUtils.select(0, xs) == MathUtils.min(xs) : Arrays.toString(ys);
+		}
+	}
+
+	public void testSelectRepeats() {
+		double[] xs = { 10, 10, 10, 10, 10 };
+		assert StatsUtils.select(4, xs) == 10.0;
+	}
+
+	private double[] randomDoubleArray() {
+		Random r = Utils.getRandom();
+		int length = 1 + (int) Math.floor(Math.pow(2, r.nextDouble() * 15));
+		double[] xs = new double[length];
+		for (int j = 0; j < length; j++) {
+			xs[j] = r.nextDouble();
+		}
+		return xs;
+	}
+
+	private double slowMedian(double[] xs) {
+		int index = xs.length / 2;
+		Arrays.sort(xs);
+		double median = xs[index];
+		if (2 * index == xs.length) {
+			// even number of elements; average the two in the middle
+			median = (median + xs[index - 1]) / 2.0;
+		}
+		return median;
 	}
 }
