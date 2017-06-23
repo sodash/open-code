@@ -51,7 +51,7 @@ class DashboardPage extends React.Component {
 		return (
 			<div className="page DashboardPage">
 				<h2>My Dashboard</h2>
-
+				TODO data!
 			</div>
 		);
 	}

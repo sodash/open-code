@@ -9,10 +9,12 @@ import C from '../C.js';
 
 import Login from 'you-again';
 
-window.DATALOG_ENDPOINT = '';
+let DATALOG_ENDPOINT = '/data';
 
-let getData = () => {
-	return load();
+let getData = (filters, breakdowns) => {
+	let specs = {		
+	};
+	return load(DATALOG_ENDPOINT, {data: specs});
 };
 
 /**
