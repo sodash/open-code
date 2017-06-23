@@ -71,11 +71,13 @@ public class MasterHttpServlet extends HttpServlet {
 	}
 	
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {		
 		WebRequest request = null;
+		String path = null;
 		try {
 			request = new WebRequest(null, req, resp);			
-			String path = request.getRequestPath();
+			path = request.getRequestPath();
+			Thread.currentThread().setName("web "+path);
 	
 			// Tracking pixel
 			if (path.startsWith("/pxl")) {
@@ -132,6 +134,7 @@ public class MasterHttpServlet extends HttpServlet {
 			WebUtils2.sendError(500, "Server Error: "+ex, resp);
 		} finally {
 			WebRequest.close(req, resp);
+			Thread.currentThread().setName("done ...web "+path);
 		}
 	}
 

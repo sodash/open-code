@@ -73,7 +73,9 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"dt", Integer.class,
 			"note", StringBuilder.class,
 			"notes", StringBuilder.class, 
-			"score", Double.class, 
+			"score", Double.class,
+			"w", Integer.class, // width
+			"h", Integer.class, // height
 			"x", Double.class,
 			"y", Double.class,
 			"z", Double.class,
