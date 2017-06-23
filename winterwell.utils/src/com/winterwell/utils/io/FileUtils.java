@@ -1102,7 +1102,8 @@ public class FileUtils {
 	public static boolean isVideo(File attachment) {		
 		String ftype = getType(attachment);
 		// NB: Facebook supports a longer list: https://developers.facebook.com/docs/graph-api/video-uploads
-		return Arrays.asList("mpg", "mpeg", "mpeg4", "divx", "mov", "wmv", "m4v", "avi").contains(ftype);
+		// np4 is ambiguous :(
+		return Arrays.asList("mpg", "mpeg", "mpeg4", "divx", "mov", "wmv", "m4v", "mp4", "avi").contains(ftype);
 	}	
 
 	/**
