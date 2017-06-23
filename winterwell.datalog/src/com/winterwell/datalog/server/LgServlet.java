@@ -135,16 +135,18 @@ public class LgServlet {
 				
 		// write to Stat / ES
 		// ...which dataspaces?
+		// Multiple dataspaces: Dan A reports a significant cost to per-user dataspaces
+		// -- he estimated one server per 4k ES indexes. c.f. #5403
 		// Info should be stored to named dataspace + user + publisher + advertiser
 		// TODO upgrade DatalogEvent to have several dataspaces??
-		ArraySet<String> dataspaces = new ArraySet(
-			dataspace, params.get("user") // publisher, advertiser			
-		);
-		for(String ds : dataspaces) {
-			if (ds==null) continue;
-			DataLogEvent event = new DataLogEvent(ds, 1, tag, params);
-			DataLog.count(event);
-		}
+//		ArraySet<String> dataspaces = new ArraySet(
+//			dataspace, params.get("user") // publisher, advertiser			
+//		);
+//		for(String ds : dataspaces) {
+//			if (ds==null) continue;
+		DataLogEvent event = new DataLogEvent(dataspace, 1, tag, params);
+		DataLog.count(event);
+//		}
 	}
 
 	
