@@ -60,7 +60,7 @@ public class DataServlet implements IServlet {
 		
 		com.winterwell.es.client.agg.Aggregation dh = Aggregations.dateHistogram("events_over_time", "time");
 		dh.put("interval", "hour");
-//		byEvent.subAggregation(dh);
+		byEvent.subAggregation(dh);
 						
 		search.addAggregation(byEvent);
 		

@@ -9,6 +9,11 @@ import C from '../C.js';
 
 import Login from 'you-again';
 
+window.DATALOG_ENDPOINT = '';
+
+let getData = () => {
+	return load();
+};
 
 /**
  * Submits an AJAX request. This is the key base method
@@ -86,7 +91,8 @@ let handleMessages = function(r) {
 
 const ServerIO = {
 	post, 
-	load
+	load,
+	getData
 };
 export default ServerIO;
 

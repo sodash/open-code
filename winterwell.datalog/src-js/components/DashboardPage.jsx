@@ -15,32 +15,43 @@ import Misc from './Misc';
 class DashboardPage extends React.Component {
 	render() {
 		let user = Login.getUser();
-		let content = null;
-
 		if ( ! user) {
-			content = (
-				<div>
+			return (
+				<div className="page DashboardPage">
+					<h2>My Dashboard</h2>
 					<a href='#' onClick={(e) => DataStore.setShow('LoginWidget', true)}>Login or register</a>.
 				</div>
 			);
-		} else {
+		}
+
+		let filters = {
+			// everything
+		};
+		let breakdowns = ['time', 'evt', 'domain'];
+
+		let dspec = JSON.stringify(filters)+" "+JSON.stringify(breakdowns);
+		let mydata = DataStore.getValue('widget', 'Dashboard', dspec);
+		if ( ! mydata) {
 			// Where does ad activity data go??
 			// dataspaces: trk for evt.pxl, goodloop for evt.viewable, adview, click, close, open, opened
 			// see https://github.com/good-loop/doc/wiki/Canonical-Terminology-for-Logging-Good-Loop-Events
-			ServerIO.getData();
+			ServerIO.getData(filters, breakdowns)
+			.then((res) => {
+				DataStore.setValue(['widget', 'Dashboard', dspec], mydata);
+			});
+			return (
+				<div className="page DashboardPage">
+					<h2>My Dashboard</h2>
+					<h3>Fetching your data...</h3>
+					<Misc.Loading />
+				</div>
+			);
 		}
-
 		// display...
 		return (
 			<div className="page DashboardPage">
 				<h2>My Dashboard</h2>
-				<h3>In development...</h3>
-				<p>Thank you for joining SoGive at this early stage.
-					This is our first release, and there's still lots of work to do.
-					By the way, we release all our code as open-source. If you would
-					like to contribute to building SoGive, please get in touch.
-				</p>
-				{ content }
+
 			</div>
 		);
 	}
