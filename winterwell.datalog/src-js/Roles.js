@@ -9,8 +9,8 @@ import {assMatch} from 'sjtest';
 const iCan = (capability) => {
 	assMatch(capability, String);
 	let roleShare = 'can:'+capability;
-	let shared = DataStore.getValue('misc', 'shares', roleShare);
-	if (shared===undefined) {
+	let shared = DataStore.getValue(['misc', 'shares', roleShare]);
+	if (shared===undefined || shared===null) {
 		let req = Login.checkShare(roleShare);
 		req.then(function(res) {
 			let yehorneh = res.success;

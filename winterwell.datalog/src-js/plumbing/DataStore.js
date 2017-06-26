@@ -64,7 +64,8 @@ class Store {
 			let pkey = path[pi];			
 			assert(pkey || pkey===0, path); // no falsy in a path - except that 0 is a valid key
 			let newTip = tip[pkey];
-			if ( ! newTip) return null;
+			// Test for hard null -- falsy are valid values
+			if (newTip===null || newTip===undefined) return null;
 			tip = newTip;
 		}
 		return tip;

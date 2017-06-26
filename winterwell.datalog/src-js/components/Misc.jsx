@@ -91,7 +91,7 @@ Misc.Icon = ({fa, size, ...other}) => {
  * NB: we cant debounce here, cos it'd be a different debounce fn each time.
  * label {?String}
  * @param path {String[]} The DataStore path to item, e.g. [data, Charity, id]
- * @param item The item being edited 
+ * @param item The item being edited. Can be null, and it will be fetched by path.
  * @param prop The field being edited 
  * dflt {?Object} default value
  */
@@ -105,7 +105,8 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 			{help? <span className="help-block">{help}</span> : null}
 		</div>);
 	}
-	let {prop, path, item, type, bg, dflt, saveFn, ...otherStuff} = stuff;
+	let {prop, path, item, type, bg, dflt, saveFn, modelValueFromInput, ...otherStuff} = stuff;
+	if ( ! modelValueFromInput) modelValueFromInput = standardModelValueFromInput;
 	assert( ! type || Misc.ControlTypes.has(type), type);
 	assert(_.isArray(path), path);
 	// // item ought to match what's in DataStore - but this is too noisy when it doesn't
@@ -134,11 +135,14 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 		// Which stores its value in two ways, straight and as a x100 no-floats format for the backend
 		let v = '';
 		if (value) v = value.value;
-		if (v===undefined && value.value100) v = value.value100/100;
+		if (v===undefined || v===null) {
+			if (value.value100) v = value.value100/100;
+			else v = '';
+		}
 		let path2 = path.concat([prop, 'value']);
 		let path100 = path.concat([prop, 'value100']);
 		const onChange = e => {
-			let newVal = e.target.value;
+			let newVal = parseFloat(e.target.value);
 			DataStore.setValue(path2, newVal);
 			DataStore.setValue(path100, newVal*100);
 			if (saveFn) saveFn({path:path});
@@ -154,6 +158,7 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 		} else {
 			currency = <InputGroup.Addon>{curr}</InputGroup.Addon>;
 		}
+		assert(v === 0 || v || v==='', [v, value]);
 		return (<InputGroup>
 					{currency}
 					<FormControl name={prop} value={v} onChange={onChange} {...otherStuff} />
@@ -161,8 +166,9 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 	}
 	// text based
 	const onChange = e => {
-		DataStore.setValue(proppath, e.target.value);
-		if (saveFn) saveFn({path:path});		
+		let mv = modelValueFromInput(e.target.value, type);
+		DataStore.setValue(proppath, mv);
+		if (saveFn) saveFn({path:path});
 	};
 	if (type==='textarea') {
 		return <textarea className="form-control" name={prop} onChange={onChange} {...otherStuff} value={value} />;
@@ -177,7 +183,7 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 	if (type==='url') {
 		return (<div>
 			<FormControl type='url' name={prop} value={value} onChange={onChange} {...otherStuff} />
-			<div className='pull-right'><Misc.SiteThumbnail url={value} /></div>
+			<div className='pull-right'><small>{value? <a href={value} target='_blank'>open in a new tab</a> : null}</small></div>
 			<div className='clearfix' />
 		</div>);
 	}
@@ -208,13 +214,28 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 	return <FormControl type={type} name={prop} value={value} onChange={onChange} {...otherStuff} />;
 };
 
-const oh = (n) => n<10? '0'+n : n;
-
 Misc.ControlTypes = new Enum("img textarea text password email url color MonetaryAmount checkbox location date year number");
 
-Misc.SiteThumbnail = ({url}) => url? <a href={url} target='_blank'><iframe style={{width:'150px',height:'100px'}} src={url} /></a> : null;
+/**
+ * Convert inputs (probably text) into the model's format (e.g. numerical)
+ */
+const standardModelValueFromInput = (inputValue, type) => {
+	if ( ! inputValue) return inputValue;
+	// numerical?
+	if (type==='year') {
+		return parseInt(inputValue);
+	}
+	if (type==='number') {
+		return parseFloat(inputValue);
+	}
+	return inputValue;
+};
 
-Misc.ImgThumbnail = ({url}) => url? <img className='logo' src={url} /> : null;
+const oh = (n) => n<10? '0'+n : n;
+
+// Misc.SiteThumbnail = ({url}) => url? <a href={url} target='_blank'><iframe style={{width:'150px',height:'100px'}} src={url} /></a> : null;
+
+Misc.ImgThumbnail = ({url}) => url? <img className='logo' style={{maxWidth:'100%'}} src={url} /> : null;
 
 /**
  * This replaces the react-bootstrap version 'cos we saw odd bugs there. 
