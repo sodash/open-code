@@ -30,14 +30,17 @@ class DashboardPage extends React.Component {
 		let breakdowns = ['time', 'evt', 'domain'];
 
 		let dspec = JSON.stringify(filters)+" "+JSON.stringify(breakdowns);
-		let mydata = DataStore.getValue('widget', 'Dashboard', dspec);
+		const dpath = ['widget', 'Dashboard', dspec];
+		let mydata = DataStore.getValue(dpath);
 		if ( ! mydata) {
 			// Where does ad activity data go??
 			// dataspaces: trk for evt.pxl, goodloop for evt.viewable, adview, click, close, open, opened
 			// see https://github.com/good-loop/doc/wiki/Canonical-Terminology-for-Logging-Good-Loop-Events
 			ServerIO.getData(filters, breakdowns)
 			.then((res) => {
-				DataStore.setValue(['widget', 'Dashboard', dspec], mydata);
+				console.warn("yeh", dpath, res);
+				let mydata2 = res.cargo;
+				DataStore.setValue(dpath, mydata2);
 			});
 			return (
 				<div className="page DashboardPage">

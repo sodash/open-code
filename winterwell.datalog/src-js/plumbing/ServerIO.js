@@ -89,6 +89,7 @@ let post = function(url, data) {
 
 let handleMessages = function(r) {
 	console.log("TODO handleMessages", r);
+	return r;
 };
 
 const ServerIO = {

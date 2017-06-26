@@ -91,7 +91,7 @@ const socialLogin = (service) => {
 		}
 		window.fbAsyncInit = function() {
 			FB.init({
-				appId            : '1847521215521290', // SoGive FB app-id
+				appId            : '320927325010346', // Good-Loop FB app-id
 				autoLogAppEvents : false,
 				xfbml            : false,
 				version          : 'v2.9',
