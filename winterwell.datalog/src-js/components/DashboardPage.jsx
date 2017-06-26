@@ -10,6 +10,7 @@ import ServerIO from '../plumbing/ServerIO';
 import DataStore from '../plumbing/DataStore';
 // import ChartWidget from './ChartWidget';
 import Misc from './Misc';
+import ChartWidget from './ChartWidget';
 
 
 class DashboardPage extends React.Component {
@@ -54,7 +55,7 @@ class DashboardPage extends React.Component {
 		return (
 			<div className="page DashboardPage">
 				<h2>My Dashboard</h2>
-				TODO data!
+				<ChartWidget label='Events' />
 			</div>
 		);
 	}
