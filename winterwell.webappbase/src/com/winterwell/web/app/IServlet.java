@@ -4,6 +4,6 @@ import java.io.IOException;
 
 public interface IServlet {
 
-	public void process(WebRequest state) throws IOException;
+	public void process(WebRequest state) throws Exception;
 	
 }
