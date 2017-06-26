@@ -83,8 +83,8 @@ case $3 in
 		CLEANPUBLISH='true'
 	;;
 	*)
-	echo "this publishing process will only overwrite old files with new versions, all other files will not be changed"
-	CLEANPUBLISH='false'
+		echo "this publishing process will only overwrite old files with new versions, all other files will not be changed"
+		CLEANPUBLISH='false'
 	;;
 esac
 
@@ -111,7 +111,8 @@ for server in ${TARGET[*]}; do
 	function frontend_publish {
 		rsync -rhP web winterwell@$server:/home/winterwell/lg.good-loop.com/
 		rsync -rhP package.json winterwell@$server:/home/winterwell/lg.good-loop.com/
-		rsync -rhP webpack.config.json winterwell@$server:/home/winterwell/lg.good-loop.com/
+		rsync -rhP webpack.config.js winterwell@$server:/home/winterwell/lg.good-loop.com/
+		rsync -rhP src-js winterwell@$server:/home/winterwell/lg.good-loop.com/
 		echo -e "Satisfying NPM dependencies..."
 		ssh winterwell@$server 'cd /home/winterwell/lg.good-loop.com && npm i'
 		echo -e "Webpacking..."

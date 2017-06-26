@@ -61,9 +61,23 @@ import jobs.BuildWinterwellProject;
  */
 public class PublishDataServer extends BuildTask {
 
-	String server = 
-//			"lg.good-loop.com"; // datalog.soda.sh
-			"testlg.good-loop.com";
+	
+	// typeOfPublish can be set to either 'production' or 'test'
+	String typeOfPublish = 
+//			"production";
+			"test";
+	
+	// publishLevel can be set to 'frontend' or 'backend' or 'everything'
+	String publishLevel =
+			"frontend";
+	//		"backend";
+	//		"everything";
+	
+	// preClean can be set to 'clean' or '' in order to clear out old files before publish/sync process (empty string= NO CLEANING)
+	String preClean =
+			"";
+	//		"true";
+	
 	String remoteUser;
 	private String remoteWebAppDir;
 	private File localWebAppDir;
@@ -128,20 +142,13 @@ public class PublishDataServer extends BuildTask {
 			FileUtils.move(localProps, localPropsOff);
 		}
 		
-		// rsync the directory
-		try {
-			assert localConfigDir.isDirectory() : localConfigDir;
-			Log.d("publish","Sending config dir files: "+Printer.toString(localConfigDir.list()));
-			String remoteConfig = remoteUser+"@"+server+":"+remoteWebAppDir+"/config";
-			RSyncTask task = new RSyncTask(localConfigDir.getAbsolutePath()+"/", remoteConfig, true);
-			task.run();		
-			
-		} finally {
-			// put local-props back
-			if (localPropsOff.exists()) {
-				FileUtils.move(localPropsOff, localProps);
-			}
-		}		
+//		// Bash script which does the rsync work
+		ProcessTask pubas = new ProcessTask("./publish-lg.sh "+typeOfPublish + " " +publishLevel + " " +preClean);
+		pubas.setEcho(true);
+		pubas.run();
+		System.out.println(pubas.getError());
+		pubas.close();
+//		Log.d(pubas.getCommand(), pubas.getOutput());
 
 
 	}
@@ -154,7 +161,7 @@ public class PublishDataServer extends BuildTask {
 			|| !new File(localWebAppDir,"web").exists()) {
 			throw new IOException("Not in the expected directory! dir="+FileUtils.getWorkingDirectory());
 		}
-		Log.i("publish", "Publishing to "+server+":"+ remoteWebAppDir);
+		Log.i("publish", "Publishing type = "+typeOfPublish+":"+ remoteWebAppDir);
 		// What's going on?
 		Environment.get().push(BobSettings.VERBOSE, true);
 
@@ -205,40 +212,10 @@ public class PublishDataServer extends BuildTask {
 				}
 			}
 			
-			// Do the rsync!
-			String from = localLib.getAbsolutePath();
-			String dest = rsyncDest("lib");			
-			RSyncTask task = new RSyncTask(from, dest, true).setDirToDir();
-			task.run();
-			task.close();
-			System.out.println(task.getOutput());
 		}
-		{	// web
-			// Rsync code with delete=true, so we get rid of old html templates
-			// ??This is a bit wasteful, but I'm afraid of what delete might do in the more general /web/static directory ^Dan
-			RSyncTask rsyncCode = new RSyncTask(
-					new File(localWebAppDir,"web").getAbsolutePath(),
-					rsyncDest("web"), true);
-			rsyncCode.setDirToDir();
-			rsyncCode.run();
-			String out = rsyncCode.getOutput();
-			rsyncCode.close();
-		}
-//		// Bash script which restarts the servers 'lg' process
-		ProcessTask pubas = new ProcessTask("./restart.lg.process.sh "+server );
-		pubas.setEcho(true);
-		pubas.run();
-		System.out.println(pubas.getError());
-		pubas.close();
-		Log.d(pubas.getCommand(), pubas.getOutput());
+
 	}
 
-	private String rsyncDest(String dir) {
-//		if ( ! dir.endsWith("/")) dir += "/";
-		return remoteUser+"@"+server+ ":" + new File(remoteWebAppDir, dir).getAbsolutePath();
-		
-		
-	}
 
 
 }
