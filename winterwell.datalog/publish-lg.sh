@@ -109,6 +109,15 @@ for server in ${TARGET[*]}; do
 
 
 	function frontend_publish {
+		echo -e "Converting LESS files to CSS..."
+		for file in web/style/*.less; do
+			if [ -e "$file" ]; then
+				lessc "$file" "${file%.less}.css"
+			else
+				echo "no less files found"
+			exit 2
+			fi
+		done
 		rsync -rhP web winterwell@$server:/home/winterwell/lg.good-loop.com/
 		rsync -rhP package.json winterwell@$server:/home/winterwell/lg.good-loop.com/
 		rsync -rhP webpack.config.js winterwell@$server:/home/winterwell/lg.good-loop.com/
