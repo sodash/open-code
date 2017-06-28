@@ -18,7 +18,8 @@
     "sjtest": "^0.4.4",
     "webpack": "^3.0.0",
     "wwutils": "^0.7.3",
-    "you-again": "^0.4.7"
+    "you-again": "^0.4.7",
+	"data-pivot": "^0.3.0"
   },
   "scripts": {
     "test-watch": "webpack --config webpack.config.test.js --progress --colors --watch",

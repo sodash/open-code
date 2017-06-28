@@ -7,6 +7,9 @@ import C from'../C.js';
 import chartjs from 'chart.js';
 import RC2 from 'react-chartjs2';
 
+/**
+	@param dataFromLabel e.g. (label)adview -> time -> number
+ */
 const ChartWidget = ({title, dataFromLabel}) => {
 	title = title || "Junk Data";
 	let label = "Stuff";
@@ -14,34 +17,15 @@ const ChartWidget = ({title, dataFromLabel}) => {
 	// function newDateString(days) {
 	// 	return moment().add(days, 'd').format(timeFormat);
 	// }
-	let labels = ["January", "February", "March", "April", "May", "June", "July"];
+	// let labels = ["January", "February", "March", "April", "May", "June", "July"];
+	let datasets = [];
+	let keys = Object.keys(dataFromLabel);
+	for(let i=0; i<keys.length; i++) {
+		datasets.push(makeDataSet(i, keys[i], dataFromLabel[keys[i]]));
+	}
 	let chartData = {
-		labels: labels,
-		datasets: [
-			{
-				label: label,
-				fill: false,
-				lineTension: 0.1,
-				backgroundColor: "rgba(75,192,192,0.4)",
-				borderColor: "rgba(75,192,192,1)",
-				borderCapStyle: 'butt',
-				borderDash: [],
-				borderDashOffset: 0.0,
-				borderJoinStyle: 'miter',
-				pointBorderColor: "rgba(75,192,192,1)",
-				pointBackgroundColor: "#fff",
-				pointBorderWidth: 3,
-				pointHoverRadius: 7,
-				pointHoverBackgroundColor: "rgba(75,192,192,1)",
-				pointHoverBorderColor: "rgba(220,220,220,1)",
-				pointHoverBorderWidth: 2,
-				pointRadius: 1,
-				pointHitRadius: 10,
-				// or {x: time-string, y: value}
-				data: [15, 25, 34, 45, 56, 60, 72],
-				spanGaps: false,
-			}
-		]
+		// labels: labels,
+		datasets: datasets
 	}; //./data
 	let chartOptions = {
 		title: title,
@@ -52,7 +36,10 @@ const ChartWidget = ({title, dataFromLabel}) => {
 					}
 				}],
 				xAxes: [{
-					ticks: {
+					time: {
+						displayFormats: {							
+                        	quarter: 'MMM YYYY'
+                    	}
 					}
 				}]
 			}
@@ -61,5 +48,33 @@ const ChartWidget = ({title, dataFromLabel}) => {
 				<RC2 data={chartData} options={chartOptions} type='line' />;
 			</div>);
 }; //./ChartWidget
+
+const makeDataSet = (i, label, data) => {
+	console.log(label, data);
+	return {
+		label: label,
+		fill: false,
+		// lineTension: 0.1,
+		// backgroundColor: "rgba(75,192,192,0.4)",
+		// borderColor: "rgba(75,192,192,1)",
+		// borderCapStyle: 'butt',
+		// borderDash: [],
+		// borderDashOffset: 0.0,
+		// borderJoinStyle: 'miter',
+		// pointBorderColor: "rgba(75,192,192,1)",
+		// pointBackgroundColor: "#fff",
+		// pointBorderWidth: 3,
+		// pointHoverRadius: 7,
+		// pointHoverBackgroundColor: "rgba(75,192,192,1)",
+		// pointHoverBorderColor: "rgba(220,220,220,1)",
+		// pointHoverBorderWidth: 2,
+		// pointRadius: 1,
+		// pointHitRadius: 10,
+		// or {x: time-string, y: value}
+		data: [15, 25, 34, 45, 56, 60, 72],
+		spanGaps: false,
+	};
+};
+
 
 export default ChartWidget;

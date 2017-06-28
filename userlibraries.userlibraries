@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <eclipse-userlibraries version="2">
-    <library name="elasticsearch_5" systemlibrary="false">
+    <library name="elasticsearch" systemlibrary="false">
         <archive path="/middleware/elasticsearch/lib/elasticsearch-5.1.2.jar"/>
         <archive path="/middleware/elasticsearch/lib/HdrHistogram-2.1.6.jar"/>
         <archive path="/middleware/elasticsearch/lib/hppc-0.7.1.jar"/>

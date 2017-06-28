@@ -3,6 +3,7 @@ import { assert, assMatch } from 'sjtest';
 import Login from 'you-again';
 import _ from 'lodash';
 import { XId } from 'wwutils';
+import pivot from 'data-pivot';
 
 import printer from '../utils/printer';
 // import C from '../C';
@@ -51,11 +52,14 @@ class DashboardPage extends React.Component {
 				</div>
 			);
 		}
+		let cdata = pivot(mydata, 
+						"'byEvent' -> 'buckets' -> bi -> {key, 'buckets' -> bi2 -> {doc_count, key_as_string}}", 
+						"key -> key_as_string -> doc_count");
 		// display...
 		return (
 			<div className="page DashboardPage">
 				<h2>My Dashboard</h2>
-				<ChartWidget label='Events' />
+				<ChartWidget title='Events' data={cdata} />
 			</div>
 		);
 	}

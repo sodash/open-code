@@ -205,7 +205,7 @@ public class Log {
 		if (error==Level.SEVERE && msg instanceof Throwable) {
 			msgText += "\tStack: ";
 			StackTraceElement[] trace = ((Throwable) msg).getStackTrace();
-			for(int i=0; i<trace.length && i<7; i++) {
+			for(int i=0; i<trace.length && i<10; i++) {
 				msgText += trace[i]+", ";
 			}
 		}
