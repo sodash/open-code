@@ -322,20 +322,17 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 	 * exposed for debugging/testing purposes.
 	 */
 	public void prune() {
-		int size = size();
-		if (size <= idealSize) return;
+		if (size() <= idealSize) return;
 		Log.v("map", "prune!");
 		// Copy out of the backing map
-		double[] counts = new double[size];
-		{
-			int i = 0;
-			for (HLEntry entry : map.values()) {
-				counts[i++] = entry.count;
-			}
+		HLEntry[] entries = map.values().toArray(new HLEntry[0]);
+		double[] counts = new double[entries.length];
+		for (int i = 0; i < entries.length; i++) {
+			counts[i] = entries[i].count;
 		}
-		double cutoff = StatsUtils.select(size - idealSize - 1, counts);
+		double cutoff = StatsUtils.select(size() - idealSize - 1, counts);
 		// What to prune?
-		List<HLEntry> toPrune = new ArrayList<HLEntry>(size - idealSize);
+		List<HLEntry> toPrune = new ArrayList<HLEntry>(size() - idealSize);
 		for (HLEntry e : map.values()) {
 			// Use <= in case there are many entries with the cutoff value
 			if (e.count <= cutoff) {

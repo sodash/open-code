@@ -77,7 +77,7 @@ public class HalfLifeMapTest {
 		assert index.containsKey("11");
 		// prune: keep sa
 		index.prune();
-		assert index.size() == 10;
+		assert index.size() == 10 : index.size();
 		assert index.containsKey("2") : index;
 		assert index.containsKey("6");
 		assert ! index.containsKey("11") : index;
