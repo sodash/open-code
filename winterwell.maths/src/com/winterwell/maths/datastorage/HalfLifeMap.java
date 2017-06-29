@@ -332,7 +332,11 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 		}
 		double cutoff = StatsUtils.select(size() - idealSize - 1, counts);
 		// What to prune?
-		List<HLEntry> toPrune = new ArrayList<HLEntry>(size() - idealSize);
+		int numberToPrune = size() - idealSize;
+		if (numberToPrune <= 0) {
+			return;
+		}
+		List<HLEntry> toPrune = new ArrayList<HLEntry>(numberToPrune);
 		for (HLEntry e : map.values()) {
 			// Use <= in case there are many entries with the cutoff value
 			if (e.count <= cutoff) {
