@@ -275,6 +275,25 @@ public class HalfLifeMapTest {
 	}
 
 	@Test
+	public void testConcurrency() {
+		HalfLifeMap map = new HalfLifeMap<>(25000);
+		// Log.setMinLevel(Level.OFF);
+		Thread[] threads = new Thread[10];
+		for (int i = 0; i < 10; i++) {
+			threads[i] = new Thread(() -> speed2_heavyPut(map));
+			threads[i].start();
+		}
+		for (Thread t: threads) {
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Test
 	public void testSerialisation() {
 		HalfLifeMap<String, Object> index = new HalfLifeMap<>(10);
 
