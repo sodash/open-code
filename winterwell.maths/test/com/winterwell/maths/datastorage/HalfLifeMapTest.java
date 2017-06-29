@@ -77,7 +77,7 @@ public class HalfLifeMapTest {
 		assert index.containsKey("11");
 		// prune: keep sa
 		index.prune();
-		assert index.size() == 10;
+		assert index.size() == 10 : index.size();
 		assert index.containsKey("2") : index;
 		assert index.containsKey("6");
 		assert ! index.containsKey("11") : index;
@@ -272,6 +272,25 @@ public class HalfLifeMapTest {
 			}
 		}
 		return (1.0*sw.getTime())/ops;
+	}
+
+	@Test
+	public void testConcurrency() {
+		HalfLifeMap map = new HalfLifeMap<>(25000);
+		// Log.setMinLevel(Level.OFF);
+		Thread[] threads = new Thread[10];
+		for (int i = 0; i < 10; i++) {
+			threads[i] = new Thread(() -> speed2_heavyPut(map));
+			threads[i].start();
+		}
+		for (Thread t: threads) {
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Test
