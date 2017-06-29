@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import com.winterwell.maths.stats.StatsUtils;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.AbstractMap2;
@@ -325,24 +324,29 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 		if (size() <= idealSize) return;
 		Log.v("map", "prune!");
 		// Copy out of the backing map
-		HLEntry[] entries = map.values().toArray(new HLEntry[0]);
-		double[] counts = new double[entries.length];
-		for (int i = 0; i < entries.length; i++) {
-			counts[i] = entries[i].count;
-		}
-		double cutoff = StatsUtils.select(size() - idealSize - 1, counts);
-		// What to prune?
-		int numberToPrune = size() - idealSize;
-		if (numberToPrune <= 0) {
-			return;
-		}
-		List<HLEntry> toPrune = new ArrayList<HLEntry>(numberToPrune);
-		for (HLEntry e : map.values()) {
-			// Use <= in case there are many entries with the cutoff value
-			if (e.count <= cutoff) {
-				toPrune.add(e);
+		List<HLEntry> entries = Arrays.asList(map.values().toArray(new HLEntry[0]));
+		if (entries.size() <= idealSize) return; // race condition
+		// sort by score
+		// NB: HLEntry score could mutate under us, which could cause
+		// > java.lang.IllegalArgumentException: Comparison method violates its general contract!
+		boolean sorted = false;
+		for(int i=0; i<5; i++) {
+			try {
+				Collections.sort(entries);
+				sorted = true;
+				break;
+			} catch(IllegalArgumentException ex) {
+				// try again...
+				Log.d("HalfLifeMap", "Rare concurrency issue: "+ex);
 			}
 		}
+		if ( ! sorted) {
+			// failed x5?! Copy them out instead
+			entries = entries.stream().map(hle -> hle.clone()).collect(Collectors.toList());
+			Collections.sort(entries);
+		}
+		// What to prune?
+		List<HLEntry> toPrune = entries.subList(0, entries.size() - idealSize);
 		// prune
 		boolean track = ! Double.isNaN(prunedValue);
 		for (HLEntry e : toPrune) {
