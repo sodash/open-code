@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
-import SJTest from 'sjtest';
+import SJTest, {assert} from 'sjtest';
 import C from'../C.js';
 
 import chartjs from 'chart.js';
@@ -11,6 +11,7 @@ import RC2 from 'react-chartjs2';
 	@param dataFromLabel e.g. (label)adview -> time -> number
  */
 const ChartWidget = ({title, dataFromLabel}) => {
+	assert(dataFromLabel);
 	title = title || "Junk Data";
 	let label = "Stuff";
 	let timeFormat = 'MM/DD/YYYY HH:mm';
@@ -21,7 +22,15 @@ const ChartWidget = ({title, dataFromLabel}) => {
 	let datasets = [];
 	let keys = Object.keys(dataFromLabel);
 	for(let i=0; i<keys.length; i++) {
-		datasets.push(makeDataSet(i, keys[i], dataFromLabel[keys[i]]));
+		let key = keys[i];
+		let data = dataFromLabel[key];
+		if ( ! _.isArray(data)) {
+			console.warn("skip", key, data);
+			continue;
+		}
+		let dset = makeDataSet(i, keys[i], data);
+		console.warn(dset);
+		datasets.push(dset);
 	}
 	let chartData = {
 		// labels: labels,
@@ -49,30 +58,33 @@ const ChartWidget = ({title, dataFromLabel}) => {
 			</div>);
 }; //./ChartWidget
 
-const makeDataSet = (i, label, data) => {
-	console.log(label, data);
+const makeDataSet = (i, label, data) => {	
+	let xydata = data.map(d => { return {x:d.key_as_string, y: d.doc_count}; });
+	console.log(label, data, xydata);	
+	let color = ["rgba(75,192,192,1)", "rgba(192,75,192,1)", "rgba(192,192,75,1)", "rgba(75,75,192,1)", "rgba(75,192,75,1)", "rgba(192,75,75,1)"][i];
 	return {
 		label: label,
 		fill: false,
+
 		// lineTension: 0.1,
-		// backgroundColor: "rgba(75,192,192,0.4)",
-		// borderColor: "rgba(75,192,192,1)",
+		backgroundColor: color, // TODO 0.4 alpha
+		borderColor: color,
 		// borderCapStyle: 'butt',
 		// borderDash: [],
 		// borderDashOffset: 0.0,
 		// borderJoinStyle: 'miter',
-		// pointBorderColor: "rgba(75,192,192,1)",
-		// pointBackgroundColor: "#fff",
+		pointBorderColor: color,
+		pointBackgroundColor: "#fff",
 		// pointBorderWidth: 3,
 		// pointHoverRadius: 7,
-		// pointHoverBackgroundColor: "rgba(75,192,192,1)",
-		// pointHoverBorderColor: "rgba(220,220,220,1)",
+		pointHoverBackgroundColor: color,
+		pointHoverBorderColor: "rgba(220,220,220,1)",
 		// pointHoverBorderWidth: 2,
 		// pointRadius: 1,
 		// pointHitRadius: 10,
 		// or {x: time-string, y: value}
-		data: [15, 25, 34, 45, 56, 60, 72],
-		spanGaps: false,
+		data: xydata,
+		// spanGaps: false,
 	};
 };
 

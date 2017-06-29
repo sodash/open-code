@@ -52,14 +52,21 @@ class DashboardPage extends React.Component {
 				</div>
 			);
 		}
-		let cdata = pivot(mydata, 
-						"'byEvent' -> 'buckets' -> bi -> {key, 'buckets' -> bi2 -> {doc_count, key_as_string}}", 
-						"key -> key_as_string -> doc_count");
+
+		// pivot the data
+		let cdata = pivot(mydata, "'byEvent' -> 'buckets' -> bi -> {key, 'events_over_time' -> 'buckets' -> bi2 -> bucket}", 
+						"key -> bucket");
+		let xydata = pivot(cdata, "key -> {doc_count, key_as_string}", "key -> {'x' -> key_as_string, 'y' -> doc_count}");		
+		// debug
+		window.pivot = pivot;
+		window.mydata = mydata;
+		console.warn("pivot", xydata, "from", cdata, 'from', mydata);
+
 		// display...
 		return (
 			<div className="page DashboardPage">
 				<h2>My Dashboard</h2>
-				<ChartWidget title='Events' data={cdata} />
+				<ChartWidget title='Events' dataFromLabel={cdata} />
 			</div>
 		);
 	}
