@@ -61,7 +61,9 @@ const ChartWidget = ({title, dataFromLabel}) => {
 const makeDataSet = (i, label, data) => {	
 	let xydata = data.map(d => { return {x:d.key_as_string, y: d.doc_count}; });
 	console.log(label, data, xydata);	
-	let color = ["rgba(75,192,192,1)", "rgba(192,75,192,1)", "rgba(192,192,75,1)", "rgba(75,75,192,1)", "rgba(75,192,75,1)", "rgba(192,75,75,1)"][i];
+	// HACK pick a colour
+	let colors = ["rgba(75,192,192,1)", "rgba(192,75,192,1)", "rgba(192,192,75,1)", "rgba(75,75,192,1)", "rgba(75,192,75,1)", "rgba(192,75,75,1)"];
+	let color = colors[i % colors.length];
 	return {
 		label: label,
 		fill: false,

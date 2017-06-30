@@ -62,7 +62,7 @@ class DashboardPage extends React.Component {
 		// // debug
 		// window.pivot = pivot;
 		// window.mydata = mydata;
-		// console.warn("pivot xydata", xydata, "from cdata", cdata, 'from', mydata);
+		console.warn("pivot", "cdata", cdata, 'from', mydata);
 
 		// breakdown data
 		let byDomainData = pivot(mydata, "'byDomain' -> 'buckets' -> bi -> {key, doc_count}", "key -> doc_count");		

@@ -69,9 +69,9 @@ public class PublishDataServer extends BuildTask {
 	
 	// publishLevel can be set to 'frontend' or 'backend' or 'everything'
 	String publishLevel =
-			"frontend";
+//			"frontend";
 	//		"backend";
-	//		"everything";
+			"everything";
 	
 	// preClean can be set to 'clean' or '' in order to clear out old files before publish/sync process (empty string= NO CLEANING)
 	String preClean =
