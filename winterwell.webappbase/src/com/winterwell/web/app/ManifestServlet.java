@@ -106,7 +106,6 @@ public class ManifestServlet extends HttpServlet {
 	}
 	
 	public void process(WebRequest state) throws IOException {	
-		Properties props = Dep.get(Properties.class);
 		
 		ArrayMap cargo = new ArrayMap();
 		// what did we load from?
@@ -144,9 +143,15 @@ public class ManifestServlet extends HttpServlet {
 		String uptime = TimeUtils.toString(startTime.dt(new Time()));
 		cargo.put("uptime", uptime);
 		
-		String origin = props.getProperty("origin");
-		if (origin == null) origin = "";
-		cargo.put("origin", origin);
+		// origin -- maybe
+		try {
+			Properties props = Dep.get(Properties.class);
+			String origin = props.getProperty("origin");
+			if (origin == null) origin = "";
+			cargo.put("origin", origin);
+		} catch(Exception ex) {
+			// oh well
+		}
 		
 		File creolePropertiesForSite = new File("config", "version.properties");
 		if (creolePropertiesForSite.exists()) {
