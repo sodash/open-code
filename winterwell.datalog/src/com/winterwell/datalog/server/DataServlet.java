@@ -42,7 +42,9 @@ public class DataServlet implements IServlet {
 		
 		Time start = new Time().minus(TUnit.MONTH);
 		Time end = new Time();
-		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time").from(start.toISOString(), true).to(end.toISOString(), true);
+		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
+				.from(start.toISOString(), true)
+				.to(end.toISOString(), true);
 		
 		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
 				.must(timeFilter);

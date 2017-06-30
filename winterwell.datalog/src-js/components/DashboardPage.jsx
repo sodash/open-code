@@ -53,16 +53,16 @@ class DashboardPage extends React.Component {
 			);
 		}
 
-		// pivot the data
+		// pivot the data from ES output to chart.js format
 		let cdata = pivot(mydata, "'byEvent' -> 'buckets' -> bi -> {key, 'events_over_time' -> 'buckets' -> bi2 -> bucket}", 
 						"key -> bucket");
 		
-		// this isn't working?!
-		let xydata = pivot(cdata, "key -> bi -> {doc_count, key_as_string}", "key -> {'x' -> key_as_string, 'y' -> doc_count}");
-		// debug
-		window.pivot = pivot;
-		window.mydata = mydata;
-		console.warn("pivot xydata", xydata, "from cdata", cdata, 'from', mydata);
+		// // this isn't working?!
+		// let xydata = pivot(cdata, "key -> bi -> {doc_count, key_as_string}", "key -> {'x' -> key_as_string, 'y' -> doc_count}");
+		// // debug
+		// window.pivot = pivot;
+		// window.mydata = mydata;
+		// console.warn("pivot xydata", xydata, "from cdata", cdata, 'from', mydata);
 
 		// breakdown data
 		let byDomainData = pivot(mydata, "'byDomain' -> 'buckets' -> bi -> {key, doc_count}", "key -> doc_count");		
@@ -72,6 +72,8 @@ class DashboardPage extends React.Component {
 			<div className="page DashboardPage">
 				<h2>My Dashboard</h2>
 				
+				<p>One month of data, in per-hour segments.</p>
+
 				<ChartWidget title='Events' dataFromLabel={cdata} />
 
 				<DashboardWidget title="By Publisher (summing all events!)">

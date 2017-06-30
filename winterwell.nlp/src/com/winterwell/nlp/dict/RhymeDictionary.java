@@ -2,8 +2,13 @@ package com.winterwell.nlp.dict;
 
 import java.util.Iterator;
 
-/**
+/** 
  * Wraps the CMU Dictionary to provide a Rhyming Dictionary
+ * 
+ * TODO CMU vowels carry a lexical stress marker: 0 — No stress 1 — Primary stress 2 — Secondary stress
+Also, our defn of rhyme is not perfect -- see https://en.wikipedia.org/wiki/Rhyme
+we're doing syllabic rhymes.
+ * 
  * @author daniel
  * @testedby {@link RhymeDictionaryTest}
  * @see CMUDict
