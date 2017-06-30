@@ -125,10 +125,12 @@ public class LgServlet {
 			if (ref==null) ref = state.get("site"); // DfP hack
 			// remove some gumpf (UTM codes)
 			String cref = WebUtils2.cleanUp(ref);
-			params.put("url", cref);
-			// domain (e.g. sodash.com) & host (e.g. www.sodash.com)
-			params.put("domain", WebUtils2.getDomain(cref)); 
-			params.put("host", WebUtils2.getHost(cref)); // matches publisher in adverts
+			if (cref != null) {
+				params.put("url", cref);
+				// domain (e.g. sodash.com) & host (e.g. www.sodash.com)				
+				params.put("domain", WebUtils2.getDomain(cref)); 
+				params.put("host", WebUtils2.getHost(cref)); // matches publisher in adverts
+			}
 		}
 		// write to log file
 		doLogToFile(dataspace, tag, params, trckId, via, state);
