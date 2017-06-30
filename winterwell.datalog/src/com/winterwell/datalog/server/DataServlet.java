@@ -56,18 +56,18 @@ public class DataServlet implements IServlet {
 		
 		search.setFilter(filter);
 		
+		// events over time
 		com.winterwell.es.client.agg.Aggregation byEvent = new Aggregation("byEvent", "terms", DataLogEvent.EVENTTYPE);
-		
 		com.winterwell.es.client.agg.Aggregation dh = Aggregations.dateHistogram("events_over_time", "time");
 		dh.put("interval", "hour");
-		byEvent.subAggregation(dh);
-						
+		byEvent.subAggregation(dh);						
 		search.addAggregation(byEvent);
 		
-//		com.winterwell.es.client.agg.Aggregation sh = Aggregations.stats("events_stats", DataLogEvent.EVENTTYPE);
-//		search.addAggregation(sh);
-		com.winterwell.es.client.agg.Aggregation sh2 = Aggregations.stats("ecount", "count");
-		search.addAggregation(sh2);
+		// events by publisher
+		com.winterwell.es.client.agg.Aggregation byDomain = Aggregations.stats("byDomain", "domain");
+		search.addAggregation(byDomain);
+		com.winterwell.es.client.agg.Aggregation byHost = Aggregations.stats("byHost", "host");
+		search.addAggregation(byHost);
 		
 		search.setSize(0); // is this wanted??
 //		search.setSearchType("count"); // aggregations c.f. https://www.elastic.co/blog/intro-to-aggregations
