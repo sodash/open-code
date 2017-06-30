@@ -63,11 +63,22 @@ public class DataServlet implements IServlet {
 		byEvent.subAggregation(dh);						
 		search.addAggregation(byEvent);
 		
+		// sorta bug: the breakdowns below sum
+		// TODO use a 2nd search, so we can filter by evt.type = visible
 		// events by publisher
 		com.winterwell.es.client.agg.Aggregation byDomain = Aggregations.terms("byDomain", "domain");
 		search.addAggregation(byDomain);
 		com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("byHost", "host");
 		search.addAggregation(byHost);
+		// TODO
+//		com.winterwell.es.client.agg.Aggregation byAdvert = Aggregations.terms("byCampaign", "campaign");
+//		search.addAggregation(byAdvert);
+		// TODO by variant
+//		com.winterwell.es.client.agg.Aggregation byVariant = Aggregations.terms("byVariant", "host");
+//		search.addAggregation(byVariant);
+		// TODO MPU vs leaderboard
+//		com.winterwell.es.client.agg.Aggregation byFormat = Aggregations.terms("byVariant", "host");
+//		search.addAggregation(byFormat);
 		
 		search.setSize(0); // is this wanted??
 //		search.setSearchType("count"); // aggregations c.f. https://www.elastic.co/blog/intro-to-aggregations
