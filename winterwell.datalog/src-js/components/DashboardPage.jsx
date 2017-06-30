@@ -56,17 +56,27 @@ class DashboardPage extends React.Component {
 		// pivot the data
 		let cdata = pivot(mydata, "'byEvent' -> 'buckets' -> bi -> {key, 'events_over_time' -> 'buckets' -> bi2 -> bucket}", 
 						"key -> bucket");
-		let xydata = pivot(cdata, "key -> {doc_count, key_as_string}", "key -> {'x' -> key_as_string, 'y' -> doc_count}");		
+		
+		// this isn't working?!
+		let xydata = pivot(cdata, "key -> bi -> {doc_count, key_as_string}", "key -> {'x' -> key_as_string, 'y' -> doc_count}");
 		// debug
 		window.pivot = pivot;
 		window.mydata = mydata;
-		console.warn("pivot", xydata, "from", cdata, 'from', mydata);
+		console.warn("pivot xydata", xydata, "from cdata", cdata, 'from', mydata);
+
+		// breakdown data
+		let byDomainData = pivot(mydata, "'byDomain' -> 'buckets' -> bi -> {key, doc_count}", "key -> doc_count");		
 
 		// display...
 		return (
 			<div className="page DashboardPage">
 				<h2>My Dashboard</h2>
+				
 				<ChartWidget title='Events' dataFromLabel={cdata} />
+
+				<DashboardWidget title="By Publisher (summing all events!)">
+					<BreakdownWidget data={byDomainData} />
+				</DashboardWidget>
 			</div>
 		);
 	}
@@ -86,5 +96,12 @@ const DashboardWidget = ({ children, iconClass, title }) =>
 
 const DashTitleIcon = ({ iconClass }) =>
 	<i className={iconClass} aria-hidden="true" />;
+
+
+const BreakdownWidget = ({data}) => {
+	let keys = Object.keys(data).sort( (k1, k2) => data[k1] > data[k2] );
+	let list = keys.map(k => <li key={'breakdown-'+k}>{k}: {data[k]}</li>);
+	return <ol>{list}</ol>;
+};
 
 export default DashboardPage;

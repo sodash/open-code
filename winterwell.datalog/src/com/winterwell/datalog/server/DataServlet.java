@@ -64,9 +64,9 @@ public class DataServlet implements IServlet {
 		search.addAggregation(byEvent);
 		
 		// events by publisher
-		com.winterwell.es.client.agg.Aggregation byDomain = Aggregations.stats("byDomain", "domain");
+		com.winterwell.es.client.agg.Aggregation byDomain = Aggregations.terms("byDomain", "domain");
 		search.addAggregation(byDomain);
-		com.winterwell.es.client.agg.Aggregation byHost = Aggregations.stats("byHost", "host");
+		com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("byHost", "host");
 		search.addAggregation(byHost);
 		
 		search.setSize(0); // is this wanted??

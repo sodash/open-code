@@ -54,7 +54,7 @@ const ChartWidget = ({title, dataFromLabel}) => {
 			}
 		}; // ./options;
 	return (<div>
-				<RC2 data={chartData} options={chartOptions} type='line' />;
+				<RC2 data={chartData} options={chartOptions} type='line' />
 			</div>);
 }; //./ChartWidget
 
