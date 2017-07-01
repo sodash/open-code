@@ -53,6 +53,11 @@ public final class XId implements Serializable, IHasJson {
 	 * to avoid any overlap with other types.
 	 */
 	public static final String WART_G = "g_";
+
+	/**
+	 * XId for unknown person + unspecified service
+	 */
+	public static final XId ANON = new XId(WART_P+"anon@unspecified", false);
 	
 	public final String name;
 	public final String service;
