@@ -1056,6 +1056,7 @@ public class WebRequest implements IProperties, Closeable {
 		// obfuscate passwords
 		String[] pw = pmap.get("password");
 		if (pw!=null && pw.length != 0) {			
+			pmap = new HashMap(pmap);
 			pmap.put("password", new String[] {"xxxx"});
 		}
 		return "WebRequest:user=" + user + ":action=" + action + ":req="
