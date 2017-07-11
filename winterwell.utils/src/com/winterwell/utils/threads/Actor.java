@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.log.Log;
@@ -204,13 +203,4 @@ public abstract class Actor<Msg> {
 		public final Actor from;
 		public final Msg msg;
 	}
-}
-
-class QueueTooLongException extends FailureException {
-	public QueueTooLongException(String string) {
-		super(string);
-	}
-
-	private static final long serialVersionUID = 1L;
-	
 }
