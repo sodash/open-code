@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.log.Log;
@@ -25,6 +26,19 @@ public abstract class Actor<Msg> {
 	 */
 	Thread thread;
 
+	private int maxq;
+
+	/**
+	 * Unset by default. If set, check each send to see that the queue is not too long.
+	 * @param n
+	 * @return
+	 */
+	public Actor<Msg> setMaxQ(int n) {
+		maxq = n;
+		return this;
+	}
+
+	
 	protected Actor() {
 		this(new ConcurrentLinkedQueue());
 	}
@@ -134,6 +148,10 @@ public abstract class Actor<Msg> {
 
 	void send(Packet packet) {
 		threadAlive();
+		// check the queue
+		if (maxq > 0 && q.size() > maxq) {
+			throw new QueueTooLongException("Could not add "+packet);
+		}
 		q.add(packet);
 	}
 
@@ -186,4 +204,13 @@ public abstract class Actor<Msg> {
 		public final Actor from;
 		public final Msg msg;
 	}
+}
+
+class QueueTooLongException extends FailureException {
+	public QueueTooLongException(String string) {
+		super(string);
+	}
+
+	private static final long serialVersionUID = 1L;
+	
 }
