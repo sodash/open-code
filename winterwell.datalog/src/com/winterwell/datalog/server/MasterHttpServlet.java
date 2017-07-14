@@ -100,6 +100,8 @@ public class MasterHttpServlet extends HttpServlet {
 				WebUtils2.CORS(request, true);
 			}
 			
+			Log.d(request);
+			
 			// which dataspace?
 			if (request.getSlug()==null) {
 				throw new WebEx.E404(request.getRequestUrl(), "You must specify a project");

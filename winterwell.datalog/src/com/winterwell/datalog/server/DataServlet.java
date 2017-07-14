@@ -20,19 +20,35 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.AggregationResults;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
+import com.winterwell.web.fields.SField;
 
 public class DataServlet implements IServlet {
 
+	private static final SField DATASPACE = new SField("dataspace");
+
 	@Override
 	public void process(WebRequest state) throws IOException {		
+		
+		// TODO request memory use as a good graph to test
+//		"_index": "datalog.default",
+//        "_type": "evt.simple",
+//        "_id": "default/simple_6814221e746bf98518810a931070ba6c_76",
+//        "_score": 1.0,
+//        "_source": {
+//          "evt": "simple",
+//          "time": "2017-06-30T14:00:00Z",
+//          "count": 7571440.0,
+//          "tag": "mem_used",
+		
 		ESStorage ess = Dep.get(ESStorage.class);
-		String dataspace = "gl";
+		String dataspace = state.get(DATASPACE, "gl");
 		String index = "datalog."+dataspace;
 		ESHttpClient esc = ess.client(dataspace);
 		
@@ -81,8 +97,7 @@ public class DataServlet implements IServlet {
 		// TODO MPU vs leaderboard
 //		com.winterwell.es.client.agg.Aggregation byFormat = Aggregations.terms("byVariant", "host");
 //		search.addAggregation(byFormat);
-		
-		search.setSize(0); // is this wanted??
+				
 //		search.setSearchType("count"); // aggregations c.f. https://www.elastic.co/blog/intro-to-aggregations
 		
 //		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
