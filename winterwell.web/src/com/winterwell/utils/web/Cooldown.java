@@ -22,6 +22,11 @@ public class Cooldown {
 		return expiringMap.keySet();
 	}
 	
+	/**
+	 * 
+	 * @param login
+	 * @param dt How long to cooldown for
+	 */
 	public static void cooldown(XId login, Dt dt) {
 		if (login==null) return;
 		assert dt != null : login;
