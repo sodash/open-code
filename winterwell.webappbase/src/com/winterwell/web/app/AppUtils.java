@@ -1,5 +1,6 @@
 package com.winterwell.web.app;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import com.winterwell.es.ESPath;
@@ -23,24 +24,30 @@ public class AppUtils {
 
 	public static final JsonField ITEM = new JsonField("item");
 	
+	/**
+	 * Will try path,indices in order if multiple
+	 * @param path
+	 * @return
+	 */
 	public static Map<String, Object> get(ESPath path) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		ESHttpClient.debug = true;
 
 		GetRequestBuilder s = new GetRequestBuilder(client);		
-		s.setIndices(path.indices).setType(path.type).setId(path.id);
+		s.setIndices(path.indices[0]).setType(path.type).setId(path.id);
 		s.setSourceOnly(true);
 		GetResponse sr = s.get();
 		Exception error = sr.getError();
 		if (error!=null) {
-//			if (error instanceof WebEx.E404) {
-//				// was version=draft?
-//				if ("draft".equals(version)) {
-//					return getCharity(id, null);
-//				}
-//				// 404
-//				return null;
-//			}
+			if (error instanceof WebEx.E404) {
+				// was version=draft?
+				if (path.indices.length > 1) {
+					ESPath path2 = new ESPath(Arrays.copyOfRange(path.indices, 1, path.indices.length), path.type, path.id);
+					return get(path2);
+				}
+				// 404
+				return null;
+			}
 			throw Utils.runtime(error);
 		}
 		Map<String, Object> json = sr.getSourceAsMap(); //SourceAsString();
@@ -48,7 +55,7 @@ public class AppUtils {
 	}
 
 	
-	public Map<String, Object> doPublish(ESPath draftPath, ESPath publishPath) {
+	public static Map<String, Object> doPublish(ESPath draftPath, ESPath publishPath) {
 		Map<String, Object> draft = get(draftPath);
 //		Gson gson = Dep.get(Gson.class);
 		if (draft.containsKey("modified")) draft.put("modified", false);
@@ -67,13 +74,14 @@ public class AppUtils {
 		return draft;
 	}
 
-	public void doDelete(ESPath path) {		
+	public static  void doDelete(ESPath path) {		
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		DeleteRequestBuilder del = client.prepareDelete(path.index(), path.type, path.id);
 		IESResponse ok = del.get().check();		
 	}
 
-	public Map<String,Object> doSaveEdit(ESPath path, Map item, WebRequest state) {
+	public static Map<String,Object> doSaveEdit(ESPath path, Map item, WebRequest state) {
+		assert path.index().toLowerCase().contains("draft") : path;
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		XId user = state.getUserId();
 //		Map item = (Map) state.get(ITEM);		
