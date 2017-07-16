@@ -75,6 +75,7 @@ public class MasterHttpServlet extends HttpServlet {
 		WebRequest request = null;
 		String path = null;
 		try {
+			Thread.currentThread().setName("web "+path);
 			request = new WebRequest(null, req, resp);			
 			path = request.getRequestPath();
 			Thread.currentThread().setName("web "+path);

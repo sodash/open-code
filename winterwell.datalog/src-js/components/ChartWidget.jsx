@@ -24,13 +24,16 @@ const ChartWidget = ({title, dataFromLabel}) => {
 	let dataPoints = 0;
 	for(let i=0; i<keys.length; i++) {
 		let key = keys[i];
+		// if (key !== 'mem_used') continue; Debug hack
 		let data = dataFromLabel[key];
-		if ( ! _.isArray(data)) {
-			console.warn("skip", key, data);
-			continue;
-		}
-		dataPoints += data.length;
-		let dset = makeDataSet(i, keys[i], data);
+		// if ( ! _.isArray(data)) {
+			// console.warn("skip not-an-array", key, data);
+			// continue;
+		// }
+		let xydata = Object.keys(data).map(k => { return {x:k, y:data[k]}; });
+		xydata = xydata.filter(xy => xy.y);
+		dataPoints += xydata.length;
+		let dset = makeDataSet(i, keys[i], xydata);
 		console.warn(dset);
 		datasets.push(dset);
 	}
@@ -40,21 +43,23 @@ const ChartWidget = ({title, dataFromLabel}) => {
 	}; //./data
 	let chartOptions = {
 		title: title,
-			scales: {
-				yAxes: [{
-					ticks: {
-						beginAtZero:true
+		scales: {
+			yAxes: [{
+				ticks: {
+					beginAtZero:true
+				}
+			}],
+			xAxes: [{
+				type: 'time',
+				time: {
+					displayFormats: {							
+						quarter: 'MMM YYYY'
 					}
-				}],
-				xAxes: [{
-					time: {
-						displayFormats: {							
-                        	quarter: 'MMM YYYY'
-                    	}
-					}
-				}]
-			}
-		}; // ./options;
+				}
+			}]
+		}
+	}; // ./options;
+	console.warn("Draw chart", chartOptions, chartData);
 	return (<div><h3>{title}</h3>
 				<RC2 data={chartData} options={chartOptions} type='line' />
 				<div>
@@ -63,9 +68,11 @@ const ChartWidget = ({title, dataFromLabel}) => {
 			</div>);
 }; //./ChartWidget
 
-const makeDataSet = (i, label, data) => {	
-	let xydata = data.map(d => { return {x:d.key_as_string, y: d.doc_count}; });
-	console.log(label, data, xydata);	
+/**
+ * @param data Array of {x (which can be a Time string), y}
+ */
+const makeDataSet = (i, label, xydata) => {	
+	console.log(label, xydata);	
 	// HACK pick a colour
 	let colors = ["rgba(75,192,192,1)", "rgba(192,75,192,1)", "rgba(192,192,75,1)", "rgba(75,75,192,1)", "rgba(75,192,75,1)", "rgba(192,75,75,1)"];
 	let color = colors[i % colors.length];

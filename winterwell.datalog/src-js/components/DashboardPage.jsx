@@ -55,17 +55,25 @@ class DashboardPage extends React.Component {
 		// pivot the data from ES output to chart.js format
 		let cdata = pivot(mydata, "'byEvent' -> 'buckets' -> bi -> {key, 'byTime' -> 'buckets' -> bi2 -> bucket}", 
 						"key -> bucket");
-		
+		// let xydata = pivot(cdata, "label -> bi -> {key_as_string, doc_count}", "label -> bi -> {}")
+		let xydata = Object.keys(cdata).map(label => {
+			let xys = cdata[label].map(d => { return {x:d.key_as_string, y: d.doc_count}; });
+			return xys;
+		});
+
 		// TODO pull out sub-data on myCount -> sum
+		// let tdata = pivot(mydata, "'byTag' -> 'buckets' -> bi -> {key, 'byTime' -> 'buckets' -> bi2 -> bucket}", 
+		// 				"key -> bucket");
 		let tdata = pivot(mydata, "'byTag' -> 'buckets' -> bi -> {key, 'byTime' -> 'buckets' -> bi2 -> bucket}", 
-						"key -> bucket");
+						"key -> bi2 -> bucket");
+		let tdata2 = pivot(tdata, "key -> bi -> {key_as_string, 'myCount' -> 'avg' -> avg}", 'key -> key_as_string -> avg');
 
 		// // this isn't working?!
 		// let xydata = pivot(cdata, "key -> bi -> {doc_count, key_as_string}", "key -> {'x' -> key_as_string, 'y' -> doc_count}");
 		// // debug
 		window.pivot = pivot;
 		window.mydata = mydata;
-		console.warn("pivot", "cdata", cdata, 'from', mydata, 'tdata', tdata);
+		console.warn("pivot", "cdata", cdata, 'from', mydata, 'tdata', tdata, 'tdata2', tdata2);
 
 		// breakdown data
 		let byDomainData = pivot(mydata, "'byDomain' -> 'buckets' -> bi -> {key, doc_count}", "key -> doc_count");		
@@ -79,7 +87,7 @@ class DashboardPage extends React.Component {
 
 				<FiltersWidget />
 
-				<ChartWidget title='Tags' dataFromLabel={tdata} />
+				<ChartWidget title='Tags' dataFromLabel={tdata2} />
 
 				<ChartWidget title='Events' dataFromLabel={cdata} />
 

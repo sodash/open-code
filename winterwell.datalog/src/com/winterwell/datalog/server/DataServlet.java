@@ -50,7 +50,7 @@ public class DataServlet implements IServlet {
 //          "tag": "mem_used",
 		
 		ESStorage ess = Dep.get(ESStorage.class);
-		String dataspace = state.get(DATASPACE, "gl");
+		String dataspace = state.get(DATASPACE, "default");
 		List<String> breakdown = state.get(new ListField<String>("breakdown"));
 		String index = "datalog."+dataspace;
 		ESHttpClient esc = ess.client(dataspace);
@@ -79,8 +79,8 @@ public class DataServlet implements IServlet {
 		
 		// tag & time
 		com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms("byTag", "tag");
-		com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats("myCount", "count");
 		com.winterwell.es.client.agg.Aggregation byTime = Aggregations.dateHistogram("byTime", "time");
+		com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats("myCount", "count");
 		byTime.put("interval", "hour");
 		byTime.subAggregation(myCount);
 		byTag.subAggregation(byTime);
