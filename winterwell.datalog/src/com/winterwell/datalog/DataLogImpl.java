@@ -543,6 +543,8 @@ public class DataLogImpl implements Closeable, IDataLog {
 				// heart beat: check things are working by storing some useful stats
 				DataLog.set(ReflectionUtils.getUsedMemory(), STAT_MEM_USED);
 				DataLog.set(ReflectionUtils.getAvailableMemory(), "mem_free");
+				// and the time, for testing
+				DataLog.set(new Time().getMinutes(), "time.minutes");
 				
 //				int[] info = SqlUtils.getPostgresThreadInfo("sodash");
 //				DataLog.set(info[0], "postgres_sodash_processes");
