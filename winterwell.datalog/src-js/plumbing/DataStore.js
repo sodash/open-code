@@ -76,9 +76,10 @@ class Store {
 	 * Unlike update(), this can set {} or null values.
 	 * @param {String[]} path This path will be created if it doesn't exist (except if value===null)
 	 * @param {*} value 
+	 * @param {boolean} update Set to false to switch off sending out an update
 	 */
 	// TODO handle setValue(pathbit, pathbit, pathbit, value) too
-	setValue(path, value) {
+	setValue(path, value, update = true) {
 		assert(_.isArray(path), path+" is not an array.");
 		assert(this.appstate[path[0]], 
 			path[0]+" is not a node in appstate - As a safety check against errors, the root node must already exist to use setValue()");
@@ -101,7 +102,9 @@ class Store {
 			}
 			tip = newTip;
 		}
-		this.update();
+		if (update) {
+			this.update();
+		}
 	}
 
 	/**

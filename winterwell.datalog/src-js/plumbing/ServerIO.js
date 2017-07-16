@@ -11,8 +11,9 @@ import Login from 'you-again';
 
 let DATALOG_ENDPOINT = '/data';
 
-let getData = (filters, breakdowns) => {
-	let specs = {		
+let getData = (filters = {}, breakdowns) => {
+	let specs = {
+		dataspace: filters.dataspace
 	};
 	return load(DATALOG_ENDPOINT, {data: specs});
 };

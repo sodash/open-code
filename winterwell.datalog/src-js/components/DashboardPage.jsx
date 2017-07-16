@@ -26,13 +26,12 @@ class DashboardPage extends React.Component {
 			);
 		}
 
-		let filters = {
-			// everything
-		};
+		let filters = DataStore.getValue('widget', 'Dashboard', 'filters') || {};
 		let breakdowns = ['time', 'evt', 'domain'];
 
 		let dspec = JSON.stringify(filters)+" "+JSON.stringify(breakdowns);
 		const dpath = ['widget', 'Dashboard', dspec];
+		console.log('dpath', dpath);
 		let mydata = DataStore.getValue(dpath);
 		if ( ! mydata) {
 			// Where does ad activity data go??
@@ -54,15 +53,18 @@ class DashboardPage extends React.Component {
 		}
 
 		// pivot the data from ES output to chart.js format
-		let cdata = pivot(mydata, "'byEvent' -> 'buckets' -> bi -> {key, 'events_over_time' -> 'buckets' -> bi2 -> bucket}", 
+		let cdata = pivot(mydata, "'byEvent' -> 'buckets' -> bi -> {key, 'byTime' -> 'buckets' -> bi2 -> bucket}", 
 						"key -> bucket");
 		
+		let tdata = pivot(mydata, "'byTag' -> 'buckets' -> bi -> {key, 'byTime' -> 'buckets' -> bi2 -> bucket}", 
+						"key -> bucket");
+
 		// // this isn't working?!
 		// let xydata = pivot(cdata, "key -> bi -> {doc_count, key_as_string}", "key -> {'x' -> key_as_string, 'y' -> doc_count}");
 		// // debug
-		// window.pivot = pivot;
-		// window.mydata = mydata;
-		console.warn("pivot", "cdata", cdata, 'from', mydata);
+		window.pivot = pivot;
+		window.mydata = mydata;
+		console.warn("pivot", "cdata", cdata, 'from', mydata, 'tdata', tdata);
 
 		// breakdown data
 		let byDomainData = pivot(mydata, "'byDomain' -> 'buckets' -> bi -> {key, doc_count}", "key -> doc_count");		
@@ -72,7 +74,11 @@ class DashboardPage extends React.Component {
 			<div className="page DashboardPage">
 				<h2>My Dashboard</h2>
 				
-				<p>One month of data, in per-hour segments.</p>
+				<p>One month of data, in per-hour segments. Near realtime: Does NOT include the most recent 15 minutes.</p>
+
+				<FiltersWidget />
+
+				<ChartWidget title='Tags' dataFromLabel={tdata} />
 
 				<ChartWidget title='Events' dataFromLabel={cdata} />
 
@@ -104,6 +110,21 @@ const BreakdownWidget = ({data}) => {
 	let keys = Object.keys(data).sort( (k1, k2) => data[k1] > data[k2] );
 	let list = keys.map(k => <li key={'breakdown-'+k}>{k}: {data[k]}</li>);
 	return <ol>{list}</ol>;
+};
+
+const FiltersWidget = () => {
+	let livePath = ['widget', 'Dashboard', 'filters'];
+	let path = ['widget', 'Dashboard', 'filters.editor'];
+	let filters = DataStore.getValue(path);
+	if ( ! filters) {
+		filters = DataStore.getValue(livePath) || {};
+		DataStore.setValue(path, filters, false);
+	}
+	return (<div className='well'>
+		<Misc.PropControl path={path} item={filters} prop='dataspace' label='Dataspace e.g. "gl" or "default"' />
+		<Misc.PropControl path={path} item={filters} prop='tags' label='tags' />
+		<button onClick={() => { DataStore.setValue(livePath, filters); }}>Load Data</button>
+	</div>);
 };
 
 export default DashboardPage;

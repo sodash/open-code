@@ -21,6 +21,7 @@ const ChartWidget = ({title, dataFromLabel}) => {
 	// let labels = ["January", "February", "March", "April", "May", "June", "July"];
 	let datasets = [];
 	let keys = Object.keys(dataFromLabel);
+	let dataPoints = 0;
 	for(let i=0; i<keys.length; i++) {
 		let key = keys[i];
 		let data = dataFromLabel[key];
@@ -28,6 +29,7 @@ const ChartWidget = ({title, dataFromLabel}) => {
 			console.warn("skip", key, data);
 			continue;
 		}
+		dataPoints += data.length;
 		let dset = makeDataSet(i, keys[i], data);
 		console.warn(dset);
 		datasets.push(dset);
@@ -53,8 +55,11 @@ const ChartWidget = ({title, dataFromLabel}) => {
 				}]
 			}
 		}; // ./options;
-	return (<div>
+	return (<div><h3>{title}</h3>
 				<RC2 data={chartData} options={chartOptions} type='line' />
+				<div>
+					<small>Labels: {JSON.stringify(keys)}, Total data points: {dataPoints}</small>
+				</div>
 			</div>);
 }; //./ChartWidget
 
