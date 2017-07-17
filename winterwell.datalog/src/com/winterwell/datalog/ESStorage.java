@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -251,7 +252,7 @@ public class ESStorage implements IDataLogStorage {
 	 * @return 
 	 */
 	@Override
-	public ListenableFuture<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period period) {
+	public Future<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period period) {
 //		Log.d("datalog.es", "saveEvent: "+event);		
 		String index = indexFromDataspace(dataspace);
 		// init?
@@ -261,21 +262,22 @@ public class ESStorage implements IDataLogStorage {
 		long secs = period.getEnd().getTime() % 1000;
 		String id = event.getId()+"_"+secs;
 		ESHttpClient client = client(dataspace);
+		// TODO something round here is spawning lots of threads!! To reproduce, run DataLogServer
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
 		if (event.time==null) event.time = period.getEnd();
 		// set doc
 		prepIndex.setBodyMap(event.toJson2());
-		ListenableFuture<ESHttpResponse> f = prepIndex.execute();
-		// log stuff
-		f.addListener(() -> {			
-			try {
-				ESHttpResponse response = f.get();
-				response.check();
-//				Log.d("datalog.es", "...saveEvent done :) event: "+event);
-			} catch(Throwable ex) {
-				Log.d(DataLog.LOGTAG, "...saveEvent FAIL :( "+ex+" from event: "+event);
-			}
-		}, MoreExecutors.directExecutor());
+		Future<ESHttpResponse> f = prepIndex.execute();
+//		// log stuff
+//		f.addListener(() -> {			
+//			try {
+//				ESHttpResponse response = f.get();
+//				response.check();
+////				Log.d("datalog.es", "...saveEvent done :) event: "+event);
+//			} catch(Throwable ex) {
+//				Log.d(DataLog.LOGTAG, "...saveEvent FAIL :( "+ex+" from event: "+event);
+//			}
+//		}, MoreExecutors.directExecutor());
 		return f;
 	}
 
