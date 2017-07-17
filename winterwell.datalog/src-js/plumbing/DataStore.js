@@ -5,7 +5,7 @@ import C from '../C.js';
 import _ from 'lodash';
 import {getType} from '../data/DataClass';
 import {assert,assMatch} from 'sjtest';
-import {yessy} from 'wwutils';
+import {yessy, getUrlVars, parseHash, modifyHash, toTitleCase} from 'wwutils';
 
 /**
  * Hold data in a simple json tree, and provide some utility methods to update it - and to attach a listener.
@@ -15,7 +15,59 @@ class Store {
 
 	constructor() {
 		this.callbacks = [];
-		this.appstate = {data:{}, focus:{}, show:{}, misc:{}};
+		// init the "canonical" categories		
+		this.appstate = {
+			data:{}, 
+			/** what are you looking at? */
+			focus:{}, 
+			/** e.g. form settings */
+			widget:{}, 
+			/**
+			 * nav state, stored in the url (this gives nice shareable deep-linking urls)
+			 */
+			location:{}, 
+			misc:{}
+		};
+		// init url vars
+		this.parseUrlVars(window.location);
+	}
+
+	/**
+	 * Keep navigation state in the url, after the hash, so we have shareable urls.
+	 * To set a nav variable, use setUrlValue(key, value);
+	 */
+	parseUrlVars(url) {		
+		let {path, params} = parseHash();
+		// peel off eg publisher/myblog		
+		let location = {};
+		location.path = path;
+		let page = path? path[0] : null;
+		if (page) {
+			// page/slug? DEPRECATED If so, store in DataStore focus
+			const ptype = toTitleCase(page); // hack publisher -> Publisher			
+			this.setValue(['focus', ptype], path[1]);			
+		}
+		location.page = page;
+		if (path.length > 2) location.slug = path[1];
+		if (path.length > 3) location.subslug = path[2];		
+		location.params = params;
+		this.update({location});
+	}
+
+	/**
+	 * Set a key=value in the url for navigation. This modifies the window.location and DataStore.appstore.location, and does an update.
+	 * @param {String} key 
+	 * @param {String} value 
+	 */
+	setUrlValue(key, value) {
+		assMatch(key, String);
+		if (value) assMatch(value, "String|Boolean|Number");
+		// update the url
+		let newParams = {};
+		newParams[key] = value;
+		modifyHash(null, newParams);
+		// update the datastore
+		DataStore.setValue(['location', key], value);
 	}
 
 	/**
@@ -181,9 +233,6 @@ DataStore.update({
 	focus: {
 		Charity: null,
 		User: null,
-	},	
-	widget: {},
-	misc: {
 	},
 	/** status of server requests, for displaying 'loading' spinners 
 	 * Normally: transient.$item_id.status

@@ -15,6 +15,7 @@ import ChartWidget from './ChartWidget';
 
 
 class DashboardPage extends React.Component {
+
 	render() {
 		let user = Login.getUser();
 		if ( ! user) {
@@ -122,19 +123,23 @@ const BreakdownWidget = ({data}) => {
 };
 
 const FiltersWidget = () => {
-	let livePath = ['widget', 'Dashboard', 'filters'];
 	let path = ['widget', 'Dashboard', 'filters.editor'];
 	let filters = DataStore.getValue(path);
 	if ( ! filters) {
-		filters = DataStore.getValue(livePath) || {};
+		filters = DataStore.getValue('location', 'params') || {};
 		DataStore.setValue(path, filters, false);
 	}
+	// click
+	const setFilters = () => {
+		DataStore.setUrlValue('dataspace', filters.dataspace);
+		DataStore.setUrlValue('tags', filters.tags);
+	};
 		// <Misc.PropControl path={path} item={filters} prop='events' label='events' />
 		// <Misc.PropControl path={path} item={filters} prop='publisher' label='Publisher' />
 	return (<div className='well'>
 		<Misc.PropControl path={path} item={filters} prop='dataspace' label='Dataspace e.g. "gl" or "default"' />
 		<Misc.PropControl path={path} item={filters} prop='tags' label='tags' />
-		<button onClick={() => { DataStore.setValue(livePath, filters); }}>Load Data</button>
+		<button onClick={setFilters}>Load Data</button>
 	</div>);
 };
 
