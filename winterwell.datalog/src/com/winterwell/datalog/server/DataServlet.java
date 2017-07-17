@@ -1,6 +1,7 @@
 package com.winterwell.datalog.server;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggre
 import org.elasticsearch.search.sort.SortOrder;
 
 import com.winterwell.datalog.DataLogEvent;
+import com.winterwell.datalog.DataLogSecurity;
 import com.winterwell.datalog.ESStorage;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.SearchRequestBuilder;
@@ -24,6 +26,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
@@ -31,13 +34,17 @@ import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
 
+/**
+ * Serves up aggregations data
+ * @author daniel
+ *
+ */
 public class DataServlet implements IServlet {
 
 	private static final SField DATASPACE = new SField("dataspace");
 
 	@Override
-	public void process(WebRequest state) throws IOException {		
-		
+	public void process(WebRequest state) throws IOException {						
 		// TODO request memory use as a good graph to test
 //		"_index": "datalog.default",
 //        "_type": "evt.simple",
@@ -50,8 +57,15 @@ public class DataServlet implements IServlet {
 //          "tag": "mem_used",
 		
 		ESStorage ess = Dep.get(ESStorage.class);
-		String dataspace = state.get(DATASPACE, "default");
-		List<String> breakdown = state.get(new ListField<String>("breakdown"));
+		String dataspace = state.get(DATASPACE, "default");				
+		// Uses "paths" of breakdown1/breakdown2/... {field1:operation, field2}
+		List<String> breakdown = state.get(new ListField<String>("breakdown"), 
+				Arrays.asList("tag/time {count:avg}", "event/time", 
+						"publisher", "domain", "campaign", "variant"));
+
+		// security: on the dataspace, and optionally on the breakdown
+		DataLogSecurity.check(state, dataspace, breakdown);
+
 		String index = "datalog."+dataspace;
 		ESHttpClient esc = ess.client(dataspace);
 		
@@ -77,43 +91,30 @@ public class DataServlet implements IServlet {
 		
 		search.setFilter(filter);
 		
-		// tag & time
-		com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms("byTag", "tag");
-		com.winterwell.es.client.agg.Aggregation byTime = Aggregations.dateHistogram("byTime", "time");
-		com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats("myCount", "count");
-		byTime.put("interval", "hour");
-		byTime.subAggregation(myCount);
-		byTag.subAggregation(byTime);
-		search.addAggregation(byTag);
+		for(String bd : breakdown) {
+			// tag & time
+			// e.g. tag/time {count:avg}
+			// TODO proper recursive handling
+			String[] b = bd.split(" ")[0].split("/");
+			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms("by_"+b[0], b[0]);
+			Aggregation leaf = byTag;
+			if (b.length > 1) {
+				assert b[1].equals("time") : b;
+				com.winterwell.es.client.agg.Aggregation byTime = Aggregations.dateHistogram("by_time", "time");
+				byTime.put("interval", "hour");			
+				byTag.subAggregation(byTime);
+				leaf = byTime;
+			}
+			search.addAggregation(byTag);	
+			// add a count handler
+			if (bd.split(" ").length <= 1) continue;
+			String bd2 = bd.substring(bd.indexOf(" ")+2, bd.length()-1);
+			if (bd2.contains("count")) {
+				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats("myCount", "count");			
+				leaf.subAggregation(myCount);
+			}
+		} // ./breakdown
 		
-//		// events over time
-//		com.winterwell.es.client.agg.Aggregation byEvent = new Aggregation("byEvent", "terms", DataLogEvent.EVENTTYPE);
-//		com.winterwell.es.client.agg.Aggregation dh = Aggregations.dateHistogram("byTime", "time");
-//		dh.put("interval", "hour");
-//		byEvent.subAggregation(dh);						
-//		search.addAggregation(byEvent);
-//		
-//		// sorta bug: the breakdowns below sum
-//		// TODO use a 2nd search, so we can filter by evt.type = visible
-//		// events by publisher
-//		com.winterwell.es.client.agg.Aggregation byDomain = Aggregations.terms("byDomain", "domain");
-//		search.addAggregation(byDomain);
-//		com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("byHost", "host");
-//		search.addAggregation(byHost);
-//		// TODO
-////		com.winterwell.es.client.agg.Aggregation byAdvert = Aggregations.terms("byCampaign", "campaign");
-////		search.addAggregation(byAdvert);
-//		// TODO by variant
-////		com.winterwell.es.client.agg.Aggregation byVariant = Aggregations.terms("byVariant", "host");
-////		search.addAggregation(byVariant);
-//		// TODO MPU vs leaderboard
-////		com.winterwell.es.client.agg.Aggregation byFormat = Aggregations.terms("byVariant", "host");
-////		search.addAggregation(byFormat);
-//				
-////		search.setSearchType("count"); // aggregations c.f. https://www.elastic.co/blog/intro-to-aggregations
-		
-//		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
-//		client.debug = true;
 		SearchResponse sr = search.get();
 		
 		Map aggregations = sr.getAggregations();
