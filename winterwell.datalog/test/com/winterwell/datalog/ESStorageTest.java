@@ -61,7 +61,7 @@ public class ESStorageTest {
 				"tracker", "szkpogoeegglvcszwtao@trk"
 				));
 		Period period = new Period(new Time().minus(TUnit.MINUTE), new Time());
-		ListenableFuture<ESHttpResponse> res = storage.saveEvent(
+		Future<ESHttpResponse> res = storage.saveEvent(
 				"testdataspace", event, period);
 		ESHttpResponse r = res.get();
 		r.check();

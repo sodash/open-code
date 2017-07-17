@@ -49,7 +49,9 @@ public class DataLogConfig extends DBOptions {
 	 * Bucket size. Also the gap between saves.
 	 */
 	@Option(description = "Bucket size. Also the gap between saves.")
-	public Dt interval = new Dt(15, TUnit.MINUTE);
+	public Dt interval = 
+			new Dt(1, TUnit.MINUTE);
+//			new Dt(15, TUnit.MINUTE);
 
 	/**
 	 * Normally "default", This sets {@link DataLog#DEFAULT_DATASPACE}
