@@ -169,7 +169,31 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 		let mv = modelValueFromInput(e.target.value, type);
 		DataStore.setValue(proppath, mv);
 		if (saveFn) saveFn({path:path});
+		e.preventDefault();
+		e.stopPropagation();
 	};
+	if (type === 'arraytext') {
+		// Pretty hacky: Value stored as ["one", "two", "three"] but displayed as "one two three"
+		// Currently used for entering list of unit-variants for publisher
+		const arrayChange = e => {
+			const oldString = DataStore.getValue(proppath);
+			const newString = e.target.value;
+
+			// Split into space-separated tokens
+			let newValue = newString.split(' ');
+			// Remove falsy entries, if deleting (ie newString is substring of oldString) but not if adding
+			// allows us to go 'one' (['one']) -> "one " ('one', '') -> "one two" ('one', 'two')
+			if (oldString.indexOf(newString) >= 0) {
+				newValue = newValue.filter(val => val);
+			}
+			
+			DataStore.setValue(proppath, newValue);
+			if (saveFn) saveFn({path});
+			e.preventDefault();
+			e.stopPropagation();
+		};
+		return <FormControl type={type} name={prop} value={value.join(' ')} onChange={arrayChange} {...otherStuff} />;
+	}
 	if (type==='textarea') {
 		return <textarea className="form-control" name={prop} onChange={onChange} {...otherStuff} value={value} />;
 	}
@@ -214,7 +238,8 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 	return <FormControl type={type} name={prop} value={value} onChange={onChange} {...otherStuff} />;
 };
 
-Misc.ControlTypes = new Enum("img textarea text password email url color MonetaryAmount checkbox location date year number");
+Misc.ControlTypes = new Enum("img textarea text password email url color MonetaryAmount checkbox"
+							+" location date year number arraytext");
 
 /**
  * Convert inputs (probably text) into the model's format (e.g. numerical)
