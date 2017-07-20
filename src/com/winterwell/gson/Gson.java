@@ -1297,12 +1297,11 @@ public class Gson {
 		return obj;
 	}
 
-	private static Gson SAFE_GSON = new GsonBuilder()			
-				.setLenientReader(true)				
-				.serializeSpecialFloatingPointValues()
-				.setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-				.setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL)				
-				.create();
+	/**
+	 * Uses no "@class" property
+	 */
+	private static Gson SAFE_GSON = GsonBuilder.safe().create();	
+	
 	
 	/**
 	 * This is the GSON used by {@link #toJSON(Object)} and {@link #fromJSON(String)}.

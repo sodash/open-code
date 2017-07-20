@@ -610,4 +610,16 @@ private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
 		this.lenientReader = stripComments;
 		return this;
 	}
+
+	/**
+	 * Make a GsonBuilder with a safe (but not vanilla) set of defaults
+	 * @return
+	 */
+	public static GsonBuilder safe() {
+		 return new GsonBuilder()		
+			.setLenientReader(true)				
+			.serializeSpecialFloatingPointValues()
+			.setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+			.setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL);
+	}
 }
