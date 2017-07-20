@@ -55,7 +55,7 @@ class Store {
 	}
 
 	/**
-	 * Set a key=value in the url for navigation. This modifies the window.location and DataStore.appstore.location, and does an update.
+	 * Set a key=value in the url for navigation. This modifies the window.location and DataStore.appstore.location.params, and does an update.
 	 * @param {String} key 
 	 * @param {String} value 
 	 */
@@ -67,7 +67,16 @@ class Store {
 		newParams[key] = value;
 		modifyHash(null, newParams);
 		// update the datastore
-		DataStore.setValue(['location', key], value);
+		DataStore.setValue(['location', 'params', key], value);
+	}
+
+	/**
+	 * Convenience for appstate.location.params.key. This is to match setUrlValue.
+	 * @param {String} key 
+	 */
+	getUrlValue(key) {
+		assMatch(key, String);
+		return DataStore.getValue(['location', 'params', key]);
 	}
 
 	/**

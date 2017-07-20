@@ -262,7 +262,7 @@ public class ESStorage implements IDataLogStorage {
 		long secs = period.getEnd().getTime() % 1000;
 		String id = event.getId()+"_"+secs;
 		ESHttpClient client = client(dataspace);
-		// TODO something round here is spawning lots of threads!! To reproduce, run DataLogServer
+		client.debug = false;
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
 		if (event.time==null) event.time = period.getEnd();
 		// set doc

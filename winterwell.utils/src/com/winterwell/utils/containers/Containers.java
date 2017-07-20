@@ -319,7 +319,9 @@ public final class Containers  {
 			IFn<I, O> fn) {
 		return new IterableFn<I, O>(list, fn);
 	}
+
 	/**
+	 * @deprecated use {@link #applyToMap(Map, java.util.function.BiFunction)} for preference
 	 * Produces a new Map of key/values by mapping each entry value through a
 	 * transformation function.
 	 * 
@@ -341,7 +343,22 @@ public final class Containers  {
 		}
 		return after;
 	}
-	
+
+	public static <K, I, O> Map<K,O> applyToMap(Map<? extends K, ? extends I> map, java.util.function.BiFunction<K, I, O> fn) {
+		HashMap after = new HashMap(map.size());
+		for (K k : map.keySet()) {
+			try {
+				I v = map.get(k);				
+				O o = fn.apply(k, v);
+				if (o==null) continue;
+				after.put(k, o);
+			} catch(Exception ex) {
+				throw Utils.runtime(ex);
+			}
+		}
+		return after;
+	}
+
 
 	/**
 	 * Walk the tree.

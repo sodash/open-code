@@ -23,6 +23,7 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.AggregationResults;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
@@ -60,8 +61,15 @@ public class DataServlet implements IServlet {
 		String dataspace = state.get(DATASPACE, "default");				
 		// Uses "paths" of breakdown1/breakdown2/... {field1:operation, field2}
 		List<String> breakdown = state.get(new ListField<String>("breakdown"), 
-				Arrays.asList("tag/time {count:avg}", "event/time", 
-						"publisher", "domain", "campaign", "variant"));
+				Arrays.asList(
+//						"tag/time {count:avg}", 
+						"evt/time", 
+//						"publisher", 
+						"domain",
+//						"evt"
+						"campaign", 
+						"variant"
+						));
 
 		// security: on the dataspace, and optionally on the breakdown
 		DataLogSecurity.check(state, dataspace, breakdown);
@@ -104,20 +112,25 @@ public class DataServlet implements IServlet {
 				byTime.put("interval", "hour");			
 				byTag.subAggregation(byTime);
 				leaf = byTime;
-			}
-			search.addAggregation(byTag);	
+			}				
 			// add a count handler
-			if (bd.split(" ").length <= 1) continue;
+			if (bd.split(" ").length <= 1) {
+				search.addAggregation(byTag);
+				continue;
+			}
 			String bd2 = bd.substring(bd.indexOf(" ")+2, bd.length()-1);
 			if (bd2.contains("count")) {
 				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats("myCount", "count");			
 				leaf.subAggregation(myCount);
 			}
+			search.addAggregation(byTag);
 		} // ./breakdown
 		
+		esc.debug = true;
 		SearchResponse sr = search.get();
 		
 		Map aggregations = sr.getAggregations();
+				
 		JsonResponse jr = new JsonResponse(state, aggregations);
 		WebUtils2.sendJson(jr, state);
 	}
