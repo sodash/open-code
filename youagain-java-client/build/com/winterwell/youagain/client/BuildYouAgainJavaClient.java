@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.junit.Test;
+
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.JarTask;
@@ -21,11 +23,13 @@ import jobs.BuildUtils;
 import jobs.BuildWeb;
 import jobs.BuildWinterwellProject;
 
+
 public class BuildYouAgainJavaClient extends BuildWinterwellProject {
 
 	public BuildYouAgainJavaClient() {
 		super(new File(FileUtils.getWinterwellDir(), "open-code/youagain-java-client"));
 		setIncSrc(true);
+		setVersion("0.2.0");
 	}
 
 	@Override

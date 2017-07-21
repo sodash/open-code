@@ -34,6 +34,12 @@ public class BuildWinterwellProject extends BuildTask {
 	public final File projectDir;
 	protected boolean incSrc;
 	protected File jarFile;
+
+	private String version;
+	
+	public void setVersion(String version) {
+		this.version = version;
+	}
 	
 	public BuildWinterwellProject setIncSrc(boolean incSrc) {
 		this.incSrc = incSrc;
@@ -81,6 +87,7 @@ public class BuildWinterwellProject extends BuildTask {
 			jar2.setAppend(true);
 			jar2.setManifestProperty(JarTask.MANIFEST_TITLE, 
 					projectDir.getName()+" library (c) Winterwell. All rights reserved.");
+			if (version!=null) jar2.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, version);
 			jar2.run();			
 		}
 		// Test
