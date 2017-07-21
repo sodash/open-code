@@ -46,6 +46,7 @@ import com.winterwell.web.LoginDetails;
 import com.winterwell.web.app.BuildWWAppBase;
 import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
+import com.winterwell.youagain.client.BuildYouAgainJavaClient;
 
 import jobs.BuildBob;
 import jobs.BuildFlexiGson;
@@ -99,7 +100,8 @@ public class PublishDataServer extends BuildTask {
 				new BuildDataLog(), // This!
 				new BuildESJavaClient(),
 				new BuildFlexiGson(),
-				new BuildWWAppBase()
+				new BuildWWAppBase(),
+				new BuildYouAgainJavaClient()
 				);
 	}
 
