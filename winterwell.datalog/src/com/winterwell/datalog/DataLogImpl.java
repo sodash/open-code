@@ -22,6 +22,7 @@ import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.ExtraDimensionsDataStream;
 import com.winterwell.maths.timeseries.ExtraDimensionsDataStream.KMatchPolicy;
 import com.winterwell.maths.timeseries.IDataStream;
+import com.winterwell.maths.timeseries.TimeSlicer;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
@@ -313,6 +314,28 @@ public class DataLogImpl implements Closeable, IDataLog {
 	Period getCurrentBucket() {
 		Dt dt = getPeriod();
 		return new Period(start, start.plus(dt));
+	}
+	
+	Period getBucket(Time time) {
+		Dt dt = getPeriod();
+		if (time.isAfter(start)) {
+			// the future (odd!)
+			Time t = start;
+			while(time.isAfter(t)) {
+				t = t.plus(dt);
+			}
+			Period p = new Period(t.minus(dt), t);
+			assert p.contains(time);
+			return p;
+		}
+		// the past (normal case)
+		Time t = start;
+		while(t.isAfter(time)) {
+			t = t.minus(dt);
+		}
+		Period p = new Period(t, t.plus(dt));
+		assert p.contains(time);
+		return p;
 	}
 
 	private boolean closed;

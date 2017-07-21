@@ -77,9 +77,17 @@ public class ESStorage implements IDataLogStorage {
 	}
 
 	@Override
-	public void saveHistory(Map<Pair2<String, Time>, Double> tag2time2count) {
-		// TODO Auto-generated method stub
-		Log.e("TODO", "saveHistory "+tag2time2count);
+	public void saveHistory(Map<Pair2<String, Time>, Double> tag2time2count) {		
+		for(Entry<Pair2<String, Time>, Double> tc : tag2time2count.entrySet()) {
+			DataLogEvent event = event4tag(tc.getKey().first, tc.getValue());
+			event.time = tc.getKey().second;
+			// Minor TODO batch for efficiency
+			Collection<DataLogEvent> events = new ArrayList();
+			events.add(event);		
+			DataLogImpl dl = (DataLogImpl) DataLog.getImplementation();
+			Period bucketPeriod = dl.getBucket(event.time); 
+			saveEvents(events, bucketPeriod);
+		}		
 	}
 
 	@Override
@@ -248,23 +256,23 @@ public class ESStorage implements IDataLogStorage {
 	 * @param cnt
 	 * @param dataspace
 	 * @param event
-	 * @param period 
+	 * @param bucketPeriod 
 	 * @return 
 	 */
 	@Override
-	public Future<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period period) {
+	public Future<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period bucketPeriod) {
 //		Log.d("datalog.es", "saveEvent: "+event);		
 		String index = indexFromDataspace(dataspace);
 		// init?
 		initIndex(dataspace, index);
 		String type = typeFromEventType(event.eventType);
 		// put a time marker on it -- the end in seconds is enough
-		long secs = period.getEnd().getTime() % 1000;
+		long secs = bucketPeriod.getEnd().getTime() % 1000;
 		String id = event.getId()+"_"+secs;
 		ESHttpClient client = client(dataspace);
 		client.debug = false;
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
-		if (event.time==null) event.time = period.getEnd();
+		if (event.time==null) event.time = bucketPeriod.getEnd();
 		// set doc
 		prepIndex.setBodyMap(event.toJson2());
 		Future<ESHttpResponse> f = prepIndex.execute();
