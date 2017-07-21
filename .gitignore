@@ -14,3 +14,4 @@ bin.test
 bin/
 lg.txt
 *.log
+node_modules
