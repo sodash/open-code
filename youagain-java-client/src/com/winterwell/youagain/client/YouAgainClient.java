@@ -3,6 +3,7 @@ package com.winterwell.youagain.client;
 import java.util.Map;
 import java.util.Set;
 
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Properties;
 import com.winterwell.utils.log.Log;
@@ -21,6 +22,7 @@ public class YouAgainClient {
 	String app;
 	
 	public YouAgainClient(String app) {
+		assert ! Utils.isBlank(app);
 		this.app = app;
 	}
 	
