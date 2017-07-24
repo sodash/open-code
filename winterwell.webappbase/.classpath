@@ -9,5 +9,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/flexi-gson"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.depot"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

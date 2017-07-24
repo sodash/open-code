@@ -19,6 +19,11 @@ import com.winterwell.web.WebEx;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.JsonField;
 
+/**
+ * Stuff used across the projects, mostly ES / CRUD stuff.
+ * @author daniel
+ *
+ */
 public class AppUtils {
 
 
