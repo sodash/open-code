@@ -10,6 +10,7 @@ import com.winterwell.data.KStatus;
 import com.winterwell.depot.IInit;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.IESRouter;
+import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
@@ -34,6 +35,7 @@ public class CrudServlet<T> implements IServlet {
 		
 	}
 	
+	ESHttpClient es;
 	Class<T> type;
 	T thing;
 
@@ -53,38 +55,38 @@ public class CrudServlet<T> implements IServlet {
 	}
 
 	private void doList(WebRequest state) throws IOException {
-		// copied from SoGive SearchServlet
-		SearchRequestBuilder s = new SearchRequestBuilder(es).setIndices(
-				config.publisherIndex(KStatus.PUBLISHED),
-				config.publisherIndex(KStatus.PENDING),
-				config.publisherIndex(KStatus.DRAFT), 
-				config.publisherIndex(KStatus.REQUEST_PUBLISH));
-		String q = state.get("q");
-		if ( q != null) {
-			QueryBuilder qb = QueryBuilders.multiMatchQuery(q, 
-					"id", "name", "keywords")
-							.operator(Operator.AND);
-			s.setQuery(qb);
-		}
-		// TODO paging!
-		s.setSize(10000);
-		SearchResponse sr = s.get();
-		Map<String, Object> jobj = sr.getParsedJson();
-		List<Map> hits = sr.getHits();
-		List hits2 = Containers.apply(hits, h -> h.get("_source"));
-		long total = sr.getTotal();
-		String json = Dep.get(Gson.class).toJson(
-				new ArrayMap(
-					"hits", hits2, 
-					"total", total
-				));
-		JsonResponse output = new JsonResponse(state).setCargoJson(json);
-		WebUtils2.sendJson(output, state);
+//		// copied from SoGive SearchServlet
+//		SearchRequestBuilder s = new SearchRequestBuilder(es).setIndices(
+//				config.publisherIndex(KStatus.PUBLISHED),
+//				config.publisherIndex(KStatus.PENDING),
+//				config.publisherIndex(KStatus.DRAFT), 
+//				config.publisherIndex(KStatus.REQUEST_PUBLISH));
+//		String q = state.get("q");
+//		if ( q != null) {
+//			QueryBuilder qb = QueryBuilders.multiMatchQuery(q, 
+//					"id", "name", "keywords")
+//							.operator(Operator.AND);
+//			s.setQuery(qb);
+//		}
+//		// TODO paging!
+//		s.setSize(10000);
+//		SearchResponse sr = s.get();
+//		Map<String, Object> jobj = sr.getParsedJson();
+//		List<Map> hits = sr.getHits();
+//		List hits2 = Containers.apply(hits, h -> h.get("_source"));
+//		long total = sr.getTotal();
+//		String json = Dep.get(Gson.class).toJson(
+//				new ArrayMap(
+//					"hits", hits2, 
+//					"total", total
+//				));
+//		JsonResponse output = new JsonResponse(state).setCargoJson(json);
+//		WebUtils2.sendJson(output, state);
 	}
 
 	private void doSave(WebRequest state) {
 		String json = state.get("publisher");
-		String id = state.getSlugBits(1);
+		String id = getId(state);
 //		if (id.endsWith(".json")) id = id.substring(0, id.length()-5); not needed - done in slug??
 		Gson gson = Dep.get(Gson.class);
 		thing = gson.fromJson(json, type);
@@ -94,9 +96,10 @@ public class CrudServlet<T> implements IServlet {
 		}
 		assert true;
 		// new? No -- created by installing the code on your site
-		assert id.equals(publisher.id);
+//		assert id.equals(thing getId(state)publisher.id);
 		{	// update
-			UpdateRequestBuilder pu = es.prepareUpdate(config.publisherIndex(publisher.getStatus()), config.publisherType, id);
+			ESPath path = esRouter.getPath(type, id, KStatus.DRAFT);
+			UpdateRequestBuilder pu = es.prepareUpdate(path.index(), path.type, id);
 			pu.setDoc(json);		
 			IESResponse r = pu.get().check();
 		}
