@@ -82,7 +82,8 @@ public final class JThing<T> {
 	 * @param v
 	 */
 	public void put(String k, Object v) {
-		map().put(k, v);
+		map();
+		map.put(k, v);
 		java = null;
 		json = null;
 	}

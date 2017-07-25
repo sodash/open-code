@@ -26,6 +26,7 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.data.XId;
+import com.winterwell.web.fields.SField;
 /**
  * TODO refactor so adserver and sogive use this
  * @author daniel
@@ -60,7 +61,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			return;
 		}
 		// make a new thing?
-		if (state.actionIs("new")) {
+		if (state.actionIs("new") || "new".equals(getId(state))) {
 			// add is "special" as the only request that doesn't need an id
 			jthing = doNew(state);
 		}
@@ -132,7 +133,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		ESPath draftPath = esRouter.getPath(type, id, KStatus.DRAFT);
 		ESPath publishPath = esRouter.getPath(type, id, KStatus.PUBLISHED);		
 		Map<String, Object> obj = AppUtils.doPublish(draftPath, publishPath);
-		return jthing.java();
+		return (T) new JThing().setMap(obj).setType(type).java();
 	}
 
 	protected String getId(WebRequest state) {
@@ -172,6 +173,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected void doSave(WebRequest state) {
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
 		T thing = getThing(state);
+		assert thing != null : state;
 		// set modified = true
 		jthing.put("modified", true);
 		{	// update
@@ -197,6 +199,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		return jthing.java();
 	}
 
-	protected abstract String getJson(WebRequest state);
+	protected String getJson(WebRequest state) {
+		return state.get(new SField(AppUtils.ITEM.getName()));
+	}
 	
 }

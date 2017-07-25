@@ -47,6 +47,10 @@ public class AppUtils {
 		s.setIndices(path.indices[0]).setType(path.type).setId(path.id);
 		s.setSourceOnly(true);
 		GetResponse sr = s.get();
+		if (sr.isSuccess()) {
+			Map<String, Object> json = sr.getSourceAsMap(); //SourceAsString();
+			return json;
+		}
 		Exception error = sr.getError();
 		if (error!=null) {
 			if (error instanceof WebEx.E404) {
@@ -60,13 +64,13 @@ public class AppUtils {
 			}
 			throw Utils.runtime(error);
 		}
-		Map<String, Object> json = sr.getSourceAsMap(); //SourceAsString();
-		return json;
+		return null;
 	}
 
 	
 	public static Map<String, Object> doPublish(ESPath draftPath, ESPath publishPath) {
 		Map<String, Object> draft = get(draftPath);
+		assert draft != null : draftPath;
 		// remove modified flag
 		if (draft.containsKey("modified")) {
 			draft.put("modified", false);
