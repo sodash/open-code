@@ -3,6 +3,7 @@ package com.winterwell.web.app;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.winterwell.data.JThing;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.client.DeleteRequestBuilder;
 import com.winterwell.es.client.ESConfig;
@@ -85,27 +86,27 @@ public class AppUtils {
 		IESResponse ok = del.get().check();		
 	}
 
-	public static Map<String,Object> doSaveEdit(ESPath path, Map item, WebRequest state) {
+	public static JThing doSaveEdit(ESPath path, JThing item, WebRequest state) {
 		assert path.index().toLowerCase().contains("draft") : path;
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		XId user = state.getUserId();
 //		Map item = (Map) state.get(ITEM);		
-		String version = state.get("version");
+//		String version = state.get("version");
 //		boolean isDraft = "draft".equals(version) || version==null;
 //		assert isDraft : version;
 //		item.put("modified", isDraft);
 		// turn it into a charity (runs some type correction)
 //		NGO mod = Thing.getThing(item, NGO.class);		
 		// save update		
-		String id = (String) item.get("@id"); //mod.getId();
-		if (id==null) id = (String) item.get("id");
+		String id = (String) item.map().get("@id"); //mod.getId();
+		if (id==null) id = (String) item.map().get("id");
 		assert id != null && ! id.equals("new");
 		assert id.equals(path.id) : path+" vs "+id;
 //		String idx = isDraft? config.charityDraftIndex : config.charityIndex;		
 		UpdateRequestBuilder up = client.prepareUpdate(path.index(), path.type, path.id);
 //		item = new ArrayMap("name", "foo"); // FIXME
 		// This should merge against what's in the DB
-		up.setDoc(item);
+		up.setDoc(item.map());
 		up.setDocAsUpsert(true);
 		// NB: this doesn't return the merged item :(
 		IESResponse resp = up.get().check();
