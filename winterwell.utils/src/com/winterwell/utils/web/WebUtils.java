@@ -1361,10 +1361,12 @@ public class WebUtils {
 	public static URI resolveUri(String base, String extension) {
 		if (extension==null) {
 			return URI(base);
-		}
+		}		
 		// Is it an absolute url? Then stop here
 		URI ext = URI(extension);
 		if (ext.isAbsolute()) return ext;
+		// a relative url?!
+		if (base==null) return ext;
 		// if ( ! base.endsWith("/")) base += "/";
 		// hack
 		URI b = URI(base);
