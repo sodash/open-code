@@ -72,7 +72,7 @@ public class MasterHttpServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {		
-		WebRequest request = null;
+		WebRequest request = null; // NB: If Eclipse says "resource leak" it's wrong -- the finally clause does it
 		String path = null;
 		try {
 			Thread.currentThread().setName("web "+path);

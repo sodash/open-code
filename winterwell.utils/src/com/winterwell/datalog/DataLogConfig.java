@@ -87,7 +87,7 @@ public class DataLogConfig extends DBOptions {
 
 
 	@Option(description="If true, Java will set CORS cross-domain access headers. Note that this can cause bugs if NGinx is also setting them.")
-	public boolean CORS;
+	public boolean CORS = true;
 
 
 }
