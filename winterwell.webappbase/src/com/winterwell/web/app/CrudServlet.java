@@ -23,6 +23,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.data.XId;
 /**
@@ -33,6 +34,16 @@ import com.winterwell.web.data.XId;
  */
 public abstract class CrudServlet<T> implements IServlet {
 
+
+	public CrudServlet(Class<T> type) {
+		this(type, Dep.get(IESRouter.class));
+	}
+	
+	public CrudServlet(Class<T> type, IESRouter esRouter) {
+		this.type = type;
+		this.esRouter = esRouter;
+		Utils.check4null(type, esRouter);
+	}
 
 	protected JThing<T> doDiscardEdits(WebRequest state) {
 		ESPath path = esRouter.getPath(type, getId(state), KStatus.DRAFT);
@@ -65,23 +76,55 @@ public abstract class CrudServlet<T> implements IServlet {
 			doPublish(state);
 		}
 		// return json?
+		getThing(state);
+		if (jthing==null) jthing = getThingFromDB(state); 
 		if (jthing != null) {			
 			String json = jthing.string();
 			JsonResponse output = new JsonResponse(state).setCargoJson(json);
 			WebUtils2.sendJson(output, state);
 			return;
 		}
+		if (state.getAction()==null) {
+			throw new WebEx.E404(state.getRequestUrl());
+		}
 		JsonResponse output = new JsonResponse(state);
 		WebUtils2.sendJson(output, state);
 	}
 	
+	protected JThing<T> getThingFromDB(WebRequest state) {		
+		ESPath path = getPath(state);
+		Map<String, Object> obj = AppUtils.get(path);
+		if (obj==null) {
+			// was version=draft?
+			if (state.get(AppUtils.STATUS)==KStatus.DRAFT) {
+				// Try for the published version
+				WebRequest state2 = new WebRequest(state.request, state.response);
+				state2.put(AppUtils.STATUS, KStatus.PUBLISHED);
+				return getThingFromDB(state2);
+			}
+			return null;
+		}
+		return new JThing().setMap(obj).setType(type);
+	}
+
+	protected ESPath getPath(WebRequest state) {
+		assert state != null;
+		ESPath path = esRouter.getPath(type, getId(state), state.get(AppUtils.STATUS, KStatus.PUBLISHED));
+		return path;
+	}
+
+	/**
+	 * Make a new thing. The state will often contain json info for this.
+	 * @param state
+	 * @return
+	 */
 	protected abstract JThing<T> doNew(WebRequest state);
 
-	protected ESHttpClient es;
-	protected Class<T> type;
+	protected ESHttpClient es = Dep.get(ESHttpClient.class);
+	protected final Class<T> type;
 	protected JThing<T> jthing;
 
-	IESRouter esRouter;
+	final IESRouter esRouter;
 
 	protected T doPublish(WebRequest state) {
 		String id = getId(state);
@@ -129,33 +172,28 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected void doSave(WebRequest state) {
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
 		T thing = getThing(state);
-		if (thing instanceof IInit) {
-			((IInit) thing).init();
-		}
-		assert true;
-		// new? No -- created by installing the code on your site
-//		assert id.equals(thing getId(state)publisher.id);		
+		// set modified = true
+		jthing.put("modified", true);
 		{	// update
 			String id = getId(state);
 			ESPath path = esRouter.getPath(type, id, KStatus.DRAFT);
 			AppUtils.doSaveEdit(path, jthing, state);
-			UpdateRequestBuilder pu = es.prepareUpdate(path.index(), path.type, id);
-			String json = getJson(state);
-			pu.setDoc(json);		
-			IESResponse r = pu.get().check();
 		}
 	}
 	
 
-
+	/**
+	 * Get from field or state. Does NOT call the database.
+	 * @param state
+	 * @return
+	 */
 	protected T getThing(WebRequest state) {
 		if (jthing!=null) return jthing.java();
 		String json = getJson(state);
-		if (json==null) return null;
-		String id = getId(state);
-//		if (id.endsWith(".json")) id = id.substring(0, id.length()-5); not needed - done in slug??
-		Gson gson = Dep.get(Gson.class);
-		jthing = new JThing(json).setJava(gson.fromJson(json, type));
+		if (json==null) {
+			return null;
+		}
+		jthing = new JThing(json).setType(type);
 		return jthing.java();
 	}
 

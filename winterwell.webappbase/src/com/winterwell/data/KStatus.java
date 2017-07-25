@@ -36,5 +36,12 @@ public enum KStatus {
 	TRASH,
 
 	/** special value for use only in url parameters */
-	ALL_BAR_TRASH
+	ALL_BAR_TRASH;
+
+	/**
+	 * We only create two ES indices, matching published and draft 
+	 */
+	public static KStatus[] main() {
+		return new KStatus[] {PUBLISHED, DRAFT};
+	}
 }
