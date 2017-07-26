@@ -63,7 +63,7 @@ public final class JThing<T> {
 	
 	public T java() {
 		if (java==null && string() != null) {
-			assert type != null : this;
+			assert type != null : "Call setType() first "+this;
 			java = Dep.get(Gson.class).fromJson(string(), type);
 			if (java instanceof IInit) {
 				((IInit) java).init();
