@@ -35,7 +35,7 @@ import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.XStreamUtils;
 
 /**
- * Describes how to make a data artifact.
+ * The keys in Depot. Describes how to make a data artifact.
  * <p>
  * fields/properties must be primitives or other ArtifactDescriptions! Complex
  * objects would risk memory leaks and serialisation problems.
