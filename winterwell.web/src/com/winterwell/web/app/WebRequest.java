@@ -676,7 +676,7 @@ public class WebRequest implements IProperties, Closeable {
 	 *         you call {@link #sendRedirect()}.
 	 *         <p>
 	 *         Can be set via {@link #setRedirect(String)} or by the request itself using 
-	 *         {@link #REDIRECT_REQUEST}
+	 *         {@link #REDIRECT_REQUEST} (e.g. put link=myurl into the request url)
 	 */
 	public final String getRedirect() {
 		return redirect;
