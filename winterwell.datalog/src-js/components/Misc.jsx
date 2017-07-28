@@ -1,13 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
-// FormControl
-import {Checkbox,Textarea, InputGroup, DropdownButton, MenuItem} from 'react-bootstrap';
-import DataStore from '../plumbing/DataStore';
+// FormControl removed in favour of basic <inputs> while debugging input lag
+import { Checkbox, InputGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import {assert, assMatch} from 'sjtest';
 import _ from 'lodash';
 import Enum from 'easy-enums';
+
+import DataStore from '../plumbing/DataStore';
 import printer from '../utils/printer.js';
 import C from '../C.js';
 import I18n from 'easyi18n';
@@ -73,7 +73,7 @@ Misc.Logo = ({service, size, transparent}) => {
 	if (size) klass += " logo-"+size;
 	let file = '/img/'+service+'-logo.svg';
 	if (service === 'instagram') file = '/img/'+service+'-logo.png';
-	if (service === 'sogive') {
+	if (service === 'goodloop') {
 		file = '/img/logo.png';
 		// if (transparent === false) file = '/img/SoGive-Light-70px.png';
 	}
@@ -293,6 +293,11 @@ Misc.ImgThumbnail = ({url}) => url? <img className='logo' style={{maxWidth:'100%
  * Plus since we're providing state handling, we don't need a full component.
  */
 const FormControl = (props) => {
+	// avoid null
+	if (props.value === null) {
+		props = Object.assign({}, props);
+		props.value = '';
+	}
 	return <input className='form-control' {...props} />;
 };
 

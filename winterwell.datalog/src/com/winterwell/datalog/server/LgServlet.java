@@ -129,6 +129,7 @@ public class LgServlet {
 				params.put("url", cref);
 				// domain (e.g. sodash.com) & host (e.g. www.sodash.com)				
 				params.put("domain", WebUtils2.getDomain(cref)); 
+				// host is the one to use!
 				params.put("host", WebUtils2.getHost(cref)); // matches publisher in adverts
 			}
 		}

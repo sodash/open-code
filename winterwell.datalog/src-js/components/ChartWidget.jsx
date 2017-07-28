@@ -80,7 +80,8 @@ const makeDataSet = (i, label, xydata) => {
 		label: label,
 		fill: false,
 
-		// lineTension: 0.1,
+		lineTension: 0.05, // higher, and spikes can turn into loopy calligraphy
+		// cubicInterpolationMode: 'monotone',
 		backgroundColor: color, // TODO 0.4 alpha
 		borderColor: color,
 		// borderCapStyle: 'butt',

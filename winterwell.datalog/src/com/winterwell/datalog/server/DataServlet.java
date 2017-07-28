@@ -64,7 +64,8 @@ public class DataServlet implements IServlet {
 				Arrays.asList(
 //						"tag/time {count:avg}", 
 						"evt/time", 
-//						"publisher", 
+						"publisher", 
+						"host",
 						"domain",
 //						"evt"
 						"campaign", 

@@ -12,7 +12,7 @@ import DataStore from '../plumbing/DataStore';
 // import ChartWidget from './ChartWidget';
 import Misc from './Misc';
 import ChartWidget from './ChartWidget';
-
+import SearchQuery from '../searchquery';
 
 class DashboardPage extends React.Component {
 
@@ -30,7 +30,7 @@ class DashboardPage extends React.Component {
 		const dataspace = DataStore.getUrlValue('dataspace');
 		const query = DataStore.getUrlValue('q');
 		let filters = {dataspace, query};
-		let breakdowns = ['time', 'evt', 'domain'];
+		let breakdowns = ['time', 'evt', 'host'];
 
 		let dspec = JSON.stringify(filters)+" "+JSON.stringify(breakdowns);
 		const dpath = ['widget', 'Dashboard', dspec];		
@@ -76,7 +76,7 @@ class DashboardPage extends React.Component {
 		console.warn("pivot", "cdata", evtdata2, 'from', mydata, 'tdata', tdata, 'tdata2', tdata2);
 
 		// breakdown data
-		let byDomainData = pivot(mydata, "'by_domain' -> 'buckets' -> bi -> {key, doc_count}", "key -> doc_count");		
+		let byDomainData = pivot(mydata, "'by_host' -> 'buckets' -> bi -> {key, doc_count}", "key -> doc_count");		
 
 		// display...
 		return (
@@ -91,8 +91,8 @@ class DashboardPage extends React.Component {
 
 				<ChartWidget title='Events' dataFromLabel={evtdata2} />
 
-				<DashboardWidget title="By Domain (Publisher) -- (summing all events!)">
-					<BreakdownWidget data={byDomainData} />
+				<DashboardWidget title="By Host (Publisher) -- (summing all events!)">
+					<BreakdownWidget data={byDomainData} param='host' />
 				</DashboardWidget>
 			</div>
 		);
@@ -114,16 +114,40 @@ const DashboardWidget = ({ children, iconClass, title }) =>
 const DashTitleIcon = ({ iconClass }) =>
 	<i className={iconClass} aria-hidden="true" />;
 
+const filtersEditorPath = ['widget', 'Dashboard', 'filters.editor'];
+/**
+ * Set e.g. publisher:thesun as a query filter
+ * @param {String} param 
+ * @param {*} key 
+ */
+const addFilter = (param, key) => {
+	// get the query
+	let q = DataStore.getUrlValue('q') || '';	
+	// modify it	
+	let sq = new SearchQuery(q);
+	let sq2 = sq.setProp(param, key);	
+	q = sq2.query;
+	// set it
+	// ...clear the editor (without an update, cos its coming next)
+	DataStore.setValue(filtersEditorPath, null);
+	// set	
+	DataStore.setUrlValue('q', q);
+};
 
-const BreakdownWidget = ({data}) => {
+const BreakdownWidget = ({data, param}) => {
 	let keys = Object.keys(data).sort( (k1, k2) => data[k1] > data[k2] );
-	let list = keys.map(k => <li key={'breakdown-'+k}>{k}: {data[k]}</li>);
-	return <ol>{list}</ol>;
+	let sum = Object.values(data).reduce((s, v) => s+v, 0);
+	let list = keys.map(k => <BreakdownLine key={k} k={k} param={param} value={data[k]} sum={sum} />);
+	return <div><ol>{list}</ol><p>Total: {sum}</p></div>;
+};
+const BreakdownLine = ({param, k, value, sum}) => {
+	return (<li><a href='' onClick={ (e) => { e.preventDefault(); e.stopPropagation(); addFilter(param, k); } } >
+				{k}: {value}
+			</a></li>);
 };
 
 const FiltersWidget = () => {
-	let path = ['widget', 'Dashboard', 'filters.editor'];
-	let filters = DataStore.getValue(path);
+	let filters = DataStore.getValue(filtersEditorPath);
 	if ( ! filters) {
 		// read unedited valued off the url
 		filters = {
@@ -131,7 +155,7 @@ const FiltersWidget = () => {
 			q: DataStore.getUrlValue('q'),
 		};
 		// and set in the editor (without an update)
-		DataStore.setValue(path, filters, false);
+		DataStore.setValue(filtersEditorPath, filters, false);
 	}
 	// click
 	const setFilters = () => {
@@ -141,8 +165,8 @@ const FiltersWidget = () => {
 		// <Misc.PropControl path={path} item={filters} prop='events' label='events' />
 		// <Misc.PropControl path={path} item={filters} prop='publisher' label='Publisher' />
 	return (<div className='well'>
-		<Misc.PropControl path={path} item={filters} prop='dataspace' label='Dataspace e.g. "gl" or "default"' />
-		<Misc.PropControl path={path} item={filters} prop='q' label='Query' />
+		<Misc.PropControl path={filtersEditorPath} item={filters} prop='dataspace' label='Dataspace e.g. "gl" or "default"' />
+		<Misc.PropControl path={filtersEditorPath} item={filters} prop='q' label='Query' />
 		<button className='btn btn-default' onClick={setFilters}>Load Data</button>
 	</div>);
 };

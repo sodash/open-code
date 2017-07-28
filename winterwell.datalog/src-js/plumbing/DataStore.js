@@ -133,7 +133,7 @@ class Store {
 	 * Update a single path=value.
 	 * Unlike update(), this can set {} or null values.
 	 * @param {String[]} path This path will be created if it doesn't exist (except if value===null)
-	 * @param {*} value 
+	 * @param {*} value The new value. Can be null to null-out a value.
 	 * @param {boolean} update Set to false to switch off sending out an update
 	 */
 	// TODO handle setValue(pathbit, pathbit, pathbit, value) too
