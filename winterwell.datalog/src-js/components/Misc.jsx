@@ -33,10 +33,15 @@ const CURRENCY = {
 	GBP: "£",
 	USD: "$"
 };
+/**
+ * Money span
+ * @param amount {MonetaryAmount|Number}
+ */
 Misc.Money = ({amount, precision}) => {
 	if (_.isNumber(amount) || _.isString(amount)) {
 		amount = {value: amount, currency:'GBP'};
 	}
+	if ( ! amount) amount = {};
 	return <span>{CURRENCY[amount.currency] || ''}{printer.prettyNumber(amount.value)}</span>;
 };
 /**
@@ -95,17 +100,18 @@ Misc.Icon = ({fa, size, ...other}) => {
  * @param prop The field being edited 
  * dflt {?Object} default value
  */
-Misc.PropControl = ({label, help, ...stuff}) => {
+Misc.PropControl = ({type, label, help, ...stuff}) => {
 	// label / help? show it and recurse
-	if (label || help) {
+	// NB: Checkbox has a different html layout :( -- handled below
+	if ((label || help) && ! Misc.ControlTypes.ischeckbox(type)) {
 		// Minor TODO help block id and aria-described-by property in the input
 		return (<div className="form-group">
 			{label? <label>{label}</label> : null}
-			<Misc.PropControl {...stuff} />
+			<Misc.PropControl type={type} {...stuff} />
 			{help? <span className="help-block">{help}</span> : null}
 		</div>);
 	}
-	let {prop, path, item, type, bg, dflt, saveFn, modelValueFromInput, ...otherStuff} = stuff;
+	let {prop, path, item, bg, dflt, saveFn, modelValueFromInput, ...otherStuff} = stuff;
 	if ( ! modelValueFromInput) modelValueFromInput = standardModelValueFromInput;
 	assert( ! type || Misc.ControlTypes.has(type), type);
 	assert(_.isArray(path), path);
@@ -126,7 +132,7 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 			if (saveFn) saveFn({path:path});		
 		};
 		if (value===undefined) value = false;
-		return (<Checkbox checked={value} onChange={onChange} {...otherStuff} />);
+		return (<Checkbox checked={value} onChange={onChange} {...otherStuff}>{label}</Checkbox>);
 	}
 	if (value===undefined) value = '';
 	// £s
@@ -152,9 +158,11 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 		let changeCurrency = otherStuff.changeCurrency || true;
 		if (changeCurrency) {
 			// TODO other currencies
-			currency = (<DropdownButton title={curr} componentClass={InputGroup.Button} id={'input-dropdown-addon-'+JSON.stringify(path2)} >
-          					<MenuItem key="1">{curr}</MenuItem>
-			</DropdownButton>);
+			currency = (
+				<DropdownButton title={curr} componentClass={InputGroup.Button} id={'input-dropdown-addon-'+JSON.stringify(path2)}>
+					<MenuItem key="1">{curr}</MenuItem>
+				</DropdownButton>
+			);
 		} else {
 			currency = <InputGroup.Addon>{curr}</InputGroup.Addon>;
 		}
@@ -222,24 +230,37 @@ Misc.PropControl = ({label, help, ...stuff}) => {
 		let datePreview = value? 'not a valid date' : null;
 		try {
 			let date = new Date(value);
-			datePreview = date.toLocaleDateString();
+			datePreview = date.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
 		} catch (er) {
 			// bad date
 		}
 		// let's just use a text entry box -- c.f. bugs reported https://github.com/winterstein/sogive-app/issues/71 & 72
+		// Encourage ISO8601 format
+		if ( ! otherStuff.placeholder) otherStuff.placeholder = 'yyyy-mm-dd, e.g. today is '+isoDate(new Date());
 		return (<div>
 			<FormControl type='text' name={prop} value={value} onChange={onChange} {...otherStuff} />
 			<div className='pull-right'><i>{datePreview}</i></div>
 			<div className='clearfix' />
 		</div>);
 	}
+	if (type==='select') {
+		let options = otherStuff.options;
+		delete otherStuff.options;
+		assert(options, [prop, otherStuff]);
+		assert(options.map, options);
+		let domOptions = options.map(option => <option key={"option_"+option} value={option} >{option}</option>);
+		return (<select className='form-control' name={prop} value={value} onChange={onChange} {...otherStuff} >
+				{domOptions}
+			</select>);
+	}
 	// normal
 	// NB: type=color should produce a colour picker :)
 	return <FormControl type={type} name={prop} value={value} onChange={onChange} {...otherStuff} />;
 };
 
-Misc.ControlTypes = new Enum("img textarea text password email url color MonetaryAmount checkbox"
+Misc.ControlTypes = new Enum("img textarea text select password email url color MonetaryAmount checkbox"
 							+" location date year number arraytext");
+
 
 /**
  * Convert inputs (probably text) into the model's format (e.g. numerical)
@@ -257,6 +278,11 @@ const standardModelValueFromInput = (inputValue, type) => {
 };
 
 const oh = (n) => n<10? '0'+n : n;
+/**
+ * @param d {Date}
+ * @returns {String}
+ */
+const isoDate = (d) => d.toISOString().replace(/T.+/, '');
 
 // Misc.SiteThumbnail = ({url}) => url? <a href={url} target='_blank'><iframe style={{width:'150px',height:'100px'}} src={url} /></a> : null;
 
@@ -268,6 +294,30 @@ Misc.ImgThumbnail = ({url}) => url? <img className='logo' style={{maxWidth:'100%
  */
 const FormControl = (props) => {
 	return <input className='form-control' {...props} />;
+};
+
+/**
+ * save buttons
+ * TODO auto-save on edit -- copy from sogive
+ */
+Misc.SavePublishDiscard = ({type, id}) => {
+	assert(C.TYPES.has(type));
+	assMatch(id, String);
+	let transientStatus = DataStore.getValue('transient', id, 'status');
+	let isSaving = C.STATUS.issaving(transientStatus);	
+	return (<div>
+		<button className='btn btn-primary' disabled={isSaving} onClick={() => ActionMan.saveEdits(type, id)}>
+			Save Edits {isSaving? <span className="glyphicon glyphicon-cd spinning" /> : null}
+		</button>
+		&nbsp;
+		<button className='btn btn-primary' disabled={isSaving} onClick={() => ActionMan.publishEdits(type, id)}>
+			Publish Edits {isSaving? <span className="glyphicon glyphicon-cd spinning" /> : null}
+		</button>
+		&nbsp;
+		<button className='btn btn-warning' disabled={isSaving} onClick={() => ActionMan.discardEdits(type, id)}>
+			Discard Edits {isSaving? <span className="glyphicon glyphicon-cd spinning" /> : null}
+		</button>
+	</div>);
 };
 
 export default Misc;

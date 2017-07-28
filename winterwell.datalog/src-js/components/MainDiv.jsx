@@ -44,6 +44,14 @@ class MainDiv extends Component {
 		Login.app = 'datalog';
 		// Set up login watcher here, at the highest level		
 		Login.change(() => {
+			// ?? should we store and check for "Login was attempted" to guard this??
+			if (Login.isLoggedIn()) {
+				// close the login dialog on success
+				DataStore.setShow('LoginWidget', false);
+			} else {
+				// poke React via DataStore (e.g. for Login.error)
+				DataStore.update({});
+			}
 			this.setState({});
 		});
 	}

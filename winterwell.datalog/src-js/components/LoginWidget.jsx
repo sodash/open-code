@@ -23,6 +23,7 @@ if (false && window.location.host.indexOf('local') !== -1) {
 
 
 const SocialSignin = ({verb, services}) => {
+	if (verb==='reset') return null;
 	return (
 		<div className="social-signin">
 			<div className={services && services.indexOf('twitter') === -1? "hidden" : "form-group"}>
@@ -47,76 +48,21 @@ const SocialSignin = ({verb, services}) => {
 	);
 };
 
-// Annoyingly -- this is likely to fail the first time round! They use a popup which gets blocked :(
-// Possible fixes: Load FB on page load (but then FB track everyone)
-// Use a redirect (i.e. server side login)
-const doFBLogin = function() {	
-	console.warn("FB.login...");
-	FB.login(function(response) {
-		console.warn("FB.login", response);
-		if (response.status === 'connected') {
-			doFBLogin_connected(response);
-		} else {
-			// fail
-		}
-	}); //, {scope: 'public_profile,email,user_friends'}); // what permissions??
-	// see https://developers.facebook.com/docs/facebook-login/permissions
-};
-
-const doFBLogin_connected = (response) => {
-	let ar = response.authResponse;
-	// ar.userID;
-	// ar.accessToken;
-	// ar.expiresIn;	
-	Login.setUser({
-		xid: ar.userID+'@facebook'
-	});
-	// ask for extra data (what you get depends on the permissions, but the ask is harmless)
-	FB.api('/me?fields=name,about,cover,age_range,birthday,email,gender,relationship_status,website', function(meResponse) {
-		console.warn('Successful login for: ' + meResponse.name, meResponse);
-		Login.setUser({
-			xid: ar.userID+'@facebook',
-			name: meResponse.name
-		});
-	});
-	// close the dialog on success
-	DataStore.setShow(C.show.LoginWidget, false);
-};
 
 const socialLogin = (service) => {
-	if (service==='facebook') {
-		if (window.FB) {
-			doFBLogin();
-			return;
-		}
-		window.fbAsyncInit = function() {
-			FB.init({
-				appId            : '320927325010346', // Good-Loop FB app-id
-				autoLogAppEvents : false,
-				xfbml            : false,
-				version          : 'v2.9',
-				status           : true // auto-check login
-			});
-			// FB.AppEvents.logPageView();
-			FB.getLoginStatus(function(response) {
-				console.warn("FB.getLoginStatus", response);
-				if (response.status === 'connected') {
-					doFBLogin_connected(response);
-				} else {
-					doFBLogin();
-				}
-			}); // ./login status
-		};
-		(function(d, s, id){
-			let fjs = d.getElementsByTagName(s)[0];
-			if (d.getElementById(id)) return;
-			let js = d.createElement(s); js.id = id;
-			js.src = "//connect.facebook.net/en_US/sdk.js";
-			fjs.parentNode.insertBefore(js, fjs);
-		}(document, 'script', 'facebook-jssdk'));
-		return;
-	} // ./fb
-	Login.auth(service, 'good-loop');
+	Login.auth(service, Login.app);
+	// auth doesnt return a future, so rely on Login's change listener
+	// to close stuff.
+	// .then(function(res) {
+	// 	console.warn("socialLogin", res);
+	// 	if (Login.isLoggedIn()) {
+	// 		// close the dialog on success
+	// 		DataStore.setShow(C.show.LoginWidget, false);
+	// 	} else {
+	// 		// poke React via DataStore (e.g. for Login.error)
+	// 		DataStore.update({});
+	// 	}
+	// });	
 }; // ./socialLogin
 
 

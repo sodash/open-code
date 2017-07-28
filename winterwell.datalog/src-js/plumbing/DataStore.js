@@ -1,6 +1,4 @@
 
-// copy-pasta from adserver/src!
-
 import C from '../C.js';
 import _ from 'lodash';
 import {getType} from '../data/DataClass';
@@ -83,7 +81,6 @@ class Store {
 	 * It is a good idea to wrap your callback in _.debounce()
 	 */
 	addListener(callback) {
-		// add in a debounce for the callbacks??
 		this.callbacks.push(callback);
 	}
 
@@ -171,7 +168,7 @@ class Store {
 	/**
 	* Set widget.thing.show
 	 * @param {String} thing The name of the widget.
-	 * @param {boolean} showing 
+	 * @param {Boolean} showing 
 	 */
 	setShow(thing, showing) {
 		assMatch(thing, String);
