@@ -84,12 +84,22 @@ public class DataServlet implements IServlet {
 		
 		Time start = new Time().minus(TUnit.MONTH);
 		Time end = new Time();
+		String q = state.get("q");
+		// TODO search spec q, and get out the host
+		
 		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
 				.from(start.toISOString(), true)
 				.to(end.toISOString(), true);
 		
 		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
 				.must(timeFilter);
+		
+		// TODO
+		String host = null;
+		if (host!=null) {
+			QueryBuilder kvFilter = QueryBuilders.termQuery("host", host);
+			filter = filter.must(kvFilter);
+		}
 		
 //		// HACK tag match
 //		String tag = (String) spec.props.get("tag");
