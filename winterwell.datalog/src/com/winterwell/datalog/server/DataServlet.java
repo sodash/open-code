@@ -34,6 +34,7 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
+import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
 import com.winterwell.web.fields.TimeField;
@@ -83,7 +84,8 @@ public class DataServlet implements IServlet {
 		
 		SearchRequestBuilder search = esc.prepareSearch(index);
 //		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
-		search.setSize(0); // just the stats
+		Integer size = state.get(new IntField("size"), 10);
+		search.setSize(size); // TODO 0 = just the stats
 		
 		// search parameters
 		// time box
@@ -145,7 +147,8 @@ public class DataServlet implements IServlet {
 		SearchResponse sr = search.get();
 		
 		Map aggregations = sr.getAggregations();
-				
+		// also send eg data
+		aggregations.put("examples", sr.getHits());
 		JsonResponse jr = new JsonResponse(state, aggregations);
 		WebUtils2.sendJson(jr, state);
 	}

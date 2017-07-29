@@ -240,7 +240,7 @@ public class ESStorage implements IDataLogStorage {
 		}
 	}
 
-	public String indexFromDataspace(String dataspace) {
+	public static String indexFromDataspace(String dataspace) {
 		assert ! Utils.isBlank(dataspace);
 		assert ! dataspace.startsWith("datalog.") : dataspace;
 		String idx = "datalog."+dataspace;
