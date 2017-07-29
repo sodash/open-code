@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.winterwell.utils.Constant;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
 
@@ -18,7 +19,7 @@ import com.winterwell.utils.time.TimeUtils;
  * @author daniel
  * @testedby {@link TimeFieldTest}
  */
-public class TimeField extends AField<Callable<Time>> {
+public class TimeField extends AField<ICallable<Time>> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,7 +36,7 @@ public class TimeField extends AField<Callable<Time>> {
 	 * finally {@link TimeUtils#parseExperimental(String)}.
 	 */
 	@Override
-	public Callable<Time> fromString(String v) {
+	public ICallable<Time> fromString(String v) {
 		AtomicBoolean isRel = new AtomicBoolean();
 		// HACK fixing bugs elsewhere really. Handle "5+days+ago" from a query
 		v = v.replace('+', ' ');		
@@ -50,7 +51,7 @@ public class TimeField extends AField<Callable<Time>> {
 	}
 
 	@Override
-	public String toString(Callable<Time> _time) {
+	public String toString(ICallable<Time> _time) {
 		// relative?
 		if (_time instanceof RelTime) {
 			return ((RelTime) _time).v;
@@ -68,13 +69,13 @@ public class TimeField extends AField<Callable<Time>> {
 	}
 
 	@Override
-	public Class<Callable<Time>> getValueClass() {
+	public Class<ICallable<Time>> getValueClass() {
 		return (Class) Callable.class;
 	}
 }
 
 
-final class RelTime implements Callable<Time>, Serializable {
+final class RelTime implements ICallable<Time>, Serializable {
 	private static final long serialVersionUID = 1L;
 	final String v;
 	
@@ -88,7 +89,7 @@ final class RelTime implements Callable<Time>, Serializable {
 	}
 
 	@Override
-	public Time call() throws Exception {
+	public Time call() {
 		return TimeUtils.parseExperimental(v);
 	}
 }

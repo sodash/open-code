@@ -3,6 +3,7 @@ package com.winterwell.utils;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.threads.IFuture;
 
 /**
@@ -11,7 +12,7 @@ import com.winterwell.utils.threads.IFuture;
  *
  * @param <V>
  */
-public class Constant<V> implements Callable<V>, IFuture<V> {
+public final class Constant<V> implements ICallable<V>, IFuture<V> {
 	private final V v;
 
 	public Constant(V value) {

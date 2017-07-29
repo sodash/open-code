@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -25,6 +26,7 @@ import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.SimpleJson;
@@ -34,6 +36,7 @@ import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
+import com.winterwell.web.fields.TimeField;
 
 /**
  * Serves up aggregations data
@@ -82,31 +85,32 @@ public class DataServlet implements IServlet {
 //		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
 		search.setSize(0); // just the stats
 		
-		Time start = new Time().minus(TUnit.MONTH);
-		Time end = new Time();
+		// search parameters
+		// time box
+		ICallable<Time> cstart = state.get(new TimeField("start"));
+		Time start = cstart==null? new Time().minus(TUnit.MONTH) : cstart.call();
+		ICallable<Time> cend = state.get(new TimeField("end"));
+		Time end = cend==null? new Time() : cend.call();
+		// query
 		String q = state.get("q");
-		// TODO search spec q, and get out the host
+		if (q==null) q = "";
+		SearchQuery sq = new SearchQuery(q);
 		
 		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
 				.from(start.toISOString(), true)
 				.to(end.toISOString(), true);
 		
 		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
-				.must(timeFilter);
+				.must(timeFilter);		
 		
-		// TODO
-		String host = null;
-		if (host!=null) {
-			QueryBuilder kvFilter = QueryBuilders.termQuery("host", host);
-			filter = filter.must(kvFilter);
+		// filters
+		for(String prop : "host campaign".split(" ")) {
+			String host = sq.getProp(prop);
+			if (host!=null) {
+				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
+				filter = filter.must(kvFilter);
+			}
 		}
-		
-//		// HACK tag match
-//		String tag = (String) spec.props.get("tag");
-//		if (tag!=null) {
-//			QueryBuilder tagFilter = QueryBuilders.termQuery("tag", tag);
-//			filter = filter.must(tagFilter);
-//		}		
 		
 		search.setFilter(filter);
 		
