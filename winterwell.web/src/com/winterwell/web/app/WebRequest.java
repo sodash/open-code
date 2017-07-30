@@ -23,6 +23,7 @@ import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -52,6 +53,7 @@ public class WebRequest implements IProperties, Closeable {
 	public void removeCookie(String cookieName, String cookieDomain) {
 		String path = "/";;
 		// is null null valid??
+		if (freshCookies!=null) freshCookies.remove(cookieName);
 		WebUtils2.removeCookie(cookieName, getResponse(), cookieDomain, path);
 	}
 	
@@ -62,11 +64,25 @@ public class WebRequest implements IProperties, Closeable {
 	 * @see WebUtils2#addCookie(HttpServletResponse, String, Object, Dt, String)
 	 */
 	public void setCookie(String name, String value, Dt timeTolive, String cookieDomain) {
+		if (freshCookies==null) freshCookies = new ArrayMap();
+		freshCookies.put(name, value);
 		WebUtils2.addCookie(getResponse(), name, value, timeTolive, cookieDomain);
 	}
 
 
+	Map<String,String> freshCookies;
+	
+	/**
+	 * 
+	 * @param name
+	 * @return cookie value -- a fresh cookie from {@link #setCookie(String, String, Dt, String)}
+	 * or (normal) from the request.
+	 */
 	public String getCookie(String name) {
+		if (freshCookies!=null) {
+			String v = freshCookies.get(name);
+			if (v!=null) return v;
+		}
 		return WebUtils2.getCookie(getRequest(), name);
 	}
 
@@ -510,7 +526,7 @@ public class WebRequest implements IProperties, Closeable {
 				if (v != null)
 					return (T) v;
 				// Fall back to cookie
-				String cv = WebUtils2.getCookie(request, key.getName());
+				String cv = getCookie(key.getName());
 				if (cv != null)
 					return (T) field.fromString(cv);
 			} catch (MissingFieldException e) {

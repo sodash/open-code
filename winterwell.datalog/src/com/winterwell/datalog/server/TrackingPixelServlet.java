@@ -52,17 +52,17 @@ public class TrackingPixelServlet extends HttpServlet {
 
 	/**
 	 * @param state
-	 * @return can be null for do-not-track
+	 * @return can be null for do-not-track. Repeated calls 
 	 */
 	public static String getCreateCookieTrackerId(WebRequest state) {
 		if (state==null) return null;
-		String uid = WebUtils2.getCookie(state.getRequest(), "trkid");		
+		String uid = state.getCookie("trkid");		
 		if (uid!=null) return uid;
 		boolean dnt = state.isDoNotTrack();
 		// TODO if this user has opted-in, we can ignore DNT 
 //		if (dnt) return null; FIXME
 		uid = Utils.getRandomString(20)+"@trk";
-		WebUtils2.addCookie(state.getResponse(), "trkid", uid, TUnit.YEAR.dt, DataLogServer.settings.COOKIE_DOMAIN);
+		state.setCookie("trkid", uid, TUnit.YEAR.dt, DataLogServer.settings.COOKIE_DOMAIN);
 		return uid;
 	}
 	
@@ -154,14 +154,14 @@ public class TrackingPixelServlet extends HttpServlet {
 		}
 //		Log.d("track", ref+" via "+viav);
 		// 1st affiliate wins -- 2nd affiliate does not override
-		String oldVia = WebUtils2.getCookie(state.getRequest(), VIA.getName());
+		String oldVia = state.getCookie(VIA.getName());
 		if (oldVia==null) {
-			WebUtils2.addCookie(state.getResponse(), VIA.getName(), viav, TUnit.MONTH.dt, ".soda.sh");
+			state.setCookie(VIA.getName(), viav, TUnit.MONTH.dt, ".soda.sh");
 		} else if ( ! oldVia.equals(viav)) {
 			Log.d("track", ref+" new-via "+viav+" skipped due to old-via "+oldVia);
 		}
 		// but do put all the affiliates into a chain
-		String via2 = WebUtils2.getCookie(state.getRequest(), "via2");
+		String via2 = state.getCookie("via2");
 		if (Utils.isBlank(via2)) {
 			via2= viav; 
 		} else if (via2.endsWith(viav)) {
@@ -170,7 +170,7 @@ public class TrackingPixelServlet extends HttpServlet {
 		} else {
 			via2 += ","+viav; 
 		}
-		WebUtils2.addCookie(state.getResponse(), "via2", via2, TUnit.YEAR.dt, ".soda.sh");
+		state.setCookie("via2", via2, TUnit.YEAR.dt, ".soda.sh");
 		return oldVia==null? viav : oldVia;
 	}
 	

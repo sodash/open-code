@@ -1,5 +1,6 @@
 package com.winterwell.datalog;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +15,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.Warning;
 import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
@@ -110,9 +112,15 @@ public class DataLog {
 
 	private static IDataLog initDflt() {
 		try {
-			IDataLog dl = (IDataLog) Class.forName(CLASS_DATALOGIMPL)
-					.newInstance();
-			Dep.set(DataLogConfig.class, dl.getConfig());
+			DataLogConfig dlConfig = new DataLogConfig();
+			File propertiesFile = new File("config/datalog.properties");
+			if (propertiesFile.isFile()) {
+				new ArgsParser(dlConfig).set(propertiesFile);
+			}
+			IDataLog dl = setConfig(dlConfig);
+//			IDataLog dl = (IDataLog) Class.forName(CLASS_DATALOGIMPL)
+//					.newInstance();
+//			Dep.set(DataLogConfig.class, dl.getConfig());
 			return dl;
 		} catch (Exception e) {
 			// Bad!
@@ -274,8 +282,9 @@ public class DataLog {
 	 * Replace the default DataLog with a new one, as specified by config.
 	 *
 	 * @param myConfig
+	 * @return 
 	 */
-	public static void setConfig(DataLogConfig myConfig) {
+	public static IDataLog setConfig(DataLogConfig myConfig) {
 		if (dflt != null) {
 			try {
 				dflt.close();
@@ -294,6 +303,7 @@ public class DataLog {
 			Class<?> klass = Class.forName(CLASS_DATALOGIMPL);
 			Constructor<?> cons = klass.getConstructor(DataLogConfig.class);
 			dflt = (IDataLog) cons.newInstance(myConfig);
+			return dflt;
 		} catch (Exception ex) {
 			throw Utils.runtime(ex);
 		}

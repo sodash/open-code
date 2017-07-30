@@ -70,7 +70,9 @@ public class ESStore implements IStore {
 	private void initIndex(String index, String type) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		// make index
-		CreateIndexRequest pc = esc.admin().indices().prepareCreate(index);
+		String bindex = index+"_"+esc.getConfig().getIndexAliasVersion();
+		CreateIndexRequest pc = esc.admin().indices().prepareCreate(bindex);
+		pc.setAlias(index);
 		pc.get(); // this will fail if it already exists - oh well
 		// mapping
 		PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(index, type);

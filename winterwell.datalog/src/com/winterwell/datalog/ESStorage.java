@@ -33,12 +33,14 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
+import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Environment;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
@@ -52,6 +54,7 @@ import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
+import com.winterwell.web.fields.IntField;
 
 public class ESStorage implements IDataLogStorage {
 
@@ -190,11 +193,19 @@ public class ESStorage implements IDataLogStorage {
 		if (_client.admin().indices().indexExists(index)) {
 			return;
 		}
-		// make it
-		CreateIndexRequest pc = _client.admin().indices().prepareCreate(index);
+		// make it, with a base and an alias
+		// HACK
+		String v = _client.getConfig().getIndexAliasVersion();
+		String baseIndex = index+"_"+v;
+		CreateIndexRequest pc = _client.admin().indices().prepareCreate(baseIndex);
 		pc.setDefaultAnalyzer(Analyzer.keyword);
+		pc.setAlias(index);
 		IESResponse cres = pc.get();
-		cres.check();		
+		cres.check();
+//		IndicesAliasesRequest ar = _client.admin().indices().prepareAliases();
+//		ar.addAlias(baseIndex, index);
+//		ar.get().check();
+		
 		// register some standard event types??
 		try {
 			PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, typeFromEventType(simple));
@@ -375,6 +386,7 @@ public class ESStorage implements IDataLogStorage {
 	public ESHttpClient client(String dataspace) {
 		assert ! dataspace.startsWith("datalog.") : dataspace;
 		ESConfig _config = Utils.or(config4dataspace.get(dataspace), esConfig);
+		assert _config != null : dataspace+" "+esConfig;
 		return new ESHttpClient(_config);
 	}
 
