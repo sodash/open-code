@@ -83,9 +83,10 @@ public class AppUtils {
 		// NB: this doesn't return the merged item :(
 		IESResponse resp = up.get().check();
 
-		// OK - delete the draft (ignoring the race condition!)
-		DeleteRequestBuilder del = client.prepareDelete(draftPath.index(), draftPath.type, draftPath.id);
-		IESResponse ok = del.get().check();		
+		// Keep the draft!
+//		// OK - delete the draft (ignoring the race condition!)
+//		DeleteRequestBuilder del = client.prepareDelete(draftPath.index(), draftPath.type, draftPath.id);
+//		IESResponse ok = del.get().check();		
 
 		return draft;
 	}
@@ -99,22 +100,15 @@ public class AppUtils {
 	public static JThing doSaveEdit(ESPath path, JThing item, WebRequest state) {
 		assert path.index().toLowerCase().contains("draft") : path;
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-		XId user = state.getUserId();
-//		Map item = (Map) state.get(ITEM);		
-//		String version = state.get("version");
-//		boolean isDraft = "draft".equals(version) || version==null;
-//		assert isDraft : version;
-//		item.put("modified", isDraft);
-		// turn it into a charity (runs some type correction)
-//		NGO mod = Thing.getThing(item, NGO.class);		
+		XId user = state.getUserId();		
 		// save update		
+		// sanity check id matches path
 		String id = (String) item.map().get("@id"); //mod.getId();
 		if (id==null) id = (String) item.map().get("id");
-		assert id != null && ! id.equals("new");
+		assert id != null && ! id.equals("new") : "use action=new "+state;
 		assert id.equals(path.id) : path+" vs "+id;
-//		String idx = isDraft? config.charityDraftIndex : config.charityIndex;		
+		// save to ES
 		UpdateRequestBuilder up = client.prepareUpdate(path);
-//		item = new ArrayMap("name", "foo"); // FIXME
 		// This should merge against what's in the DB
 		up.setDoc(item.map());
 		up.setDocAsUpsert(true);

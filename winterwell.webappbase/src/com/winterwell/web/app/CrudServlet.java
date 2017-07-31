@@ -1,10 +1,14 @@
 package com.winterwell.web.app;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.util.ajax.JSON;
+import org.elasticsearch.index.query.Operator;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
@@ -61,12 +65,14 @@ public abstract class CrudServlet<T> implements IServlet {
 			return;
 		}
 		// make a new thing?
-		if (state.actionIs("new") || "new".equals(getId(state))) {
+		if (state.actionIs("new")) {
 			// add is "special" as the only request that doesn't need an id
-			jthing = doNew(state);
+			String id = getId(state);
+			jthing = doNew(state, id);
+			jthing.setType(type);
 		}
 		// save?
-		if (state.actionIs("save")) {
+		if (state.actionIs("save") || state.actionIs("new")) {
 			doSave(state);
 		}
 		if (state.actionIs("discard-edits")) {
@@ -94,8 +100,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 	protected JThing<T> getThingFromDB(WebRequest state) {		
 		ESPath path = getPath(state);
-		Map<String, Object> obj = AppUtils.get(path);
+		Map<String, Object> obj = AppUtils.get(path);		
 		if (obj==null) {
+			// Not found :(
 			// was version=draft?
 			if (state.get(AppUtils.STATUS)==KStatus.DRAFT) {
 				// Try for the published version
@@ -119,13 +126,19 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param state
 	 * @return
 	 */
-	protected abstract JThing<T> doNew(WebRequest state);
+	protected abstract JThing<T> doNew(WebRequest state, String id);
 
 	protected ESHttpClient es = Dep.get(ESHttpClient.class);
 	protected final Class<T> type;
 	protected JThing<T> jthing;
 
 	final IESRouter esRouter;
+	
+	/**
+	 * The focal thing's ID.
+	 * This might be newly minted for a new thing
+	 */
+	private String id;
 
 	protected T doPublish(WebRequest state) {
 		String id = getId(state);
@@ -137,37 +150,72 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 	protected String getId(WebRequest state) {
-		return state.getSlugBits(1);
+		if (id!=null) return id;
+		id = state.getSlugBits(1);
+		if ("new".equals(id)) {
+			id = Utils.or(state.getUserId(), state.get("name"), type.getSimpleName()).toString().toLowerCase()
+					+"_"+Utils.getRandomString(8);
+			// avoid ad, 'cos adblockers dont like it!
+			if (id.startsWith("ad")) {
+				id = id.substring(2, id.length());
+			}
+		}
+		return id;
 	}
 
 	protected void doList(WebRequest state) throws IOException {
-//		// copied from SoGive SearchServlet
-//		SearchRequestBuilder s = new SearchRequestBuilder(es).setIndices(
-//				config.publisherIndex(KStatus.PUBLISHED),
-//				config.publisherIndex(KStatus.PENDING),
-//				config.publisherIndex(KStatus.DRAFT), 
-//				config.publisherIndex(KStatus.REQUEST_PUBLISH));
-//		String q = state.get("q");
-//		if ( q != null) {
-//			QueryBuilder qb = QueryBuilders.multiMatchQuery(q, 
+		// copied from SoGive SearchServlet
+		SearchRequestBuilder s = new SearchRequestBuilder(es);
+		/// which index? draft+published by default
+		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
+		if (status!=null) {
+			s.setIndex(
+					esRouter.getPath(type, null, status).index()
+					);
+		} 
+//		else {
+//			s.setIndices(
+//					esRouter.getPath(type, null, KStatus.PUBLISHED).index(),
+//					esRouter.getPath(type, null, KStatus.DRAFT).index()
+//				);
+//		}
+		
+		// query
+		String q = state.get("q");
+		if ( q != null) {
+			// TODO match on all?
+			QueryBuilder qb = QueryBuilders.queryStringQuery(q);
+//			multimatchquery, 
 //					"id", "name", "keywords")
 //							.operator(Operator.AND);
-//			s.setQuery(qb);
+			s.setQuery(qb);
+		}
+		// TODO paging!
+		s.setSize(10000);
+		SearchResponse sr = s.get();
+		Map<String, Object> jobj = sr.getParsedJson();
+		List<Map> hits = sr.getHits();
+
+		// prefer draft? No - in the ad portal, draft holds a copy of all ads, pubs
+//		List hitSourcePreferDraft = new ArrayList(); 
+//		for (Map hit : hits) {
+//			Object index = hit.get("_index");
+//			Object src = hit.get("_source");
+//			System.out.println(hit);
+//			hitsPreferDraft.add(src);
 //		}
-//		// TODO paging!
-//		s.setSize(10000);
-//		SearchResponse sr = s.get();
-//		Map<String, Object> jobj = sr.getParsedJson();
-//		List<Map> hits = sr.getHits();
-//		List hits2 = Containers.apply(hits, h -> h.get("_source"));
-//		long total = sr.getTotal();
-//		String json = Dep.get(Gson.class).toJson(
-//				new ArrayMap(
-//					"hits", hits2, 
-//					"total", total
-//				));
-//		JsonResponse output = new JsonResponse(state).setCargoJson(json);
-//		WebUtils2.sendJson(output, state);
+		
+		List hits2 = Containers.apply(hits, h -> h.get("_source"));
+		
+		
+		long total = sr.getTotal();
+		String json = Dep.get(Gson.class).toJson(
+				new ArrayMap(
+					"hits", hits2, 
+					"total", total
+				));
+		JsonResponse output = new JsonResponse(state).setCargoJson(json);
+		WebUtils2.sendJson(output, state);		
 	}
 
 	protected void doSave(WebRequest state) {
@@ -190,7 +238,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @return
 	 */
 	protected T getThing(WebRequest state) {
-		if (jthing!=null) return jthing.java();
+		if (jthing!=null) {
+			return jthing.java();
+		}
 		String json = getJson(state);
 		if (json==null) {
 			return null;

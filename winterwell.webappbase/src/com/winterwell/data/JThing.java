@@ -24,10 +24,12 @@ public final class JThing<T> {
 	
 	/**
 	 * Usually needed (depending on the gson setup) for {@link #java()} to deserialise json.
+	 * Note: Once set, you cannot change the type (repeated calls with the same type are fine).
 	 * @param type
-	 * @return
+	 * @return this
 	 */
 	public JThing<T> setType(Class<T> type) {
+		assert this.type==null || this.type.equals(type) : this.type+" != "+type;
 		this.type = type;
 		return this;
 	}
@@ -52,7 +54,11 @@ public final class JThing<T> {
 	}
 	
 	public Map<String, Object> map() {
-		if (map==null && json!=null) map = (Map<String, Object>) JSON.parse(json);
+		if (map==null && string()!=null) map = (Map<String, Object>) JSON.parse(json);
+		if (map==null) {
+			//
+			return null;
+		}
 		return Collections.unmodifiableMap(map);
 	}
 	
