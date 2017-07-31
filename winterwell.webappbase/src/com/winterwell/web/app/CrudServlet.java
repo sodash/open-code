@@ -80,7 +80,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		// publish?
 		if (state.actionIs("publish")) {
-			doPublish(state);
+			jthing = doPublish(state);
+			assert jthing.string().contains(KStatus.PUBLISHED.toString()) : jthing;
 		}
 		// return json?
 		getThing(state);
@@ -140,13 +141,13 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	private String id;
 
-	protected T doPublish(WebRequest state) {
+	protected JThing doPublish(WebRequest state) {
 		String id = getId(state);
 		Utils.check4null(id); 
 		ESPath draftPath = esRouter.getPath(type, id, KStatus.DRAFT);
 		ESPath publishPath = esRouter.getPath(type, id, KStatus.PUBLISHED);		
 		Map<String, Object> obj = AppUtils.doPublish(draftPath, publishPath);
-		return (T) new JThing().setMap(obj).setType(type).java();
+		return new JThing().setMap(obj).setType(type);
 	}
 
 	protected String getId(WebRequest state) {
