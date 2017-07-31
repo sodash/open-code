@@ -145,9 +145,14 @@ public abstract class CrudServlet<T> implements IServlet {
 		String id = getId(state);
 		Utils.check4null(id); 
 		ESPath draftPath = esRouter.getPath(type, id, KStatus.DRAFT);
-		ESPath publishPath = esRouter.getPath(type, id, KStatus.PUBLISHED);		
-		Map<String, Object> obj = AppUtils.doPublish(draftPath, publishPath);
-		return new JThing().setMap(obj).setType(type);
+		ESPath publishPath = esRouter.getPath(type, id, KStatus.PUBLISHED);
+		// load (if not loaded)
+		getThing(state);
+		if (jthing==null) {
+			jthing = getThingFromDB(state);
+		}
+		JThing obj = AppUtils.doPublish(jthing, draftPath, publishPath);
+		return obj.setType(type);
 	}
 
 	protected String getId(WebRequest state) {

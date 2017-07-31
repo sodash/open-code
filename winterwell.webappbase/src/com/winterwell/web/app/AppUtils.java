@@ -68,11 +68,15 @@ public class AppUtils {
 	}
 
 	
-	public static Map<String, Object> doPublish(ESPath draftPath, ESPath publishPath) {
-		Map<String, Object> draft = get(draftPath);
+	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath) {
+		// prefer being given the draft to avoid ES race conditions
+		if (draft==null) {
+			Map<String, Object> draftMap = get(draftPath);
+			draft = new JThing().setMap(draftMap);
+		}
 		assert draft != null : draftPath;
 		// remove modified flag
-		if (draft.containsKey("modified")) {
+		if (draft.map().containsKey("modified")) {
 			draft.put("modified", false);
 		}
 		// set status
@@ -80,14 +84,14 @@ public class AppUtils {
 		// publish
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		UpdateRequestBuilder up = client.prepareUpdate(publishPath);
-		up.setDoc(draft);
+		up.setDoc(draft.map());
 		up.setDocAsUpsert(true);
 		// NB: this doesn't return the merged item :(
 		IESResponse resp = up.get().check();
 		
 		// Also update draft		
 		UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
-		upd.setDoc(draft);
+		upd.setDoc(draft.map());
 		upd.setDocAsUpsert(true);
 		IESResponse respd = upd.get().check();
 		

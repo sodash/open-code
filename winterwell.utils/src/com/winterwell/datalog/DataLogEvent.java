@@ -56,6 +56,12 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"to", String.class,
 			"src", String.class,
 			"from", String.class,
+			// content / advert properties
+			"pub", String.class,
+			"ad", String.class,
+			"vert", String.class,
+			"variant", String.class,
+			"campaign", String.class,
 			// text properties (support tokenisation)
 			"place", StringBuilder.class,
 			"locn", StringBuilder.class,
