@@ -75,6 +75,8 @@ public class AppUtils {
 		if (draft.containsKey("modified")) {
 			draft.put("modified", false);
 		}
+		// set status
+		draft.put("status", KStatus.PUBLISHED);
 		// publish
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		UpdateRequestBuilder up = client.prepareUpdate(publishPath);
@@ -82,7 +84,13 @@ public class AppUtils {
 		up.setDocAsUpsert(true);
 		// NB: this doesn't return the merged item :(
 		IESResponse resp = up.get().check();
-
+		
+		// Also update draft		
+		UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
+		upd.setDoc(draft);
+		upd.setDocAsUpsert(true);
+		IESResponse respd = upd.get().check();
+		
 		// Keep the draft!
 //		// OK - delete the draft (ignoring the race condition!)
 //		DeleteRequestBuilder del = client.prepareDelete(draftPath.index(), draftPath.type, draftPath.id);
@@ -99,6 +107,15 @@ public class AppUtils {
 
 	public static JThing doSaveEdit(ESPath path, JThing item, WebRequest state) {
 		assert path.index().toLowerCase().contains("draft") : path;
+		
+		// update status TODO factor out the status logic
+		Object s = item.map().get("status");
+		if (Utils.streq(s, KStatus.PUBLISHED)) {
+			item.put("status", KStatus.MODIFIED);
+		} else {
+			item.put("status", KStatus.DRAFT);
+		}
+		
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		XId user = state.getUserId();		
 		// save update		

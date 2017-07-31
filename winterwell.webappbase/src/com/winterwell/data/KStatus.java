@@ -10,6 +10,11 @@ public enum KStatus {
 	 * Status = 0, 
 	 */
 	DRAFT,
+	
+	/**
+	 * Published but there are unpublished edits
+	 */
+	MODIFIED,
 
 	/**
 	 * The author has requested publishing, but doesn't have the appropriate
@@ -18,7 +23,7 @@ public enum KStatus {
 	REQUEST_PUBLISH,
 	
 	 /**
-	 * The object is cleared for future publication.
+	 * The object is cleared for future publication. E.g. this is a scheduled Facebook post.
 	 */
 	PENDING,
 
