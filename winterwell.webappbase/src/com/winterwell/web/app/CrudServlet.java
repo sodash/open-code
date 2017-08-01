@@ -99,6 +99,11 @@ public abstract class CrudServlet<T> implements IServlet {
 		WebUtils2.sendJson(output, state);
 	}
 	
+	/**
+	 * 
+	 * @param state
+	 * @return thing or null
+	 */
 	protected JThing<T> getThingFromDB(WebRequest state) {		
 		ESPath path = getPath(state);
 		Map<String, Object> obj = AppUtils.get(path);		
