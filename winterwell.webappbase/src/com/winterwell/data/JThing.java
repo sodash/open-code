@@ -64,6 +64,8 @@ public final class JThing<T> {
 	
 	public JThing<T> setJava(T java) {
 		this.java = java;
+		map = null;
+		json = null;
 		return this;
 	}
 	
