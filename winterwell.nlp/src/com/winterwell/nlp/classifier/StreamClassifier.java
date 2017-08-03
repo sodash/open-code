@@ -45,8 +45,14 @@ public class StreamClassifier<Tok> implements ITextClassifier<String>, IStreamCl
 
 	ISitnStream<Tok> tokeniser;
 
-	public void setPrior(IFiniteDistribution<String> prior) {
+	/**
+	 * 
+	 * @param prior
+	 * @return this
+	 */
+	public StreamClassifier<Tok> setPrior(IFiniteDistribution<String> prior) {
 		this.prior = prior;
+		return this;
 	}
 	
 	/**
@@ -171,9 +177,11 @@ public class StreamClassifier<Tok> implements ITextClassifier<String>, IStreamCl
 	
 	/**
 	 * normally null. If set, it will pick top-tokens based on maximising P(topTokensTag)
+	 * @return this
 	 */
-	public void setTopTokensTag(String topTokensTag) {
+	public StreamClassifier<Tok> setTopTokensTag(String topTokensTag) {
 		this.topTokensTag = topTokensTag;
+		return this;
 	}
 
 	/**
@@ -182,9 +190,11 @@ public class StreamClassifier<Tok> implements ITextClassifier<String>, IStreamCl
 	 * To counteract several weak markers over-whelming a strong marker.
 	 * To slightly counteract the double-counting effect of correlated terms including repeated terms.		
 	 * Default: 20.
+	 * @return this
 	 */
-	public void setTopTokensFocus(int only_top_tokens) {
+	public StreamClassifier<Tok> setTopTokensFocus(int only_top_tokens) {
 		this.topTokensFocus = only_top_tokens;
+		return this;
 	}
 	
 	@Override
