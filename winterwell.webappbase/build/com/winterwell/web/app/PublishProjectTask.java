@@ -172,9 +172,11 @@ public class PublishProjectTask extends BuildTask {
 			}			
 			
 			// This jar
-			JarTask jarTask = new JarTask(jarFile, new File(localWebAppDir, "bin"));
-			jarTask.run();
-			jarTask.close();
+			if (jarFile!=null) {
+				JarTask jarTask = new JarTask(jarFile, new File(localWebAppDir, "bin"));
+				jarTask.run();
+				jarTask.close();
+			}
 		}
 		
 //		// Bash script which does the rsync work
