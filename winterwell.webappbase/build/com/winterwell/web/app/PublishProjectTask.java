@@ -70,9 +70,9 @@ public class PublishProjectTask extends BuildTask {
 	
 	/** typeOfPublish can be set to either 'test' or 'production' or 'local' (local=your machine only)
 	 */
-	protected String typeOfPublish = 
+	protected KPubType typeOfPublish = 
 //			"production";
-			"test";
+			KPubType.test;
 //			"local";
 	
 	// preClean can be set to 'clean' in order to sanitize a target before the files are synced to it
