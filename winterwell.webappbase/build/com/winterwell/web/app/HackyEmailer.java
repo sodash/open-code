@@ -35,7 +35,11 @@ public class HackyEmailer implements Closeable {
 	public static void init() {
 		if (initFlag) return;
 		initFlag = true;
-		Properties props = FileUtils.loadProperties(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.webappbase/local-config/local.properties"));
+		File propsFile = new File(FileUtils.getWinterwellDir(), "open-code/winterwell.webappbase/local-config/local.properties");
+		if ( ! propsFile.exists()) {
+			throw new ConfigException("Please make a file with email login details here: "+propsFile);
+		}
+		Properties props = FileUtils.loadProperties(propsFile);
 		LoginDetails ld = new LoginDetails(props.getProperty("server").trim(), 
 				props.getProperty("from").trim(), props.getProperty("password").trim(), 25);
 		ld.put(SMTPClient.USE_SSL, false);
