@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/flexi-gson"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.depot"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/youagain-java-client"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/elasticsearch"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

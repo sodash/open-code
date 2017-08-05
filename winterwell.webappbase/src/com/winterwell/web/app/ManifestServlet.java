@@ -41,12 +41,19 @@ public class ManifestServlet extends HttpServlet {
 	public static final String PROPERTY_GIT_COMMIT_INFO = "lastCommitInfo";
 	public static final String PROPERTY_PUBLISH_DATE = "publishDate";
 	
-	public static void saveVersionProperties() {
+	/**
+	 * Create version.properties
+	 */
+	public static void saveVersionProperties(File configDir) {
 		try {
-			File creolePropertiesForSite = new File("config", "version.properties");
+			File creolePropertiesForSite = new File(configDir, "version.properties");
 			Properties props = creolePropertiesForSite.exists()? FileUtils.loadProperties(creolePropertiesForSite) : new Properties();
 			// set the publish time
 			props.setProperty(PROPERTY_PUBLISH_DATE, ""+System.currentTimeMillis());
+			// TIMESTAMP code to avoid caching issues: epoch-seconds, mod 10000 to shorten it
+			String timestampCode = "" + ((System.currentTimeMillis()/1000) % 10000);
+			props.setProperty("timecode", ""+timestampCode);
+			
 			// set info on the git branch
 			String branch = GitTask.getGitBranch(null);
 			props.setProperty(PROPERTY_GIT_BRANCH, branch);

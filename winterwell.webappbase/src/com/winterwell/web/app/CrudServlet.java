@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.util.ajax.JSON;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
@@ -21,6 +20,7 @@ import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
+import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
@@ -195,11 +195,11 @@ public abstract class CrudServlet<T> implements IServlet {
 		String q = state.get("q");
 		if ( q != null) {
 			// TODO match on all?
-			QueryBuilder qb = QueryBuilders.queryStringQuery(q);
+			QueryStringQueryBuilder qsq = QueryBuilders.queryStringQuery(q);
 //			multimatchquery, 
 //					"id", "name", "keywords")
 //							.operator(Operator.AND);
-			s.setQuery(qb);
+			s.setQuery(qsq);
 		}
 		// TODO paging!
 		s.setSize(10000);

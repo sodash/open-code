@@ -12,7 +12,7 @@ import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
 
 /**
- * 
+ * TODO replace with the more advanced code in HackyEmailer
  * 
  * @author daniel. Uses free code supplied by Sudhir Ancha
  * 

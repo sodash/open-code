@@ -44,6 +44,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.XStreamUtils;
 import com.winterwell.web.LoginDetails;
 import com.winterwell.web.app.BuildWWAppBase;
+import com.winterwell.web.app.PublishProjectTask;
 import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
 import com.winterwell.youagain.client.BuildYouAgainJavaClient;
@@ -57,167 +58,17 @@ import jobs.BuildWeb;
 import jobs.BuildWinterwellProject;
 
 
-/**
- * FIXME rsync is making sub-dirs :(
- */
-public class PublishDataServer extends BuildTask {
-
-	
-	// typeOfPublish can be set to either 'production' or 'test'
-	String typeOfPublish = 
-//			"production";
-			"test";
-	
-	// publishLevel can be set to 'frontend' or 'backend' or 'everything'
-	String publishLevel =
-//			"frontend";
-	//		"backend";
-			"everything";
-	
-	// preClean can be set to 'clean' or '' in order to clear out old files before publish/sync process (empty string= NO CLEANING)
-	String preClean =
-			"";
-	//		"true";
-	
-	String remoteUser;
-	private String remoteWebAppDir;
-	private File localWebAppDir;
+public class PublishDataServer extends PublishProjectTask {
 			
 	public PublishDataServer() throws Exception {
-		this.remoteUser = "winterwell";
-		this.remoteWebAppDir = "/home/winterwell/lg.good-loop.com/";
-		// local
-		this.localWebAppDir = FileUtils.getWorkingDirectory();
+		super("lg", "/home/winterwell/lg.good-loop.com/");
+		jarFile = null;
 	}
 
-	@Override
-	public Collection<? extends BuildTask> getDependencies() {
-		return Arrays.asList(
-				new BuildUtils(),
-				new BuildMaths(),
-				new BuildBob(),
-				new BuildWeb(),
-				new BuildDataLog(), // This!
-				new BuildESJavaClient(),
-				new BuildFlexiGson(),
-				new BuildWWAppBase(),
-				new BuildYouAgainJavaClient()
-				);
-	}
-
-	private void doUploadProperties(Object timestampCode) throws IOException {
-		// Copy up creole.properties and version.properties
-		Log.report("publish","Uploading .properties...", Level.INFO);
-		File localConfigDir = new File(localWebAppDir, "config");
-		{	// create the version properties
-			File creolePropertiesForSite = new File(localConfigDir, "version.properties");
-			Properties props = creolePropertiesForSite.exists()? FileUtils.loadProperties(creolePropertiesForSite)
-								: new Properties();
-			// set the publish time
-			props.setProperty("publishDate", ""+System.currentTimeMillis());
-			// set info on the git branch
-			String branch = GitTask.getGitBranch(null);
-			props.setProperty("branch", branch);
-			// ...and commit IDs
-			try {
-				Map<String, Object> info = GitTask.getLastCommitInfo(localWebAppDir);
-				props.setProperty("lastCommitId", (String)info.get("hash"));
-				props.setProperty("lastCommitInfo", StrUtils.compactWhitespace(XStreamUtils.serialiseToXml(info)));
-			} catch(Exception ex) {
-				// oh well;
-				Log.d("git.info", ex);
-			}
-
-			// the timestamp code
-			props.setProperty("timecode", ""+timestampCode);
-
-			// save
-			BufferedWriter w = FileUtils.getWriter(creolePropertiesForSite);
-			props.store(w, null);
-			FileUtils.close(w);
-		}
-
-		// Don't upload any local properties
-		File localProps = new File(localConfigDir, "local.properties");
-		File localPropsOff = new File(localConfigDir, "local.props.off");
-		if (localProps.exists()) {
-			FileUtils.move(localProps, localPropsOff);
-		}
-		
-//		// Bash script which does the rsync work
-		ProcessTask pubas = new ProcessTask("./publish-lg.sh "+typeOfPublish + " " +publishLevel + " " +preClean);
-		pubas.setEcho(true);
-		pubas.run();
-		System.out.println(pubas.getError());
-		pubas.close();
-//		Log.d(pubas.getCommand(), pubas.getOutput());
-
-
-	}
-
+	
 	@Override
 	protected void doTask() throws Exception {
-		// Setup file paths
-		// Check that we are running from a plausible dir:
-		if (! localWebAppDir.exists() || ! new File(localWebAppDir, "bin").isDirectory()
-			|| !new File(localWebAppDir,"web").exists()) {
-			throw new IOException("Not in the expected directory! dir="+FileUtils.getWorkingDirectory());
-		}
-		Log.i("publish", "Publishing type = "+typeOfPublish+":"+ remoteWebAppDir);
-		// What's going on?
-		Environment.get().push(BobSettings.VERBOSE, true);
-
-		// TIMESTAMP code to avoid caching issues: epoch-seconds, mod 10000 to shorten it
-		String timestampCode = "" + ((System.currentTimeMillis()/1000) % 10000);
-
-		{	// copy all the properties files
-			doUploadProperties(timestampCode);
-		}
-
-		// Copy up the code		
-		// TODO copy up all the jars needed
-		{
-			EclipseClasspath ec = new EclipseClasspath(localWebAppDir);
-			Set<File> jars = ec.getCollectedLibs();
-			System.out.println(jars); // Why no mixpanel getting copied??
-			// Create local lib dir
-			File localLib = new File(localWebAppDir,"tmp-lib");
-			localLib.mkdirs();
-			assert localLib.isDirectory();
-			// Ensure desired jars are present
-			for (File jar : jars) {
-				File localJar = new File(localLib, jar.getName());
-				if (localJar.isFile() && localJar.lastModified() >= jar.lastModified()) {
-					continue;
-				}
-				FileUtils.copy(jar, localJar);
-			}
-	//		// Remove unwanted jars
-	//		for (File jar : localLib.listFiles()) {
-	//			boolean found = false;
-	//			for (File jar2 : jars) {
-	//				if (jar.getName().equals(jar2.getName())) found = true;
-	//			}
-	//			if (!found) {
-	//				// This was in the lib directory, but not in the classpath
-	//				Log.w("publish", "Deleteing apparently unwanted file " + jar.getAbsolutePath());
-	//				FileUtils.delete(jar);
-	//			}
-	//		}
-			
-			// WW jars
-			Collection<? extends BuildTask> deps = getDependencies();
-			for (BuildTask buildTask : deps) {
-				if (buildTask instanceof BuildWinterwellProject) {
-					File jar = ((BuildWinterwellProject) buildTask).getJar();
-					FileUtils.copy(jar, localLib);
-				}
-			}
-			
-		}
-
+		super.doTask();
 	}
-
-
 
 }
