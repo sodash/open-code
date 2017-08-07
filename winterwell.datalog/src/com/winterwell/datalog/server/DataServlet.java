@@ -14,6 +14,7 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
+import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.datalog.DataLogSecurity;
 import com.winterwell.datalog.ESStorage;
@@ -142,6 +143,12 @@ public class DataServlet implements IServlet {
 			}
 			search.addAggregation(byTag);
 		} // ./breakdown
+		
+		// TODO unify the ES search above with the DataLog interface call below
+		// i.e. define a Java interface to match the above 
+//		String[] tagBits = null;
+//		DataLog.getData(start, end, null, TUnit.HOUR.dt, tagBits);
+//		DataLog.getData(start, end, sum/as-is, bucket, DataLogEvent filter, breakdown);
 		
 		esc.debug = true;
 		SearchResponse sr = search.get();
