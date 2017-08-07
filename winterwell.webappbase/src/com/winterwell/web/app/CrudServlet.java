@@ -23,6 +23,7 @@ import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
@@ -32,7 +33,8 @@ import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.SField;
 /**
- * TODO refactor so adserver and sogive use this
+ * TODO security checks
+ *  
  * @author daniel
  *
  * @param <T>
@@ -78,6 +80,9 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (state.actionIs("discard-edits")) {
 			jthing = doDiscardEdits(state);
 		}
+		if (state.actionIs("delete")) {
+			jthing = doDelete(state);
+		}
 		// publish?
 		if (state.actionIs("publish")) {
 			jthing = doPublish(state);
@@ -99,6 +104,21 @@ public abstract class CrudServlet<T> implements IServlet {
 		WebUtils2.sendJson(output, state);
 	}
 	
+	/**
+	 * Delete from draft and published!!
+	 * @param state
+	 * @return
+	 */
+	protected JThing<T> doDelete(WebRequest state) {
+		String id = getId(state);
+		for(KStatus s : KStatus.main()) {
+			ESPath path = esRouter.getPath(type, id, s);
+			DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
+			IESResponse ok = del.get().check();					
+		}
+		return null;
+	}
+
 	/**
 	 * 
 	 * @param state
@@ -144,7 +164,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * The focal thing's ID.
 	 * This might be newly minted for a new thing
 	 */
-	private String id;
+	private String _id;
 
 	protected JThing doPublish(WebRequest state) {
 		String id = getId(state);
@@ -161,17 +181,19 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 	protected String getId(WebRequest state) {
-		if (id!=null) return id;
-		id = state.getSlugBits(1);
-		if ("new".equals(id)) {
-			id = Utils.or(state.getUserId(), state.get("name"), type.getSimpleName()).toString().toLowerCase()
-					+"_"+Utils.getRandomString(8);
+		if (_id!=null) return _id;
+		_id = state.getSlugBits(1);
+		if ("new".equals(_id)) {
+			String nicestart = StrUtils.toCanonical(
+					Utils.or(state.getUserId(), state.get("name"), type.getSimpleName()).toString()
+					).replace(' ', '_');
+			_id = nicestart+"_"+Utils.getRandomString(8);
 			// avoid ad, 'cos adblockers dont like it!
-			if (id.startsWith("ad")) {
-				id = id.substring(2, id.length());
+			if (_id.startsWith("ad")) {
+				_id = _id.substring(2, _id.length());
 			}
 		}
-		return id;
+		return _id;
 	}
 
 	protected void doList(WebRequest state) throws IOException {
