@@ -112,9 +112,13 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected JThing<T> doDelete(WebRequest state) {
 		String id = getId(state);
 		for(KStatus s : KStatus.main()) {
-			ESPath path = esRouter.getPath(type, id, s);
-			DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
-			IESResponse ok = del.get().check();					
+			try {
+				ESPath path = esRouter.getPath(type, id, s);
+				DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
+				IESResponse ok = del.get().check();
+			} catch(WebEx.E404 e404) {
+				// gone already				
+			}
 		}
 		return null;
 	}
@@ -199,7 +203,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected void doList(WebRequest state) throws IOException {
 		// copied from SoGive SearchServlet
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
-		/// which index? draft+published by default
+		/// which index? draft (which should include copies of published) by default
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
 		if (status!=null) {
 			s.setIndex(

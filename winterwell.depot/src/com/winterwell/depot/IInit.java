@@ -26,6 +26,7 @@ public interface IInit {
 	 * <p>
 	 * Best practice: Do not rely on this being called externally. Have a
 	 * transient boolean initFlag, & use this to call init() in methods.
+	 * @return this
 	 */
 	void init();
 }
