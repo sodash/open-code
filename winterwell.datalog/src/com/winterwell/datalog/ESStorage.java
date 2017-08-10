@@ -210,18 +210,18 @@ public class ESStorage implements IDataLogStorage {
 		try {
 			PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, typeFromEventType(simple));
 			// See DataLogEvent.COMMON_PROPS and toJson()
-			ESType keywordy = new ESType().keyword();
+			ESType keywordy = new ESType().keyword().norms(false);
 			// Huh? Why were we using type text with keyword analyzer??
 //					.text().analyzer("keyword")					
 //					.fielddata(true);
 			ESType props = new ESType()
 					.property("k", keywordy)
-					.property("v", new ESType().text())
-					.property("n", new ESType().DOUBLE());
+					.property("v", new ESType().text().norms(false))
+					.property("n", new ESType().DOUBLE().norms(false));
 			ESType simpleEvent = new ESType()
 					.property(DataLogEvent.EVENTTYPE, keywordy)
-					.property("time", new ESType().date())
-					.property("count", new ESType().DOUBLE())
+					.property("time", new ESType().date().norms(false))
+					.property("count", new ESType().DOUBLE().norms(false))
 					.property("props", props);			
 			for(Entry<String, Class> cp : DataLogEvent.COMMON_PROPS.entrySet()) {
 				// HACK to turn Class into ESType
@@ -239,7 +239,7 @@ public class ESStorage implements IDataLogStorage {
 						est = new ESType().geo_point();
 					}
 				}
-				simpleEvent.property(cp.getKey(), est);
+				simpleEvent.property(cp.getKey(), est.norms(false));
 			}
 					
 			pm.setMapping(simpleEvent);
