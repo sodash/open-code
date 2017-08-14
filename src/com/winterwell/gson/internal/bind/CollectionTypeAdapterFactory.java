@@ -18,7 +18,9 @@ package com.winterwell.gson.internal.bind;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.winterwell.gson.Gson;
 import com.winterwell.gson.TypeAdapter;
@@ -82,12 +84,36 @@ public final class CollectionTypeAdapterFactory implements TypeAdapterFactory {
 			}
 
 			Collection<E> collection = constructor.construct();
-			in.beginArray();
-			while (in.hasNext()) {
-				E instance = elementTypeAdapter.read(in);
-				collection.add(instance);
+			// Winterwell modification: Let's also handle integer-keyed objects, since js treats these as basically equivalent to arrays. ^DW
+			if (in.peek() == JsonToken.BEGIN_OBJECT) {
+				// object-as-array
+				in.beginObject();
+				List list = new ArrayList();
+				while (in.hasNext()) {
+					// Does not assume the keys are in order.
+					// This is slightly inefficient for the normal case, where the keys are in order. 
+					String pname = in.nextName();
+					int index = Integer.parseInt(pname);
+					E instance = elementTypeAdapter.read(in);
+					if (index <list.size()) {
+						list.set(index, instance);
+					} else {
+						while(list.size() < index) list.add(null);
+						list.add(instance);
+					}
+				}
+				in.endObject();
+				collection.addAll(list);
+			} else {
+				// End of Winterwell modification
+				// normal array read
+				in.beginArray();
+				while (in.hasNext()) {
+					E instance = elementTypeAdapter.read(in);
+					collection.add(instance);
+				}
+				in.endArray();
 			}
-			in.endArray();
 			return collection;
 		}
 
