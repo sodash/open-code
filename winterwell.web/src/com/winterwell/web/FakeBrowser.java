@@ -39,6 +39,7 @@ import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.Cooldown;
@@ -120,6 +121,8 @@ public class FakeBrowser {
 
 	private static final int MAX_REDIRECTS = 10;
 
+	private static final String LOGTAG = "FakeBrowser";
+
 	static {
 		try {
 			INSECURE_SSL_CONTEXT = SSLContext.getInstance("SSL");
@@ -169,6 +172,9 @@ public class FakeBrowser {
 	 */
 	private boolean downloadImages = false;
 
+	/**
+	 * response headers
+	 */
 	private Map<String, List<String>> headers;
 
 	/**
@@ -334,7 +340,9 @@ public class FakeBrowser {
 			assert timeOutMilliSecs > 0 : "problem with timeOutMilliSecs";
 			// Build URI with query params
 			uri = WebUtils.addQueryParameters(uri, vars);
-			if (debug) Log.d("get", uri);
+			if (debug) {
+				Log.d("get", uri);
+			}
 			// Setup a connection
 			setupConnection(uri, timeOutMilliSecs);
 			location = uri;
@@ -401,35 +409,8 @@ public class FakeBrowser {
 	 * @return The response from the server.
 	 */
 	public String post(String uri, Map<String, String> vars) {
-		// People are never too fast
-		if (slowPosts) {
-			Utils.sleep(new Random().nextInt(1000));
-		}
-		// uri = uri.replace("format", format.toString());
-		try {
-			setupConnection(uri, DEFAULT_TIMEOUT);
-			if (requestMethod==null) {
-				connection.setRequestMethod("POST");
-			}
-			location = uri;
-			// Post out
-			connection.setDoOutput(true);
-			connection.setRequestProperty("Content-Type",
-					MIME_TYPE_URLENCODED_FORM);
-			String encodedData = WebUtils.urlEncode(vars);
-			connection.setRequestProperty("Content-Length",
-					String.valueOf(encodedData.length()));
-			OutputStream os = connection.getOutputStream();
-			os.write(encodedData.getBytes());
-			FileUtils.close(os);
-			// Response
-			// TODO handle redirect, copy fetch code
-			return processResponse();
-		} catch (IOException ex) {
-			throw new WrappedException(ex);
-		} finally {
-			disconnect();
-		}
+		String encodedData = WebUtils.urlEncode(vars);
+		return post(uri, MIME_TYPE_URLENCODED_FORM, encodedData);
 	}
 
 	/**
@@ -447,6 +428,14 @@ public class FakeBrowser {
 			Utils.sleep(new Random().nextInt(750));
 		}
 		// uri = uri.replace("format", format.toString());
+		if (debug) {
+			String sheaders = StrUtils.join(Containers.apply(reqHeaders.keySet(), h -> {
+				Object v = reqHeaders.get(h);
+				return v==null? "" : " -H '"+h+": "+v+"'";
+			}), " ");
+			String curl = StrUtils.compactWhitespace("curl -XPOST -d '"+encodedPostBody+"'"+sheaders+" '"+uri+"'");
+			Log.d(LOGTAG, curl);
+		}
 		try {
 			connection = setupConnection(uri, DEFAULT_TIMEOUT);
 			// Post out
