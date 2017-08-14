@@ -123,6 +123,8 @@ public class FakeBrowser {
 
 	private static final String LOGTAG = "FakeBrowser";
 
+	
+
 	static {
 		try {
 			INSECURE_SSL_CONTEXT = SSLContext.getInstance("SSL");
