@@ -166,6 +166,11 @@ public class ManifestServlet extends HttpServlet {
 				Properties versionProps = FileUtils.loadProperties(creolePropertiesForSite);
 //				ArrayMap vps = new ArrayMap(versionProps);				
 				cargo.put("version", versionProps);
+				// HACK
+				String pubDate = versionProps.getProperty("publishDate");
+				if (pubDate!=null) {
+					cargo.put("version_published_date", new Time(pubDate).toString());
+				}
 			} catch(Exception ex) {
 				cargo.put("error", ex);
 			}

@@ -9,13 +9,16 @@ import C from '../C.js';
 
 import Login from 'you-again';
 
-let DATALOG_ENDPOINT = '/data';
+const ServerIO = {};
+
+//ServerIO.DATALOG_ENDPOINT = 'https://testlg.good-loop.com/data';
+ServerIO.DATALOG_ENDPOINT = '/data';
 
 let getData = (filters = {}, breakdowns) => {
 	let specs = {
 		dataspace: filters.dataspace
 	};
-	return load(DATALOG_ENDPOINT, {data: specs});
+	return load(ServerIO.DATALOG_ENDPOINT, {data: specs});
 };
 
 /**
@@ -93,11 +96,9 @@ let handleMessages = function(r) {
 	return r;
 };
 
-const ServerIO = {
-	post, 
-	load,
-	getData
-};
+ServerIO.post = post;
+ServerIO.load = load;
+ServerIO.getData = getData;
 export default ServerIO;
 
 // for debug

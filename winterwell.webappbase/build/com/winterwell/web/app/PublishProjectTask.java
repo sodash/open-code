@@ -70,10 +70,7 @@ public class PublishProjectTask extends BuildTask {
 	
 	/** typeOfPublish can be set to either 'test' or 'production' or 'local' (local=your machine only)
 	 */
-	protected KPubType typeOfPublish = 
-//			"production";
-			KPubType.test;
-//			"local";
+	protected KPubType typeOfPublish = null;
 	
 	// preClean can be set to 'clean' in order to sanitize a target before the files are synced to it
 	protected String preClean =
@@ -86,6 +83,11 @@ public class PublishProjectTask extends BuildTask {
 	protected File jarFile;
 	protected String bashScript;
 	protected File localLib;
+
+	/**
+	 * frontend backend everything
+	 */
+	protected String codePart = "everything";
 			
 	public PublishProjectTask(String projectName, String remoteWebAppDir) throws Exception {
 		this.projectName = projectName;
@@ -115,6 +117,7 @@ public class PublishProjectTask extends BuildTask {
 
 	@Override
 	protected void doTask() throws Exception {
+		assert typeOfPublish!=null : "Set typeOfPublish to test or production!"; 
 		// Setup file paths
 		// Check that we are running from a plausible dir:
 		if ( ! localWebAppDir.exists()) { 
@@ -180,7 +183,7 @@ public class PublishProjectTask extends BuildTask {
 		}
 		
 //		// Bash script which does the rsync work
-		ProcessTask pubas = new ProcessTask(bashScript+" "+typeOfPublish + " " +preClean);
+		ProcessTask pubas = new ProcessTask(bashScript+" "+typeOfPublish + " "+codePart+" "+preClean);
 		pubas.setEcho(true);
 		pubas.run();
 		System.out.println(pubas.getError());

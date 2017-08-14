@@ -14,9 +14,6 @@ CLEANPUBLISH=$2
 
 
 
-
-
-
 case $1 in
 	production)
 	echo "this is a PRODUCTION pushout"
