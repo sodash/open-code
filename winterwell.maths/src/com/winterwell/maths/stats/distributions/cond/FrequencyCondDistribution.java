@@ -32,6 +32,7 @@ public class FrequencyCondDistribution<X, C> extends
 	 * @return a new Map
 	 */
 	protected final Function<C, Map> newMap;
+	protected final Supplier<Map> newGenericMap;
 	
 	protected final Map<C, ObjectDistribution<X>> dists;
 
@@ -46,17 +47,20 @@ public class FrequencyCondDistribution<X, C> extends
 	 * secondary marginal->prob maps.
 	 */
 	public FrequencyCondDistribution(Supplier<Map> newMap) {
-		this(newMap, (c) -> newMap.get());
+		this(newMap, newMap, (c) -> newMap.get());
 	}
 
 	/**
 	 * @param newDistMap factory function for the top-level context->marginal map
+	 * @param newGenericMap factory function for the "generic" marginal map
 	 * @param newMap factory function for the secondary marginal->prob maps
 	 */
-	public FrequencyCondDistribution(Supplier<Map> newDistMap, Function<C, Map> newMap) {
+	public FrequencyCondDistribution(Supplier<Map> newDistMap, Supplier<Map> newGenericMap, Function<C, Map> newMap) {
 		this.newMap = newMap;
+		this.newGenericMap = newGenericMap;
 		assert newMap!=null;
 		assert newDistMap != null;
+		assert newGenericMap != null;
 		dists = newDistMap.get();
 //		generic = new ObjectDistribution<X>(newMap.get(), false).setPseudoCount(pseudoCount);
 	}
@@ -93,7 +97,11 @@ public class FrequencyCondDistribution<X, C> extends
 	public ObjectDistribution<X> getCreateMarginal(C context) {
 		ObjectDistribution<X> dist = dists.get(context);
 		if (dist == null) {
-			dist = new ObjectDistribution<X>(newMap.apply(context), false);
+			if (context == GENERIC) {
+				dist = new ObjectDistribution<X>(newGenericMap.get(), false);
+			} else {
+				dist = new ObjectDistribution<X>(newMap.apply(context), false);
+			}
 			dist.setPseudoCount(pseudoCount);
 			dists.put(context, dist);
 		}
