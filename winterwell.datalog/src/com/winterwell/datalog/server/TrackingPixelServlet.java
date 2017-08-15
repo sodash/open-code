@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.utils.web.WebUtils2;
-
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.FileUtils;
@@ -62,8 +62,8 @@ public class TrackingPixelServlet extends HttpServlet {
 		// TODO if this user has opted-in, we can ignore DNT 
 //		if (dnt) return null; FIXME
 		uid = Utils.getRandomString(20)+"@trk";
-		assert DataLogServer.settings != null;
-		state.setCookie("trkid", uid, TUnit.YEAR.dt, DataLogServer.settings.COOKIE_DOMAIN);
+		DataLogConfig dls = Dep.get(DataLogConfig.class);
+		state.setCookie("trkid", uid, TUnit.YEAR.dt, dls.COOKIE_DOMAIN);
 		return uid;
 	}
 	
