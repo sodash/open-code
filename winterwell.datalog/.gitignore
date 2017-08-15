@@ -1,3 +1,9 @@
 lg.txt*
 main.css
 print.css
+version.properties
+*.local.*
+web/style/*.css
+local-config
+temp-iso
+*/local-config

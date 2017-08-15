@@ -73,7 +73,7 @@ public class DataServlet implements IServlet {
 						"host",
 						"domain",
 //						"evt"
-						"campaign", 
+//						"campaign", 
 						"variant"
 						));
 
