@@ -62,6 +62,7 @@ public class TrackingPixelServlet extends HttpServlet {
 		// TODO if this user has opted-in, we can ignore DNT 
 //		if (dnt) return null; FIXME
 		uid = Utils.getRandomString(20)+"@trk";
+		assert DataLogServer.settings != null;
 		state.setCookie("trkid", uid, TUnit.YEAR.dt, DataLogServer.settings.COOKIE_DOMAIN);
 		return uid;
 	}

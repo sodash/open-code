@@ -43,6 +43,7 @@ public class DataLogServer {
 	public static void main(String[] args) {
 		settings = ArgsParser.getConfig(new DataLogConfig(), args, new File("config/datalog.properties"), null);
 		assert settings != null;
+		Dep.set(DataLogConfig.class, settings);
 		
 		logFile = new LogFile(DataLogServer.settings.logFile)
 					// keep 8 weeks of 1 week log files ??revise this??
