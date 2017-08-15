@@ -32,31 +32,29 @@ import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
 
 /**
- * @deprecated Replaced by {@link ConfigBuilder}
- * 
  * Parse Unix style command line arguments. Also handles Java properties objects
  * (as created from .properties files).
  * 
- * Sets fields annotated with {@link Option} in a settings object.
+ * Sets fields annotated with {@link Option} in a config object.
  * 
  * <h3>Best Practice Example</h2>
  * <pre><code>
  * public static void main(String[] args) {
- * 	MyConfig config = new MyConfig();
- * 	ArgsParser ap = new ArgsParser(config);
- * 	// Load a properties file
- * 	File myPropertiesFile;
- * 	ap.set(myPropertiesFile);
- * 	// Then load any system properties
- * 	ap.setFromSystemProperties("MyApp");
- * 	// Then load from command line args
- * 	ap.setFromMain(args);
+ * 	MyConfig config = new ArgsParser(new MyConfig())
+ * 		// Load a properties file
+ * 		.set(new File("my.properties")
+ * 		// Then load any system properties
+ * 		.setFromSystemProperties("MyApp")
+ * 		// Then load from command line args
+ * 		.setFromMain(args)
+ *		// done
+ * 		.get();
  *	// Now do your thing...
  * }
  * </code></pre>
  * @author daniel
  */
-public class ArgsParser {
+public class ConfigBuilder {
 
 	private static final Map<Class,ISerialize> convertors = new HashMap();
 	
@@ -74,55 +72,6 @@ public class ArgsParser {
 			File.class, URI.class,
 			// COllections
 			List.class, Set.class, Map.class);
-
-	
-	/**
-	 * Fill in config from:
-	 * 
-	 * 1. Command line args
-	 * 2. Properties file
-	 * 3. {@link Environment#getProperties()}
-	 * 4. System properties
-	 * 
-	 * @param settings
-	 * @param args Can be null
-	 * @param propertiesFile Can be null. Can not exist (ignored with a log message)
-	 * @param leftoverArgs Can be null. If not null, args which are not picked out as options will be added
-	 * to this.
-	 * @return settings (same object as input)
-	 */
-	public static <S> S getConfig(S settings, String[] args, File propertiesFile, List<String> leftoverArgs) {
-		assert settings != null;
-		ArgsParser ap = new ArgsParser(settings);
-		// Order: the last setting wins, so start with the "least important" source
-		// system props first
-		ap.setFromSystemProperties(null);
-		// shared properties
-		Properties eprops = Environment.getProperties();
-		if (eprops!=null) {
-			ap.set(eprops);
-		}
-		// properties file
-		if (propertiesFile!=null) {
-			if (propertiesFile.exists()) {
-				ap.set(propertiesFile);
-			} else {
-				Log.d("config", settings.getClass()+": No properties file: "+propertiesFile+" = "+propertiesFile.getAbsolutePath());
-			}
-		}		
-		// Command line arguments (can override properties file)
-		if (args!=null) {
-			String[] _nonOptions = ap.setFromMain(args);
-			if (leftoverArgs!=null) {
-				for (String s : _nonOptions) {
-					leftoverArgs.add(s);
-				}
-			}
-		}		
-		// done
-		ap.checkRequiredSettings();
-		return settings;
-	}
 	
 	/**
 	 * Create an instance of type from a string representation.
@@ -190,52 +139,38 @@ public class ArgsParser {
 
 	Map<Field, Object> field2default = new HashMap<Field, Object>();
 
-	private List<Field> missingArgs;
-
 	/**
 	 * Reusable
 	 */
-	List<Field> requiredArgs = new ArrayList<Field>();
+	List<Field> requiredArgs;
 
-	/**
-	 * Temporary copy used during a parse
-	 */
-	List<Field> requiredArgs2;
-
-	private final Object settings;
+	private final Object config;
 
 	/**
 	 * The tokens do NOT include the leading "-"
 	 */
 	final Map<String, Field> token2field = new HashMap<String, Field>();
 
-	private Map<Field, ArgsParser> field2subparser = new HashMap();
+	private Map<Field, ConfigBuilder> field2subparser = new HashMap();
+
+	private boolean parseFlag;
+
+	private String[] remainderArgs;
+
 
 	/**
 	 * Create an ArgsParser which will set {@link Option} fields in the given
-	 * settings object.
+	 * config object.
 	 * 
-	 * @param settings
+	 * @param config
 	 */
-	public ArgsParser(Object settings) {
-		assert settings != null;
-		this.settings = settings;
+	public ConfigBuilder(Object config) {
+		assert config != null;
+		this.config = config;
 		// Setup token->field map
-		parseSettingsObject(settings.getClass());
-	}
+		parseConfigObject(config.getClass());
+	}	
 	
-	/** @deprecated better to provide an object*/
-	ArgsParser(Class settingsClass) {
-		Object obj = null; 
-		try {
-			obj = settingsClass.newInstance();			
-		} catch (Exception ex) {
-		}
-		this.settings = obj;
-		// Setup token->field map
-		parseSettingsObject(settingsClass);
-	}
-
 	private boolean checkField(Class<?> type) {
 		if (convertors.containsKey(type)) return true;
 		for(Class k : recognisedTypes) {
@@ -245,17 +180,18 @@ public class ArgsParser {
 		return false;
 	}
 
-	private void checkRequiredSettings() {
-		if (requiredArgs2==null || requiredArgs2.size() == 0)
-			return;
-		missingArgs = requiredArgs2;
-		throw new IllegalArgumentException("Missing required arguments: "+Containers.apply(missingArgs, f -> f.getName()));
+
+	public List<Field> getMissingProperties() {		
+		List<Field> reqs = new ArrayList(getRequiredProperties());
+		reqs.removeAll(setFields);
+		return reqs;
 	}
 
-	public List<Field> getMissingArguments() {
-		if (missingArgs == null)
-			throw new IllegalStateException("parse has not run and failed");
-		return missingArgs;
+	public List<Field> getRequiredProperties() {
+		if ( ! parseFlag) {
+			parseConfigObject(config.getClass());
+		}
+		return requiredArgs;
 	}
 
 	/**
@@ -286,6 +222,14 @@ public class ArgsParser {
 	}
 
 	/**
+	 * After {@link #setFromMain(String[])}, this will hold the remaining unused arguments
+	 * @return
+	 */
+	public String[] getRemainderArgs() {
+		return remainderArgs;
+	}
+	
+	/**
 	 * @param args
 	 *            The arguments as passed into main()
 	 * @return the non-options arguments, i.e. the ones after the options
@@ -293,10 +237,9 @@ public class ArgsParser {
 	 *             with a usage message. The missing arguments (if this is the
 	 *             problem) can then be found via {@link #getMissingArguments()}
 	 */
-	public String[] setFromMain(String[] args) {
-		requiredArgs2 = new ArrayList<Field>(requiredArgs);
+	public ConfigBuilder setFromMain(String[] args) {
 		try {
-			// Look for settings
+			// Look for config
 			int i = 0;
 			for (; i < args.length; i++) {
 				String a = args[i];
@@ -314,21 +257,16 @@ public class ArgsParser {
 				// set field & advance i appropriately
 				i = parse2_1arg(args, i, field);
 			}
-			// OK?
-			checkRequiredSettings();
 			// return remainder
-			return Arrays.copyOfRange(args, i, args.length);
+			remainderArgs = Arrays.copyOfRange(args, i, args.length);
+			return this;
 		} catch (Exception e) {
-			if (missingArgs == null) {
-				missingArgs = new ArrayList<Field>(0);
-			}
 			throw Utils.runtime(e);
 		}
 	}
 
-	private int parse2_1arg(String[] args, int i, Field field)
-			throws IllegalAccessException, ParseException {
-		requiredArgs2.remove(field);
+	private int parse2_1arg(String[] args, int i, Field field) throws IllegalAccessException, ParseException 
+	{
 		if (field.getType() == Boolean.class
 				|| field.getType() == boolean.class) {
 			boolean v = true;
@@ -340,14 +278,21 @@ public class ArgsParser {
 					i++; // advance to consume v
 				}
 			}
-			field.set(settings, v);
+			fieldSet(field, v);			
 		} else {
 			// Take next argument as parameter
 			i++;
 			Object v = convert(field.getType(), args[i]);
-			field.set(settings, v);
+			fieldSet(field, v);
 		}
 		return i;
+	}
+
+	List<Field> setFields = new ArrayList();
+	
+	private void fieldSet(Field field, Object v) throws IllegalArgumentException, IllegalAccessException {
+		setFields.add(field);
+		field.set(config, v);
 	}
 
 	/**
@@ -357,7 +302,12 @@ public class ArgsParser {
 	 *            Must exist
 	 * @return The fields that got set
 	 */
-	public List<Field> set(File propertiesFile) {
+	public ConfigBuilder set(File propertiesFile) {
+		if (propertiesFile==null) return this;
+		if ( ! propertiesFile.exists()) {
+			Log.d("config", config.getClass()+": No properties file: "+propertiesFile+" = "+propertiesFile.getAbsolutePath());
+			return this;
+		}		
 		try {
 			File absFile = propertiesFile.getAbsoluteFile();
 			Properties props = new Properties();
@@ -369,14 +319,19 @@ public class ArgsParser {
 	}
 
 	/**
-	 * @return the settings object which we're filling in.
+	 * @return the config object which we're filling in.
+	 * This will check all the required fields have been set.
 	 */
-	public Object getSettings() {
-		return settings;
+	public <S> S get() {
+		List<Field> missing = getMissingProperties();
+		if ( ! missing.isEmpty()) {
+			throw new IllegalArgumentException("Missing required arguments: "+Containers.apply(missing, f -> f.getName()));
+		}
+		return (S) config;
 	}
 
 	/**
-	 * Set settings fields from a Java properties object. Tokens are the same as
+	 * Set config fields from a Java properties object. Tokens are the same as
 	 * in the command-line, except that any leading - or -- is stripped off.
 	 * 
 	 * @param properties
@@ -385,7 +340,7 @@ public class ArgsParser {
 	 *             if a property value cannot be converted. It will set as many
 	 *             properties as it can before throwing any exception.
 	 */
-	public List<Field> set(Map properties) {
+	public ConfigBuilder set(Map properties) {
 		ArrayList<Field> set = new ArrayList();
 		List<Exception> errors = new ArrayList();
 		// keys
@@ -397,7 +352,7 @@ public class ArgsParser {
 		} else {
 			keys = properties.keySet();
 		}
-		// Look for settings
+		// Look for config
 		for (String a : keys) {
 			String v = StrUtils.str(properties.get(a));
 			if (v==null) continue;			
@@ -408,13 +363,13 @@ public class ArgsParser {
 		if (errors.size() != 0) {
 			throw Utils.runtime(errors.get(0));
 		}
-		return set;
+		return this;
 	}
 
 	private boolean setOneKeyValue(String a, String v, List<Field> set, List<Exception> errors) {
 		// special case: config is a Properties object
-		if (settings instanceof Properties) {
-			((Properties)settings).setProperty(a, v);
+		if (config instanceof Properties) {
+			((Properties)config).setProperty(a, v);
 			return true;
 		}
 		// normal case?
@@ -430,7 +385,7 @@ public class ArgsParser {
 		field = token2field.get(bits[0]);
 		if (field==null) return false;
 		// recursive?
-		ArgsParser ap2 = field2subparser.get(field);
+		ConfigBuilder ap2 = field2subparser.get(field);
 		if (ap2!=null) {
 			ap2.setOneKeyValue(bits[1], v, set, errors);
 			return true;
@@ -442,10 +397,10 @@ public class ArgsParser {
 				return false;
 			}
 			try {
-				Map map = (Map) field.get(settings);
+				Map map = (Map) field.get(config);
 				if (map==null) {
 					map = (Map) (field.getType().isInterface()? new ArrayMap() : field.getType().newInstance());
-					field.set(settings, map);
+					fieldSet(field, map);
 				}
 				map.put(bits[1], v);
 				return true;
@@ -460,7 +415,7 @@ public class ArgsParser {
 		assert f != null : prop;
 		try {
 			Object v = convert(f.getType(), prop);
-			f.set(settings, v);
+			fieldSet(f, v);
 			set.add(f);
 			return true;
 		} catch (Exception e) {
@@ -472,27 +427,29 @@ public class ArgsParser {
 	/**
 	 * setup the {@link #token2field} map
 	 * 
-	 * @param settings
+	 * @param config
 	 * @throws IllegalArgumentException
 	 */
-	 Map<String,Field> parseSettingsObject(Class settingsClass) throws IllegalArgumentException {
+	 Map<String,Field> parseConfigObject(Class configClass) throws IllegalArgumentException {
+		 parseFlag = true;
+		 requiredArgs = new ArrayList();
 		 final HashMap classToken2field = new HashMap();
 		 // Get annotated fields
-		 List<Field> fields = ReflectionUtils.getAnnotatedFields(settingsClass,
+		 List<Field> fields = ReflectionUtils.getAnnotatedFields(configClass,
 				Option.class, true);
 		 // Get tokens
 		 for (Field field : fields) {
 			// Is this OK?
 			boolean ok = checkField(field.getType());
 			if ( ! ok) {
-				// Support recursive settings
-				ArgsParser ap2 = null;
+				// Support recursive config
+				ConfigBuilder ap2 = null;
 				try {
-					Object v = field.get(settings);
-					if (v!=null) ap2 = new ArgsParser(v);					
+					Object v = field.get(config);
+					if (v!=null) ap2 = new ConfigBuilder(v);					
 				} catch (IllegalAccessException e) {
 				}				
-				if (ap2==null) ap2 = new ArgsParser(field.getType());
+				if (ap2==null) ap2 = new ConfigBuilder(field.getType());
 				if (ap2.token2field.isEmpty()) {
 					throw new IllegalArgumentException("Unrecognised type: " + field.getType()+" "+field.getName());
 				}
@@ -515,13 +472,13 @@ public class ArgsParser {
 				requiredArgs.add(field);
 			}
 			// Default
-			if (settings!=null && field.getType() != Boolean.class
+			if (config!=null && field.getType() != Boolean.class
 					&& field.getType() != boolean.class) {
 				try {
 					if ( ! field.isAccessible()) {
 						field.setAccessible(true);
 					}
-					Object d = field.get(settings);
+					Object d = field.get(config);
 					field2default.put(field, d);
 				} catch (IllegalAccessException e) {
 					throw new IllegalArgumentException(e);
@@ -547,12 +504,13 @@ public class ArgsParser {
 		return getClass().getSimpleName() + '\n' + getOptionsMessage();
 	}
 
+	
 	/**
 	 * Look in the system properties (i.e. -D arguments passed into the JVM)
 	 * @param namespace Can be null or blank. 
 	 * If not blank, then this will look for namespace.property  
 	 */
-	public List<Field> setFromSystemProperties(String namespace) {
+	public ConfigBuilder setFromSystemProperties(String namespace) {
 		if (namespace!=null && namespace.isEmpty()) namespace = null;
 		Properties systemProps = System.getProperties();
 		if (namespace==null || namespace.isEmpty()) {
@@ -572,22 +530,6 @@ public class ArgsParser {
 			map.put(key, me.getValue());
 		}
 		return set(map);
-	}
-
-	/**
-	 * Convenience for {@link #getConfig(Object, String[], File, List)} with just a file.
-	 * Suggested usage:
-	 * <code>
-	 * MyConfig myconfig = ArgsParser.getConfig(new MyConfig(), new File("myconfig.properties")); // simples :)
-	 *  </code>
-	 * 
-	 * @param config
-	 * @param propertiesFile Can be null. Doesn't have to exist. If this file exists, load properties from it.
-	 * In SoDash, this is normally "config/MySubsystem.properties"
-	 * @return config (same object), with properties set
-	 */
-	public static <S> S getConfig(S config, File propertiesFile) {
-		return getConfig(config, null, propertiesFile, null);
 	}
 	
 

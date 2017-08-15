@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.bob.tasks.GitTask;
+import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
@@ -112,18 +113,38 @@ public class ManifestServlet extends HttpServlet {
 		}
 	}
 	
+	static List<Object> configs = new ArrayList();
+	
+	public static void addConfig(Object config) {
+		configs.add(config);
+	}
+	
 	public void process(WebRequest state) throws IOException {	
 		
 		ArrayMap cargo = new ArrayMap();
 		// what did we load from?
 		cargo.put("configFiles", configFiles);
-		// 
-//		String pd = props.getProperty(Creole.PROPERTY_PUBLISH_DATE);
-//		cargo.put(DB2Json.pubDate, pd);
-//		String branch = props.getProperty(Creole.PROPERTY_GIT_BRANCH);
-//		cargo.put("branch", branch);
+		
+		// what config did we pick up?
+		// Screen for sensitive keys, e.g. passwords
+		Map configsjson = new ArrayMap();
+		String[] sens = "login password pwd token auth key secret".split(" ");
+		for(Object c : configs) {
+			ArrayMap<String, Object> vs = new ArrayMap(Containers.objectAsMap(c));
+			for(String k : vs.keySet()) {
+				String kl = k.toLowerCase();
+				Object v = vs.get(k);
+				for(String sen : sens) {
+					if (kl.contains(sen)) {
+						vs.put(k, "****");
+					}
+				}
+			}
+			configsjson.put(c.getClass().getSimpleName(), vs);
+		}
+		cargo.put("config", configsjson);
+		
 		ArrayList repos = new ArrayList();
-//		HtmlTable tbl = new HtmlTable("Repo", "Date", "Commit-message", "Author", "hash");
 //		// Extra Branch Info, if we have it
 		for(String repo : new String[]{"adserver","flexi-gson"}) {
 //			String rhash = props.getProperty(Creole.PROPERTY_GIT_COMMIT_ID+"."+repo);
@@ -138,13 +159,6 @@ public class ManifestServlet extends HttpServlet {
 		}
 		cargo.put("git-repos", repos);
 
-		// Where was the push done from?
-//			String origin = props.getProperty("origin");
-//			if (origin!=null) page.append("<p>Origin: "+origin+"</p>\n");
-//			
-//			page.append("<p>Running: "+DateFilter.prettyDate(CreoleMain.startTime)+"</p>\n");
-//			page.append("<p>Base Directory: "+Statics.getWebAppDir()+"</p>\n");
-//			page.append("<p>JTwitter version: "+Twitter.version+"</p>\n");
 		cargo.put("hostname", WebUtils2.hostname());
 		
 		String uptime = TimeUtils.toString(startTime.dt(new Time()));
@@ -175,7 +189,6 @@ public class ManifestServlet extends HttpServlet {
 				cargo.put("error", ex);
 			}
 		}
-
 		
 		JsonResponse output = new JsonResponse(state, cargo);
 		WebUtils2.sendJson(output, state);

@@ -7,6 +7,7 @@ import org.elasticsearch.node.Node;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.ArgsParser;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.Dt;
@@ -15,6 +16,7 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.JettyLauncher;
+import com.winterwell.web.app.ManifestServlet;
 import com.winterwell.youagain.client.YouAgainClient;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.datalog.DataLog;
@@ -40,18 +42,10 @@ public class DataLogServer {
 
 	public static DataLogConfig settings;
 
-	public static void main(String[] args) {
-		settings = ArgsParser.getConfig(new DataLogConfig(), args, new File("config/datalog.properties"), null);
-		assert settings != null;
-		Dep.set(DataLogConfig.class, settings);
-		
-		logFile = new LogFile(DataLogServer.settings.logFile)
-					// keep 8 weeks of 1 week log files ??revise this??
-					.setLogRotation(TUnit.WEEK.dt, 8);
+	public static void main(String[] args) {						
+		init(args);
 		
 		Log.i("Go!");
-		// storage layer (eg ES)
-		init();
 		assert jl==null;
 		jl = new JettyLauncher(new File("web"), settings.port);
 		jl.setup();
@@ -62,12 +56,23 @@ public class DataLogServer {
 		Log.i("Running...");
 	}
 
-	private static void init() {
-		// Where does config come from??
-//		IDataLog dli = DataLog.getImplementation();
-//		DataLogConfig myConfig = (DataLogConfig) dli.getConfig();
-		DataLog.setConfig(settings);
+	private static void init(String[] args) {
+		settings = new ConfigBuilder(new DataLogConfig())
+				.setFromSystemProperties(null)
+				.set(new File("config/datalog.properties"))
+				.set(new File("config/datalog.local.properties"))
+				.setFromMain(args)
+				.get();
+		assert settings != null;
+		Dep.set(DataLogConfig.class, settings);
+		// set the config
+		DataLog.setConfig(settings);		
+		ManifestServlet.addConfig(settings);
 		
+		logFile = new LogFile(DataLogServer.settings.logFile)
+				// keep 8 weeks of 1 week log files ??revise this??
+				.setLogRotation(TUnit.WEEK.dt, 8);
+
 		// app=datalog for login
 		YouAgainClient yac = new YouAgainClient("datalog");
 		Dep.set(YouAgainClient.class, yac);
