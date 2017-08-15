@@ -84,7 +84,7 @@ class DashboardPage extends React.Component {
 				<h2>My Dashboard</h2>
 				
 				<p>One month of data, in per-hour segments. Near realtime: Does NOT include the most recent 15 minutes.</p>
-
+				<p>Endpoint: {ServerIO.DATALOG_ENDPOINT}</p>
 				<FiltersWidget />
 
 				<ChartWidget title='Tags' dataFromLabel={tdata2} />

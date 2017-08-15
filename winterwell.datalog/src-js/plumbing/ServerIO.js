@@ -11,7 +11,7 @@ import Login from 'you-again';
 
 const ServerIO = {};
 
-//ServerIO.DATALOG_ENDPOINT = 'https://testlg.good-loop.com/data';
+// ServerIO.DATALOG_ENDPOINT = 'https://testlg.good-loop.com/data';
 ServerIO.DATALOG_ENDPOINT = '/data';
 
 let getData = (filters = {}, breakdowns) => {

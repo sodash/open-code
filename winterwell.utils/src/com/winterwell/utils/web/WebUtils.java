@@ -787,6 +787,7 @@ public class WebUtils {
 	 * @see #getDomain(String)
 	 */
 	public static String getHost(String url) {
+		if (url==null) return null;
 		Matcher m = URL_REGEX.matcher(url);
 		if ( ! m.find()) {
 			return null;

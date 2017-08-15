@@ -73,8 +73,8 @@ Misc.Logo = ({service, size, transparent}) => {
 	if (size) klass += " logo-"+size;
 	let file = '/img/'+service+'-logo.svg';
 	if (service === 'instagram') file = '/img/'+service+'-logo.png';
-	if (service === 'goodloop') {
-		file = '/img/logo.png';
+	if (service === C.app.service) {
+		file = C.app.logo;
 		// if (transparent === false) file = '/img/SoGive-Light-70px.png';
 	}
 	return (

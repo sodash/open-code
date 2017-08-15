@@ -3,6 +3,7 @@ import Login from 'you-again';
 import { assert } from 'sjtest';
 import { getUrlVars } from 'wwutils';
 import _ from 'lodash';
+import C from '../C';
 
 // Plumbing
 import DataStore from '../plumbing/DataStore';
@@ -101,7 +102,7 @@ class MainDiv extends Component {
 						<Page {...pageProps} />
 					</div>
 				</div>
-				<LoginWidget logo='sogive' title='Welcome to SoGive' />
+				<LoginWidget logo={C.app.service} title={'Welcome to '+C.app.name} />
 			</div>
 		);
 	}

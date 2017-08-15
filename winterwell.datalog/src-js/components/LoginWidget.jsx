@@ -188,7 +188,7 @@ const LoginWidget = ({showDialog, logo, title}) => {
 	let verb = DataStore.appstate.widget && DataStore.appstate.widget.LoginWidget && DataStore.appstate.widget.LoginWidget.verb;
 	if ( ! verb) verb = 'login';
 
-	if ( ! title) title = `Welcome ${verb==='login'? '(back)' : ''} to DataLog`;
+	if ( ! title) title = `Welcome ${verb==='login'? '(back)' : ''} to {C.app.name}`;
 
 	const heading = {
 		login: 'Log In',
