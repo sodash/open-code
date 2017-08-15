@@ -12,6 +12,7 @@ import java.util.Map;
 
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.log.Log;
 import com.winterwell.gson.Gson;
 import com.winterwell.gson.JsonSyntaxException;
 import com.winterwell.gson.KLoopPolicy;
@@ -26,6 +27,7 @@ import com.winterwell.gson.stream.JsonToken;
 import com.winterwell.gson.stream.JsonWriter;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.TodoException;
 
 /**
  * Uses "@class" property to instantiate sub-classes.
@@ -250,57 +252,74 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 			
 			// Class-correction: Correct for wrong-class choices, based on what the target field is.
 			// Is the target a number? We get class-cast issues where gson
-			// has opted for Double, but we need Integer			
-			Class fClass = f.getType();
-			if (fClass != double.class && ReflectionUtils.isaNumber(fClass)) {
-				value = MathUtils.cast(fClass, (Number) value);
-				
-			} else if (value instanceof String && ! ReflectionUtils.isa(String.class, fClass)) {
-				// If a Map convertor was used earlier, classes like Class and URI can end up as Strings 
-				value = gson.fromJson((String)value, fClass);
-				
-			} else if (value instanceof Map && ! ReflectionUtils.isa(value.getClass(), fClass)) {
-				// Handle Map/List sub-class choices based on the field
-				// E.g. a ListMap could get serialised to {}, deserialised to LinkedHashMap -- in which case convert
-				Map mapSubClass = (Map) fClass.newInstance();
-				mapSubClass.putAll((Map)value);
-				value = mapSubClass;
-				
-			} else if (value instanceof Collection && ! ReflectionUtils.isa(value.getClass(), fClass)) {
-				// Same as Map above, but for Lists, Sets and Arrays
-				Collection collection = (Collection)value;
-				// an array?
-				if (fClass.isArray()) {
-					Class compType = fClass.getComponentType();
-					Object array = Array.newInstance(compType, collection.size());
-					int i=0;
-					for(Object vi : collection) {
-						if (vi!=null) {
-							vi = read3_lateBinding(array, null, i, vi, in);
-						}
-						Array.set(array, i, vi);
-						i++;
-					}
-					value = array;
-					
-				} else {
-					Collection listSubClass = (Collection) fClass.newInstance();
-					int i=0;
-					for(Object vi : collection) {
-						if (vi!=null) {
-							vi = read3_lateBinding(listSubClass, null, i, vi, in);
-						}
-						listSubClass.add(vi);
-						i++;
-					}
-					value = listSubClass;
-				}
-			} // end of class correction
+			// has opted for Double, but we need Integer
+			value = read3_maybeChangeClass_changeFieldClass(in, f, value);
 			
 			// Set it
 			f.set(obj, value);
 		}
 		return obj;
+	}
+
+	private Object read3_maybeChangeClass_changeFieldClass(JsonReader in, Field f, Object value)
+			throws InstantiationException, IllegalAccessException 
+	{
+		final Class fClass = f.getType();
+		if (ReflectionUtils.isa(value.getClass(), fClass)) {
+			return value; // all fine
+		}
+		if (fClass != double.class && ReflectionUtils.isaNumber(fClass)) {
+			return MathUtils.cast(fClass, (Number) value);			
+		}
+		if (value instanceof String) {
+			// If a Map convertor was used earlier, classes like Class and URI can end up as Strings 
+			value = gson.fromJson((String)value, fClass);
+			return value;
+			
+		}
+		if (value instanceof Map) {
+			// Handle Map/List sub-class choices based on the field
+			// E.g. a ListMap could get serialised to {}, deserialised to LinkedHashMap -- in which case convert
+			if (ReflectionUtils.isa(fClass, Map.class)) {
+				Map mapSubClass = (Map) fClass.newInstance();
+				mapSubClass.putAll((Map)value);
+				return mapSubClass;
+			}
+			// Bug seen August 2017 with GL adserver MonetaryAmount
+			// ?How did we get here?! This should have been converted to a POJO
+			String valueJson = Gson.toJSON(value);
+			Object value2 = gson.fromJson(valueJson, fClass);
+			return value2;			
+		}
+		if (value instanceof Collection) {
+			// Same as Map above, but for Lists, Sets and Arrays
+			Collection collection = (Collection)value;
+			// an array?
+			if (fClass.isArray()) {
+				Class compType = fClass.getComponentType();
+				Object array = Array.newInstance(compType, collection.size());
+				int i=0;
+				for(Object vi : collection) {
+					if (vi!=null) {
+						vi = read3_lateBinding(array, null, i, vi, in);
+					}
+					Array.set(array, i, vi);
+					i++;
+				}
+				return array;				
+			}
+			Collection listSubClass = (Collection) fClass.newInstance();
+			int i=0;
+			for(Object vi : collection) {
+				if (vi!=null) {
+					vi = read3_lateBinding(listSubClass, null, i, vi, in);
+				}
+				listSubClass.add(vi);
+				i++;
+			}
+			return listSubClass;			
+		} // end of class correction
+		return value;
 	}
 
 	/**
