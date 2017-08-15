@@ -39,16 +39,24 @@ public class FrequencyCondDistribution<X, C> extends
 	public FrequencyCondDistribution() {
 		this(HashMap::new);
 	}
-	
+
 	/**
-	 * Override to use e.g. HalfLifeMap. This is used for both the top-level context->marginal map, and the
-	 * secondary marginal->prob map.
-	 * @return a new Map
+	 * @param newMap factory function used for both the top-level context->marginal map, and the
+	 * secondary marginal->prob maps.
 	 */
 	public FrequencyCondDistribution(Supplier<Map> newMap) {
+		this(newMap, newMap);
+	}
+
+	/**
+	 * @param newDistMap factory function for the top-level context->marginal map
+	 * @param newMap factory function for the secondary marginal->prob maps
+	 */
+	public FrequencyCondDistribution(Supplier<Map> newDistMap, Supplier<Map> newMap) {
 		this.newMap = newMap;
 		assert newMap!=null;
-		dists = newMap.get();
+		assert newDistMap != null;
+		dists = newDistMap.get();
 //		generic = new ObjectDistribution<X>(newMap.get(), false).setPseudoCount(pseudoCount);
 	}
 	
