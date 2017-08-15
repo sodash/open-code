@@ -3,6 +3,7 @@ package com.winterwell.maths.stats.distributions.cond;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.winterwell.maths.ITrainable;
@@ -30,7 +31,7 @@ public class FrequencyCondDistribution<X, C> extends
 	 * secondary marginal->prob map.
 	 * @return a new Map
 	 */
-	protected final Supplier<Map> newMap;
+	protected final Function<C, Map> newMap;
 	
 	protected final Map<C, ObjectDistribution<X>> dists;
 
@@ -45,14 +46,14 @@ public class FrequencyCondDistribution<X, C> extends
 	 * secondary marginal->prob maps.
 	 */
 	public FrequencyCondDistribution(Supplier<Map> newMap) {
-		this(newMap, newMap);
+		this(newMap, (c) -> newMap.get());
 	}
 
 	/**
 	 * @param newDistMap factory function for the top-level context->marginal map
 	 * @param newMap factory function for the secondary marginal->prob maps
 	 */
-	public FrequencyCondDistribution(Supplier<Map> newDistMap, Supplier<Map> newMap) {
+	public FrequencyCondDistribution(Supplier<Map> newDistMap, Function<C, Map> newMap) {
 		this.newMap = newMap;
 		assert newMap!=null;
 		assert newDistMap != null;
@@ -92,7 +93,7 @@ public class FrequencyCondDistribution<X, C> extends
 	public ObjectDistribution<X> getCreateMarginal(C context) {
 		ObjectDistribution<X> dist = dists.get(context);
 		if (dist == null) {
-			dist = new ObjectDistribution<X>(newMap.get(), false);
+			dist = new ObjectDistribution<X>(newMap.apply(context), false);
 			dist.setPseudoCount(pseudoCount);
 			dists.put(context, dist);
 		}
