@@ -27,7 +27,7 @@ const isa = function(obj, typ) {
 
 const getType = function(item) {
 	// schema.org type?
-	let type = item['@Type'];
+	let type = item['@type'];
 	if (type) return type;
 	let klass = item['@class'];
 	if ( ! klass) return null;
