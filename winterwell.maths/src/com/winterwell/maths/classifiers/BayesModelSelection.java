@@ -130,8 +130,8 @@ public class BayesModelSelection<X> extends AClassifier<X> implements
 	public void train1(Vector x, X tag, double weight) {
 		prior.addProb(tag, weight);
 		IDistribution m = models.get(tag);
-		if (weight != 1 && m instanceof ITrainable.IHandleWeights) {
-			((ITrainable.IHandleWeights) m).train(new double[]{weight}, Arrays.asList(x));
+		if (weight != 1 && m instanceof ITrainable.Unsupervised.Weighted) {
+			((ITrainable.Unsupervised.Weighted) m).train(new double[]{weight}, Arrays.asList(x));
 		} else {
 			((ITrainable.Unsupervised<Vector>) m).train1(x);
 		}

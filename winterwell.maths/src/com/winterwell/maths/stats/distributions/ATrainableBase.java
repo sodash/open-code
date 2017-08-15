@@ -136,7 +136,7 @@ public class ATrainableBase<X, Tag> {
 		trainingDataLabels.add(tag);
 	}
 
-	protected void train1weighted(double weight, X data) {
+	protected void train1(X data, double weight) {
 		fillInWeights();
 		dataWeights.add(weight);
 		train1(data);

@@ -1,7 +1,6 @@
 package com.winterwell.maths.stats.distributions;
 
 import com.winterwell.maths.ITrainable;
-import com.winterwell.maths.ITrainable.IHandleWeights;
 import com.winterwell.maths.matrix.DiagonalMatrix;
 import com.winterwell.maths.stats.StatsUtils;
 import com.winterwell.maths.stats.distributions.d1.Gaussian1D;
@@ -26,7 +25,7 @@ import no.uib.cipr.matrix.Vector;
  * @author daniel
  */
 public final class AxisAlignedGaussian extends ADistribution implements
-		IGaussian, IHandleWeights<Vector>, ITrainable.Unsupervised<Vector> {
+		IGaussian, ITrainable.Unsupervised.Weighted<Vector> {
 
 	private final Vector mean;
 	private final Vector var;
@@ -208,7 +207,7 @@ public final class AxisAlignedGaussian extends ADistribution implements
 	}
 
 	@Override
-	public void train1weighted(double weight, Vector data) {
-		super.train1weighted(weight, data);
+	public void train1(Vector data, double weight) {
+		super.train1(data, weight);
 	}
 }

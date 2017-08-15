@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import com.winterwell.maths.ITrainable;
-import com.winterwell.maths.ITrainable.IHandleWeights;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.timeseries.DataUtils;
 import com.winterwell.utils.log.Log;
@@ -20,7 +19,7 @@ import no.uib.cipr.matrix.Vector;
  * 
  */
 public class IndependentComponentsModel extends ADistribution implements
-		ITrainable.Unsupervised<Vector>, IHandleWeights<Vector> {
+		ITrainable.Unsupervised.Weighted<Vector> {
 
 	private final IDistribution1D[] basis;
 
@@ -39,6 +38,11 @@ public class IndependentComponentsModel extends ADistribution implements
 		return p;
 	}
 
+	@Override
+	public void train1(Vector data, double weight) {
+		super.train1(data, weight);
+	}
+	
 	@Override
 	public void finishTraining() {
 		for (IDistribution1D dist : basis) {
@@ -121,8 +125,8 @@ public class IndependentComponentsModel extends ADistribution implements
 	@Override
 	public void train(double[] weights, Iterable<? extends Vector> wdata) {
 		for (IDistribution1D dist : basis) {
-			if (dist instanceof IHandleWeights) {
-				((IHandleWeights<Vector>) dist).train(weights, wdata);
+			if (dist instanceof ITrainable.Unsupervised.Weighted) {
+				((ITrainable.Unsupervised.Weighted<Vector>) dist).train(weights, wdata);
 			} else {
 				if (dist instanceof ITrainable)
 					throw new IllegalStateException(

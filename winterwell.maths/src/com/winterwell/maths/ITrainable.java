@@ -40,25 +40,6 @@ public interface ITrainable<DataType> {
 
 	}
 
-	/**
-	 * It was discussed whether to call this "bodybuilder", or "gymrat".
-	 * 
-	 * @author daniel
-	 * 
-	 * @param <DataType>
-	 */
-	public static interface IHandleWeights<DataType> extends
-			ITrainable<DataType> {
-
-		/**
-		 * Unsupervised training with larger batches.
-		 * 
-		 * @param x
-		 *            example dats to learn from
-		 */
-		void train(double[] weights, Iterable<? extends DataType> data);
-
-	}
 
 	public static interface Seqn<Observed> extends ITrainable<Observed> {
 		/**
@@ -122,8 +103,11 @@ public interface ITrainable<DataType> {
 		 * @param x
 		 *            example dats to learn from
 		 */
-		void train(Iterable<? extends DataType> data)
-				throws UnsupportedOperationException;
+		default void train(Iterable<? extends DataType> data) {
+			for (DataType x : data) {
+				train1(x);
+			}
+		}
 
 		/**
 		 * Unsupervised training
@@ -135,6 +119,12 @@ public interface ITrainable<DataType> {
 		// over which method gets called if DataType is Iterable
 		void train1(DataType data) throws UnsupportedOperationException;
 
+		/**
+		 * It was discussed whether to call this "bodybuilder", or "gymrat".
+		 * @author daniel
+		 *
+		 * @param <DataType>
+		 */
 		public static interface Weighted<DataType> extends Unsupervised<DataType> {
 			/**
 			 * Unsupervised training with larger batches.
@@ -142,7 +132,22 @@ public interface ITrainable<DataType> {
 			 * @param x
 			 *            example dats to learn from
 			 */
-			void train(double[] weights, Iterable<? extends DataType> data);
+			default void train(double[] weights, Iterable<? extends DataType> data) {
+				int i=0;
+				for(DataType x : data) {
+					double w = weights[i];
+					i++;
+					train1(x, w);
+				}
+			}
+			
+			/**
+			 * default to weight=1 and call {@link #train1(Object, double)}
+			 */
+			@Override
+			default void train1(DataType data) throws UnsupportedOperationException {
+				train1(data, 1);
+			}
 
 			/**
 			 * Unsupervised training

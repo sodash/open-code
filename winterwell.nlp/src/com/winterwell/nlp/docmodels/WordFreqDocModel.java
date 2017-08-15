@@ -31,7 +31,7 @@ import com.winterwell.utils.log.KErrorPolicy;
  * @testedby {@link WordFreqDocModelTest}
  */
 public final class WordFreqDocModel extends ADocModel implements
-		ITrainable.IHandleWeights<IDocument> {
+		ITrainable.Unsupervised.Weighted<IDocument> {
 
 	private IndexedDistribution<String> freqs;
 
@@ -227,22 +227,23 @@ public final class WordFreqDocModel extends ADocModel implements
 	public void train(double[] weights, Iterable<? extends IDocument> wdata) {
 		int i = 0;
 		for (IDocument doc : wdata) {
-			train1weighted(weights[i], doc);
+			train1(doc, weights[i]);
 			i++;
 		}
 	}
 
 	@Override
 	public void train1(IDocument doc) {
-		train1weighted(1, doc);
+		train1(doc, 1);
 	}
 
 	@Override
-	public void train1weighted(double weight, IDocument doc) {
+	public void train1(IDocument doc, double weight) {
 		ITokenStream stream = tokenizer.factory(doc.getContents());
 		for (Tkn token : stream) {
 			freqs.addProb(token.getText(), weight);
 		}
 		trainingCount++;
 	}
+
 }

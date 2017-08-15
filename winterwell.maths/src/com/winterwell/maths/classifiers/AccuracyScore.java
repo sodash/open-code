@@ -7,9 +7,11 @@ import java.util.Set;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Range;
+import com.winterwell.utils.web.IHasJson;
 
 /**
  * Accuracy scores: PPV (positive predictive value) & sensitivity by tag.
@@ -28,7 +30,7 @@ import com.winterwell.utils.containers.Range;
  * @author daniel
  * @testedby {@link AccuracyScoreTest}
  */
-public class AccuracyScore<Tag>  {
+public class AccuracyScore<Tag> implements IHasJson  {
 	
 	private static final String NULL = "null";
 	
@@ -237,19 +239,23 @@ public class AccuracyScore<Tag>  {
 			Containers.plus((Map)falsePos, _predicted, n*unit);
 			Containers.plus((Map)falseNeg, _target, n*unit);
 		}
-		incUnit();		
+		incUnit();	
+		count++;
 	}
 		
+	long count = 0;
 	double unit = 1;
 
 	private void incUnit() {
 		unit *= inflationRate;
 	}
 
+	
+	
 	/**
 	 * Positive predictive value: true predictions for this class / (total
 	 * predictions for this class)
-	 * 
+	 * Also known as `precision`.
 	 * @param klass
 	 * @return PPV (zero if no predictions were made for this class)
 	 */
@@ -336,6 +342,23 @@ public class AccuracyScore<Tag>  {
 		Double fn = falseNeg.get(klass);
 		if (fn==null) return 1;
 		return tp / (tp+fn);		
+	}
+
+
+	@Override
+	public Map toJson2() throws UnsupportedOperationException {
+		Map<String, Double> ppv = new ArrayMap();
+		Map<String, Double> sensitivity = new ArrayMap();
+		for(Tag tag : getTags()) {
+			ppv.put(tag.toString(), getPPV(tag));
+			sensitivity.put(tag.toString(), getSensitivity(tag));
+		}
+		return new ArrayMap(
+				"correct", correct,
+				"ppv", ppv,
+				"sensitivity", sensitivity,
+				"count", count
+				);
 	}	
 	
 }

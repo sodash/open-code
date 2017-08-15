@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.maths.ITrainable;
-import com.winterwell.maths.ITrainable.IHandleWeights;
+
 import com.winterwell.maths.stats.StatsUtils;
 import com.winterwell.maths.vector.IMetric1D;
 import com.winterwell.utils.MathUtils;
@@ -30,7 +30,7 @@ import no.uib.cipr.matrix.Vector;
  * 
  */
 public class MetricGaussian1D extends ADistribution1D implements
-		ITrainable.Unsupervised<Double>, IHandleWeights<Double> {
+		ITrainable.Unsupervised<Double>, ITrainable.Unsupervised.Weighted<Double> {
 	/**
 	 * This is the distribution of distance from the mean.
 	 */
@@ -165,6 +165,11 @@ public class MetricGaussian1D extends ADistribution1D implements
 	@Override
 	public void train1(Double x) {
 		super.train1(x);
+	}
+	
+	@Override
+	public void train1(Double data, double weight) {
+		super.train1(data, weight);
 	}
 
 	@Override

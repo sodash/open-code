@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import com.winterwell.maths.ITrainable;
-import com.winterwell.maths.ITrainable.IHandleWeights;
+
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.log.Log;
@@ -158,7 +158,7 @@ public abstract class MixtureModelBase<X, D extends IDistributionBase<X>>
 			}
 			// ((ITrainable) g).resetup();
 			// And do we need to track the winners of each point?
-			if (!(g instanceof IHandleWeights)) {
+			if (!(g instanceof ITrainable.Unsupervised.Weighted)) {
 				trackWinners = true;
 			}
 		}
@@ -335,8 +335,8 @@ public abstract class MixtureModelBase<X, D extends IDistributionBase<X>>
 		try {
 			ITrainable.Unsupervised<X> dist = (ITrainable.Unsupervised) g;
 			dist.resetup();
-			if (dist instanceof IHandleWeights) {
-				((IHandleWeights<X>) dist).train(weights, trainingData);
+			if (dist instanceof ITrainable.Unsupervised.Weighted) {
+				((ITrainable.Unsupervised.Weighted<X>) dist).train(weights, trainingData);
 				dist.finishTraining();
 				return;
 			}
