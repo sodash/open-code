@@ -15,6 +15,15 @@ import com.winterwell.utils.time.TimeUtils;
 
 public class TimeFieldTest {
 
+	@Test
+	public void testMonth() throws Exception {
+		{
+			String date = "june";
+			TimeField df = new TimeField("test");
+			Callable<Time> x = df.fromString(date);
+			System.out.println(x+" "+x.call());
+		}
+	}
 
 	@Test
 	public void testTimeOfDay() throws Exception {

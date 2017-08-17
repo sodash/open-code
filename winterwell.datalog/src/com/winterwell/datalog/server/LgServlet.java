@@ -82,6 +82,8 @@ public class LgServlet {
 	public static void fastLog(WebRequest state) throws IOException {
 		HttpServletRequest req = state.getRequest();
 		HttpServletResponse resp = state.getResponse();
+		String u = state.getRequestUrl();
+		Map<String, Object> ps = state.getParameterMap();
 		String ds = state.getRequired(DATASPACE);
 		// TODO security check the dataspace?
 		String tag = state.getRequired(TAG);

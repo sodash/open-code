@@ -165,7 +165,7 @@ const FiltersWidget = () => {
 		// <Misc.PropControl path={path} item={filters} prop='events' label='events' />
 		// <Misc.PropControl path={path} item={filters} prop='publisher' label='Publisher' />
 	return (<div className='well'>
-		<Misc.PropControl path={filtersEditorPath} item={filters} prop='dataspace' label='Dataspace e.g. "gl" or "default"' />
+		<Misc.PropControl path={filtersEditorPath} item={filters} prop='dataspace' label='Dataspace e.g. "gl", "trk", or "default"' />
 		<Misc.PropControl path={filtersEditorPath} item={filters} prop='q' label='Query' />
 		<button className='btn btn-default' onClick={setFilters}>Load Data</button>
 	</div>);

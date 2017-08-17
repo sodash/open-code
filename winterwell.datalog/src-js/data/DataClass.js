@@ -25,6 +25,10 @@ const isa = function(obj, typ) {
 	return true;
 };
 
+/**
+ * Uses schema.org or gson class to get the type.
+ * Or null
+ */
 const getType = function(item) {
 	// schema.org type?
 	let type = item['@type'];

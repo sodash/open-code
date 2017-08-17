@@ -25,6 +25,7 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.AggregationResults;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ICallable;
@@ -69,6 +70,7 @@ public class DataServlet implements IServlet {
 				Arrays.asList(
 //						"tag/time {count:avg}", 
 						"evt/time", 
+						"evt/host",
 						"publisher", 
 						"host",
 						"domain",
@@ -122,14 +124,20 @@ public class DataServlet implements IServlet {
 			// e.g. tag/time {count:avg}
 			// TODO proper recursive handling
 			String[] b = bd.split(" ")[0].split("/");
-			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms("by_"+b[0], b[0]);
+			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
+					"by_"+StrUtils.join(b,'_'), b[0]);
 			Aggregation leaf = byTag;
 			if (b.length > 1) {
-				assert b[1].equals("time") : b;
-				com.winterwell.es.client.agg.Aggregation byTime = Aggregations.dateHistogram("by_time", "time");
-				byTime.put("interval", "hour");			
-				byTag.subAggregation(byTime);
-				leaf = byTime;
+				if (b[1].equals("time")) {
+					com.winterwell.es.client.agg.Aggregation byTime = Aggregations.dateHistogram("by_time", "time");
+					byTime.put("interval", "hour");			
+					byTag.subAggregation(byTime);
+					leaf = byTime;
+				} else {
+					com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);			
+					byTag.subAggregation(byHost);
+					leaf = byHost;
+				}
 			}				
 			// add a count handler
 			if (bd.split(" ").length <= 1) {
