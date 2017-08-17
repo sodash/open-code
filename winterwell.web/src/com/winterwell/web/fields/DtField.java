@@ -12,6 +12,8 @@ import com.winterwell.utils.time.TimeUtils;
  */
 public class DtField extends AField<Dt>{
 
+	private static final long serialVersionUID = 1L;
+
 	public DtField(String name) {
 		super(name);
 	}

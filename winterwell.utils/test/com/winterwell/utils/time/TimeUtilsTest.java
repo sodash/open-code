@@ -359,7 +359,7 @@ public class TimeUtilsTest {
 	@Test
 	public void testParsePeriod() {
 		Pair<Time> p = TimeUtils
-				.parsePeriod("18/11/09 to 23/11/09", "dd/MM/yy");
+				.parsePeriod("18/11/09 to 23/11/09", null);
 		assert p.first.equals(new Time(2009, 11, 18)) : p;
 		assert p.second.equals(new Time(2009, 11, 23)) : p;
 	}

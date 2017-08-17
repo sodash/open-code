@@ -17,7 +17,9 @@ import com.winterwell.utils.time.TimeUtils;
  * 
  * Note: This uses a human-readable format which can lose upto a second of precision.
  * 
- * @see TimeField which is more flexible (but re-uses {@link #toString2(Time)} from here)
+ * @see TimeField which is more flexible
+ * TODO gut this, and use TimeField to do the heavy lifting.
+ * 
  * @see DateFormatField which is more rigid / predictable
  * @author daniel
  * @testedby {@link DateFieldTest}
@@ -32,7 +34,10 @@ public class DateField extends AField<Time> {
 		List<SimpleDateFormat> _formats = new ArrayList();
 		
 		_formats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sssZ")); // ISO 8601, with milliseconds.
+		_formats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'")); // WTF, Java doesn't parse Z properly?
+		_formats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss Z")); // ISO 8601, with milliseconds.
 		_formats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")); // ISO 8601, with seconds.
+		_formats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")); // WTF, Java doesn't parse Z properly?
 		_formats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ")); // ISO 8601, without seconds.
 		
 		// formats[0] -- the "canonical" format
@@ -76,12 +81,14 @@ public class DateField extends AField<Time> {
 	}
 	
 	/**
+	 * NB: duplicated in TimeField
+	 * 
 	 * Attempts to parse a string to a date/time as several standard formats, returns null for specific malformed strings similar to "+0000", and finally attempts natural-language parsing.
 	 * @param v A String which should represent a date/time.
 	 * @param isRelative True if the String represents a time relative to now
 	 * @return A Time object on successful parsing, or null for strings similar to "+0000"
 	 */
-	static Time parse(String v, AtomicBoolean isRelative) {
+	private static Time parse(String v, AtomicBoolean isRelative) {
 		assert isRelative==null || ! isRelative.get() : v;
 		// UTC milliseconds code?
 		if (StrUtils.isInteger(v)) {
@@ -148,9 +155,11 @@ public class DateField extends AField<Time> {
 			// TODO include BC for a pretty string
 			return Long.toString(time.getTime());
 		}
-		// send a human readable string
-		String s = ((SimpleDateFormat) formats[0].clone()).format(time
-				.getDate());
+		// send a human readable ISO8601 string
+		String s = time.toISOString();
+
+		//		((SimpleDateFormat) formats[0].clone()).format(time
+//				.getDate());		
 		// NOTE: SimpleDateFormat.parse ___AND___ SimpleDateFormat.format are
 		// not thread safe...
 		// hence the .clone

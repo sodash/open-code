@@ -203,11 +203,36 @@ public class TimeUtils {
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
+		// hour = 24
 		cal.set(Calendar.HOUR_OF_DAY, 24);
 		Time t = new Time(cal);
 		return t;
 	}
 
+	/**
+	 * 
+	 * @param time
+	 * @return midnight at the month / next-month boundary
+	 */
+	public static Time getEndOfMonth(Time time) {
+		GregorianCalendar cal = time.getCalendar();
+		// zero lots
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+//		Time t0 = new Time(cal);
+		// step 1 month
+		cal.add(Calendar.MONTH, 1);
+//		Time t2 = new Time(cal);
+//		// step back 1 milli-second to be within the month??
+		// No -- let's go for the exact boundary
+//		cal.add(Calendar.MILLISECOND, -1);
+		Time t = new Time(cal);
+		return t;
+	}
+	
 	public static Time getStartOfHour(Time time) {
 		GregorianCalendar cal = time.getCalendar();
 		// zero everything below hour
@@ -406,17 +431,35 @@ public class TimeUtils {
 	 * @return
 	 */
 	public static Time parseExperimental(String s, AtomicBoolean isRelative) throws IllegalArgumentException {
+		Period period = parsePeriod(s, isRelative);
+		return period.first;
+	}
+	
+	/**
+	 * TODO break this out into a TimeParser class so we can have language & timezone support.
+	 * WARNING: will return a point time (a 0-length period) for many cases
+	 * @param s a period or a time. Anything really, but only English.
+	 * @param isRelative
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public static Period parsePeriod(String s, AtomicBoolean isRelative) throws IllegalArgumentException {
+		if (s.contains(" to ")) {
+			String[] bits = s.split(" to ");
+			Time t0 = parseExperimental(bits[0], isRelative);
+			Time t1 = parseExperimental(bits[1], isRelative);
+			return new Period(t0, t1);
+		}
 		s = s.trim().toLowerCase();
 		// standard?
 		try {
 			Time t = new Time(s);
-			return t;
+			return new Period(t);
 		} catch (Exception e) {
 			// oh well
 		}
 
-		// TODO new strategy:
-		// - use regexs to pick out markers for day, month, hour, dt
+		// Use regexs to pick out markers for day, month, hour, dt
 		String month = null, day = null, hour = null;
 		int year = -1;
 		// - build a time object based on what we find
@@ -460,13 +503,14 @@ public class TimeUtils {
 
 		}
 		
-		if (month != null && year != -1) {
+		// put together a date
+		if (month != null) {
+			if (year==-1) year = new Time().getYear();
 			String formatPattern = "dd MMM yyyy";
 			if (day != null) formatPattern = "EEE " + formatPattern;
 			DateFormat df = new SimpleDateFormat(formatPattern);
 			df.setLenient(false);
-			
-			// day of month
+			// look for a day of month
 			Matcher m = Pattern.compile("\\d+").matcher(s);
 			Date date = null;
 			while (m.find()) {
@@ -478,17 +522,35 @@ public class TimeUtils {
 				} catch (ParseException ex) {
 					continue;
 				}
+			}			
+			if (date != null) return new Period(new Time(date));
+			if (day==null) {
+				String formatted = "1 " + month + " " + year;
+				try {
+					date = df.parse(formatted);
+				} catch (ParseException ex) {
+					// oh well
+				}
+				Time t = new Time(date);
+				return new Period(t, getEndOfMonth(new Time(date).plus(TUnit.DAY)));
 			}
-			if (date != null) return new Time(date);
 		}
 
 		// special strings
-		if (s.equals("today") || s.equals("now")) {
+		if (s.equals("now")) {
 			if (isRelative!=null) isRelative.set(true);
-			return new Time();
-		} else if (s.equals("yesterday")) {			
+			return new Period(new Time());
+		}
+		if (s.equals("today")) {
+			if (isRelative!=null) isRelative.set(true);
+			return new Period(getStartOfDay(new Time()), getEndOfDay(new Time()));
+		}
+		if (s.equals("yesterday")) {
+			if (isRelative!=null) isRelative.set(true);
 			s = "1 day ago";
-		} else if (s.equals("tomorrow")) {			
+		}
+		if (s.equals("tomorrow")) {
+			if (isRelative!=null) isRelative.set(true);
 			s = "1 day from now";
 		}
 		
@@ -509,10 +571,10 @@ public class TimeUtils {
 					lastDay = lastDay.minus(TUnit.DAY);
 					String lday = lastDay.format("EEE");
 					if (lday.toLowerCase().startsWith(day)) {
-						return lastDay;
+						return new Period(getStartOfDay(lastDay), getEndOfDay(lastDay));
 					}
 				}				
-				return lastDay;
+				return new Period(getStartOfDay(lastDay), getEndOfDay(lastDay));
 			}
 			s = s.replace("last", "1") + " ago";
 		}
@@ -535,14 +597,14 @@ public class TimeUtils {
 			} else {
 				t = new Time().plus(dt);
 			}
-			if (startEnd==null) return t;
+			if (startEnd==null) return new Period(t);
 			// TODO don't assume month -- also handle "start of last week"
 			Time t2 = TimeUtils.getStartOfMonth(t);
 			if ("start".equals(startEnd)) {
-				return t2;
+				return new Period(t2);
 			} else {
 				Time t3 = t2.plus(TUnit.MONTH).minus(TUnit.MILLISECOND);
-				return t3;
+				return new Period(t3);
 			}
 		} catch (Exception e) {
 			// oh well
@@ -558,21 +620,6 @@ public class TimeUtils {
 
 		// parse failed
 		throw new IllegalArgumentException(s);
-	}
-
-	/**
-	 * @param timeSpec
-	 *            e.g. "18/11/09 to 23/11/09"
-	 * @param pattern
-	 *            SimpleDateFormat, e.g. "dd/MM/yy"
-	 * @testedby {@link TimeUtilsTest#testParsePeriod}
-	 */
-	public static Period parsePeriod(String timeSpec, String pattern) {
-		String[] se = timeSpec.split("\\s+to\\s+");
-		assert se.length == 2;
-		Time start = parse(se[0], pattern);
-		Time end = parse(se[1], pattern);
-		return new Period(start, end);
 	}
 
 	/**
@@ -832,6 +879,7 @@ public class TimeUtils {
 		float offset = timeZone.getOffset(t.getTime());
 		float tz = offset / TUnit.HOUR.millisecs;
 		return t.getHour() + tz;
+
 	}
 
 

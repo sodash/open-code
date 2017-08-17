@@ -464,7 +464,8 @@ public class Time implements Serializable, Comparable<Time> {
 		return format(iso8601);
 	}
 	/**
-	 * Human readable GMT time
+	 * Human readable GMT time. This is NOT ISO8601
+	 * @see #toISOString()
 	 */
 	@SuppressWarnings("deprecation")
 	@Override

@@ -21,7 +21,22 @@ public class TimeFieldTest {
 			String date = "june";
 			TimeField df = new TimeField("test");
 			Callable<Time> x = df.fromString(date);
-			System.out.println(x+" "+x.call());
+			System.out.println("June (but BST bleurgh): "+x.call());
+		}
+		{
+			String date = "november";
+			TimeField df = new TimeField("test");
+			Callable<Time> x = df.fromString(date);
+			System.out.println("november: "+x.call());
+		}
+		{	// end
+			String date = "november";
+			TimeField df = new TimeField("test");
+			df.setPreferEnd(true);
+			Callable<Time> x = df.fromString(date);
+			System.out.println("end of november: "+x.call());
+			assert x.call().isAfter(TimeUtils.parseExperimental("10 November"));
+			assert x.call().isBefore(new Time(new Time().getYear(), 12, 2)) : x;
 		}
 	}
 
@@ -194,7 +209,7 @@ public class TimeFieldTest {
 		{ // check inverse
 			String s = df.toString(now);
 			Time n2 = df.fromString(s).call();
-			assert n2.diff(now, TUnit.MINUTE).getValue() < 2;
+			assert n2.diff(now, TUnit.MINUTE).getValue() < 2 : now +" vs "+n2;
 		}
 		{ // ago
 			Time ago = df.fromString("2 days ago").call();

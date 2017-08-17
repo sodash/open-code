@@ -57,6 +57,14 @@ public final class Period extends Pair<Time> {
 	}
 
 	/**
+	 * A 0-length period ie. a time.
+	 * @param t
+	 */
+	public Period(Time t) {
+		super(t, t);
+	}
+
+	/**
 	 * Is t inside this range? Includes the end values.
 	 */
 	public boolean contains(Time t) {
