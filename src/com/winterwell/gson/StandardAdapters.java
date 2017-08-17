@@ -7,7 +7,7 @@ import com.winterwell.utils.time.Time;
 /**
  * TODO move some of our adapters in here for our convenience
  * @author daniel
- *
+ * @testedby {@link StandardAdaptersTest}
  */
 public class StandardAdapters {
 
@@ -33,6 +33,13 @@ public static class TimeTypeAdapter implements JsonSerializer<Time>, JsonDeseria
 	@Override
 	public Time deserialize(JsonElement json, Type type,
 			JsonDeserializationContext context) throws JsonParseException {
+		if (json.isJsonObject()) {
+			// a vanilla Gson will turn Time into {ut: }
+			JsonObject jobj = (JsonObject) json;
+			JsonPrimitive ut = jobj.getAsJsonPrimitive("ut");
+			long utv = ut.getAsLong();
+			return new Time(utv);
+		}
 		return new Time(json.getAsString());
 	}
 }

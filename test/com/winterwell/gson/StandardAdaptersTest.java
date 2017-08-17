@@ -12,6 +12,20 @@ import com.winterwell.utils.time.Time;
 public class StandardAdaptersTest {
 
 	@Test
+	public void testTime() {
+		Gson gsonWith = new GsonBuilder()
+						.registerTypeAdapter(Class.class, new StandardAdapters.ClassTypeAdapter())
+						.registerTypeAdapter(Time.class, new StandardAdapters.TimeTypeAdapter())
+						.create();
+		
+		Time now = new Time();
+		String gson1 = Gson.toJSON(now);
+		System.out.println(gson1);
+		Time now2 = gsonWith.fromJson(gson1, Time.class);
+		assert now.equals(now2);
+	}
+	
+	@Test
 	public void testWithMap() {
 		Gson gsonWith = new GsonBuilder()
 						.registerTypeAdapter(Class.class, new StandardAdapters.ClassTypeAdapter())
