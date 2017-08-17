@@ -1,7 +1,11 @@
 package com.winterwell.web.app;
 
 import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
 
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
@@ -18,10 +22,12 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.WebUtils;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.EnumField;
 import com.winterwell.web.fields.JsonField;
+
 
 /**
  * Stuff used across the projects, mostly ES / CRUD stuff.
@@ -33,13 +39,16 @@ public class AppUtils {
 
 	public static final JsonField ITEM = new JsonField("item");
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
+	private static final List<String> LOCAL_MACHINES = Arrays.asList(
+			"stross");
+	private static final List<String> TEST_MACHINES = Arrays.asList();
 	
 	/**
 	 * Will try path,indices in order if multiple
 	 * @param path
 	 * @return
 	 */
-	public static Map<String, Object> get(ESPath path) {
+	public static <X> X get(ESPath path, Class<X> klass) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		ESHttpClient.debug = true;
 
@@ -48,8 +57,13 @@ public class AppUtils {
 		s.setSourceOnly(true);
 		GetResponse sr = s.get();
 		if (sr.isSuccess()) {
+			if (klass!=null) {
+				Gson gson = Dep.get(Gson.class);
+				X item = gson.fromJson(sr.getSourceAsString(), klass);
+				return item;
+			}
 			Map<String, Object> json = sr.getSourceAsMap(); //SourceAsString();
-			return json;
+			return (X) json;
 		}
 		Exception error = sr.getError();
 		if (error!=null) {
@@ -57,7 +71,7 @@ public class AppUtils {
 				// was version=draft?
 				if (path.indices.length > 1) {
 					ESPath path2 = new ESPath(Arrays.copyOfRange(path.indices, 1, path.indices.length), path.type, path.id);
-					return get(path2);
+					return get(path2, klass);
 				}
 				// 404
 				return null;
@@ -68,10 +82,12 @@ public class AppUtils {
 	}
 
 	
+	
+	
 	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath) {
 		// prefer being given the draft to avoid ES race conditions
 		if (draft==null) {
-			Map<String, Object> draftMap = get(draftPath);
+			Map<String, Object> draftMap = get(draftPath, null);
 			draft = new JThing().setMap(draftMap);
 		}
 		assert draft != null : draftPath;
@@ -90,10 +106,12 @@ public class AppUtils {
 		IESResponse resp = up.get().check();
 		
 		// Also update draft		
-		UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
-		upd.setDoc(draft.map());
-		upd.setDocAsUpsert(true);
-		IESResponse respd = upd.get().check();
+		if ( ! draftPath.equals(publishPath)) {
+			UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
+			upd.setDoc(draft.map());
+			upd.setDocAsUpsert(true);
+			IESResponse respd = upd.get().check();
+		}
 		
 		// Keep the draft!
 //		// OK - delete the draft (ignoring the race condition!)
@@ -138,7 +156,52 @@ public class AppUtils {
 //		Map<String, Object> item2 = resp.getParsedJson();
 		
 		return item;
-	}
+	}	
 
+	/**
+	 * local / test / production
+	 */
+	public static KServerType getServerType(WebRequest state) {
+		if (state != null && false) {
+			String url = state.getRequestUrl();
+			if (url.contains("//local")) return KServerType.LOCAL;
+			if (url.contains("//test")) return KServerType.TEST;
+			return KServerType.PRODUCTION;
+		}
+		// cache the answer
+		if (_serverType==null) {
+			_serverType = getServerType2();
+		}
+		return _serverType;
+	}		
+	
+	private static KServerType _serverType;
+
+	/**
+	 * Determined in this order:
+	 *
+	 * 1. Is there a config rule "serverType=dev|production" in Statics.properties?
+	 * (i.e. loaded from a server.properties file)
+	 * 2. Is the hostname in the hardcoded PRODUCTION_ and DEV_MACHINES lists?
+	 *
+	 * @return
+	 */
+	private static KServerType getServerType2() {
+		// explicit config
+		if (Dep.has(Properties.class)) {
+			String st = Dep.get(Properties.class).getProperty("serverType");
+			if (st!=null) {
+				Log.d("init", "Using explicit serverType "+st);			
+				return KServerType.valueOf(st);
+			}
+		}
+		// explicitly listed
+		String hostname = WebUtils.fullHostname();
+		if (LOCAL_MACHINES.contains(hostname)) return KServerType.LOCAL;
+		if (TEST_MACHINES.contains(hostname)) return KServerType.TEST;
+
+		Log.i("init", "Treating "+hostname+" as a production machine");
+		return KServerType.PRODUCTION;
+	}
 	
 }

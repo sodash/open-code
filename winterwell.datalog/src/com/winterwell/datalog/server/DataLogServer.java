@@ -19,6 +19,7 @@ import com.winterwell.web.app.JettyLauncher;
 import com.winterwell.web.app.ManifestServlet;
 import com.winterwell.youagain.client.YouAgainClient;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.winterwell.datalog.CallbackManager;
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.ESStorage;
 import com.winterwell.datalog.IDataLog;
@@ -76,7 +77,7 @@ public class DataLogServer {
 		// app=datalog for login
 		YouAgainClient yac = new YouAgainClient("datalog");
 		Dep.set(YouAgainClient.class, yac);
-		
+				
 		// register the tracking event
 		IDataLogAdmin admin = DataLog.getAdmin();
 		admin.registerDataspace(DataLog.getDataspace());

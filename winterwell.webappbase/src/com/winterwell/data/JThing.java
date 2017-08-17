@@ -8,6 +8,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 import com.winterwell.depot.IInit;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 
 /**
@@ -29,9 +30,15 @@ public final class JThing<T> {
 	 * @return this
 	 */
 	public JThing<T> setType(Class<T> type) {
+		// Once set, you cannot change the type (repeated calls with the same type are fine).
 		assert this.type==null || this.type.equals(type) : this.type+" != "+type;
 		this.type = type;
+		assert java==null || type==null || ReflectionUtils.isa(java.getClass(), type) : type+" vs "+java.getClass();
 		return this;
+	}
+	
+	public Class<T> getType() {
+		return type;
 	}
 	
 	public JThing() {
@@ -66,6 +73,7 @@ public final class JThing<T> {
 		this.java = java;
 		map = null;
 		json = null;
+		assert java==null || type==null || ReflectionUtils.isa(java.getClass(), type) : type+" vs "+java.getClass();
 		return this;
 	}
 	

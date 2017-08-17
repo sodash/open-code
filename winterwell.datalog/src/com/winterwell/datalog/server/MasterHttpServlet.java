@@ -115,7 +115,12 @@ public class MasterHttpServlet extends HttpServlet {
 				new DataServlet().process(request);
 				return;
 			}
-			
+
+			if (path.startsWith("/callback")) {
+				new CallbackServlet().process(request);
+				return;
+			}
+
 			// TODO experiment reports table
 			
 			// TODO experiment reports details

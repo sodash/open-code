@@ -125,6 +125,9 @@ public class ManifestServlet extends HttpServlet {
 		// what did we load from?
 		cargo.put("configFiles", configFiles);
 		
+		// server type
+		cargo.put("serverType", AppUtils.getServerType(null));
+				
 		// what config did we pick up?
 		// Screen for sensitive keys, e.g. passwords
 		Map configsjson = new ArrayMap();
@@ -188,7 +191,7 @@ public class ManifestServlet extends HttpServlet {
 			} catch(Exception ex) {
 				cargo.put("error", ex);
 			}
-		}
+		}		
 		
 		JsonResponse output = new JsonResponse(state, cargo);
 		WebUtils2.sendJson(output, state);

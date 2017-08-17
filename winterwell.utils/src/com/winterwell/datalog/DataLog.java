@@ -16,6 +16,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.Warning;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ArgsParser;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
@@ -112,11 +113,9 @@ public class DataLog {
 
 	private static IDataLog initDflt() {
 		try {
-			DataLogConfig dlConfig = new DataLogConfig();
-			File propertiesFile = new File("config/datalog.properties");
-			if (propertiesFile.isFile()) {
-				new ArgsParser(dlConfig).set(propertiesFile);
-			}
+			DataLogConfig dlConfig = new ConfigBuilder(new DataLogConfig())
+				.set(new File("config/datalog.properties"))
+				.get();
 			IDataLog dl = setConfig(dlConfig);
 //			IDataLog dl = (IDataLog) Class.forName(CLASS_DATALOGIMPL)
 //					.newInstance();
@@ -124,7 +123,7 @@ public class DataLog {
 			return dl;
 		} catch (Exception e) {
 			// Bad!
-			Log.e(LOGTAG, e.getMessage());
+			Log.e(LOGTAG, e);
 			// Let stuff continue without exceptions elsewhere
 			return new DummyDataLog(e);
 		}

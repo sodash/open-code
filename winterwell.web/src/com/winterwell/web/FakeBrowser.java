@@ -414,6 +414,19 @@ public class FakeBrowser {
 		String encodedData = WebUtils.urlEncode(vars);
 		return post(uri, MIME_TYPE_URLENCODED_FORM, encodedData);
 	}
+	
+
+	/**
+	 * @param uri
+	 *            The uri to post to.
+	 * @param body
+	 *            This will be URL encoded before sending.
+	 * @return The response from the server.
+	 */
+	public String post(String uri, String body) {
+		String encodedData = WebUtils.urlEncode(body);
+		return post(uri, MIME_TYPE_URLENCODED_FORM, encodedData);
+	}
 
 	/**
 	 * TODO merge with {@link #post(String, Map)} if successful

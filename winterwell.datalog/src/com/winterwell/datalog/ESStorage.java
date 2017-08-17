@@ -287,6 +287,7 @@ public class ESStorage implements IDataLogStorage {
 		// set doc
 		prepIndex.setBodyMap(event.toJson2());
 		Future<ESHttpResponse> f = prepIndex.execute();
+		client.close();
 //		// log stuff
 //		f.addListener(() -> {			
 //			try {

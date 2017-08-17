@@ -60,6 +60,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"pub", String.class,
 			"ad", String.class,
 			"vert", String.class,
+			"bid", String.class,
 			"variant", String.class,
 			"campaign", String.class,
 			// text properties (support tokenisation)
@@ -97,6 +98,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 */
 	final Map<String, ?> props;
 
+	public Object getProp(String prop) {
+		return props.get(prop);
+	}
+	
 	/**
 	 * Does NOT include time-period or dataspace. This is added by the DataLog based on how
 	 * it buckets stuff.
@@ -169,12 +174,20 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		return dataspace+"/"+eventType+"_"+StrUtils.md5(txt);
 	}
 
+	/**
+	 * This is for ElasticSearch!
+	 * For external use, use Gson or similar.
+	 */
 	@Override
 	public String toJSONString() {
 		return new SimpleJson().toJson(toJson2());
 	}
 
 	/**
+	 * This is for ElasticSearch!
+	 * For external use, use Gson or similar.
+	 * 
+	 * 
 	 * Because this has to handle big data, we economise and store either n or v, not both.
 	 * {k: string, n: ?number, v: ?string}
 	 */

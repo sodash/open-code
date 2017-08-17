@@ -48,7 +48,7 @@ import com.winterwell.web.fields.TimeField;
  */
 public class DataServlet implements IServlet {
 
-	private static final SField DATASPACE = new SField("dataspace");
+	static final SField DATASPACE = new SField("dataspace");
 
 	@Override
 	public void process(WebRequest state) throws IOException {						
@@ -94,7 +94,7 @@ public class DataServlet implements IServlet {
 		// time box
 		ICallable<Time> cstart = state.get(new TimeField("start"));
 		Time start = cstart==null? new Time().minus(TUnit.MONTH) : cstart.call();
-		ICallable<Time> cend = state.get(new TimeField("end"));
+		ICallable<Time> cend = state.get(new TimeField("end").setPreferEnd(true));
 		Time end = cend==null? new Time() : cend.call();
 		// query
 		String q = state.get("q");

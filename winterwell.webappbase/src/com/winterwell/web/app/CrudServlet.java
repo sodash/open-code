@@ -130,7 +130,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	protected JThing<T> getThingFromDB(WebRequest state) {		
 		ESPath path = getPath(state);
-		Map<String, Object> obj = AppUtils.get(path);		
+		T obj = AppUtils.get(path, type);		
 		if (obj==null) {
 			// Not found :(
 			// was version=draft?
@@ -142,7 +142,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			}
 			return null;
 		}
-		return new JThing().setMap(obj).setType(type);
+		return new JThing().setType(type).setJava(obj);
 	}
 
 	protected ESPath getPath(WebRequest state) {

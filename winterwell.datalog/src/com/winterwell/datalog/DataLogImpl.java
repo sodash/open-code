@@ -23,6 +23,7 @@ import com.winterwell.maths.timeseries.ExtraDimensionsDataStream;
 import com.winterwell.maths.timeseries.ExtraDimensionsDataStream.KMatchPolicy;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.TimeSlicer;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
@@ -263,6 +264,12 @@ public class DataLogImpl implements Closeable, IDataLog {
 		saveThread = new Timer("DataLog.save", true);
 		saveThread.scheduleAtFixedRate(new SystemStatsTask(), first.getDate(), config.interval.getMillisecs());
 		Log.i(DataLog.LOGTAG, "1st save at "+first+" ("+TimeUtils.toString(new Time().dt(first))+")");
+		// prepare for callbacks
+		if ( ! Dep.has(CallbackManager.class)) {
+			CallbackManager cbman = new CallbackManager();
+			cbman.init();
+			Dep.set(CallbackManager.class, cbman);
+		}
 	}
 
 	/**
@@ -589,6 +596,9 @@ public class DataLogImpl implements Closeable, IDataLog {
 		// Tracker events are unlikely to duplicate, so there's no advantage to batching them -- and there is a memory issue.
 		if (storage instanceof ESStorage && event.props!=null && event.props.size() > 1) {
 			storage.saveEvent(event.dataspace, event, getCurrentBucket());
+			// callback
+			CallbackManager cbman = Dep.get(CallbackManager.class);
+			cbman.send(event);		
 			return;
 		}
 		// turn it into a plain stag
@@ -606,6 +616,10 @@ public class DataLogImpl implements Closeable, IDataLog {
 //		}		
 //		// drop it :(
 //		Log.e("datalog", "Could not count "+event);
+		
+		// callback
+		CallbackManager cbman = Dep.get(CallbackManager.class);
+		cbman.send(event);		
 	}
 
 	public static String event2tag(String dataspace, Map event) {
