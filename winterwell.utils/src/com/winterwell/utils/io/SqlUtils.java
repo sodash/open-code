@@ -30,6 +30,7 @@ import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Cache;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
@@ -1132,6 +1133,25 @@ public class SqlUtils {
 			assert ! col2val.containsKey("id") : col2val;
 		}
 		return columnInfo;
+	}
+
+	public static List<Map<String, Object>> select(Connection conn, String table, String where, List<String> props) throws SQLException 
+	{
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(
+				"select "+StrUtils.join(props, ",")
+				+" from bid b where "+where);
+		Iterable<Object[]> rit = asIterable(rs);
+		List<Map<String, Object>> maps = new ArrayList();
+		for (Object[] row : rit) {
+			ArrayMap map = new ArrayMap();
+			for(int i=0; i<props.size(); i++) {
+				String prop = props.get(i);
+				map.put(prop, row[i]);
+			}
+			maps.add(map);
+		}		
+		return maps;
 	}
 
 
