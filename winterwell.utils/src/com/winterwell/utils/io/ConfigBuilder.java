@@ -238,6 +238,7 @@ public class ConfigBuilder {
 	 *             problem) can then be found via {@link #getMissingArguments()}
 	 */
 	public ConfigBuilder setFromMain(String[] args) {
+		if (args==null) return this;
 		try {
 			// Look for config
 			int i = 0;
@@ -367,6 +368,8 @@ public class ConfigBuilder {
 	}
 
 	private boolean setOneKeyValue(String a, String v, List<Field> set, List<Exception> errors) {
+		// trim strings (strings loaded from .properties can have trailing whitespace)
+		if (v != null) v = v.trim();
 		// special case: config is a Properties object
 		if (config instanceof Properties) {
 			((Properties)config).setProperty(a, v);
