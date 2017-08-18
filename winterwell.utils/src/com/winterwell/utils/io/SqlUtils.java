@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -863,9 +864,8 @@ public class SqlUtils {
 		return s;
 	}
 
-	@Deprecated
-	// TODO
-	public static int insert(Object row, String table, Connection con) {
+	
+	public static int insert(Map<String,Object> item, String table, Connection con) {
 		// half-hearted anti-injection check
 		assert !table.contains(";") && !table.contains("--") : table;
 		boolean autoClose = false;
@@ -876,18 +876,27 @@ public class SqlUtils {
 			}
 			Statement stmnt = con.createStatement();
 
-			List<Field> fields = ReflectionUtils.getAllFields(row.getClass());
-			StringBuilder select = new StringBuilder();
-			for (Field field : fields) {
-				if (ReflectionUtils.isTransient(field))
-					continue;
-			}
-			StringBuilder cols = new StringBuilder();
+//			List<Field> fields = ReflectionUtils.getAllFields(row.getClass());
+//			fields = Containers.filter(fields, f -> ! ReflectionUtils.isTransient(f));
+//			StringBuilder select = new StringBuilder();
+			ArrayList<String> keys = new ArrayList(item.keySet());
+			String cols = StrUtils.join(keys, ",");
 			StringBuilder values = new StringBuilder();
+			for(String f : keys) {
+				Object v = item.get(f);
+				if (v == null) { values.append("null,"); continue; }
+				if (v instanceof Number) values.append(v+",");
+				else if (v instanceof Boolean) values.append(v+",");
+				else if (v instanceof String) values.append(SqlUtils.sqlEncode((String)v)+",");
+				else {
+					values.append(SqlUtils.sqlEncode(v.toString())+",");
+				}
+			}
+			StrUtils.pop(values, 1);
 			String sql = "insert into " + table + " (" + cols + ") values ("
 					+ values + ");";
-			if (true)
-				throw new TodoException();
+//			if (true)
+//				throw new TodoException();
 			int rs = stmnt.executeUpdate(sql);
 			if (!con.getAutoCommit())
 				con.commit();
