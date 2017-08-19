@@ -67,6 +67,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	public transient Object history;
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely go.
+	 * 
 	 * Default: join Files with concatenation. Override to handle other types!
 	 *
 	 * @param bits
@@ -93,6 +95,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	}
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely go.
+	 * 
 	 * Default: filter Files with 1st word=Java timestamp Override to handle
 	 * other types!
 	 *
@@ -155,6 +159,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 		return WebUtils.fullHostname();
 	}
 
+	@Deprecated // When we simplify Desc, this will likely go.
 	public static enum KSerialiser {
 		JAVA, 
 		/** The default, ie null = XStream */ XSTREAM
@@ -180,12 +185,16 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	String server = LOCAL_SERVER;
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely go.
 	 * @see #setServerHint(String). Normally null
 	 */
 	transient String serverHint;
 
 	private Class type;
+
 	/**
+	 * @deprecated When we simplify Desc, this will likely go, or become a String.
+	 * 
 	 * null by default. If not-null, this should be part of the id.
 	 */
 	private Number version;
@@ -438,18 +447,10 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	}
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely go.
 	 * You could think of this as the data-artifact's format
 	 */
 	KSerialiser ser;
-
-	/**
-	 * @param ser
-	 *            null by default for XStream. Set to use Java serialisation
-	 *            instead.
-	 */
-	public void setSerialiser(KSerialiser ser) {
-		this.ser = ser;
-	}
 
 	/**
 	 * @return a key using the id. May have a very long name!
@@ -478,6 +479,10 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 		return type;
 	}
 
+	/**
+	 * @deprecated When we simplify Desc, this will likely merge with #getVersion()
+	 * @return
+	 */
 	public Number getVersion() {
 		return version;
 	}
@@ -629,6 +634,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	}
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely go.
+	 * 
 	 * If this artifact naturally lives on a particular server.<br>
 	 * This is part of the id -- so 
 	 * e.g. the artifact myserver1/free_memory != myserver2/free_memory <br>
@@ -668,6 +675,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	}
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely merge with copy().
+	 * 
 	 * For changing type - used in conjunction with the copy constructor.
 	 *
 	 * @param type
@@ -703,8 +712,10 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 		return s;
 	}
 
+	@Deprecated // When we simplify Desc, this will likely go.
 	Period range;
 
+	@Deprecated // When we simplify Desc, this will likely go.
 	boolean gzip;
 
 	/**
@@ -721,19 +732,17 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	transient com.winterwell.depot.MetaData metadata;
 
 	/**
-	 * Set if an IMerger is to be used. Normally null (don't use a merger)
+	 * Set if an IMerger is to be used. Normally null.
 	 */
 	private transient X before;
 	
+	/**
+	 * The "before" freshly-loaded state of the artifact.
+	 * Set if an IMerger is to be used. Normally null.
+	 * @return
+	 */
 	X getBefore() {
 		return before;
-	}
-
-	/**
-	 * Use gzip compression when saving this object? false by default
-	 */
-	public void setGzip(boolean gzip) {
-		this.gzip = gzip;
 	}
 
 	/**
@@ -797,6 +806,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	}
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely go.
+	 * 
 	 * Ranged data can be split across several files. This makes it good for
 	 * long running data-streams, as we can fairly quickly access the desired
 	 * range.
@@ -816,11 +827,17 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 		this.range = new Period(start, end);
 	}
 
+	/**
+	 * @deprecated When we simplify Desc, this will likely go.
+	 * @return
+	 */
 	public Period getRange() {
 		return range;
 	}
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely go.
+	 * 
 	 * Put a key/value pairing which (like dependencies) should be stored as
 	 * part of one big hashcode.
 	 *
@@ -894,6 +911,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	}
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely go.
+	 * 
 	 * Give Depot a hint for which server to find this on. <br>
 	 * Use case 1: if server=any, or if you're trying to fetch a backup copy.<br>
 	 * Use case 2: to do a local put of a holding-place object (so code runs smoothly)
@@ -1000,6 +1019,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	}
 
 	/**
+	 * @deprecated When we simplify Desc, this will likely go.
 	 * Equivalent to new {@link #Desc(Desc)}
 	 */
 	public Desc copy() {
