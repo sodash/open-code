@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.es.ESPath;
@@ -80,10 +79,38 @@ public class AppUtils {
 		}
 		return null;
 	}
+	
+	public static JThing doUnPublish(JThing thing, ESPath draftPath, ESPath pubPath, KStatus newStatus) {
+		// prefer being given the thing to avoid ES race conditions
+		if (thing==null) {
+			Map<String, Object> draftMap = get(pubPath, null);
+			thing = new JThing().setMap(draftMap);
+		}
+		assert thing != null : draftPath;
+		// remove modified flag
+		if (thing.map().containsKey("modified")) {
+			thing.put("modified", false);
+		}
+		// set status
+		thing.put("status", newStatus);
+		// update draft // TODO just an update script to set status
+		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
+		UpdateRequestBuilder up = client.prepareUpdate(draftPath);
+		up.setDoc(thing.map());
+		up.setDocAsUpsert(true);
+		// NB: this doesn't return the merged item :(
+		IESResponse resp = up.get().check();
+		
+		// delete the published version	
+		if ( ! draftPath.equals(pubPath)) {
+			DeleteRequestBuilder del = client.prepareDelete(pubPath.index(), pubPath.type, pubPath.id);
+			IESResponse ok = del.get().check();		
+		}
+		
+		return thing;
+	}
+	
 
-	
-	
-	
 	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath) {
 		// prefer being given the draft to avoid ES race conditions
 		if (draft==null) {
@@ -120,7 +147,8 @@ public class AppUtils {
 
 		return draft;
 	}
-
+	
+	
 	public static  void doDelete(ESPath path) {		
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		DeleteRequestBuilder del = client.prepareDelete(path.index(), path.type, path.id);
@@ -203,5 +231,7 @@ public class AppUtils {
 		Log.i("init", "Treating "+hostname+" as a production machine");
 		return KServerType.PRODUCTION;
 	}
+
+
 	
 }
