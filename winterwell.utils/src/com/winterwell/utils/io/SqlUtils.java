@@ -1135,13 +1135,24 @@ public class SqlUtils {
 		return columnInfo;
 	}
 
-	public static List<Map<String, Object>> select(Connection conn, String table, String where, List<String> props) throws SQLException 
+	/**
+	 * 
+	 * @param conn
+	 * @param table
+	 * @param where
+	 * @param props
+	 * @param max 0 for unlimited
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Map<String, Object>> select(
+			Connection conn, String table, String where, List<String> props,
+			int max
+			) throws SQLException 
 	{
-		Statement s = conn.createStatement();
-		ResultSet rs = s.executeQuery(
-				"select "+StrUtils.join(props, ",")
-				+" from bid b where "+where);
-		Iterable<Object[]> rit = asIterable(rs);
+		String sql = "select "+StrUtils.join(props, ",")+" from "+table+" where "+where;
+		// call the DB
+		Iterable<Object[]> rit = executeQuery(sql, conn, max);
 		List<Map<String, Object>> maps = new ArrayList();
 		for (Object[] row : rit) {
 			ArrayMap map = new ArrayMap();
