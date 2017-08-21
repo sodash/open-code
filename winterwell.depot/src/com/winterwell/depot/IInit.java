@@ -1,5 +1,7 @@
 package com.winterwell.depot;
 
+import java.util.Map;
+
 /**
  * This gormlessly named interface is for objects which have transient wiring or
  * resources that should be setup when they are created/loaded. init() should be
@@ -29,4 +31,15 @@ public interface IInit {
 	 * @return this
 	 */
 	void init();
+
+	/**
+	 * Convenience for calling init() on a set of sub-objects
+	 * @param objects
+	 */
+	static void init(IInit... objects) {
+		for (IInit obj : objects) {
+			if (obj!=null) obj.init();
+		}
+	}	
+	
 }

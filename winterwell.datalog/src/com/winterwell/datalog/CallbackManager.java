@@ -34,7 +34,8 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 		String protocol = mtype==KServerType.LOCAL? "http" : "https"; 
 		String url = protocol+"://"+(mtype==KServerType.PRODUCTION? "" : mtype.toString().toLowerCase())
 				+"as.good-loop.com/lgwebhook";
-		Callback minview = new Callback("gl", "close", url);
+		// FIXME minview is where money gets spent!		
+		Callback minview = new Callback("gl", "minview", url);
 		callbacksForDataspace.add("gl", minview);
 	}
 
@@ -48,6 +49,7 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 			try {
 				Log.d(LOGTAG, callback.url+" for "+msg);
 				FakeBrowser fb = new FakeBrowser();
+				fb.setDebug(true);
 				String json = Gson.toJSON(msg);
 				String ok = fb.post(callback.url, json);
 			} catch(Exception ex) {

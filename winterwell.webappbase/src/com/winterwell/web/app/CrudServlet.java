@@ -98,6 +98,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			return;
 		}
 		if (state.getAction()==null) {
+			// no thing?
 			throw new WebEx.E404(state.getRequestUrl());
 		}
 		JsonResponse output = new JsonResponse(state);
@@ -136,6 +137,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			// was version=draft?
 			if (state.get(AppUtils.STATUS)==KStatus.DRAFT) {
 				// Try for the published version
+				// NB: all published should be in draft, so this should be redundant
 				WebRequest state2 = new WebRequest(state.request, state.response);
 				state2.put(AppUtils.STATUS, KStatus.PUBLISHED);
 				return getThingFromDB(state2);
@@ -170,7 +172,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	private String _id;
 
-	protected JThing doPublish(WebRequest state) {
+	protected JThing<T> doPublish(WebRequest state) {
 		String id = getId(state);
 		Utils.check4null(id); 
 		ESPath draftPath = esRouter.getPath(type, id, KStatus.DRAFT);
