@@ -4,21 +4,16 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.containers.Containers;
-import com.winterwell.utils.log.Log;
 import com.winterwell.gson.Gson;
 import com.winterwell.gson.JsonSyntaxException;
 import com.winterwell.gson.KLoopPolicy;
 import com.winterwell.gson.TypeAdapter;
 import com.winterwell.gson.internal.ConstructorConstructor;
-import com.winterwell.gson.internal.LinkedTreeMap;
 import com.winterwell.gson.internal.ObjectConstructor;
 import com.winterwell.gson.internal.bind.ReflectiveTypeAdapterFactory.BoundField;
 import com.winterwell.gson.reflect.TypeToken;
@@ -27,7 +22,6 @@ import com.winterwell.gson.stream.JsonToken;
 import com.winterwell.gson.stream.JsonWriter;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.ReflectionUtils;
-import com.winterwell.utils.TodoException;
 
 /**
  * Uses "@class" property to instantiate sub-classes.
