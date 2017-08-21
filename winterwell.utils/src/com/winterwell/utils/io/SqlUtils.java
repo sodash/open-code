@@ -1015,8 +1015,25 @@ public class SqlUtils {
 		SqlUtils.upsert2_insert(table, col2val, specialCaseId, columnInfo,
 				whereClause, upsert);
 
-		// do it
-		return executeUpdate(upsert.toString(), em);
+		// HACK sub vars TODO refactor to not use vars 
+		// This code here is not 100% safe! 
+		String sql = upsert.toString();
+		for(String k : col2val.keySet()) {
+			Object v = col2val.get(k);
+			String vs = sqlEncode(v);
+			sql = sql.replaceAll(":\\b"+k+"\\b", vs);
+		}
+		
+		// do it		
+		return executeUpdate(sql, em);
+	}
+
+	public static String sqlEncode(Object v) {
+		if (v instanceof String) return SqlUtils.sqlEncode((String)v);
+		if (v==null) return "null";
+		if (v instanceof Number) return v.toString();
+		if (v.getClass().isEnum()) return SqlUtils.sqlEncode(v.toString());
+		return v.toString();		
 	}
 
 //	static void upsert2_setParams(Map<String, ?> col2val,
@@ -1130,7 +1147,7 @@ public class SqlUtils {
 //			assert getColumnIndex(em, "id", table) != -1 : table + " = "
 //					+ getTableColumns(em, table);
 		} else {
-			assert ! col2val.containsKey("id") : col2val;
+//			assert ! col2val.containsKey("id") : col2val;
 		}
 		return columnInfo;
 	}
