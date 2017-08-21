@@ -118,6 +118,11 @@ public class PublishProjectTask extends BuildTask {
 	@Override
 	protected void doTask() throws Exception {
 		assert typeOfPublish!=null : "Set typeOfPublish to test or production!"; 
+		if (typeOfPublish==KPubType.production && GuiUtils.isInteractive()) {
+			boolean ok = GuiUtils.confirm(
+				"Are you sure you want to push "+GitTask.getGitBranch(localWebAppDir)+" to production?");
+			if ( ! ok) throw new FailureException();			
+		}
 		// Setup file paths
 		// Check that we are running from a plausible dir:
 		if ( ! localWebAppDir.exists()) { 
