@@ -367,7 +367,7 @@ public class FileUtils {
 		assert in.isDirectory() : in;
 		// Create out?
 		if (!out.exists()) {
-			boolean ok = out.mkdir();
+			boolean ok = out.mkdirs();
 			if (!ok) {
 				failed.add(in);
 				return;
