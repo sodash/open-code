@@ -60,6 +60,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"pub", String.class,
 			"ad", String.class,
 			"vert", String.class,
+			"vertiser", String.class,
 			"bid", String.class,
 			"variant", String.class,
 			"campaign", String.class,
@@ -123,6 +124,11 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 */
 	public Time time = new Time();
 	
+	/**
+	 * @deprecated Use the other constructor
+	 * @param eventType
+	 * @param properties
+	 */
 	public DataLogEvent(String eventType, Map<String,?> properties) {
 		this(DataLog.getDataspace(), 1, eventType, properties);
 	}
