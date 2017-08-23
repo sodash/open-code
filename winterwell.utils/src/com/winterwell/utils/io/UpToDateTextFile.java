@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.concurrent.Callable;
 
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.io.FileUtils;
 
 /**
  * Checks if the file has a modified timestamp & reloads if it has.

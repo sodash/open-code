@@ -3,15 +3,12 @@ package com.winterwell.nlp.io;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.winterwell.maths.timeseries.ADataStream;
-
-import com.winterwell.utils.ReflectionUtils;
-
-import com.winterwell.utils.containers.AbstractIterator;
-
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasDesc;
 import com.winterwell.depot.ModularXML;
+import com.winterwell.maths.timeseries.ADataStream;
+import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.containers.AbstractIterator;
 
 /**
  * A stream of word/sentence tokens.

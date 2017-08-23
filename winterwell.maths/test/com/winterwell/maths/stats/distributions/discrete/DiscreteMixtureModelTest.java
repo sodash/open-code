@@ -1,7 +1,5 @@
 package com.winterwell.maths.stats.distributions.discrete;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import com.winterwell.utils.MathUtils;

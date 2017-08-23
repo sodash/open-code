@@ -2,13 +2,10 @@ package com.winterwell.datalog.server;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.IDataLog;
-import com.winterwell.datalog.Rate;
-import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
-import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.app.WebRequest;
 

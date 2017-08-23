@@ -1,7 +1,6 @@
 package com.winterwell.nlp.io;
 
 import com.winterwell.nlp.PorterStemmer;
-import com.winterwell.utils.StrUtils;
 
 /**
  * A default pipeline for simplifying text. Break into words, lowercase, discard

@@ -1,6 +1,5 @@
 package com.winterwell.nlp.dict;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,14 +11,9 @@ import java.util.Set;
 
 import com.winterwell.nlp.NLPWorkshop;
 import com.winterwell.nlp.analysis.SyllableCounter;
-import com.winterwell.nlp.io.pos.PosTagByOpenNLP;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ListMap;
 import com.winterwell.utils.io.LineReader;
-import com.winterwell.utils.log.KErrorPolicy;
-
-import com.winterwell.depot.Depot;
-import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.io.FileUtils;
 
 /**
  * Wrapper for the CMU pronunciation dictionary, which can be used for syllable-counting and rhyming.

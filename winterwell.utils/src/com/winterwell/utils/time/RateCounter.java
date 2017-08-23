@@ -3,8 +3,8 @@ package com.winterwell.utils.time;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.winterwell.datalog.Rate;
 import com.winterwell.datalog.DataLog;
+import com.winterwell.datalog.Rate;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
 

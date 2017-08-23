@@ -3,9 +3,6 @@ package com.winterwell.nlp.docmodels;
 import java.util.HashSet;
 import java.util.List;
 
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.Printer;
-
 import com.winterwell.maths.ITrainable;
 import com.winterwell.maths.datastorage.IIndex;
 import com.winterwell.maths.datastorage.Index;
@@ -17,6 +14,8 @@ import com.winterwell.nlp.corpus.SimpleDocument;
 import com.winterwell.nlp.io.ITokenStream;
 import com.winterwell.nlp.io.Tkn;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
+import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.KErrorPolicy;

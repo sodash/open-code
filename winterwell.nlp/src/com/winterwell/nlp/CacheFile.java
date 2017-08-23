@@ -5,12 +5,12 @@ package com.winterwell.nlp;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import com.winterwell.depot.Depot;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.MetaData;
 import com.winterwell.utils.gui.GuiUtils;
+
+import junit.framework.TestCase;
 
 /**
  * Add a file to the NLP depot. Implemented as a JUnit test so it can be run

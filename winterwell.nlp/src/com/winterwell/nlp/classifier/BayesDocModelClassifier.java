@@ -3,8 +3,6 @@ package com.winterwell.nlp.classifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.winterwell.utils.MathUtils;
-
 import com.winterwell.maths.classifiers.BayesModelSelection;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.LogProbDistribution;
@@ -12,6 +10,7 @@ import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.docmodels.IDocModel;
 import com.winterwell.nlp.docmodels.WordFreqDocModel;
+import com.winterwell.utils.MathUtils;
 
 /**
  * Use with {@link WordFreqDocModel} to get the "classic" Naive Bayes algorithm.

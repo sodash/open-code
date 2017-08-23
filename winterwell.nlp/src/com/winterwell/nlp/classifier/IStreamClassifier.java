@@ -1,14 +1,9 @@
 package com.winterwell.nlp.classifier;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.winterwell.maths.stats.distributions.cond.ExplnOfDist;
 import com.winterwell.maths.stats.distributions.cond.ISitnStream;
-import com.winterwell.maths.stats.distributions.cond.Sitn;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.nlp.corpus.IDocument;
-import com.winterwell.utils.containers.Pair2;
 
 public interface IStreamClassifier<Tok> extends ITextClassifier<String> {
 

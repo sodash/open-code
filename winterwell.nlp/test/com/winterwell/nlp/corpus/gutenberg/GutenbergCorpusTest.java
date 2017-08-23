@@ -2,9 +2,8 @@ package com.winterwell.nlp.corpus.gutenberg;
 
 import org.junit.Test;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.nlp.corpus.IDocument;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 
 public class GutenbergCorpusTest {

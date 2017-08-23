@@ -9,9 +9,6 @@ import java.util.List;
 
 import com.winterwell.utils.containers.AbstractIterator;
 
-import com.winterwell.depot.Desc;
-import com.winterwell.depot.IHasDesc;
-
 /**
  * Just wrap a String[].
  * TODO merge with {@link ListTokenStream}

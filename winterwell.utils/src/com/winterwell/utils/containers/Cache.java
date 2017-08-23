@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.winterwell.datalog.DataLog;
-
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.IFn;
 

@@ -3,7 +3,6 @@ package com.winterwell.nlp.simpleparser;
 import java.util.Arrays;
 
 import com.winterwell.utils.Printer;
-
 import com.winterwell.utils.Utils;
 
 public class First<PT> extends Parser<PT> {

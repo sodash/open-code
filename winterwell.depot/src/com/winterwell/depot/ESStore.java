@@ -1,32 +1,21 @@
 package com.winterwell.depot;
 
 import java.io.File;
-import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.jetty.util.ajax.JSON;
-
-import com.google.common.util.concurrent.ListenableFuture;
-import com.thoughtworks.xstream.core.util.Base64Encoder;
-import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasVersion.IHasBefore;
-import com.winterwell.depot.MetaData;
 import com.winterwell.es.ESType;
 import com.winterwell.es.client.DeleteRequestBuilder;
-import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.es.client.GetRequestBuilder;
 import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.IndexRequestBuilder;
-import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.XStreamUtils;

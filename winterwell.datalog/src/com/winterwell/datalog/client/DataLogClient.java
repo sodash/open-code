@@ -2,9 +2,7 @@ package com.winterwell.datalog.client;
 
 import java.util.Map;
 
-import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogEvent;
-import com.winterwell.datalog.IDataLog;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.FakeBrowser;

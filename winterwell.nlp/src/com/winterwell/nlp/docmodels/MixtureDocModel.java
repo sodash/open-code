@@ -1,10 +1,9 @@
 package com.winterwell.nlp.docmodels;
 
-import com.winterwell.utils.MathUtils;
-
 import com.winterwell.maths.datastorage.IIndex;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.nlp.corpus.IDocument;
+import com.winterwell.utils.MathUtils;
 
 /**
  * Weighted sum of several models. Can DiscreteMixtureModel replace this?

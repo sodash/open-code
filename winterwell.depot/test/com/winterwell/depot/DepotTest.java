@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 
 import com.winterwell.depot.DepotTest.IInner;
-import com.winterwell.depot.ModularXML;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;

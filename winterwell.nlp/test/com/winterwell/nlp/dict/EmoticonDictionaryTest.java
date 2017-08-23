@@ -1,11 +1,11 @@
 package com.winterwell.nlp.dict;
 
-import junit.framework.TestCase;
+import com.winterwell.depot.Depot;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.ListMap;
 import com.winterwell.utils.log.KErrorPolicy;
 
-import com.winterwell.depot.Depot;
-import com.winterwell.utils.Printer;
+import junit.framework.TestCase;
 
 public class EmoticonDictionaryTest extends TestCase {
 

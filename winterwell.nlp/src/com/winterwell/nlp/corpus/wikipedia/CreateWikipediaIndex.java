@@ -7,9 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.nlp.NLPWorkshop;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.web.WebUtils;

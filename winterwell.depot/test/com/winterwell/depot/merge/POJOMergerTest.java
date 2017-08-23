@@ -1,7 +1,5 @@
 package com.winterwell.depot.merge;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import com.winterwell.utils.Printer;

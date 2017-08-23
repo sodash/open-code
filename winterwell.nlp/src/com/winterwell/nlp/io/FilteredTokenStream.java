@@ -3,9 +3,7 @@ package com.winterwell.nlp.io;
 import java.util.Collection;
 import java.util.HashSet;
 
-import com.winterwell.nlp.spam.RudeWordsFilter;
 import com.winterwell.utils.FailureException;
-import com.winterwell.utils.IFilter;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.AbstractIterator;

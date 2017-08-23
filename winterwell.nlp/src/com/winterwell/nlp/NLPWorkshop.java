@@ -1,10 +1,7 @@
 package com.winterwell.nlp;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,8 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.zip.GZIPInputStream;
 
+import com.winterwell.depot.Depot;
+import com.winterwell.depot.Desc;
+import com.winterwell.depot.MetaData;
 import com.winterwell.maths.datastorage.HalfLifeMap;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
@@ -30,15 +29,8 @@ import com.winterwell.utils.TodoException;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Cache;
-
 import com.winterwell.utils.io.FileUtils;
-
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.log.KErrorPolicy;
-
-import com.winterwell.depot.Depot;
-import com.winterwell.depot.Desc;
-import com.winterwell.depot.MetaData;
 
 /**
  * Provide access to NLP stuff - such as dictionaries - in a context sensitive

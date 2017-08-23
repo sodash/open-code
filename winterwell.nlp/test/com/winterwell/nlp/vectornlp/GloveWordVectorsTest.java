@@ -1,17 +1,14 @@
 package com.winterwell.nlp.vectornlp;
 
-import static org.junit.Assert.*;
-
 import java.util.Set;
-
-import no.uib.cipr.matrix.Vector;
 
 import org.junit.Test;
 
 import com.winterwell.nlp.NLPWorkshop;
 import com.winterwell.nlp.vectornlp.GloveWordVectors.KGloveSource;
-
 import com.winterwell.utils.containers.TopNList;
+
+import no.uib.cipr.matrix.Vector;
 
 public class GloveWordVectorsTest {
 

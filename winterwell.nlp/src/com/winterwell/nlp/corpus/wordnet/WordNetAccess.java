@@ -7,6 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.winterwell.nlp.NLPWorkshop;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.io.FileUtils;
+
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.IndexWord;
@@ -16,10 +21,6 @@ import net.didion.jwnl.data.PointerType;
 import net.didion.jwnl.data.Synset;
 import net.didion.jwnl.data.Word;
 import net.didion.jwnl.dictionary.Dictionary;
-import com.winterwell.nlp.NLPWorkshop;
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.WrappedException;
-import com.winterwell.utils.io.FileUtils;
 
 /**
  * Provide access to WordNet via JWNL.

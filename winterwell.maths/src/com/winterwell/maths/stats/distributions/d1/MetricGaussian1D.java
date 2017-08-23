@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.maths.ITrainable;
-
 import com.winterwell.maths.stats.StatsUtils;
 import com.winterwell.maths.vector.IMetric1D;
 import com.winterwell.utils.MathUtils;

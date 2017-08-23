@@ -8,11 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.utils.time.TimeFragment;
-
 import com.winterwell.maths.hmm.ObjectHMM;
 import com.winterwell.maths.matrix.ObjectMatrix;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.time.TimeFragment;
 
 /**
  * Can learn time formats. This is a HiddenMarkovModel, but the output is

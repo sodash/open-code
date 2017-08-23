@@ -1,8 +1,5 @@
 package com.winterwell.nlp.classifier;
 
-import no.uib.cipr.matrix.Vector;
-import no.uib.cipr.matrix.sparse.SparseVector;
-
 import org.junit.Test;
 
 import com.winterwell.maths.datastorage.Index;
@@ -10,6 +7,9 @@ import com.winterwell.maths.datastorage.Vectoriser;
 import com.winterwell.maths.timeseries.DataUtils;
 import com.winterwell.nlp.corpus.SimpleDocument;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
+
+import no.uib.cipr.matrix.Vector;
+import no.uib.cipr.matrix.sparse.SparseVector;
 
 public class DocVectoriserTest {
 

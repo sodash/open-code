@@ -1,7 +1,5 @@
 package com.winterwell.maths.datastorage;
 
-import static org.junit.Assert.*;
-
 import java.util.Map;
 
 import org.junit.Test;

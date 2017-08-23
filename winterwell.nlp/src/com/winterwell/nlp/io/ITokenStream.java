@@ -5,11 +5,9 @@ package com.winterwell.nlp.io;
 
 import java.util.List;
 
+import com.winterwell.depot.ModularXML;
 import com.winterwell.maths.IFactory;
 import com.winterwell.utils.containers.AbstractIterator;
-
-import com.winterwell.depot.IHasDesc;
-import com.winterwell.depot.ModularXML;
 
 /**
  * {@link ITokenStream}s can be chained together to form a processing pipeline.

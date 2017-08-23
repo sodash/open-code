@@ -1,7 +1,8 @@
 package com.winterwell.nlp;
 
-import junit.framework.TestCase;
 import com.winterwell.nlp.Tense.KTense;
+
+import junit.framework.TestCase;
 
 public class TenseTest extends TestCase {
 

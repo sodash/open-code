@@ -16,9 +16,6 @@ import java.util.logging.Level;
 
 import com.thoughtworks.xstream.XStreamException;
 import com.winterwell.datalog.DataLog;
-import com.winterwell.depot.merge.ClassMap;
-import com.winterwell.depot.merge.IMerger;
-import com.winterwell.depot.merge.MapMerger;
 import com.winterwell.depot.merge.Merger;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;

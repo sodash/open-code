@@ -12,13 +12,8 @@ import com.winterwell.nlp.io.Tkn;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers;
-
-import com.winterwell.depot.Depot;
 import com.winterwell.utils.io.FileUtils;
-
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.log.KErrorPolicy;
-
 import com.winterwell.utils.threads.ATask;
 
 /**

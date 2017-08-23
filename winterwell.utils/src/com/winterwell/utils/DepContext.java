@@ -1,7 +1,6 @@
 package com.winterwell.utils;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 /**
  * Context object for {@link Dep}. This allows having several contexts active within one JVM.

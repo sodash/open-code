@@ -3,17 +3,13 @@ package com.winterwell.utils.containers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.log.Log;
 
 /**
  * A type-safe multi-class sort-of-map. NB This backends onto a {@link HashMap}

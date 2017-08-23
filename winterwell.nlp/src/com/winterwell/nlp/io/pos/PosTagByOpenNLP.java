@@ -2,21 +2,12 @@ package com.winterwell.nlp.io.pos;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import opennlp.tools.postag.POSModel;
-import opennlp.tools.postag.POSTaggerME;
-import opennlp.tools.util.Sequence;
-import com.winterwell.maths.stats.StatsUtils;
-import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.nlp.NLPWorkshop;
-import com.winterwell.nlp.corpus.brown.BrownCorpusTags;
 import com.winterwell.nlp.io.ATokenStream;
 import com.winterwell.nlp.io.ITokenStream;
 import com.winterwell.nlp.io.Tkn;
@@ -24,7 +15,10 @@ import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.AbstractIterator;
 import com.winterwell.utils.containers.ArraySet;
-import com.winterwell.utils.log.Log;
+
+import opennlp.tools.postag.POSModel;
+import opennlp.tools.postag.POSTaggerME;
+import opennlp.tools.util.Sequence;
 
 /**
  * 

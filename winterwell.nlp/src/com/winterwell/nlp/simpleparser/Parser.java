@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.utils.Key;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.log.Log;
 
 /**

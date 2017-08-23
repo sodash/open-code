@@ -1,7 +1,6 @@
 package com.winterwell.datalog;
 
 import java.io.Closeable;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,14 +21,12 @@ import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.ExtraDimensionsDataStream;
 import com.winterwell.maths.timeseries.ExtraDimensionsDataStream.KMatchPolicy;
 import com.winterwell.maths.timeseries.IDataStream;
-import com.winterwell.maths.timeseries.TimeSlicer;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair2;
-import com.winterwell.utils.io.SqlUtils;
 import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.FixedFuture;

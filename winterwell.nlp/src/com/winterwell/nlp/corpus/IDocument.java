@@ -1,10 +1,9 @@
 package com.winterwell.nlp.corpus;
 
 import com.winterwell.nlp.io.ITokenStream;
+import com.winterwell.nlp.languages.ISO639;
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.containers.Slice;
-
-import com.winterwell.nlp.languages.ISO639;
 
 public interface IDocument {
 

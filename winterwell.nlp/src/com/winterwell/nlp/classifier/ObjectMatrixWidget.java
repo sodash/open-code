@@ -7,15 +7,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.web.SimpleJson;
-
 import com.winterwell.maths.matrix.ObjectMatrix;
 import com.winterwell.utils.IBuildStrings;
+import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.web.HtmlTable;
 import com.winterwell.web.IWidget;
 

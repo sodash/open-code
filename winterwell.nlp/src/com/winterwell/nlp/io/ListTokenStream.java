@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.winterwell.utils.Printer;
-
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.containers.AbstractIterator;
 import com.winterwell.utils.containers.Containers;

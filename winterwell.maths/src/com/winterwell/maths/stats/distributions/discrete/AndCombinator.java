@@ -1,7 +1,5 @@
 package com.winterwell.maths.stats.distributions.discrete;
 
-import com.winterwell.maths.classifiers.WilsonScoreInterval;
-
 /**
  * experimental
  * combine 2 distributions, using 2nd order probability reasoning
