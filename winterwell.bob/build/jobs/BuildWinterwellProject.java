@@ -3,6 +3,7 @@ package jobs;
 import java.io.File;
 
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
@@ -36,6 +37,12 @@ public class BuildWinterwellProject extends BuildTask {
 	protected File jarFile;
 
 	private String version;
+
+	private boolean compile;
+	
+	public void setCompile(boolean compile) {
+		this.compile = compile;
+	}
 	
 	public void setVersion(String version) {
 		this.version = version;
@@ -55,7 +62,7 @@ public class BuildWinterwellProject extends BuildTask {
 	@Override
 	public void doTask() throws Exception {
 		File srcDir = getSrcDir();
-		File binDir = new File(projectDir, "bin");
+		File binDir = getBinDir();
 		binDir.mkdir();
 		assert binDir.isDirectory() : binDir.getAbsoluteFile();
 		
@@ -64,7 +71,7 @@ public class BuildWinterwellProject extends BuildTask {
 		
 		// Jar		
 		FileUtils.delete(jarFile);
-		JarTask jar = new JarTask(jarFile, new File(projectDir, "bin"));
+		JarTask jar = new JarTask(jarFile, getBinDir());
 		jar.setAppend(false);
 		jar.setManifestProperty(JarTask.MANIFEST_TITLE, 
 				projectDir.getName()+" library (c) Winterwell. All rights reserved.");
@@ -102,14 +109,20 @@ public class BuildWinterwellProject extends BuildTask {
 		Log.d(LOGTAG, "Copied "+jarFile.getName()+" to "+lib);
 	}
 
+	protected File getBinDir() {
+		return new File(projectDir, "bin");
+	}
+
 	protected File getSrcDir() {
 		return new File(projectDir, "src");
 	}
 
 	protected void doTask2_compile(File srcDir, File binDir) {
 		// FIXME Compile seeing errors in Windows re XStream dependency!
-//		CompileTask compile = new CompileTask(srcDir, binDir);
-//		compile.run();
+		if (compile) {
+			CompileTask compile = new CompileTask(srcDir, binDir);
+			compile.run();
+		}
 		CopyTask nonJava = new CopyTask(srcDir, binDir);
 		nonJava.setNegativeFilter(".*\\.java");
 		nonJava.setIncludeHiddenFiles(false);
