@@ -38,7 +38,7 @@ public class HackyEmailer implements Closeable {
 		File propsFile = new File(FileUtils.getWinterwellDir(), "open-code/winterwell.webappbase/local-config/local.properties");
 		if ( ! propsFile.exists()) {
 			System.out.println("Please make a file with email login details here: "+propsFile);
-			throw new ConfigException("Please make a file with email login details here: "+propsFile);
+			throw new ConfigException("Please symlink the logins/local.properties file or make a file with email login details here: "+propsFile+".");
 		}
 		Properties props = FileUtils.loadProperties(propsFile);
 		LoginDetails ld = new LoginDetails(props.getProperty("server").trim(), 
