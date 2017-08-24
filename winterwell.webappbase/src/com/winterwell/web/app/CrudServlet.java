@@ -61,6 +61,8 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 	public void process(WebRequest state) throws IOException {
+		// CORS??
+		WebUtils2.CORS(state, false);		
 		// list?
 		if (state.getSlug().contains("/list")) {
 			doList(state);
@@ -93,7 +95,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (jthing==null) jthing = getThingFromDB(state); 
 		if (jthing != null) {			
 			String json = jthing.string();
-			JsonResponse output = new JsonResponse(state).setCargoJson(json);
+			JsonResponse output = new JsonResponse(state).setCargoJson(json);			
 			WebUtils2.sendJson(output, state);
 			return;
 		}
