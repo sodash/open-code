@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
-import com.winterwell.depot.ModularXML;
 import com.winterwell.utils.web.XStreamUtils;
 
 /**

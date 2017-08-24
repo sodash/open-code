@@ -1,6 +1,5 @@
 package com.winterwell.depot.merge;
 
-import com.winterwell.depot.Desc;
 import com.winterwell.utils.TodoException;
 
 /**

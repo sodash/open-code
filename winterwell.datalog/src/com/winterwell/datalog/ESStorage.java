@@ -3,7 +3,6 @@ package com.winterwell.datalog;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,11 +17,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.winterwell.datalog.DataLog.KInterpolate;
-import com.winterwell.datalog.server.LgServlet;
-import com.winterwell.depot.Desc;
 import com.winterwell.es.ESType;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
@@ -33,17 +28,14 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
-import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.Dep;
-import com.winterwell.utils.Environment;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
@@ -54,7 +46,6 @@ import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
-import com.winterwell.web.fields.IntField;
 
 public class ESStorage implements IDataLogStorage {
 

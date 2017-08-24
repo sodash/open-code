@@ -1,7 +1,6 @@
 package com.winterwell.nlp.simpleparser;
 
 import com.winterwell.utils.Environment;
-
 import com.winterwell.utils.containers.Slice;
 
 public class ParseFail extends RuntimeException {

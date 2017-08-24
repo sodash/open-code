@@ -10,10 +10,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.datalog.DataLog.KInterpolate;
-
 import com.winterwell.depot.Depot;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.MetaData;

@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.winterwell.utils.containers.Cache;
+
+import junit.framework.Assert;
 
 public class PorterStemmerTest {
 

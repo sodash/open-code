@@ -4,17 +4,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.mzsanford.cld.CompactLanguageDetector;
+import com.mzsanford.cld.LanguageDetectionCandidate;
+import com.mzsanford.cld.LanguageDetectionResult;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.nlp.classifier.ITextClassifier;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
-
-import com.mzsanford.cld.CompactLanguageDetector;
-import com.mzsanford.cld.LanguageDetectionCandidate;
-import com.mzsanford.cld.LanguageDetectionResult;
-import com.winterwell.nlp.languages.ISO639;
 
 /**
  * Wrapper for {@link CompactLanguageDetector}

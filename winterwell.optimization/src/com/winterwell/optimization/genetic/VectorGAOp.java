@@ -2,14 +2,15 @@ package com.winterwell.optimization.genetic;
 
 import java.util.Random;
 
-import no.uib.cipr.matrix.Vector;
-import no.uib.cipr.matrix.VectorEntry;
 import com.winterwell.maths.stats.distributions.BiDiExponentialDistribution1D;
 import com.winterwell.maths.stats.distributions.ExponentialBall;
 import com.winterwell.maths.stats.distributions.IDistribution;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.discrete.RandomChoice;
 import com.winterwell.utils.Utils;
+
+import no.uib.cipr.matrix.Vector;
+import no.uib.cipr.matrix.VectorEntry;
 
 /**
  * Generate, mutate and crossover for real-valued vectors.

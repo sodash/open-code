@@ -2,7 +2,6 @@ package com.winterwell.datalog.server;
 
 import java.io.File;
 
-import com.winterwell.es.ESUtils;
 import com.winterwell.es.client.DeleteRequestBuilder;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;

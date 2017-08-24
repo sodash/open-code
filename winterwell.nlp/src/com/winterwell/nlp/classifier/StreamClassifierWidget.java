@@ -1,11 +1,8 @@
 package com.winterwell.nlp.classifier;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.winterwell.utils.web.SimpleJson;
 
 import com.winterwell.maths.chart.PieChart;
 import com.winterwell.maths.chart.Rainbow;
@@ -20,6 +17,7 @@ import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair2;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.web.IWidget;
 

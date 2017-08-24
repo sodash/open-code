@@ -16,3 +16,4 @@ lg.txt
 *.log
 node_modules
 winterwell.datalog/web/build
+testFiles

@@ -1,9 +1,6 @@
 package com.winterwell.nlp.classifier;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import com.winterwell.maths.stats.distributions.ATrainableBase;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.nlp.corpus.IDocument;

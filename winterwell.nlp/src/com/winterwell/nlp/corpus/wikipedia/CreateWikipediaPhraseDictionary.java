@@ -5,11 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.nlp.NLPWorkshop;
 import com.winterwell.nlp.io.Tkn;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.LineReader;

@@ -1,10 +1,10 @@
 package com.winterwell.nlp.dict;
 
-import junit.framework.TestCase;
-import com.winterwell.utils.log.KErrorPolicy;
-
 import com.winterwell.depot.Depot;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.log.KErrorPolicy;
+
+import junit.framework.TestCase;
 
 public class ShortNameDictionaryTest extends TestCase {
 

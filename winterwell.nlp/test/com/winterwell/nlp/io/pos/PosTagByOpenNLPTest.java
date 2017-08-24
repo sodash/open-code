@@ -6,7 +6,6 @@ import java.util.List;
 import org.junit.Test;
 
 import com.winterwell.depot.Depot;
-
 import com.winterwell.nlp.io.DumbTokenStream;
 import com.winterwell.nlp.io.Tkn;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser;

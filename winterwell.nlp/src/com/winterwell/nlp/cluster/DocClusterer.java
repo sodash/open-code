@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import no.uib.cipr.matrix.Matrix;
-import no.uib.cipr.matrix.Vector;
 import com.winterwell.maths.ITrainable;
 import com.winterwell.maths.datastorage.Vectoriser;
 import com.winterwell.maths.matrix.CrudeDimensionReduction;
@@ -22,6 +20,9 @@ import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.maths.timeseries.DataUtils;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.utils.containers.TopNList;
+
+import no.uib.cipr.matrix.Matrix;
+import no.uib.cipr.matrix.Vector;
 
 /**
  * @author daniel

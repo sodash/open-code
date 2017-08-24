@@ -7,18 +7,18 @@ import java.awt.Image;
 
 import javax.swing.JFrame;
 
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.gui.GuiUtils;
-
-import junit.framework.TestCase;
-import no.uib.cipr.matrix.Vector;
 import com.winterwell.maths.GridInfo;
 import com.winterwell.maths.chart.Distribution2DChart;
 import com.winterwell.maths.chart.HighchartsRenderer;
 import com.winterwell.maths.stats.distributions.GridDistribution2D;
 import com.winterwell.maths.timeseries.DataUtils;
 import com.winterwell.optimization.AEvaluate;
+import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Printer;
+import com.winterwell.utils.gui.GuiUtils;
+
+import junit.framework.TestCase;
+import no.uib.cipr.matrix.Vector;
 
 /**
  * 

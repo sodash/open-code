@@ -1,14 +1,13 @@
 package com.winterwell.datalog;
 
-import com.winterwell.utils.io.DBUtils.DBOptions;
-import com.winterwell.utils.log.Log;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import com.winterwell.utils.io.DBUtils.DBOptions;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 

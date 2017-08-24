@@ -7,11 +7,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.nlp.dict.Dictionary;
 import com.winterwell.nlp.dict.EmoticonDictionary;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser.TweetSpeak;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.KErrorPolicy;

@@ -1,7 +1,5 @@
 package com.winterwell.depot;
 
-import java.util.Map;
-
 /**
  * This gormlessly named interface is for objects which have transient wiring or
  * resources that should be setup when they are created/loaded. init() should be

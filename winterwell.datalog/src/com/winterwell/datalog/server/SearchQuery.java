@@ -8,26 +8,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
-import com.winterwell.utils.IFilter;
 import com.winterwell.utils.Mutable;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.containers.Containers;
-import com.winterwell.utils.log.Log;
-import com.winterwell.utils.web.HashTagger;
-
 import com.winterwell.utils.web.IHasJson;
-
-import com.winterwell.web.ExternalServiceException;
-
-import com.winterwell.utils.ReflectionUtils;
 
 /**
  * NB: copy-pasta then simplified from SoDash's SearchSpec

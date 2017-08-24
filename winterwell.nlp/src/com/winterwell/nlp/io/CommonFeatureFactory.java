@@ -2,12 +2,10 @@ package com.winterwell.nlp.io;
 
 import java.util.List;
 
-import com.winterwell.utils.containers.Containers;
-
 import com.winterwell.maths.IFactory;
-import com.winterwell.maths.stats.distributions.cond.Cntxt;
 import com.winterwell.maths.stats.distributions.cond.Sitn;
 import com.winterwell.nlp.io.SitnStream.IFeature;
+import com.winterwell.utils.containers.Containers;
 
 /**
  * Used with {@link SitnStream}

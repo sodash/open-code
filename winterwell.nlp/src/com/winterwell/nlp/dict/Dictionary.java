@@ -23,11 +23,10 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Cache;
 import com.winterwell.utils.containers.Containers;
-import com.winterwell.utils.io.LineReader;
-import com.winterwell.utils.log.Log;
-import com.winterwell.utils.log.KErrorPolicy;
-
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.io.LineReader;
+import com.winterwell.utils.log.KErrorPolicy;
+import com.winterwell.utils.log.Log;
 
 /**
  * Make a dictionary or thesaurus, e.g. from a file. Includes a simple spell-checker -- getCloseWords()

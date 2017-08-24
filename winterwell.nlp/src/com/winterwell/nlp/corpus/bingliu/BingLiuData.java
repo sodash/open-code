@@ -4,14 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.winterwell.depot.Depot;
 import com.winterwell.nlp.NLPWorkshop;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.LineReader;
 import com.winterwell.utils.log.KErrorPolicy;
-
-import com.winterwell.depot.Depot;
-import com.winterwell.utils.Printer;
 
 /**
  * Data provided by Bing Liu from http://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html

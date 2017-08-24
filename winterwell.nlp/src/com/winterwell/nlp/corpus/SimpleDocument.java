@@ -3,10 +3,9 @@ package com.winterwell.nlp.corpus;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.winterwell.utils.StrUtils;
-
 import com.winterwell.nlp.io.ITokenStream;
 import com.winterwell.utils.IProperties;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Properties;
 import com.winterwell.utils.containers.Slice;

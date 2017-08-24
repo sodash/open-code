@@ -2,33 +2,17 @@ package com.winterwell.datalog.server;
 
 import java.io.File;
 
-import org.elasticsearch.node.Node;
-
+import com.winterwell.datalog.DataLog;
+import com.winterwell.datalog.DataLogConfig;
+import com.winterwell.datalog.IDataLogAdmin;
 import com.winterwell.utils.Dep;
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
-import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
-import com.winterwell.utils.web.WebUtils2;
-import com.winterwell.web.WebEx;
-import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.JettyLauncher;
 import com.winterwell.web.app.ManifestServlet;
 import com.winterwell.youagain.client.YouAgainClient;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.winterwell.datalog.CallbackManager;
-import com.winterwell.datalog.DataLog;
-import com.winterwell.datalog.ESStorage;
-import com.winterwell.datalog.IDataLog;
-import com.winterwell.datalog.IDataLogAdmin;
-import com.winterwell.datalog.IDataLogStorage;
-import com.winterwell.datalog.DataLogConfig;
-import com.winterwell.datalog.DataLogImpl;
-import com.winterwell.es.ESUtils;
-import com.winterwell.es.client.ESConfig;
 
 /**
  * Runs this for a standalone DataLog micro-service server.

@@ -10,8 +10,6 @@ import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.IntRange;
 
-import com.winterwell.nlp.languages.ISO639;
-
 /**
  * Identify the language by the charset used. This is a quick and effective way
  * of picking out e.g. arabic, or hebrew. But less good for European languages.

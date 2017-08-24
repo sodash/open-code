@@ -2,6 +2,7 @@ package com.winterwell.nlp.docmodels;
 
 import java.util.List;
 
+import com.winterwell.depot.IInit;
 import com.winterwell.maths.datastorage.IIndex;
 import com.winterwell.maths.datastorage.IPruneListener;
 import com.winterwell.maths.stats.distributions.ADistributionBase;
@@ -10,8 +11,6 @@ import com.winterwell.maths.stats.distributions.discrete.AFiniteDistribution;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.io.ITokenStream;
 import com.winterwell.utils.TodoException;
-
-import com.winterwell.depot.IInit;
 
 /**
  * A trainable model of a type of document.

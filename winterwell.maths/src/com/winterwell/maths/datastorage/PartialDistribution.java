@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.winterwell.maths.stats.distributions.discrete.AFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.SingletonDistribution;
-import com.winterwell.utils.containers.AbstractMap2;
 import com.winterwell.utils.log.KErrorPolicy;
 
 /**

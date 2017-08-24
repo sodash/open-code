@@ -1,12 +1,13 @@
 package com.winterwell.nlp.docmodels;
 
-import no.uib.cipr.matrix.Vector;
 import com.winterwell.maths.ITrainable;
 import com.winterwell.maths.stats.distributions.IDistribution;
 import com.winterwell.maths.vector.Cuboid;
 import com.winterwell.nlp.classifier.DocVectoriser;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.io.ITokenStream;
+
+import no.uib.cipr.matrix.Vector;
 
 /**
  * Use a vector prob model as a document model.

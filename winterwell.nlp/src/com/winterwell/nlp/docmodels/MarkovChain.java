@@ -1,6 +1,5 @@
 package com.winterwell.nlp.docmodels;
 
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +13,7 @@ import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.Vector.Norm;
 import no.uib.cipr.matrix.VectorEntry;
 import no.uib.cipr.matrix.sparse.SparseVector;
+
 import com.winterwell.maths.datastorage.IIndex;
 import com.winterwell.maths.datastorage.IPruneListener;
 import com.winterwell.maths.datastorage.Index;

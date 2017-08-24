@@ -12,13 +12,12 @@ import java.util.List;
 
 import org.apache.tools.bzip2.CBZip2InputStream;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.nlp.NLPWorkshop;
 import com.winterwell.nlp.corpus.ICorpus;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.corpus.SimpleDocument;
 import com.winterwell.utils.IFilter;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;

@@ -11,7 +11,6 @@ import java.util.concurrent.Future;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;

@@ -2,11 +2,10 @@ package com.winterwell.nlp.classifier;
 
 import java.util.Collection;
 
-import com.winterwell.utils.MathUtils;
-
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.nlp.corpus.IDocument;
+import com.winterwell.utils.MathUtils;
 
 /**
  * TODO refactor CreoleClassifier.impossible to use this

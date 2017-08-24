@@ -5,12 +5,11 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.nlp.corpus.brown.BrownCorpusTags;
 import com.winterwell.nlp.dict.IDictionary;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Mutable;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.AbstractIterator;

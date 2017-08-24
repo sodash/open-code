@@ -1,9 +1,5 @@
 package com.winterwell.nlp.corpus.brown;
 
-import java.util.Arrays;
-
-import com.winterwell.utils.StrUtils;
-
 /**
  * See http://en.wikipedia.org/wiki/Brown_Corpus#Part-of-speech_tags_used
  * @author daniel

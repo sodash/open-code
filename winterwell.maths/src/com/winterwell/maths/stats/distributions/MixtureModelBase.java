@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import com.winterwell.maths.ITrainable;
-
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.log.Log;

@@ -3,14 +3,12 @@ package com.winterwell.nlp.classifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
-
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.Printer;
 
 import com.winterwell.maths.classifiers.ConfusionMatrix;
 import com.winterwell.utils.IBuildStrings;
+import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;

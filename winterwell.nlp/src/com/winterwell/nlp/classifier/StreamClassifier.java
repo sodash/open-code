@@ -4,13 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.containers.TopNList;
-import com.winterwell.utils.log.Log;
-
 import com.winterwell.maths.ITrainable;
-import com.winterwell.maths.graph.DiGraph;
 import com.winterwell.maths.stats.StatsUtils;
 import com.winterwell.maths.stats.distributions.cond.Cntxt;
 import com.winterwell.maths.stats.distributions.cond.ExplnOfDist;
@@ -21,12 +15,12 @@ import com.winterwell.maths.stats.distributions.cond.Sitn;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.nlp.corpus.IDocument;
-import com.winterwell.nlp.tablesense.PTable;
-import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.TodoException;
-
+import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair2;
+import com.winterwell.utils.containers.TopNList;
+import com.winterwell.utils.log.Log;
 
 /**
  * Use Bayes theorem to classify an ISitnStream.

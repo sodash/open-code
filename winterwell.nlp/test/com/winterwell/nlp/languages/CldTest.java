@@ -2,12 +2,12 @@ package com.winterwell.nlp.languages;
 
 import java.util.Locale;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.mzsanford.cld.CompactLanguageDetector;
 import com.mzsanford.cld.LanguageDetectionResult;
+
+import junit.framework.Assert;
 
 /**
  * Test case for the Chromium compact language detection framework.

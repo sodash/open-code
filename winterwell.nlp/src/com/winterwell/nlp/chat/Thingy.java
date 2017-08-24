@@ -3,10 +3,9 @@ package com.winterwell.nlp.chat;
 import java.util.Collection;
 import java.util.Map;
 
-import com.winterwell.utils.Printer;
-
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.ArrayMap;
 
 public final class Thingy implements IProperties {

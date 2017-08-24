@@ -10,24 +10,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.winterwell.utils.ReflectionUtils;
-
 import com.winterwell.maths.ITrainable;
 import com.winterwell.maths.datastorage.HalfLifeMap;
 import com.winterwell.maths.datastorage.IPruneListener;
 import com.winterwell.maths.stats.distributions.ATrainableBase;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
-import com.winterwell.nlp.NLPWorkshop;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.io.ITokenStream;
 import com.winterwell.nlp.io.SentenceStream;
 import com.winterwell.nlp.io.Tkn;
-import com.winterwell.nlp.spam.RudeWordsFilter;
-import com.winterwell.utils.IFilter;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
-
 import com.winterwell.utils.containers.ArrayMap;
-
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.WeirdException;

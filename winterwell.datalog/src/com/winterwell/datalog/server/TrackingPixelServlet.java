@@ -2,27 +2,20 @@ package com.winterwell.datalog.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogConfig;
-import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.WebRequest;
-import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.SField;
-import com.winterwell.web.data.XId;
 
 /**
  * See {@link Tripwire} E.g. use: <img src='http://myworkspace.soda.sh/trk?via=areseller'>

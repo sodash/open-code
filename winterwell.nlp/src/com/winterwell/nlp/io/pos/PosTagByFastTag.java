@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.knowledgebooks.nlp.fasttag.FastTag;
 import com.winterwell.nlp.io.ATokenStream;
 import com.winterwell.nlp.io.ITokenStream;
 import com.winterwell.nlp.io.Tkn;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.containers.AbstractIterator;
-
-import com.knowledgebooks.nlp.fasttag.FastTag;
 
 
 /**

@@ -2,14 +2,14 @@ package com.winterwell.nlp.spam;
 
 import java.io.File;
 
-import junit.framework.TestCase;
+import com.winterwell.depot.Depot;
 import com.winterwell.nlp.io.Tkn;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.KErrorPolicy;
 
-import com.winterwell.depot.Depot;
-import com.winterwell.utils.Printer;
+import junit.framework.TestCase;
 
 public class RudeWordsFilterTest extends TestCase {
 
