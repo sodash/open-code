@@ -223,7 +223,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		String q = state.get("q");
 		if ( q != null) {
 			// TODO match on all?
-			QueryStringQueryBuilder qsq = QueryBuilders.queryStringQuery(q);
+			QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
 //			multimatchquery, 
 //					"id", "name", "keywords")
 //							.operator(Operator.AND);
@@ -231,6 +231,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		// TODO paging!
 		s.setSize(10000);
+		es.debug = true;
 		SearchResponse sr = s.get();
 		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();

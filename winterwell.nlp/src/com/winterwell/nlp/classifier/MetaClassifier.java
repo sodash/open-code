@@ -1,6 +1,5 @@
 package com.winterwell.nlp.classifier;
 
-import gnu.trove.TDoubleArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +8,8 @@ import com.winterwell.maths.stats.distributions.discrete.IDiscreteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.nlp.corpus.IDocument;
+
+import gnu.trove.list.array.TDoubleArrayList;
 
 /**
  * Classify based on the output from several classifiers.

@@ -7,7 +7,7 @@ import com.winterwell.maths.stats.StatsUtils;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.utils.MathUtils;
 
-import gnu.trove.TDoubleArrayList;
+import gnu.trove.list.array.TDoubleArrayList;
 
 /**
  * Classify two classes based on one threshold in one-dimensional data.
@@ -226,8 +226,8 @@ public class SimpleThresholdClassifier<X> {
 			}
 		}
 		double[][] splitData = new double[2][];
-		splitData[0] = data0.toNativeArray();
-		splitData[1] = data1.toNativeArray();
+		splitData[0] = data0.toArray();
+		splitData[1] = data1.toArray();
 		return splitData;
 	}
 

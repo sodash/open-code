@@ -5,8 +5,8 @@ import java.util.Iterator;
 import com.winterwell.maths.vector.ICompact;
 import com.winterwell.maths.vector.IntXY;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import no.uib.cipr.matrix.AbstractMatrix;
 import no.uib.cipr.matrix.MatrixEntry;
 import no.uib.cipr.matrix.Vector;

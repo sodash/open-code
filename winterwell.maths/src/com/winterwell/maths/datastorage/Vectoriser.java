@@ -15,7 +15,7 @@ import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.WeirdException;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.VectorEntry;
 import no.uib.cipr.matrix.sparse.SparseVector;
@@ -122,7 +122,7 @@ public class Vectoriser<Word, Document> {
 
 	public List<Word> inverseIndexList(TIntArrayList vs) {
 		List<Word> list = new ArrayList<Word>();
-		int[] avs = vs.toNativeArray();
+		int[] avs = vs.toArray();
 		for (int i : avs) {
 			Word v = index.get(i);
 			list.add(v);

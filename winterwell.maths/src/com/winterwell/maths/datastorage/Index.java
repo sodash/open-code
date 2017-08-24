@@ -11,7 +11,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.IntRange;
 import com.winterwell.utils.io.XStreamBinaryConverter.BinaryXML;
 
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * An index maps objects to index numbers (starting at zero), and vice-versa. It

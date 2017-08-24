@@ -13,7 +13,7 @@ import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.log.Log;
 
-import gnu.trove.TDoubleArrayList;
+import gnu.trove.list.array.TDoubleArrayList;
 import no.uib.cipr.matrix.DenseMatrix;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.MatrixSingularException;
@@ -174,7 +174,7 @@ public class LinearRegression implements IPredictor,
 			assert DataUtils.isSafe(a) : a;
 			// Are the weights "reasonable" compared with the input / target scale?
 			// Is this a useful safety check??
-			double[] _targets = targets.toNativeArray();
+			double[] _targets = targets.toArray();
 			double min = MathUtils.min(_targets);
 			double max = MathUtils.max(_targets);
 			double range = max - min;

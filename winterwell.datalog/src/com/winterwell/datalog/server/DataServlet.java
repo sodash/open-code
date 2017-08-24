@@ -11,7 +11,6 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
 import com.winterwell.datalog.DataLog;
@@ -102,8 +101,8 @@ public class DataServlet implements IServlet {
 		SearchQuery sq = new SearchQuery(q);
 		
 		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
-				.from(start.toISOString(), true)
-				.to(end.toISOString(), true);
+				.from(start.toISOString()) //, true) ES versioning pain
+				.to(end.toISOString()); //, true);
 		
 		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
 				.must(timeFilter);		

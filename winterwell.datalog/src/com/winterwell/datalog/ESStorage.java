@@ -351,7 +351,9 @@ public class ESStorage implements IDataLogStorage {
 		SearchRequestBuilder search = client(spec.dataspace).prepareSearch(index);
 		search.setType(typeFromEventType(spec.eventType));
 		search.setSize(config.maxDataPoints);
-		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time").from(start.toISOString(), true).to(end.toISOString(), true);
+		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
+				.from(start.toISOString()) //, true)
+				.to(end.toISOString()); //, true);
 		
 		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
 				.must(timeFilter);

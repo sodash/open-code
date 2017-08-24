@@ -126,13 +126,13 @@ public class RenderWithJFreeChart extends ARender {
 //			xslt.add(gi.getBucketTop(bucketIndex) + offset);
 //			ysl.add(d.get(1));
 //		}
-//		double[] ys = ysl.toNativeArray();
+//		double[] ys = ysl.toArray();
 //
 //		// In principle this supports uneven grids
 //		DefaultIntervalXYDataset dataset = new DefaultIntervalXYDataset();
 //		dataset.addSeries("f",
-//				new double[][] { xslm.toNativeArray(), xslb.toNativeArray(),
-//						xslt.toNativeArray(), ys, ys, ys });
+//				new double[][] { xslm.toArray(), xslb.toArray(),
+//						xslt.toArray(), ys, ys, ys });
 //
 //		JFreeChart jfc = ChartFactory.createHistogram(chart.getTitle(),
 //				xAxis.getTitle(), yAxis.getTitle(), dataset, PlotOrientation.VERTICAL,
@@ -167,8 +167,8 @@ public class RenderWithJFreeChart extends ARender {
 //			xs.add(d.get(0));
 //			ys.add(d.get(1));
 //		}
-//		double[][] data = new double[][] { xs.toNativeArray(),
-//				ys.toNativeArray() };
+//		double[][] data = new double[][] { xs.toArray(),
+//				ys.toArray() };
 //		dataset.addSeries("f", data);
 //		// Line based?
 //		if (chart.type == ChartType.LINE) {

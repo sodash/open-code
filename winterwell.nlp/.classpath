@@ -9,7 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.maths"/>
 	<classpathentry kind="lib" path="/middleware/jwnl/jwnl.jar" sourcepath="/middleware/jwnl/src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/middleware/trove/trove-2.0.4.jar" sourcepath="/middleware/trove/trove-src-2.0.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.depot"/>
 	<classpathentry kind="lib" path="/middleware/fasttag/fasttag.jar"/>
 	<classpathentry kind="lib" path="/middleware/langdetect/lib/jsonic-1.2.0.jar"/>
@@ -24,7 +23,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/middleware/opennlp/opennlp-tools.jar" sourcepath="/middleware/opennlp/opennlp-tools-src.zip"/>
-	<classpathentry kind="lib" path="/middleware/opennlp/opennlp-uima.jar"/>
 	<classpathentry exported="true" kind="lib" path="/middleware/stemmer/stemmer.jar" sourcepath="/middleware/stemmer/src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,6 +1,5 @@
 package com.winterwell.nlp.docmodels;
 
-import gnu.trove.TIntArrayList;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,6 +8,7 @@ import java.util.Set;
 
 import com.winterwell.utils.MathUtils;
 
+import gnu.trove.list.array.TIntArrayList;
 import no.uib.cipr.matrix.MatrixEntry;
 import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.Vector.Norm;
