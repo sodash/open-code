@@ -224,12 +224,23 @@ public class AppUtils {
 			if (st!=null) {
 				Log.d("init", "Using explicit serverType "+st);			
 				return KServerType.valueOf(st);
+			} else {
+				Log.d("init", "No explicit serverType in config");
 			}
+		} else {
+			Log.d("init", "No Properties for explicit serverType");
 		}
 		// explicitly listed
 		String hostname = WebUtils.fullHostname();
-		if (LOCAL_MACHINES.contains(hostname)) return KServerType.LOCAL;
-		if (TEST_MACHINES.contains(hostname)) return KServerType.TEST;
+		Log.d("init", "serverType for host "+hostname+" ...?");
+		if (LOCAL_MACHINES.contains(hostname)) {
+			Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.LOCAL);
+			return KServerType.LOCAL;
+		}
+		if (TEST_MACHINES.contains(hostname)) {
+			Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.TEST);
+			return KServerType.TEST;
+		}
 
 		Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.PRODUCTION);
 		return KServerType.PRODUCTION;
