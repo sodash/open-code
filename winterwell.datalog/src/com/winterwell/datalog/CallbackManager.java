@@ -30,7 +30,7 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 	public void init() {
 		// a call to adserver
 		KServerType mtype = AppUtils.getServerType(null);
-		String protocol = mtype==KServerType.LOCAL? "http" : "https"; 
+		String protocol = mtype==KServerType.LOCAL? "http" : "https"; 		
 		String url = protocol+"://"+(mtype==KServerType.PRODUCTION? "" : mtype.toString().toLowerCase())
 				+"as.good-loop.com/lgwebhook";
 		// FIXME minview is where money gets spent!		

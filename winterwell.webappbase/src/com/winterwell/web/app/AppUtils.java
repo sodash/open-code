@@ -42,7 +42,7 @@ public class AppUtils {
 			"stross"
 			);
 	private static final List<String> TEST_MACHINES = Arrays.asList(
-			"hugh"
+			"hugh", "mail.soda.sh"
 			);
 	
 	/**
@@ -193,16 +193,19 @@ public class AppUtils {
 	 * local / test / production
 	 */
 	public static KServerType getServerType(WebRequest state) {
-		if (state != null && false) {
-			String url = state.getRequestUrl();
-			if (url.contains("//local")) return KServerType.LOCAL;
-			if (url.contains("//test")) return KServerType.TEST;
-			return KServerType.PRODUCTION;
+		if (state != null && false) {			
+			KServerType st = KServerType.PRODUCTION;
+			String url = state.getRequestUrl();				
+			if (url.contains("//local")) st = KServerType.LOCAL;
+			if (url.contains("//test")) st = KServerType.TEST;			
+			Log.d("AppUtils", "Using WebRequest serverType "+st+" from url "+url);
+			return st;
 		}
 		// cache the answer
 		if (_serverType==null) {
 			_serverType = getServerType2();
 		}
+		Log.d("AppUtils", "Using serverType "+_serverType);
 		return _serverType;
 	}		
 	
