@@ -208,17 +208,17 @@ public class ESStorage implements IDataLogStorage {
 			ESType props = new ESType()
 					.property("k", keywordy)
 					.property("v", new ESType().text().norms(false))
-					.property("n", new ESType().DOUBLE().norms(false));
+					.property("n", new ESType().DOUBLE());
 			ESType simpleEvent = new ESType()
 					.property(DataLogEvent.EVENTTYPE, keywordy)
-					.property("time", new ESType().date().norms(false))
-					.property("count", new ESType().DOUBLE().norms(false))
+					.property("time", new ESType().date())
+					.property("count", new ESType().DOUBLE())
 					.property("props", props);			
 			for(Entry<String, Class> cp : DataLogEvent.COMMON_PROPS.entrySet()) {
 				// HACK to turn Class into ESType
-				ESType est = keywordy;
+				ESType est = keywordy.copy();
 				if (cp.getValue()==StringBuilder.class) {
-					est = new ESType().text();
+					est = new ESType().text().norms(false);
 				} else if (cp.getValue()==Time.class) {
 					est = new ESType().date();
 				} else if (cp.getValue()==Double.class) {
@@ -230,10 +230,11 @@ public class ESStorage implements IDataLogStorage {
 						est = new ESType().geo_point();
 					}
 				}
-				simpleEvent.property(cp.getKey(), est.norms(false));
+				simpleEvent.property(cp.getKey(), est);
 			}
 					
 			pm.setMapping(simpleEvent);
+			_client.debug = true;
 			IESResponse res = pm.get();
 			res.check();
 		} catch(Throwable ex) {
