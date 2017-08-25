@@ -67,8 +67,7 @@ public class LogServlet implements IServlet {
 		String msg = state.get(MSG);
 		if (msg!=null) {
 			String tag = state.get(TAG, "log");
-			Level level = Level.SEVERE;
-			Log.report(AJAX_TAG_PREFIX+tag, msg, level);
+			Log.e(AJAX_TAG_PREFIX+tag, msg);
 			WebUtils2.sendText("OK", state.getResponse());
 		}		
 	}
