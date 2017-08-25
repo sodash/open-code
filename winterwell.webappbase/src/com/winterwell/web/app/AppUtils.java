@@ -39,8 +39,11 @@ public class AppUtils {
 	public static final JsonField ITEM = new JsonField("item");
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
 	private static final List<String> LOCAL_MACHINES = Arrays.asList(
-			"stross");
-	private static final List<String> TEST_MACHINES = Arrays.asList();
+			"stross"
+			);
+	private static final List<String> TEST_MACHINES = Arrays.asList(
+			"hugh"
+			);
 	
 	/**
 	 * Will try path,indices in order if multiple
@@ -228,7 +231,7 @@ public class AppUtils {
 		if (LOCAL_MACHINES.contains(hostname)) return KServerType.LOCAL;
 		if (TEST_MACHINES.contains(hostname)) return KServerType.TEST;
 
-		Log.i("init", "Treating "+hostname+" as a production machine");
+		Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.PRODUCTION);
 		return KServerType.PRODUCTION;
 	}
 
