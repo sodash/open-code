@@ -23,7 +23,7 @@ import com.winterwell.web.fields.SField;
 
 
 /**
- * Fast Ajax logging.
+ * Fast Ajax logging of stats.
  * 
  * Endpoint: /lg <br>
  * Parameters: <br>
