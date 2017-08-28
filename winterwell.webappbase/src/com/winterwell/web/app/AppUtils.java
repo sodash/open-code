@@ -84,6 +84,7 @@ public class AppUtils {
 	}
 	
 	public static JThing doUnPublish(JThing thing, ESPath draftPath, ESPath pubPath, KStatus newStatus) {
+		Log.d("unpublish", draftPath+" "+pubPath+" "+newStatus);
 		// prefer being given the thing to avoid ES race conditions
 		if (thing==null) {
 			Map<String, Object> draftMap = get(pubPath, null);
@@ -106,6 +107,7 @@ public class AppUtils {
 		
 		// delete the published version	
 		if ( ! draftPath.equals(pubPath)) {
+			Log.d("unpublish", "deleting published version "+pubPath);
 			DeleteRequestBuilder del = client.prepareDelete(pubPath.index(), pubPath.type, pubPath.id);
 			IESResponse ok = del.get().check();		
 		}

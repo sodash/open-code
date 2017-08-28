@@ -25,6 +25,7 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
+import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
