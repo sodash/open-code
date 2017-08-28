@@ -203,8 +203,14 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		List propslist = new ArrayList();
 		for(Entry<String, ?> pv : props.entrySet()) {
 			Object v = pv.getValue();
-			if (COMMON_PROPS.containsKey(pv.getKey())) {
+			Class proptype = COMMON_PROPS.get(pv.getKey());
+			if (proptype!=null) {
 				// privileged props
+				if (v instanceof Map && proptype!=Object.class) {
+					// no objects here (otherwise ES will throw an error)
+					String vs = new SimpleJson().toJson(v);
+					v = vs;
+				}
 				map.put(pv.getKey(), v);
 				continue;
 			}

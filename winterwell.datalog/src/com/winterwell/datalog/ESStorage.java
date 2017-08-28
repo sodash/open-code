@@ -17,6 +17,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.es.ESType;
 import com.winterwell.es.client.ESConfig;
@@ -273,23 +275,27 @@ public class ESStorage implements IDataLogStorage {
 		long secs = bucketPeriod.getEnd().getTime() % 1000;
 		String id = event.getId()+"_"+secs;
 		ESHttpClient client = client(dataspace);
-		client.debug = false;
+		client.debug = true; // FIXME
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
 		if (event.time==null) event.time = bucketPeriod.getEnd();
 		// set doc
 		prepIndex.setBodyMap(event.toJson2());
 		Future<ESHttpResponse> f = prepIndex.execute();
 		client.close();
-//		// log stuff
-//		f.addListener(() -> {			
-//			try {
-//				ESHttpResponse response = f.get();
-//				response.check();
-////				Log.d("datalog.es", "...saveEvent done :) event: "+event);
-//			} catch(Throwable ex) {
-//				Log.d(DataLog.LOGTAG, "...saveEvent FAIL :( "+ex+" from event: "+event);
-//			}
-//		}, MoreExecutors.directExecutor());
+		
+		// log stuff ??does this create a resource leak??
+		if (f instanceof ListenableFuture) {
+			((ListenableFuture<ESHttpResponse>) f).addListener(() -> {			
+				try {
+					ESHttpResponse response = f.get();
+					response.check();
+	//				Log.d("datalog.es", "...saveEvent done :) event: "+event);
+				} catch(Throwable ex) {
+					Log.e(DataLog.LOGTAG, "...saveEvent FAIL :( "+ex+" from event: "+event);
+				}
+			}, MoreExecutors.directExecutor());
+		}
+		
 		return f;
 	}
 
