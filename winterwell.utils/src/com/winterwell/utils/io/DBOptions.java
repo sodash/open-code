@@ -14,6 +14,16 @@ public class DBOptions {
 	public String sslkey;
 	@Option
 	public String sslcert;
+
+	@Option
+	public int loginTimeout = 30;
+
+	@Option
+	public int connectTimeout = 60;
+
+	@Option
+	public int socketTimeout = 600;
+
 	
 	@Override
 	public String toString() {

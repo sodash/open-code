@@ -164,7 +164,7 @@ public class SqlUtils {
 	 *         mode)
 	 */
 	public static Connection getConnection(DBOptions dboptions) {
-		try (TimeOut timeout = new TimeOut(TUnit.MINUTE.dt)) {			
+		try {			
 			String dbUrl = dboptions.dbUrl;
 			initCommonJdbcDriver(dbUrl);
 
@@ -181,6 +181,9 @@ public class SqlUtils {
 					props.setProperty("sslkey", dboptions.sslkey);
 					props.setProperty("sslcert", dboptions.sslcert);
 				}
+				if (dboptions.loginTimeout!=0) props.setProperty("loginTimeout", ""+dboptions.loginTimeout);
+				if (dboptions.connectTimeout!=0) props.setProperty("connectTimeout", ""+dboptions.connectTimeout);
+				if (dboptions.socketTimeout!=0) props.setProperty("socketTimeout", ""+dboptions.socketTimeout);
 				con = DriverManager.getConnection(dbUrl, props);
 			}
 
