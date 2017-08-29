@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import com.winterwell.utils.io.DBUtils.DBOptions;
+import com.winterwell.utils.io.DBOptions;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
 import com.winterwell.utils.log.Log;

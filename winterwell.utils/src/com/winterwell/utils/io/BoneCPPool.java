@@ -5,7 +5,6 @@ import java.sql.SQLException;
 
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
-import com.winterwell.utils.io.DBUtils.DBOptions;
 import com.winterwell.utils.log.Log;
 
 /**

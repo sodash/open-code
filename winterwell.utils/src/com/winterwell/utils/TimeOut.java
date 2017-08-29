@@ -1,5 +1,6 @@
 package com.winterwell.utils;
 
+import java.io.Closeable;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,7 +33,7 @@ import com.winterwell.utils.time.Dt;
  * @testedby {@link TimeOutTest}
  * @author daniel
  */
-public final class TimeOut {
+public final class TimeOut implements Closeable {
 
 	private static Timer timer = newTimer();
 	private TimerTask task;
@@ -111,6 +112,14 @@ public final class TimeOut {
 	public static void cancel(TimeOut timeout) {
 		if (timeout==null) return;
 		timeout.cancel();		
+	}
+
+	/**
+	 * same as cancel()
+	 */
+	@Override
+	public void close() {
+		cancel();
 	}
 
 }

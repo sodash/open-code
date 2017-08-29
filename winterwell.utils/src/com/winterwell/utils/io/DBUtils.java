@@ -26,18 +26,4 @@ public class DBUtils{
 			assert (newOptions.dbUrl != null): newOptions;
 		}
 	}
-	
-	public static class DBOptions {
-		@Option
-		public String dbUrl;
-		@Option
-		public String dbUser;
-		@Option
-		public String dbPassword;		
-				
-		@Override
-		public String toString() {
-			return getClass().getSimpleName()+"["+dbUser+"@"+dbUrl+"]";
-		}
-	}
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,12 +28,12 @@ import com.winterwell.utils.Printer;
 import com.winterwell.utils.Proc;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.TimeOut;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Cache;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
-import com.winterwell.utils.io.DBUtils.DBOptions;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
@@ -163,7 +164,34 @@ public class SqlUtils {
 	 *         mode)
 	 */
 	public static Connection getConnection(DBOptions dboptions) {
-		return getConnection(dboptions.dbUrl, dboptions.dbUser, dboptions.dbPassword);
+		try (TimeOut timeout = new TimeOut(TUnit.MINUTE.dt)) {			
+			String dbUrl = dboptions.dbUrl;
+			initCommonJdbcDriver(dbUrl);
+
+			Connection con;
+			if (pool != null && dbUrl.equals(pool.getURL()) && Utils.equals(dboptions.dbUser, pool.getUsername())) {
+				// Use the pool (which matches our setup)
+				con = pool.getConnection();
+			} else {
+				Properties props = new Properties();
+				props.setProperty("user", dboptions.dbUser);
+				props.setProperty("password", dboptions.dbPassword);
+				if (Utils.yes(dboptions.ssl)) {
+					props.setProperty("ssl", "true");
+					props.setProperty("sslkey", dboptions.sslkey);
+					props.setProperty("sslcert", dboptions.sslcert);
+				}
+				con = DriverManager.getConnection(dbUrl, props);
+			}
+
+			// This is needed for streaming mode, so set it so by default
+			// -- you must then explicitly call commit!
+			con.setAutoCommit(false);
+
+			return con;
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		}
 	}
 
 	/**
@@ -377,26 +405,13 @@ public class SqlUtils {
 	 *         mode)
 	 */
 	public static Connection getConnection(String dbUrl, String user,
-			String password) {
-		try {
-			initCommonJdbcDriver(dbUrl);
-
-			Connection con;
-			if (pool != null && dbUrl.equals(pool.getURL()) && Utils.equals(user, pool.getUsername())) {
-				// Use the pool (which matches our setup)
-				con = pool.getConnection();
-			} else {
-				con = DriverManager.getConnection(dbUrl,user, password);
-			}
-
-			// This is needed for streaming mode, so set it so by default
-			// -- you must then explicitly call commit!
-			con.setAutoCommit(false);
-
-			return con;
-		} catch (Exception e) {
-			throw Utils.runtime(e);
-		}
+			String password) 
+	{
+		DBOptions dbo = new DBOptions();
+		dbo.dbUrl = dbUrl;
+		dbo.dbUser = user;
+		dbo.dbPassword = password;
+		return getConnection(dbo);
 	}
 
 	private static boolean init;

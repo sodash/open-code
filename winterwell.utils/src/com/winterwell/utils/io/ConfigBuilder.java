@@ -114,6 +114,9 @@ public class ConfigBuilder {
 				if (type == boolean.class)
 					return Boolean.valueOf(string);
 			}
+			if (type == Boolean.class) {
+				return Boolean.valueOf(string);
+			}
 			// Date
 			if (type == Date.class)
 				return DateFormat.getInstance().parse(string);

@@ -15,7 +15,7 @@ import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair2;
-import com.winterwell.utils.io.DBUtils.DBOptions;
+import com.winterwell.utils.io.DBOptions;
 import com.winterwell.utils.io.SqlUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
