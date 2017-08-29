@@ -164,6 +164,7 @@ public class SqlUtils {
 	 *         mode)
 	 */
 	public static Connection getConnection(DBOptions dboptions) {
+		Utils.check4null(dboptions.dbUrl, dboptions.dbUser, dboptions.dbPassword);
 		try {			
 			String dbUrl = dboptions.dbUrl;
 			initCommonJdbcDriver(dbUrl);
@@ -173,6 +174,7 @@ public class SqlUtils {
 				// Use the pool (which matches our setup)
 				con = pool.getConnection();
 			} else {
+				// see https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters
 				Properties props = new Properties();
 				props.setProperty("user", dboptions.dbUser);
 				props.setProperty("password", dboptions.dbPassword);
