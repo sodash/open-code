@@ -139,7 +139,20 @@ public class PublishProjectTask extends BuildTask {
 		{	// make version.properties		
 			Log.report("publish","Uploading .properties...", Level.INFO);
 			File localConfigDir = new File(localWebAppDir, "config");
-			ManifestServlet.saveVersionProperties(localConfigDir);
+			File creolePropertiesForSite = new File(localConfigDir, "version.properties");
+			Properties props = new Properties();
+			// fill in
+			ManifestServlet.setVersionProperties(props);
+			// dep info??
+//			for(BuildTask bt : getDependencies()) {
+//				if (bt instanceof BuildWinterwellProject) {
+//					dir = bt.get
+//				}
+//			}
+			// save
+			BufferedWriter w = FileUtils.getWriter(creolePropertiesForSite);
+			props.store(w, null);
+			FileUtils.close(w);
 		}
 
 		// Find jars and move them into tmp-lib

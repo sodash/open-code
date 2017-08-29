@@ -45,10 +45,8 @@ public class ManifestServlet extends HttpServlet {
 	/**
 	 * Create version.properties
 	 */
-	public static void saveVersionProperties(File configDir) {
+	public static void setVersionProperties(Properties props) {
 		try {
-			File creolePropertiesForSite = new File(configDir, "version.properties");
-			Properties props = creolePropertiesForSite.exists()? FileUtils.loadProperties(creolePropertiesForSite) : new Properties();
 			// set the publish time
 			props.setProperty(PROPERTY_PUBLISH_DATE, ""+System.currentTimeMillis());
 			// TIMESTAMP code to avoid caching issues: epoch-seconds, mod 10000 to shorten it
@@ -85,11 +83,7 @@ public class ManifestServlet extends HttpServlet {
 			} catch(Exception ex) {
 				// oh well
 			}
-	
-			// save
-			BufferedWriter w = FileUtils.getWriter(creolePropertiesForSite);
-			props.store(w, null);
-			FileUtils.close(w);
+
 		} catch (Throwable ex) {
 			Log.e("debug", ex);
 		}

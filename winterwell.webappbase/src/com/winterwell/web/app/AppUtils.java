@@ -20,6 +20,7 @@ import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.web.WebEx;
@@ -39,11 +40,16 @@ public class AppUtils {
 	public static final JsonField ITEM = new JsonField("item");
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
 	private static final List<String> LOCAL_MACHINES = Arrays.asList(
-			"stross"
+			"stross", "aardvark"
 			);
 	private static final List<String> TEST_MACHINES = Arrays.asList(
 			"hugh", "mail.soda.sh"
 			);
+	private static final List<String> PROD_MACHINES = Arrays.asList(
+			"heppner"
+			);
+	
+	KServerType serverType = AppUtils.getServerType(null); 
 	
 	/**
 	 * Will try path,indices in order if multiple
@@ -246,8 +252,12 @@ public class AppUtils {
 			Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.TEST);
 			return KServerType.TEST;
 		}
+		if (PROD_MACHINES.contains(hostname)) {
+			Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.PRODUCTION);
+			return KServerType.PRODUCTION;
+		}
 
-		Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.PRODUCTION);
+		Log.i("init", "Fallback: Treating "+hostname+" as serverType = "+KServerType.PRODUCTION);
 		return KServerType.PRODUCTION;
 	}
 
