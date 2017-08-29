@@ -132,7 +132,7 @@ public class ConfigBuilder {
 			if (type== Class.class) {
 				return Class.forName(string);
 			}
-			throw new IllegalArgumentException("Unrecognised type: " + type);
+			throw new IllegalArgumentException("Unrecognised type: " + type+" Odd? "+recognisedTypes.contains(type));
 		} catch (Exception e) {
 			throw new ParseException(e.getMessage(), 1);
 		}
