@@ -27,6 +27,10 @@ public class GitTaskTest {
 		File sodashDir = new File(FileUtils.getWinterwellDir(), "sodash");
 		String hash2 = GitTask.getLastCommitId(sodashDir);
 		System.out.println(hash2);
+		
+		File creoleDir = new File(FileUtils.getWinterwellDir(), "code/creole");
+		String hash3 = GitTask.getLastCommitId(creoleDir);
+		System.out.println(hash3);
 	}
 
 

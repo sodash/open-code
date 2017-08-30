@@ -89,6 +89,8 @@ public class PublishProjectTask extends BuildTask {
 	 * frontend backend everything
 	 */
 	protected String codePart = "everything";
+
+	protected boolean compile;
 			
 	public PublishProjectTask(String projectName, String remoteWebAppDir) throws Exception {
 		this.projectName = projectName;
@@ -102,7 +104,7 @@ public class PublishProjectTask extends BuildTask {
 
 	@Override
 	public List<BuildTask> getDependencies() {
-		return new ArrayList(Arrays.asList(
+		List<BuildTask> deps = new ArrayList(Arrays.asList(
 				new BuildUtils(),
 				new BuildMaths(),
 				new BuildBob(),
@@ -114,6 +116,12 @@ public class PublishProjectTask extends BuildTask {
 				new BuildYouAgainJavaClient(),
 				new BuildWWAppBase()
 				));
+		for (BuildTask buildTask : deps) {
+			if (buildTask instanceof BuildWinterwellProject) {
+				((BuildWinterwellProject) buildTask).setCompile(compile);
+			}
+		}
+		return deps;
 	}
 
 	@Override

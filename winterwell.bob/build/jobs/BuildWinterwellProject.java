@@ -80,7 +80,12 @@ public class BuildWinterwellProject extends BuildTask {
 		}
 		// Version = date Is this good or bogus?
 		Time vt = new Time();
-		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, vt.ddMMyyyy());
+		try {
+			jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
+					"date: "+vt.ddMMyyyy()+" git: "+GitTask.getLastCommitId(srcDir.getParentFile()));
+		} catch(Exception ex) {
+			jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, vt.ddMMyyyy());
+		}
 //		// Git details? No this upsets IntelliJ
 		if (incGitInManifest) {
 			String branch = GitTask.getGitBranch(srcDir.getParentFile());
