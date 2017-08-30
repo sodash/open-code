@@ -23,6 +23,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Trio;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -124,18 +125,12 @@ public class ManifestServlet extends HttpServlet {
 				
 		// what config did we pick up?
 		// Screen for sensitive keys, e.g. passwords
-		Map configsjson = new ArrayMap();
-		String[] sens = "login password pwd token auth key secret".split(" ");
+		Map configsjson = new ArrayMap();		
 		for(Object c : configs) {
 			ArrayMap<String, Object> vs = new ArrayMap(Containers.objectAsMap(c));
 			for(String k : vs.keySet()) {
-				String kl = k.toLowerCase();
-				Object v = vs.get(k);
-				for(String sen : sens) {
-					if (kl.contains(sen)) {
-						vs.put(k, "****");
-					}
-				}
+				boolean protect = ConfigBuilder.protectPasswords(k);
+				if (protect) vs.put(k, "****");
 			}
 			configsjson.put(c.getClass().getSimpleName(), vs);
 		}

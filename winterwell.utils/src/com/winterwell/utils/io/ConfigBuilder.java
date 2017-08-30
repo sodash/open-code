@@ -56,6 +56,18 @@ public class ConfigBuilder {
 
 	private static final Map<Class,ISerialize> convertors = new HashMap();
 	
+	public static boolean protectPasswords(String k) {
+		String[] sens = "login password pwd token auth key secret private".split(" ");
+		String kl = k.toLowerCase();
+		for(String sen : sens) {
+			if (kl.contains(sen)) {
+				return true;
+			}
+		}
+		return false;
+
+	}
+	
 	static List<Class> recognisedTypes = Arrays.asList((Class) 
 			// Any enum
 			Enum.class,
@@ -232,7 +244,7 @@ public class ConfigBuilder {
 	
 	/**
 	 * @param args
-	 *            The arguments as passed into main()
+	 *            The arguments as passed into main() Can be null
 	 * @return the non-options arguments, i.e. the ones after the options
 	 * @throws RuntimeException
 	 *             with a usage message. The missing arguments (if this is the
@@ -340,8 +352,15 @@ public class ConfigBuilder {
 		}
 		// debug?
 		if (debug) {
-			for(Field f : source4setFields.keySet()) {
-				Log.d("config", config.getClass().getSimpleName()+"."+f.getName()+" was set from "+source4setFields.get(f));
+			try {
+				for(Field f : source4setFields.keySet()) {
+					Log.d("config", config.getClass().getSimpleName()+"."+f.getName()
+									+" was set from "+source4setFields.get(f)
+									+(protectPasswords(f.getName())? "" : " to "+f.get(config))
+									);
+				}
+			} catch(Exception ex) {
+				Log.e("config.debug.fail", ex);
 			}
 		}
 		return (S) config;

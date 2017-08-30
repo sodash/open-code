@@ -43,6 +43,7 @@ import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.ArgsParser;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
@@ -152,7 +153,7 @@ public class ESStorage implements IDataLogStorage {
 		this.config = config;
 		// ES config
 		if (esConfig == null) {
-			esConfig = ArgsParser.getConfig(new ESConfig(), new File("config/datalog.properties"));
+			esConfig = new ConfigBuilder(new ESConfig()).set(new File("config/datalog.properties")).get();
 		}
 		// Support per-namespace ESConfigs
 		if (config.namespaceConfigs!=null) {

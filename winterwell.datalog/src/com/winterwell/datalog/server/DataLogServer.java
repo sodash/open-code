@@ -43,6 +43,7 @@ public class DataLogServer {
 
 	private static void init(String[] args) {
 		settings = new ConfigBuilder(new DataLogConfig())
+				.setDebug(true)
 				.setFromSystemProperties(null)
 				.set(new File("config/datalog.properties"))
 				.set(new File("config/datalog.local.properties"))

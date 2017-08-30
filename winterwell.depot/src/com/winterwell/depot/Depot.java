@@ -23,6 +23,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.ArgsParser;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
@@ -751,7 +752,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		// setup default
 		DepotConfig dconfig = new DepotConfig();
 		// Load any params we can find
-		ArgsParser ap = new ArgsParser(dconfig);
+		ConfigBuilder ap = new ConfigBuilder(dconfig);
 		File propsFile = new File("config/Depot.properties");
 		if (propsFile.exists()) {			
 			ap.set(propsFile);

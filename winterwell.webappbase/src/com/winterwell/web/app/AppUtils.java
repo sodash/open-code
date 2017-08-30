@@ -1,5 +1,6 @@
 package com.winterwell.web.app;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -21,8 +22,11 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.EnumField;
@@ -50,6 +54,36 @@ public class AppUtils {
 			);
 	
 	KServerType serverType = AppUtils.getServerType(null); 
+
+	
+	/**
+	 * TODO refactor into AppUtils
+	 * @param config
+	 * @param args
+	 * @return
+	 */
+	public static <X> X getConfig(String appName, X config, String[] args) {
+		String thingy = config.getClass().getSimpleName().toLowerCase().replace("config", "");
+		config = new ConfigBuilder(config)
+			.setDebug(true)
+			.set(new File("config/sogive.properties"))
+			.set(new File("config/"+thingy+".properties"))
+			.set(new File("config/"+WebUtils2.hostname()+".properties"))
+			.set(new File("config/"+AppUtils.getServerType(null).toString().toLowerCase()+".properties"))
+			// or in logins, for passwords?
+			.set(new File("config/logins.properties"))
+			.set(new File(FileUtils.getWinterwellDir(), "logins/"+thingy+".properties"))
+			.setFromMain(args)
+			.get();
+		Dep.set((Class)config.getClass(), config);
+		
+		// set them for manifest
+//		ManifestServlet.setConfigFiles(files);
+		ManifestServlet.addConfig(config);
+		assert config != null;
+		return config;
+	}
+
 	
 	/**
 	 * Will try path,indices in order if multiple
