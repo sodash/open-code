@@ -150,7 +150,7 @@ public class ManifestServlet extends HttpServlet {
 //			repos.add(info);
 		}
 		cargo.put("git-repos", repos);
-
+		
 		cargo.put("hostname", WebUtils2.hostname());
 		
 		String uptime = TimeUtils.toString(startTime.dt(new Time()));

@@ -38,6 +38,7 @@ import com.winterwell.utils.Proc;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.Warning;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.CSVReader;
 import com.winterwell.utils.io.FileUtils;
@@ -144,11 +145,18 @@ public class PublishProjectTask extends BuildTask {
 			// fill in
 			ManifestServlet.setVersionProperties(props);
 			// dep info??
-//			for(BuildTask bt : getDependencies()) {
-//				if (bt instanceof BuildWinterwellProject) {
-//					dir = bt.get
-//				}
-//			}
+			for(BuildTask bt : getDependencies()) {
+				try {
+					if (bt instanceof BuildWinterwellProject) {
+						File jar = ((BuildWinterwellProject) bt).getJar();
+						Map<String, Object> manifest = JarTask.getManifest(jar);
+						Map<String, Object> namedManifest = Containers.applyToKeys(manifest, k -> jar.getName()+"."+k);
+						props.putAll(namedManifest);
+					}
+				} catch(Exception ex) {
+					Log.e("publish", ex);
+				}
+			}
 			// save
 			BufferedWriter w = FileUtils.getWriter(creolePropertiesForSite);
 			props.store(w, null);

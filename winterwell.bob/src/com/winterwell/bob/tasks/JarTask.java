@@ -11,6 +11,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -18,6 +22,7 @@ import java.util.zip.ZipOutputStream;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -31,6 +36,20 @@ import com.winterwell.utils.time.Time;
  */
 public class JarTask extends BuildTask {
 
+	public static Map<String, Object> getManifest(File jar) {		
+		try {
+			JarFile jf = new JarFile(jar);
+			Manifest m = jf.getManifest();
+			Map<String, Attributes> es = m.getEntries();
+			Attributes ma = m.getMainAttributes();			
+			Map<String, Object> map = Containers.applyToKeys(ma, k -> k.toString());
+			return map;
+		} catch (IOException e) {
+			throw Utils.runtime(e);
+		} finally {
+		}
+	}
+	
 	/**
 	 * The version number for this jar
 	 */
