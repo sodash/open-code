@@ -62,7 +62,7 @@ public class GitTask extends ProcessTask {
 	}
 	
 	public static String getLastCommitId(File dir) {
-		String command = "git log -1 --format=%H";
+		String command = "git log -1 --format=%h"; // use %H for full commit ID, but shorts should always be good enough
 		
 		Proc p;
 		if (dir==null) {
