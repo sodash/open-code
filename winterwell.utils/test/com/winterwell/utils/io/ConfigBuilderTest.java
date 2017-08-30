@@ -65,6 +65,20 @@ public class ConfigBuilderTest extends TestCase {
 	}
 	
 	@Test
+	public void testDebug() throws IOException {
+		NestedTestSettings settings = new NestedTestSettings();
+		ConfigBuilder parser = new ConfigBuilder(settings).setDebug(true);
+		Properties props = new Properties();
+		props.put("n", "2");
+		props.put("ts.n", "3");
+		parser.set(props);
+		parser.setFromMain(new String[] {"-ts.meh", "foo"});
+		parser.get();
+		assert settings.n == 2;
+		assert settings.ts.n == 3;
+	}
+	
+	@Test
 	public void testOptionsMessage() throws IOException {
 		TestSettings settings = new TestSettings();
 		ConfigBuilder parser = new ConfigBuilder(settings);
@@ -123,4 +137,5 @@ class NestedTestSettings {
 	
 	@Option
 	int n = 5;
+	
 }

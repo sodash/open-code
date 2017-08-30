@@ -184,7 +184,7 @@ public class ConfigBuilder {
 
 	public List<Field> getMissingProperties() {		
 		List<Field> reqs = new ArrayList(getRequiredProperties());
-		reqs.removeAll(setFields);
+		reqs.removeAll(source4setFields.keySet());
 		return reqs;
 	}
 
@@ -240,6 +240,7 @@ public class ConfigBuilder {
 	 */
 	public ConfigBuilder setFromMain(String[] args) {
 		if (args==null) return this;
+		source = "main args";
 		try {
 			// Look for config
 			int i = 0;
@@ -251,6 +252,7 @@ public class ConfigBuilder {
 					break;
 				}
 				a = a.substring(1, a.length());
+				// TODO refactor setOneKeyValue() so this can use the same get-field
 				Field field = token2field.get(a);
 				if (field == null) {
 					// end or options - return the rest as leftover
@@ -264,6 +266,8 @@ public class ConfigBuilder {
 			return this;
 		} catch (Exception e) {
 			throw Utils.runtime(e);
+		} finally {
+			source = null;
 		}
 	}
 
@@ -290,10 +294,12 @@ public class ConfigBuilder {
 		return i;
 	}
 
-	List<Field> setFields = new ArrayList();
+	Map<Field,Object> source4setFields = new ArrayMap();
+
+	private boolean debug;
 	
 	private void fieldSet(Field field, Object v) throws IllegalArgumentException, IllegalAccessException {
-		setFields.add(field);
+		source4setFields.put(field, Utils.or(source, "unknown"));
 		field.set(config, v);
 	}
 
@@ -305,11 +311,12 @@ public class ConfigBuilder {
 	 * @return The fields that got set
 	 */
 	public ConfigBuilder set(File propertiesFile) {
-		if (propertiesFile==null) return this;
+		if (propertiesFile==null) return this;		
 		if ( ! propertiesFile.exists()) {
 			Log.d("config", config.getClass()+": No properties file: "+propertiesFile+" = "+propertiesFile.getAbsolutePath());
 			return this;
 		}		
+		source = propertiesFile.getAbsoluteFile();
 		try {
 			File absFile = propertiesFile.getAbsoluteFile();
 			Properties props = new Properties();
@@ -317,6 +324,8 @@ public class ConfigBuilder {
 			return set(props);
 		} catch (IOException e) {
 			throw new WrappedException(e);
+		} finally {
+			source = null;
 		}
 	}
 
@@ -328,6 +337,12 @@ public class ConfigBuilder {
 		List<Field> missing = getMissingProperties();
 		if ( ! missing.isEmpty()) {
 			throw new IllegalArgumentException("Missing required arguments: "+Containers.apply(missing, f -> f.getName()));
+		}
+		// debug?
+		if (debug) {
+			for(Field f : source4setFields.keySet()) {
+				Log.d("config", config.getClass().getSimpleName()+"."+f.getName()+" was set from "+source4setFields.get(f));
+			}
 		}
 		return (S) config;
 	}
@@ -343,7 +358,7 @@ public class ConfigBuilder {
 	 *             properties as it can before throwing any exception.
 	 */
 	public ConfigBuilder set(Map properties) {
-		ArrayList<Field> set = new ArrayList();
+		if (source==null) source = "Map";
 		List<Exception> errors = new ArrayList();
 		// keys
 		Collection<String> keys;
@@ -358,7 +373,7 @@ public class ConfigBuilder {
 		for (String a : keys) {
 			String v = StrUtils.str(properties.get(a));
 			if (v==null) continue;			
-			setOneKeyValue(a, v, set, errors);
+			setOneKeyValue(a, v, errors);
 		} // ./loop
 		
 		// OK?
@@ -368,7 +383,14 @@ public class ConfigBuilder {
 		return this;
 	}
 
-	private boolean setOneKeyValue(String a, String v, List<Field> set, List<Exception> errors) {
+	/**
+	 * Where most stuff actually gets set
+	 * @param a The argument
+	 * @param v value
+	 * @param errors
+	 * @return
+	 */
+	private boolean setOneKeyValue(String a, String v, List<Exception> errors) {
 		// trim strings (strings loaded from .properties can have trailing whitespace)
 		if (v != null) v = v.trim();
 		// special case: config is a Properties object
@@ -379,7 +401,7 @@ public class ConfigBuilder {
 		// normal case?
 		Field field = token2field.get(a);
 		if (field != null) {
-			set2(field, v, set, errors);
+			set2(field, v, errors);
 			return true;
 		}
 		// a map or recursive field?
@@ -391,7 +413,7 @@ public class ConfigBuilder {
 		// recursive?
 		ConfigBuilder ap2 = field2subparser.get(field);
 		if (ap2!=null) {
-			ap2.setOneKeyValue(bits[1], v, set, errors);
+			ap2.setOneKeyValue(bits[1], v, errors);
 			return true;
 		}
 		// map?
@@ -415,12 +437,13 @@ public class ConfigBuilder {
 		return false;
 	}
 
-	private boolean set2(Field f, String prop, List<Field> set, List<Exception> errors) {
+	Object source;
+	
+	private boolean set2(Field f, String prop, List<Exception> errors) {
 		assert f != null : prop;
 		try {
 			Object v = convert(f.getType(), prop);
 			fieldSet(f, v);
-			set.add(f);
 			return true;
 		} catch (Exception e) {
 			errors.add(e);
@@ -516,24 +539,39 @@ public class ConfigBuilder {
 	 */
 	public ConfigBuilder setFromSystemProperties(String namespace) {
 		if (namespace!=null && namespace.isEmpty()) namespace = null;
-		Properties systemProps = System.getProperties();
-		if (namespace==null || namespace.isEmpty()) {
-			return set(systemProps);
-		}
-		// Copy with namespace filter and removal
-		assert ! namespace.endsWith(".");
-		namespace += ".";
-		HashMap map = new HashMap(systemProps.size());
-		for(Map.Entry me : systemProps.entrySet()) {
-			String key = me.getKey().toString();
-			if ( ! key.startsWith(namespace)) {
-				continue;
+		source = "System.properties"+(Utils.isBlank(namespace)? "" : " namespace:"+namespace);
+		try {
+			Properties systemProps = System.getProperties();
+			if (Utils.isBlank(namespace)) {
+				return set(systemProps);
 			}
-			key = key.substring(namespace.length());
-			if (key.isEmpty()) continue;
-			map.put(key, me.getValue());
+			// Copy with namespace filter and removal
+			assert ! namespace.endsWith(".");
+			namespace += ".";
+			HashMap map = new HashMap(systemProps.size());
+			for(Map.Entry me : systemProps.entrySet()) {
+				String key = me.getKey().toString();
+				if ( ! key.startsWith(namespace)) {
+					continue;
+				}
+				key = key.substring(namespace.length());
+				if (key.isEmpty()) continue;
+				map.put(key, me.getValue());
+			}
+			return set(map);
+		} finally {
+			source = null;
 		}
-		return set(map);
+	}
+
+	/**
+	 * If true, get() will cause the source of each setting to be output to logs 
+	 * @param b
+	 * @return 
+	 */
+	public ConfigBuilder setDebug(boolean b) {
+		debug = b;
+		return this;
 	}
 	
 
