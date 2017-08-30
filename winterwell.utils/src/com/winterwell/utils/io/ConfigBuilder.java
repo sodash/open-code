@@ -311,7 +311,11 @@ public class ConfigBuilder {
 	private boolean debug;
 	
 	private void fieldSet(Field field, Object v) throws IllegalArgumentException, IllegalAccessException {
-		source4setFields.put(field, Utils.or(source, "unknown"));
+		Object prev = source4setFields.put(field, Utils.or(source, "unknown"));
+		if (prev!=null) {
+			// log the override
+			Log.i("config", "... "+config.getClass().getSimpleName()+"."+field.getName()+" source "+source+" overrode "+prev);
+		}
 		field.set(config, v);
 	}
 

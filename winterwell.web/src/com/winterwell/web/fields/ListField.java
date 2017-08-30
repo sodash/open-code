@@ -1,6 +1,7 @@
 package com.winterwell.web.fields;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,6 +42,8 @@ public class ListField<X> extends AField<List<X>> {
 
 	KNullPolicy nullPolicy = KNullPolicy.KEEP;
 
+	private String splitPattern;
+
 	/**
 	 * 
 	 * @param name
@@ -72,7 +75,7 @@ public class ListField<X> extends AField<List<X>> {
 	 */
 	@Override
 	public List<X> fromString(String s) throws Exception {
-		List<String> bits = StrUtils.split(s);
+		List<String> bits = splitPattern!=null? Arrays.asList(s.split(splitPattern)) : StrUtils.split(s);
 		if (elementConverter == null) {
 			for (int i = 0; i < bits.size(); i++) {
 				String bit = bits.get(i);
@@ -163,5 +166,16 @@ public class ListField<X> extends AField<List<X>> {
 	@Override
 	public String toString(List<X> value) {
 		return toString((Collection<X>) value);
+	}
+
+	/**
+	 * Override the default (which is to use {@link StrUtils#split(String)})
+	 * @param splitPattern
+	 * @return
+	 */
+	public ListField<X> setSplitPattern(String splitPattern) {
+		this.splitPattern = splitPattern;
+		assert splitPattern==null || ! splitPattern.isEmpty();
+		return this;
 	}
 }

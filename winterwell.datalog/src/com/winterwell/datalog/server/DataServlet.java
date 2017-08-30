@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -21,6 +22,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
@@ -56,18 +58,9 @@ public class DataServlet implements IServlet {
 		ESStorage ess = Dep.get(ESStorage.class);
 		String dataspace = state.get(DATASPACE, "default");				
 		// Uses "paths" of breakdown1/breakdown2/... {field1:operation, field2}
-		List<String> breakdown = state.get(new ListField<String>("breakdown"), 
-				Arrays.asList(
-//						"tag/time {count:avg}", 
-						"evt/time", 
-						"evt/host",
-						"publisher", 
-						"host",
-						"domain",
-//						"evt"
-//						"campaign", 
-						"variant"
-						));
+		List<String> breakdown = state.get(
+				new ListField<String>("breakdown").setSplitPattern(",")
+				);
 
 		// security: on the dataspace, and optionally on the breakdown
 		DataLogSecurity.check(state, dataspace, breakdown);
@@ -99,7 +92,7 @@ public class DataServlet implements IServlet {
 				.must(timeFilter);		
 		
 		// filters
-		for(String prop : "host campaign".split(" ")) {
+		for(String prop : "evt host campaign".split(" ")) {
 			String host = sq.getProp(prop);
 			if (host!=null) {
 				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
@@ -109,11 +102,12 @@ public class DataServlet implements IServlet {
 		
 		search.setFilter(filter);
 		
-		for(String bd : breakdown) {
+		for(final String bd : breakdown) {
 			// tag & time
 			// e.g. tag/time {count:avg}
 			// TODO proper recursive handling
-			String[] b = bd.split(" ")[0].split("/");
+			String[] breakdown_output = bd.split("\\{");
+			String[] b = breakdown_output[0].trim().split("/");
 			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
 					"by_"+StrUtils.join(b,'_'), b[0]);
 			Aggregation leaf = byTag;
@@ -129,14 +123,15 @@ public class DataServlet implements IServlet {
 					leaf = byHost;
 				}
 			}				
-			// add a count handler
-			if (bd.split(" ").length <= 1) {
+			// add a count handler?
+			if (breakdown_output.length <= 1) { // no - done
 				search.addAggregation(byTag);
 				continue;
 			}
-			String bd2 = bd.substring(bd.indexOf(" ")+2, bd.length()-1);
-			if (bd2.contains("count")) {
-				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats("myCount", "count");			
+			String json = bd.substring(bd.indexOf("{"), bd.length());
+			Map<String,String> output = (Map) JSON.parse(json);
+			for(String k : output.keySet()) {
+				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);			
 				leaf.subAggregation(myCount);
 			}
 			search.addAggregation(byTag);
