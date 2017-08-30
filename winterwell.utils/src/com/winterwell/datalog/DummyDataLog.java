@@ -1,5 +1,6 @@
 package com.winterwell.datalog;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -114,7 +115,7 @@ class DummyDataLog implements IDataLog {
 		if (warnings < 3)
 			Log.w(LOGTAG, err);
 		warnings++;
-		return null;
+		return new ArrayList();
 	}
 
 	@Override

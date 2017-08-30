@@ -113,6 +113,7 @@ public class DataLog {
 	private static IDataLog initDflt() {
 		try {
 			DataLogConfig dlConfig = new ConfigBuilder(new DataLogConfig())
+				.setDebug(true)
 				.set(new File("config/datalog.properties"))
 				.get();
 			IDataLog dl = setConfig(dlConfig);
