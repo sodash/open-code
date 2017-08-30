@@ -40,12 +40,14 @@ public class BuildWinterwellProject extends BuildTask {
 
 	private boolean compile;
 	
-	public void setCompile(boolean compile) {
+	public BuildWinterwellProject setCompile(boolean compile) {
 		this.compile = compile;
+		return this;
 	}
 	
-	public void setVersion(String version) {
+	public BuildWinterwellProject setVersion(String version) {
 		this.version = version;
+		return this;
 	}
 	
 	public BuildWinterwellProject setIncSrc(boolean incSrc) {
