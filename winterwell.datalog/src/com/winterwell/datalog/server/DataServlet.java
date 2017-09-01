@@ -99,9 +99,7 @@ public class DataServlet implements IServlet {
 				filter = filter.must(kvFilter);
 			}
 		}
-		
-		search.setFilter(filter);
-		
+				
 		for(final String bd : breakdown) {
 			// tag & time
 			// e.g. tag/time {count:avg}
@@ -133,9 +131,14 @@ public class DataServlet implements IServlet {
 			for(String k : output.keySet()) {
 				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);			
 				leaf.subAggregation(myCount);
+				// filter 0s ??does this work??
+				filter.must(QueryBuilders.rangeQuery(k).gt(0));
 			}
 			search.addAggregation(byTag);
 		} // ./breakdown
+		
+		// Set filter
+		search.setFilter(filter);
 		
 		// TODO unify the ES search above with the DataLog interface call below
 		// i.e. define a Java interface to match the above 
