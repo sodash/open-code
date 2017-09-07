@@ -1,45 +1,69 @@
 package com.winterwell.youagain.client;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Properties;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
+import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
 
 public class YouAgainClient {
 
 	static final String ENDPOINT = "https://youagain.winterwell.com/youagain.json";
 	
-	static SField JWT = new SField("jwt");
+	static ListField<String> JWT = new ListField("jwt");
 	
-	String app;
+	final String app;
 	
 	public YouAgainClient(String app) {
 		assert ! Utils.isBlank(app);
 		this.app = app;
+	}	
+	
+	/**
+	 * This will also call state.setUser()
+	 * @param state
+	 * @return null if not logged in at all, otherwise list of AuthTokens
+	 */
+	public List<AuthToken> login(WebRequest state) {
+		List<String> jwt = getAllJWTTokens(state);				
+		List<AuthToken> tokens = Containers.apply(jwt, this::tokenFromJWT);
+		String as = state.get("as");
+		if (as!=null) {
+			// TODO must have an auth token or be su
+			XId uxid = new XId(as,false);
+			Properties user = new Properties(new ArrayMap("xid", uxid));
+			// set the user
+			state.setUser(uxid, user);
+		}
+		if (jwt.isEmpty()) return null;
+		return tokens;
 	}
 	
-	public Properties login(WebRequest state) {
+	AuthToken tokenFromJWT(String jwt) {
+		// FIXME Now verify it		
+		Map vuser = verify(jwt);
+		return new AuthToken(jwt);
+	}
+
+	private List<String> getAllJWTTokens(WebRequest state) {
 		Map<String, String> cookies = WebUtils2.getCookies(state.getRequest());
 		Set<String> ckeys = cookies.keySet();
 		Map<String, Object> params = state.getParameterMap();
 		Set<String> pkeys = params.keySet();
-		String jwt = state.get(JWT);
-		String as = state.get("as");
-		if (as==null) return null;
-		XId uxid = new XId(as,false);
-		// FIXME Now verify it
-		Map vuser = verify(jwt);
-		Properties user = new Properties(new ArrayMap("xid", uxid));
-		state.setUser(uxid, user);
-		return user;
+		List<String> jwt = state.get(JWT);
+		return Utils.or(jwt, new ArrayList());
 	}
 
 	private Map verify(String jwt) {

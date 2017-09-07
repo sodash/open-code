@@ -11,6 +11,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.web.ajax.AjaxMsg;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
+import com.winterwell.youagain.client.AuthToken;
 import com.winterwell.youagain.client.YouAgainClient;
 
 /**
@@ -24,7 +25,7 @@ public class DataLogSecurity {
 		XId user = state.getUserId();
 		if (user==null) {
 			YouAgainClient yac = Dep.get(YouAgainClient.class);
-			Properties u = yac.login(state);
+			List<AuthToken> u = yac.login(state);
 			if (u==null) {
 				state.addMessage(new AjaxMsg(new SecurityException("not logged in")));
 				Log.e("security", "not logged in "+state);
