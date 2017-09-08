@@ -37,8 +37,9 @@ public class YouAgainClient {
 	 * @return null if not logged in at all, otherwise list of AuthTokens
 	 */
 	public List<AuthToken> login(WebRequest state) {
-		List<String> jwt = getAllJWTTokens(state);				
-		List<AuthToken> tokens = Containers.apply(jwt, this::tokenFromJWT);
+		List<String> jwt = getAllJWTTokens(state);
+		// verify the tokens
+		List<AuthToken> tokens = verify(jwt);
 		String as = state.get("as");
 		if (as!=null) {
 			// TODO must have an auth token or be su
@@ -51,10 +52,20 @@ public class YouAgainClient {
 		return tokens;
 	}
 	
-	AuthToken tokenFromJWT(String jwt) {
-		// FIXME Now verify it		
-		Map vuser = verify(jwt);
-		return new AuthToken(jwt);
+	List<AuthToken> verify(List<String> jwt) {
+		if (jwt==null) return null;
+		try {
+			FakeBrowser fb = new FakeBrowser();
+			Object response = fb.getPage(ENDPOINT, new ArrayMap(
+					"app", app, 
+					"action", "verify", 
+					"jwt", jwt));
+			System.out.println(response);
+			return null;
+		} catch(Throwable ex) {
+			Log.e("youagain.verify", ex);
+			return null;
+		}
 	}
 
 	private List<String> getAllJWTTokens(WebRequest state) {
@@ -64,19 +75,6 @@ public class YouAgainClient {
 		Set<String> pkeys = params.keySet();
 		List<String> jwt = state.get(JWT);
 		return Utils.or(jwt, new ArrayList());
-	}
-
-	private Map verify(String jwt) {
-		if (jwt==null) return null;
-		try {
-			FakeBrowser fb = new FakeBrowser();
-			Object response = fb.getPage(ENDPOINT, new ArrayMap("app", app, "action", "verify", "jwt", jwt));
-			System.out.println(response);
-			return null;
-		} catch(Throwable ex) {
-			Log.e("youagain.verify", ex);
-			return null;
-		}
 	}
 
 }
