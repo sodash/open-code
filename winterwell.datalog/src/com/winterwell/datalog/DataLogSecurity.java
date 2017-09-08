@@ -25,7 +25,7 @@ public class DataLogSecurity {
 		XId user = state.getUserId();
 		if (user==null) {
 			YouAgainClient yac = Dep.get(YouAgainClient.class);
-			List<AuthToken> u = yac.login(state);
+			List<AuthToken> u = yac.getAuthTokens(state);
 			if (u==null) {
 				state.addMessage(new AjaxMsg(new SecurityException("not logged in")));
 				Log.e("security", "not logged in "+state);

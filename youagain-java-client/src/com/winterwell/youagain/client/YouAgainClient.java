@@ -6,11 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jetty.util.ajax.JSON;
+
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Properties;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.app.WebRequest;
@@ -36,7 +39,7 @@ public class YouAgainClient {
 	 * @param state
 	 * @return null if not logged in at all, otherwise list of AuthTokens
 	 */
-	public List<AuthToken> login(WebRequest state) {
+	public List<AuthToken> getAuthTokens(WebRequest state) {
 		List<String> jwt = getAllJWTTokens(state);
 		// verify the tokens
 		List<AuthToken> tokens = verify(jwt);
@@ -75,6 +78,31 @@ public class YouAgainClient {
 		Set<String> pkeys = params.keySet();
 		List<String> jwt = state.get(JWT);
 		return Utils.or(jwt, new ArrayList());
+	}
+
+	public AuthToken login(String usernameUsuallyAnEmail, String password) {
+		Utils.check4null(usernameUsuallyAnEmail, password);
+		FakeBrowser fb = new FakeBrowser();
+		Object response = fb.getPage(ENDPOINT, new ArrayMap(
+				"app", app, 
+				"action", "login",
+				"person", usernameUsuallyAnEmail,
+				"password", password));
+		System.out.println(response);
+		return null;
+	}
+
+	public AuthToken register(String usernameUsuallyAnEmail, String password) {
+		Utils.check4null(usernameUsuallyAnEmail, password);
+		FakeBrowser fb = new FakeBrowser();
+		String response = fb.getPage(ENDPOINT, new ArrayMap(
+				"app", app, 
+				"action", "signup",
+				"person", usernameUsuallyAnEmail,
+				"password", password));
+		Map jobj = (Map) JSON.parse(response);
+		Map user = SimpleJson.get(jobj, "cargo", "user");
+		return new AuthToken("TODO");
 	}
 
 }
