@@ -228,7 +228,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 		try {
 			storage = (IDataLogStorage) config.storageClass.newInstance();
 			storage.init(config);
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			Log.e(DataLog.LOGTAG, "storage creation failed for "+config.storageClass);
 			throw Utils.runtime(ex);
 		}
