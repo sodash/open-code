@@ -77,9 +77,10 @@ public class SQLStorage implements IDataLogStorage {
 		// ready?		
 		if (SqlUtils.options == null && config.dbUrl==null) {
 			// Not setup yet
-			Log.w(DataLog.LOGTAG, "SQLStorage: Stat cannot access the DB yet.");
+			Log.w(DataLog.LOGTAG, "SQLStorage: Stat cannot access the DB yet: no DB url / login details");
 			return;
 		}		
+		Log.w(DataLog.LOGTAG, "SQLStorage: init DB...");
 		if (config.dbUrl!=null) {
 			SqlUtils.setDBOptions(config);
 		}

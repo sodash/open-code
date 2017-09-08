@@ -21,6 +21,7 @@ import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.XStreamUtils;
 
 /**
  * Vital Statistics: A data-logging & charting service for arbitrary realtime
@@ -304,6 +305,8 @@ public class DataLog {
 			dflt = (IDataLog) cons.newInstance(myConfig);
 			return dflt;
 		} catch (Exception ex) {
+			Log.e(LOGTAG, "Error creating "+CLASS_DATALOGIMPL+" with config "+XStreamUtils.serialiseToXml(myConfig));
+			Log.e(LOGTAG, ex); 
 			throw Utils.runtime(ex);
 		}
 	}
