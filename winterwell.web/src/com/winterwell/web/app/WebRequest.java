@@ -1168,4 +1168,19 @@ public class WebRequest implements IProperties, Closeable {
 			// oh well
 		}		
 	}
+
+	public boolean isPUT() {
+		return is("PUT");
+	}
+	
+	private boolean is(String method) {
+		return method.equals(getRequest().getMethod().toUpperCase());
+	}
+
+	public boolean isPOST() {
+		return is("POST");
+	}
+	public boolean isGET() {
+		return is("GET");
+	}
 }
