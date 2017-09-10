@@ -1173,8 +1173,13 @@ public class WebRequest implements IProperties, Closeable {
 		return is("PUT");
 	}
 	
+	/**
+	 * HACK allows action=put etc as an alternative to a proper http PUT
+	 * @param method
+	 * @return
+	 */
 	private boolean is(String method) {
-		return method.equals(getRequest().getMethod().toUpperCase());
+		return method.equalsIgnoreCase(getRequest().getMethod()) || actionIs(method);
 	}
 
 	public boolean isPOST() {
