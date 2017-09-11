@@ -24,8 +24,8 @@ import com.winterwell.utils.reporting.LogFileTest;
  * Yet another logging system. We use Android LogCat style commands, e.g.
  * <code>Log.e(tag, message)</code> to report an error.
  * <p>
- * Simpler than Log4J, but without features such as /crashes when it fails to
- * find it's config file/.
+ * Simpler than Log4J, but without features such as "crashes when it fails to
+ * find it's config file" or "classpath settings can cause versions to conflict and kill your JVM".
  *
  * @testedby {@link LogFileTest}
  * @author daniel
@@ -161,6 +161,7 @@ public class Log {
 		listeners = ls.toArray(new ILogListener[0]);
 	}
 
+	@Deprecated
 	public static void report(Object msg) {
 		if (!(msg instanceof Throwable)) {
 			report(msg, Level.WARNING);
@@ -169,8 +170,9 @@ public class Log {
 		}
 	}
 
+	@Deprecated
 	public static void report(Object msg, Level error) {
-		report(null, msg, error);
+		report(null, msg, error, null);
 	}
 
 	/**
@@ -186,7 +188,7 @@ public class Log {
 	 * @param msg
 	 * @param error
 	 */
-	public static void report(String tag, Object msg, Level error) {
+	static void report(String tag, Object msg, Level error, Throwable ex) {
 		// Ignore?
 		Level minLevel = getMinLevel(tag);
 		if (minLevel.intValue() > error.intValue())
@@ -200,7 +202,9 @@ public class Log {
 										// clickable from the Eclipse console
 		}
 
-		String msgText = Printer.toString(msg);
+		String smsg = Printer.toString(msg);
+		if (ex==null && msg instanceof Throwable) ex = (Throwable) msg;
+		String msgText = smsg;
 		// Exception? Add in some stack
 		if (error==Level.SEVERE && msg instanceof Throwable) {
 			msgText += "\tStack: ";
@@ -217,15 +221,15 @@ public class Log {
 //			System.err.println(new IllegalArgumentException(
 //					"Log message too long: " + msgText));
 		}
-		Report report = new Report(tag, msg, msgText, error);
+		Report report = new Report(tag, smsg, error, msgText, ex);
 		// Note: using an array for listeners avoids any concurrent-mod
 		// exceptions
 		for (ILogListener listener : listeners) {
 			try {
 				listener.listen(report);
-			} catch (Throwable ex) {
+			} catch (Throwable ex2) {
 				// swallow if something goes wrong
-				ex.printStackTrace();
+				ex2.printStackTrace();
 			}
 		}
 		// HACK escalate on error + #escalate?
@@ -234,6 +238,12 @@ public class Log {
 		}
 	}
 
+	@Deprecated
+	public static void report(String tag, Object msg, Level error) {
+		report(tag,msg,error,null);
+	}
+	
+	@Deprecated
 	public static void report(Throwable ex) {
 		report(Printer.toString(ex, true), Level.SEVERE);
 	}
@@ -289,7 +299,7 @@ public class Log {
 	 * @param msg
 	 */
 	public static void w(String tag, Object msg) {
-		report(tag, msg, Level.WARNING);
+		report(tag, msg, Level.WARNING, null);
 	}
 
 	/**
@@ -298,22 +308,23 @@ public class Log {
 	 * @param msg - Note that msg here, can be a Throwable, and you'll get some stack
 	 */
 	public static void e(String tag, Object msg) {
-		report(tag, msg, Level.SEVERE);
+		report(tag, msg, Level.SEVERE, null);
 	}
 
 	/**
+	 * @deprecated
 	 * This one logs the stack-trace too.
 	 * @param tag
 	 * @param msg
 	 * @param t
 	 */
 	public static void st(String tag, Throwable t){
-		report(tag + ".stacktracelog", stackToString(t), WARNING);
+		report(tag + ".stacktracelog", stackToString(t), WARNING, t);
 	}
 
 
 	public static void i(String tag, Object msg) {
-		report(tag, msg, INFO);
+		report(tag, msg, INFO, null);
 	}
 
 	/**
@@ -340,6 +351,7 @@ public class Log {
 		report(tag, items, VERBOSE);
 	}
 
+	
 	@Deprecated
 	// use i()
 	public static void info(String string) {
@@ -360,6 +372,7 @@ public class Log {
 	}
 
 	/**
+	 * @deprecated
 	 * Replace {class} and {method} with values obtained from reflection lookups.
 	 * Convenience method for easy creation of log messages.
 	 * <p>

@@ -20,36 +20,34 @@ public final class Report implements Serializable {
 	/**
 	 * NB: Only set by exceptions
 	 */
-	private String details = "";
+	private final String details;
 	public final Level level;
 	private final String msg;
-	/**
-	 * The object behind the message (can be handy to keep it for listeners).
-	 */
-	public final Object ref;
+//	/**
+//	 * The object behind the message (can be handy to keep it for listeners).
+//	 */
+//	public final Object ref;
 
 	/**
 	 * NB: does not start with a # -- that's added by toString().
 	 */
 	public final String tag;
 	private final Time time = new Time();
+	final Throwable ex;
+//	final long threadId;
 
 	public Report(String tag, Exception ex) {
-		this.tag = tag;
-		ref = ex;
-		msg = ex.getMessage();
-		level = Level.SEVERE;
-		StringWriter sw = new StringWriter();
-		PrintWriter w = new PrintWriter(sw);
-		ex.printStackTrace(w);
-		details = sw.toString();
+		this(tag, ex.getMessage(), Level.SEVERE, Printer.toString(ex, true), ex); 
 	}
 
-	public Report(String tag, Object ref, String msg, Level level) {
+	public Report(String tag, String msg, Level level, String details, Throwable ex) {
 		this.tag = tag;
 		this.msg = msg;
 		this.level = level;
-		this.ref = ref;
+//		this.ref = ref;
+		this.ex = ex;
+		this.details = details;
+//		this.threadId = Thread.currentThread().getId();
 	}
 
 	public String getMessage() {

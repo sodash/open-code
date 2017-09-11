@@ -2,6 +2,8 @@ package com.winterwell.utils.log;
 
 import java.io.Closeable;
 import java.io.File;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.ReflectionUtils;
@@ -98,10 +100,19 @@ public class LogFile implements ILogListener, Closeable {
 				}
 			}
 		}
+//		String lines = report.toString();
+		// Use Java SimpleFormatter to make LogStash happy out of the box
+		LogRecord lr = new LogRecord(report.level, report.getMessage());
+//		lr.setThreadID(report.threadId);
+		lr.setMillis(report.getTime().getTime());
+		lr.setThrown(report.ex);
+		String lines = sf.format(lr);
 		// a single line for each report to make it easier to grep
-		String line = report.toString().replaceAll("[\r\n]", " ") + "\n";
+		String line = lines.replaceAll("[\r\n]", " ") + "\n";
 		listen2(line, report.getTime());
 	}
+	
+	SimpleFormatter sf = new SimpleFormatter();
 	
 	/**
 	 * Low-level faster writing. 
