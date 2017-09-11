@@ -91,11 +91,11 @@ public class YouAgainClient {
 			}
 		}		
 		// NB: This isnt standard, this is our naming rule 
-		Pattern KEY = Pattern.compile("(\\w+\\.)?jwt");
+		Pattern KEY = Pattern.compile("^(\\w+\\.)?jwt");
 		// cookies
 		Map<String, String> cookies = WebUtils2.getCookies(state.getRequest());
 		for(String c : cookies.keySet()) {
-			if ( ! KEY.matcher(c).matches()) continue; 
+			if ( ! KEY.matcher(c).find()) continue; 
 			String jwt = cookies.get(c);
 			all.add(jwt);
 		}				
