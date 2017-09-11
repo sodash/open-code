@@ -132,7 +132,7 @@ public class Log {
 	/**
 	 * @return extra contextual message, or "" if unset
 	 */
-	public static String getContextMessage() {
+	static String getContextMessage() {
 		String cm = Environment.get().get(Log.ENV_CONTEXT_MESSAGE);
 		return cm == null ? "" : cm;
 	}

@@ -47,8 +47,10 @@ public final class Report implements Serializable {
 //		this.ref = ref;
 		this.ex = ex;
 		this.details = details;
-//		this.threadId = Thread.currentThread().getId();
+//		this.threadId = Thread.currentThread().getId();		
 	}
+	
+	final String context = Log.getContextMessage();
 
 	public String getMessage() {
 		return msg;

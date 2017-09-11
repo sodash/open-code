@@ -102,7 +102,7 @@ public class LogFile implements ILogListener, Closeable {
 		}
 //		String lines = report.toString();
 		// Use Java SimpleFormatter to make LogStash happy out of the box
-		LogRecord lr = new LogRecord(report.level, report.getMessage());
+		LogRecord lr = new LogRecord(report.level, report.getMessage()+" "+report.context+" "+report.thread);
 //		lr.setThreadID(report.threadId);
 		lr.setMillis(report.getTime().getTime());
 		lr.setThrown(report.ex);
