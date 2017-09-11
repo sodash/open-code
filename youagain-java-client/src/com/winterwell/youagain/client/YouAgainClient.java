@@ -2,14 +2,17 @@ package com.winterwell.youagain.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Properties;
 import com.winterwell.utils.log.Log;
@@ -25,8 +28,6 @@ public class YouAgainClient {
 
 	static final String ENDPOINT = "https://youagain.winterwell.com/youagain.json";
 	
-	static ListField<String> JWT = new ListField("jwt");
-	
 	final String app;
 	
 	public YouAgainClient(String app) {
@@ -35,6 +36,7 @@ public class YouAgainClient {
 	}	
 	
 	/**
+	 * TODO
 	 * This will also call state.setUser()
 	 * @param state
 	 * @return null if not logged in at all, otherwise list of AuthTokens
@@ -71,13 +73,47 @@ public class YouAgainClient {
 		}
 	}
 
-	private List<String> getAllJWTTokens(WebRequest state) {
+	/**
+	 * Low-level access to JWT tokens
+	 * https://en.wikipedia.org/wiki/JSON_Web_Token
+	 * @param state
+	 * @return
+	 */
+	public List<String> getAllJWTTokens(WebRequest state) {		
+		ArraySet<String> all = new ArraySet();		
+		// Auth header
+		String authHeader = state.getRequest().getHeader("Authorization");
+		if (authHeader!=null) {
+			authHeader = authHeader.trim();
+			if (authHeader.startsWith("Bearer")) {
+				String jwt = authHeader.substring("Bearer".length(), authHeader.length()).trim();
+				all.add(jwt);
+			}
+		}		
+		// NB: This isnt standard, this is our naming rule 
+		Pattern KEY = Pattern.compile("(\\w+\\.)?jwt");
+		// cookies
 		Map<String, String> cookies = WebUtils2.getCookies(state.getRequest());
-		Set<String> ckeys = cookies.keySet();
-		Map<String, Object> params = state.getParameterMap();
-		Set<String> pkeys = params.keySet();
-		List<String> jwt = state.get(JWT);
-		return Utils.or(jwt, new ArrayList());
+		for(String c : cookies.keySet()) {
+			if ( ! KEY.matcher(c).matches()) continue; 
+			String jwt = cookies.get(c);
+			all.add(jwt);
+		}				
+		// and parameters
+		Map<String, Object> pmap = state.getParameterMap();
+		for(String c : pmap.keySet()) {
+			if ( ! KEY.matcher(c).matches()) continue;		
+			Object jwt = pmap.get(c);
+			// is it a list??
+			if (jwt instanceof String[]) {
+				List<String> jwts = Containers.asList((String[])jwt);
+				all.addAll(jwts);	
+			} else {
+				all.add((String)jwt);
+			}
+		}
+		// done
+		return all.asList();
 	}
 
 	public AuthToken login(String usernameUsuallyAnEmail, String password) {
