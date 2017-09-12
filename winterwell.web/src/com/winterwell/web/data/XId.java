@@ -334,8 +334,8 @@ public final class XId implements Serializable, IHasJson {
 		return _xids;
 	}
 	/**
-	 * Type coercion convenience.
-	 * @param xid Can be String or XId or null. Does NOT canonicalise
+	 * Flexible type coercion / constructor convenience.
+	 * @param xid Can be String or XId or null (returns null). Does NOT canonicalise
 	 * */
 	public static XId xid(Object xid) {
 		if (xid==null) return null;

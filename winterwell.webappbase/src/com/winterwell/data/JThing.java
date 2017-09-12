@@ -61,7 +61,9 @@ public final class JThing<T> {
 	}
 	
 	public Map<String, Object> map() {
-		if (map==null && string()!=null) map = (Map<String, Object>) JSON.parse(json);
+		if (map==null && string()!=null) {
+			map = (Map<String, Object>) JSON.parse(json);
+		}
 		if (map==null) {
 			//
 			return null;

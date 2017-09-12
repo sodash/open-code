@@ -2,6 +2,7 @@ package com.winterwell.youagain.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -10,23 +11,32 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
+import com.winterwell.utils.Key;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.containers.Properties;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.WebEx;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
+import com.winterwell.web.fields.XIdField;
+
+import lgpl.haustein.Base64Encoder;
 
 public class YouAgainClient {
 
 	static final String ENDPOINT = "https://youagain.winterwell.com/youagain.json";
+
+	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
 	
 	final String app;
 	
@@ -42,35 +52,54 @@ public class YouAgainClient {
 	 * @return null if not logged in at all, otherwise list of AuthTokens
 	 */
 	public List<AuthToken> getAuthTokens(WebRequest state) {
+		List<AuthToken> tokens = state.get(AUTHS);
+		if (tokens!=null) return tokens;
 		List<String> jwt = getAllJWTTokens(state);
-		// verify the tokens
-		List<AuthToken> tokens = verify(jwt);
-		String as = state.get("as");
-		if (as!=null) {
-			// TODO must have an auth token or be su
-			XId uxid = new XId(as,false);
-			Properties user = new Properties(new ArrayMap("xid", uxid));
-			// set the user
-			state.setUser(uxid, user);
+		// basic auth?
+		AuthToken basicToken = null;
+		Pair<String> np = WebUtils2.getBasicAuthentication(state.getRequest());
+		if (np !=null) {
+			// verify it
+			basicToken = verifyNamePassword(np.first, np.second);
 		}
-		if (jwt.isEmpty()) return null;
+		if (jwt.isEmpty() && basicToken==null) return null;
+		// verify the tokens
+		tokens = verify(jwt);
+		// add the name/password user first, if set
+		if (basicToken!=null) tokens.add(0, basicToken);
+		// stash them
+		state.put(AUTHS, tokens);
+		// set user?
+		XId uxid = getUserId2(state, tokens);		
 		return tokens;
 	}
 	
+	private AuthToken verifyNamePassword(String email, String password) {
+		Utils.check4null(email, password);
+		FakeBrowser fb = new FakeBrowser();
+		String response = fb.getPage(ENDPOINT, new ArrayMap(
+				"app", app, 
+				"action", "login", 
+				"person", email,
+				"password", password));
+		// FIXME
+		Map jobj = (Map) JSON.parse(response);
+		System.out.println(response);			
+		AuthToken token = new AuthToken(null);
+		token.xid = new XId(email, "email");
+		return token;
+	}
+
 	List<AuthToken> verify(List<String> jwt) {
-		if (jwt==null) return null;
-		try {
-			FakeBrowser fb = new FakeBrowser();
-			Object response = fb.getPage(ENDPOINT, new ArrayMap(
-					"app", app, 
-					"action", "verify", 
-					"jwt", jwt));
-			System.out.println(response);
-			return null;
-		} catch(Throwable ex) {
-			Log.e("youagain.verify", ex);
-			return null;
-		}
+		List<AuthToken> list = new ArrayList();
+		if (jwt.isEmpty()) return list;
+		FakeBrowser fb = new FakeBrowser();
+		Object response = fb.getPage(ENDPOINT, new ArrayMap(
+				"app", app, 
+				"action", "verify", 
+				"jwt", jwt));
+		System.out.println(response);			
+		return list;		
 	}
 
 	/**
@@ -139,6 +168,42 @@ public class YouAgainClient {
 		Map jobj = (Map) JSON.parse(response);
 		Map user = SimpleJson.get(jobj, "cargo", "user");
 		return new AuthToken("TODO");
+	}
+
+	/**
+	 * If uxid is specified use that (testing for a matching auth token!),
+	 * otherwise return the first auth-token,
+	 * or null.
+	 * @return the user this request should be treated as being from.
+	 */
+	public XId getUserId(WebRequest state) {
+		List<AuthToken> auths = getAuthTokens(state);
+		return getUserId2(state, auths);
+	}
+	
+	XId getUserId2(WebRequest state, List<AuthToken> auths) {
+		XId uxid = state.get(new XIdField("uxid"));
+		if (uxid==null) {
+			// no user?
+			if (auths==null || auths.isEmpty()) {
+				return null;
+			}			
+			uxid = auths.get(0).xid;			
+		} else {
+			if (auths==null) throw new WebEx.E401(state.getRequestUrl(), "No auth-tokens. Can't act as "+uxid);
+		}
+		assert uxid != null;
+		final XId fuxid = uxid;
+		// security check
+		AuthToken auth = Containers.first(auths, a -> a.xid.equals(fuxid));
+		if (auth==null) {
+			throw new WebEx.E401(state.getRequestUrl(), "No auth-token for "+uxid);
+		}
+		// set the user
+		Properties user = new Properties(new ArrayMap("xid", uxid));
+		state.setUser(uxid, user);
+		// done
+		return uxid;
 	}
 
 }

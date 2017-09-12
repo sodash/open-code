@@ -53,7 +53,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 	protected JThing<T> doDiscardEdits(WebRequest state) {
-		ESPath path = esRouter.getPath(type, getId(state), KStatus.DRAFT);
+		ESPath path = esRouter.getPath(dataspace,type, getId(state), KStatus.DRAFT);
 		DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
 		IESResponse ok = del.get().check();		
 		getThing(state);
@@ -62,7 +62,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	public void process(WebRequest state) throws IOException {
 		// CORS??
-		WebUtils2.CORS(state, false);		
+		WebUtils2.CORS(state, false);
 		// list?
 		if (state.getSlug().contains("/list")) {
 			doList(state);
@@ -116,7 +116,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		String id = getId(state);
 		for(KStatus s : KStatus.main()) {
 			try {
-				ESPath path = esRouter.getPath(type, id, s);
+				ESPath path = esRouter.getPath(dataspace,type, id, s);
 				DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
 				IESResponse ok = del.get().check();
 			} catch(WebEx.E404 e404) {
@@ -151,7 +151,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected ESPath getPath(WebRequest state) {
 		assert state != null;
-		ESPath path = esRouter.getPath(type, getId(state), state.get(AppUtils.STATUS, KStatus.PUBLISHED));
+		ESPath path = esRouter.getPath(dataspace,type, getId(state), state.get(AppUtils.STATUS, KStatus.PUBLISHED));
 		return path;
 	}
 
@@ -173,12 +173,13 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * This might be newly minted for a new thing
 	 */
 	private String _id;
+	private String dataspace = null;
 
 	protected JThing<T> doPublish(WebRequest state) {
 		String id = getId(state);
 		Utils.check4null(id); 
-		ESPath draftPath = esRouter.getPath(type, id, KStatus.DRAFT);
-		ESPath publishPath = esRouter.getPath(type, id, KStatus.PUBLISHED);
+		ESPath draftPath = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
+		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
 		// load (if not loaded)
 		getThing(state);
 		if (jthing==null) {
@@ -211,7 +212,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
 		if (status!=null) {
 			s.setIndex(
-					esRouter.getPath(type, null, status).index()
+					esRouter.getPath(dataspace, type, null, status).index()
 					);
 		} 
 //		else {
@@ -268,7 +269,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		jthing.put("modified", true);
 		{	// update
 			String id = getId(state);
-			ESPath path = esRouter.getPath(type, id, KStatus.DRAFT);
+			ESPath path = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
 			AppUtils.doSaveEdit(path, jthing, state);
 		}
 	}

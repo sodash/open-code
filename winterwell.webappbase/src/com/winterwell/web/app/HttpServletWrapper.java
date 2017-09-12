@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
 
 public class HttpServletWrapper extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -26,7 +27,8 @@ public class HttpServletWrapper extends HttpServlet {
 			factory.get().process(state);
 		} catch (IOException | ServletException e) {
 			throw e;
-		} catch (Exception e) {
+		} catch (Throwable e) {
+			Log.e("web", e);
 			throw Utils.runtime(e);
 		} finally {
 			WebRequest.close(req, resp);

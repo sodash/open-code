@@ -100,7 +100,9 @@ public class Log {
 			@Override
 			public void listen(Report report) {
 				Printer.out(// Environment.get().get(Printer.INDENT)+
-				'#' + report.tag + " " + report.getMessage());
+				'#' + report.tag + " " + report.getMessage()
+				+(report.ex==null? "" : report.getDetails()
+						));
 			}
 		});
 

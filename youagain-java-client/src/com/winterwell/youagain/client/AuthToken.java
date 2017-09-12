@@ -10,6 +10,13 @@ import com.winterwell.web.data.XId;
  */
 public class AuthToken {
 
+	/**
+	 * @return a JWT token
+	 */
+	public String getToken() {
+		return token;
+	}
+	
 	public AuthToken(String token) {
 		this.token = token;
 	}
@@ -21,5 +28,10 @@ public class AuthToken {
 	 * Who is this for?
 	 */
 	XId xid;
+	
+	@Override
+	public String toString() {
+		return "AuthToken["+xid+"]";
+	}
 	
 }

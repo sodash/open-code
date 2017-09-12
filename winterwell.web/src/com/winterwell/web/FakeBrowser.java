@@ -801,17 +801,17 @@ public class FakeBrowser {
 				}
 			});
 
-		}
+		}		
+		// Authenticate?
+		if (password!=null) {
+			assert password != null;
+			setBasicAuthentication(connection, name, password);
+		}		
 		// Set outgoing request headers
 		for(String h : reqHeaders.keySet()) {
 			Object v = reqHeaders.get(h);
 			if (v==null) continue;
 			connection.setRequestProperty(h, v.toString());
-		}
-		// Authenticate?
-		if (password!=null) {
-			assert password != null;
-			setBasicAuthentication(connection, name, password);
 		}
 		connection.setDoInput(true); // we always want input?
 		connection.setReadTimeout(timeOutMilliSecs);
@@ -913,6 +913,14 @@ public class FakeBrowser {
 
 	public Cooldown getCooldown() {
 		return cooldown;
+	}
+
+	/**
+	 * @param token
+	 * See https://en.wikipedia.org/wiki/JSON_Web_Token#Use
+	 */
+	public void setAuthenticationByJWT(String token) {		
+		setRequestHeader("Authorization", "Bearer "+token);		
 	}
 
 }

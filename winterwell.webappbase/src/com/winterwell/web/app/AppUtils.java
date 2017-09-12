@@ -22,6 +22,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -210,13 +211,27 @@ public class AppUtils {
 		} else {
 			item.put("status", KStatus.DRAFT);
 		}
-		
-		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-		XId user = state.getUserId();		
+		// talk to ES
+		return doSaveEdit2(path, item, state);
+	}
+	
+	/**
+	 * skips the status bit in {@link #doSaveEdit(ESPath, JThing, WebRequest)}
+	 * @param path
+	 * @param item
+	 * @param state
+	 * @return
+	 */
+	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest state) {
+		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));		
 		// save update		
 		// sanity check id matches path
 		String id = (String) item.map().get("@id"); //mod.getId();
-		if (id==null) id = (String) item.map().get("id");
+		if (id==null) {
+			Object _id = item.map().get("id");
+			if (_id instanceof String) id= (String) _id;
+			if (_id.getClass().isArray()) id= (String) Containers.asList(_id).get(0);
+		}
 		assert id != null && ! id.equals("new") : "use action=new "+state;
 		assert id.equals(path.id) : path+" vs "+id;
 		// save to ES

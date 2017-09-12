@@ -28,6 +28,10 @@ public final class Report implements Serializable {
 //	 */
 //	public final Object ref;
 
+	public String getDetails() {
+		return details;
+	}
+	
 	/**
 	 * NB: does not start with a # -- that's added by toString().
 	 */
