@@ -240,6 +240,8 @@ public class AppUtils {
 		// This should merge against what's in the DB
 		up.setDoc(item.map());
 		up.setDocAsUpsert(true);
+		// TODO delete stuff?? fields or items from a list
+//		up.setScript(script)
 		// NB: this doesn't return the merged item :(
 		IESResponse resp = up.get().check();
 //		Map<String, Object> item2 = resp.getParsedJson();

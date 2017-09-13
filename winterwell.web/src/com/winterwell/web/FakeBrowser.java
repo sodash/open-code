@@ -880,9 +880,11 @@ public class FakeBrowser {
 	 * Set the request method. This will override the normal use of GET or POST, 
 	 * for all requests until it is reset to null.
 	 * @param method Can be null for default behaviour.
+	 * @return this
 	 */
-	public void setRequestMethod(String method) {
+	public FakeBrowser setRequestMethod(String method) {
 		this.requestMethod = method;
+		return this;
 	}
 
 	/**
