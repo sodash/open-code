@@ -25,7 +25,7 @@ import com.winterwell.utils.containers.Pair;
  */
 public class TimeUtils {
 	/**
-	 * The GMT standard timezone. 
+	 * The GMT aka UTC standard timezone. 
 	 * To get your own timezone, use TimeZone.getTimeZone(name);
 	 */
 	/*

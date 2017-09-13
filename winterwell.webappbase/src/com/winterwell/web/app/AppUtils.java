@@ -102,7 +102,8 @@ public class AppUtils {
 		if (sr.isSuccess()) {
 			if (klass!=null) {
 				Gson gson = Dep.get(Gson.class);
-				X item = gson.fromJson(sr.getSourceAsString(), klass);
+				String json = sr.getSourceAsString();
+				X item = gson.fromJson(json, klass);
 				return item;
 			}
 			Map<String, Object> json = sr.getSourceAsMap(); //SourceAsString();

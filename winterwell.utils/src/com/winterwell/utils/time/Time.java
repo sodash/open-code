@@ -1,11 +1,18 @@
 package com.winterwell.utils.time;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -147,32 +154,51 @@ public class Time implements Serializable, Comparable<Time> {
 	 */
 	public Time(String date) {
 		if (date==null) throw new NullPointerException();
+		ut = parse(date);
+	}	
+
+	private static final Pattern DATE_ONLY = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+	
+	private static long parse(String date) {
 		// Is it a timecode?
 		if (date.length() > 8 && date.length() < 24 && StrUtils.isInteger(date)) {
-			this.ut = Long.valueOf(date);
-			return;
+			return Long.valueOf(date);
 		}
 		// One Special case short value
 		if ("0".equals(date)) {
-			this.ut = 0;
-			return;
+			return 0;
 		}
-		long _ut;
+		// ISO date only?
+		if (DATE_ONLY.matcher(date).matches()) {
+			date += "T00:00:00Z"; // make it midnight GMT
+		}				
+		// Try ISO 8601 format
+		// Note: This does not fully handle 8601 -- there are valid offsets which will cause an error.
+		// E.g. "+0100" or "+01"
 		try {
-			long _date = Date.parse(date);
-			_ut = _date;
-		} catch (IllegalArgumentException ex) {
-			// Try ISO 8601 format
+//				OffsetDateTime odt = OffsetDateTime.parse(date);
+//				long oes = odt.toEpochSecond();
+			ZonedDateTime zp = ZonedDateTime.parse(date);
+			long zes = zp.toEpochSecond();
+//				Date.from(zp.toInstant())
+//				Instant ip = Instant.parse(date);
+//				TemporalAccessor j8 = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(date);
+//				Instant instant = Instant.from(j8);
+//				long es = instant.getEpochSecond();
+//				Date idate = Date.from(instant);
+//				SimpleDateFormat sdf = new SimpleDateFormat(iso8601inferZone);
+//				Date parsed = sdf.parse(date);
+//				_ut = parsed.getTime();
+			return 1000*zes;
+		} catch(Exception ex2) {	
 			try {
-				SimpleDateFormat sdf = new SimpleDateFormat(iso8601);
-				Date parsed = sdf.parse(date);
-				_ut = parsed.getTime();
-			} catch(Exception ex2) {
+				// Try Date, which can handle Time.toString()
+				return Date.parse(date);
+			} catch(Exception ex3) {
 				// be more informative! _What_ failed to parse
 				throw new IllegalArgumentException(StrUtils.ellipsize(date, 100));
-			}			
-		}
-		this.ut = _ut;
+			}
+		}			
 	}
 
 	/**
@@ -260,8 +286,8 @@ public class Time implements Serializable, Comparable<Time> {
 	 */
 	public String format(String format) {
 		SimpleDateFormat df = new SimpleDateFormat(format);
-		TimeZone zone = TimeZone.getTimeZone("GMT");
-		df.setTimeZone(zone);
+//		TimeZone zone = TimeZone.getTimeZone("GMT");
+		df.setTimeZone(TimeUtils._GMT_TIMEZONE);
 		return df.format(getDate());
 	}
 
@@ -454,14 +480,16 @@ public class Time implements Serializable, Comparable<Time> {
 		return plus(dt.dt);
 	}
 	
-	// TODO should we open up the timezone to allow it to be specified?
-	final static String iso8601 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+	/**
+	 * See ??
+	 */
+	final static String iso8601Z = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	
 	/**
 	 * @return ISO 8601 format yyyy-MM-ddTHH:mm:ssZ
 	 */
 	public String toISOString() {	
-		return format(iso8601);
+		return format(iso8601Z);
 	}
 	/**
 	 * Human readable GMT time. This is NOT ISO8601

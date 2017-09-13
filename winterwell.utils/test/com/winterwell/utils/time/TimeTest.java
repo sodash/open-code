@@ -1,7 +1,15 @@
 package com.winterwell.utils.time;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -142,8 +150,140 @@ public class TimeTest {
 		}
 	}
 
+
 	@Test
-	public void testTime() {
+	public void testISOTime() {		
+		for(String s : new String[] {
+				"2017-09-13",
+				"T10:36:40Z",
+				"2017-09-13T10:36:40Z",
+				"2017-09-13T10:36:40+0000",
+				"2017-09-13T10:36:40+00:00",
+				"2017-09-13T10:36:40+0100",
+				"2017-09-13T10:36:40+01:00",
+				"2017-09-13T10:36:40+01",
+				new Time().toISOString(),
+				new Date().toString(),
+				new Time().toString()
+		}) {
+			System.out.println("\n"+s);
+			try {
+				Time time = new Time(s);
+				System.out.println("	Time:	"+time);
+			} catch(Exception ex) {
+				System.out.println("	Time:	"+ex);
+			}
+			try {
+				Date time = new Date(s);
+				System.out.println("	Date:	"+time);
+			} catch(Exception ex) {
+				System.out.println("	Date:	"+ex);
+			}
+			try {
+				Instant odt = Instant.parse(s);
+				long oes = odt.toEpochMilli();
+				System.out.println("	Instant:	"+new Time(oes));
+			} catch(Exception ex) {
+				System.out.println("	Instant:	"+ex);
+			}
+			try {
+				OffsetDateTime odt = OffsetDateTime.parse(s);
+				long oes = odt.toEpochSecond()*1000;
+				System.out.println("	OffsetDateTime:	"+new Time(oes));
+			} catch(Exception ex) {
+				System.out.println("	OffsetDateTime:	"+ex);
+			}
+			try {
+				ZonedDateTime odt = ZonedDateTime.parse(s);
+				long oes = odt.toEpochSecond()*1000;
+				System.out.println("	ZonedDateTime:	"+new Time(oes));
+			} catch(Exception ex) {
+				System.out.println("	ZonedDateTime:	"+ex);
+			}
+			try {
+				TemporalAccessor j8 = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(s);
+				Instant instant = Instant.from(j8);
+				long oes = instant.toEpochMilli();
+				System.out.println("	DateTimeFormatter:	"+new Time(oes));
+			} catch(Exception ex) {
+				System.out.println("	DateTimeFormatter:	"+ex);
+			}
+			try {
+				TemporalAccessor j8 = DateTimeFormatter.ISO_DATE.parse(s);				
+				Instant instant = Instant.from(j8);
+				long oes = instant.toEpochMilli();
+				System.out.println("	DateTimeFormatter ISO Date:	"+new Time(oes));
+			} catch(Exception ex) {
+				System.out.println("	DateTimeFormatter ISO Date:	"+ex);
+			}
+			try {
+				TemporalAccessor j8 = DateTimeFormatter.ISO_OFFSET_DATE.parse(s);
+				Instant instant = Instant.from(j8);
+				long oes = instant.toEpochMilli();
+				System.out.println("	DateTimeFormatter ISO Offset Date:	"+new Time(oes));
+			} catch(Exception ex) {
+				System.out.println("	DateTimeFormatter ISO Offset Date:	"+ex);
+			}
+//			try {
+//				SimpleDateFormat sdf = new SimpleDateFormat(Time.iso8601inferZone);
+//				Date parsed = sdf.parse(s);				
+//				System.out.println("SimpleDateFormat infer:	"+new Time(parsed));
+//			} catch(Exception ex) {
+//				System.out.println("SimpleDateFormat infer:	"+ex);
+//			}
+			try {
+				SimpleDateFormat sdf = new SimpleDateFormat(Time.iso8601Z);
+				Date parsed = sdf.parse(s);				
+				System.out.println("	SimpleDateFormat Z:	"+new Time(parsed));
+			} catch(Exception ex) {
+				System.out.println("	SimpleDateFormat Z:	"+ex);
+			}
+			try {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddX");
+				Date parsed = sdf.parse(s);				
+				System.out.println("	SimpleDateFormat X:	"+new Time(parsed));
+			} catch(Exception ex) {
+				System.out.println("	SimpleDateFormat X:	"+ex);
+			}
+			try {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				Date parsed = sdf.parse(s);				
+				System.out.println("	SimpleDateFormat date:	"+new Time(parsed));
+			} catch(Exception ex) {
+				System.out.println("	SimpleDateFormat date:	"+ex);
+			}
+			try {
+				Calendar p = javax.xml.bind.DatatypeConverter.parseDateTime(s);				
+				System.out.println("	jaxb:	"+new Time(p));
+			} catch(Exception ex) {
+				System.out.println("	jaxb:	"+ex);
+			}			
+		}
+	}
+	
+	@Test
+	public void testTime() {				
+		{
+			Time now = new Time();
+			String iso = now.toISOString();
+			Time t1 = new Time(iso);
+			assert Math.abs(t1.diff(now)) < 1000 : t1.diff(now);
+		}
+		{
+			Time now = new Time();
+			String s = now.toString();
+			Time t1 = new Time(s);
+			assert Math.abs(t1.diff(now)) < 1000 : t1.diff(now);
+		}
+		{
+			Time sep = new Time("2017-09-13");
+			assert sep.toISOString().startsWith("2017-09-13");
+		}
+		{	// a 1 hour offset
+			Time t0 = new Time("2017-09-13T10:36:40+01:00");
+			Time t1 = new Time("2017-09-13T10:36:40Z");
+			assert Math.abs(t1.diff(t0)) == TUnit.HOUR.getMillisecs() : t1.diff(t0);
+		}
 		{
 			Time t1 = new Time("01/03/3100");
 			assert t1.isAfter(new Time());
