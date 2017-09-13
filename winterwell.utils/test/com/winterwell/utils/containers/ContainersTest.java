@@ -25,7 +25,37 @@ import com.winterwell.utils.threads.SafeExecutor;
 import junit.framework.Assert;
 
 public class ContainersTest {
-
+	
+	@Test
+	public void testContains() {
+		{
+			String[] a = new String[]{"a", "a/b", "/foo/"};
+			assert Containers.contains("a", a);
+			assert Containers.contains("/foo/", a);
+			assert ! Containers.contains("/foo/bar", a);
+		}
+		{
+			Pair[] a = new Pair[]{new Pair("a", "A"), new Pair("b","B")};
+			assert ! Containers.contains("a", a);
+			assert ! Containers.contains(null, a);
+			assert Containers.contains(new Pair("a", "A"), a);
+		}
+	}
+	
+	@Test
+	public void testSame() {
+		{
+			String[] a = new String[]{"a", "a/b", "/foo/"};
+			String[] b = new String[]{"a", "a/b", "/foo/bar"};
+			assert ! Containers.same(a,b);
+		}
+		{
+			Pair[] a = new Pair[]{new Pair("a", "A"), new Pair("b","B")};
+			Pair[] b = new Pair[]{new Pair("b","B"), new Pair("a", "A")};
+			assert Containers.same(a, b);
+		}
+	}
+	
 	
 	@Test
 	public void testArrayApply() {

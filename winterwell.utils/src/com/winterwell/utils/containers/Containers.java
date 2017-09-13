@@ -689,8 +689,8 @@ public final class Containers  {
 	 * @param strings Cannot be null
 	 * @return true if s (or an equals() String) is in strings
 	 */
-	public static boolean contains(String s, String[] strings) {
-		for (String string : strings) {
+	public static <T> boolean contains(T s, T[] strings) {
+		for (T string : strings) {
 			if (s == null ? string == null : s.equals(string))
 				return true;
 		}
@@ -1583,6 +1583,24 @@ public final class Containers  {
 		if (b==null) return false;
 		return differences(a, b).isEmpty();
 	}
+	
+	/**
+	 * Same elements, ignoring order. 
+	 * Optimised for small arrays -- this is O(n2). For large arrays, route via HashSet or similar.
+	 * @param a
+	 * @param b
+	 * @return true if a and b have equals elements.
+	 */
+	public static <T> boolean same(T[] a, T[] b) {
+		if (a==null) return b==null;
+		if (b==null) return false;
+		if (a.length != b.length) return false;
+		for (T x : a) {
+			if ( ! contains(x, b)) return false;
+		}
+		return true;
+	}
+
 
 	public static boolean same(Collection a, Object... b) {
 		return differences(a, Arrays.asList(b)).isEmpty();

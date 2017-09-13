@@ -29,7 +29,7 @@ import com.winterwell.utils.web.XStreamUtils;
  * @author daniel
  * 
  */
-public class Utils {
+public final class Utils {
 
 	private static final char[] consonants = "bcdfghjklmnpqrstvwxz"
 			.toCharArray();
