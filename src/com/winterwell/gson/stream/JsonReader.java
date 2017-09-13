@@ -1819,6 +1819,11 @@ public class JsonReader implements Closeable {
 		};
 	}
 
+	/**
+	 * Look up a JSOG id (hopefully stashed earlier in parsing)
+	 * @param ref
+	 * @return
+	 */
 	public Object getIdValue(String ref) {
 		return ids.get(ref);
 	}

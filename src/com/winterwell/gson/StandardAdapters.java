@@ -40,7 +40,8 @@ public static class TimeTypeAdapter implements JsonSerializer<Time>, JsonDeseria
 			long utv = ut.getAsLong();
 			return new Time(utv);
 		}
-		return new Time(json.getAsString());
+		String s = json.getAsString();
+		return new Time(s);
 	}
 }
 

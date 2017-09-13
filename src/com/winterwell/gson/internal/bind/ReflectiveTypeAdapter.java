@@ -247,7 +247,7 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 			// Class-correction: Correct for wrong-class choices, based on what the target field is.
 			// Is the target a number? We get class-cast issues where gson
 			// has opted for Double, but we need Integer
-			value = read3_maybeChangeClass_changeFieldClass(in, f, value);
+			value = read3_maybeChangeClass_changeFieldClass(in, f.getType(), value);
 			
 			// Set it
 			f.set(obj, value);
@@ -255,10 +255,10 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 		return obj;
 	}
 
-	private Object read3_maybeChangeClass_changeFieldClass(JsonReader in, Field f, Object value)
+	private Object read3_maybeChangeClass_changeFieldClass(JsonReader in, final Class fClass, Object value)
 			throws InstantiationException, IllegalAccessException 
-	{
-		final Class fClass = f.getType();
+	{		
+		// Right class?
 		if (ReflectionUtils.isa(value.getClass(), fClass)) {
 			return value; // all fine
 		}
@@ -266,8 +266,10 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 			return MathUtils.cast(fClass, (Number) value);			
 		}
 		if (value instanceof String) {
-			// If a Map convertor was used earlier, classes like Class and URI can end up as Strings 
-			value = gson.fromJson((String)value, fClass);
+			// If a Map convertor was used earlier, classes like Class and URI can end up as Strings
+			// NB: we must re-wrap value as a json string to pass it back into Gson.
+			String jsonValue = gson.toJson(value);
+			value = gson.fromJson(jsonValue, fClass);
 			return value;
 			
 		}
@@ -290,13 +292,14 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 			Collection collection = (Collection)value;
 			// an array?
 			if (fClass.isArray()) {
-				Class compType = fClass.getComponentType();
+				final Class compType = fClass.getComponentType();
 				Object array = Array.newInstance(compType, collection.size());
 				int i=0;
 				for(Object vi : collection) {
 					if (vi!=null) {
 						vi = read3_lateBinding(array, null, i, vi, in);
-					}
+						vi = read3_maybeChangeClass_changeFieldClass(in, compType, vi);
+					}					
 					Array.set(array, i, vi);
 					i++;
 				}
@@ -307,6 +310,7 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 			for(Object vi : collection) {
 				if (vi!=null) {
 					vi = read3_lateBinding(listSubClass, null, i, vi, in);
+					// NB: erasure means we have no component type info here
 				}
 				listSubClass.add(vi);
 				i++;

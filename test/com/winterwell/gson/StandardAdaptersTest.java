@@ -11,6 +11,7 @@ import com.winterwell.utils.time.Time;
 
 public class StandardAdaptersTest {
 
+	
 	@Test
 	public void testTime() {
 		Gson gsonWith = new GsonBuilder()
@@ -23,6 +24,26 @@ public class StandardAdaptersTest {
 		System.out.println(gson1);
 		Time now2 = gsonWith.fromJson(gson1, Time.class);
 		assert now.equals(now2);
+	}
+	
+	@Test
+	public void testISOTime() {
+		{
+			Gson gsonWith = new GsonBuilder()
+							.registerTypeAdapter(Time.class, new StandardAdapters.TimeTypeAdapter())
+							.create();
+						
+			Time now2 = gsonWith.fromJson("\"2017-09-13T11:55:26Z\"", Time.class);
+			
+			assert now2 != null;
+		}
+		if (false) {	// without ""s it will fail, cos its not valid json
+			Gson gsonWith = new GsonBuilder()
+							.registerTypeAdapter(Time.class, new StandardAdapters.TimeTypeAdapter())
+							.create();
+						
+			Time now2 = gsonWith.fromJson("2017-09-13T11:55:26Z", Time.class);
+		}
 	}
 	
 	@Test
