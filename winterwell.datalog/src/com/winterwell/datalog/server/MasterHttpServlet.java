@@ -11,6 +11,7 @@ import com.winterwell.utils.Key;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.ManifestServlet;
 import com.winterwell.web.app.WebRequest;
 
@@ -34,13 +35,14 @@ public class MasterHttpServlet extends HttpServlet {
 		String path = null;
 		try {
 			Thread.currentThread().setName("web "+path);
-			request = new WebRequest(null, req, resp);			
+			request = new WebRequest(null, req, resp);
+			AppUtils.addDebugInfo(request);
 			path = request.getRequestPath();
 			Thread.currentThread().setName("web "+path);
 	
 			// Tracking pixel
 			if (path.startsWith("/pxl")) {
-				new TrackingPixelServlet().doGet(req, resp);
+				new TrackingPixelServlet().process(request);
 				return;
 			}		
 			// Log

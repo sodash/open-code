@@ -270,6 +270,7 @@ public class AppUtils {
 	}		
 	
 	private static KServerType _serverType;
+	private static String _hostname;
 
 	/**
 	 * Determined in this order:
@@ -294,7 +295,7 @@ public class AppUtils {
 			Log.d("init", "No Properties for explicit serverType");
 		}
 		// explicitly listed
-		String hostname = WebUtils.fullHostname();
+		String hostname = getFullHostname();
 		Log.d("init", "serverType for host "+hostname+" ...?");
 		if (LOCAL_MACHINES.contains(hostname)) {
 			Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.LOCAL);
@@ -311,6 +312,17 @@ public class AppUtils {
 
 		Log.i("init", "Fallback: Treating "+hostname+" as serverType = "+KServerType.PRODUCTION);
 		return KServerType.PRODUCTION;
+	}
+
+
+	public static String getFullHostname() {
+		if (_hostname==null) _hostname = WebUtils.fullHostname();
+		return _hostname;
+	}
+
+
+	public static void addDebugInfo(WebRequest request) {
+		request.getResponse().addHeader("X-Server", AppUtils.getFullHostname());
 	}
 
 

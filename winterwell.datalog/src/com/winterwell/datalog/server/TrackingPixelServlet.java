@@ -14,6 +14,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.app.FileServlet;
+import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.SField;
 
@@ -25,21 +26,9 @@ import com.winterwell.web.fields.SField;
  * @author daniel
  *
  */
-public class TrackingPixelServlet extends HttpServlet {
+public class TrackingPixelServlet implements IServlet {
 	private static final long serialVersionUID = 1L;
-	static final String DATALOG_EVENT_TYPE = "pxl";
-
-	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		try {
-			WebRequest wr = new WebRequest(this, req, resp);
-			processIncoming(wr);
-		} finally {
-			WebRequest.close(req, resp);
-		}
-		
-	}
-	
+	static final String DATALOG_EVENT_TYPE = "pxl";	
 	
 
 
@@ -63,7 +52,7 @@ public class TrackingPixelServlet extends HttpServlet {
 	static File PIXEL = new File("web/img/tracking-pixel.gif");
 
 
-	private void processIncoming(WebRequest state) {	
+	public void process(WebRequest state) {	
 		// Who are they? Track them across pages
 		String uid = getCreateCookieTrackerId(state);
 		String ref = Utils.or(state.get("ref"), state.getReferer());
@@ -167,5 +156,6 @@ public class TrackingPixelServlet extends HttpServlet {
 		state.setCookie("via2", via2, TUnit.YEAR.dt, ".soda.sh");
 		return oldVia==null? viav : oldVia;
 	}
+
 	
 }
