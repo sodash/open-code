@@ -222,32 +222,40 @@ public class AccuracyScore<Tag> implements IHasJson  {
 	 * </p>
 	 * @param target
 	 * @param predicted
-	 * @param dist 
-	 * @param p 
 	 */
 	public void count(Tag target, Tag predicted) {
 		count(target, predicted, 1);
 	}
-	
-	public synchronized void count(Tag target, Tag predicted, double n) {
+	/**
+	 * Count a prediction, updating the relevant entry in the matrix by (weight * inflation)
+	 * @param target
+	 * @param predicted
+	 * @param weight Normally 1. Use this to weight some items more or less than others.
+	 */
+	public synchronized void count(Tag target, Tag predicted, double weight) {
+		if (MathUtils.isTooSmall(weight)) return; // no-op
 		// HACK: throw away type-safety info
 		Object _target = target==null? NULL : target;
 		Object _predicted = predicted==null? NULL : predicted;
 		if (Utils.equals(_target, _predicted)) {
-			Containers.plus((Map)correct, _target, n*unit);
+			Containers.plus((Map)correct, _target, weight*unit);
 		} else {
-			Containers.plus((Map)falsePos, _predicted, n*unit);
-			Containers.plus((Map)falseNeg, _target, n*unit);
+			Containers.plus((Map)falsePos, _predicted, weight*unit);
+			Containers.plus((Map)falseNeg, _target, weight*unit);
 		}
-		incUnit();	
-		count++;
+		incUnit(weight);	
+		count += weight;
 	}
 		
-	long count = 0;
+	double count = 0;
 	double unit = 1;
 
-	private void incUnit() {
-		unit *= inflationRate;
+	private void incUnit(double weight) {
+//		if (inflationRate==1) return; // no inflation
+		// E.g. If the weight is 1/2, then square-root so that 2x calls will give
+		// "one" inflcation increment
+		double inflate = Math.pow(inflationRate, weight);
+		unit *= inflate;
 	}
 
 	

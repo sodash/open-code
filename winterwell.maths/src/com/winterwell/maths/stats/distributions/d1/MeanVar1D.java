@@ -177,9 +177,9 @@ public class MeanVar1D extends ADistribution1D implements
 	public Map<String,Object> toJson2() {
 		return new ArrayMap(
 				"mean", getMean(),
-				"var", getVariance(),
-				"max", getMax(),
-				"min", getMin(),
+				"var", MathUtils.isFinite(getVariance())? getVariance() : null,
+				"max", MathUtils.isFinite(max)? max : null,
+				"min", MathUtils.isFinite(min)? min : null,
 				"count", getCount()
 				);
 	}
