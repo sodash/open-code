@@ -99,9 +99,6 @@ public class BuildWinterwellProject extends BuildTask {
 		if (incSrc) {
 			JarTask jar2 = new JarTask(jarFile, new File(projectDir, "src"));
 			jar2.setAppend(true);
-			jar2.setManifestProperty(JarTask.MANIFEST_TITLE, 
-					projectDir.getName()+" library (c) Winterwell. All rights reserved.");
-			if (version!=null) jar2.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, version);
 			jar2.run();			
 		}
 		// Test

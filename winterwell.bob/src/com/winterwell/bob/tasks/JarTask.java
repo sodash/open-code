@@ -51,6 +51,14 @@ public class JarTask extends BuildTask {
 	}
 	
 	/**
+	 * Warning: this is only the ones set here, to be written by this task
+	 * @return
+	 */
+	public Map<String, String> getManifestProps() {
+		return manifestProps;
+	}
+	
+	/**
 	 * The version number for this jar
 	 */
 	public static final String MANIFEST_IMPLEMENTATION_VERSION = "Implementation-Version";
@@ -205,6 +213,11 @@ public class JarTask extends BuildTask {
 		if (appendFlag && manifestProps.size() != 0) { 
 			// Don't let the old manifest in
 			filenames.add("META-INF/MANIFEST.MF");
+			// But do copy its properties where they don't conflict
+			Map<String, Object> oldManifest = getManifest(tempFile);
+			oldManifest.entrySet().forEach(
+					e -> manifestProps.putIfAbsent(e.getKey(), StrUtils.str(e.getValue()))
+					);
 		}
 		// Add the files !
 		doTask2_addFiles(files, out);
