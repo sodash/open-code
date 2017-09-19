@@ -38,7 +38,8 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 		callbacksForDataspace.add("gl", minview);
 	}
 
-	protected void receive(DataLogEvent msg, Actor sender) throws Exception {		
+	@Override
+	protected void accept(DataLogEvent msg, Actor sender) throws Exception {		
 		List<Callback> cbs = callbacksForDataspace.get(msg.dataspace);
 		if (cbs==null) return;
 		for (Callback callback : cbs) {

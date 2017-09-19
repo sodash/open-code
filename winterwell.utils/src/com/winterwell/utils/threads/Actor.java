@@ -1,12 +1,16 @@
 package com.winterwell.utils.threads;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.Actor.Packet;
 
 /**
  * A simple pure-Java Actor implementation. Maintains a queue of messages.
@@ -16,7 +20,7 @@ import com.winterwell.utils.log.Log;
  * @testedby ActorTest
  * @author daniel
  */
-public abstract class Actor<Msg> {
+public class Actor<Msg> {
 
 	final Queue<Packet<Msg>> q;
 
@@ -36,7 +40,6 @@ public abstract class Actor<Msg> {
 		maxq = n;
 		return this;
 	}
-
 	
 	protected Actor() {
 		this(new ConcurrentLinkedQueue());
@@ -46,6 +49,15 @@ public abstract class Actor<Msg> {
 		this.q = queue;
 	}
 
+	/**
+	 * can be null
+	 */
+	IActorMsgConsumer<Msg> consumer;
+	
+	public void setConsumer(IActorMsgConsumer<Msg> consumer) {
+		this.consumer = consumer;
+	}
+	
 	public final boolean isAlive() {
 		return thread != null && thread.isAlive();
 	}
@@ -56,14 +68,14 @@ public abstract class Actor<Msg> {
 
 	/**
 	 * @return the most recent input-to-exception, or null. Note: only the most
-	 *         recent exception is ever stored.
+	 *         recent exception is ever stored. The Msg part may be null
 	 */
 	public Pair2<Msg, Throwable> peekLastException() {
 		return lastEx;
 	}
 
 	/**
-	 * @return the most recent input-to-exception, or null. This clears the
+	 * @return the most recent input-to-exception, or null. The Msg part may be null. This clears the
 	 *         exception -- a 2nd call will return null. Note: only the most
 	 *         recent exception is ever stored.
 	 */
@@ -103,9 +115,14 @@ public abstract class Actor<Msg> {
 	}
 
 	final void loop() {
+		if (q instanceof BlockingQueue) {
+			loop2_batch();
+			return;
+		}
 		while ( ! pleaseStop) {
 			Packet<Msg> msg = null;
 			try {
+				// sleep based poll
 				if (q.isEmpty()) {
 					Utils.sleep(10);
 				}
@@ -116,13 +133,62 @@ public abstract class Actor<Msg> {
 					Utils.sleep(10);
 					continue;
 				}
-				receive(msg.msg, msg.from);
+				accept(msg.msg, msg.from);
 			} catch (Throwable e) {
 				Log.e(getName(), e);
-				lastEx = new Pair2<Msg, Throwable>(msg.msg, e);
+				lastEx = new Pair2<Msg, Throwable>(msg==null? null : msg.msg, e);
 			}
 		}
+
 	}
+
+	/**
+	 * Forwards to the consumer. 
+	 * If you don't want to use a consumer, just override this method
+	 * @param msg
+	 * @throws Exception 
+	 */
+	protected void accept(Msg msg, Actor from) throws Exception {
+		consumer.accept(msg, from);
+	}
+	
+	@Deprecated
+	protected final void receive(Msg msg, Actor from) {
+		
+	}
+
+	private void loop2_batch() {
+		ArrayList<Packet<Msg>> batch = new ArrayList();
+		int batchSize = 16;
+		BlockingQueue<Packet<Msg>> bq = (BlockingQueue<Packet<Msg>>) q;
+		while ( ! pleaseStop) {
+			try {				
+				// drain the queue into batch
+				if (bq.drainTo(batch, batchSize) == 0) {
+					// nothing in q? q.take() will wait for something...
+					batch.add(bq.take());
+				}
+				// receive
+				acceptBatch(batch);				
+				batch.clear();
+			} catch (Throwable e) {
+				Log.e(getName(), e);
+				lastEx = new Pair2<Msg, Throwable>(null, e);
+			}
+		}
+
+	}
+	
+	protected void acceptBatch(ArrayList<Packet<Msg>> batch) throws Exception {
+		if (consumer!=null) {
+			consumer.acceptBatch(batch);
+			return;
+		}
+		for (Packet<Msg> packet : batch) {
+			accept(packet.msg, packet.from);
+		}
+	}
+
 
 	/**
 	 * Send a message to this actor!
@@ -141,11 +207,11 @@ public abstract class Actor<Msg> {
 	 * 
 	 * @param msg
 	 */
-	public void send(Msg msg) {
-		send(msg, null);
+	public final void send(Msg msg) {
+		send(new Packet(msg, null));
 	}
 
-	void send(Packet packet) {
+	protected final void send(Packet packet) {
 		threadAlive();
 		// check the queue
 		if (maxq > 0 && q.size() > maxq) {
@@ -162,17 +228,6 @@ public abstract class Actor<Msg> {
 	public final Queue<Packet<Msg>> getQ() {
 		return q;
 	}
-
-	/**
-	 * Receive a message! This is where the actor does it's thing.
-	 * 
-	 * @param msg
-	 * @param sender
-	 *            Can be null (e.g. if the message was sent by a non-Actor
-	 *            class)
-	 * @throws Exception Exceptions are caught and swallowed.
-	 */
-	protected abstract void receive(Msg msg, Actor sender) throws Exception;
 
 	public final void pleaseStop() {
 		pleaseStop = true;

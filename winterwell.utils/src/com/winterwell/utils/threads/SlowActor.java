@@ -15,7 +15,7 @@ import com.winterwell.utils.time.Time;
  * 
  * @author daniel
  */
-public abstract class SlowActor<Msg> extends Actor<Msg> {
+public class SlowActor<Msg> extends Actor<Msg> {
 
 	public SlowActor() {
 		super(new DelayQueue());
@@ -28,7 +28,7 @@ public abstract class SlowActor<Msg> extends Actor<Msg> {
 
 	public void send(Msg msg, Actor sender) {
 		send(new DPacket<Msg>(msg, sender, null));
-	}
+	}	
 
 	/**
 	 * Send a message to this actor!

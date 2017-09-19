@@ -45,21 +45,21 @@ public class ActorTest {
 		static volatile String log = "";
 
 		@Override
-		protected void receive(String msg, Actor sender) {
-			log += sender.getName() + ": " + msg + "\n";
+		protected void accept(String msg, Actor from) {		
+			log += from.getName() + ": " + msg + "\n";
 			if (msg.startsWith("STOP")) {
 				pleaseStop();
 				return;
 			}
 			if (n == max) {
-				sender.send("STOP", this);
+				from.send("STOP", this);
 				pleaseStop();
 				return;
 			}
 			if (msg.startsWith("ping")) {
-				sender.send("pong " + n, this);
+				from.send("pong " + n, this);
 			} else {
-				sender.send("ping " + n, this);
+				from.send("ping " + n, this);
 			}
 			n++;
 		}

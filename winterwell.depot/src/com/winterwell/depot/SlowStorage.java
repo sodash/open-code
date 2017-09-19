@@ -31,7 +31,7 @@ import com.winterwell.utils.time.TimeUtils;
  * @param <V>
  */
 public class SlowStorage extends SlowActor<Desc> 
-implements IStore , Flushable, Closeable 
+implements IStore , Flushable, Closeable
 {
 	
 	@Override
@@ -80,7 +80,7 @@ implements IStore , Flushable, Closeable
 		// send it all through receive
 		Queue<Packet<Desc>> _q = getQ();
 		for (Packet<Desc> packet : _q) {
-			receive(packet.msg, packet.from);
+			accept(packet.msg, packet.from);
 		}
 	}
 	
@@ -161,7 +161,7 @@ implements IStore , Flushable, Closeable
 	}
 
 	@Override
-	protected void receive(Desc desc, Actor sender) {
+	protected void accept(Desc desc, Actor sender) {
 		// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map.
 		// Remove any other requests for msg
 		for(Packet p : getQ().toArray(new Packet[0])) {
