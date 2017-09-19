@@ -98,8 +98,19 @@ public class MasterHttpServlet extends HttpServlet {
 			
 			WebUtils2.sendError(500, "TODO", resp);
 		} catch(Throwable ex) {
-			Log.e("error", ex);
-			WebUtils2.sendError(500, "Server Error: "+ex, resp);
+			// default to generic Server Error
+			int errorCode = 500;
+			// but catch and use code from web exceptions
+			if (ex instanceof WebEx) {
+				errorCode = ((WebEx) ex).code;
+			}
+			// and take it easy when logging 404 Not Found
+			if (errorCode == 404) {
+				Log.w("404", ex);	
+			} else {
+				Log.e("error", ex);
+			}
+			WebUtils2.sendError(errorCode, "Server Error: " + ex, resp);
 		} finally {
 			WebRequest.close(req, resp);
 			Thread.currentThread().setName("done ...web "+path);
