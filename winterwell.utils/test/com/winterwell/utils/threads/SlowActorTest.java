@@ -72,7 +72,7 @@ public class SlowActorTest {
 		static volatile String log = "";
 
 		@Override
-		protected void accept(String msg, Actor sender) {
+		protected void consume(String msg, Actor sender) {
 			log += sender.getName() + ": " + msg + "\n";
 			if (msg.startsWith("STOP")) {
 				pleaseStop();

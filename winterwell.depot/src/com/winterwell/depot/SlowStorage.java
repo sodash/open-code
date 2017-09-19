@@ -75,14 +75,7 @@ implements IStore , Flushable, Closeable
 	
 	final ConcurrentHashMap<Desc, Object> map = new ConcurrentHashMap();
 	
-	@Override
-	public void flush() throws IOException {
-		// send it all through receive
-		Queue<Packet<Desc>> _q = getQ();
-		for (Packet<Desc> packet : _q) {
-			accept(packet.msg, packet.from);
-		}
-	}
+	
 	
 	@Override
 	public final void remove(Desc desc) {
@@ -161,7 +154,7 @@ implements IStore , Flushable, Closeable
 	}
 
 	@Override
-	protected void accept(Desc desc, Actor sender) {
+	protected void consume(Desc desc, Actor sender) {
 		// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map.
 		// Remove any other requests for msg
 		for(Packet p : getQ().toArray(new Packet[0])) {

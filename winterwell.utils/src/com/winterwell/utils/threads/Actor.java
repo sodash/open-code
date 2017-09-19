@@ -22,6 +22,43 @@ import com.winterwell.utils.threads.Actor.Packet;
  */
 public class Actor<Msg> {
 
+	/**
+	 * Message + sending Actor.
+	 * @author daniel
+	 *
+	 * @param <Msg>
+	 */
+	public static class Packet<Msg> implements Serializable {
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * Sender, can be null.
+		 */
+		public final Actor from;
+
+		public final Msg msg;
+
+		public Packet(Msg msg, Actor sender) {
+			this.msg = msg;
+			this.from = sender;
+		}
+		@Override
+		public String toString() {
+			return "Packet[from=" + from + ", msg=" + msg + "]";
+		}
+	}
+	
+	/**
+	 * can be null
+	 */
+	IActorMsgConsumer<Msg> consumer;
+
+	private Pair2<Msg, Throwable> lastEx;
+
+	private int maxq;
+
+	private boolean pleaseStop;
+	
 	final Queue<Packet<Msg>> q;
 
 	/**
@@ -29,18 +66,6 @@ public class Actor<Msg> {
 	 */
 	Thread thread;
 
-	private int maxq;
-
-	/**
-	 * Unset by default. If set, check each send to see that the queue is not too long.
-	 * @param n
-	 * @return
-	 */
-	public Actor<Msg> setMaxQ(int n) {
-		maxq = n;
-		return this;
-	}
-	
 	protected Actor() {
 		this(new ConcurrentLinkedQueue());
 	}
@@ -48,70 +73,42 @@ public class Actor<Msg> {
 	protected Actor(Queue<Packet<Msg>> queue) {
 		this.q = queue;
 	}
-
-	/**
-	 * can be null
-	 */
-	IActorMsgConsumer<Msg> consumer;
 	
-	public void setConsumer(IActorMsgConsumer<Msg> consumer) {
-		this.consumer = consumer;
+	/**
+	 * Forwards to the consumer. 
+	 * If you don't want to use a consumer, just override this method
+	 * @param msg
+	 * @throws Exception 
+	 */
+	protected void consume(Msg msg, Actor from) throws Exception {
+		consumer.accept(msg, from);
 	}
 	
-	public final boolean isAlive() {
-		return thread != null && thread.isAlive();
-	}
-
-	private boolean pleaseStop;
-
-	private Pair2<Msg, Throwable> lastEx;
-
-	/**
-	 * @return the most recent input-to-exception, or null. Note: only the most
-	 *         recent exception is ever stored. The Msg part may be null
-	 */
-	public Pair2<Msg, Throwable> peekLastException() {
-		return lastEx;
-	}
-
-	/**
-	 * @return the most recent input-to-exception, or null. The Msg part may be null. This clears the
-	 *         exception -- a 2nd call will return null. Note: only the most
-	 *         recent exception is ever stored.
-	 */
-	public final Pair2<Msg, Throwable> popLastException() {
-		Pair2<Msg, Throwable> _lastEx = lastEx;
-		lastEx = null;
-		return _lastEx;
-	}
-
-	/**
-	 * ensure we have an alive thread
-	 */
-	private void threadAlive() {
-		if (thread != null && thread.isAlive()) {
+	protected void consumeBatch(ArrayList<Packet<Msg>> batch) throws Exception {
+		if (consumer!=null) {
+			consumer.acceptBatch(batch);
 			return;
 		}
-		synchronized (this) {
-			if (thread != null && thread.isAlive()) {
-				return;
-			}
-			thread = new Thread(new Runnable() {
-				@Override
-				public void run() {					
-					loop();
-					
-					// Done!
-					Log.d("actor", getName() + " done");
-				}
-			}, getName());
-			thread.setDaemon(true);
-			thread.start();
+		for (Packet<Msg> packet : batch) {
+			consume(packet.msg, packet.from);
 		}
 	}
 
 	protected String getName() {
 		return getClass().getSimpleName();
+	}
+
+	/**
+	 * Access the queue. Warning: at your own risk!
+	 * 
+	 * @return
+	 */
+	public final Queue<Packet<Msg>> getQ() {
+		return q;
+	}
+
+	public final boolean isAlive() {
+		return thread != null && thread.isAlive();
 	}
 
 	final void loop() {
@@ -133,7 +130,7 @@ public class Actor<Msg> {
 					Utils.sleep(10);
 					continue;
 				}
-				accept(msg.msg, msg.from);
+				consume(msg.msg, msg.from);
 			} catch (Throwable e) {
 				Log.e(getName(), e);
 				lastEx = new Pair2<Msg, Throwable>(msg==null? null : msg.msg, e);
@@ -142,34 +139,19 @@ public class Actor<Msg> {
 
 	}
 
-	/**
-	 * Forwards to the consumer. 
-	 * If you don't want to use a consumer, just override this method
-	 * @param msg
-	 * @throws Exception 
-	 */
-	protected void accept(Msg msg, Actor from) throws Exception {
-		consumer.accept(msg, from);
-	}
-	
-	@Deprecated
-	protected final void receive(Msg msg, Actor from) {
-		
-	}
-
 	private void loop2_batch() {
 		ArrayList<Packet<Msg>> batch = new ArrayList();
 		int batchSize = 16;
 		BlockingQueue<Packet<Msg>> bq = (BlockingQueue<Packet<Msg>>) q;
 		while ( ! pleaseStop) {
-			try {				
+			try {
 				// drain the queue into batch
 				if (bq.drainTo(batch, batchSize) == 0) {
 					// nothing in q? q.take() will wait for something...
 					batch.add(bq.take());
 				}
 				// receive
-				acceptBatch(batch);				
+				consumeBatch(batch);				
 				batch.clear();
 			} catch (Throwable e) {
 				Log.e(getName(), e);
@@ -178,17 +160,39 @@ public class Actor<Msg> {
 		}
 
 	}
+
+	/**
+	 * @return the most recent input-to-exception, or null. Note: only the most
+	 *         recent exception is ever stored. The Msg part may be null
+	 */
+	public Pair2<Msg, Throwable> peekLastException() {
+		return lastEx;
+	}
 	
-	protected void acceptBatch(ArrayList<Packet<Msg>> batch) throws Exception {
-		if (consumer!=null) {
-			consumer.acceptBatch(batch);
-			return;
-		}
-		for (Packet<Msg> packet : batch) {
-			accept(packet.msg, packet.from);
-		}
+	public final void pleaseStop() {
+		pleaseStop = true;
 	}
 
+	/**
+	 * @return the most recent input-to-exception, or null. The Msg part may be null. This clears the
+	 *         exception -- a 2nd call will return null. Note: only the most
+	 *         recent exception is ever stored.
+	 */
+	public final Pair2<Msg, Throwable> popLastException() {
+		Pair2<Msg, Throwable> _lastEx = lastEx;
+		lastEx = null;
+		return _lastEx;
+	}
+
+	/**
+	 * Send a message to this actor! Convenience for
+	 * {@link #send(Object, Actor)} with sender=null
+	 * 
+	 * @param msg
+	 */
+	public final void send(Msg msg) {
+		send(new Packet(msg, DeadLetterActor.dflt));
+	}
 
 	/**
 	 * Send a message to this actor!
@@ -201,16 +205,6 @@ public class Actor<Msg> {
 		send(new Packet(msg, sender));
 	}
 
-	/**
-	 * Send a message to this actor! Convenience for
-	 * {@link #send(Object, Actor)} with sender=null
-	 * 
-	 * @param msg
-	 */
-	public final void send(Msg msg) {
-		send(new Packet(msg, null));
-	}
-
 	protected final void send(Packet packet) {
 		threadAlive();
 		// check the queue
@@ -220,42 +214,40 @@ public class Actor<Msg> {
 		q.add(packet);
 	}
 
+	public Actor<Msg> setConsumer(IActorMsgConsumer<Msg> consumer) {
+		this.consumer = consumer;
+		return this;
+	}
+
 	/**
-	 * Access the queue. Warning: at your own risk!
-	 * 
+	 * Unset by default. If set, check each send to see that the queue is not too long.
+	 * @param n
 	 * @return
 	 */
-	public final Queue<Packet<Msg>> getQ() {
-		return q;
-	}
-
-	public final void pleaseStop() {
-		pleaseStop = true;
+	public Actor<Msg> setMaxQ(int n) {
+		maxq = n;
+		return this;
 	}
 
 	/**
-	 * Message + sending Actor.
-	 * @author daniel
-	 *
-	 * @param <Msg>
+	 * ensure we have an alive thread
 	 */
-	public static class Packet<Msg> implements Serializable {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public String toString() {
-			return "Packet[from=" + from + ", msg=" + msg + "]";
+	private void threadAlive() {
+		if (thread != null && thread.isAlive()) {
+			return;
 		}
-
-		public Packet(Msg msg, Actor sender) {
-			this.msg = msg;
-			this.from = sender;
+		
+		synchronized (this) {
+			if (thread != null && thread.isAlive()) {
+				return;
+			}
+			thread = new Thread(() -> {
+				loop();
+				// Done!?
+				Log.d("actor", getName() + " is now exiting");
+			}, getName());
+			thread.setDaemon(true);
+			thread.start();
 		}
-
-		/**
-		 * Sender, can be null.
-		 */
-		public final Actor from;
-		public final Msg msg;
 	}
 }

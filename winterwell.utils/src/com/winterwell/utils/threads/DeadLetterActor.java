@@ -9,16 +9,18 @@ import java.util.ArrayList;
  */
 public final class DeadLetterActor extends Actor {
 
+	public static final Actor dflt = new DeadLetterActor();
+	
 	@Override
 	public void send(Object msg, Actor sender) {
 		// no-op
 	}
 	
 	@Override
-	protected void accept(Object msg, Actor from) {		
+	protected void consume(Object msg, Actor from) {		
 	}
 	@Override
-	protected void acceptBatch(ArrayList batch) throws Exception {	
+	protected void consumeBatch(ArrayList batch) throws Exception {	
 	}
 	
 }

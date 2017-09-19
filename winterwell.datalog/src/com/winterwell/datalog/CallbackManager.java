@@ -39,7 +39,7 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 	}
 
 	@Override
-	protected void accept(DataLogEvent msg, Actor sender) throws Exception {		
+	protected void consume(DataLogEvent msg, Actor sender) throws Exception {		
 		List<Callback> cbs = callbacksForDataspace.get(msg.dataspace);
 		if (cbs==null) return;
 		for (Callback callback : cbs) {

@@ -1,9 +1,15 @@
 package com.winterwell.utils.threads;
 
+import java.io.Flushable;
+import java.io.IOException;
+import java.util.Queue;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
+import com.winterwell.depot.Desc;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.threads.Actor.Packet;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
 
@@ -15,12 +21,27 @@ import com.winterwell.utils.time.Time;
  * 
  * @author daniel
  */
-public class SlowActor<Msg> extends Actor<Msg> {
+public class SlowActor<Msg> extends Actor<Msg> implements Flushable {
 
 	public SlowActor() {
 		super(new DelayQueue());
 	}
 
+	@Override
+	public void flush() throws IOException {
+		// send it all through receive
+		Queue<Packet<Msg>> _q = getQ();
+		try {
+			for (Packet<Msg> packet : _q) {				
+				consume(packet.msg, packet.from);
+			}
+		} catch (IOException e) {
+			throw e;
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		}
+	}
+	
 	public final void sendDelayed(Msg msg, Actor sender, Dt delay) {
 //		Log.d(getClass().getSimpleName(), "in " + delay + ": " + msg);
 		sendDelayed(msg, sender, new Time().plus(delay));

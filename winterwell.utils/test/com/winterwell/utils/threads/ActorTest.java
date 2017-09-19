@@ -45,7 +45,7 @@ public class ActorTest {
 		static volatile String log = "";
 
 		@Override
-		protected void accept(String msg, Actor from) {		
+		protected void consume(String msg, Actor from) {		
 			log += from.getName() + ": " + msg + "\n";
 			if (msg.startsWith("STOP")) {
 				pleaseStop();
