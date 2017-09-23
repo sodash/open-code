@@ -97,6 +97,7 @@ rm /tmp/target.list.txt
 #CREATING TEXT FILE ARRAY OF TARGETTED SERVERS
 ####
 printf '%s\n' "${TARGET[@]}" >> /tmp/target.list.txt
+echo "TARGETS: ${TARGET[@]}"
 ####
 #END OF CREATING TEXT FILE ARRAY OF TARGETTED SERVERS
 ####
@@ -133,7 +134,8 @@ function frontend_publish {
 
 function backend_publish {
 	echo -e "> Syncing fresh JARs..."
-	parallel-rsync -h /tmp/target.list.txt --user=winterwell --recursive tmp-lib /home/winterwell/lg.good-loop.com/lib
+    echo "parallel-rsync -h /tmp/target.list.txt --user=winterwell --recursive tmp-lib/ /home/winterwell/lg.good-loop.com/lib/"
+	parallel-rsync -h /tmp/target.list.txt --user=winterwell --recursive tmp-lib/ /home/winterwell/lg.good-loop.com/lib/
 	echo ""
 	echo -e "> Restarting the lg process on target(s)"
 	parallel-ssh -h /tmp/target.list.txt --user=winterwell 'sudo service lg restart'
