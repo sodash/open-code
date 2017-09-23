@@ -942,7 +942,7 @@ public class WebUtils {
 			// assert ! here.contains(".") : here;
 			Log.d("network", "Retrieved hostname: " + hostname);
 			return hostname;
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			Log.e("network", e);
 			return null;
 		}
