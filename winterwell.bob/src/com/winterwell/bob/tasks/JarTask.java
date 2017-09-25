@@ -274,6 +274,8 @@ public class JarTask extends BuildTask {
 	 * If any manifest properties are set, then a fresh manifest will be added
 	 * to the jar.
 	 * 
+	 * NB: Packaging-Date is auto set this class
+	 * 
 	 * @param key
 	 * @param value
 	 */

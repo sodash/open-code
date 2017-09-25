@@ -220,10 +220,10 @@ public class AppUtils {
 	 * skips the status bit in {@link #doSaveEdit(ESPath, JThing, WebRequest)}
 	 * @param path
 	 * @param item
-	 * @param state
+	 * @param stateCanBeNull
 	 * @return
 	 */
-	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest state) {
+	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest stateCanBeNull) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));		
 		// save update		
 		// sanity check id matches path
@@ -233,7 +233,7 @@ public class AppUtils {
 			if (_id instanceof String) id= (String) _id;
 			if (_id.getClass().isArray()) id= (String) Containers.asList(_id).get(0);
 		}
-		assert id != null && ! id.equals("new") : "use action=new "+state;
+		assert id != null && ! id.equals("new") : "use action=new "+stateCanBeNull;
 		assert id.equals(path.id) : path+" vs "+id;
 		// save to ES
 		UpdateRequestBuilder up = client.prepareUpdate(path);

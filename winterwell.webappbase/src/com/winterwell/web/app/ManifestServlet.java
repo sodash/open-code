@@ -5,10 +5,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.bob.tasks.GitTask;
+import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
@@ -26,14 +33,19 @@ import com.winterwell.utils.containers.Trio;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.SafeExecutor;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.utils.web.XStreamUtils;
 import com.winterwell.web.ajax.JsonResponse;
 
-
-public class ManifestServlet extends HttpServlet {
+/**
+ * NB: Can be used directly or via {@link HttpServletWrapper}
+ * @author daniel
+ *
+ */
+public class ManifestServlet extends HttpServlet implements IServlet {
 
 	private static final long serialVersionUID = 1L;
 
@@ -182,8 +194,36 @@ public class ManifestServlet extends HttpServlet {
 			}
 		}		
 		
+		Map<String,Object> manifests = getJarManifests();
+		cargo.put(("jarManifests"), manifests);
+		
+		
 		JsonResponse output = new JsonResponse(state, cargo);
 		WebUtils2.sendJson(output, state);
+	}
+
+	/**
+	 * Info about the jars
+	 * @return
+	 */
+	private Map<String, Object> getJarManifests() {
+		ConcurrentMap<String, Object> manifestFromJar = new ConcurrentHashMap();
+		try {		
+			File dir = new File(FileUtils.getWorkingDirectory(), "lib");
+			ExecutorService pool = Executors.newFixedThreadPool(10);
+			File[] files = dir.listFiles();
+			for (File file : files) {
+				pool.submit(() -> {
+					Map<String, Object> manifest = JarTask.getManifest(file);
+					manifestFromJar.put(file.getName(), manifest);
+				});	
+			}
+			pool.shutdown();
+			pool.awaitTermination(10, TimeUnit.SECONDS);			
+		} catch(Throwable ex) {
+			manifestFromJar.put("error", ex);
+		}
+		return manifestFromJar;
 	}
 	
 	

@@ -7,9 +7,11 @@ import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.WebUtils2;
 
 /**
  * Build & copy into code/lib
@@ -84,9 +86,13 @@ public class BuildWinterwellProject extends BuildTask {
 		Time vt = new Time();
 		try {
 			jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
-					"date: "+vt.ddMMyyyy()+" git: "+GitTask.getLastCommitId(srcDir.getParentFile()));
-		} catch(Exception ex) {
+					(Utils.isBlank(version)? "" : "version: "+version+" ")
+					+"git: "+GitTask.getLastCommitId(srcDir.getParentFile())
+					+" by: "+WebUtils2.hostname()					
+					);
+		} catch(Throwable ex) {
 			jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, vt.ddMMyyyy());
+			Log.w(LOGTAG, ex);
 		}
 //		// Git details? No this upsets IntelliJ
 		if (incGitInManifest) {
