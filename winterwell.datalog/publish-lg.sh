@@ -38,7 +38,7 @@ CLEANPUBLISH=$2
 case $1 in
 	production|PRODUCTION)
 	echo "this is a PRODUCTION pushout"
-	TARGET=$PRODUCTION
+	TARGET=${PRODUCTION[@]}
 	;;
 	test|TEST)
 	echo "this is a TEST pushout"
@@ -96,8 +96,9 @@ rm /tmp/target.list.txt
 ####
 #CREATING TEXT FILE ARRAY OF TARGETTED SERVERS
 ####
-printf '%s\n' "${TARGET[@]}" >> /tmp/target.list.txt
-echo "TARGETS: ${TARGET[@]}"
+printf '%s\n' ${TARGET[@]} >> /tmp/target.list.txt
+echo "TARGETS ARE:"
+cat /tmp/target.list.txt
 ####
 #END OF CREATING TEXT FILE ARRAY OF TARGETTED SERVERS
 ####
