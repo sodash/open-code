@@ -135,6 +135,7 @@ function frontend_publish {
 
 function backend_publish {
 	echo -e "> Syncing fresh JARs..."
+	rm tmp-lib/elasticsearch-1*.jar
     echo "parallel-rsync -h /tmp/target.list.txt --user=winterwell --recursive tmp-lib/ /home/winterwell/lg.good-loop.com/lib/"
 	parallel-rsync -h /tmp/target.list.txt --user=winterwell --recursive tmp-lib/ /home/winterwell/lg.good-loop.com/lib/
 	echo ""
