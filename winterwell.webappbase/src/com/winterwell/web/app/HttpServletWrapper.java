@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.WebEx;
 
 public class HttpServletWrapper extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -24,12 +26,16 @@ public class HttpServletWrapper extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			WebRequest state = new WebRequest(req, resp);
-			factory.get().process(state);
-		} catch (IOException | ServletException e) {
-			throw e;
-		} catch (Throwable e) {
-			Log.e("web", e);
-			throw Utils.runtime(e);
+			IServlet servlet = factory.get();
+			servlet.process(state);
+		} catch (Throwable ex) {
+			WebEx wex = WebUtils2.runtime(ex);
+			if (wex.code >= 500) {
+				Log.e("error", ex);
+			} else {
+				Log.i(wex.getClass().getSimpleName(), wex);
+			}
+			WebUtils2.sendError(wex.code, wex.getMessage(), resp);
 		} finally {
 			WebRequest.close(req, resp);
 		}

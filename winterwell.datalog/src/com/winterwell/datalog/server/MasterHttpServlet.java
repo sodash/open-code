@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.utils.Key;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
@@ -98,19 +99,15 @@ public class MasterHttpServlet extends HttpServlet {
 			
 			WebUtils2.sendError(500, "TODO", resp);
 		} catch(Throwable ex) {
-			// default to generic Server Error
-			int errorCode = 500;
-			// but catch and use code from web exceptions
-			if (ex instanceof WebEx) {
-				errorCode = ((WebEx) ex).code;
-			}
-			// and take it easy when logging 404 Not Found
-			if (errorCode == 404) {
-				Log.w("404", ex);	
+			WebEx wex = WebUtils2.runtime(ex);
+			if (wex.code >= 500) {
+				// log as severe
+				Log.e(Utils.or(wex.getCause(), wex).getClass().getSimpleName(), wex);
 			} else {
-				Log.e("error", ex);
+				// log quieter
+				Log.w(wex.getClass().getSimpleName(), wex);
 			}
-			WebUtils2.sendError(errorCode, "Server Error: " + ex, resp);
+			WebUtils2.sendError(wex.code, wex.getMessage(), resp);
 		} finally {
 			WebRequest.close(req, resp);
 			Thread.currentThread().setName("done ...web "+path);

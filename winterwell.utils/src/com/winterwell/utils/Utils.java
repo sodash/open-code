@@ -505,7 +505,7 @@ public final class Utils {
 	 * exception, which you can't do now, mwhaha" message).
 	 * 
 	 * @param e Should not be null (although that isn't enforced to avoid error-on-error badness)
-	 * @return
+	 * @return original exception if {@link RuntimeException}, or a {@link WrappedException}
 	 */
 	public static RuntimeException runtime(Throwable e) {
 		if (e instanceof RuntimeException)

@@ -1283,6 +1283,29 @@ public class WebUtils2 extends WebUtils {
 		return WebUtils2.canonicalEmail(WebUtils2.internetAddress(address.trim()));
 	}
 
+	/**
+	 * Wrap an exception as a WebEx exception.
+	 * This does not re-throw or log the error -- just wraps it.
+	 * It's a no-op if ex already is a WebEx 
+	 * @param ex
+	 * @return ex (wrapped if need be)
+	 */
+	public static WebEx runtime(Throwable ex) {
+		if (ex instanceof WebEx) {
+			return (WebEx) ex;
+		}
+		if (ex instanceof IOException) {
+			// probably a 404
+			return new WebEx.E40X(400, ex.getMessage(), ex);
+		}
+		// send it via Utils which may improve some errors, eg SQL 
+		RuntimeException wrap = Utils.runtime(ex);
+		if (wrap instanceof WrappedException) {
+			return new WebEx.E50X(wrap.getCause());	
+		}
+		return new WebEx.E50X(wrap);
+	}
+
 }
 
 

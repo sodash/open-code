@@ -32,7 +32,7 @@ public class WebEx extends RuntimeException {
 			super(code, StrUtils.joinWithSkip(" ", url, msg));
 		}
 		
-		public E40X(int code, String msg, Exception e) {
+		public E40X(int code, String msg, Throwable e) {
 			super(code, msg, e);
 		}		
 	}
@@ -115,7 +115,7 @@ public class WebEx extends RuntimeException {
 		 * Wrap another exception to mark it as a 50X in disguise.
 		 * @param ex
 		 */
-		public E50X(Exception ex) {
+		public E50X(Throwable ex) {
 			super(500, ex.getMessage(), ex);
 		}
 		public E50X(int code, String url) {
