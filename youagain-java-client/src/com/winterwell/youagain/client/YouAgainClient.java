@@ -100,14 +100,18 @@ public class YouAgainClient {
 		Log.d(LOGTAG, "verify: "+jwt);
 		List<AuthToken> list = new ArrayList();
 		if (jwt.isEmpty()) return list;
-		FakeBrowser fb = new FakeBrowser();
-		Object response = fb.getPage(ENDPOINT, new ArrayMap(
-				"app", app, 
-				"action", "verify", 
-				"jwt", StrUtils.join(jwt, ","),
-				"debug", debug
-				));
-		Log.w(LOGTAG, "TODO process YouAgain verify response: " + response);			
+		try {
+			FakeBrowser fb = new FakeBrowser();
+			Object response = fb.getPage(ENDPOINT, new ArrayMap(
+					"app", app, 
+					"action", "verify", 
+					"jwt", StrUtils.join(jwt, ","),
+					"debug", debug
+					));
+			Log.w(LOGTAG, "TODO process YouAgain verify response: " + response);
+		} catch(Throwable ex) {
+			Log.e(LOGTAG, ex); // FIXME
+		}
 		return list;		
 	}
 
