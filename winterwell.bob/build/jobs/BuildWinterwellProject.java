@@ -90,6 +90,7 @@ public class BuildWinterwellProject extends BuildTask {
 					+"git: "+GitTask.getLastCommitId(srcDir.getParentFile())
 					+" by: "+WebUtils2.hostname()					
 					);
+			jar.setManifestProperty("Implementation-Vendor", "Winterwell");
 		} catch(Throwable ex) {
 			jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, vt.ddMMyyyy());
 			Log.w(LOGTAG, ex);

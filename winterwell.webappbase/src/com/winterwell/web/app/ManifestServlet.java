@@ -215,7 +215,13 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			for (File file : files) {
 				pool.submit(() -> {
 					Map<String, Object> manifest = JarTask.getManifest(file);
-					manifestFromJar.put(file.getName(), manifest);
+					// reduce down to avoid bloat
+					ArrayMap smallMainfest = new ArrayMap();
+					for(String k : new String[] {"Implementation-Version", "Packaging-Date", "Bundle-Version"}) {
+						Object v = manifest.get(k);
+						if (v!=null) smallMainfest.put(k, v);
+					}					
+					manifestFromJar.put(file.getName(), smallMainfest);
 				});	
 			}
 			pool.shutdown();

@@ -217,6 +217,10 @@ public class PublishProjectTask extends BuildTask {
 		}
 		
 //		// Bash script which does the rsync work
+		if (typeOfPublish== KPubType.local) {
+			Log.i(LOGTAG, "local -- no publish step.");
+			return;
+		}
 		ProcessTask pubas = new ProcessTask(bashScript+" "+typeOfPublish + " "+codePart+" "+preClean);
 		pubas.setEcho(true);
 		pubas.run();
