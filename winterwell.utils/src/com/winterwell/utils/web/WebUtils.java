@@ -113,6 +113,8 @@ public class WebUtils {
 
 	public static final String MIME_TYPE_HTML = "text/html";
 
+	public static final String MIME_TYPE_CSV = "text/csv";
+
 	/**
 	 * HTML, utf-8 encoded
 	 */
@@ -209,6 +211,7 @@ public class WebUtils {
 	 * Note: XPaths are not thread safe, so best to create new ones as needed
 	 */
 	public static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
+
 
 	
 	public static <X> String addQueryParameter(String url, Key<X> param, X value) {

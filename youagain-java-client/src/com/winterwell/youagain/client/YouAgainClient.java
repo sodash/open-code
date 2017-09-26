@@ -37,12 +37,18 @@ public class YouAgainClient {
 	static final String ENDPOINT = "https://youagain.winterwell.com/youagain.json";
 
 	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
+
+	private static final String LOGTAG = "youagain";
 	
 	final String app;
+
+	private boolean debug;
 	
 	public YouAgainClient(String app) {
 		assert ! Utils.isBlank(app);
 		this.app = app;
+		
+		setDebug(true); // FIXME
 	}	
 	
 	/**
@@ -91,14 +97,17 @@ public class YouAgainClient {
 	}
 
 	List<AuthToken> verify(List<String> jwt) {
+		Log.d(LOGTAG, "verify: "+jwt);
 		List<AuthToken> list = new ArrayList();
 		if (jwt.isEmpty()) return list;
 		FakeBrowser fb = new FakeBrowser();
 		Object response = fb.getPage(ENDPOINT, new ArrayMap(
 				"app", app, 
 				"action", "verify", 
-				"jwt", jwt));
-		System.out.println(response);			
+				"jwt", StrUtils.join(jwt, ","),
+				"debug", debug
+				));
+		Log.w(LOGTAG, "TODO process YouAgain verify response: " + response);			
 		return list;		
 	}
 
@@ -109,13 +118,14 @@ public class YouAgainClient {
 	 * @return
 	 */
 	public List<String> getAllJWTTokens(WebRequest state) {		
-		ArraySet<String> all = new ArraySet();		
+		Collection<String> all = new ArrayList();		
 		// Auth header
 		String authHeader = state.getRequest().getHeader("Authorization");
 		if (authHeader!=null) {
 			authHeader = authHeader.trim();
 			if (authHeader.startsWith("Bearer")) {
 				String jwt = authHeader.substring("Bearer".length(), authHeader.length()).trim();
+				if (state.debug) Log.d(LOGTAG, "JWT from auth-header Bearer: "+jwt);
 				all.add(jwt);
 			}
 		}		
@@ -126,6 +136,7 @@ public class YouAgainClient {
 		for(String c : cookies.keySet()) {
 			if ( ! KEY.matcher(c).find()) continue; 
 			String jwt = cookies.get(c);
+			if (state.debug) Log.d(LOGTAG, "JWT from cookie "+c+": "+jwt);
 			all.add(jwt);
 		}				
 		// and parameters
@@ -136,13 +147,33 @@ public class YouAgainClient {
 			// is it a list??
 			if (jwt instanceof String[]) {
 				List<String> jwts = Containers.asList((String[])jwt);
+				if (state.debug) Log.d(LOGTAG, "JWTs from parameter "+c+": "+jwts);				
 				all.addAll(jwts);	
 			} else {
+				if (state.debug) Log.d(LOGTAG, "JWT from parameter "+c+": "+jwt);	
 				all.add((String)jwt);
 			}
 		}
+		// unpack any lists
+		// since , [ are not valid base64, this is safe and easy
+		ArraySet all2 = new ArraySet();
+		for (String jwt : all) {
+			if (jwt.startsWith("[")) {
+				try {
+					List jwts = (List) JSON.parse(jwt);
+					all2.addAll(jwts);
+				} catch (Exception ex) {
+					Log.w(LOGTAG, "JWT parse error: "+ex+" from "+jwt);
+				}
+			} else if (jwt.contains(",")) {
+				List jwts = StrUtils.splitOnComma(jwt);
+				all2.addAll(jwts);
+			} else {
+				all2.add(jwt);
+			}
+		}
 		// done
-		return all.asList();
+		return all2.asList();
 	}
 
 	public AuthToken login(String usernameUsuallyAnEmail, String password) {
@@ -204,6 +235,10 @@ public class YouAgainClient {
 		state.setUser(uxid, user);
 		// done
 		return uxid;
+	}
+
+	public void setDebug(boolean b) {
+		this.debug = b;
 	}
 
 }
