@@ -178,6 +178,19 @@ function clean_publish {
 #END OF SETTING THE 'CLEANPUBLISH'S' FUNCTION
 ####
 
+
+function force_jar_parity {
+	# 1st process will compare an array/list of local jars with the jars on the target(s)
+	# 2nd process will parallel-rsync jars to target(s)
+}
+
+
+
+
+
+
+
+
 ####
 #PERFORMING THE PUBLISH
 ####
