@@ -8,7 +8,7 @@
 if [ $(which parallel-ssh) = "" ]; then
 	echo -e "In order to use this publishing script, you will need Parallel-SSH installed on your machine"
 	echo -e "install Parallel-SSH with 'sudo apt-get install pssh'"
-	exit 1
+	exit 2
 fi
 ####
 #END OF CHECKS
