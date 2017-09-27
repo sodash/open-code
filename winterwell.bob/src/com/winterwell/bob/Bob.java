@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.TaskRunner;
 
 /**
  * Bob the Builder, a Java based build utility.
@@ -105,6 +107,7 @@ public class Bob {
 	}
 
 	public static Bob getSingleton() {
+		dflt.init();
 		return dflt;
 	}
 
@@ -163,7 +166,7 @@ public class Bob {
 	 */
 	private final AtomicInteger bobCount = new AtomicInteger();
 
-	private boolean initFlag;
+	private volatile boolean initFlag;
 
 //	Set<File> outputFiles = new HashSet<File>();
 
@@ -247,6 +250,14 @@ public class Bob {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		initTaskRunner();
+	}
+
+	private void initTaskRunner() {
+		if ( ! Dep.has(TaskRunner.class)) {
+			Dep.set(TaskRunner.class, new TaskRunner(10)); // TODO config num threads
+		}
 	}
 
 	@Deprecated
@@ -271,6 +282,12 @@ public class Bob {
 
 	public void setSettings(BobSettings settings) {
 		this.settings = settings;
+	}
+
+	public void close() {
+		// clean up ops
+		TaskRunner tr = Dep.get(TaskRunner.class);
+		tr.shutdown();
 	}
 
 }

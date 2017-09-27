@@ -265,22 +265,6 @@ public class TaskRunner {
 		return f;
 	}
 
-	/**
-	 * Convenience for {@link #submit(ATask)} which doesn't throw
-	 * {@link NotUniqueException}s
-	 * 
-	 * @param task
-	 * @return true if the task was submitted, false if an equivalent task was
-	 *         already in the queue.
-	 */
-	public boolean trySubmit(ATask task) {
-		try {
-			submit(task);
-			return true;
-		} catch (NotUniqueException ex) {
-			return false;
-		}
-	}
 
 	/**
      * Attempts to stop all actively executing tasks, halts the
@@ -343,7 +327,7 @@ public class TaskRunner {
 		Log.i("TaskRunner." + getName(), "Load from " + dump + "...");
 		List<ATask> _todo = FileUtils.load(dump);
 		for (ATask aTask : _todo) {
-			trySubmit(aTask);
+			submitIfAbsent(aTask);
 		}
 		Log.i("TaskRunner." + getName(), "Loaded " + _todo.size()
 				+ " from dump");
@@ -364,6 +348,14 @@ public class TaskRunner {
 		return null;
 	}
 
+	/**
+	 * Convenience for {@link #submit(ATask)} which doesn't throw
+	 * {@link NotUniqueException}s
+	 * 
+	 * @param task
+	 * @return true if the task was submitted, false if an equivalent task was
+	 *         already in the queue.
+	 */
 	public boolean submitIfAbsent(ATask task) {
 		try {
 			submit(task);

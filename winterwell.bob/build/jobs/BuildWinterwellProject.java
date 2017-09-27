@@ -7,6 +7,7 @@ import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
+import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -118,6 +119,12 @@ public class BuildWinterwellProject extends BuildTask {
 		lib.mkdirs();
 		FileUtils.copy(jarFile, lib);
 		Log.d(LOGTAG, "Copied "+jarFile.getName()+" to "+lib);
+		
+		// attempt to upload (but don't block)
+		SCPTask scp = new SCPTask(jarFile, "winterwell@winterwell.com", 
+				"/home/git/www/software/downloads/"+jarFile.getName());
+		scp.setMkdirTask(false);
+		scp.runInThread();
 	}
 
 	protected File getBinDir() {

@@ -45,6 +45,14 @@ public class SCPTask extends ProcessTask {
 		this.atomic = atomic;
 	}
 	
+	public void setMkdirTask(boolean onOff) {
+		if (onOff) {
+			assert mkdirTask != null;
+			return;
+		}
+		mkdirTask = null;
+	}
+	
 	/**
 	 * Copy file TO the remote server
 	 * @param localFile Can be a directory
@@ -182,4 +190,6 @@ public class SCPTask extends ProcessTask {
 			}
 		}
 	}
+
+	
 }

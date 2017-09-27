@@ -9,10 +9,13 @@ import java.util.logging.Level;
 
 import org.junit.Test;
 
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.TimeOut;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.ATask;
+import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TimeUtils;
 
@@ -255,6 +258,22 @@ public abstract class BuildTask implements Closeable {
 	public void setMaxTime(Dt maxTime) {
 		this.maxTime = maxTime;
 	}
+	
+	/**
+	 * Like run, but it uses the Bob thread pool to run in parallel.
+	 */
+	public void runInThread() {
+		TaskRunner taskRunner = Dep.get(TaskRunner.class);
+		ATask atask = new ATask<Object>(getClass().getSimpleName()) {
+			@Override
+			protected Object run() throws Exception {
+				BuildTask.this.run();
+				return null;
+			}
+			
+		};
+		taskRunner.submitIfAbsent(atask);
+	}
 
 	/**
 	 * Call this to run the task!
@@ -334,6 +353,7 @@ public abstract class BuildTask implements Closeable {
 			}
 			Log.report(LOGTAG, "...exiting " + toString(), Level.FINE);
 			if (bc == 0) {
+				bob.close();
 				Log.report(LOGTAG, "----- BUILD COMPLETE -----", Level.INFO);
 			}
 		}
