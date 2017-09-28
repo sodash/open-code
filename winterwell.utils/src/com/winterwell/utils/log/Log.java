@@ -205,15 +205,13 @@ public class Log {
 		}
 
 		String smsg = Printer.toString(msg);
-		if (ex==null && msg instanceof Throwable) ex = (Throwable) msg;
-		String msgText = smsg;
+		String msgText;
 		// Exception? Add in some stack
-		if (error==Level.SEVERE && msg instanceof Throwable) {
-			msgText += "\tStack: ";
-			StackTraceElement[] trace = ((Throwable) msg).getStackTrace();
-			for(int i=0; i<trace.length && i<10; i++) {
-				msgText += trace[i]+", ";
-			}
+		if (msg instanceof Throwable) {
+			msgText = Printer.toString((Throwable)msg, true);
+			if (ex==null) ex = (Throwable) msg;
+		} else {
+			msgText = Printer.toString(msg);			
 		}
 		// Guard against giant objects getting put into log, which is almost
 		// certainly a careless error

@@ -121,8 +121,9 @@ public class BuildWinterwellProject extends BuildTask {
 		Log.d(LOGTAG, "Copied "+jarFile.getName()+" to "+lib);
 		
 		// attempt to upload (but don't block)
-		SCPTask scp = new SCPTask(jarFile, "winterwell@winterwell.com", 
-				"/home/git/www/software/downloads/"+jarFile.getName());
+		SCPTask scp = new SCPTask(jarFile, "winterwell@winterwell.com",				
+				"/home/winterwell/public-software/"+jarFile.getName());
+		// this is online at: https://www.winterwell.com/software/downloads
 		scp.setMkdirTask(false);
 		scp.runInThread();
 	}
