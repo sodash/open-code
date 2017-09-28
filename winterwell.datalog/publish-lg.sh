@@ -180,8 +180,7 @@ function clean_publish {
 
 
 function force_jar_parity {
-	# 1st process will compare an array/list of local jars with the jars on the target(s)
-	# 2nd process will parallel-rsync jars to target(s)
+	#if $TYPEOFPUSHOUT==PRODUCTION, rsync --delete command to gl-es-03, then tell gl-es-03 to perform an 'rsync --delete' sync to rest of cluster.
 }
 
 
