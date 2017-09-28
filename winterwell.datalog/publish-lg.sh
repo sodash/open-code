@@ -19,8 +19,9 @@ fi
 ####
 #SETTING THE ARRAYS OF POTENTIAL SERVERS
 ####
+PRODUCTIONPUBLISHER=(gl-es-03.soda.sh)  #Can be changed to any machine in the production array.
 PRODUCTION=(gl-es-03.soda.sh gl-es-04.soda.sh gl-es-05.soda.sh)
-TEST='hugh.soda.sh'
+TEST=(hugh.soda.sh)
 ####
 #END OF TARGET ARRAYS
 ####
@@ -29,9 +30,8 @@ TEST='hugh.soda.sh'
 #Is this a production pushout or a test pushout?
 ####
 TYPEOFPUSHOUT=$1
-CLEANPUBLISH=$2
-
-
+LEVEL=$2
+CLEANPUBLISH=$3
 ####
 #ACCEPTING AND PROCESSING THE ARGUMENTS
 ####
@@ -39,10 +39,12 @@ case $1 in
 	production|PRODUCTION)
 	echo "this is a PRODUCTION pushout"
 	TARGET=${PRODUCTION[@]}
+	TYPEOFPUSHOUT='PRODUCTION'
 	;;
 	test|TEST)
 	echo "this is a TEST pushout"
 	TARGET=$TEST
+	TYPEOFPUSHOUT='TEST'
 	;;
 	*)
 	echo "The script couldn't discern if this was a production or a test pushout.  EXITING..."
@@ -96,6 +98,11 @@ rm /tmp/target.list.txt
 ####
 #CREATING TEXT FILE ARRAY OF TARGETTED SERVERS
 ####
+# Removing the name of the productionpublisher from the array of production servers
+if [[ $TYPEOFPUSHOUT = 'PRODUCTION' ]]; then
+	TARGET=${TARGET[@]//$PRODUCTIONPUBLISHER}
+fi
+#
 printf '%s\n' ${TARGET[@]} >> /tmp/target.list.txt
 echo "TARGETS ARE:"
 cat /tmp/target.list.txt
@@ -134,10 +141,15 @@ function frontend_publish {
 }
 
 function backend_publish {
-	echo -e "> Syncing fresh JARs..."
-	rm tmp-lib/elasticsearch-1*.jar
-    echo "parallel-rsync -h /tmp/target.list.txt --user=winterwell --recursive tmp-lib/ /home/winterwell/lg.good-loop.com/lib/"
-	parallel-rsync -h /tmp/target.list.txt --user=winterwell --recursive tmp-lib/ /home/winterwell/lg.good-loop.com/lib/
+	echo -e "> Strictly Syncing JARs from YOUR localmachine to ${TARGET[0]}"
+	rsync -rhP --delete-before tmp-lib/*.jar winterwell@${TARGET[0]}:/home/winterwell/lg.good-loop.com/lib/
+	if [[ $TYPEOFPUSHOUT = 'PRODUCTION' ]]; then
+		echo -e "> Sending list of targets to $PRODUCTIONPUBLISHER..."
+		scp /tmp/target.list.txt winterwell@$PRODUCTIONPUBLISHER:/tmp/
+		echo -e "> Telling $PRODUCTIONPUBLISHER to update the backend..."
+		ssh winterwell@$PRODUCTIONPUBLISHER 'bash /home/winterwell/lg.good-loop.com/cluster-jar-sync.sh backend'
+		ssh winterwell@$PRODUCTIONPUBLISHER 'sudo service lg restart'
+	fi
 	echo ""
 	echo -e "> Restarting the lg process on target(s)"
 	parallel-ssh -h /tmp/target.list.txt --user=winterwell 'sudo service lg restart'
@@ -153,6 +165,8 @@ function backend_publish {
 ####
 #SETTING THE 'CLEANPUBLISH' FUNCTION
 ####
+
+########HAVE TO FIX THIS SO THAT IT ONLY CLEANS OUT EITHER THE TEST SERVER OR THE PRODUCTIONPUBLISHER SERVER
 function clean_publish {
 	if [[ $PUBLISHLEVEL != 'everything' ]]; then
 		echo -e "Silly goose! you cannot perform a 'clean-out' unless you are publishing both the frontend AND the backend"
@@ -177,16 +191,6 @@ function clean_publish {
 ####
 #END OF SETTING THE 'CLEANPUBLISH'S' FUNCTION
 ####
-
-
-#function force_jar_parity {
-	#if $TYPEOFPUSHOUT==PRODUCTION, rsync --delete command to gl-es-03, then tell gl-es-03 to perform an 'rsync --delete' sync to rest of cluster.
-#}
-
-
-
-
-
 
 
 
