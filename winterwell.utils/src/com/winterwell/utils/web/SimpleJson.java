@@ -49,7 +49,7 @@ public class SimpleJson {
 		for (int i = 0; i < fields.length; i++) {
 			// object property
 			Object fi = fields[i];
-			if (fi instanceof String) {
+			if (fi instanceof String && jsonObj instanceof Map) {
 				String f = (String) fi;
 				Object jsonObj2 = ((Map) jsonObj).get(f);
 				if (jsonObj2 == null) {
@@ -60,11 +60,14 @@ public class SimpleJson {
 				continue;
 			}
 			// array
-			Integer f = ((Number) fi).intValue();
+			if (fi instanceof String) {
+				fi = Integer.valueOf((String)fi);
+			}
+			int f = ((Number) fi).intValue();			
 			if (jsonObj.getClass().isArray()) {
-				jsonObj = Array.get(jsonObj, f);
+				jsonObj = Array.getLength(jsonObj) > f? Array.get(jsonObj, f) : null;
 			} else {
-				jsonObj = ((List) jsonObj).get(f);
+				jsonObj = Containers.get((List)jsonObj, f);
 			}
 			if (jsonObj == null) {
 //				throw new NullPointerException(jsonObj + ".." + f);				
