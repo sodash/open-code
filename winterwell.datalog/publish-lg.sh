@@ -124,7 +124,7 @@ function frontend_publish {
 		rsync -rhP --delete-before webpack.config.js winterwell@$TEST:/home/winterwell/lg.good-loop.com/
 		rsync -rhP --delete-before src-js winterwell@$TEST:/home/winterwell/lg.good-loop.com/
 	else
-		echo -e "> Strictly Syncing the Frontend from YOUR localmachin to $PRODUCTIONPUBLISHER"
+		echo -e "> Strictly Syncing the Frontend from YOUR localmachine to $PRODUCTIONPUBLISHER"
 		rsync -rhP --delete-before web winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
 		rsync -rhP --delete-before package.json winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
 		rsync -rhP --delete-before webpack.config.js winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
