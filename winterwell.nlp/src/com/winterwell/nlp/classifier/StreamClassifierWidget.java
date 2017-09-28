@@ -8,6 +8,7 @@ import com.winterwell.maths.chart.PieChart;
 import com.winterwell.maths.chart.Rainbow;
 import com.winterwell.maths.chart.RenderWithFlot;
 import com.winterwell.maths.stats.distributions.cond.ExplnOfDist;
+import com.winterwell.maths.stats.distributions.cond.ISitnStream;
 import com.winterwell.maths.stats.distributions.cond.Sitn;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.nlp.corpus.IDocument;
@@ -19,6 +20,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.IWidget;
 
 /**
@@ -72,8 +74,10 @@ public class StreamClassifierWidget implements IWidget {
 		IFiniteDistribution<String> pTags = classifier.pClassify(target, tokenProbs);
 				
 		// what did it do?
-		String alltext = target.getContents();
-		sb.append("<p>"+alltext+"</p>");		
+		String alltext = target.getTitleAndContents();
+		sb.append("<p class='well'><i>Title + Text:</i> "+target.getTitleAndContents()+"</p>");
+		ISitnStream<Tkn> tokens = classifier.tokenise(target);
+		sb.append("<p class='well'><i>Tokens:</i> "+Containers.apply(tokens, t -> String.valueOf(t.outcome)+" ")+"</p>");
 
 		// colours
 		List<String> pTagsList = Containers.getList(pTags);
@@ -118,7 +122,7 @@ public class StreamClassifierWidget implements IWidget {
 			sb.append("data='"+
 						WebUtils.attributeEncode(jsonData)+"'>");
 			// the word!
-			sb.append(tkn.getText());
+			sb.append(WebUtils2.htmlEncode(tkn.getText()));
 			if (subexpln !=null && subexpln.skipped) {
 				sb.append("<span title='skipped'>_</span>");
 			}
