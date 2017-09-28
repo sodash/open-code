@@ -212,7 +212,6 @@ public class ESStorage implements IDataLogStorage {
 		// rcae condition - check it hasn't been made
 		if (_client.admin().indices().indexExists(index)) {
 			knownIndexes.add(index);
-			assert knownIndexes.size() < 100000;
 			return;
 		}
 		try {			
@@ -220,6 +219,7 @@ public class ESStorage implements IDataLogStorage {
 			String v = _client.getConfig().getIndexAliasVersion();
 			String baseIndex = index+"_"+v;
 			CreateIndexRequest pc = _client.admin().indices().prepareCreate(baseIndex);
+			pc.setFailIfAliasExists(true); // this is synchronized, but what about other servers?
 			pc.setDefaultAnalyzer(Analyzer.keyword);
 			pc.setAlias(index);
 			IESResponse cres = pc.get();

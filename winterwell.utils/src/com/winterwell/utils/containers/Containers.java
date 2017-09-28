@@ -31,6 +31,7 @@ import com.winterwell.utils.IFn;
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.NotUniqueException;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.TodoException;
@@ -1869,6 +1870,19 @@ public final class Containers  {
 			if (filter.accept(list.get(i))) return i;
 		}
 		return -1;
+	}
+
+
+	/**
+	 * @param list
+	 * @return the first and only element of list. Throws an exception if list is empty or has >1 elements.
+	 */
+	public static <X> X only(Iterable<X> list) {
+		Iterator<X> it = list.iterator();
+		if ( ! it.hasNext()) throw new IndexOutOfBoundsException("Empty: "+list);
+		X obj = it.next();
+		if (it.hasNext()) throw new NotUniqueException("Too many elements: "+list);
+		return obj;
 	}
 
 
