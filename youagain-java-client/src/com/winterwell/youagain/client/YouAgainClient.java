@@ -110,7 +110,7 @@ public class YouAgainClient {
 					));
 			Log.w(LOGTAG, "TODO process YouAgain verify response: " + response);
 		} catch(Throwable ex) {
-			Log.e(LOGTAG, ex); // FIXME
+			Log.w(LOGTAG, ex); // FIXME
 		}
 		return list;		
 	}
