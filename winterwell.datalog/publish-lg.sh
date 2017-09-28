@@ -179,9 +179,9 @@ function clean_publish {
 ####
 
 
-function force_jar_parity {
+#function force_jar_parity {
 	#if $TYPEOFPUSHOUT==PRODUCTION, rsync --delete command to gl-es-03, then tell gl-es-03 to perform an 'rsync --delete' sync to rest of cluster.
-}
+#}
 
 
 
