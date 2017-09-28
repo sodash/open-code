@@ -115,20 +115,25 @@ cat /tmp/target.list.txt
 ####
 function frontend_publish {
 	echo -e "> Converting LESS files to CSS..."
-	build-less.sh
+	./build-less.sh
 	echo ""
-	echo -e "> Syncing the 'web' directory..."
-	parallel-rsync -h /tmp/target.list.txt --user=winterwell --recursive web /home/winterwell/lg.good-loop.com/
-	echo ""
-	echo -e "> Syncing the 'package.json' file..."
-	parallel-rsync -h /tmp/target.list.txt --user=winterwell package.json /home/winterwell/lg.good-loop.com/
-	echo ""
-	echo -e "> Syncing the 'webpack.config.js' file..."
-	parallel-rsync -h /tmp/target.list.txt --user=winterwell webpack.config.js /home/winterwell/lg.good-loop.com/
-	echo ""
-	echo -e "> Syncing the 'src-js' directory..."
-	parallel-rsync -h /tmp/target.list.txt --user=winterwell --recursive src-js /home/winterwell/lg.good-loop.com/
-	echo ""
+	if [[ $TYPEOFPUSHOUT = 'TEST' ]]; then
+		echo -e "> Strictly Syncing the Frontend from YOUR localmachine to $TEST"
+		rsync -rhP --delete-before web winterwell@$TEST:/home/winterwell/lg.good-loop.com/
+		rsync -rhP --delete-before package.json winterwell@$TEST:/home/winterwell/lg.good-loop.com/
+		rsync -rhP --delete-before webpack.config.js winterwell@$TEST:/home/winterwell/lg.good-loop.com/
+		rsync -rhP --delete-before src-js winterwell@$TEST:/home/winterwell/lg.good-loop.com/
+	else
+		echo -e "> Strictly Syncing the Frontend from YOUR localmachin to $PRODUCTIONPUBLISHER"
+		rsync -rhP --delete-before web winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
+		rsync -rhP --delete-before package.json winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
+		rsync -rhP --delete-before webpack.config.js winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
+		rsync -rhP --delete-before src-js winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/winterwell/lg.good-loop.com/
+		echo -e "> Sending list of targets to $PRODUCTIONPUBLISHER..."
+		scp /tmp/target.list.txt winterwell@$PRODUCTIONPUBLISHER:/tmp/
+		echo -e "> Telling $PRODUCTIONPUBLISHER to update the frontend..."
+		ssh winterwell@$PRODUCTIONPUBLISHER 'bash /home/winterwell/lg.good-loop.com/cluster-sync.sh frontend'
+	fi
 	echo -e "> Satisfying NPM dependencies..."
 	parallel-ssh -h /tmp/target.list.txt --user=winterwell 'cd /home/winterwell/lg.good-loop.com && npm i'
 	echo ""
@@ -147,7 +152,7 @@ function backend_publish {
 		echo -e "> Sending list of targets to $PRODUCTIONPUBLISHER..."
 		scp /tmp/target.list.txt winterwell@$PRODUCTIONPUBLISHER:/tmp/
 		echo -e "> Telling $PRODUCTIONPUBLISHER to update the backend..."
-		ssh winterwell@$PRODUCTIONPUBLISHER 'bash /home/winterwell/lg.good-loop.com/cluster-jar-sync.sh backend'
+		ssh winterwell@$PRODUCTIONPUBLISHER 'bash /home/winterwell/lg.good-loop.com/cluster-sync.sh backend'
 		ssh winterwell@$PRODUCTIONPUBLISHER 'sudo service lg restart'
 	fi
 	echo ""
@@ -165,8 +170,6 @@ function backend_publish {
 ####
 #SETTING THE 'CLEANPUBLISH' FUNCTION
 ####
-
-########HAVE TO FIX THIS SO THAT IT ONLY CLEANS OUT EITHER THE TEST SERVER OR THE PRODUCTIONPUBLISHER SERVER
 function clean_publish {
 	if [[ $PUBLISHLEVEL != 'everything' ]]; then
 		echo -e "Silly goose! you cannot perform a 'clean-out' unless you are publishing both the frontend AND the backend"
@@ -183,9 +186,9 @@ function clean_publish {
 		sleep 1
 		CURRENTCOUNT=$((CURRENTCOUNT-1))
 	done
-	parallel-ssh -h /tmp/target.list.txt --user=winterwell 'rm -rf /home/winterwell/lg.good-loop.com/lib/*'
-	parallel-ssh -h /tmp/target.list.txt --user=winterwell 'rm -rf /home/winterwell/lg.good-loop.com/web/*'
-	parallel-ssh -h /tmp/target.list.txt --user=winterwell 'rm -rf /home/winterwell/lg.good-loop.com/config/*'
+	ssh winterwell@${TARGET[0]} 'rm -rf /home/winterwell/lg.good-loop.com/lib/*'
+	ssh winterwell@${TARGET[0]} 'rm -rf /home/winterwell/lg.good-loop.com/web/*'
+	ssh winterwell@${TARGET[0]} 'rm -rf /home/winterwell/lg.good-loop.com/config/*'
 	echo -e "Cleaning of the lg.good-loop.com directory is now complete for all targets."
 }
 ####
