@@ -4,11 +4,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -150,10 +154,11 @@ public class ESStorage implements IDataLogStorage {
 	}
 
 	public IDataLogStorage init(DataLogConfig config) {
+		ConfigBuilder cb = new ConfigBuilder(new ESConfig());
 		this.config = config;
 		// ES config
 		if (esConfig == null) {
-			esConfig = new ConfigBuilder(new ESConfig()).set(new File("config/datalog.properties")).get();
+			esConfig = cb.set(new File("config/datalog.properties")).get();
 		}
 		// Support per-namespace ESConfigs
 		if (config.namespaceConfigs!=null) {
@@ -161,8 +166,15 @@ public class ESStorage implements IDataLogStorage {
 				for (String n : config.namespaceConfigs) {
 					File f = new File("config/datalog."+n.toLowerCase()+".properties");
 					Log.d("DataLog.init", "Looking for special namespace "+n+" config in "+f+" file-exists: "+f.exists());
-					ESConfig esConfig4n = ArgsParser.getConfig(new ESConfig(), f);
-					config4dataspace.put(n, esConfig4n);
+					if ( ! f.exists()) {
+						Log.w("DataLog.init", "No special config file "+f.getAbsoluteFile());
+						continue;
+					}
+					ESConfig esConfig4n = new ConfigBuilder(new ESConfig())
+							.set(new File("config/datalog.properties"))
+							.set(f).
+							get();
+					config4dataspace.put(n, esConfig4n);					
 				}
 			}
 		}
@@ -182,26 +194,41 @@ public class ESStorage implements IDataLogStorage {
 	}
 
 	
+	final Set<String> knownIndexes = new HashSet();
+	
 	private void initIndex(String dataspace, String index) {
+		if (knownIndexes.contains(index)) return;
 		ESHttpClient _client = client(dataspace);
 		if (_client.admin().indices().indexExists(index)) {
+			knownIndexes.add(index);
+			assert knownIndexes.size() < 100000;
 			return;
 		}
 		// make it, with a base and an alias
-		// HACK
-		String v = _client.getConfig().getIndexAliasVersion();
-		String baseIndex = index+"_"+v;
-		CreateIndexRequest pc = _client.admin().indices().prepareCreate(baseIndex);
-		pc.setDefaultAnalyzer(Analyzer.keyword);
-		pc.setAlias(index);
-		IESResponse cres = pc.get();
-		cres.check();
-//		IndicesAliasesRequest ar = _client.admin().indices().prepareAliases();
-//		ar.addAlias(baseIndex, index);
-//		ar.get().check();
+		initIndex2(index, _client);
+	}
+
+	private synchronized void initIndex2(String index, ESHttpClient _client) {
+		// rcae condition - check it hasn't been made
+		if (_client.admin().indices().indexExists(index)) {
+			knownIndexes.add(index);
+			assert knownIndexes.size() < 100000;
+			return;
+		}
+		try {			
+			// HACK
+			String v = _client.getConfig().getIndexAliasVersion();
+			String baseIndex = index+"_"+v;
+			CreateIndexRequest pc = _client.admin().indices().prepareCreate(baseIndex);
+			pc.setDefaultAnalyzer(Analyzer.keyword);
+			pc.setAlias(index);
+			IESResponse cres = pc.get();
+			cres.check();
+	//		IndicesAliasesRequest ar = _client.admin().indices().prepareAliases();
+	//		ar.addAlias(baseIndex, index);
+	//		ar.get().check();
 		
 		// register some standard event types??
-		try {
 			PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, typeFromEventType(simple));
 			// See DataLogEvent.COMMON_PROPS and toJson()
 			ESType keywordy = new ESType().keyword().norms(false);
