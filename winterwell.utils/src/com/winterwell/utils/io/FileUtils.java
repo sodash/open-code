@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.winterwell.utils.FailureException;
@@ -1670,6 +1671,21 @@ public class FileUtils {
 		}
 	}
 
+	/**
+	 * Note: .zip files can contain many sub-files! This method JUST reads the first entry.
+	 * @param file a single-entry .zip file
+	 * @return a reader for the first entry in the zip.
+	 */
+	public static BufferedReader getZIPReader(File file) {
+		try {
+			ZipFile zipf = new ZipFile(file);
+			ZipEntry entry = zipf.entries().nextElement();
+			InputStream in = zipf.getInputStream(entry);
+			return FileUtils.getReader(in);
+		} catch(Exception ex) {
+			throw Utils.runtime(ex);
+		}
+	}
 
 
 }

@@ -40,7 +40,7 @@ class DescCache implements IDescCache {
 	
 	public <T> Desc<T> getDescription(T x) {
 		assert x != null;
-		assert !(x instanceof Desc);
+		assert ! (x instanceof Desc) : x;
 		Desc desc = sharedObject2Desc.get(x);
 		if (desc != null)
 			return desc;

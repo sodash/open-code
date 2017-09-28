@@ -22,7 +22,7 @@ import com.winterwell.utils.Printer;
 public class TimeTest {
 
 	public static void main(String[] args) {
-		System.out.println(new Time("1476964316000"));
+		System.out.println(new Time().minus(1, TUnit.MONTH).getTime());
 	}
 	
 	@Test
