@@ -40,6 +40,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"url", String.class,
 			"domain", String.class,
 			"host", String.class,
+			"country", String.class,
 			// common event-defining properties
 			"tag", String.class, 
 			"action", String.class, 
@@ -83,7 +84,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"z", Double.class,
 			"geo", Object.class,
 			"lat", Double.class,
-			"lng", Double.class
+			"lng", Double.class,
+			// browser info
+			"mbl", Boolean.class,
+			"ua", StringBuilder.class // user agent
 			));
 	
 	public final double count;

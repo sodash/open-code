@@ -244,9 +244,9 @@ public class XStreamUtils {
 		}
 	}
 
-	static void setupXStream() {
+	public static XStream setupXStream(XStream _xstream) {
 		try {
-			_xstream = new XStream();
+			if (_xstream == null) _xstream = new XStream();
 			// be robust & keep on truckin
 			_xstream.ignoreUnknownElements();
 			// prettier shorter xml
@@ -268,14 +268,13 @@ public class XStreamUtils {
 				// oh well -- no depot support
 				Log.i("xstream", "Oh well -- no ModularConverter: " + ex);
 			}
-
 			// Backwards-compatibility: XStream changed how it formats URIs
 			_xstream.registerConverter(new URIConverter());
 
-			// return _xstream;
+			 return _xstream;
 		} catch (Throwable e) {
 			Log.report(e);
-			// return null;
+			return _xstream;
 		}
 	}
 
@@ -287,7 +286,8 @@ public class XStreamUtils {
 	 */
 	public static XStream xstream() {
 		if (_xstream == null) {
-			setupXStream();
+			_xstream = new XStream();
+			setupXStream(_xstream);
 		}
 		return _xstream;
 	}

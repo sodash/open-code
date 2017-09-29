@@ -64,6 +64,14 @@ public class LgServlet {
 		String tag = state.getRequired(TAG);
 		String via = req.getParameter("via");
 		Map params = (Map) state.get(PARAMS);
+		if (params==null) {
+			// params from the url?
+			params = state.getMap();
+			params.remove(TAG);
+			params.remove(DATASPACE);
+			params.remove("via");
+			params.remove("track");
+		}
 		
 		boolean stdTrackerParams = state.get(new BoolField("track"), true);
 		doLog(state, ds, tag, via, params, stdTrackerParams);
@@ -88,26 +96,26 @@ public class LgServlet {
 			// TODO allow the caller to explicitly set some of these if they want to
 			if (params==null) params = new ArrayMap();
 			// Replace $user with tracking-id, and $
-			params.put("user", trckId);			
+			params.putIfAbsent("user", trckId);			
 			// ip: $ip
-			params.put("ip", state.getRemoteAddr());
+			params.putIfAbsent("ip", state.getRemoteAddr());
 			// Browser info
 			String ua = state.getUserAgent();			
-			params.put("ua", ua);
+			params.putIfAbsent("ua", ua);
 			BrowserType bt = new BrowserType(ua);
 			boolean mobile = bt.isMobile();
-			params.put("mbl", mobile);
+			params.putIfAbsent("mbl", mobile);
 			// what page?
 			String ref = state.getReferer();
 			if (ref==null) ref = state.get("site"); // DfP hack
 			// remove some gumpf (UTM codes)
 			String cref = WebUtils2.cleanUp(ref);
 			if (cref != null) {
-				params.put("url", cref);
+				params.putIfAbsent("url", cref);
 				// domain (e.g. sodash.com) & host (e.g. www.sodash.com)				
-				params.put("domain", WebUtils2.getDomain(cref)); 
+				params.putIfAbsent("domain", WebUtils2.getDomain(cref)); 
 				// host is the one to use!
-				params.put("host", WebUtils2.getHost(cref)); // matches publisher in adverts
+				params.putIfAbsent("host", WebUtils2.getHost(cref)); // matches publisher in adverts
 			}
 		}
 		// write to log file
