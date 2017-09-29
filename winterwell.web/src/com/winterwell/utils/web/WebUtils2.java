@@ -1031,12 +1031,11 @@ public class WebUtils2 extends WebUtils {
 
 	/**
 	 * Send a text return (closes the response).
+	 * Swallows all exceptions.
 	 * 
 	 * @param output
 	 *            The text to send
 	 * @param response
-	 * @throws IOException
-	 *             (wrapped)
 	 */
 	public static final void sendError(int code, String output,
 			HttpServletResponse response) {
@@ -1054,7 +1053,7 @@ public class WebUtils2 extends WebUtils {
 				return;
 			}
 			response.sendError(code, output);
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			Log.e("web", e);
 		}
 	}
