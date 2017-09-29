@@ -118,11 +118,11 @@ public class YouAgainClient {
 			try {
 				AuthToken token = new AuthToken(jt);
 				// FIXME decode the token properly!
-				byte[] decoded = Base64.getMimeDecoder().decode(jt);			
-				String decs = new String(decoded, StrUtils.ENCODING_UTF8);
-				token.xid = new XId(decs, false); // FIXME!
+//				byte[] decoded = Base64.getMimeDecoder().decode(jt);			
+//				String decs = new String(decoded, StrUtils.ENCODING_UTF8);
+				token.xid = new XId("foo@dummy", false); // FIXME!
 				list.add(token);
-			} catch (UnsupportedEncodingException e) {
+			} catch (Exception e) {
 				Log.e(LOGTAG, e);
 			}
 		}
