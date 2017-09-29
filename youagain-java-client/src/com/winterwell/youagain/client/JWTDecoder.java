@@ -37,7 +37,6 @@ public class JWTDecoder {
 
 	private PublicKey pubKey;
 
-	private static Encoder base64encoder = Base64.getEncoder();
 	private static Decoder base64decoder = Base64.getDecoder();
 	
 	public JWTDecoder() {

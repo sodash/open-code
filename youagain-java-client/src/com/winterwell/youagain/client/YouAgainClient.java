@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
+import org.jose4j.jwt.JwtClaims;
 
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
@@ -118,15 +119,23 @@ public class YouAgainClient {
 			try {
 				AuthToken token = new AuthToken(jt);
 				// FIXME decode the token properly!
-//				byte[] decoded = Base64.getMimeDecoder().decode(jt);			
-//				String decs = new String(decoded, StrUtils.ENCODING_UTF8);
-				token.xid = new XId("foo@dummy", false); // FIXME!
+				JWTDecoder dec = getDecoder();
+				JwtClaims decd = dec.decryptJWT(jt);
+				token.xid = new XId(decd.getSubject(), false);
 				list.add(token);
 			} catch (Exception e) {
 				Log.e(LOGTAG, e);
 			}
 		}
 		return list;		
+	}
+
+	private JWTDecoder getDecoder() throws Exception {
+		JWTDecoder dec = new JWTDecoder();
+		String pkey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu3njghYwWN8Bf/f6FndCr3h3/uzPNctZZf2qLHqGicZaQQvjMqFfr2tz/JGsFkxeCSeEuLqzHjBoc8P9S2aKb7X04b/OfTJkSjH/5UArKuAGZL1/hVFwZwnSoQOhklElHtq/RwGUgemmu7QIjTcgKEINUNzC537vWOtiQkWAO/abqwpfQgKPvMNvViPMrJtk8A07bFetQKjU4A6do6E3BvTItzgMZJLmMVePn8Yo3uH/7rLtKybl2tn8BhOWPGLnEyZiPZ2f8V/56hR1zsHr9i9QMjLX8O18+w4pno04jST2Yp7yxTNN3mttqgyl8s8oFMptSG2/3g+WqwwwBTbGgQIDAQAB"; 
+		// FIXME load from the server, so we could change keys
+		dec.setPublicKey(pkey);
+		return dec;
 	}
 
 	/**
