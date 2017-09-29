@@ -1,5 +1,6 @@
 package com.winterwell.youagain.client;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -111,6 +112,19 @@ public class YouAgainClient {
 			Log.w(LOGTAG, "TODO process YouAgain verify response: " + response);
 		} catch(Throwable ex) {
 			Log.w(LOGTAG, ex); // FIXME
+		}
+		// HACK Security hole!
+		for (String jt : jwt) {
+			try {
+				AuthToken token = new AuthToken(jt);
+				// FIXME decode the token properly!
+				byte[] decoded = Base64.getMimeDecoder().decode(jt);			
+				String decs = new String(decoded, StrUtils.ENCODING_UTF8);
+				token.xid = new XId(decs, false); // FIXME!
+				list.add(token);
+			} catch (UnsupportedEncodingException e) {
+				Log.e(LOGTAG, e);
+			}
 		}
 		return list;		
 	}
@@ -229,11 +243,11 @@ public class YouAgainClient {
 		}
 		assert uxid != null;
 		final XId fuxid = uxid;
-		// security check
-		AuthToken auth = Containers.first(auths, a -> a.xid.equals(fuxid));
-		if (auth==null) {
-			throw new WebEx.E401(state.getRequestUrl(), "No auth-token for "+uxid);
-		}
+		// FIXME security check
+//		AuthToken auth = Containers.first(auths, a -> a.xid.equals(fuxid));
+//		if (auth==null) {
+//			throw new WebEx.E401(state.getRequestUrl(), "No auth-token for "+uxid);
+//		}
 		// set the user
 		Properties user = new Properties(new ArrayMap("xid", uxid));
 		state.setUser(uxid, user);
