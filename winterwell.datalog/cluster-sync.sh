@@ -59,7 +59,7 @@ function backend_publish {
 	echo -e "> ${HOSTNAME} says: 'Cleaning Cluster's Backend...'"
 	$PASSH 'rm -rf /home/winterwell/lg.good-loop.com/lib/*.jar'
 	echo -e "> ${HOSTNAME} says: 'Syncing Backend..."
-	$PARSYNC $LGHOME/lib $LGHOME/lib
+	$PARSYNC $LGHOME/lib $LGHOME/
 }
 
 function everything_publish {

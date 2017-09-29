@@ -100,7 +100,8 @@ rm /tmp/target.list.txt
 ####
 # Removing the name of the productionpublisher from the array of production servers
 if [[ $TYPEOFPUSHOUT = 'PRODUCTION' ]]; then
-	TARGET=${TARGET[@]//$PRODUCTIONPUBLISHER}
+	#echo ${TARGET[@]/$PRODUCTIONPUBLISHER}
+	TARGET=( "${TARGET[@]/$PRODUCTIONPUBLISHER}" )
 fi
 #
 printf '%s\n' ${TARGET[@]} >> /tmp/target.list.txt
@@ -128,7 +129,7 @@ function frontend_publish {
 		rsync -rhP --delete-before web winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
 		rsync -rhP --delete-before package.json winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
 		rsync -rhP --delete-before webpack.config.js winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
-		rsync -rhP --delete-before src-js winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/winterwell/lg.good-loop.com/
+		rsync -rhP --delete-before src-js winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
 		echo -e "> Sending list of targets to $PRODUCTIONPUBLISHER..."
 		scp /tmp/target.list.txt winterwell@$PRODUCTIONPUBLISHER:/tmp/
 		echo -e "> Telling $PRODUCTIONPUBLISHER to update the frontend..."
@@ -149,6 +150,7 @@ function backend_publish {
 	echo -e "> Strictly Syncing JARs from YOUR localmachine to ${TARGET[0]}"
 	rsync -rhP --delete-before tmp-lib/*.jar winterwell@${TARGET[0]}:/home/winterwell/lg.good-loop.com/lib/
 	if [[ $TYPEOFPUSHOUT = 'PRODUCTION' ]]; then
+		scp cluster-sync.sh winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
 		echo -e "> Sending list of targets to $PRODUCTIONPUBLISHER..."
 		scp /tmp/target.list.txt winterwell@$PRODUCTIONPUBLISHER:/tmp/
 		echo -e "> Telling $PRODUCTIONPUBLISHER to update the backend..."
