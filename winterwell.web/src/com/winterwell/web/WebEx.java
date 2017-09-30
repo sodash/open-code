@@ -1,6 +1,10 @@
 package com.winterwell.web;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
+
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.web.data.XId;
 
 public class WebEx extends RuntimeException {
@@ -122,6 +126,46 @@ public class WebEx extends RuntimeException {
 			super(code, url);
 		}
 		private static final long serialVersionUID = 1L;
+		
+		
+		// Exception wrapping code -- should we move this into WebEx??
+		private Throwable error() {
+			return Utils.or(getCause(), this);
+		}
+		/**
+		 * The original Throwable
+		 */
+		@Override
+		public final Throwable getCause() {
+			Throwable ex = super.getCause();
+			return ex;
+		}
+
+		@Override
+		public final StackTraceElement[] getStackTrace() {
+			return error().getStackTrace();
+		}
+
+		@Override
+		public void printStackTrace(PrintStream s) {
+			error().printStackTrace();
+		}
+
+		@Override
+		public void printStackTrace(PrintWriter s) {
+			error().printStackTrace();
+		}
+
+		/**
+		 * Hide the WrappedException bit - show the underlying exception
+		 */
+		@Override
+		public String toString() {
+			Throwable e = getCause();
+			return e == null ? super.toString() : getClass().getSimpleName()+"(wrapped)"
+					+ getCause().toString();
+		}
+
 	}
 
 
