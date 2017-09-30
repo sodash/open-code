@@ -162,7 +162,7 @@ public class WebEx extends RuntimeException {
 		@Override
 		public String toString() {
 			Throwable e = getCause();
-			return e == null ? super.toString() : getClass().getSimpleName()+"(wrapped)"
+			return e == null ? super.toString() : getClass().getSimpleName()+" wraps "
 					+ getCause().toString();
 		}
 
