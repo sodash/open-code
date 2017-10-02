@@ -66,6 +66,11 @@ public class LgServlet {
 		Map params = (Map) state.get(PARAMS);
 		if (params==null) {
 			// params from the url?
+			// e.g. 
+			// https://lg.good-loop.com/lg?d=gl&t=install&idfa={idfa}&adid={adid}&android_id={android_id}&gps_adid={gps_adid}
+			// &fire_adid={fire_adid}&win_udid={win_udid}&ua={user_agent}&ip={ip_address}&country={country}
+			// &time={created_at}&app_id={app_id}&app_name={app_name}&store={store}&tracker_name={tracker_name}&tracker={tracker}
+			// &bid={dcp_bid}
 			params = state.getMap();
 			params.remove(TAG);
 			params.remove(DATASPACE);
@@ -132,7 +137,7 @@ public class LgServlet {
 //		);
 //		for(String ds : dataspaces) {
 //			if (ds==null) continue;
-		DataLogEvent event = new DataLogEvent(dataspace, 1, tag, params);
+		DataLogEvent event = new DataLogEvent(dataspace, 1, tag, params);		
 		DataLog.count(event);
 //		}
 	}

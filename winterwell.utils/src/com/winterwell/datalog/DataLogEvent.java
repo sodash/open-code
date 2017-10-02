@@ -12,6 +12,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.KErrorPolicy;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.SimpleJson;
@@ -41,6 +42,9 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"domain", String.class,
 			"host", String.class,
 			"country", String.class,
+			// ad tracking
+			"adid", String.class,
+			"idfa", String.class,
 			// common event-defining properties
 			"tag", String.class, 
 			"action", String.class, 
@@ -147,6 +151,15 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		this.props = properties == null? Collections.EMPTY_MAP : properties;
 		this.id = makeId();
 		assert ! Utils.isBlank(eventType);
+		// set time??
+		Object t = this.props.get("time");
+		if (t != null) {
+			try {
+				time = new Time(t.toString());
+			} catch(Exception ex) {
+				Log.w("DataLogEvent.time", t+" "+ex);
+			}
+		}
 	}
 
 	@Override
