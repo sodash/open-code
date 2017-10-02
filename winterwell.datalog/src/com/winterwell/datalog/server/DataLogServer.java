@@ -57,7 +57,7 @@ public class DataLogServer {
 		
 		logFile = new LogFile(DataLogServer.settings.logFile)
 				// keep 8 weeks of 1 week log files ??revise this??
-				.setLogRotation(TUnit.WEEK.dt, 8);
+				.setLogRotation(TUnit.DAY.dt, 10);
 
 		// app=datalog for login
 		YouAgainClient yac = new YouAgainClient("datalog");
