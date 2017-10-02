@@ -35,9 +35,9 @@ public class MasterHttpServlet extends HttpServlet {
 		WebRequest request = null; // NB: If Eclipse says "resource leak" it's wrong -- the finally clause does it
 		String path = null;
 		try {
-			Thread.currentThread().setName("web "+path);
 			request = new WebRequest(null, req, resp);
 			AppUtils.addDebugInfo(request);
+			Log.d("web", request);
 			path = request.getRequestPath();
 			Thread.currentThread().setName("web "+path);
 	
