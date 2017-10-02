@@ -36,7 +36,9 @@ import lgpl.haustein.Base64Encoder;
 
 public class YouAgainClient {
 
-	static final String ENDPOINT = "https://youagain.winterwell.com/youagain.json";
+	static final String ENDPOINT = 
+				"https://youagain.winterwell.com/youagain.json";
+//				"http://localyouagain.winterwell.com/youagain.json";
 
 	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
 
@@ -102,18 +104,18 @@ public class YouAgainClient {
 		Log.d(LOGTAG, "verify: "+jwt);
 		List<AuthToken> list = new ArrayList();
 		if (jwt.isEmpty()) return list;
-		try {
-			FakeBrowser fb = new FakeBrowser();
-			Object response = fb.getPage(ENDPOINT, new ArrayMap(
-					"app", app, 
-					"action", "verify", 
-					"jwt", StrUtils.join(jwt, ","),
-					"debug", debug
-					));
-			Log.w(LOGTAG, "TODO process YouAgain verify response: " + response);
-		} catch(Throwable ex) {
-			Log.w(LOGTAG, ex); // FIXME
-		}
+//		try {
+//			FakeBrowser fb = new FakeBrowser();
+//			Object response = fb.getPage(ENDPOINT, new ArrayMap(
+//					"app", app, 
+//					"action", "verify", 
+//					"jwt", StrUtils.join(jwt, ","),
+//					"debug", debug
+//					));
+//			Log.w(LOGTAG, "TODO process YouAgain verify response: " + response);
+//		} catch(Throwable ex) {
+//			Log.w(LOGTAG, ex); // FIXME
+//		}
 		// HACK Security hole!
 		for (String jt : jwt) {
 			try {
@@ -130,11 +132,16 @@ public class YouAgainClient {
 		return list;		
 	}
 
+	static JWTDecoder dec = new JWTDecoder();
+	
 	private JWTDecoder getDecoder() throws Exception {
-		JWTDecoder dec = new JWTDecoder();
-		String pkey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu3njghYwWN8Bf/f6FndCr3h3/uzPNctZZf2qLHqGicZaQQvjMqFfr2tz/JGsFkxeCSeEuLqzHjBoc8P9S2aKb7X04b/OfTJkSjH/5UArKuAGZL1/hVFwZwnSoQOhklElHtq/RwGUgemmu7QIjTcgKEINUNzC537vWOtiQkWAO/abqwpfQgKPvMNvViPMrJtk8A07bFetQKjU4A6do6E3BvTItzgMZJLmMVePn8Yo3uH/7rLtKybl2tn8BhOWPGLnEyZiPZ2f8V/56hR1zsHr9i9QMjLX8O18+w4pno04jST2Yp7yxTNN3mttqgyl8s8oFMptSG2/3g+WqwwwBTbGgQIDAQAB"; 
-		// FIXME load from the server, so we could change keys
-		dec.setPublicKey(pkey);
+		if (dec.getPublicKey()==null) {
+			String publickeyEndpoint = ENDPOINT.replace("youagain.json", "publickey");
+			// load from the server, so we could change keys
+			String pkey = new FakeBrowser().getPage(publickeyEndpoint);
+//			String pkey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu3njghYwWN8Bf/f6FndCr3h3/uzPNctZZf2qLHqGicZaQQvjMqFfr2tz/JGsFkxeCSeEuLqzHjBoc8P9S2aKb7X04b/OfTJkSjH/5UArKuAGZL1/hVFwZwnSoQOhklElHtq/RwGUgemmu7QIjTcgKEINUNzC537vWOtiQkWAO/abqwpfQgKPvMNvViPMrJtk8A07bFetQKjU4A6do6E3BvTItzgMZJLmMVePn8Yo3uH/7rLtKybl2tn8BhOWPGLnEyZiPZ2f8V/56hR1zsHr9i9QMjLX8O18+w4pno04jST2Yp7yxTNN3mttqgyl8s8oFMptSG2/3g+WqwwwBTbGgQIDAQAB";			
+			dec.setPublicKey(pkey);			
+		}
 		return dec;
 	}
 

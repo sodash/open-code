@@ -30,6 +30,7 @@ import com.winterwell.web.data.XId;
 
 /**
  * This class will wrap low-level JWT stuff, and present it for YouAgain.
+ * @See JWTEncoder
  * @author daniel
  *
  */
@@ -72,12 +73,18 @@ public class JWTDecoder {
         return jwtClaims;
 	}
 	
-	public JWTDecoder setPublicKey(String key) throws Exception {		
+	public JWTDecoder setPublicKey(String key) throws Exception {
+		Log.d("ya.init", "decoder Public key: "+key);
 	    byte[] data = base64decoder.decode(key);
 	    X509EncodedKeySpec spec = new X509EncodedKeySpec(data);
 	    KeyFactory fact = KeyFactory.getInstance("RSA");
 	    pubKey = fact.generatePublic(spec);
 	    return this;
+	}
+
+
+	public PublicKey getPublicKey() {
+		return pubKey;
 	}
 
 }
