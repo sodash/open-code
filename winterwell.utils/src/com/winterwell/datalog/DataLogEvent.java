@@ -220,6 +220,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		List propslist = new ArrayList();
 		for(Entry<String, ?> pv : props.entrySet()) {
 			Object v = pv.getValue();
+			if ( ! Utils.truthy(v)) continue;
 			Class proptype = COMMON_PROPS.get(pv.getKey());
 			if (proptype!=null) {
 				// privileged props
@@ -237,8 +238,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 						"k", pv.getKey(),
 						"n", v
 						);		
-			} else {
-				if ( ! Utils.truthy(pv.getValue())) continue;
+			} else {				
 				prop = new ArrayMap(
 						"k", pv.getKey(),
 						"v", v.toString()
