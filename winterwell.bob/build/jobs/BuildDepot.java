@@ -10,7 +10,7 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildDepot extends BuildWinterwellProject {
 
 	public BuildDepot() {
-		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.depot"));
+		super("winterwell.depot");
 	}	
 
 	@Override

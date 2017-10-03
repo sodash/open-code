@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Trio;
 import com.winterwell.utils.io.ConfigBuilder;
@@ -54,6 +56,27 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 	public static final String PROPERTY_GIT_COMMIT_ID = "lastCommitId";
 	public static final String PROPERTY_GIT_COMMIT_INFO = "lastCommitInfo";
 	public static final String PROPERTY_PUBLISH_DATE = "publishDate";
+
+
+	private static volatile boolean initFlag;
+	
+	public ManifestServlet() {
+		initManifest();
+	}
+	
+	public static void initManifest() {
+		if (initFlag) return;
+		initFlag = true;
+		// stick version info into ManifestServlet
+		try {
+			File f = new File("config/version.properties");
+			if (f.isFile()) {
+				configFiles.add(f);
+			}
+		} catch(Exception ex) {
+			Log.e("manifest", ex);
+		}		
+	}
 	
 	/**
 	 * Create version.properties
@@ -102,10 +125,10 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		}
 	}
 
-	static Collection<File> configFiles;
+	static final Collection<File> configFiles = new ArraySet<>();
 	
-	public static void setConfigFiles(Collection<File> configFiles) {
-		ManifestServlet.configFiles = configFiles;
+	public static void addConfigFiles(Collection<File> configFiles) {
+		ManifestServlet.configFiles.addAll(configFiles);
 	}
 
 	private static Time startTime = new Time();
@@ -230,6 +253,15 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			manifestFromJar.put("error", ex);
 		}
 		return manifestFromJar;
+	}
+
+	public static void addConfigBuilder(ConfigBuilder cb) {
+		// TODO store more from cb
+		for(Object s : cb.getSources()) {
+			if (s instanceof File) {
+				addConfigFiles(Arrays.asList((File)s));
+			}
+		}
 	}
 	
 	

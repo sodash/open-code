@@ -26,6 +26,8 @@ import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.ajax.AjaxMsg;
+import com.winterwell.web.ajax.AjaxMsg.KNoteType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.ListField;
@@ -74,7 +76,7 @@ public class YouAgainClient {
 		}
 		if (jwt.isEmpty() && basicToken==null) return null;
 		// verify the tokens
-		tokens = verify(jwt);
+		tokens = verify(jwt, state);
 		// add the name/password user first, if set
 		if (basicToken!=null) tokens.add(0, basicToken);
 		// stash them
@@ -100,33 +102,30 @@ public class YouAgainClient {
 		return token;
 	}
 
-	List<AuthToken> verify(List<String> jwt) {
+	/**
+	 * 
+	 * @param jwt
+	 * @param state Can be null. For sending messages back
+	 * @return
+	 */
+	List<AuthToken> verify(List<String> jwt, WebRequest state) {
 		Log.d(LOGTAG, "verify: "+jwt);
 		List<AuthToken> list = new ArrayList();
 		if (jwt.isEmpty()) return list;
-//		try {
-//			FakeBrowser fb = new FakeBrowser();
-//			Object response = fb.getPage(ENDPOINT, new ArrayMap(
-//					"app", app, 
-//					"action", "verify", 
-//					"jwt", StrUtils.join(jwt, ","),
-//					"debug", debug
-//					));
-//			Log.w(LOGTAG, "TODO process YouAgain verify response: " + response);
-//		} catch(Throwable ex) {
-//			Log.w(LOGTAG, ex); // FIXME
-//		}
-		// HACK Security hole!
 		for (String jt : jwt) {
 			try {
 				AuthToken token = new AuthToken(jt);
-				// FIXME decode the token properly!
+				// decode the token
 				JWTDecoder dec = getDecoder();
 				JwtClaims decd = dec.decryptJWT(jt);
 				token.xid = new XId(decd.getSubject(), false);
 				list.add(token);
-			} catch (Exception e) {
-				Log.e(LOGTAG, e);
+			} catch (Throwable e) {
+				Log.w(LOGTAG, e);
+				// pass back to the user
+				if (state!=null) {
+					state.addMessage(new AjaxMsg(KNoteType.warning, "JWT token error", e.toString()));
+				}
 			}
 		}
 		return list;		

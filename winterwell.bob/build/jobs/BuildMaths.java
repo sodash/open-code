@@ -10,7 +10,7 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildMaths extends BuildWinterwellProject {
 
 	public BuildMaths() {
-		super(new File(FileUtils.getWinterwellDir(), "code/winterwell.maths"));
+		super("winterwell.maths");
 		incSrc = false;
 	}
 

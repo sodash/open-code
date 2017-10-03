@@ -10,7 +10,7 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildOptimization extends BuildWinterwellProject {
 
 	public BuildOptimization() {
-		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.optimization"));
+		super("winterwell.optimization");
 	}
 
 	@Override
