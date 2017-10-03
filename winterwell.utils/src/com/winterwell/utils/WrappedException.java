@@ -53,7 +53,7 @@ public class WrappedException extends RuntimeException {
 	@Override
 	public String toString() {
 		Throwable e = getCause();
-		return e == null ? super.toString() : "(wrapped)"
+		return e == null ? super.toString() : getMessage() + " (wraps) "
 				+ getCause().toString();
 	}
 }

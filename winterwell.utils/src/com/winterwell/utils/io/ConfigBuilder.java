@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -253,6 +254,7 @@ public class ConfigBuilder {
 	public ConfigBuilder setFromMain(String[] args) {
 		if (args==null) return this;
 		source = "main args";
+		sources.add(source);
 		try {
 			// Look for config
 			int i = 0;
@@ -309,6 +311,12 @@ public class ConfigBuilder {
 	Map<Field,Object> source4setFields = new ArrayMap();
 
 	private boolean debug;
+
+	private final List<Object> sources = new ArrayList();
+	
+	public List<Object> getSources() {
+		return Collections.unmodifiableList(sources);
+	}
 	
 	private void fieldSet(Field field, Object v) throws IllegalArgumentException, IllegalAccessException {
 		Object prev = source4setFields.put(field, Utils.or(source, "unknown"));
@@ -333,6 +341,7 @@ public class ConfigBuilder {
 			return this;
 		}		
 		source = propertiesFile.getAbsoluteFile();
+		sources.add(source);
 		try {
 			File absFile = propertiesFile.getAbsoluteFile();
 			Properties props = new Properties();
@@ -381,7 +390,10 @@ public class ConfigBuilder {
 	 *             properties as it can before throwing any exception.
 	 */
 	public ConfigBuilder set(Map properties) {
-		if (source==null) source = "Map";
+		if (source==null) {
+			source = "Map";
+			sources.add(source);
+		}
 		List<Exception> errors = new ArrayList();
 		// keys
 		Collection<String> keys;
@@ -563,6 +575,7 @@ public class ConfigBuilder {
 	public ConfigBuilder setFromSystemProperties(String namespace) {
 		if (namespace!=null && namespace.isEmpty()) namespace = null;
 		source = "System.properties"+(Utils.isBlank(namespace)? "" : " namespace:"+namespace);
+		sources.add(source);
 		try {
 			Properties systemProps = System.getProperties();
 			if (Utils.isBlank(namespace)) {

@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
+import org.jose4j.jwt.JwtClaims;
 
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
@@ -25,6 +26,8 @@ import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.ajax.AjaxMsg;
+import com.winterwell.web.ajax.AjaxMsg.KNoteType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.ListField;
@@ -35,7 +38,9 @@ import lgpl.haustein.Base64Encoder;
 
 public class YouAgainClient {
 
-	static final String ENDPOINT = "https://youagain.winterwell.com/youagain.json";
+	static final String ENDPOINT = 
+				"https://youagain.winterwell.com/youagain.json";
+//				"http://localyouagain.winterwell.com/youagain.json";
 
 	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
 
@@ -71,7 +76,7 @@ public class YouAgainClient {
 		}
 		if (jwt.isEmpty() && basicToken==null) return null;
 		// verify the tokens
-		tokens = verify(jwt);
+		tokens = verify(jwt, state);
 		// add the name/password user first, if set
 		if (basicToken!=null) tokens.add(0, basicToken);
 		// stash them
@@ -97,36 +102,46 @@ public class YouAgainClient {
 		return token;
 	}
 
-	List<AuthToken> verify(List<String> jwt) {
+	/**
+	 * 
+	 * @param jwt
+	 * @param state Can be null. For sending messages back
+	 * @return
+	 */
+	List<AuthToken> verify(List<String> jwt, WebRequest state) {
 		Log.d(LOGTAG, "verify: "+jwt);
 		List<AuthToken> list = new ArrayList();
 		if (jwt.isEmpty()) return list;
-		try {
-			FakeBrowser fb = new FakeBrowser();
-			Object response = fb.getPage(ENDPOINT, new ArrayMap(
-					"app", app, 
-					"action", "verify", 
-					"jwt", StrUtils.join(jwt, ","),
-					"debug", debug
-					));
-			Log.w(LOGTAG, "TODO process YouAgain verify response: " + response);
-		} catch(Throwable ex) {
-			Log.w(LOGTAG, ex); // FIXME
-		}
-		// HACK Security hole!
 		for (String jt : jwt) {
 			try {
 				AuthToken token = new AuthToken(jt);
-				// FIXME decode the token properly!
-				byte[] decoded = Base64.getMimeDecoder().decode(jt);			
-				String decs = new String(decoded, StrUtils.ENCODING_UTF8);
-				token.xid = new XId(decs, false); // FIXME!
+				// decode the token
+				JWTDecoder dec = getDecoder();
+				JwtClaims decd = dec.decryptJWT(jt);
+				token.xid = new XId(decd.getSubject(), false);
 				list.add(token);
-			} catch (UnsupportedEncodingException e) {
-				Log.e(LOGTAG, e);
+			} catch (Throwable e) {
+				Log.w(LOGTAG, e);
+				// pass back to the user
+				if (state!=null) {
+					state.addMessage(new AjaxMsg(KNoteType.warning, "JWT token error", e.toString()));
+				}
 			}
 		}
 		return list;		
+	}
+
+	static JWTDecoder dec = new JWTDecoder();
+	
+	private JWTDecoder getDecoder() throws Exception {
+		if (dec.getPublicKey()==null) {
+			String publickeyEndpoint = ENDPOINT.replace("youagain.json", "publickey");
+			// load from the server, so we could change keys
+			String pkey = new FakeBrowser().getPage(publickeyEndpoint);
+//			String pkey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu3njghYwWN8Bf/f6FndCr3h3/uzPNctZZf2qLHqGicZaQQvjMqFfr2tz/JGsFkxeCSeEuLqzHjBoc8P9S2aKb7X04b/OfTJkSjH/5UArKuAGZL1/hVFwZwnSoQOhklElHtq/RwGUgemmu7QIjTcgKEINUNzC537vWOtiQkWAO/abqwpfQgKPvMNvViPMrJtk8A07bFetQKjU4A6do6E3BvTItzgMZJLmMVePn8Yo3uH/7rLtKybl2tn8BhOWPGLnEyZiPZ2f8V/56hR1zsHr9i9QMjLX8O18+w4pno04jST2Yp7yxTNN3mttqgyl8s8oFMptSG2/3g+WqwwwBTbGgQIDAQAB";			
+			dec.setPublicKey(pkey);			
+		}
+		return dec;
 	}
 
 	/**

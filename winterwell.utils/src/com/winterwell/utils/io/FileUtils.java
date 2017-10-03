@@ -1687,6 +1687,19 @@ public class FileUtils {
 		}
 	}
 
+	/**
+	 * The first non-null existing file, or null
+	 * @param files Can be null, empty, or contain null.
+	 * @return
+	 */
+	public static File or (File... files) {
+		if (files==null) return null;
+		for (File file : files) {
+			if (file !=null && file.exists()) return file;
+		}
+		return null;
+	}
+
 
 }
 

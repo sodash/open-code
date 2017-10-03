@@ -1295,7 +1295,7 @@ public class WebUtils2 extends WebUtils {
 		}
 		if (ex instanceof IOException) {
 			// probably a 404
-			return new WebEx.E40X(400, ex.getMessage(), ex);
+			return new WebEx.E40X(400, ex.getMessage(), ex); // wrap the stacktrace??
 		}
 		// send it via Utils which may improve some errors, eg SQL 
 		RuntimeException wrap = Utils.runtime(ex);

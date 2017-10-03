@@ -7,7 +7,7 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildUtils extends BuildWinterwellProject {
 
 	public BuildUtils() {
-		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.utils"));		
+		super("winterwell.utils");		
 		incSrc = true;				
 		setCompile(true);
 	}

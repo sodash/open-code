@@ -1,11 +1,14 @@
 package com.winterwell.datalog.server;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Properties;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.IDataLogAdmin;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
@@ -42,7 +45,8 @@ public class DataLogServer {
 	}
 
 	private static void init(String[] args) {
-		settings = new ConfigBuilder(new DataLogConfig())
+		ConfigBuilder cb = new ConfigBuilder(new DataLogConfig());
+		settings = cb
 				.setDebug(true)
 				.setFromSystemProperties(null)
 				.set(new File("config/datalog.properties"))
@@ -54,10 +58,11 @@ public class DataLogServer {
 		// set the config
 		DataLog.setConfig(settings);		
 		ManifestServlet.addConfig(settings);
+		ManifestServlet.addConfigBuilder(cb);
 		
 		logFile = new LogFile(DataLogServer.settings.logFile)
 				// keep 8 weeks of 1 week log files ??revise this??
-				.setLogRotation(TUnit.WEEK.dt, 8);
+				.setLogRotation(TUnit.DAY.dt, 10);
 
 		// app=datalog for login
 		YouAgainClient yac = new YouAgainClient("datalog");

@@ -10,7 +10,7 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildDataLog extends BuildWinterwellProject {
 
 	public BuildDataLog() {
-		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.datalog"));
+		super("winterwell.datalog");
 	}	
 
 	@Override

@@ -10,7 +10,7 @@ public class BuildWeb extends BuildWinterwellProject {
 	 * Build winterwell.web
 	 */
 	public BuildWeb() {
-		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.web"));
+		super("winterwell.web");
 		incSrc=true;	
 	}
 	

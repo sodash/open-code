@@ -58,7 +58,20 @@ public class BuildWinterwellProject extends BuildTask {
 		return this;
 	}
 	
+	/**
+	 * HACK try a few "standard" places to find the project
+	 * @param projectName
+	 */
+	public BuildWinterwellProject(String projectName) {
+		this(FileUtils.or(
+			new File(FileUtils.getWinterwellDir(), "open-code/"+projectName),
+			new File(FileUtils.getWinterwellDir(), "code/"+projectName),
+			new File(FileUtils.getWinterwellDir(), projectName)
+		));
+	}
+	
 	public BuildWinterwellProject(File projectDir) {
+		assert projectDir != null;
 		this.projectDir = projectDir;
 		assert projectDir.isDirectory() : projectDir+" "+this;
 		jarFile = new File(projectDir, projectDir.getName()+ ".jar");
