@@ -147,9 +147,13 @@ function frontend_publish {
 }
 
 function backend_publish {
-	echo -e "> Strictly Syncing JARs from YOUR localmachine to ${TARGET[0]}"
-	rsync -rhP --delete-before tmp-lib/*.jar winterwell@${TARGET[0]}:/home/winterwell/lg.good-loop.com/lib/
+	if [[ $TYPEOFPUSHOUT = 'TEST' ]]; then
+		echo -e "> Strictly Syncing JARs from your localmachine to $TEST"
+		rsync -rhP --delete-before tmp-lib/*.jar winterwell@$TEST:/home/winterwell/lg.good-loop.com/lib/
+	fi
 	if [[ $TYPEOFPUSHOUT = 'PRODUCTION' ]]; then
+		echo -e "> Strictly Syncing JARs from YOUR localmachine to $PRODUCTIONPUBLISHER"
+		rsync -rhP --delete-before tmp-lib/*.jar winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/lib/
 		scp cluster-sync.sh winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
 		echo -e "> Sending list of targets to $PRODUCTIONPUBLISHER..."
 		scp /tmp/target.list.txt winterwell@$PRODUCTIONPUBLISHER:/tmp/
