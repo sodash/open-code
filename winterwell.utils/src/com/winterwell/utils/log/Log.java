@@ -18,14 +18,16 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.ArgsParser;
-import com.winterwell.utils.reporting.LogFileTest;
 
 /**
  * Yet another logging system. We use Android LogCat style commands, e.g.
  * <code>Log.e(tag, message)</code> to report an error.
  * <p>
+ * Why?<br>
  * Simpler than Log4J, but without features such as "crashes when it fails to
  * find it's config file" or "classpath settings can cause versions to conflict and kill your JVM".
+ * It's not that this is better than log4j / slf4j / java logging / etc., it's that it's small, simple and
+ * never breaks.
  *
  * @testedby {@link LogFileTest}
  * @author daniel

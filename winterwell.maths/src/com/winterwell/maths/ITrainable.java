@@ -100,8 +100,8 @@ public interface ITrainable<DataType> {
 		/**
 		 * Unsupervised training with larger batches.
 		 * 
-		 * @param x
-		 *            example dats to learn from
+		 * @param data
+		 *            example data to learn from
 		 */
 		default void train(Iterable<? extends DataType> data) {
 			for (DataType x : data) {
