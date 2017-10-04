@@ -166,6 +166,9 @@ function backend_publish {
 	parallel-ssh -h /tmp/target.list.txt --user=winterwell 'sudo service lg restart'
 	echo ""
 	echo -e "backend(s) have been updated for..."
+	if [[ $TYPEOFPUSHOUT = 'PRODUCTION' ]]; then
+		echo -e "$PRODUCTIONPUBLISHER and..."
+	fi
 	cat /tmp/target.list.txt
 	echo ""
 }
