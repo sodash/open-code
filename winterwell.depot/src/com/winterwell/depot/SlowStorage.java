@@ -4,7 +4,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 

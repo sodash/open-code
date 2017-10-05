@@ -1,17 +1,13 @@
 package com.winterwell.web.app;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jetty.util.ajax.JSON;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
-import com.winterwell.depot.IInit;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.IESRouter;
 import com.winterwell.es.client.DeleteRequestBuilder;
@@ -19,8 +15,6 @@ import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
-import com.winterwell.es.client.UpdateRequestBuilder;
-import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;

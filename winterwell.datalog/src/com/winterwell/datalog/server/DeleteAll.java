@@ -7,7 +7,6 @@ import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.ConfigBuilder;
 
 public class DeleteAll {

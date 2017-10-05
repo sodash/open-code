@@ -1,13 +1,9 @@
 package com.winterwell.youagain.client;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
@@ -30,11 +26,7 @@ import com.winterwell.web.ajax.AjaxMsg;
 import com.winterwell.web.ajax.AjaxMsg.KNoteType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
-import com.winterwell.web.fields.ListField;
-import com.winterwell.web.fields.SField;
 import com.winterwell.web.fields.XIdField;
-
-import lgpl.haustein.Base64Encoder;
 
 public class YouAgainClient {
 

@@ -1,7 +1,6 @@
 package com.winterwell.datalog.server;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +9,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+
 import com.winterwell.datalog.DataLogSecurity;
 import com.winterwell.datalog.ESStorage;
 import com.winterwell.es.client.ESHttpClient;
@@ -22,12 +22,10 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
-import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
-import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;

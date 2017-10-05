@@ -1,6 +1,7 @@
 package com.winterwell.utils.threads;
 
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.time.Dt;
 
 /**
  * Thrown if {@link Lock#getLock(IHasId, Dt)} times-out without getting the lock.

@@ -1,8 +1,6 @@
 package com.winterwell.utils.log;
 
-import java.io.PrintWriter;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.logging.Level;
 
 import com.winterwell.utils.Printer;

@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -46,7 +44,6 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Pair2;
-import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;

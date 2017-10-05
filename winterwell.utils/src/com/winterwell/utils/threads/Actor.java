@@ -2,7 +2,6 @@ package com.winterwell.utils.threads;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -10,7 +9,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.threads.Actor.Packet;
 
 /**
  * A simple pure-Java Actor implementation. Maintains a queue of messages.

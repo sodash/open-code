@@ -1,9 +1,7 @@
 package com.winterwell.utils.threads;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import com.winterwell.utils.threads.Actor.Packet;
 

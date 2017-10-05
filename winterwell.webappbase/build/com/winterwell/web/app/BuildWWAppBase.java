@@ -4,17 +4,13 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
-
 import com.winterwell.bob.BuildTask;
 import com.winterwell.es.BuildESJavaClient;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.youagain.client.BuildYouAgainJavaClient;
 
 import jobs.BuildBob;
-import jobs.BuildDataLog;
 import jobs.BuildFlexiGson;
-import jobs.BuildMaths;
 import jobs.BuildUtils;
 import jobs.BuildWeb;
 import jobs.BuildWinterwellProject;

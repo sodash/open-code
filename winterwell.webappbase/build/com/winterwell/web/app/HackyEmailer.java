@@ -2,16 +2,9 @@ package com.winterwell.web.app;
 
 import java.io.Closeable;
 import java.io.File;
-import java.util.Date;
 import java.util.Properties;
 
-import javax.mail.internet.InternetAddress;
-
-import com.sun.mail.imap.IMAPFolder;
-import com.winterwell.utils.Dep;
-import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.ConfigException;

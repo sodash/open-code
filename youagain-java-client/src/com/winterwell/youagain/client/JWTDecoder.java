@@ -1,32 +1,17 @@
 package com.winterwell.youagain.client;
 
-import java.io.File;
-import java.security.Key;
 import java.security.KeyFactory;
-import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.KeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Base64.Decoder;
-import java.util.Base64.Encoder;
 
-import org.jose4j.jwk.RsaJsonWebKey;
-import org.jose4j.jwk.RsaJwkGenerator;
-import org.jose4j.jws.AlgorithmIdentifiers;
-import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
-import org.jose4j.lang.JoseException;
 
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.web.XStreamUtils;
-import com.winterwell.web.data.XId;
 
 /**
  * This class will wrap low-level JWT stuff, and present it for YouAgain.

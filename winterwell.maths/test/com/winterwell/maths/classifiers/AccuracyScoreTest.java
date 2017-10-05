@@ -1,13 +1,10 @@
 package com.winterwell.maths.classifiers;
 
-import static org.junit.Assert.*;
-
 import java.util.Map;
 
 import org.junit.Test;
 
 import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.containers.Containers;
 
 public class AccuracyScoreTest {
 
