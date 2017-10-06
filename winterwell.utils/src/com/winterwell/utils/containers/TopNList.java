@@ -56,7 +56,7 @@ public class TopNList<X> extends AbstractList<X>
 	 * @param comp Warning: This assumes the comparator provides a total-ordering.
 	 */
 	public TopNList(int n, Comparator<X> comp) {
-		assert n > 0;
+		assert n > 0 : "cannot list the top 0";
 		this.comp = comp;
 		objects = new Object[n];
 	}
