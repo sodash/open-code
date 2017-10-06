@@ -2,6 +2,7 @@ package com.winterwell.datalog.server;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.app.AppUtils;
@@ -128,6 +130,20 @@ public class LgServlet {
 			}
 		}
 		
+		// HACK remove Hetzner from the ip param 
+		// TODO make this a config setting?? Or even better, the servers report their IP
+		Object ip = params.get("ip");
+		if (ip instanceof String) ip = ((String) ip).split(",\\s*");
+		List<Object> ips = Containers.list(ip);
+		if (ips.contains("5.9.23.51")) {
+			ips = Containers.filter(ips, a -> ! "5.9.23.51".equals(a));
+			if (ips.size() == 1) {
+				params.put("ip", ips.get(0));
+			} else {
+				params.put("ip", ips);
+			}
+		}
+		
 		// screen out our IPs?
 		if ( ! accept(dataspace, tag, params)) {
 			return false;
@@ -167,10 +183,14 @@ public class LgServlet {
 	private static boolean accept(String dataspace, String tag, Map params) {
 		KServerType stype = AppUtils.getServerType(null);
 		// only screen our IPs out of production
-		if (stype != KServerType.PRODUCTION) return true;
+		if (stype != KServerType.PRODUCTION) 
+		{
+			return true;
+		}
 		if ( ! "gl".equals(dataspace)) return true;
-		String ip = (String) params.get("ip");
-		if (OUR_IPS.contains(ip)) {
+		Object ip = params.get("ip");
+		List<String> ips = Containers.list(ip);		
+		if ( ! Collections.disjoint(OUR_IPS, ips)) {
 			Log.d("lg", "skip ip "+ip+" event: "+tag+params);
 			return false;
 		}

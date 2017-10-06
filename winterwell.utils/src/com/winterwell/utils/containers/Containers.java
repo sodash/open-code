@@ -520,7 +520,7 @@ public final class Containers  {
 	public static <X> List<X> asList(final Object array) {
 		if (array instanceof List) return (List) array;
 		if ( ! array.getClass().isArray())
-			throw new IllegalArgumentException("Backing object is not an array");
+			throw new IllegalArgumentException("Backing object is not an array: "+array.getClass());
 		// the primitive types
 		if (array instanceof int[]) {
 			return (List) asList((int[])array);
@@ -1883,6 +1883,29 @@ public final class Containers  {
 		X obj = it.next();
 		if (it.hasNext()) throw new NotUniqueException("Too many elements: "+list);
 		return obj;
+	}
+
+
+	/**
+	 * For handling data that might be a single item, but might be a list
+	 * (e.g. ES json results, or web forms)
+	 * @param itemOrListOrArray An item, or a list, or an array, or a Collection. Can be null (returns empty-list).
+	 * @return definitely a list, never null. Do not modify.
+	 */
+	public static <X> List<X> list(Object itemOrListOrArray) {
+		if (itemOrListOrArray == null) {
+			return Collections.EMPTY_LIST; 
+		}
+		if (itemOrListOrArray instanceof List) {
+			return Collections.unmodifiableList((List)itemOrListOrArray);
+		}		
+		if (itemOrListOrArray.getClass().isArray()) {
+			return Collections.unmodifiableList(asList(itemOrListOrArray));
+		}
+		if (itemOrListOrArray instanceof Collection) {
+			return Collections.unmodifiableList(getList((Collection)itemOrListOrArray));
+		}		
+		return (List<X>) Collections.singletonList(itemOrListOrArray);
 	}
 
 
