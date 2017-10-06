@@ -1,6 +1,7 @@
 package com.winterwell.datalog.server;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
@@ -39,6 +41,7 @@ import com.winterwell.web.fields.TimeField;
 public class DataServlet implements IServlet {
 
 	static final SField DATASPACE = new SField("dataspace");
+	private static final String LOGTAG = "DataServlet";
 
 	@Override
 	public void process(WebRequest state) throws IOException {						
@@ -59,6 +62,10 @@ public class DataServlet implements IServlet {
 		List<String> breakdown = state.get(
 				new ListField<String>("breakdown").setSplitPattern(",")
 				);
+		if (breakdown==null) {
+			Log.w(LOGTAG, "You want data but no breakdown?! "+state);
+			breakdown = new ArrayList();
+		}
 
 		// security: on the dataspace, and optionally on the breakdown
 		DataLogSecurity.check(state, dataspace, breakdown);
@@ -99,6 +106,9 @@ public class DataServlet implements IServlet {
 		}
 				
 		for(final String bd : breakdown) {
+			if (bd==null) {
+				Log.w(LOGTAG, "null breakdown?! in "+breakdown+" from "+state);
+			}
 			// tag & time
 			// e.g. tag/time {count:avg}
 			// TODO proper recursive handling

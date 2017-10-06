@@ -16,6 +16,13 @@ public class HttpServletWrapper extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	Supplier<IServlet> factory;
+
+	private boolean debug;
+	
+	public HttpServletWrapper setDebug(boolean debug) {
+		this.debug = debug;
+		return this;
+	}
 	
 	public HttpServletWrapper(Supplier<IServlet> factory) {
 		this.factory = factory;
@@ -24,8 +31,12 @@ public class HttpServletWrapper extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			WebRequest state = new WebRequest(req, resp);
+			WebRequest state = new WebRequest(req, resp);			
 			IServlet servlet = factory.get();
+			// log everything?
+			if (debug) {
+				Log.d(servlet.getClass().getSimpleName(), state);
+			}
 			servlet.process(state);
 		} catch (Throwable ex) {
 			WebEx wex = WebUtils2.runtime(ex);

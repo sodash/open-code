@@ -58,8 +58,8 @@ public class DataLogServer {
 		ManifestServlet.addConfigBuilder(cb);
 		
 		logFile = new LogFile(DataLogServer.settings.logFile)
-				// keep 8 weeks of 1 week log files ??revise this??
-				.setLogRotation(TUnit.DAY.dt, 10);
+				// keep 6 weeks of log files so we can do 1 month reports
+				.setLogRotation(TUnit.DAY.dt, 6*7);
 
 		// app=datalog for login
 		YouAgainClient yac = new YouAgainClient("datalog");

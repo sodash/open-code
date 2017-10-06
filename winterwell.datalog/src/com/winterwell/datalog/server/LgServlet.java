@@ -1,6 +1,8 @@
 package com.winterwell.datalog.server;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,8 +15,10 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.BrowserType;
 import com.winterwell.web.app.FileServlet;
+import com.winterwell.web.app.KServerType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.fields.BoolField;
@@ -79,7 +83,7 @@ public class LgServlet {
 		}
 		
 		boolean stdTrackerParams = state.get(new BoolField("track"), true);
-		doLog(state, ds, tag, via, params, stdTrackerParams);
+		boolean logged = doLog(state, ds, tag, via, params, stdTrackerParams);
 		
 		// Reply
 		// .gif?
@@ -90,10 +94,10 @@ public class LgServlet {
 		if (DataLogServer.settings.CORS) {
 			WebUtils2.CORS(state, false);
 		}
-		WebUtils2.sendText("OK", resp);
+		WebUtils2.sendText(logged? "OK" : "not logged", resp);
 	}
 
-	static void doLog(WebRequest state, String dataspace, String tag, String via, Map params, boolean stdTrackerParams) {
+	static boolean doLog(WebRequest state, String dataspace, String tag, String via, Map params, boolean stdTrackerParams) {
 		assert dataspace != null;
 		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		// special vars
@@ -123,6 +127,12 @@ public class LgServlet {
 				params.putIfAbsent("host", WebUtils2.getHost(cref)); // matches publisher in adverts
 			}
 		}
+		
+		// screen out our IPs?
+		if ( ! accept(dataspace, tag, params)) {
+			return false;
+		}
+		
 		// write to log file
 		doLogToFile(dataspace, tag, params, trckId, via, state);
 				
@@ -140,8 +150,45 @@ public class LgServlet {
 		DataLogEvent event = new DataLogEvent(dataspace, 1, tag, params);		
 		DataLog.count(event);
 //		}
+		return true;
 	}
 
+	
+	/**
+	 * HACK screen off our IPs and test sites
+	 * 
+	 * TODO instead do this by User, and have a no-log parameter in the advert
+	 * 
+	 * @param dataspace2
+	 * @param tag2
+	 * @param params2
+	 * @return
+	 */
+	private static boolean accept(String dataspace, String tag, Map params) {
+		KServerType stype = AppUtils.getServerType(null);
+		// only screen our IPs out of production
+		if (stype != KServerType.PRODUCTION) return true;
+		if ( ! "gl".equals(dataspace)) return true;
+		String ip = (String) params.get("ip");
+		if (OUR_IPS.contains(ip)) {
+			Log.d("lg", "skip ip "+ip+" event: "+tag+params);
+			return false;
+		}
+		if ("good-loop.com".equals(params.get("host"))) {
+			String url = (String) params.get("url");
+			// do track the marketing site, esp live demo, but otherwise no GL sites 
+			if (url!=null) {
+				if (url.contains("live-demo")) return true;
+				if (url.contains("//www.good-loop.com")) return true;
+				if (url.contains("//good-loop.com")) return true;
+			}
+			Log.d("lg", "skip url "+url+" event: "+tag+params);
+			return false;
+		}
+		return true;
+	}
+
+	static List<String> OUR_IPS = Arrays.asList("62.30.12.102", "62.6.190.196", "82.37.169.72");
 	
 	private static void doLogToFile(String dataspace, String tag, Map params, String trckId, String via, WebRequest state) {
 		String msg = params == null? "" : Printer.toString(params, ", ", ": ");
