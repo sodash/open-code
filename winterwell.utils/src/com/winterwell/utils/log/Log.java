@@ -197,7 +197,6 @@ public class Log {
 		Level minLevel = getMinLevel(tag);
 		if (minLevel.intValue() > error.intValue())
 			return;
-
 		// null tag? Put in the calling class.method
 		if (tag == null) {
 			StackTraceElement ste = ReflectionUtils.getCaller(Log.class
@@ -321,7 +320,7 @@ public class Log {
 	 * @param t
 	 */
 	public static void st(String tag, Throwable t){
-		report(tag + ".stacktracelog", stackToString(t), WARNING, t);
+		report(tag + ".stacktracelog", Printer.toString(t, true), WARNING, t);
 	}
 
 

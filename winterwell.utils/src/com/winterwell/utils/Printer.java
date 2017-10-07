@@ -168,8 +168,8 @@ public class Printer {
 					, ": ", "{}");
 			return;
 		}
-		if (x instanceof Exception) {
-			sb.append(toString((Exception) x, true));
+		if (x instanceof Throwable) {
+			sb.append(toString((Throwable) x, true));
 			return;
 		}
 		if (x instanceof Node) {
@@ -437,7 +437,7 @@ public class Printer {
 	 * Stacktrace lines contain the message, so this isn't as useful as I'd
 	 * hoped - JH
 	 */
-	static int MAX_ERROR_MSG_LENGTH = 200;
+	static int MAX_ERROR_MSG_LENGTH = 240;
 
 	/**
 	 * 
