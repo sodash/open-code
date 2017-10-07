@@ -2,6 +2,8 @@ package com.winterwell.utils.log;
 
 import java.io.File;
 
+import javax.management.RuntimeErrorException;
+
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
@@ -21,6 +23,18 @@ public class LogFileTest extends TestCase {
 		Printer.out(log);
 		Log.report("Hello 3");
 		log = FileUtils.read(f);
+		Printer.out(log);
+		lf.close();
+	}
+
+	public void testLogError() {
+		File f = new File("test-output/test-error.txt");
+		FileUtils.delete(f);
+		LogFile lf = new LogFile(f);
+		Exception es = new Exception("base");
+		RuntimeException ex2 = new RuntimeException(es);
+		Log.e("test", ex2);		
+		String log = FileUtils.read(f);
 		Printer.out(log);
 		lf.close();
 	}
