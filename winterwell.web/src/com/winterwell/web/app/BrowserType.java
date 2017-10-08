@@ -134,6 +134,7 @@ public class BrowserType {
 			make = MAKE_IE;
 			version = Double.valueOf(m.group(1));
 		}
+		// TODO safari, edge, firefox, chrome, opera
 		return make;
 	}
 	

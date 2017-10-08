@@ -930,7 +930,11 @@ public final class Containers  {
 	 * @return list without any nulls
 	 */
 	public static <X> List<X> filterNulls(Iterable<X> list) {
-		return removeNulls(list);
+		List<X> list2 = new ArrayList();
+		for (X x : list) {
+			if (x!=null) list2.add(x);
+		}
+		return list2;
 	}
 
 	/**
@@ -1536,16 +1540,13 @@ public final class Containers  {
 	}
 	
 	/**
+	 * @deprecated replaced by {@link #filterNulls(Iterable)}
 	 * @param list
 	 * @return list without any null items
 	 */
 	public static <X> List<X> removeNulls(Iterable<X> list) {
 //		return filter(IFilter<X>.NOT_NULL, list);
-		List<X> list2 = new ArrayList();
-		for (X x : list) {
-			if (x!=null) list2.add(x);
-		}
-		return list2;
+		return filterNulls(list);
 	}
 
 	/**
