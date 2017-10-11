@@ -127,7 +127,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	protected JThing<T> getThingFromDB(WebRequest state) {		
 		ESPath path = getPath(state);
-		T obj = AppUtils.get(path, type);		
+		T obj = AppUtils.get(path, type);
 		if (obj==null) {
 			// Not found :(
 			// was version=draft?

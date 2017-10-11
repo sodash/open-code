@@ -98,7 +98,7 @@ public class ESStorage implements IDataLogStorage {
 	public StatReq<IDataStream> getData(String tag, Time start, Time end, KInterpolate fn, Dt bucketSize) {
 		DataLogEvent spec = eventspec4tag(tag);
 		SearchResponse sr = getData2(spec, start, end, true);
-		List<Map> hits = sr.getSearchResults();
+		List<Map<String, Object>> hits = sr.getSearchResults();
 		ListDataStream list = new ListDataStream(1);
 		for (Map hit : hits) {
 			Object t = hit.get("time");
