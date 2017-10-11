@@ -97,6 +97,8 @@ public class PublishProjectTask extends BuildTask {
 		for (BuildTask buildTask : deps) {
 			if (buildTask instanceof BuildWinterwellProject) {
 				((BuildWinterwellProject) buildTask).setCompile(compile);
+				// don't scp??
+				((BuildWinterwellProject) buildTask).setScpToWW(false);
 			}
 		}
 		return deps;
