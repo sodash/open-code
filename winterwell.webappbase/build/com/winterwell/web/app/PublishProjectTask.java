@@ -19,6 +19,7 @@ import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
+import com.winterwell.bob.tasks.MakeVersionPropertiesTask;
 import com.winterwell.bob.tasks.ProcessTask;
 import com.winterwell.es.BuildESJavaClient;
 import com.winterwell.utils.Environment;
@@ -122,32 +123,25 @@ public class PublishProjectTask extends BuildTask {
 		// What's going on?
 		Environment.get().push(BobSettings.VERBOSE, true);		
 		
-		{	// make version.properties		
-			Log.report("publish","Uploading .properties...", Level.INFO);
-			File localConfigDir = new File(localWebAppDir, "config");
-			File creolePropertiesForSite = new File(localConfigDir, "version.properties");
-			Properties props = new Properties();
-			// fill in
-			ManifestServlet.setVersionProperties(props);
-			// dep info??
-			for(BuildTask bt : getDependencies()) {
-				try {
-					if (bt instanceof BuildWinterwellProject) {
-						File jar = ((BuildWinterwellProject) bt).getJar();
-						Map<String, Object> manifest = JarTask.getManifest(jar);
-						Map<String, Object> namedManifest = Containers.applyToKeys(manifest, k -> jar.getName()+"."+k);
-						props.putAll(namedManifest);
-					}
-				} catch(Exception ex) {
-					Log.e("publish", ex);
-				}
-			}
-			// save
-			BufferedWriter w = FileUtils.getWriter(creolePropertiesForSite);
-			props.store(w, null);
-			FileUtils.close(w);
-		}
-
+		// make version.properties					
+		MakeVersionPropertiesTask mvpt = new MakeVersionPropertiesTask().setAppDir(localWebAppDir);
+		Properties props = new Properties();
+		// dep info??
+//		for(BuildTask bt : getDependencies()) {
+//			try {
+//				if (bt instanceof BuildWinterwellProject) {
+//					File jar = ((BuildWinterwellProject) bt).getJar();
+//					Map<String, Object> manifest = JarTask.getManifest(jar);
+//					Map<String, Object> namedManifest = Containers.applyToKeys(manifest, k -> jar.getName()+"."+k);
+//					props.putAll(namedManifest);
+//				}
+//			} catch(Exception ex) {
+//				Log.e("publish", ex);
+//			}
+//		}
+		mvpt.setProperties(props);
+		mvpt.run();
+			
 		// Find jars and move them into tmp-lib
 		{
 			EclipseClasspath ec = new EclipseClasspath(localWebAppDir);

@@ -96,19 +96,20 @@ public class BuildWinterwellProject extends BuildTask {
 		if (mainClass!=null) {
 			jar.setManifestProperty(JarTask.MANIFEST_MAIN_CLASS, mainClass);
 		}
-		// Version = date Is this good or bogus?
-		Time vt = new Time();
+		// Version
+		String gitiv = "";
 		try {
-			jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
-					(Utils.isBlank(version)? "" : "version: "+version+" ")
-					+"git: "+GitTask.getLastCommitId(srcDir.getParentFile())
-					+" by: "+WebUtils2.hostname()					
-					);
-			jar.setManifestProperty("Implementation-Vendor", "Winterwell");
+			gitiv = " git: "+GitTask.getLastCommitId(srcDir.getParentFile());
 		} catch(Throwable ex) {
-			jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, vt.ddMMyyyy());
 			Log.w(LOGTAG, ex);
 		}
+		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
+				"version: "+(Utils.isBlank(version)? new Time().ddMMyyyy() : version)
+				+gitiv
+				+" by: "+WebUtils2.hostname()					
+				);
+		// vendor
+		jar.setManifestProperty("Implementation-Vendor", "Winterwell");	
 //		// Git details? No this upsets IntelliJ
 		if (incGitInManifest) {
 			String branch = GitTask.getGitBranch(srcDir.getParentFile());

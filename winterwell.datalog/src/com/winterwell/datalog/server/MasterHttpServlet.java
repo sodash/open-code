@@ -102,10 +102,10 @@ public class MasterHttpServlet extends HttpServlet {
 			WebEx wex = WebUtils2.runtime(ex);
 			if (wex.code >= 500) {
 				// log as severe
-				Log.e(Utils.or(wex.getCause(), wex).getClass().getSimpleName(), wex);
+				Log.e(ex.getClass().getSimpleName(), ex);
 			} else {
 				// log quieter
-				Log.w(wex.getClass().getSimpleName(), wex);
+				Log.w(ex.getClass().getSimpleName(), ex);
 			}
 			WebUtils2.sendError(wex.code, wex.getMessage(), resp);
 		} finally {

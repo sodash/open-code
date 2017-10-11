@@ -45,10 +45,10 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 	private static final long serialVersionUID = 1L;
 
 
-	public static final String PROPERTY_GIT_BRANCH = "branch";
-	public static final String PROPERTY_GIT_COMMIT_ID = "lastCommitId";
-	public static final String PROPERTY_GIT_COMMIT_INFO = "lastCommitInfo";
-	public static final String PROPERTY_PUBLISH_DATE = "publishDate";
+//	public static final String PROPERTY_GIT_BRANCH = "branch";
+//	public static final String PROPERTY_GIT_COMMIT_ID = "lastCommitId";
+//	public static final String PROPERTY_GIT_COMMIT_INFO = "lastCommitInfo";
+//	public static final String PROPERTY_PUBLISH_DATE = "publishDate";
 
 
 	private static volatile boolean initFlag;
@@ -71,52 +71,52 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		}		
 	}
 	
-	/**
-	 * Create version.properties
-	 */
-	public static void setVersionProperties(Properties props) {
-		try {
-			// set the publish time
-			props.setProperty(PROPERTY_PUBLISH_DATE, ""+System.currentTimeMillis());
-			// TIMESTAMP code to avoid caching issues: epoch-seconds, mod 10000 to shorten it
-			String timestampCode = "" + ((System.currentTimeMillis()/1000) % 10000);
-			props.setProperty("timecode", ""+timestampCode);
-			
-			// set info on the git branch
-			String branch = GitTask.getGitBranch(null);
-			props.setProperty(PROPERTY_GIT_BRANCH, branch);
-			// ...and commit IDs
-			for(String repo : new String[]{"open-code"}) {
-				File repodir = new File(FileUtils.getWinterwellDir(), repo);
-				try {
-					Map<String, Object> info = GitTask.getLastCommitInfo(repodir);
-					props.setProperty(PROPERTY_GIT_COMMIT_ID+"."+repo, (String)info.get("hash"));
-					props.setProperty(PROPERTY_GIT_COMMIT_INFO+"."+repo, StrUtils.compactWhitespace(XStreamUtils.serialiseToXml(info)));
-	//				TODO props.setProperty(Creole.PROPERTY_GIT_BRANCH+"."+repo, (String)info.get("branch"));
-				} catch(Exception ex) {
-					// oh well;
-					Log.d("git.info", ex);
-				}
-				try {
-					String rbranch = GitTask.getGitBranch(repodir);
-					props.setProperty(PROPERTY_GIT_BRANCH+"."+repo, rbranch);
-				} catch(Throwable ex) {
-					// oh well
-					Log.d("git.info", ex);
-				}
-			}
-	
-			// Who did the push?
-			try {
-				props.setProperty("origin", WebUtils2.hostname());
-			} catch(Exception ex) {
-				// oh well
-			}
-
-		} catch (Throwable ex) {
-			Log.e("debug", ex);
-		}
-	}
+//	/**
+//	 * Create version.properties
+//	 */
+//	public static void setVersionProperties(Properties props) {
+//		try {
+//			// set the publish time
+//			props.setProperty(PROPERTY_PUBLISH_DATE, ""+System.currentTimeMillis());
+//			// TIMESTAMP code to avoid caching issues: epoch-seconds, mod 10000 to shorten it
+//			String timestampCode = "" + ((System.currentTimeMillis()/1000) % 10000);
+//			props.setProperty("timecode", ""+timestampCode);
+//			
+//			// set info on the git branch
+//			String branch = GitTask.getGitBranch(null);
+//			props.setProperty(PROPERTY_GIT_BRANCH, branch);
+//			// ...and commit IDs
+//			for(String repo : new String[]{"open-code"}) {
+//				File repodir = new File(FileUtils.getWinterwellDir(), repo);
+//				try {
+//					Map<String, Object> info = GitTask.getLastCommitInfo(repodir);
+//					props.setProperty(PROPERTY_GIT_COMMIT_ID+"."+repo, (String)info.get("hash"));
+//					props.setProperty(PROPERTY_GIT_COMMIT_INFO+"."+repo, StrUtils.compactWhitespace(XStreamUtils.serialiseToXml(info)));
+//	//				TODO props.setProperty(Creole.PROPERTY_GIT_BRANCH+"."+repo, (String)info.get("branch"));
+//				} catch(Throwable ex) {
+//					// oh well;
+//					Log.d("git.info", ex);
+//				}
+//				try {
+//					String rbranch = GitTask.getGitBranch(repodir);
+//					props.setProperty(PROPERTY_GIT_BRANCH+"."+repo, rbranch);
+//				} catch(Throwable ex) {
+//					// oh well
+//					Log.d("git.info", ex);
+//				}
+//			}
+//	
+//			// Who did the push?
+//			try {
+//				props.setProperty("origin", WebUtils2.hostname());
+//			} catch(Exception ex) {
+//				// oh well
+//			}
+//
+//		} catch (Throwable ex) {
+//			Log.e("debug", ex);
+//		}
+//	}
 
 	static final Collection<File> configFiles = new ArraySet<>();
 	
@@ -208,7 +208,9 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			} catch(Exception ex) {
 				cargo.put("error", ex);
 			}
-		}		
+		} else {
+			cargo.put("version", "no file at "+creolePropertiesForSite);
+		}
 		
 		Map<String,Object> manifests = getJarManifests();
 		cargo.put(("jarManifests"), manifests);

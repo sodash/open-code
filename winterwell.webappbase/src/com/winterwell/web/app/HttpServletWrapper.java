@@ -41,9 +41,9 @@ public class HttpServletWrapper extends HttpServlet {
 		} catch (Throwable ex) {
 			WebEx wex = WebUtils2.runtime(ex);
 			if (wex.code >= 500) {
-				Log.e("error", ex);
+				Log.e("error."+wex.getClass().getSimpleName(), ex);
 			} else {
-				Log.i(wex.getClass().getSimpleName(), wex);
+				Log.i(wex.getClass().getSimpleName(), ex);
 			}
 			WebUtils2.sendError(wex.code, wex.getMessage(), resp);
 		} finally {

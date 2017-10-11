@@ -150,16 +150,20 @@ function backend_publish {
 	if [[ $TYPEOFPUSHOUT = 'TEST' ]]; then
 		echo -e "> Strictly Syncing JARs from your localmachine to $TEST"
 		rsync -rhP --delete-before tmp-lib/*.jar winterwell@$TEST:/home/winterwell/lg.good-loop.com/lib/
+		echo -e "> Strictly Syncing config from YOUR localmachine to $TEST"
+		rsync -rhP --delete-before config/*.properties winterwell@$TEST:/home/winterwell/lg.good-loop.com/config/
 	fi
 	if [[ $TYPEOFPUSHOUT = 'PRODUCTION' ]]; then
 		echo -e "> Strictly Syncing JARs from YOUR localmachine to $PRODUCTIONPUBLISHER"
 		rsync -rhP --delete-before tmp-lib/*.jar winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/lib/
+		echo -e "> Strictly Syncing config from YOUR localmachine to $PRODUCTIONPUBLISHER"
+		rsync -rhP --delete-before config/*.properties winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/config/
 		scp cluster-sync.sh winterwell@$PRODUCTIONPUBLISHER:/home/winterwell/lg.good-loop.com/
 		echo -e "> Sending list of targets to $PRODUCTIONPUBLISHER..."
 		scp /tmp/target.list.txt winterwell@$PRODUCTIONPUBLISHER:/tmp/
 		echo -e "> Telling $PRODUCTIONPUBLISHER to update the backend..."
 		ssh winterwell@$PRODUCTIONPUBLISHER 'bash /home/winterwell/lg.good-loop.com/cluster-sync.sh backend'
-		ssh winterwell@$PRODUCTIONPUBLISHER 'sudo service lg restart'
+		ssh winterwell@$PRODUCTIONPUBLISHER 'sudo service lg restart' # @DA Is this restart not duplicated below?? ^Dan W
 	fi
 	echo ""
 	echo -e "> Restarting the lg process on target(s)"

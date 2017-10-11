@@ -2,6 +2,7 @@ package com.winterwell.bob.tasks;
 
 import java.io.File;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Proc;
@@ -91,7 +92,7 @@ public class GitTask extends ProcessTask {
 	 */
 	public static Map<String,Object> getLastCommitInfo(File dir) throws IllegalArgumentException {
 		String SEP=">   <";
-		String command = "git log -1 --format=\"%H"+SEP+"%an"+SEP+"%aD"+SEP+"%s\"";
+		String command = "git log -1 --format=\"%H"+SEP+"%an"+SEP+"%aD"+SEP+"%s"+SEP+"%D\"";
 		
 		Proc p;
 		if (dir==null) {
@@ -109,13 +110,30 @@ public class GitTask extends ProcessTask {
 		if (Utils.isBlank(out)) {
 			throw new IllegalArgumentException(dir+" is not a git directory");
 		}
-		String[] bits = out.split(SEP);	
+		String[] bits = out.split(SEP);
+		String branch = bits[4].trim();
+		// simplify the branch info
+		String[] bbits = branch.split(", ");
+		for (String bbit : bbits) {
+			if (bbit.startsWith("origin/")) {
+				String bbit2 = bbit.substring(7);
+				if (bbit2.startsWith("HEAD")) continue;
+				branch = bbit2;
+				break;
+			}
+			if (bbit.contains("->")) {
+				String bbit2 = bbit.split("->")[1].trim();
+				if (bbit2.startsWith("HEAD")) continue;
+				branch = bbit2;
+			}
+		}
+		
 		return new ArrayMap(
 			"hash", bits[0],
 			"author", bits[1],
 			"time", new Time(bits[2]),
 			"subject", bits[3].trim(),
-			"branch", ""
+			"branch", branch
 		);		
 	}
 	

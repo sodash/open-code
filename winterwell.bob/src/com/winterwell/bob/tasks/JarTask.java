@@ -36,6 +36,13 @@ import com.winterwell.utils.time.Time;
  */
 public class JarTask extends BuildTask {
 
+	/**
+	 * NB: to see manifest info on the command line, use
+	 * unzip -p myjar.jar META-INF/MANIFEST.MF
+	 * 
+	 * @param jar
+	 * @return
+	 */
 	public static Map<String, Object> getManifest(File jar) {		
 		try {
 			JarFile jf = new JarFile(jar);
