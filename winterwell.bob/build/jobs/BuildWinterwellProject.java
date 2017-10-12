@@ -44,6 +44,8 @@ public class BuildWinterwellProject extends BuildTask {
 	private boolean compile;
 
 	private boolean scpToWW = true;
+
+	protected String projectName;
 	
 	public void setScpToWW(boolean scpToWW) {
 		this.scpToWW = scpToWW;
@@ -73,14 +75,20 @@ public class BuildWinterwellProject extends BuildTask {
 			new File(FileUtils.getWinterwellDir(), "open-code/"+projectName),
 			new File(FileUtils.getWinterwellDir(), "code/"+projectName),
 			new File(FileUtils.getWinterwellDir(), projectName)
-		));
+		), projectName);
 	}
 	
-	public BuildWinterwellProject(File projectDir) {
+	public BuildWinterwellProject(File projectDir, String projectName) {
 		assert projectDir != null;
 		this.projectDir = projectDir;
 		assert projectDir.isDirectory() : projectDir+" "+this;
-		jarFile = new File(projectDir, projectDir.getName()+ ".jar");
+		if (projectName==null) projectName = projectDir.getName();
+		this.projectName = projectName;
+		jarFile = new File(projectDir, projectName+ ".jar");
+	}
+
+	public BuildWinterwellProject(File projectDir) {
+		this(projectDir, null);
 	}
 
 	@Override
