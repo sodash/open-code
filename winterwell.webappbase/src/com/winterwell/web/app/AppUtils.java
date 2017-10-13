@@ -260,8 +260,8 @@ public class AppUtils {
 		// cache the answer
 		if (_serverType==null) {
 			_serverType = getServerType2();
+			Log.d("AppUtils", "Using serverType "+_serverType);
 		}
-		Log.d("AppUtils", "Using serverType "+_serverType);
 		return _serverType;
 	}		
 	
