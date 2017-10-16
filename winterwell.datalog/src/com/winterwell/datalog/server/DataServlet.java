@@ -20,6 +20,7 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
@@ -156,8 +157,13 @@ public class DataServlet implements IServlet {
 		
 		esc.debug = true;
 		SearchResponse sr = search.get();
+		sr.check();
 		
 		Map aggregations = sr.getAggregations();
+		if (aggregations==null) {
+			Log.d(LOGTAG, "No aggregations?! "+state+" "+sr);
+			aggregations = new ArrayMap();
+		}
 		// also send eg data
 		aggregations.put("examples", sr.getHits());
 		JsonResponse jr = new JsonResponse(state, aggregations);
