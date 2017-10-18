@@ -17,7 +17,6 @@ import junit.framework.TestCase;
 
 public class FileUtilsTest extends TestCase {
 
-
 	public void testGetWWDir() throws IOException {
 		File wwd = FileUtils.getWinterwellDir();
 		System.out.println(wwd);
