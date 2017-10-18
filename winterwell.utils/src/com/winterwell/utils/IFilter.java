@@ -19,22 +19,19 @@ public interface IFilter<X> {
 	/**
 	 * Filter returning true if x is not null.
 	 */
-	public static final IFilter NOT_NULL = Utils.yes(true)? new NotNullFilter() : new IFilter() {
-		@Override
-		public boolean accept(Object x) {
-			return x != null;
-		}
-	};
+	public static final IFilter NOT_NULL = new NotNullFilter();
 
 	/**
 	 * Filter which returns true for everything.
 	 */
-	public static final IFilter TRUE = Utils.yes(true)? new TrueFilter() : new IFilter() {
-		@Override
-		public boolean accept(Object x) {
-			return true;
-		}
-	};
+	public static final IFilter TRUE = new TrueFilter();
+	
+
+	/**
+	 * Filter which returns false for everything.
+	 */
+	public static final IFilter FALSE = new FalseFilter();
+
 
 	/**
 	 * @param x
@@ -49,10 +46,16 @@ public interface IFilter<X> {
 }
 
 
-class TrueFilter implements IFilter {
+final class TrueFilter implements IFilter {
 	@Override
 	public boolean accept(Object x) {
 		return true;
+	}	
+}
+final class FalseFilter implements IFilter {
+	@Override
+	public boolean accept(Object x) {
+		return false;
 	}	
 }
 

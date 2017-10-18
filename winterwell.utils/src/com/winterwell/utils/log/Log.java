@@ -5,11 +5,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
 import com.winterwell.utils.Environment;
+import com.winterwell.utils.IFilter;
 import com.winterwell.utils.IFn;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
@@ -18,6 +20,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.ArgsParser;
+import com.winterwell.utils.io.ConfigBuilder;
 
 /**
  * Yet another logging system. We use Android LogCat style commands, e.g.
@@ -110,17 +113,10 @@ public class Log {
 
 		// config
 		try {
-			config = ArgsParser.getConfig(new LogConfig(), new File("config/log.properties"));
-			if (config.ignoretags!=null) {
-				for(String tag : config.ignoretags) {
-					setMinLevel(tag, OFF);
-				}
-			}
-			if (config.verbosetags!=null) {
-				for(String tag : config.verbosetags) {
-					setMinLevel(tag, VERBOSE);
-				}
-			}
+			config = new ConfigBuilder(new LogConfig())
+					.set(new File("config/log.properties"))
+					.get();
+			setConfig(config);			
 		} catch(Throwable ex) {
 			// How can we report this bad config issue? Only to std-error :(
 			System.err.println(ex);
@@ -128,9 +124,53 @@ public class Log {
 	}
 	
 	static LogConfig config;
+
+	private static IFilter<String> excludeFilter;
+
+	/**
+	 * Allows a config file change to downgrade severe reports (to stop unwanted alerts)
+	 */
+	private static IFilter<String> downgradeFilter;
 	
 	public static void setConfig(LogConfig config) {
 		Log.config = config;
+		sensitiveTags.clear();
+		if (config.ignoretags!=null) {
+			for(String tag : config.ignoretags) {
+				setMinLevel(tag, OFF);
+			}
+		}
+		if (config.verbosetags!=null) {
+			for(String tag : config.verbosetags) {
+				setMinLevel(tag, VERBOSE);
+			}
+		}
+		if (Utils.isEmpty(config.exclude)) {
+			excludeFilter = null;
+		} else {
+			excludeFilter = new IFilter<String>() {
+				@Override
+				public boolean accept(String x) {
+					for(String s : config.exclude) {
+						if (x.contains(s)) return true;
+					}
+					return false;
+				}
+			};
+		}
+		if (Utils.isEmpty(config.downgrade)) {
+			downgradeFilter = null;
+		} else {
+			downgradeFilter = new IFilter<String>() {
+				@Override
+				public boolean accept(String x) {
+					for(String s : config.downgrade) {
+						if (x.contains(s)) return true;
+					}
+					return false;
+				}
+			};
+		}
 	}
 
 	/**
@@ -222,6 +262,18 @@ public class Log {
 //			System.err.println(new IllegalArgumentException(
 //					"Log message too long: " + msgText));
 		}
+		// exclude or downgrade?
+		if (excludeFilter!=null) {
+			if (excludeFilter.accept(smsg)) {
+				return;
+			}
+		}		
+		if (downgradeFilter!=null && error.intValue() > Level.INFO.intValue()) {
+			if (downgradeFilter.accept(smsg)) {
+				error = Level.INFO;
+			}
+		}
+		// make a Report
 		Report report = new Report(tag, smsg, error, msgText, ex);
 		// Note: using an array for listeners avoids any concurrent-mod
 		// exceptions

@@ -14,7 +14,7 @@ import com.winterwell.utils.time.Time;
  * 
  * TODO maybe refactor to use IGridInfo, so not Time specific??
  * 
- * TODO support for in-progress?? 
+ * TODO support for in-progress?? cursors??
  * 
  * TODO support for adding gaps?? so we can use this to fill in streaming-probe outages??
  * 

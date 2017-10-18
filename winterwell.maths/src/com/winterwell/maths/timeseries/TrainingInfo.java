@@ -19,6 +19,7 @@ import com.winterwell.utils.web.IHasJson;
  * Training proceeds both historically (through the database, oldest first)
  * And with live stuff, as it comes in.
  * 
+ * TODO refactor to remove SoDash bits
  * @author daniel
  *
  */
