@@ -32,9 +32,16 @@ public class AMain<ConfigType> {
 	protected ConfigType config;
 
 	protected void doMain(String[] args) {
+		init(args);
+		launchJetty();
+	}
+
+	protected void init(String[] args) {
 		config = initConfig(args);
 		init(config);
-		launchJetty();
+	}
+	public void init() {
+		init(new String[0]);
 	}
 
 	protected void init(ConfigType config) {
