@@ -12,7 +12,7 @@ import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 
 /**
- * wrapper for json objects
+ * Wrapper for json objects
  * @author daniel
  *
  */

@@ -7,6 +7,7 @@ import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 /**
  * TODO can we refactor some more common code here?
@@ -17,22 +18,28 @@ import com.winterwell.utils.time.TUnit;
  */
 public class AMain<ConfigType> {
 
-	private static JettyLauncher jl;
+//	public static final Time startTime = new Time();
+	
+	protected static JettyLauncher jl;
 	
 	public static String projectName = FileUtils.getWorkingDirectory().getName();
 	
 	public static LogFile logFile = new LogFile(new File(projectName+".log"))
 									.setLogRotation(TUnit.DAY.dt, 14);
 
+	protected static boolean initFlag;
+
+	protected ConfigType config;
+
 	protected void doMain(String[] args) {
-		ConfigType config = initConfig(args);
+		config = initConfig(args);
 		init(config);
 		launchJetty();
 	}
 
 	protected void init(ConfigType config) {
-		// TODO Auto-generated method stub
-		
+		if (initFlag) return;
+		initFlag = true;		
 	}
 
 	protected ConfigType initConfig(String[] args) {
@@ -46,7 +53,6 @@ public class AMain<ConfigType> {
 		jl = new JettyLauncher(getWebRootDir(), getPort());
 		jl.setup();		
 		
-		jl.addServlet("/manifest", new HttpServletWrapper(ManifestServlet::new));
 		addJettyServlets(jl);
 				
 		Log.i("web", "...Launching Jetty web server on port "+jl.getPort());
@@ -72,10 +78,14 @@ public class AMain<ConfigType> {
 	}
 
 	/**
-	 * Override to set e.g. /* -> Master servlet
+	 * Adds /manifest
+	 *
+	 * Override (but do call super) to set e.g. /* -> Master servlet
 	 * @param jl
 	 */
 	protected void addJettyServlets(JettyLauncher jl) {
+		jl.addServlet("/manifest", new HttpServletWrapper(ManifestServlet::new));
+
 	}
 
 }

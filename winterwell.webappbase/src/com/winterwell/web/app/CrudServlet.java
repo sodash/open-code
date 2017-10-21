@@ -6,8 +6,10 @@ import java.util.Map;
 
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 
+import com.winterwell.data.AThing;
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
+import com.winterwell.depot.IInit;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.IESRouter;
 import com.winterwell.es.client.DeleteRequestBuilder;
@@ -39,6 +41,8 @@ public abstract class CrudServlet<T> implements IServlet {
 	public CrudServlet(Class<T> type) {
 		this(type, Dep.get(IESRouter.class));
 	}
+	
+	
 	
 	public CrudServlet(Class<T> type, IESRouter esRouter) {
 		this.type = type;
@@ -152,9 +156,36 @@ public abstract class CrudServlet<T> implements IServlet {
 	/**
 	 * Make a new thing. The state will often contain json info for this.
 	 * @param state
+	 * @param id Can be null ??It may be best for the front-end to normally provide IDs. 
 	 * @return
 	 */
-	protected abstract JThing<T> doNew(WebRequest state, String id);
+	protected JThing<T> doNew(WebRequest state, String id) {
+		String json = getJson(state);
+		T item;
+		if (json == null) {
+			try {
+				item = type.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw Utils.runtime(e);
+			}
+		} else {
+			// from front end json
+			item = Dep.get(Gson.class).fromJson(json, type);
+			// TODO safety check ID! Otherwise someone could hack your object with a new object
+//			idFromJson = AppUtils.getItemId(item);
+		}
+		// ID
+		if (id != null) {
+			if (item instanceof AThing) {
+				((AThing) item).setId(id);
+			}
+			// else ??
+		}
+		if (item instanceof IInit) {
+			((IInit) item).init();
+		}
+		return new JThing().setJava(item);
+	}
 
 	protected ESHttpClient es = Dep.get(ESHttpClient.class);
 	protected final Class<T> type;
