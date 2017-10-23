@@ -203,6 +203,8 @@ public class AppUtils {
 	public static JThing doSaveEdit(ESPath path, JThing item, WebRequest state) {
 		assert path.index().toLowerCase().contains("draft") : path;
 		
+		// TODO check security with YouAgain!
+		
 		// update status TODO factor out the status logic
 		Object s = item.map().get("status");
 		if (Utils.streq(s, KStatus.PUBLISHED)) {
