@@ -14,6 +14,6 @@
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-math3.jar" sourcepath="/home/daniel/winterwell/code/middleware/jakarta/commons-math3-3.6.1-sources.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.web"/>
-	<classpathentry exported="true" kind="lib" path="/middleware/trove/trove.jar"/>
+        <classpathentry exported="true" kind="lib" path="/middleware/trove/trove.jar" sourcepath="/middleware/trove/trove-src.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
