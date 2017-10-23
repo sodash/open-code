@@ -28,6 +28,9 @@ import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.SField;
+import com.winterwell.youagain.client.AuthToken;
+import com.winterwell.youagain.client.NoAuthException;
+import com.winterwell.youagain.client.YouAgainClient;
 /**
  * TODO security checks
  *  
@@ -61,11 +64,41 @@ public abstract class CrudServlet<T> implements IServlet {
 	public void process(WebRequest state) throws IOException {
 		// CORS??
 		WebUtils2.CORS(state, false);
+		
 		// list?
 		if (state.getSlug().contains("/list")) {
 			doList(state);
 			return;
 		}
+		
+		// crud?
+		if (state.getAction() != null) {
+			// logged in?
+			YouAgainClient ya = Dep.get(YouAgainClient.class);
+			List<AuthToken> tokens = ya.getAuthTokens(state);
+			if (Utils.isEmpty(tokens)) throw new NoAuthException(state);
+			// do it
+			doAction(state);
+		}						
+		
+		// return json?
+		getThing(state);
+		if (jthing==null) jthing = getThingFromDB(state); 
+		if (jthing != null) {			
+			String json = jthing.string();
+			JsonResponse output = new JsonResponse(state).setCargoJson(json);			
+			WebUtils2.sendJson(output, state);
+			return;
+		}
+		if (state.getAction()==null) {
+			// no thing?
+			throw new WebEx.E404(state.getRequestUrl());
+		}
+		JsonResponse output = new JsonResponse(state);
+		WebUtils2.sendJson(output, state);
+	}
+	
+	protected void doAction(WebRequest state) {
 		// make a new thing?
 		if (state.actionIs("new")) {
 			// add is "special" as the only request that doesn't need an id
@@ -87,24 +120,11 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (state.actionIs("publish")) {
 			jthing = doPublish(state);
 			assert jthing.string().contains(KStatus.PUBLISHED.toString()) : jthing;
-		}
-		// return json?
-		getThing(state);
-		if (jthing==null) jthing = getThingFromDB(state); 
-		if (jthing != null) {			
-			String json = jthing.string();
-			JsonResponse output = new JsonResponse(state).setCargoJson(json);			
-			WebUtils2.sendJson(output, state);
-			return;
-		}
-		if (state.getAction()==null) {
-			// no thing?
-			throw new WebEx.E404(state.getRequestUrl());
-		}
-		JsonResponse output = new JsonResponse(state);
-		WebUtils2.sendJson(output, state);
+		}		
 	}
-	
+
+
+
 	/**
 	 * Delete from draft and published!!
 	 * @param state
