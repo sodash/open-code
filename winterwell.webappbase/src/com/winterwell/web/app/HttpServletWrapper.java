@@ -29,6 +29,11 @@ public class HttpServletWrapper extends HttpServlet {
 	}
 
 	@Override
+	public String toString() {
+		return "HttpServletWrapper[factory=" + factory + "]";
+	}
+
+	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			WebRequest state = new WebRequest(req, resp);			
@@ -39,16 +44,20 @@ public class HttpServletWrapper extends HttpServlet {
 			}
 			servlet.process(state);
 		} catch (Throwable ex) {
-			WebEx wex = WebUtils2.runtime(ex);
-			if (wex.code >= 500) {
-				Log.e("error."+wex.getClass().getSimpleName(), ex);
-			} else {
-				Log.i(wex.getClass().getSimpleName(), ex);
-			}
-			WebUtils2.sendError(wex.code, wex.getMessage(), resp);
+			doCatch(ex, resp);
 		} finally {
 			WebRequest.close(req, resp);
 		}
+	}
+
+	public static void doCatch(Throwable ex, HttpServletResponse resp) {
+		WebEx wex = WebUtils2.runtime(ex);
+		if (wex.code >= 500) {
+			Log.e("error."+wex.getClass().getSimpleName(), ex);
+		} else {
+			Log.i(wex.getClass().getSimpleName(), ex);
+		}
+		WebUtils2.sendError(wex.code, wex.getMessage(), resp);
 	}
 
 	@Override

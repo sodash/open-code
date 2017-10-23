@@ -9,6 +9,7 @@ import java.util.Properties;
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.es.ESPath;
+import com.winterwell.es.IESRouter;
 import com.winterwell.es.client.DeleteRequestBuilder;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
@@ -16,6 +17,7 @@ import com.winterwell.es.client.GetRequestBuilder;
 import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
+import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
@@ -319,6 +321,34 @@ public class AppUtils {
 
 	public static void addDebugInfo(WebRequest request) {
 		request.getResponse().addHeader("X-Server", AppUtils.getFullHostname());
+	}
+
+
+	/**
+	 * Make indices.
+	 * Does not set mapping.
+	 * @param main
+	 * @param dbclasses
+	 */
+	public static void initESIndices(KStatus[] main, Class[] dbclasses) {
+		IESRouter esRouter = Dep.get(IESRouter.class);
+		ESHttpClient es = Dep.get(ESHttpClient.class);
+		for(KStatus s : main) {
+			for(Class klass : dbclasses) {
+				ESPath path = esRouter.getPath(null, klass, null, s);
+				String index = path.index();
+				if (es.admin().indices().indexExists(index)) {
+					continue;
+				}
+				// make with an alias to allow for later switching if we change the schema
+				String baseIndex = index+"_"+es.getConfig().getIndexAliasVersion();
+				CreateIndexRequest pi = es.admin().indices().prepareCreate(baseIndex);
+				pi.setFailIfAliasExists(true);
+				pi.setAlias(index);
+				IESResponse r = pi.get();
+			}
+		}
+
 	}
 
 
