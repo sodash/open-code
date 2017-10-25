@@ -18,6 +18,7 @@ import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
 
 /**
@@ -143,12 +144,15 @@ public class Log {
 				setMinLevel(tag, VERBOSE);
 			}
 		}
+		// no blank patterns!
+		config.exclude = Containers.filter(config.exclude, x -> ! Utils.isBlank(x));
 		if (Utils.isEmpty(config.exclude)) {
 			excludeFilter = null;
 		} else {
 			excludeFilter = new IFilter<String>() {
 				@Override
 				public boolean accept(String x) {
+					if (Utils.isBlank(x)) return false;
 					for(String s : config.exclude) {
 						if (x.contains(s)) return true;
 					}
@@ -156,12 +160,15 @@ public class Log {
 				}
 			};
 		}
+		// no blank patterns!
+		config.downgrade = Containers.filter(config.downgrade, x -> ! Utils.isBlank(x));
 		if (Utils.isEmpty(config.downgrade)) {
 			downgradeFilter = null;
 		} else {
 			downgradeFilter = new IFilter<String>() {
 				@Override
 				public boolean accept(String x) {
+					if (Utils.isBlank(x)) return false;
 					for(String s : config.downgrade) {
 						if (x.contains(s)) return true;
 					}
@@ -262,12 +269,18 @@ public class Log {
 		}
 		// exclude or downgrade?
 		if (excludeFilter!=null) {
+			// tag or message ??should this be report.toString()
+			if (excludeFilter.accept(tag)) {
+				return;
+			}
 			if (excludeFilter.accept(smsg)) {
 				return;
 			}
 		}		
 		if (downgradeFilter!=null && error.intValue() > Level.INFO.intValue()) {
 			if (downgradeFilter.accept(smsg)) {
+				error = Level.INFO;
+			} else if (downgradeFilter.accept(tag)) {
 				error = Level.INFO;
 			}
 		}
