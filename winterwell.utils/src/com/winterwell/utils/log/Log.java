@@ -485,6 +485,10 @@ public class Log {
 		map.put(tag, level);
 		sensitiveTags = map;
 	}
+	
+	public static LogConfig getConfig() {
+		return config;
+	}
 
 }
 

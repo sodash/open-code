@@ -66,7 +66,13 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			if (f.isFile()) {
 				configFiles.add(f);
 			}
-		} catch(Exception ex) {
+		} catch(Throwable ex) {
+			Log.e("manifest", ex);
+		}		
+		// log config
+		try {
+			addConfig(Log.getConfig());
+		} catch(Throwable ex) {
 			Log.e("manifest", ex);
 		}		
 	}

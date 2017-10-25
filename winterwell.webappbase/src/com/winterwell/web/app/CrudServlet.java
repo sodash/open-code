@@ -61,7 +61,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		return jthing;
 	}
 
-	public void process(WebRequest state) throws IOException {
+	public void process(WebRequest state) throws Exception {
 		// CORS??
 		WebUtils2.CORS(state, false);
 		
