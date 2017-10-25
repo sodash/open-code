@@ -71,7 +71,7 @@ public class FrequencyCondDistribution<X, C> extends
 		return dist;
 	}
 
-	private ObjectDistribution<X> getGeneric() {
+	public ObjectDistribution<X> getGeneric() {
 		// cheat and use erasure
 		return getCreateMarginal((C)GENERIC);
 	}
