@@ -3,6 +3,7 @@ package com.winterwell.maths.stats.distributions.cond;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.winterwell.maths.ITrainable;
@@ -26,11 +27,10 @@ public class FrequencyCondDistribution<X, C> extends
 	static final protected String GENERIC = "!generic";
 
 	/**
-	 * Override to use e.g. HalfLifeMap. This is used for both the top-level context->marginal map, and the
-	 * secondary marginal->prob map.
+	 * Override to use e.g. HalfLifeMap.
 	 * @return a new Map
 	 */
-	protected final Supplier<Map> newMap;
+	protected final IFrequencyCondMapBuilder mapBuilder;
 	
 	protected final Map<C, ObjectDistribution<X>> dists;
 
@@ -39,16 +39,38 @@ public class FrequencyCondDistribution<X, C> extends
 	public FrequencyCondDistribution() {
 		this(HashMap::new);
 	}
-	
+
 	/**
-	 * Override to use e.g. HalfLifeMap. This is used for both the top-level context->marginal map, and the
-	 * secondary marginal->prob map.
-	 * @return a new Map
+	 * @param newMap factory function used for the top-level context->marginal map, the
+	 * secondary marginal->prob maps, and the "generic" map.
 	 */
 	public FrequencyCondDistribution(Supplier<Map> newMap) {
-		this.newMap = newMap;
-		assert newMap!=null;
-		dists = newMap.get();
+		this(new IFrequencyCondMapBuilder() {
+
+			@Override
+			public Map newDistributionMap() {
+				return newMap.get();
+			}
+
+			@Override
+			public Map newGenericMap() {
+				return newMap.get();
+			}
+
+			@Override
+			public Map newMarginalMap(Object context) {
+				return newMap.get();
+			}			
+		});
+	}
+
+	/**
+	 * @param mapBuilder factory object for the various Maps we need to construct
+	 */
+	public FrequencyCondDistribution(IFrequencyCondMapBuilder mapBuilder) {
+		assert mapBuilder != null;
+		this.mapBuilder = mapBuilder;
+		dists = mapBuilder.newDistributionMap();
 //		generic = new ObjectDistribution<X>(newMap.get(), false).setPseudoCount(pseudoCount);
 	}
 	
@@ -84,7 +106,11 @@ public class FrequencyCondDistribution<X, C> extends
 	public ObjectDistribution<X> getCreateMarginal(C context) {
 		ObjectDistribution<X> dist = dists.get(context);
 		if (dist == null) {
-			dist = new ObjectDistribution<X>(newMap.get(), false);
+			if (context == GENERIC) {
+				dist = new ObjectDistribution<X>(mapBuilder.newGenericMap(), false);
+			} else {
+				dist = new ObjectDistribution<X>(mapBuilder.newMarginalMap(context), false);
+			}
 			dist.setPseudoCount(pseudoCount);
 			dists.put(context, dist);
 		}
