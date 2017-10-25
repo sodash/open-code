@@ -2,6 +2,7 @@ package com.winterwell.maths.stats.distributions.cond;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -9,13 +10,20 @@ import com.winterwell.utils.containers.AbstractIterator;
 
 public class ListSitnStream<X> implements ISitnStream<X> {
 
-	private List<Sitn<X>> list;
-	private String[] sig;
+	private final List<Sitn<X>> list;
+	private final String[] sig;
 
 	public ListSitnStream(List<Sitn<X>> list) {
+		this(list,
+			// just take the first sig?!
+			list.get(0).context.sig
+			);
+	}
+
+	public ListSitnStream(List<Sitn<X>> list, String[] sig) {
 		this.list = list;
 		// just take the first sig?!
-		this.sig = list.get(0).context.sig;
+		this.sig = sig;
 	}
 	
 	@Override
@@ -40,8 +48,13 @@ public class ListSitnStream<X> implements ISitnStream<X> {
 
 	@Override
 	public AbstractIterator<Sitn<X>> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		final Iterator<Sitn<X>> sitnsit = list.iterator();
+		return new AbstractIterator<Sitn<X>>() {
+			@Override
+			protected Sitn<X> next2() throws Exception {
+				return sitnsit.hasNext() ? sitnsit.next() : null;
+			}			
+		};	
 	}
 
 }

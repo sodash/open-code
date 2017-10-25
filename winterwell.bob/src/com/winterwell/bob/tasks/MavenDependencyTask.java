@@ -8,6 +8,7 @@ import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Proc;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
@@ -29,14 +30,20 @@ public class MavenDependencyTask extends BuildTask {
 	public MavenDependencyTask() {
 	}
 
-	File outDir = new File("maven-dependencies");
+	File outDir;
 	File projectDir = FileUtils.getWorkingDirectory();
 	
-	public void setOutputDirectory(File outDir) {
+	public MavenDependencyTask setOutputDirectory(File outDir) {
 		this.outDir = outDir;
+		return this;
+	}
+	public MavenDependencyTask setProjectDir(File projectDir) {
+		this.projectDir = projectDir;
+		return this;
 	}
 	
 	List<String> dependencies = new ArrayList();
+	private File pom;
 	
 	public void addDependency(String groupId, String artifactId, String version) {
 		dependencies.add("<dependency><groupId>"+groupId+"</groupId><artifactId>"+artifactId+"</artifactId>" 
@@ -45,32 +52,60 @@ public class MavenDependencyTask extends BuildTask {
 				+"</dependency>"); 
 	}
 	
+	public MavenDependencyTask setPom(File pom) {
+		this.pom = pom;
+		return this;
+	}
+	
 	@Override
 	protected void doTask() throws Exception {
-		File pom = new File(projectDir, "pom.xml");
+		// files
+		if (outDir==null) {
+			outDir = new File(projectDir, "dependencies");
+		}
 		if (dependencies.isEmpty()) {
-			if ( ! pom.isFile()) {
-				throw new IllegalStateException("No pom.xml found and no in-Java dependencies were added: "+pom.getAbsolutePath());
+			if (pom==null) pom = FileUtils.or(new File(projectDir, "pom.xml"), new File(projectDir, "pom.bob.xml"));
+			if (pom==null || ! pom.isFile()) {
+				throw new IllegalStateException("No pom.xml found and no in-Java dependencies were added: "+pom+" "+projectDir);
 			}
 		} else {		
+			if (pom==null) pom = new File(projectDir, "pom.bob.xml");
 			doMakePom(pom);
 		}
 		// 
 		// http://maven.apache.org/plugins/maven-dependency-plugin/copy-dependencies-mojo.html
 //		-DoutputDirectory (defaults to build/dependency)
-//		-DstripVersion=true or useBaseVersion for less aggressive 
-		
-		Proc proc = new Proc("mvn org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies -DstripVersion=true -DoutputDirectory="+outDir);
-		proc.start();
-		proc.waitFor(new Dt(10, TUnit.MINUTE));
-		proc.close();
-		Log.w(LOGTAG, proc.getError());
-		Log.d(LOGTAG, proc.getOutput());
-		// did it work??		
-		if ( ! proc.getOutput().contains("BUILD SUCCESS")) {
-			throw new FailureException(proc.getError());
-		}		
-		FileUtils.delete(pom);
+//		-DstripVersion=true or useBaseVersion for less aggressive
+		File pomPrev = null;
+		File pomProper = new File("pom.xml");
+		if (pomProper.isFile()) {
+			pomPrev = new File("pom.xml."+Utils.getRandomString(4)+".temp");
+			FileUtils.move(pomProper, pomPrev);
+		}
+		try {
+			// maven expects the pom in the exact place
+			if (! pom.equals(pomProper)) {
+				FileUtils.copy(pom, pomProper);
+			}
+			
+			Proc proc = new Proc("mvn org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies -DstripVersion=true -DoutputDirectory="+outDir);
+			proc.start();
+			proc.waitFor(new Dt(10, TUnit.MINUTE));
+			proc.close();
+			Log.w(LOGTAG, proc.getError());
+			Log.d(LOGTAG, proc.getOutput());
+			// did it work??		
+			if ( ! proc.getOutput().contains("BUILD SUCCESS")) {
+				throw new FailureException(proc.getError());
+			}		
+//			FileUtils.delete(pom);
+		} finally {
+			if (pomPrev != null) {
+				FileUtils.move(pomPrev, pomProper);
+			} else {
+				FileUtils.delete(pomProper);
+			}
+		}
 	}
 
 	private void doMakePom(File pom) {
