@@ -76,8 +76,13 @@ public class DataServlet implements IServlet {
 		
 		SearchRequestBuilder search = esc.prepareSearch(index);
 //		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
+		// size controls
+		// num results
+		int numTerms = state.get(new IntField("termsSize"), 1000);		
+		// num examples
 		Integer size = state.get(new IntField("size"), 10);
-		search.setSize(size); // TODO 0 = just the stats
+		search.setSize(size);
+		
 		
 		// search parameters
 		// time box
@@ -117,6 +122,7 @@ public class DataServlet implements IServlet {
 			String[] b = breakdown_output[0].trim().split("/");
 			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
 					"by_"+StrUtils.join(b,'_'), b[0]);
+			byTag.setSize(numTerms);
 			Aggregation leaf = byTag;
 			if (b.length > 1) {
 				if (b[1].equals("time")) {
@@ -125,7 +131,8 @@ public class DataServlet implements IServlet {
 					byTag.subAggregation(byTime);
 					leaf = byTime;
 				} else {
-					com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);			
+					com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);
+					byHost.setSize(numTerms);
 					byTag.subAggregation(byHost);
 					leaf = byHost;
 				}
@@ -142,7 +149,7 @@ public class DataServlet implements IServlet {
 				leaf.subAggregation(myCount);
 				// filter 0s ??does this work??
 				filter.must(QueryBuilders.rangeQuery(k).gt(0));
-			}
+			}						
 			search.addAggregation(byTag);
 		} // ./breakdown
 		

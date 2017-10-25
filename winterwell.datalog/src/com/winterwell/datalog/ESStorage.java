@@ -33,6 +33,7 @@ import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.IDataStream;
@@ -397,7 +398,7 @@ public class ESStorage implements IDataLogStorage {
 		if (sortByTime) {
 			
 		} else {
-			search.addAggregation("event_total", "stats", "count");
+			search.addAggregation(Aggregations.stats("event_total", "count"));
 			search.setSize(0);
 		}
 //		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
