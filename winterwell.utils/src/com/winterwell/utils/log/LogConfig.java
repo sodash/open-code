@@ -1,6 +1,5 @@
 package com.winterwell.utils.log;
 
-import java.io.File;
 import java.util.List;
 
 import com.winterwell.utils.io.Option;

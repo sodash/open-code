@@ -45,11 +45,22 @@ public class MavenDependencyTask extends BuildTask {
 	List<String> dependencies = new ArrayList();
 	private File pom;
 	
-	public void addDependency(String groupId, String artifactId, String version) {
+	private boolean keepJarVersioning;
+	
+	/**
+	 * By default, stripVersion so jars have stable names.
+	 * @param keepJarVersioning
+	 */
+	public void setKeepJarVersioning(boolean keepJarVersioning) {
+		this.keepJarVersioning = keepJarVersioning;
+	}
+	
+	public MavenDependencyTask addDependency(String groupId, String artifactId, String version) {
 		dependencies.add("<dependency><groupId>"+groupId+"</groupId><artifactId>"+artifactId+"</artifactId>" 
 				+"<version>"+version+"</version>" 
 //				"			<scope>test</scope>\n" + 
-				+"</dependency>"); 
+				+"</dependency>");
+		return this;
 	}
 	
 	public MavenDependencyTask setPom(File pom) {
@@ -77,9 +88,9 @@ public class MavenDependencyTask extends BuildTask {
 //		-DoutputDirectory (defaults to build/dependency)
 //		-DstripVersion=true or useBaseVersion for less aggressive
 		File pomPrev = null;
-		File pomProper = new File("pom.xml");
+		File pomProper = new File(projectDir, "pom.xml");
 		if (pomProper.isFile()) {
-			pomPrev = new File("pom.xml."+Utils.getRandomString(4)+".temp");
+			pomPrev = new File(projectDir, "pom.xml."+Utils.getRandomString(4)+".temp");
 			FileUtils.move(pomProper, pomPrev);
 		}
 		try {
@@ -88,7 +99,10 @@ public class MavenDependencyTask extends BuildTask {
 				FileUtils.copy(pom, pomProper);
 			}
 			
-			Proc proc = new Proc("mvn org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies -DstripVersion=true -DoutputDirectory="+outDir);
+			Proc proc = new Proc("mvn org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies"
+					+( ! keepJarVersioning? " -Dmdep.stripVersion=true" : "")
+					+ " -DoutputDirectory="+outDir);
+			proc.setDirectory(projectDir);
 			proc.start();
 			proc.waitFor(new Dt(10, TUnit.MINUTE));
 			proc.close();
@@ -116,9 +130,10 @@ public class MavenDependencyTask extends BuildTask {
 			}
 		}
 		FileUtils.write(pom, 
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-				"<project>	\n" + 
-				"	<modelVersion>4.0.0</modelVersion>\n" + 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+				"<project>	\n" + 				
+				"	<modelVersion>4.0.0</modelVersion>\n" +
+				"<!-- Not a real pom! MavenDependencyTask pom for Bob -->" +
 				"	<groupId>com.example</groupId>\n" + 
 				"	<artifactId>dummy</artifactId>\n" + 
 				"	<version>0.0.1-SNAPSHOT</version>\n" + 

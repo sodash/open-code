@@ -313,7 +313,9 @@ public class FileUtils {
 	 */
 	public static void copy(InputStream in, File out) {
 		assert in != null && out != null;
-		if (!out.getParentFile().isDirectory())
+		// resolve local files to abs paths
+		out = out.getAbsoluteFile();
+		if ( ! out.getParentFile().isDirectory())
 			throw new FailureException("Directory does not exist: "
 					+ out.getParentFile());
 		try {

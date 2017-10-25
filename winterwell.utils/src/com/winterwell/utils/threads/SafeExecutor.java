@@ -9,7 +9,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.winterwell.utils.NoisyCallableTest;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
@@ -24,7 +23,7 @@ import com.winterwell.utils.log.Log;
  * @author daniel
  * 
  * @param <T>
- * @testedby {@link NoisyCallableTest}
+ * @testedby NoisyCallableTest
  */
 public class SafeExecutor implements ExecutorService {
 

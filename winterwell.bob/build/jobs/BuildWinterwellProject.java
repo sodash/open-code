@@ -1,10 +1,12 @@
 package jobs;
 
 import java.io.File;
+import java.util.Set;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
+import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.SCPTask;
@@ -170,6 +172,9 @@ public class BuildWinterwellProject extends BuildTask {
 		// FIXME Compile seeing errors in Windows re XStream dependency!
 		if (compile) {
 			CompileTask compile = new CompileTask(srcDir, binDir);
+			// classpath
+			Set<File> libs = new EclipseClasspath(projectDir).getCollectedLibs();
+			compile.setClasspath(libs);			
 			compile.run();
 		}
 		CopyTask nonJava = new CopyTask(srcDir, binDir);

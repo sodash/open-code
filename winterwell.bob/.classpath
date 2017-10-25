@@ -9,6 +9,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.web"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-net.jar"/>
 	<classpathentry kind="lib" path="/middleware/jsch/jsch.jar" sourcepath="/middleware/jsch/src.zip"/>
-	<classpathentry kind="lib" path="/middleware/markdownj/markdownj-1.0.2b4-0.3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -32,8 +32,8 @@ import com.winterwell.utils.Utils;
  * However it is safer than HashMap: doing a get in thread 1 + a put in thread 2 is fine.
  * 
  * @author Daniel
- * @testedby {@link ArrayMapTest}
- * @testedby {@link ArrayMapPerfTest}
+ * @testedby ArrayMapTest
+ * @testedby ArrayMapPerfTest
  * @param <K>
  * @param <V>
  */

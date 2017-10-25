@@ -21,7 +21,7 @@ import com.winterwell.utils.log.Log;
  * FIXME {@link #equals(Object)} is List equals!
  * 
  * @author daniel
- * @testedby {@link ArraySetTest}
+ * @testedby ArraySetTest
  * @param <T>
  */
 public final class ArraySet<T> extends AbstractSet<T> 

@@ -2,8 +2,6 @@ package com.winterwell.utils.log;
 
 import java.io.File;
 
-import javax.management.RuntimeErrorException;
-
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;

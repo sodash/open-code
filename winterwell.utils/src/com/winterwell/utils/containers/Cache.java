@@ -28,7 +28,7 @@ import com.winterwell.utils.IFn;
  * reference queues to clean out those nulls
  * 
  * @author daniel
- * @testedby {@link CacheTest}
+ * @testedby CacheTest
  * @param <Key>
  * @param <Value>
  */

@@ -9,7 +9,7 @@ import java.util.List;
  * - it allows the sort to take into account the top candidates. This allows you
  * to do a sort that rewards diversity. Which is why we have it.
  * 
- * @testedby {@link BubbleSortTest}
+ * @testedby BubbleSortTest
  * @author daniel
  */
 public abstract class BubbleSort<X> {

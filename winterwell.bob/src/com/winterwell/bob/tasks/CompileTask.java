@@ -10,6 +10,7 @@ import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
@@ -22,6 +23,7 @@ import com.winterwell.utils.Proc;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.Log;
 
 /**
  * Compile Java code. ??Ignores non-Java files! You may wish to use a
@@ -54,21 +56,35 @@ public class CompileTask extends BuildTask {
 		this.srcDir = srcDir;
 		this.outputDir = outputDir;
 	}
+	
+//	public static void main(String[] args) {
+//		// download ECJ
+//		// https://mvnrepository.com/artifact/org.eclipse.jdt.core.compiler/ecj
+//		new MavenDependencyTask().addDependency("org.eclipse.jdt.core.compiler", "ecj", "4.6.1").run();
+//	}
 
 	private void doJava6compile() throws IOException {
-		JavaCompiler jc = ToolProvider.getSystemJavaCompiler();
+		JavaCompiler jc = getJavaCompiler();
+		Log.d(LOGTAG, "compiler: "+jc.getClass());
 		// TODO There is a bug in Java on Windows Vista - this call throws a
 		// NullPointerException
 		StandardJavaFileManager sjfm = jc.getStandardFileManager(null, null,
 				null);
 		Iterable fileObjects = sjfm.getJavaFileObjectsFromFiles(javaFiles);
 		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+		// quiet
+		options.add("-nowarn");
+		// Java version: 8
+		options.add("-source"); options.add("1.8");
+		options.add("-target"); options.add("1.8");
 		// What a lousy way to set the output dir
 		options.add("-d");
 		options.add(outputDir.getAbsolutePath());
+		addClasspathToOptions();
 		// Run it!
-		Boolean ok = jc.getTask(null, sjfm, diagnostics, options, null,
-				fileObjects).call();
+		Log.d(LOGTAG, "javac options "+options);		
+		CompilationTask ctask = jc.getTask(null, sjfm, diagnostics, options, null, fileObjects);
+		Boolean ok = ctask.call();
 		sjfm.close();
 		// Diagnostic output
 		StringBuilder diags = new StringBuilder();
@@ -80,10 +96,23 @@ public class CompileTask extends BuildTask {
 					.getKind(), diagnostic.getMessage(null), diagnostic
 					.getSource());
 		}
-		Printer.out(diags);
+		Log.d(LOGTAG, diags);
 		// OK?
-		if (!ok) {
+		if ( ! ok) {
 			throw new FailureException("Compile task failed :( " + diags);
+		}
+	}
+
+	/**
+	 * Prefer the Eclipse compiler, if ecj.jar is on the classpath
+	 * @return
+	 */
+	private JavaCompiler getJavaCompiler() {
+		try {
+//			new EclipseCompiler();
+			return (JavaCompiler) Class.forName("org.eclipse.jdt.internal.compiler.tool.EclipseCompiler").newInstance();
+		} catch(Exception ex) {
+			return ToolProvider.getSystemJavaCompiler();
 		}
 	}
 
@@ -97,9 +126,9 @@ public class CompileTask extends BuildTask {
 		try {
 			// Try javac via a shell process
 			// Setup options
-			options.add("-d");
-			options.add(outputDir.getAbsolutePath());
-			addClasspathToOptions();
+//			options.add("-d");
+//			options.add(outputDir.getAbsolutePath());
+//			addClasspathToOptions();
 			for (File f : javaFiles) {
 				options.add(f.getAbsolutePath());
 			}
@@ -203,7 +232,7 @@ public class CompileTask extends BuildTask {
 		options.add(version);
 	}
 
-	public void setClasspath(List<File> classpath) {
+	public void setClasspath(Collection<File> classpath) {
 		this.classpath = new ArrayList();
 		for (File file : classpath) {
 			String path = file.getPath(); 
