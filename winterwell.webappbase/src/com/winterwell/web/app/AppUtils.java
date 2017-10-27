@@ -9,6 +9,7 @@ import java.util.Properties;
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.es.ESPath;
+import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;
 import com.winterwell.es.client.DeleteRequestBuilder;
 import com.winterwell.es.client.ESConfig;
@@ -18,9 +19,11 @@ import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
+import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
@@ -351,6 +354,33 @@ public class AppUtils {
 			}
 		}
 
+	}
+
+
+	public static void initESMappings(KStatus[] statuses, Class[] dbclasses, ArrayMap<Class,Map> mappingFromClass) {
+		IESRouter esRouter = Dep.get(IESRouter.class);
+		ESHttpClient es = Dep.get(ESHttpClient.class);
+		for(KStatus status : statuses) {			
+			for(Class k : dbclasses) {
+				ESPath path = esRouter.getPath(null, k, null, status);			
+				PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(path.index(), path.type);
+				ESType dtype = new ESType();
+				// some common props
+				dtype.property("name", new ESType().text()
+										// enable keyword based sorting
+										.field("raw", "keyword"));
+				// ID, either thing.org or sane version
+				dtype.property("@id", new ESType().keyword());
+				dtype.property("id", new ESType().keyword());
+				
+				Map mapping = mappingFromClass.get(k);
+				if (mapping != null) dtype.putAll(mapping);
+				
+				pm.setMapping(dtype);
+				IESResponse r2 = pm.get();
+				r2.check();								
+			}
+		}
 	}
 
 
