@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
 import org.jose4j.jwt.JwtClaims;
+import org.junit.runner.notification.RunListener.ThreadSafe;
 
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
@@ -28,6 +29,13 @@ import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.XIdField;
 
+/**
+ * Query YouAgain from Java. E.g. check that tokens are valid.
+ * 
+ * This is a thread-safe and lightweight object.
+ * 
+ * @author daniel
+ */
 public class YouAgainClient {
 
 	static final String ENDPOINT = 

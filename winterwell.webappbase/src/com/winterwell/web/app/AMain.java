@@ -16,7 +16,7 @@ import com.winterwell.utils.time.Time;
  *
  * @param <ConfigType>
  */
-public class AMain<ConfigType> {
+public abstract class AMain<ConfigType> {
 
 //	public static final Time startTime = new Time();
 	
@@ -24,23 +24,28 @@ public class AMain<ConfigType> {
 	
 	public static String projectName = FileUtils.getWorkingDirectory().getName();
 	
-	public static LogFile logFile = new LogFile(new File(projectName+".log"))
-									.setLogRotation(TUnit.DAY.dt, 14);
+	public static LogFile logFile;
 
 	protected static boolean initFlag;
 
 	protected ConfigType config;
 
 	protected void doMain(String[] args) {
+		logFile = new LogFile(new File(projectName+".log"))
+					.setLogRotation(TUnit.DAY.dt, 14);
 		init(args);
 		launchJetty();
 	}
 
-	protected void init(String[] args) {
+	/**
+	 * Calls initConfig() then init(config)
+	 * @param args
+	 */
+	protected final void init(String[] args) {
 		config = initConfig(args);
 		init(config);
 	}
-	public void init() {
+	public final void init() {
 		init(new String[0]);
 	}
 
@@ -49,10 +54,7 @@ public class AMain<ConfigType> {
 		initFlag = true;		
 	}
 
-	protected ConfigType initConfig(String[] args) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	protected abstract ConfigType initConfig(String[] args);
 
 	private void launchJetty() {
 		Log.i("Go!");
@@ -87,12 +89,11 @@ public class AMain<ConfigType> {
 	/**
 	 * Adds /manifest
 	 *
-	 * Override (but do call super) to set e.g. /* -> Master servlet
+	 * Override! (but do call super) to set e.g. /* -> Master servlet
 	 * @param jl
 	 */
 	protected void addJettyServlets(JettyLauncher jl) {
 		jl.addServlet("/manifest", new HttpServletWrapper(ManifestServlet::new));
-
 	}
 
 }
