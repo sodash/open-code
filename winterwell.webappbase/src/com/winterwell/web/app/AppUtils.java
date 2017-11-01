@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
+import com.winterwell.depot.IInit;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;
@@ -228,7 +229,16 @@ public class AppUtils {
 	 */
 	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest stateCanBeNull) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));		
-		// save update		
+		// save update
+		
+		// prep object
+		// e.g. set the suggest field for NGO 
+		if (item.java() instanceof IInit) {
+			((IInit) item.java()).init();
+			// force a refresh of map and json, so they get any edits made by init()
+			item.setJava(item.java());
+		}
+		
 		// sanity check id matches path
 		String id = (String) item.map().get("@id"); //mod.getId();
 		if (id==null) {

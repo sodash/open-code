@@ -28,8 +28,8 @@ public interface IInit {
 	 * transient boolean initFlag, & use this to call init() in methods.
 	 * @return this
 	 */
-	void init();
-
+	void init();	
+	
 	/**
 	 * Convenience for calling init() on a set of sub-objects
 	 * @param objects
