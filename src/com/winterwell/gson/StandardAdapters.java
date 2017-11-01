@@ -3,6 +3,7 @@ package com.winterwell.gson;
 import java.lang.reflect.Type;
 
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.IHasJson;
 
 /**
  * TODO move some of our adapters in here for our convenience
@@ -12,6 +13,12 @@ import com.winterwell.utils.time.Time;
 public class StandardAdapters {
 
 
+	public static final JsonSerializer IHASJSONADAPTER = new JsonSerializer<IHasJson>() {
+		@Override
+		public JsonElement serialize(IHasJson src, Type typeOfSrc, JsonSerializationContext context) {
+			return context.serialize(src.toJson2());
+		}
+	};
 
 
 	
@@ -45,29 +52,28 @@ public static class TimeTypeAdapter implements JsonSerializer<Time>, JsonDeseria
 	}
 }
 
-/**
- * @deprecated Not sure why we have this!
- * @author daniel
- */
-public static class ClassTypeAdapter implements JsonSerializer<Class>,
-		JsonDeserializer<Class> {
-	@Override
-	public JsonElement serialize(Class src, Type srcType,
-			JsonSerializationContext context) {
-		return new JsonPrimitive(src.getCanonicalName());
-	}
-
-	@Override
-	public Class deserialize(JsonElement json, Type type,
-			JsonDeserializationContext context) throws JsonParseException {
-		try {
-			return Class.forName(json.getAsString());
-		} catch (ClassNotFoundException e) {
-			throw new JsonParseException(e);
+	/**
+	 * @deprecated Not sure why we have this!
+	 * @author daniel
+	 */
+	public static class ClassTypeAdapter implements JsonSerializer<Class>,
+			JsonDeserializer<Class> {
+		@Override
+		public JsonElement serialize(Class src, Type srcType,
+				JsonSerializationContext context) {
+			return new JsonPrimitive(src.getCanonicalName());
+		}
+	
+		@Override
+		public Class deserialize(JsonElement json, Type type,
+				JsonDeserializationContext context) throws JsonParseException {
+			try {
+				return Class.forName(json.getAsString());
+			} catch (ClassNotFoundException e) {
+				throw new JsonParseException(e);
+			}
 		}
 	}
-}
-
 
 
 }
