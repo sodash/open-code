@@ -39,8 +39,8 @@ import com.winterwell.web.fields.XIdField;
 public class YouAgainClient {
 
 	static final String ENDPOINT = 
-				"https://youagain.winterwell.com/youagain.json";
-//				"http://localyouagain.winterwell.com/youagain.json";
+//				"https://youagain.winterwell.com/youagain.json";
+				"http://localyouagain.winterwell.com/youagain.json";
 
 	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
 
@@ -116,7 +116,7 @@ public class YouAgainClient {
 			try {
 				AuthToken token = new AuthToken(jt);
 				// decode the token
-				JWTDecoder dec = getDecoder();
+				JWTDecoder dec = getDecoder(); //"local".equals(state.get("login")));
 				JwtClaims decd = dec.decryptJWT(jt);
 				token.xid = new XId(decd.getSubject(), false);
 				list.add(token);

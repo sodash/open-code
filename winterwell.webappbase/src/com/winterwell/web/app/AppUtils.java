@@ -382,6 +382,8 @@ public class AppUtils {
 				// ID, either thing.org or sane version
 				dtype.property("@id", new ESType().keyword());
 				dtype.property("id", new ESType().keyword());
+				// type
+				dtype.property("@type", new ESType().keyword());
 				
 				Map mapping = mappingFromClass.get(k);
 				if (mapping != null) dtype.putAll(mapping);

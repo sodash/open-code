@@ -128,10 +128,10 @@ public class WebEx extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 		
 		
-		// Exception wrapping code -- should we move this into WebEx??
-		private Throwable error() {
-			return Utils.or(getCause(), this);
-		}
+//		// Exception wrapping code -- should we move this into WebEx??
+//		private Throwable error() {
+//			return Utils.or(getCause(), this);
+//		}
 		/**
 		 * The original Throwable
 		 */
@@ -143,17 +143,25 @@ public class WebEx extends RuntimeException {
 
 		@Override
 		public final StackTraceElement[] getStackTrace() {
-			return error().getStackTrace();
+			return getCause()==null? super.getStackTrace() : getCause().getStackTrace();
 		}
 
 		@Override
 		public void printStackTrace(PrintStream s) {
-			error().printStackTrace();
+			if (getCause()==null) {
+				super.printStackTrace(s);
+			} else {
+				getCause().printStackTrace(s);
+			}
 		}
 
 		@Override
 		public void printStackTrace(PrintWriter s) {
-			error().printStackTrace();
+			if (getCause()==null) {
+				super.printStackTrace(s); // otherwise you get a stackoverflow
+			} else {
+				getCause().printStackTrace(s);
+			}
 		}
 
 		/**
