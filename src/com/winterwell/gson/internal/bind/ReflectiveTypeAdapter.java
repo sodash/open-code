@@ -385,7 +385,10 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 			// no change needed (as you were -- use constructor)
 			return null;
 		}
-		Class<?> typeOfT = Class.forName(klass);
+		// user defined type mapping?
+		Class typeOfT = gson.classForClass.get(klass);
+		// get the Java class
+		if (typeOfT==null) typeOfT = Class.forName(klass);
 		TypeToken tt = TypeToken.get(typeOfT);
 		TypeAdapter _typeAdapter = gson.getAdapter(tt);
 		return _typeAdapter;

@@ -210,6 +210,8 @@ public class Gson {
 
 	private boolean lenientReader;
 
+	public final Map<String,Class> classForClass = new HashMap();
+
 	/**
 	 * How do we handle circular references? never null. HACK Should not be
 	 * static!!!
@@ -285,14 +287,18 @@ public class Gson {
 				.<Type, InstanceCreator<?>> emptyMap(), false, false,
 				DEFAULT_JSON_NON_EXECUTABLE, true, false, false,
 				LongSerializationPolicy.DEFAULT,
-				GsonBuilder.DEFAULT_CLASS_PROPERTY, null/* loop policy */,
+				GsonBuilder.DEFAULT_CLASS_PROPERTY, 
+				null/* loop policy */,
 				false,
-				Collections.<TypeAdapterFactory> emptyList());
+				Collections.<TypeAdapterFactory> emptyList(), 
+				Collections.EMPTY_MAP
+				);
 	}
 
 	/**
 	 * @param classProperty
 	 *            ^Daniel
+	 * @param classForClass 
 	 * @param loopChecking
 	 */
 	Gson(final Excluder excluder, final FieldNamingStrategy fieldNamingPolicy,
@@ -304,7 +310,7 @@ public class Gson {
 			LongSerializationPolicy longSerializationPolicy,
 			String classProperty, KLoopPolicy loopPolicy,
 			boolean lenientReader,
-			List<TypeAdapterFactory> typeAdapterFactories)
+			List<TypeAdapterFactory> typeAdapterFactories, Map<String, Class> classForClass)
     {
 		this.constructorConstructor = new ConstructorConstructor(
 				instanceCreators, classProperty);
@@ -313,6 +319,7 @@ public class Gson {
 		this.htmlSafe = htmlSafe;
 		this.prettyPrinting = prettyPrinting;
 		this.classProperty = classProperty;
+		if (classForClass!=null) this.classForClass.putAll(classForClass);
 		this.loopPolicy = loopPolicy == null ? KLoopPolicy.NO_CHECKS
 				: loopPolicy;
 		this.lenientReader = lenientReader;

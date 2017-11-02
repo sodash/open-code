@@ -88,6 +88,7 @@ public class GsonBuilder {
   private String classProperty = DEFAULT_CLASS_PROPERTY;
 private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
 	private boolean lenientReader;
+	private Map<String, Class> classForClass;
 
   /**
    * Creates a GsonBuilder instance that can be used to build Gson with various configuration
@@ -555,7 +556,7 @@ private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
         generateNonExecutableJson, escapeHtmlChars, prettyPrinting,
         serializeSpecialFloatingPointValues, longSerializationPolicy, 
         classProperty, loopPolicy, lenientReader,
-        factories);
+        factories, classForClass);
   }
 
   private void addTypeAdaptersForDate(String datePattern, int dateStyle, int timeStyle,
@@ -621,5 +622,10 @@ private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
 			.serializeSpecialFloatingPointValues()
 			.setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 			.setClassProperty(null).setLoopPolicy(KLoopPolicy.QUIET_NULL);
+	}
+
+	public GsonBuilder setClassMapping(String classNameInJson, Class class1) {
+		classForClass.put(classNameInJson, class1);
+		return this;
 	}
 }
