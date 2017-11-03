@@ -39,8 +39,8 @@ import com.winterwell.web.fields.XIdField;
 public class YouAgainClient {
 
 	static final String ENDPOINT = 
-//				"https://youagain.winterwell.com/youagain.json";
-				"http://localyouagain.winterwell.com/youagain.json";
+				"https://youagain.winterwell.com/youagain.json";
+//				"http://localyouagain.winterwell.com/youagain.json";
 
 	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
 
