@@ -65,6 +65,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		// CORS??
 		WebUtils2.CORS(state, false);
 		
+		doSecurityCheck(state);
+		
 		// list?
 		if (state.getSlug().contains("/list")) {
 			doList(state);
@@ -73,10 +75,6 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		// crud?
 		if (state.getAction() != null) {
-			// logged in?
-			YouAgainClient ya = Dep.get(YouAgainClient.class);
-			List<AuthToken> tokens = ya.getAuthTokens(state);
-			if (Utils.isEmpty(tokens)) throw new NoAuthException(state);
 			// do it
 			doAction(state);
 		}						
@@ -98,6 +96,18 @@ public abstract class CrudServlet<T> implements IServlet {
 		WebUtils2.sendJson(output, state);
 	}
 	
+	protected void doSecurityCheck(WebRequest state) throws SecurityException {
+		if (state.getAction() == null) {
+			return;
+		}
+		// logged in?			
+		YouAgainClient ya = Dep.get(YouAgainClient.class);
+		List<AuthToken> tokens = ya.getAuthTokens(state);
+		if (Utils.isEmpty(tokens)) throw new NoAuthException(state);
+	}
+
+
+
 	protected void doAction(WebRequest state) {
 		// make a new thing?
 		if (state.actionIs("new")) {
