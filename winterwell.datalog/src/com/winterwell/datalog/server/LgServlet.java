@@ -69,6 +69,8 @@ public class LgServlet {
 		// TODO security check the dataspace?
 		String tag = state.getRequired(TAG);
 		String via = req.getParameter("via");
+		// NB: dont IP/user track simple events, which are server-side
+		boolean stdTrackerParams = ! DataLogEvent.simple.equals(tag) && state.get(new BoolField("track"), true);
 		Map params = (Map) state.get(PARAMS);
 		if (params==null) {
 			// params from the url?
@@ -84,7 +86,6 @@ public class LgServlet {
 			params.remove("track");
 		}
 		
-		boolean stdTrackerParams = state.get(new BoolField("track"), true);
 		boolean logged = doLog(state, ds, tag, via, params, stdTrackerParams);
 		
 		// Reply

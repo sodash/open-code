@@ -41,6 +41,7 @@ import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
@@ -54,7 +55,6 @@ import com.winterwell.utils.time.Time;
 
 public class ESStorage implements IDataLogStorage {
 
-	private static final String simple = "simple";
 	private ESConfig esConfig;
 	private DataLogConfig config;
 	
@@ -92,7 +92,7 @@ public class ESStorage implements IDataLogStorage {
 	@Override
 	public IFuture<IDataStream> getData(Pattern id, Time start, Time end) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new TodoException();
 	}
 
 	@Override
@@ -122,10 +122,10 @@ public class ESStorage implements IDataLogStorage {
 	private DataLogEvent eventspec4tag(String tag) {
 		return event4tag(tag, 0);
 	}
-	private DataLogEvent event4tag(String tag, double count) {
-		String ds = DataLog.getDataspace(); 
-		DataLogEvent spec = new DataLogEvent(ds, count, simple, new ArrayMap("tag", tag));
-		return spec;
+	
+	@Deprecated // use new DataLogEVent directly
+	static DataLogEvent event4tag(String tag, double count) {
+		return new DataLogEvent(tag, count);
 	}
 
 	@Override
@@ -137,7 +137,7 @@ public class ESStorage implements IDataLogStorage {
 	@Override
 	public IFuture<MeanRate> getMean(Time start, Time end, String tag) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new TodoException();
 	}
 
 	@Override
@@ -227,7 +227,7 @@ public class ESStorage implements IDataLogStorage {
 	//		ar.get().check();
 		
 		// register some standard event types??
-			initIndex3_registerEventType(_client, index, simple);
+			initIndex3_registerEventType(_client, index, DataLogEvent.simple);
 		} catch(Throwable ex) {
 			Log.e(DataLog.LOGTAG, ex);
 			// swallow and carry on -- an out of date schema may not be a serious issue
@@ -237,6 +237,7 @@ public class ESStorage implements IDataLogStorage {
 	private void initIndex3_registerEventType(ESHttpClient _client, String index, String type) 
 	{
 		String esType = typeFromEventType(type);
+//		String v = _client.getConfig().getIndexAliasVersion();
 		PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, esType);
 		// See DataLogEvent.COMMON_PROPS and toJson()
 		ESType keywordy = new ESType().keyword().norms(false);

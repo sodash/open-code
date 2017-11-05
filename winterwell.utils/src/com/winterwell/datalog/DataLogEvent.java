@@ -93,8 +93,14 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"mbl", Boolean.class,
 			"ua", StringBuilder.class // user agent
 			));
+
+	public static final String simple = "simple";
 	
 	public final double count;
+	/**
+	 * Note: this is NOT the same as tag, because we want to limit to a sane number of these.
+	 * e.g. type=simple, tag=any old string
+	 */
 	public final String eventType;
 	/**
 	 * never null
@@ -133,6 +139,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 */
 	public DataLogEvent(String eventType, Map<String,?> properties) {
 		this(DataLog.getDataspace(), 1, eventType, properties);
+	}
+	
+	public DataLogEvent(String tag, double count) {
+		this(DataLog.getDataspace(), count, simple, new ArrayMap("tag", tag));
 	}
 	
 	/**
@@ -207,6 +217,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 * 
 	 * Because this has to handle big data, we economise and store either n or v, not both.
 	 * {k: string, n: ?number, v: ?string}
+	 * 
+	 * Does NOT include dataspace
 	 */
 	@Override
 	public Map<String,?> toJson2() {

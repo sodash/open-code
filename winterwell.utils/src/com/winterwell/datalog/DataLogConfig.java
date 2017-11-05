@@ -89,7 +89,8 @@ public class DataLogConfig extends DBOptions {
 	public boolean CORS = true;
 
 	@Option(description="Used for logging to a remote server (provided storageClass has been set to use one)")
-	public String remoteEndpoint;
+	public String logEndpoint;
 
+	public String getDataEndpoint;
 
 }

@@ -102,14 +102,28 @@ public class DataServlet implements IServlet {
 		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
 				.must(timeFilter);		
 		
-		// filters
-		for(String prop : "evt host campaign".split(" ")) {
-			String host = sq.getProp(prop);
-			if (host!=null) {
-				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
+		// filters TODO a true recursive SearchQuery -> ES query mapping
+		// TODO this is just a crude 1-level thing
+		List ptree = sq.getParseTree();
+		for (Object clause : ptree) {
+			if (clause instanceof List) {
+				assert ((List) clause).size() == 2 : clause+" from "+sq;
+				List<String> propVal = (List) clause;
+				String prop = propVal.get(0);
+				String val = propVal.get(1);
+				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, val);
 				filter = filter.must(kvFilter);
 			}
+//			QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
+//			filter = filter.must(kvFilter);			
 		}
+//		for(String prop : "evt host campaign".split(" ")) {
+//			String host = sq.getProp(prop);
+//			if (host!=null) {
+//				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
+//				filter = filter.must(kvFilter);
+//			}
+//		}
 				
 		for(final String bd : breakdown) {
 			if (bd==null) {

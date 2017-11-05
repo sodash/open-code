@@ -78,6 +78,13 @@ public interface IDataLogStorage {
 
 	void setHistory(Map<Pair2<String, Time>, Double> tagTime2set);
 
+	/**
+	 * 
+	 * @param dataspace
+	 * @param event
+	 * @param period
+	 * @return an object representing the save -- details depend on the class -- can be null.
+	 */
 	Object saveEvent(String dataspace, DataLogEvent event, Period period);
 
 	void saveEvents(Collection<DataLogEvent> values, Period period);

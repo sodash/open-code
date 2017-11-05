@@ -16,6 +16,7 @@ import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
@@ -488,6 +489,14 @@ public class Log {
 	
 	public static LogConfig getConfig() {
 		return config;
+	}
+	public static void w(Object warning) {
+		String cn = ReflectionUtils.getCallingClassSimpleName(1);
+		w(cn, warning);
+	}
+	public static void e(Object warning) {
+		String cn = ReflectionUtils.getCallingClassSimpleName(1);
+		e(cn, warning);
 	}
 
 }
