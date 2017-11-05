@@ -145,7 +145,7 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 	static List<Object> configs = new ArrayList();
 	
 	public static void addConfig(Object config) {
-		configs.add(config);
+		configs.add(config);		
 	}
 	
 	public void process(WebRequest state) throws IOException {	

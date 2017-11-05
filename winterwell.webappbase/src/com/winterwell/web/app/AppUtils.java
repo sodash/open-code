@@ -1,6 +1,7 @@
 package com.winterwell.web.app;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -67,27 +68,36 @@ public class AppUtils {
 	 */
 	public static <X> X getConfig(String appName, X config, String[] args) {
 		String thingy = config.getClass().getSimpleName().toLowerCase().replace("config", "");
-		config = new ConfigBuilder(config)
+		final ConfigBuilder cb = new ConfigBuilder(config);
+		cb.setDebug(true);
+		String machine = WebUtils2.hostname();
+		KServerType serverType = AppUtils.getServerType(null);
+
+		config = cb
 			.setDebug(true)
-			.set(new File("config/sogive.properties"))
+			// check several config files
+			.set(new File("config/"+appName+".properties"))
 			.set(new File("config/"+thingy+".properties"))
-			.set(new File("config/"+WebUtils2.hostname()+".properties"))
 			.set(new File("config/"+AppUtils.getServerType(null).toString().toLowerCase()+".properties"))
 			// or in logins, for passwords?
 			.set(new File("config/logins.properties"))
 			.set(new File(FileUtils.getWinterwellDir(), "logins/"+thingy+".properties"))
+			// live, local, test?			
+			.set(new File("config/"+serverType.toString().toLowerCase()+".properties"))
+			// this machine specific
+			.set(new File("config/"+WebUtils2.hostname()+".properties"))
+			// args
 			.setFromMain(args)
 			.get();
-		Dep.set((Class)config.getClass(), config);
-		
+		// set Dep
+		Dep.set((Class)config.getClass(), config);		
 		// set them for manifest
-//		ManifestServlet.setConfigFiles(files);
 		ManifestServlet.addConfig(config);
+		ManifestServlet.addConfigBuilder(cb);
 		assert config != null;
-		return config;
+		return config;		
 	}
-
-	
+		
 	/**
 	 * Will try path,indices in order if multiple
 	 * @param path

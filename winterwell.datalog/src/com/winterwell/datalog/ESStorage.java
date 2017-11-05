@@ -227,48 +227,53 @@ public class ESStorage implements IDataLogStorage {
 	//		ar.get().check();
 		
 		// register some standard event types??
-			PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, typeFromEventType(simple));
-			// See DataLogEvent.COMMON_PROPS and toJson()
-			ESType keywordy = new ESType().keyword().norms(false);
-			// Huh? Why were we using type text with keyword analyzer??
-//					.text().analyzer("keyword")					
-//					.fielddata(true);
-			ESType props = new ESType()
-					.property("k", keywordy)
-					.property("v", new ESType().text().norms(false))
-					.property("n", new ESType().DOUBLE());
-			ESType simpleEvent = new ESType()
-					.property(DataLogEvent.EVENTTYPE, keywordy)
-					.property("time", new ESType().date())
-					.property("count", new ESType().DOUBLE())
-					.property("props", props);			
-			for(Entry<String, Class> cp : DataLogEvent.COMMON_PROPS.entrySet()) {
-				// HACK to turn Class into ESType
-				ESType est = keywordy.copy();
-				if (cp.getValue()==StringBuilder.class) {
-					est = new ESType().text().norms(false);
-				} else if (cp.getValue()==Time.class) {
-					est = new ESType().date();
-				} else if (cp.getValue()==Double.class) {
-					est = new ESType().DOUBLE();
-				} else if (cp.getValue()==Integer.class) {
-						est = new ESType().INTEGER();					
-				} else if (cp.getValue()==Object.class) {
-					if ("geo".equals(cp.getKey())) {
-						est = new ESType().geo_point();
-					}
-				}
-				simpleEvent.property(cp.getKey(), est);
-			}
-					
-			pm.setMapping(simpleEvent);
-			_client.debug = true;
-			IESResponse res = pm.get();
-			res.check();
+			initIndex3_registerEventType(_client, index, simple);
 		} catch(Throwable ex) {
 			Log.e(DataLog.LOGTAG, ex);
 			// swallow and carry on -- an out of date schema may not be a serious issue
 		}
+	}
+
+	private void initIndex3_registerEventType(ESHttpClient _client, String index, String type) 
+	{
+		String esType = typeFromEventType(type);
+		PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, esType);
+		// See DataLogEvent.COMMON_PROPS and toJson()
+		ESType keywordy = new ESType().keyword().norms(false);
+		// Huh? Why were we using type text with keyword analyzer??
+//				.text().analyzer("keyword")					
+//				.fielddata(true);
+		ESType props = new ESType()
+				.property("k", keywordy)
+				.property("v", new ESType().text().norms(false))
+				.property("n", new ESType().DOUBLE());
+		ESType simpleEvent = new ESType()
+				.property(DataLogEvent.EVENTTYPE, keywordy)
+				.property("time", new ESType().date())
+				.property("count", new ESType().DOUBLE())
+				.property("props", props);			
+		for(Entry<String, Class> cp : DataLogEvent.COMMON_PROPS.entrySet()) {
+			// HACK to turn Class into ESType
+			ESType est = keywordy.copy();
+			if (cp.getValue()==StringBuilder.class) {
+				est = new ESType().text().norms(false);
+			} else if (cp.getValue()==Time.class) {
+				est = new ESType().date();
+			} else if (cp.getValue()==Double.class) {
+				est = new ESType().DOUBLE();
+			} else if (cp.getValue()==Integer.class) {
+					est = new ESType().INTEGER();					
+			} else if (cp.getValue()==Object.class) {
+				if ("geo".equals(cp.getKey())) {
+					est = new ESType().geo_point();
+				}
+			}
+			simpleEvent.property(cp.getKey(), est);
+		}
+				
+		pm.setMapping(simpleEvent);
+		IESResponse res = pm.get();
+		res.check();
 	}
 
 	public static String indexFromDataspace(String dataspace) {
@@ -339,15 +344,10 @@ public class ESStorage implements IDataLogStorage {
 	@Override
 	public void registerEventType(String dataspace, String eventType) {
 		String index = indexFromDataspace(dataspace);
-		String type = typeFromEventType(eventType);
-		PutMappingRequestBuilder putMapping = client(dataspace).admin().indices().preparePutMapping(index, type);
-		// Set the time property as time. The rest it can auto-figure
-		Map msrc = new ESType()
-						.property("time", new ESType().date());
-		putMapping.setBodyMap(msrc);
-		IESResponse res = putMapping.get();
-		res.check();
-		Map<String, Object> jout = res.getParsedJson();
+		initIndex(dataspace, index);
+		
+		ESHttpClient _client = client(dataspace);
+		initIndex3_registerEventType(_client, index, eventType);
 	}
 	
 	public double getEventTotal(Time start, Time end, DataLogEvent spec) {
