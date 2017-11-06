@@ -1,7 +1,9 @@
 package com.winterwell.data;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
+import com.winterwell.gson.FlexiGson;
 import com.winterwell.gson.JsonDeserializationContext;
 import com.winterwell.gson.JsonDeserializer;
 import com.winterwell.gson.JsonElement;
@@ -22,6 +24,11 @@ import com.winterwell.web.data.XId;
 public class AThingAdapter implements JsonSerializer<AThing>, JsonDeserializer<AThing> {
 
 	@Override
+	public String toString() {
+		return "AThingAdapter";
+	}
+
+	@Override
 	public AThing deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 			throws JsonParseException {
 		AThing thing = context.deserialize(json, typeOfT);
@@ -31,7 +38,8 @@ public class AThingAdapter implements JsonSerializer<AThing>, JsonDeserializer<A
 
 	@Override
 	public JsonElement serialize(AThing src, Type typeOfSrc, JsonSerializationContext context) {
-		JsonObject je = (JsonObject) context.serialize(src, typeOfSrc);
+		// serialize as a pojo
+		JsonObject je = (JsonObject) context.serialize(src, Object.class);
 		String type = src.getClass().getSimpleName();
 		je.addProperty("@type", type);
 		return je;
