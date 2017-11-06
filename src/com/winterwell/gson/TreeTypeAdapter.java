@@ -113,6 +113,11 @@ final class TreeTypeAdapter<T> extends TypeAdapter<T> {
     private final JsonSerializer<?> serializer;
     private final JsonDeserializer<?> deserializer;
 
+    @Override
+    public String toString() {
+    	return "SingleTypeFactory["+exactType+" -> "+(serializer==null?deserializer:serializer)+"]";
+    }
+    
     private SingleTypeFactory(Object typeAdapter, TypeToken<?> exactType, boolean matchRawType,
         Class<?> hierarchyType) {
       serializer = typeAdapter instanceof JsonSerializer
