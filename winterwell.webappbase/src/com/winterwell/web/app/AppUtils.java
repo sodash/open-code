@@ -10,6 +10,8 @@ import java.util.Properties;
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.depot.IInit;
+import com.winterwell.depot.merge.Diff;
+import com.winterwell.depot.merge.Merger;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;
@@ -385,6 +387,16 @@ public class AppUtils {
 				ESPath path = esRouter.getPath(null, k, null, status);			
 				PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(path.index(), path.type);
 				ESType dtype = new ESType();
+				// passed in
+				Map mapping = mappingFromClass.get(k);
+				if (mapping != null) {
+					// merge in
+					// NB: done here, so that it doesn't accidentally trash the settings below
+					// -- because probably both maps define "properties"
+					// Future: It'd be nice to have a deep merge, and give the passed in mapping precendent.
+					dtype.putAll(mapping);
+				}
+
 				// some common props
 				dtype.property("name", new ESType().text()
 										// enable keyword based sorting
@@ -395,8 +407,6 @@ public class AppUtils {
 				// type
 				dtype.property("@type", new ESType().keyword());
 				
-				Map mapping = mappingFromClass.get(k);
-				if (mapping != null) dtype.putAll(mapping);
 				
 				pm.setMapping(dtype);
 				IESResponse r2 = pm.get();
