@@ -80,12 +80,16 @@ public final class JThing<T> {
 	}
 	
 	public T java() {
-		if (java==null && string() != null) {
+		if (java!=null) return java;
+		if (string() != null) {
 			assert type != null : "Call setType() first "+this;
-			java = Dep.get(Gson.class).fromJson(string(), type);
-			if (java instanceof IInit) {
-				((IInit) java).init();
+			T pojo = Dep.get(Gson.class).fromJson(string(), type);
+			if (pojo instanceof IInit) {
+				((IInit) pojo).init();				
 			}
+			// this will null out the json/map
+			// ...which is good, as extra json from the front-end can cause bugs with ES mappings.
+			setJava(pojo);		
 		}
 		return java;
 	}

@@ -322,6 +322,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		assert thing != null : state;
 		// set modified = true
 		jthing.put("modified", true);
+		// run via Java, to trigger IInit
+		jthing.java();
 		{	// update
 			String id = getId(state);
 			ESPath path = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
