@@ -149,6 +149,7 @@ function frontend_publish {
 function backend_publish {
 	if [[ $TYPEOFPUSHOUT = 'TEST' ]]; then
 		echo -e "> Strictly Syncing JARs from your localmachine to $TEST"
+		cp ~/winterwell/code/middleware/jose4j/jose4j-0.5.2.jar tmp-lib/
 		rsync -rhP --delete-before tmp-lib/*.jar --exclude 'tmp-lib/lucene-*-4.8.1.jar' --exclude 'tmp-lib/elasticsearch-1.2.1.jar' winterwell@$TEST:/home/winterwell/lg.good-loop.com/lib/
 		echo -e "> Strictly Syncing config from YOUR localmachine to $TEST"
 		rsync -rhP --delete-before config/*.properties winterwell@$TEST:/home/winterwell/lg.good-loop.com/config/
