@@ -24,6 +24,7 @@ import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.fail.ESException;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
@@ -384,35 +385,60 @@ public class AppUtils {
 		ESHttpClient es = Dep.get(ESHttpClient.class);
 		for(KStatus status : statuses) {			
 			for(Class k : dbclasses) {
-				ESPath path = esRouter.getPath(null, k, null, status);			
-				PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(path.index(), path.type);
-				ESType dtype = new ESType();
-				// passed in
-				Map mapping = mappingFromClass.get(k);
-				if (mapping != null) {
-					// merge in
-					// NB: done here, so that it doesn't accidentally trash the settings below
-					// -- because probably both maps define "properties"
-					// Future: It'd be nice to have a deep merge, and give the passed in mapping precendent.
-					dtype.putAll(mapping);
+				ESPath path = esRouter.getPath(null, k, null, status);
+				try {
+					String index = path.index();
+					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
+				} catch(ESException ex) {
+					// map the base index (so we can do a reindex with the right mapping)
+					String index = path.index()
+							+"_"+Dep.get(ESConfig.class).getIndexAliasVersion()
+							;
+					// make if not exists
+					if ( ! es.admin().indices().indexExists(index)) {
+						CreateIndexRequest pi = es.admin().indices().prepareCreate(index);
+//						pi.setFailIfAliasExists(true);
+//						pi.setAlias(path.index());
+						IESResponse r = pi.get().check();
+					}
+					
+					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
+					// and shout fail
+					throw ex;
 				}
-
-				// some common props
-				dtype.property("name", new ESType().text()
-										// enable keyword based sorting
-										.field("raw", "keyword"));
-				// ID, either thing.org or sane version
-				dtype.property("@id", new ESType().keyword());
-				dtype.property("id", new ESType().keyword());
-				// type
-				dtype.property("@type", new ESType().keyword());
-				
-				
-				pm.setMapping(dtype);
-				IESResponse r2 = pm.get();
-				r2.check();								
 			}
 		}
+	}
+
+	private static void initESMappings2_putMapping(ArrayMap<Class, Map> mappingFromClass, ESHttpClient es, Class k,
+			ESPath path, String index) {
+		PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(
+				index, path.type);
+		ESType dtype = new ESType();
+		// passed in
+		Map mapping = mappingFromClass.get(k);
+		if (mapping != null) {
+			// merge in
+			// NB: done here, so that it doesn't accidentally trash the settings below
+			// -- because probably both maps define "properties"
+			// Future: It'd be nice to have a deep merge, and give the passed in mapping precendent.
+			dtype.putAll(mapping);
+		}
+
+		// some common props
+		dtype.property("name", new ESType().text()
+								// enable keyword based sorting
+								.field("raw", "keyword"));
+		// ID, either thing.org or sane version
+		dtype.property("@id", new ESType().keyword());
+		dtype.property("id", new ESType().keyword());
+		// type
+		dtype.property("@type", new ESType().keyword());
+		
+		
+		pm.setMapping(dtype);
+		IESResponse r2 = pm.get();
+		r2.check();
 	}
 
 
