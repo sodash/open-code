@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 
 import com.winterwell.data.AThing;
@@ -279,14 +281,25 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		// query
 		String q = state.get("q");
+		QueryBuilder qb = null;
 		if ( q != null) {
 			// TODO match on all?
 			QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
 //			multimatchquery, 
 //					"id", "name", "keywords")
 //							.operator(Operator.AND);
-			s.setQuery(qsq);
+			qb = qsq;
 		}
+		QueryBuilder exq = doList2_query(state);
+		if (exq!=null) {
+			if (qb==null) {
+				qb = exq;
+			} else {
+				qb = QueryBuilders.boolQuery().must(exq).must(qb);
+			}
+		}
+		if (qb!=null) s.setQuery(qb);
+		
 		// TODO paging!
 		s.setSize(10000);
 		es.debug = true;
@@ -315,6 +328,20 @@ public abstract class CrudServlet<T> implements IServlet {
 		JsonResponse output = new JsonResponse(state).setCargoJson(json);
 		WebUtils2.sendJson(output, state);		
 	}
+
+	
+
+
+	/**
+	 * 
+	 * @param state
+	 * @return null or a query
+	 */
+	protected QueryBuilder doList2_query(WebRequest state) {
+		return null;
+	}
+
+
 
 	protected void doSave(WebRequest state) {
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
