@@ -212,7 +212,7 @@ public class StreamClassifier<Tok> implements ITextClassifier<String>, IStreamCl
 	 */
 	@Override
 	public IFiniteDistribution<String> pClassify2(ISitnStream<Tok> stream, ExplnOfDist expln) {
-		assert prior!=null && prior.size() != 0 : this+" "+prior;
+		assert prior!=null && prior.size() != 0 : this+" "+prior; assert stream!=null : this+" null stream";
 		// Allow explanations to collect from several classifiers
 //		assert expln == null || expln.tokenProbs==null || expln.tokenProbs.isEmpty() : expln;
 

@@ -7,8 +7,11 @@ package com.winterwell.data;
  */
 public class PersonLite extends AThing {
 
+	// NB: name and id are defined in AThing
+	
 	public String img;
 	
 	public String locn;
 	
+	public String description;
 }

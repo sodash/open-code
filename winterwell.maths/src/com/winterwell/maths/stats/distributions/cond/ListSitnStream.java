@@ -8,6 +8,12 @@ import java.util.Map;
 
 import com.winterwell.utils.containers.AbstractIterator;
 
+/**
+ * 
+ * @author daniel
+ * @testedby {@link ListSitnStreamTest}
+ * @param <X>
+ */
 public class ListSitnStream<X> implements ISitnStream<X> {
 
 	private final List<Sitn<X>> list;
@@ -49,12 +55,13 @@ public class ListSitnStream<X> implements ISitnStream<X> {
 	@Override
 	public AbstractIterator<Sitn<X>> iterator() {
 		final Iterator<Sitn<X>> sitnsit = list.iterator();
-		return new AbstractIterator<Sitn<X>>() {
+		AbstractIterator<Sitn<X>> it = new AbstractIterator<Sitn<X>>() {
 			@Override
 			protected Sitn<X> next2() throws Exception {
 				return sitnsit.hasNext() ? sitnsit.next() : null;
 			}			
 		};	
+		return it;
 	}
 
 }
