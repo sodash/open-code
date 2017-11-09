@@ -9,6 +9,7 @@ import java.util.Properties;
 
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
+import com.winterwell.data.PersonLite;
 import com.winterwell.depot.IInit;
 import com.winterwell.depot.merge.Diff;
 import com.winterwell.depot.merge.Merger;
@@ -36,6 +37,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.EnumField;
 import com.winterwell.web.fields.JsonField;
 
@@ -102,7 +104,7 @@ public class AppUtils {
 	}
 		
 	/**
-	 * Will try path,indices in order if multiple
+	 * Will try path.indices in order if multiple
 	 * @param path
 	 * @return
 	 */
@@ -110,7 +112,8 @@ public class AppUtils {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		ESHttpClient.debug = true;
 
-		GetRequestBuilder s = new GetRequestBuilder(client);		
+		GetRequestBuilder s = new GetRequestBuilder(client);
+		// Minor TODO both indices in one call
 		s.setIndices(path.indices[0]).setType(path.type).setId(path.id);
 		s.setSourceOnly(true);
 		GetResponse sr = s.get();
@@ -439,6 +442,22 @@ public class AppUtils {
 		pm.setMapping(dtype);
 		IESResponse r2 = pm.get();
 		r2.check();
+	}
+
+	public static PersonLite getCreatePersonLite(XId from) {
+		IESRouter router = Dep.get(IESRouter.class);
+		ESPath path = router.getPath(PersonLite.class, from.toString(), KStatus.PUBLISHED);
+		PersonLite peep = get(path, PersonLite.class);
+		if (peep!=null) return peep;
+		// draft?
+		path = router.getPath(PersonLite.class, from.toString(), KStatus.DRAFT);
+		peep = get(path, PersonLite.class);		
+		if (peep!=null) return peep;
+		// make it
+		peep = new PersonLite(from);
+		// store it NB: the only data is the id, so there's no issue with race conditions
+		AppUtils.doSaveEdit(path, new JThing().setJava(peep), null);
+		return peep;
 	}
 
 

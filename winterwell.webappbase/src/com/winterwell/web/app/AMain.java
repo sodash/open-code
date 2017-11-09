@@ -30,7 +30,11 @@ public abstract class AMain<ConfigType> {
 
 	protected ConfigType config;
 
-	protected void doMain(String[] args) {
+	public ConfigType getConfig() {
+		return config;
+	}
+	
+	public void doMain(String[] args) {
 		logFile = new LogFile(new File(projectName+".log"))
 					.setLogRotation(TUnit.DAY.dt, 14);
 		init(args);
@@ -71,7 +75,7 @@ public abstract class AMain<ConfigType> {
 	}
 
 	/**
-	 * Override!
+	 * Override! This should read from config
 	 * @return
 	 */
 	protected int getPort() {
