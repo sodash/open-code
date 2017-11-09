@@ -86,6 +86,7 @@ public class AppUtils {
 			.set(new File("config/"+AppUtils.getServerType(null).toString().toLowerCase()+".properties"))
 			// or in logins, for passwords?
 			.set(new File("config/logins.properties"))
+			.set(new File(FileUtils.getWinterwellDir(), "logins/logins."+appName+".properties"))
 			.set(new File(FileUtils.getWinterwellDir(), "logins/"+thingy+".properties"))
 			// live, local, test?			
 			.set(new File("config/"+serverType.toString().toLowerCase()+".properties"))

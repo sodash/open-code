@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -262,15 +263,17 @@ public class ConfigBuilder {
 				String a = args[i];
 				// require and chop the leading -
 				if ( ! a.startsWith("-")) {
-					// end or options - return the rest as leftover
+					// end of options - return the rest as leftover
 					break;
 				}
 				a = a.substring(1, a.length());
 				// TODO refactor setOneKeyValue() so this can use the same get-field
 				Field field = token2field.get(a);
 				if (field == null) {
-					// end or options - return the rest as leftover
-					break;
+					Log.w("init", config.getClass()+" Unrecognised option: "+a+" from main args "+Printer.toString(args));
+					// advance i anyway??
+					if (args.length > i+1 && ! args[i+1].startsWith("-")) i++;
+					continue;
 				}
 				// set field & advance i appropriately
 				i = parse2_1arg(args, i, field);

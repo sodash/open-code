@@ -96,10 +96,10 @@ public class YouAgainClient {
 				"password", password));
 		// FIXME
 		Map jobj = (Map) JSON.parse(response);
-		System.out.println(response);			
-		AuthToken token = new AuthToken(null);
-		token.xid = new XId(email, "email");
-		return token;
+		Map user = SimpleJson.get(jobj, "cargo", "user");
+		AuthToken at = new AuthToken(user);
+//		token.xid = new XId(email, "email");
+		return at;
 	}
 
 	/**
@@ -209,16 +209,22 @@ public class YouAgainClient {
 		return all2.asList();
 	}
 
-	public AuthToken login(String usernameUsuallyAnEmail, String password) {
+	public AuthToken login(String usernameUsuallyAnEmail, String password) throws LoginFailedException {
 		Utils.check4null(usernameUsuallyAnEmail, password);
 		FakeBrowser fb = new FakeBrowser();
-		Object response = fb.getPage(ENDPOINT, new ArrayMap(
+		String response = fb.getPage(ENDPOINT, new ArrayMap(
 				"app", app, 
 				"action", "login",
 				"person", usernameUsuallyAnEmail,
 				"password", password));
-		System.out.println(response);
-		return null;
+		Map jobj = (Map) JSON.parse(response);
+		if ( ! Utils.yes(jobj.get("success"))) {
+			Object msg = SimpleJson.get(jobj, "messages", 0);
+			throw new LoginFailedException(""+msg);
+		}
+		Map user = SimpleJson.get(jobj, "cargo", "user");
+		AuthToken at = new AuthToken(user);
+		return at;
 	}
 
 	public AuthToken register(String usernameUsuallyAnEmail, String password) {
@@ -231,7 +237,8 @@ public class YouAgainClient {
 				"password", password));
 		Map jobj = (Map) JSON.parse(response);
 		Map user = SimpleJson.get(jobj, "cargo", "user");
-		return new AuthToken("TODO");
+		AuthToken at = new AuthToken(user);
+		return at;
 	}
 
 	/**

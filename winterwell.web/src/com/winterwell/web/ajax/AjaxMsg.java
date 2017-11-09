@@ -7,6 +7,7 @@ import java.util.Set;
 import com.winterwell.utils.containers.AbstractMap2;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.web.SimpleJson;
+import com.winterwell.web.WebEx;
 
 /**
  * Standardise the format for sending messages to clients.
@@ -31,7 +32,11 @@ public class AjaxMsg extends AbstractMap2<String, Object> implements Serializabl
 		this(KNoteType.info, null, text);
 	}
 	public AjaxMsg(Throwable ex) {
-		this(KNoteType.error, null, ex.getMessage());
+		// use class-name as ID :(
+		this(KNoteType.error, ex.getClass().toString(), ex.getMessage());
+		if (ex instanceof WebEx) {
+			jobj.put("code", ((WebEx) ex).code);
+		}
 	}
 	
 	/**

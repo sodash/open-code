@@ -43,6 +43,9 @@ import com.winterwell.youagain.client.YouAgainClient;
 public abstract class CrudServlet<T> implements IServlet {
 
 
+	public static final String ACTION_PUBLISH = "publish";
+	private static final String ACTION_NEW = "new";
+
 	public CrudServlet(Class<T> type) {
 		this(type, Dep.get(IESRouter.class));
 	}
@@ -112,14 +115,14 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected void doAction(WebRequest state) {
 		// make a new thing?
-		if (state.actionIs("new")) {
+		if (state.actionIs(ACTION_NEW)) {
 			// add is "special" as the only request that doesn't need an id
 			String id = getId(state);
 			jthing = doNew(state, id);
 			jthing.setType(type);
 		}
 		// save?
-		if (state.actionIs("save") || state.actionIs("new")) {
+		if (state.actionIs("save") || state.actionIs(ACTION_NEW)) {
 			doSave(state);
 		}
 		if (state.actionIs("discard-edits")) {
@@ -129,7 +132,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			jthing = doDelete(state);
 		}
 		// publish?
-		if (state.actionIs("publish")) {
+		if (state.actionIs(ACTION_PUBLISH)) {
 			jthing = doPublish(state);
 			assert jthing.string().contains(KStatus.PUBLISHED.toString()) : jthing;
 		}		
@@ -249,7 +252,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected String getId(WebRequest state) {
 		if (_id!=null) return _id;
 		_id = state.getSlugBits(1);
-		if ("new".equals(_id)) {
+		if (ACTION_NEW.equals(_id)) {
 			String nicestart = StrUtils.toCanonical(
 					Utils.or(state.getUserId(), state.get("name"), type.getSimpleName()).toString()
 					).replace(' ', '_');

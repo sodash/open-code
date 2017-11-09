@@ -73,9 +73,11 @@ public final class JThing<T> {
 	
 	public JThing<T> setJava(T java) {
 		this.java = java;
+		if (java==null) return this;
 		map = null;
-		json = null;
-		assert java==null || type==null || ReflectionUtils.isa(java.getClass(), type) : type+" vs "+java.getClass();
+		json = null;		
+		if (type==null) type = (Class<T>) java.getClass();
+		assert ReflectionUtils.isa(java.getClass(), type) : type+" vs "+java.getClass();		
 		return this;
 	}
 	

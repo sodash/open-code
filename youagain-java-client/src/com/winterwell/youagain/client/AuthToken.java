@@ -1,5 +1,9 @@
 package com.winterwell.youagain.client;
 
+import java.util.Map;
+
+import javax.annotation.Generated;
+
 import com.winterwell.web.data.XId;
 
 /**
@@ -10,6 +14,8 @@ import com.winterwell.web.data.XId;
  */
 public class AuthToken {
 
+	public String app;
+	
 	/**
 	 * @return a JWT token
 	 */
@@ -20,6 +26,10 @@ public class AuthToken {
 	public AuthToken(String token) {
 		this.token = token;
 	}
+	public AuthToken(Map jsonObj) {
+		this.token = (String) jsonObj.get("jwt");
+		this.xid = XId.xid(jsonObj.get("xid"));
+	}
 	/**
 	 * A token which can be verified with the YouAgain server.
 	 */
@@ -27,7 +37,7 @@ public class AuthToken {
 	/**
 	 * Who is this for?
 	 */
-	XId xid;
+	public XId xid;
 	
 	@Override
 	public String toString() {

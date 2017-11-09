@@ -516,8 +516,10 @@ public final class Containers  {
 	 * e.g. int[] or double[].
 	 * Throws an IllegalArgumentException if 'array' is not an array or a List (eg. an int
 	 * value)
+	 * @param array array or list
+	 * @return List
 	 */
-	public static <X> List<X> asList(final Object array) {
+	public static <X> List<X> asList(final Object array) {		
 		if (array instanceof List) return (List) array;
 		if ( ! array.getClass().isArray())
 			throw new IllegalArgumentException("Backing object is not an array: "+array.getClass());
