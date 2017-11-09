@@ -29,7 +29,7 @@ public class TrackingPixelServlet implements IServlet {
 
 	/**
 	 * @param state
-	 * @return can be null for do-not-track. Repeated calls 
+	 * @return A nonce@trk XId. Can be null for do-not-track. Repeated calls will return the same uid. 
 	 */
 	public static String getCreateCookieTrackerId(WebRequest state) {
 		if (state==null) return null;
