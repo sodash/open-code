@@ -14,6 +14,11 @@ import com.winterwell.utils.log.Log;
  * A simple pure-Java Actor implementation. Maintains a queue of messages.
  * Backed by a daemon thread which is started on the first message.
  * 
+ * The Actor code is provided by either:
+ *  - {@link #setConsumer(IActorMsgConsumer)} for a lambda, which often gives nice code.
+ * or
+ *  - over-riding {@link #consume(Object, Actor)}, to have access to the actor object.
+ * 
  * @param <Msg> Type of the message, e.g. String or something more structured like a custom data-class.
  * @testedby ActorTest
  * @author daniel
@@ -79,6 +84,7 @@ public class Actor<Msg> {
 	 * @throws Exception 
 	 */
 	protected void consume(Msg msg, Actor from) throws Exception {
+		if (consumer==null) throw new IllegalStateException("No Actor code! Either override consume() or call setConsumer()");
 		consumer.accept(msg, from);
 	}
 	

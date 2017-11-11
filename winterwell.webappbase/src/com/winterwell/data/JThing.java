@@ -23,6 +23,10 @@ public final class JThing<T> {
 	private T java;
 	private Class<T> type;
 	
+	public JThing(T item) {
+		setJava(item);
+	}
+	
 	/**
 	 * Usually needed (depending on the gson setup) for {@link #java()} to deserialise json.
 	 * Note: Once set, you cannot change the type (repeated calls with the same type are fine).
@@ -41,9 +45,9 @@ public final class JThing<T> {
 		return type;
 	}
 	
-	public JThing() {
-		this(null);
+	public JThing() {		
 	}
+	
 	public JThing(String json) {
 		this.json = json;
 	}

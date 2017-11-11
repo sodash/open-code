@@ -44,11 +44,7 @@ public class LoginDetails implements IProperties, Serializable {
 	}
 
 	public LoginDetails(String server, int port) {
-		assert server != null;
-		this.server = server;
-		loginName = null;
-		password = null;
-		this.port = port;
+		this(server, null, null, port);
 	}
 
 	/**
