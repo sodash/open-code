@@ -17,7 +17,11 @@ import com.winterwell.utils.Mutable;
 import com.winterwell.utils.Mutable.Strng;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
-
+/**
+ * Handle multipart form data
+ * @author daniel
+ *
+ */
 public class FileUploadField extends AField<File> {
 	private static final long serialVersionUID = 1L;
 

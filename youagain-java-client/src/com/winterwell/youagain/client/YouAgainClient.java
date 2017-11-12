@@ -145,7 +145,7 @@ public class YouAgainClient {
 	}
 
 	/**
-	 * Low-level access to JWT tokens
+	 * Low-level access to JWT tokens. Use {@link #getAuthTokens(WebRequest)} instead.
 	 * https://en.wikipedia.org/wiki/JSON_Web_Token
 	 * @param state
 	 * @return
@@ -252,6 +252,12 @@ public class YouAgainClient {
 		return getUserId2(state, auths);
 	}
 	
+	/**
+	 * also sets state.setUser()
+	 * @param state
+	 * @param auths
+	 * @return
+	 */
 	XId getUserId2(WebRequest state, List<AuthToken> auths) {
 		XId uxid = state.get(new XIdField("uxid"));
 		if (uxid==null) {

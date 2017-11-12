@@ -54,6 +54,7 @@ class BlockingImageObserver implements ImageObserver {
 			}
 		}
 	}
+	
 
 	@Override
 	public synchronized boolean imageUpdate(Image img, int infoflags, int x,
@@ -78,6 +79,34 @@ public class GuiUtils {
 		void onClick(JComponent clicked);
 
 	}
+
+
+	public static void createThumbnailImage(BufferedImage image, File thumbFile) {
+		// Make thumbnail
+		BufferedImage thumbnail = scaleWidthHeight(image, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT);
+		GuiUtils.saveImage(thumbnail, thumbFile);
+	}
+
+
+	/**
+	 * what's a sensible arbitrary?
+	 * https://en.wikipedia.org/wiki/Thumbnail#Dimensions
+	 */
+	private static final int THUMBNAIL_WIDTH = 150;
+	private static final int THUMBNAIL_HEIGHT = 150;
+
+	public static BufferedImage scaleWidthHeight(BufferedImage image, double maxWidth, double maxHeight) {
+		double scale = Math.max(image.getWidth()/maxWidth, image.getHeight()/maxHeight);
+		int w = (int) (image.getWidth()/scale);
+		int h = (int) (image.getHeight()/scale);
+		w = Math.max(w, 1);
+		h = Math.max(h, 1);
+		// ?? image was all black! this is going to be a jpg - so no alpha channel
+		image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		GuiUtils.scaleImage(image, image);
+		return image;
+	}
+
 
 	/** Winterwell's less corporate blue **/
 	public static Color WINTERWELL_BLUE = getColor("#0096bb");

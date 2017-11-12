@@ -22,6 +22,7 @@ import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.GetRequestBuilder;
 import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
+import com.winterwell.es.client.ReindexRequest;
 import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
@@ -405,8 +406,11 @@ public class AppUtils {
 //						pi.setAlias(path.index());
 						IESResponse r = pi.get().check();
 					}
-					
+					// setup the right mapping
 					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
+					// attempt a simple reindex
+					ReindexRequest rr = new ReindexRequest(es, path.index(), index);
+					rr.execute(); // could be slow, so don't wait
 					// and shout fail
 					throw ex;
 				}

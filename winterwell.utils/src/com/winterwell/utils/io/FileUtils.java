@@ -905,7 +905,7 @@ public class FileUtils {
 
 	/**
 	 * @param filename
-	 * @return E.g. "txt" Maybe "", never null.
+	 * @return E.g. "txt" Maybe "", never null. Always lowercase
 	 */
 	public static String getType(String filename) {
 		int i = filename.lastIndexOf(".");
