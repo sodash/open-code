@@ -19,7 +19,7 @@ import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
 
 /**
- * @testedby {@link YouAgainEmailerTest}
+ * @testedby {@link EmailerTest}
  * @author daniel
  *
  */
