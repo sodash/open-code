@@ -449,7 +449,13 @@ public class AppUtils {
 		r2.check();
 	}
 
+	/**
+	 * 
+	 * @param from
+	 * @return
+	 */
 	public static PersonLite getCreatePersonLite(XId from) {
+		// it is strongly recommended that the router treat PersonLite == Person 
 		IESRouter router = Dep.get(IESRouter.class);
 		ESPath path = router.getPath(PersonLite.class, from.toString(), KStatus.PUBLISHED);
 		PersonLite peep = get(path, PersonLite.class);

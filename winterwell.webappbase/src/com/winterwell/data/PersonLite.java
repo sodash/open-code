@@ -33,4 +33,12 @@ public class PersonLite extends AThing {
 	public String locn;
 	
 	public String description;
+
+	/**
+	 * Convenience for {@link #getId()} with new XId(id, false)
+	 * @return
+	 */
+	public XId getXId() {
+		return new XId(getId(), false);
+	}
 }
