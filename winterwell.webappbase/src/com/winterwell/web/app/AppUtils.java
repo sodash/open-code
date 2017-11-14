@@ -105,6 +105,18 @@ public class AppUtils {
 		return config;		
 	}
 		
+	
+	/**
+	 * Convenience for {@link #get(ESPath, Class)} using Dep.get(IESRouter)
+	 * @param id
+	 * @param klass
+	 * @return
+	 */
+	public static <X> X get(String id, Class<X> klass) {
+		ESPath path = Dep.get(IESRouter.class).getPath(klass, id, KStatus.PUBLISHED);
+		return get(path, klass);
+	}
+	
 	/**
 	 * Will try path.indices in order if multiple
 	 * @param path
