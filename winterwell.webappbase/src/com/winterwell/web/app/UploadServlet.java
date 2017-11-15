@@ -89,7 +89,9 @@ public final class UploadServlet implements IServlet {
 		cargo.put("author", state.getUserId());
 		cargo.put("fileFormat", WebUtils2.getMimeType(_asset));
 		cargo.put("name", _asset.getName());
-//		cargo.put("url", url);
+		cargo.put("absolutePath", _asset.getAbsolutePath());
+		cargo.put("url", _asset.getPath().replaceFirst("web", ""));
+		
 
 		state.put(UPLOAD, _asset);
 		
@@ -170,7 +172,7 @@ public final class UploadServlet implements IServlet {
 //		}
 	}
 
-	File uploadsDir = new File("uploads");
+	File uploadsDir = new File("web/uploads");
 	
 	public UploadServlet setUploadDir(File uploadDir) {
 		this.uploadsDir = uploadDir;
