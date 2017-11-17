@@ -93,6 +93,37 @@ implements Comparable<MonetaryAmount>, IHasJson {
 		this(currency, new BigDecimal(value));
 	}
 
+	/**
+	 * 
+	 * @param x
+	 * @return a new MA for this + x, or this if x=0
+	 */
+	public MonetaryAmount plus(MonetaryAmount x) {
+		if (x.isZero()) return this;
+		if (currency!=null && x.currency!=null && currency != x.currency) {
+			throw new IllegalArgumentException("Cannot plus across currency "+this+ " "+x);
+		}
+		return new MonetaryAmount(currency, getValue().add(x.getValue()));
+	}
+
+	
+	/**
+	 * 
+	 * @param x
+	 * @return a new MA for this * x, or this if x=1
+	 */
+	public MonetaryAmount multiply(BigDecimal x) {
+		if (x.doubleValue()==1) return this;
+		BigDecimal v2 = getValue().multiply(x);
+		return new MonetaryAmount(currency, v2);
+	}
+	
+	
+	/**
+	 * 
+	 * @param x
+	 * @return a new MA for this - x, or this if x=0
+	 */
 	public MonetaryAmount minus(MonetaryAmount x) {
 		if (x.isZero()) return this;
 		if (currency!=null && x.currency!=null && currency != x.currency) {

@@ -38,6 +38,8 @@ public abstract class AMain<ConfigType> {
 
 	protected ConfigType config;
 
+	public static AMain main;
+
 	public AMain() {
 		this(FileUtils.getWorkingDirectory().getName().toLowerCase());
 	}
@@ -61,6 +63,7 @@ public abstract class AMain<ConfigType> {
 	 * @param args
 	 */
 	protected final void init(String[] args) {
+		main = this;
 		config = init2_config(args);
 		init2(config);
 	}
