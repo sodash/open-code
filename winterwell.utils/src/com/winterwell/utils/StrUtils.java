@@ -997,6 +997,8 @@ public class StrUtils {
 	}
 
 	/**
+	 * @deprecated sits between {@link #splitCSVStyle(String)} and just doing string.split(",\\w+"); -- so why?
+	 * 
 	 * Cheap version of {@link #split(String)} without whitespace Splitting.
 	 * Does support quotes -- and the returned Strings will include the "quote" marks.
 	 * 
@@ -1004,7 +1006,7 @@ public class StrUtils {
 	 * @return
 	 * @see #splitCSVStyle(String) which is probably better, but swallows "quote" marks.
 	 */
-	public static List<String> splitOnComma(String line) {
+	public static List<String> splitOnComma(String line) {		
 		if (line == null || line.length() == 0)
 			return Collections.emptyList();
 		ArrayList<String> row = new ArrayList<String>();
@@ -1028,7 +1030,7 @@ public class StrUtils {
 					continue;
 				}
 				// Finished a tag
-				row.add(field.toString());
+				row.add(field.toString().trim());
 				field = new StringBuilder();
 				continue;
 			}
