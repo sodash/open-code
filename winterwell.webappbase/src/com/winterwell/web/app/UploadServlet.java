@@ -13,6 +13,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.winterwell.utils.Printer;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.data.XId;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
@@ -34,7 +35,9 @@ import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.FileUploadField;
 import com.winterwell.web.fields.MissingFieldException;
 import com.winterwell.web.fields.SafeString;
+import com.winterwell.youagain.client.AuthToken;
 import com.winterwell.youagain.client.NoAuthException;
+import com.winterwell.youagain.client.YouAgainClient;
 
 /**
  * View, upload, edit and delete assets.
@@ -213,6 +216,10 @@ public final class UploadServlet implements IServlet {
 
 	@Override
 	public void process(WebRequest state) throws IOException {
+		// must be logged in
+		state.processMultipartIncoming(new ArrayMap());
+		YouAgainClient ya = Dep.get(YouAgainClient.class);
+		List<AuthToken> tokens = ya.getAuthTokens(state);		
 		if (state.getUser() == null) throw new NoAuthException(state);
 		if (ServletFileUpload.isMultipartContent(state.getRequest())) {
 //			try {

@@ -58,6 +58,11 @@ public class ConfigBuilder {
 
 	private static final Map<Class,ISerialize> convertors = new HashMap();
 	
+	/**
+	 * 
+	 * @param k
+	 * @return true if k should be protected
+	 */
 	public static boolean protectPasswords(String k) {
 		String[] sens = "login password pwd token auth key secret private".split(" ");
 		String kl = k.toLowerCase();

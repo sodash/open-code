@@ -109,7 +109,7 @@ public class Printer {
 		// env.put(Printer.INDENT, newIndent);
 	}
 
-	private static void append(Object x, StringBuilder sb) {
+	public static void append(StringBuilder sb, Object x) {
 		if (x == null)
 			return;
 		// special case: string or stringbuilder
@@ -216,7 +216,7 @@ public class Printer {
 				sb.append("(this Collection)");
 				continue;
 			}
-			append(y, sb);
+			append(sb, y);
 			sb.append(separator);
 		}
 		if (added) {
@@ -426,7 +426,7 @@ public class Printer {
 		if (x == null)
 			return "";
 		StringBuilder sb = new StringBuilder();
-		append(x, sb);
+		append(sb, x);
 		return sb.toString();
 	}
 

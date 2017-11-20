@@ -25,6 +25,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
@@ -958,6 +959,34 @@ public class WebRequest implements IProperties, Closeable {
 		redirect = (String) properties.get(REDIRECT_REQUEST);
 	}
 
+	
+
+    /**
+     * Utility method that determines whether the request contains multipart
+     * content.
+     * 
+     * @author Based on Apache Commons FileUpload 
+     *
+     * @param request The servlet request to be evaluated. Must be non-null.
+     *
+     * @return <code>true</code> if the request is multipart;
+     *         <code>false</code> otherwise.
+     */
+    public final boolean isMultipartContent() {
+        if ( ! isPOST() && ! isPUT()) {
+            return false;
+        }
+        String contentType = request.getContentType();
+        if (contentType == null) {
+            return false;
+        }
+        if (contentType.toLowerCase().startsWith("multipart/")) {
+            return true;
+        }
+        return false;
+    }
+
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T put(Key<T> key, T value) {
@@ -1068,15 +1097,23 @@ public class WebRequest implements IProperties, Closeable {
 
 	@Override
 	public String toString() {
-		Map<String, String[]> pmap = request.getParameterMap();
+		StringBuilder sb = new StringBuilder("WebRequest:user=" + user + ":action=" + action + ":req={");
 		// obfuscate passwords
-		String[] pw = pmap.get("password");
-		if (pw!=null && pw.length != 0) {			
-			pmap = new HashMap(pmap);
-			pmap.put("password", new String[] {"xxxx"});
-		}
-		return "WebRequest:user=" + user + ":action=" + action + ":req="
-				+ Printer.toString(pmap, ", ", "=");
+		Map<String, Object> pmap = getParameterMap();
+		pmap.entrySet().forEach(e -> {			
+			Object v = e.getValue();
+			if (ConfigBuilder.protectPasswords(e.getKey())) {
+				v = "XXX";
+			}
+			sb.append(e.getKey()+"=");
+			// cap big strings, so we can see more keys
+			String sv = Printer.str(v);
+			sb.append(StrUtils.ellipsize(sv, 50));
+			sb.append(", ");
+		});	
+		if ( ! pmap.isEmpty()) StrUtils.pop(sb, 2);
+		sb.append('}');
+		return sb.toString();
 	}
 
 	/**
