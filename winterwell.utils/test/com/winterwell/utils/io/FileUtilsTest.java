@@ -23,7 +23,11 @@ public class FileUtilsTest extends TestCase {
 		assert new File(wwd, "open-code").isDirectory();
 	}
 
-	public void testChunk() throws IOException {
+	/**
+	 * TODO add a chunky file
+	 * @throws IOException
+	 */
+	public void offtestChunk() throws IOException {
 		final int CHUNK_SIZE = 1000;
 		File f = new File("");
 		BufferedInputStream stream = new BufferedInputStream(new FileInputStream(f));

@@ -455,6 +455,15 @@ public class WebUtils {
 	 *           succeeds.
 	 */
 	public static String dig(final String site, boolean returnIP) {
+		try {
+			return dig2(site, returnIP);
+		} catch(FailureException ex) {
+			// try again: dig can fail sporadically (5% of the time on my desktop with this test ^DW)
+			return dig2(site, returnIP);
+		}
+	}
+
+	private static String dig2(String site, boolean returnIP) {
 		assert site != null;
 		if (!Utils.OSisUnix())
 			throw new TodoException();
@@ -500,7 +509,7 @@ public class WebUtils {
 		if (ip == null)
 			throw new FailureException("Couldn't find server name or ip for "
 					+ site + " in [" + out + "] " + p.getError());
-		return dig(ip, false);
+		return dig2(ip, false);
 	}
 
 	/**

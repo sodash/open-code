@@ -96,6 +96,10 @@ public final class ArraySet<T> extends AbstractSet<T>
 		return new ArraySet(Arrays.asList(array));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * Will skip `null` (returns false)
+	 */
 	@Override
 	public boolean add(T e) {
 		if (backing.contains(e) || e==null)

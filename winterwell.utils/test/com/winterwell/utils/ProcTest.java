@@ -107,16 +107,15 @@ public class ProcTest {
 	@Test
 	public void testSetDirectory() throws InterruptedException {
 		// Unix
-		Proc p = new Proc("ls -l");
+		Proc p = new Proc("pwd");
 		p.setDirectory(new File("src"));
 		p.run();
 		p.waitFor();
-		String out = p.getOutput();
+		String out = p.getOutput().trim();
 		String err = p.getError();
 		p.close();
-		assert err.length() == 0 : err;
-		assert out.length() != 0 : out;
-		assert !out.contains("src") && out.contains("winterwell") : out;
+		assert out.endsWith("/src");
+//		System.out.println(out);
 	}
 
 	@Test

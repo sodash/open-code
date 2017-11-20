@@ -51,14 +51,14 @@ public class ArraySetTest extends TestCase {
 
 	public void testAddT4() {
 		ArraySet<String> array = new ArraySet<String>("first", "second");
-		assert array.add(null);
-		assert array.size() == 3;
+		assert ! array.add(null);
+		assert array.size() == 2;
 	}
 
 	public void testAddT5() {
 		ArraySet<String> array = new ArraySet<String>("first", null);
 		assert array.add(null) == false;
-		assert array.size() == 2;
+		assert array.size() == 1;
 	}
 
 	public void testRemoveObject1() {
@@ -87,7 +87,7 @@ public class ArraySetTest extends TestCase {
 
 	public void testRemoveObject5() {
 		ArraySet<String> array = new ArraySet<String>("first", "second", null);
-		assert array.remove(null);
+		array.remove(null);
 		assert array.size() == 2;
 	}
 
@@ -127,6 +127,6 @@ public class ArraySetTest extends TestCase {
 
 	public void testSize5() {
 		ArraySet<String> array = new ArraySet<String>("first", "second", null);
-		assert array.size() == 3;
+		assert array.size() == 2;
 	}
 }
