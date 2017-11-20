@@ -21,8 +21,6 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.Entity;
-
 import com.winterwell.utils.IFn;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Proc;
@@ -871,7 +869,7 @@ public class SqlUtils {
 		for (Field field : fields) {
 			if (ReflectionUtils.isTransient(field))
 				continue;
-			if (field.getType().isAnnotationPresent(Entity.class)) {
+			if (ReflectionUtils.hasAnnotation(field.getType(), "Entity")) {
 				select.append(var + "." + field.getName() + "_id,");
 			} else {
 				select.append(var + "." + field.getName() + ",");

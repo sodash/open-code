@@ -18,6 +18,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;
 
@@ -728,6 +729,21 @@ public class ReflectionUtils {
 		int ldot = cn.lastIndexOf('.');
 		if (ldot != -1) cn = cn.substring(ldot+1);
 		return cn;
+	}
+
+	/**
+	 * Like {@link Class#isAnnotationPresent(Class)}, but without a compile-time dependency on the annotation. 
+	 * 
+	 * @param type
+	 * @param annotationName
+	 * @return
+	 */
+	public static boolean hasAnnotation(Class<?> type, String annotationName) {
+		Annotation[] annos = type.getAnnotations();
+		Annotation anno = Containers.first(Arrays.asList(annos), 
+				a -> annotationName.equals(a.getClass().getSimpleName())
+				);
+		return anno!=null;
 	}
 
 }

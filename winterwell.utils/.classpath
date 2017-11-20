@@ -8,7 +8,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="/middleware/xstream/xstream.jar" sourcepath="/middleware/xstream/src.zip"/>
 	<classpathentry kind="lib" path="/middleware/bonecp/bonecp.jar"/>
-	<classpathentry kind="lib" path="/middleware/hibernate/lib/ejb3-persistence.jar" sourcepath="/middleware/hibernate/src"/>
 	<classpathentry kind="lib" path="/middleware/junit/junit.jar"/>
+	<classpathentry kind="lib" path="/middleware/hibernate/lib/ejb3-persistence.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
