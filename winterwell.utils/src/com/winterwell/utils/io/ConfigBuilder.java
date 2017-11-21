@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.imageio.metadata.IIOInvalidTreeException;
+
+import com.winterwell.depot.IInit;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
@@ -365,11 +368,16 @@ public class ConfigBuilder {
 	/**
 	 * @return the config object which we're filling in.
 	 * This will check all the required fields have been set.
+	 * This will call init() if the config implements {@link IInit}.
 	 */
 	public <S> S get() {
 		List<Field> missing = getMissingProperties();
 		if ( ! missing.isEmpty()) {
 			throw new IllegalArgumentException("Missing required arguments: "+Containers.apply(missing, f -> f.getName()));
+		}
+		// init?
+		if (config instanceof IInit) {
+			((IInit) config).init();
 		}
 		// debug?
 		if (debug) {

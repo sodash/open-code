@@ -1,7 +1,8 @@
 package com.winterwell.utils.time;
 
 /**
- * 0 = Sunday, 1=Monday ... 6=Saturday
+ * ISO definitions, compatible with Date and Time classes
+ * 0 = Sunday, 1=Monday ... 6=Saturday, 7=Sunday
  */
 public enum KDay {
 	Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday;

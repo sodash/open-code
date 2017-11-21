@@ -24,6 +24,20 @@ import com.winterwell.utils.containers.Pair;
  * @testedby {@link TimeUtilsTest}
  */
 public class TimeUtils {
+	
+	/**
+	 * @deprecated Warning: English only! Convenience for using KDay - better to use directly
+	 * 
+	 * ISO definitions:
+	 * 1 = Monday
+	 * 0/7 = Sunday
+	 * @param dow
+	 * @return e.g. "Monday"
+	 */
+	public static String toStringDayOfWeek(int dow) {
+		return KDay.valueOf(dow).toString();
+	}
+	
 	/**
 	 * The GMT aka UTC standard timezone. 
 	 * To get your own timezone, use TimeZone.getTimeZone(name);
