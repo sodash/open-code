@@ -87,6 +87,8 @@ public final class UploadServlet implements IServlet {
 		
 		// Do the storage!
 		File _asset = doUpload2(state.getUserId(), tempFile, name, cargo);
+		
+		// respond
 		cargo.put("contentSize", _asset.length());
 		cargo.put("uploadDate", new Time().toISOString());
 		cargo.put("author", state.getUserId());
