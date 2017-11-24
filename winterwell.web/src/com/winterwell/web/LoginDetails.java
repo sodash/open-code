@@ -68,9 +68,9 @@ public class LoginDetails implements IProperties, Serializable {
 		// Utils.check4null(server, loginName, password);
 		// }
 		this.server = server;
-		assert ! server.contains(" ") && ! server.contains("\n") : server; // whitespace
-																			// is
-																			// bad
+		if (server==null || server.contains(" ") || server.contains("\n")) {
+			throw new IllegalArgumentException("bad server ["+ server+"]"); 
+		} 
 		this.loginName = loginName;
 		this.password = password;
 		this.port = port;
