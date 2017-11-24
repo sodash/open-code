@@ -9,6 +9,7 @@ import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -145,7 +146,7 @@ public class TestHttpServletRequest implements HttpServletRequest {
 	
 	@Override
 	public String getHeader(String name) {
-		return null;
+		return headers.get(name);
 	}
 
 	@Override
@@ -643,5 +644,10 @@ public class TestHttpServletRequest implements HttpServletRequest {
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void setHeader(String name, String val) {
+		headers.put(name, val);
+	}
+	final Map<String,String> headers = new HashMap();
 
 }
