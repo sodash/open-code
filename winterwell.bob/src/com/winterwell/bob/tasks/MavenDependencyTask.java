@@ -103,6 +103,7 @@ public class MavenDependencyTask extends BuildTask {
 					+( ! keepJarVersioning? " -Dmdep.stripVersion=true" : "")
 					+ " -DoutputDirectory="+outDir);
 			proc.setDirectory(projectDir);
+			Log.d(LOGTAG, "dir: "+projectDir+" run: "+proc.getCommand());
 			proc.start();
 			proc.waitFor(new Dt(10, TUnit.MINUTE));
 			proc.close();
@@ -144,5 +145,12 @@ public class MavenDependencyTask extends BuildTask {
 				"</project>\n" + 
 				"");
 	}
+	@Override
+	public String toString() {
+		return "MavenDependencyTask[mavenArtifactSpec=" + mavenArtifactSpec + ", outDir=" + outDir + ", projectDir="
+				+ projectDir + "]";
+	}
 
+	
+	
 }
