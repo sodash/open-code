@@ -95,7 +95,7 @@ public class MavenDependencyTask extends BuildTask {
 		}
 		try {
 			// maven expects the pom in the exact place
-			if (! pom.equals(pomProper)) {
+			if ( ! pom.equals(pomProper)) {
 				FileUtils.copy(pom, pomProper);
 			}
 			
