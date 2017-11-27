@@ -21,6 +21,7 @@ public class DataLogSecurity {
 
 	public static void check(WebRequest state, String dataspace, List<String> breakdown) {
 		// TODO insist on login
+//		if (true) return;
 		XId user = state.getUserId();
 		if (user==null) {
 			YouAgainClient yac = Dep.get(YouAgainClient.class);
