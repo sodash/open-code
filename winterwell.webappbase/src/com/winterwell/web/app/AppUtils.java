@@ -378,6 +378,7 @@ public class AppUtils {
 	public static void initESIndices(KStatus[] main, Class[] dbclasses) {
 		IESRouter esRouter = Dep.get(IESRouter.class);
 		ESHttpClient es = Dep.get(ESHttpClient.class);
+		ESException err = null;
 		for(KStatus s : main) {
 			for(Class klass : dbclasses) {
 				ESPath path = esRouter.getPath(null, klass, null, s);
@@ -385,21 +386,27 @@ public class AppUtils {
 				if (es.admin().indices().indexExists(index)) {
 					continue;
 				}
-				// make with an alias to allow for later switching if we change the schema
-				String baseIndex = index+"_"+es.getConfig().getIndexAliasVersion();
-				CreateIndexRequest pi = es.admin().indices().prepareCreate(baseIndex);
-				pi.setFailIfAliasExists(true);
-				pi.setAlias(index);
-				IESResponse r = pi.get();
+				try {
+					// make with an alias to allow for later switching if we change the schema
+					String baseIndex = index+"_"+es.getConfig().getIndexAliasVersion();
+					CreateIndexRequest pi = es.admin().indices().prepareCreate(baseIndex);
+					pi.setFailIfAliasExists(true);
+					pi.setAlias(index);
+					IESResponse r = pi.get();
+				} catch(ESException ex) {
+					Log.e("ES.init", ex.toString());
+					err = ex;
+				}
 			}
 		}
-
+		if (err!=null) throw err;
 	}
 
 
 	public static void initESMappings(KStatus[] statuses, Class[] dbclasses, ArrayMap<Class,Map> mappingFromClass) {
 		IESRouter esRouter = Dep.get(IESRouter.class);
 		ESHttpClient es = Dep.get(ESHttpClient.class);
+		ESException err = null;
 		for(KStatus status : statuses) {			
 			for(Class k : dbclasses) {
 				ESPath path = esRouter.getPath(null, k, null, status);
@@ -423,11 +430,15 @@ public class AppUtils {
 					// attempt a simple reindex
 					ReindexRequest rr = new ReindexRequest(es, path.index(), index);
 					rr.execute(); // could be slow, so don't wait
-					// and shout fail
-					throw ex;
+					// and shout fail!
+					//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
+					// c.f. https://issues.soda.sh/stream?tag=35538&as=su
+					err = ex;
+					Log.e("init", ex.toString());
 				}
 			}
 		}
+		if (err != null) throw err;
 	}
 
 	private static void initESMappings2_putMapping(ArrayMap<Class, Map> mappingFromClass, ESHttpClient es, Class k,
