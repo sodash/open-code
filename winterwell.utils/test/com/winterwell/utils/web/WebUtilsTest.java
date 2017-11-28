@@ -514,6 +514,14 @@ public class WebUtilsTest extends TestCase {
 	}
 
 	public void testGetDomain() {
+		{
+			String d = WebUtils.getDomain("good-loop-xmas.com");
+			assert d.equals("good-loop-xmas.com") : d;
+		}
+		{
+			String d = WebUtils.getDomain("https://good-loop-xmas.com?foo=bar");
+			assert d.equals("good-loop-xmas.com") : d;
+		}
 		{ 
 			String d = WebUtils.getDomain("https://foo.soda.sh/bar");
 			assert d.equals("soda.sh") : d;
