@@ -25,6 +25,7 @@ import com.winterwell.es.BuildESJavaClient;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.FileUtils;
@@ -70,11 +71,22 @@ public class PublishProjectTask extends BuildTask {
 
 	protected boolean compile;
 			
+	/**
+	 * 
+	 * @param projectName
+	 * @param remoteWebAppDir  
+	 * @throws Exception
+	 */
 	public PublishProjectTask(String projectName, String remoteWebAppDir) throws Exception {
+		this(projectName, remoteWebAppDir, FileUtils.getWorkingDirectory());
+	}
+	
+	public PublishProjectTask(String projectName, String remoteWebAppDir, File localWebAppDir) throws Exception {
+		Utils.check4null(projectName, remoteWebAppDir);
 		this.projectName = projectName;
 		this.remoteWebAppDir = remoteWebAppDir;
 		// local
-		this.localWebAppDir = FileUtils.getWorkingDirectory();
+		this.localWebAppDir = localWebAppDir;
 		localLib = new File(localWebAppDir,"tmp-lib");
 		jarFile = new File(localLib, projectName+".jar");
 		bashScript = "./publish-"+projectName+".sh";		
@@ -87,7 +99,7 @@ public class PublishProjectTask extends BuildTask {
 				new BuildMaths(),
 				new BuildBob(),
 				new BuildWeb(),
-				new BuildDataLog(), // This!
+				new BuildDataLog(),
 				new BuildDepot(),
 				new BuildESJavaClient(),
 				new BuildFlexiGson(),

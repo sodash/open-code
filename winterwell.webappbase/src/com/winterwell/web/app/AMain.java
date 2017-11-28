@@ -21,7 +21,7 @@ import com.winterwell.web.LoginDetails;
  *
  * @param <ConfigType>
  */
-public abstract class AMain<ConfigType> {
+public abstract class AMain<ConfigType extends ISiteConfig> {
 
 //	public static final Time startTime = new Time();
 	
