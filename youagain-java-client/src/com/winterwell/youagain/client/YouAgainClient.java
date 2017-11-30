@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.mail.internet.InternetAddress;
+
 import org.eclipse.jetty.util.ajax.JSON;
 import org.jose4j.jwt.JwtClaims;
 import org.junit.runner.notification.RunListener.ThreadSafe;
@@ -36,8 +38,17 @@ import com.winterwell.web.fields.XIdField;
  * 
  * @author daniel
  */
-public class YouAgainClient {
+public final class YouAgainClient {
 
+	public static XId xidFromEmail(String email) {
+		return new XId(WebUtils2.canonicalEmail(email), "email");
+	}
+	
+	public static XId xidFromEmail(InternetAddress email) {
+		return new XId(WebUtils2.canonicalEmail(email), "email");
+	}
+
+	
 	static final String ENDPOINT = 
 				"https://youagain.winterwell.com/youagain.json";
 //				"http://localyouagain.winterwell.com/youagain.json";
@@ -58,8 +69,10 @@ public class YouAgainClient {
 	}	
 	
 	/**
-	 * TODO
-	 * This will also call state.setUser()
+	 * This is the method you want :)
+	 * 
+	 * This will also call state.setUser(). 
+	 * Caches the return so repeated calls are fast.
 	 * @param state
 	 * @return null if not logged in at all, otherwise list of AuthTokens
 	 */

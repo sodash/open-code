@@ -15,9 +15,9 @@ import com.winterwell.utils.web.IHasJson;
  * Support values down to 0.01p (a hundredth of a pence)
  * (i.e. £0.10 CPM is the lowest value)
  */
-public final class MonetaryAmount 
+public final class Money 
 extends AThing // dubious -- no id, no url
-implements Comparable<MonetaryAmount>, IHasJson {
+implements Comparable<Money>, IHasJson {
 	
 	private static final long serialVersionUID = 1L;
 	private Time start;
@@ -36,7 +36,7 @@ implements Comparable<MonetaryAmount>, IHasJson {
 	 */
 	private static final BigDecimal P100 = new BigDecimal(10000);
 
-	MonetaryAmount() {	
+	Money() {	
 	}
 	
 	public KCurrency currency = KCurrency.GBP;
@@ -69,7 +69,7 @@ implements Comparable<MonetaryAmount>, IHasJson {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		MonetaryAmount other = (MonetaryAmount) obj;
+		Money other = (Money) obj;
 		if (currency != other.currency)
 			return false;
 		if (getValue100p() != other.getValue100p())
@@ -82,14 +82,14 @@ implements Comparable<MonetaryAmount>, IHasJson {
 	 * @param gbp 
 	 * @param value
 	 */
-	public MonetaryAmount(KCurrency currency, Number value) {
+	public Money(KCurrency currency, Number value) {
 		this.currency = currency;
 		this._value = MathUtils.cast(BigDecimal.class, value);
 		this.value = _value.toPlainString();
 		this.value100p = _value.multiply(P100).longValue();
 	}
 
-	public MonetaryAmount(KCurrency currency, String value) {
+	public Money(KCurrency currency, String value) {
 		this(currency, new BigDecimal(value));
 	}
 
@@ -98,12 +98,12 @@ implements Comparable<MonetaryAmount>, IHasJson {
 	 * @param x
 	 * @return a new MA for this + x, or this if x=0
 	 */
-	public MonetaryAmount plus(MonetaryAmount x) {
+	public Money plus(Money x) {
 		if (x.isZero()) return this;
 		if (currency!=null && x.currency!=null && currency != x.currency) {
 			throw new IllegalArgumentException("Cannot plus across currency "+this+ " "+x);
 		}
-		return new MonetaryAmount(currency, getValue().add(x.getValue()));
+		return new Money(currency, getValue().add(x.getValue()));
 	}
 
 	
@@ -112,10 +112,10 @@ implements Comparable<MonetaryAmount>, IHasJson {
 	 * @param x
 	 * @return a new MA for this * x, or this if x=1
 	 */
-	public MonetaryAmount multiply(BigDecimal x) {
+	public Money multiply(BigDecimal x) {
 		if (x.doubleValue()==1) return this;
 		BigDecimal v2 = getValue().multiply(x);
-		return new MonetaryAmount(currency, v2);
+		return new Money(currency, v2);
 	}
 	
 	
@@ -124,12 +124,12 @@ implements Comparable<MonetaryAmount>, IHasJson {
 	 * @param x
 	 * @return a new MA for this - x, or this if x=0
 	 */
-	public MonetaryAmount minus(MonetaryAmount x) {
+	public Money minus(Money x) {
 		if (x.isZero()) return this;
 		if (currency!=null && x.currency!=null && currency != x.currency) {
 			throw new IllegalArgumentException("Cannot minus across currency "+this+ " "+x);
 		}
-		return new MonetaryAmount(currency, getValue().subtract(x.getValue()));
+		return new Money(currency, getValue().subtract(x.getValue()));
 	}
 
 
@@ -146,8 +146,8 @@ implements Comparable<MonetaryAmount>, IHasJson {
 	}
 
 
-	public static MonetaryAmount pound(double number) {
-		return new MonetaryAmount(KCurrency.GBP, new BigDecimal(number));
+	public static Money pound(double number) {
+		return new Money(KCurrency.GBP, new BigDecimal(number));
 	}
 
 	
@@ -178,7 +178,7 @@ implements Comparable<MonetaryAmount>, IHasJson {
 
 
 	@Override
-	public int compareTo(MonetaryAmount o) {
+	public int compareTo(Money o) {
 		return Long.compare(value100p, o.value100p);
 	}
 
@@ -200,8 +200,8 @@ implements Comparable<MonetaryAmount>, IHasJson {
 		return currency;
 	}
 
-	public static MonetaryAmount from100p(KCurrency c, Number v100p) {
-		return new MonetaryAmount(c, MathUtils.cast(BigDecimal.class, v100p).divide(P100));
+	public static Money from100p(KCurrency c, Number v100p) {
+		return new Money(c, MathUtils.cast(BigDecimal.class, v100p).divide(P100));
 	}
 	
 }

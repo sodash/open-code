@@ -1,5 +1,9 @@
 package com.winterwell.web.fields;
 
+/**
+ * Simple String field
+ * @author daniel
+ */
 public final class SField extends AField<String> {
 
 	public SField(String name) {
