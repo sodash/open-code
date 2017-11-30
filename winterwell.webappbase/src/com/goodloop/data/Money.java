@@ -191,6 +191,10 @@ implements Comparable<Money>, IHasJson {
 				);
 	}
 
+	/**
+	 * @return value in hundredth of a pence, e.g. £1 = 10000 !
+	 * This is a "high precision" int, stored to support database arithmetic.
+	 */
 	public long getValue100p() {
 		init();
 		return value100p;
