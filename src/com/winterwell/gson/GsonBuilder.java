@@ -86,9 +86,9 @@ public class GsonBuilder {
   private boolean prettyPrinting;
   private boolean generateNonExecutableJson;
   private String classProperty = DEFAULT_CLASS_PROPERTY;
-private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
-	private boolean lenientReader;
-	private Map<String, Class> classForClass;
+  private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
+  private boolean lenientReader;
+  private Map<String, Class> classForClass;
 
   /**
    * Creates a GsonBuilder instance that can be used to build Gson with various configuration
@@ -625,6 +625,7 @@ private KLoopPolicy loopPolicy = KLoopPolicy.QUIET_NULL;
 	}
 
 	public GsonBuilder setClassMapping(String classNameInJson, Class class1) {
+		if (classForClass==null) classForClass = new HashMap();
 		classForClass.put(classNameInJson, class1);
 		return this;
 	}

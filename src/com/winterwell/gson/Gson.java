@@ -210,6 +210,9 @@ public class Gson {
 
 	private boolean lenientReader;
 
+	/**
+	 * See GsonBuilder.setClassMapping()
+	 */
 	public final Map<String,Class> classForClass = new HashMap();
 
 	/**

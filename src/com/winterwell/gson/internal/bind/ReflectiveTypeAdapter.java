@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.winterwell.gson.Gson;
+import com.winterwell.gson.GsonBuilder;
 import com.winterwell.gson.JsonSyntaxException;
 import com.winterwell.gson.KLoopPolicy;
 import com.winterwell.gson.TypeAdapter;
@@ -379,6 +380,11 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 		}
 	}
 
+	/**
+	 * @param klass
+	 * @return
+	 * @throws ClassNotFoundException
+	 */
 	TypeAdapter read3(String klass) throws ClassNotFoundException {
 		// what does the constructor handle??
 		if (constructor.getType().getCanonicalName().equals(klass)) {
@@ -386,6 +392,7 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 			return null;
 		}
 		// user defined type mapping?
+		// See GsonBuilder.setClassMapping() 		
 		Class typeOfT = gson.classForClass.get(klass);
 		// get the Java class
 		if (typeOfT==null) typeOfT = Class.forName(klass);
