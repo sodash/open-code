@@ -559,7 +559,9 @@ public class WebRequest implements IProperties, Closeable {
 	 * :(
 	 */
 	public final <T> T get(Key<T> key, T defaultValue) {
-		assert defaultValue != null;
+		if (defaultValue == null) {
+			Log.w("web", "null default for "+key);
+		}
 		T result = get(key);
 		if (result == null)
 			return defaultValue;
