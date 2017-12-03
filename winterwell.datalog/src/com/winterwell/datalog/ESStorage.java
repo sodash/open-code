@@ -263,7 +263,9 @@ public class ESStorage implements IDataLogStorage {
 			} else if (cp.getValue()==Double.class) {
 				est = new ESType().DOUBLE();
 			} else if (cp.getValue()==Integer.class) {
-					est = new ESType().INTEGER();					
+					est = new ESType().INTEGER();
+			} else if (cp.getValue()==Long.class) {
+				est = new ESType().LONG();					 
 			} else if (cp.getValue()==Object.class) {
 				if ("geo".equals(cp.getKey())) {
 					est = new ESType().geo_point();
