@@ -3,6 +3,11 @@ package com.winterwell.web.app;
 import java.io.File;
 import java.util.function.Supplier;
 
+import com.winterwell.es.XIdTypeAdapter;
+import com.winterwell.gson.Gson;
+import com.winterwell.gson.GsonBuilder;
+import com.winterwell.gson.KLoopPolicy;
+import com.winterwell.gson.StandardAdapters;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
@@ -13,6 +18,7 @@ import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.web.LoginDetails;
+import com.winterwell.web.data.XId;
 
 /**
  * TODO can we refactor some more common code here?
@@ -67,6 +73,24 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		config = init2_config(args);
 		init2(config);
 	}
+	
+	/**
+	 * TODO refactor so all AMains use this (poss overriding it)
+	 */
+	protected void init3_gson() {
+		Gson gson = new GsonBuilder()
+		.setLenientReader(true)
+		.registerTypeAdapter(Time.class, new StandardAdapters.TimeTypeAdapter())
+		.registerTypeAdapter(XId.class, new XIdTypeAdapter())
+		.serializeSpecialFloatingPointValues()
+		.setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+//		.setClassProperty(null)
+		.setLoopPolicy(KLoopPolicy.QUIET_NULL)
+		.create();
+		Dep.set(Gson.class, gson);
+	}
+
+	
 	public final void init() {
 		init(new String[0]);
 	}
@@ -75,12 +99,13 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		if (initFlag) return;
 		initFlag = true;		
 		try {
-			init3_emailer();
+			init3_emailer();			
 		} catch(Throwable ex) {
 			// compact whitespace => dont spew a big stacktrace, so we don't scare ourselves in dev
 			Log.e("init", StrUtils.compactWhitespace(Printer.toString(ex, true)));
 			// oh well, no emailer
-		}
+		}		
+		// TODO init3_gson();
 	}
 
 	protected void init3_emailer() {
@@ -90,6 +115,11 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		Dep.set(Emailer.class, emailer);		
 	}
 	
+	/**
+	 * Suggestion: use AppUtils.getConfig()
+	 * @param args
+	 * @return
+	 */
 	protected abstract ConfigType init2_config(String[] args);
 
 	private void launchJetty() {
@@ -110,8 +140,8 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * Override! This should read from config
 	 * @return
 	 */
-	protected int getPort() {
-		return 80;
+	protected final int getPort() {
+		return getConfig().getPort();
 	}
 
 	/**

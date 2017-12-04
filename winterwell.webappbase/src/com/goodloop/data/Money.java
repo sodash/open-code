@@ -79,8 +79,6 @@ implements Comparable<Money>, IHasJson {
 
 	/**
 	 * 
-	 * @param gbp 
-	 * @param value
 	 */
 	public Money(KCurrency currency, Number value) {
 		this.currency = currency;
