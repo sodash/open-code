@@ -191,6 +191,10 @@ public class AppUtils {
 	
 
 	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath) {
+		return doPublish(draft, draftPath, publishPath, false);
+	}
+	
+	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath, boolean forceRefresh) {
 		// prefer being given the draft to avoid ES race conditions
 		if (draft==null) {
 			Map<String, Object> draftMap = get(draftPath, null);
@@ -207,6 +211,7 @@ public class AppUtils {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		UpdateRequestBuilder up = client.prepareUpdate(publishPath);
 		up.setDoc(draft.map());
+		if (forceRefresh) up.setRefresh("true");
 		up.setDocAsUpsert(true);
 		// NB: this doesn't return the merged item :(
 		IESResponse resp = up.get().check();
@@ -216,6 +221,7 @@ public class AppUtils {
 			UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
 			upd.setDoc(draft.map());
 			upd.setDocAsUpsert(true);
+			if (forceRefresh) upd.setRefresh("true");
 			IESResponse respd = upd.get().check();
 		}
 		

@@ -814,6 +814,8 @@ public class WebRequest implements IProperties, Closeable {
 	}
 
 	/**
+	 * WARNING: this removes .html .json etc -- but it can also remove .stuff you want!
+	 * 
 	 * @return the page slug, or null if none. The slug is url decoded. E.g. if
 	 *         the url is http://foobar.com/servlet/red%20fish/sub?x=1, the slug
 	 *         is "red fish/sub" The final file-type ending is removed, so
@@ -826,9 +828,11 @@ public class WebRequest implements IProperties, Closeable {
 		String pi = request.getPathInfo();
 		if (pi == null)
 			return null;
+		boolean keepFileType = false;
 		// eg. /profile/ has no slug
 		if (pi.endsWith("/")) {
 			pi = pi.substring(0, pi.length() - 1);
+			keepFileType = true; // its not a file type!
 		}
 		String servletPath = getServletPath();
 		if (pi == null || pi.length() <= servletPath.length())
@@ -840,7 +844,9 @@ public class WebRequest implements IProperties, Closeable {
 		pi = pi.substring(servletPath.length() + 1); // remove initial servlet
 														// path plus trailing /
 		// remove file type
-		pi = FileUtils.getBasenameCautious(pi);
+		if ( ! keepFileType) {
+			pi = FileUtils.getBasenameCautious(pi);
+		}
 		return pi;
 	}
 

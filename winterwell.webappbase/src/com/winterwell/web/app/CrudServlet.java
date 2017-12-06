@@ -274,13 +274,12 @@ public abstract class CrudServlet<T> implements IServlet {
 			s.setIndex(
 					esRouter.getPath(dataspace, type, null, status).index()
 					);
-		} 
-//		else {
-//			s.setIndices(
-//					esRouter.getPath(type, null, KStatus.PUBLISHED).index(),
-//					esRouter.getPath(type, null, KStatus.DRAFT).index()
-//				);
-//		}
+		} else {
+			s.setIndices(
+					esRouter.getPath(type, null, KStatus.PUBLISHED).index(),
+					esRouter.getPath(type, null, KStatus.DRAFT).index()
+				);
+		}
 		
 		// query
 		String q = state.get("q");
