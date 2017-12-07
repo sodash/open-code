@@ -108,11 +108,14 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		// TODO init3_gson();
 	}
 
-	protected void init3_emailer() {
-		if (Dep.has(Emailer.class)) return;
+	protected Emailer init3_emailer() {
+		if (Dep.has(Emailer.class)) return Dep.get(Emailer.class);
 		EmailConfig ec = AppUtils.getConfig(projectName, new EmailConfig(), null);
-		Emailer emailer = new Emailer(ec.getLoginDetails());
-		Dep.set(Emailer.class, emailer);		
+		LoginDetails ld = ec.getLoginDetails();
+		if (ld == null) return null;
+		Emailer emailer = new Emailer(ld);
+		Dep.set(Emailer.class, emailer);
+		return emailer;
 	}
 	
 	/**

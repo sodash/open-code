@@ -22,6 +22,7 @@ public class EmailConfig {
 	boolean emailSSL;
 	
 	public LoginDetails getLoginDetails() {
+		if (emailServer==null) return null;
 		LoginDetails ld = new LoginDetails(emailServer, emailFrom, emailPassword, emailPort);
 		ld.put(SMTPClient.USE_SSL, emailSSL);
 		return ld;

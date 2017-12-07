@@ -19,6 +19,7 @@ import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
 
 /**
+ * Send emails by SMTP, using a bot/admin email account.
  * @testedby {@link EmailerTest}
  * @author daniel
  *
