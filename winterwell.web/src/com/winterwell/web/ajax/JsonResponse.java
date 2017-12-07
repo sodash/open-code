@@ -18,6 +18,9 @@ import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.SafeString;
 
 /**
+ * TODO it'd be nice to replace this with JSend which is 
+ * https://labs.omniti.com/labs/jsend
+ * 
  * Use with
  * {@link WebUtils2#sendJson(JsonResponse, javax.servlet.http.HttpServletResponse)}.
  * Typical output:
@@ -167,7 +170,8 @@ public class JsonResponse implements IProperties {
 	}
 	
 	public String toJSON() {
-		String json = JSON.toString(Containers.getMap(this));
+		Map<String, Object> map = Containers.getMap(this);
+		String json = JSON.toString(map);
 		if (cargoJson==null) return json;
 		// HACK direct json cargo + the json for the response wrapper
 		String json2 = "{\"cargo\":"+cargoJson+","+json.substring(1);
