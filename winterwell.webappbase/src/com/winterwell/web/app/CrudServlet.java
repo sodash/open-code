@@ -102,12 +102,12 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 	
 	protected void doSecurityCheck(WebRequest state) throws SecurityException {
+		YouAgainClient ya = Dep.get(YouAgainClient.class);
+		List<AuthToken> tokens = ya.getAuthTokens(state);
 		if (state.getAction() == null) {
 			return;
 		}
-		// logged in?			
-		YouAgainClient ya = Dep.get(YouAgainClient.class);
-		List<AuthToken> tokens = ya.getAuthTokens(state);
+		// logged in?					
 		if (Utils.isEmpty(tokens)) throw new NoAuthException(state);
 	}
 
