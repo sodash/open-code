@@ -17,6 +17,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
 
 /**
@@ -306,17 +307,8 @@ public abstract class BuildTask implements Closeable {
 		try {
 			if (maxTime!=null) timeOut = new TimeOut(maxTime.getMillisecs());
 			// call dependencies
-			long depLrd = 0;
 			// run
-			Collection<? extends BuildTask> deps = getDependencies();
-			if (deps!=null) {
-				for (BuildTask bs : deps) {
-					bs.run();
-					long lrd = bs.getLastRunDate();
-					if (lrd > depLrd)
-						depLrd = lrd;
-				}
-			}
+			long depLrd = run2_dependencies();
 			// Do we need to run?
 			if (depLrd < getLastRunDate() && ! triggered()) {
 				Log.report(LOGTAG, "skipping " + getClass().getName(), Level.FINE);
@@ -357,6 +349,20 @@ public abstract class BuildTask implements Closeable {
 				Log.report(LOGTAG, "----- BUILD COMPLETE -----", Level.INFO);
 			}
 		}
+	}
+
+	private Time run2_dependencies() {
+		Collection<? extends BuildTask> deps = getDependencies();
+		if (deps==null) return null;
+		foo
+			for (BuildTask bs : deps) {
+				bs.run();
+				long lrd = bs.getLastRunDate();
+				if (lrd > depLrd)
+					depLrd = lrd;
+			}
+		}
+		return depLrd;
 	}
 
 	protected void report(String msg, Level level) {
