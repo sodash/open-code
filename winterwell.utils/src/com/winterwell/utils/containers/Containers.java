@@ -279,7 +279,7 @@ public final class Containers  {
 	 * 
 	 * @return [fn applied to each member of list]
 	 */
-	public static <I, O> List<O> apply(Iterable<? extends I> list, IFn<I, O> fn) {
+	public static <I, O> ArrayList<O> apply(Iterable<? extends I> list, IFn<I, O> fn) {
 		ArrayList after = list instanceof Collection? new ArrayList(((Collection) list).size()) : new ArrayList();
 		try {
 			for (I object : list) {
