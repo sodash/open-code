@@ -9,6 +9,8 @@ import java.util.logging.Level;
 
 import org.junit.Test;
 
+import com.winterwell.depot.Desc;
+import com.winterwell.depot.IHasDesc;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.TimeOut;
@@ -19,6 +21,9 @@ import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
+import com.winterwell.utils.web.XStreamUtils;
+
+import jobs.BuildUtils;
 
 /**
  * A task forming part or all of a build process. Subclass this to create build
@@ -65,7 +70,44 @@ import com.winterwell.utils.time.TimeUtils;
  * @author daniel
  * 
  */
-public abstract class BuildTask implements Closeable {
+public abstract class BuildTask implements Closeable, IHasDesc {
+
+	private Desc desc;
+
+	@Override
+	public Desc getDesc() {
+		if (this.desc!=null) return desc;
+		desc = new Desc("BuildTask", getClass());
+		desc.setTag("bob");
+		desc.setVersionStamp(this);
+		
+		// FIXME debug
+		if (this instanceof BuildUtils) {
+			String vrsn = XStreamUtils.serialiseToXml(this);
+			Log.i(LOGTAG, "Desc vstamp: "+vrsn);			
+		}
+		
+		return desc;
+	}
+	
+	
+	@Override
+	public int hashCode() {
+		return getDesc().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BuildTask other = (BuildTask) obj;
+		return getDesc().equals(other.getDesc());
+	}
+
 
 	private IErrorHandler errorHandler;
 
@@ -129,41 +171,6 @@ public abstract class BuildTask implements Closeable {
 	protected abstract void doTask() throws Exception;
 
 	/**
-	 * Equals() if same class and all non-transient fields are equals.
-	 */
-	@Override
-	public final boolean equals(Object obj) {
-		if (obj.getClass() != getClass()) return false;		
-		try {
-			return equals2(this, obj, getClass());
-		} catch (Exception e) {
-			throw Utils.runtime(e);
-		}		
-	}
-
-	private boolean equals2(Object a, Object b, Class klass) throws Exception {
-		// Loop through fields
-		Field[] fields = getClass().getDeclaredFields();
-		for (Field field : fields) {
-			// Ignore transient and static fields
-			int mod = field.getModifiers();
-			if (Modifier.isTransient(mod) || Modifier.isStatic(mod))
-				continue;
-			// Get the value
-			field.setAccessible(true);
-			Object v1 = field.get(a);
-			Object v2 = field.get(b);
-			if ( ! Utils.equals(v1, v2)) {
-				return false;
-			}
-		}
-		// Recurse
-		Class sClazz = klass.getSuperclass();
-		if (sClazz == null) return true;
-		return equals2(a, b, sClazz);
-	}
-
-	/**
 	 * @return The build tasks this task depends on. Dependencies will be run
 	 *         first. Returns an empty list by default - override to specify
 	 *         some dependencies. null is also acceptable.
@@ -188,43 +195,6 @@ public abstract class BuildTask implements Closeable {
 		throw Utils.runtime(e);		
 	}
 
-	@Override
-	public final int hashCode() {
-		if (hashcode != 0)
-			return hashcode;
-		try {
-			hashcode = hashCode2(getClass());
-			return hashcode;
-		} catch (IllegalAccessException e) {
-			throw new IllegalArgumentException(
-					"BuildTask requires access to all fields for hashcode calculations. This has failed: "
-							+ e.getMessage());
-		}
-	}
-
-	int hashCode2(Class clazz) throws IllegalAccessException {
-		int code = 1;
-		int prime = 17;
-		// Loop through fields
-		Field[] fields = clazz.getDeclaredFields();
-		for (Field field : fields) {
-			// Ignore transient and static fields
-			int mod = field.getModifiers();
-			if (Modifier.isTransient(mod) || Modifier.isStatic(mod))
-				continue;
-			// Get the value
-			field.setAccessible(true);
-			Object v = field.get(this);
-			code = code * prime;
-			if (v != null)
-				code += v.hashCode();
-		}
-		// Recurse
-		Class sClazz = clazz.getSuperclass();
-		if (sClazz == null || BuildTask.class.equals(sClazz))
-			return code;
-		return 3 * code + hashCode2(sClazz);
-	}
 	
 	Dt maxTime;
 
@@ -236,7 +206,7 @@ public abstract class BuildTask implements Closeable {
 	 * How many tasks down have we recursed? 
 	 * Use-case: for skipping
 	 */
-	protected int depth;
+	protected transient int depth;
 	
 	/**
 	 * if true, the dependencies will NOT be run!
@@ -357,6 +327,7 @@ public abstract class BuildTask implements Closeable {
 			for (BuildTask bs : deps) {
 				Time lastRun = Bob.getLastRunDate(bs);
 				if (lastRun.isAfterOrEqualTo(rs)) {
+					Log.i(LOGTAG, "Skip repeat dependency: "+bs);
 					continue; // skip it -- dont repeat run
 				}
 				bs.setDepth(depth+1);

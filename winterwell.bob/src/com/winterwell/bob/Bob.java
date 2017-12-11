@@ -13,6 +13,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
@@ -56,7 +57,7 @@ public class Bob {
 
 	private static final Bob dflt = new Bob();
 
-	static Map<BuildTask, Time> time4task = new HashMap<BuildTask, Time>();
+	static Map<Class, Time> time4task = new HashMap<Class, Time>();
 
 	private static volatile Time runStart;
 
@@ -99,9 +100,13 @@ public class Bob {
 
 	public static Time getLastRunDate(BuildTask buildTask) {
 		assert buildTask != null;
-		Time t = time4task.get(buildTask);
+		Time t = time4task.get(buildTask.getClass());
 		if (t != null)
 			return t;
+//		// FIXME BU != BU :(
+//		for(BuildTask huh : time4task.keySet()) {
+//			assert ! huh.equals(buildTask);
+//		}
 		// // From file?
 		// File f = getFile(buildTask);
 		// if (f != null && f.exists()) {
@@ -160,7 +165,7 @@ public class Bob {
 	}
 
 	public static void setLastRunDate(BuildTask buildTask) {
-		time4task.put(buildTask, new Time());
+		time4task.put(buildTask.getClass(), new Time());
 	}
 
 	/**
@@ -173,6 +178,8 @@ public class Bob {
 //	Set<File> outputFiles = new HashSet<File>();
 
 	private BobSettings settings = new BobSettings();
+
+private LogFile logfile;
 
 //	PrintStream sharedErrorStream;
 //
@@ -236,6 +243,10 @@ public class Bob {
 		if (initFlag)
 			return;
 		initFlag = true;
+		
+		// ?? how do we want to log stuff??
+		logfile = new LogFile(new File("bob.log"));
+		
 		// for dispose() to restore
 //		sysOut = System.out;
 //		sysErr = System.err;
