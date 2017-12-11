@@ -17,6 +17,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
 
 /**
@@ -107,8 +108,6 @@ public abstract class BuildTask implements Closeable {
 
 	transient private int hashcode;
 
-	transient long lastRunDate;
-
 	protected BuildTask() {
 		config();
 	}
@@ -173,25 +172,6 @@ public abstract class BuildTask implements Closeable {
 		return Collections.emptyList();
 	}
 
-	public final long getLastRunDate() {
-		// Lazy setting to make sure getId() has all its vars set by the
-		// subclass, if overridden
-		if (lastRunDate == 0) {
-			lastRunDate = Bob.getLastRunDate(this);
-		}
-		return lastRunDate;
-	}
-
-	/**
-	 * @return the objects which will trigger this script to run. E.g. if a file
-	 *         has changed since the script was last run. The dependencies also
-	 *         count as triggers (there is no need to include them here). null
-	 *         indicates that this script should always be run.
-	 */
-	public Collection<? extends Object> getTriggers() {
-		return null;
-	}
-
 	private void handleException(Throwable e) {
 		if (bob.getSettings().ignoreAllExceptions) {
 			System.out.println("Ignoring: " + e);
@@ -249,6 +229,23 @@ public abstract class BuildTask implements Closeable {
 	Dt maxTime;
 
 	protected String LOGTAG = Bob.LOGTAG+"."+getClass().getSimpleName();
+
+	private boolean skipDependencies;
+
+	/**
+	 * How many tasks down have we recursed? 
+	 * Use-case: for skipping
+	 */
+	protected int depth;
+	
+	/**
+	 * if true, the dependencies will NOT be run!
+	 * Use-case: for speed in debug runs.
+	 * @param skipDependencies
+	 */
+	public void setSkipDependencies(boolean skipDependencies) {
+		this.skipDependencies = skipDependencies;
+	}
 	
 	/**
 	 * null by default. 
@@ -305,23 +302,8 @@ public abstract class BuildTask implements Closeable {
 		TimeOut timeOut = null;
 		try {
 			if (maxTime!=null) timeOut = new TimeOut(maxTime.getMillisecs());
-			// call dependencies
-			long depLrd = 0;
-			// run
-			Collection<? extends BuildTask> deps = getDependencies();
-			if (deps!=null) {
-				for (BuildTask bs : deps) {
-					bs.run();
-					long lrd = bs.getLastRunDate();
-					if (lrd > depLrd)
-						depLrd = lrd;
-				}
-			}
-			// Do we need to run?
-			if (depLrd < getLastRunDate() && ! triggered()) {
-				Log.report(LOGTAG, "skipping " + getClass().getName(), Level.FINE);
-				return;
-			}
+			// call dependencies?
+			doDependencies();
 
 			// run
 			doTask();
@@ -357,6 +339,40 @@ public abstract class BuildTask implements Closeable {
 				Log.report(LOGTAG, "----- BUILD COMPLETE -----", Level.INFO);
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean doDependencies() {
+		if (skipDependencies) {
+			// was there a change in the dependencies? who knows
+			return true;
+		}
+		// run
+		Collection<? extends BuildTask> deps = getDependencies();
+		if (deps!=null) {
+			Time rs = Bob.getRunStart();
+			for (BuildTask bs : deps) {
+				Time lastRun = Bob.getLastRunDate(bs);
+				if (lastRun.isAfterOrEqualTo(rs)) {
+					continue; // skip it -- dont repeat run
+				}
+				bs.setDepth(depth+1);
+				bs.run();
+			}
+		}
+//		// Do we need to run?
+//		if (depLrd < getLastRunDate() && ! triggered()) {
+//			Log.d(LOGTAG, "no need to run? " + getClass().getName()+" dependencies up to date");
+//			return false;
+//		}
+		return true;
+	}
+
+	private void setDepth(int depth) {
+		this.depth = depth;
 	}
 
 	protected void report(String msg, Level level) {

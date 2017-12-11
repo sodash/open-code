@@ -14,6 +14,8 @@ import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.TaskRunner;
+import com.winterwell.utils.time.Time;
+import com.winterwell.utils.time.TimeUtils;
 
 /**
  * Bob the Builder, a Java based build utility.
@@ -54,7 +56,9 @@ public class Bob {
 
 	private static final Bob dflt = new Bob();
 
-	static Map<Integer, Long> taskHashCode2Time = new HashMap<Integer, Long>();
+	static Map<BuildTask, Time> time4task = new HashMap<BuildTask, Time>();
+
+	private static volatile Time runStart;
 
 	public final static String VERSION_NUMBER = "0.01.01";
 
@@ -93,9 +97,9 @@ public class Bob {
 						+ StrUtils.LINEEND + "----------");
 	}
 
-	public static long getLastRunDate(BuildTask buildTask) {
+	public static Time getLastRunDate(BuildTask buildTask) {
 		assert buildTask != null;
-		Long t = taskHashCode2Time.get(buildTask.hashCode());
+		Time t = time4task.get(buildTask);
 		if (t != null)
 			return t;
 		// // From file?
@@ -103,7 +107,7 @@ public class Bob {
 		// if (f != null && f.exists()) {
 		// return f.lastModified();
 		// }
-		return 0;
+		return TimeUtils.WELL_OLD;
 	}
 
 	public static Bob getSingleton() {
@@ -156,9 +160,7 @@ public class Bob {
 	}
 
 	public static void setLastRunDate(BuildTask buildTask) {
-		long t = System.currentTimeMillis();
-		taskHashCode2Time.put(buildTask.hashCode(), t);
-		buildTask.lastRunDate = t;
+		time4task.put(buildTask, new Time());
 	}
 
 	/**
@@ -288,6 +290,11 @@ public class Bob {
 		// clean up ops
 		TaskRunner tr = Dep.get(TaskRunner.class);
 		tr.shutdown();
+	}
+
+	public static Time getRunStart() {
+		if (runStart==null) runStart = new Time();
+		return runStart;
 	}
 
 }
