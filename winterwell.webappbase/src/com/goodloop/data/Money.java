@@ -150,13 +150,15 @@ implements Comparable<Money>, IHasJson {
 
 	
 
+	/**
+	 * e.g. £10
+	 */
 	@Override
 	public String toString() {
-		return "MonetaryAmount["
-					+(currency==null? "" : currency.symbol) 
+		return (currency==null? "" : currency.symbol) 
 					+ value 
-					+(name==null? "" : ", name=" + name)
-					+ "]";
+//					+(name==null? "" : ", name=" + name)					
+					;
 	}
 
 	/**
