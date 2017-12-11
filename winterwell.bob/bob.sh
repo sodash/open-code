@@ -3,10 +3,10 @@
 
 if [ -z $WINTERWELL_HOME ]; then
     echo "WINTERWELL_HOME is unset"
-    exit 1
+WINTERWELL_HOME=`pwd`
 fi
 
-BOB_DIR=$WINTERWELL_HOME/code/winterwell.bob
+BOB_DIR=$WINTERWELL_HOME/open-code/winterwell.bob
 
 SCRIPTNAME=$2
 BOB_CLASSPATH=$1

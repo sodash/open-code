@@ -15,6 +15,11 @@ import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 
 /**
+ * EITHER setup via
+ * {@link #addDependency(String, String, String)}
+ * OR setup via
+ * pom.bob.xml
+ * 
  * See https://stackoverflow.com/questions/1895492/how-can-i-download-a-specific-maven-artifact-in-one-command-line
  * @author daniel
  *
@@ -83,6 +88,7 @@ public class MavenDependencyTask extends BuildTask {
 			if (pom==null) pom = new File(projectDir, "pom.bob.xml");
 			doMakePom(pom);
 		}
+		assert pom.exists() : "EITHER setup via addDependency() OR setup via pom.bob.xml";
 		// 
 		// http://maven.apache.org/plugins/maven-dependency-plugin/copy-dependencies-mojo.html
 //		-DoutputDirectory (defaults to build/dependency)
@@ -98,6 +104,7 @@ public class MavenDependencyTask extends BuildTask {
 			if ( ! pom.equals(pomProper)) {
 				FileUtils.copy(pom, pomProper);
 			}
+			assert pomProper.exists():  "no pom file?! "+new File(outDir, "pom.xml");
 			
 			Proc proc = new Proc("mvn org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies"
 					+( ! keepJarVersioning? " -Dmdep.stripVersion=true" : "")
