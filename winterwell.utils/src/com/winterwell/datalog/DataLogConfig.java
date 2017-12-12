@@ -2,8 +2,14 @@ package com.winterwell.datalog;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import com.winterwell.depot.IInit;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.DBOptions;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
@@ -36,7 +42,7 @@ server=localhost
  *         library. In particular, licenses for the com.winterwell.utils library do
  *         not apply to this file.
  */
-public class DataLogConfig extends DBOptions {
+public class DataLogConfig extends DBOptions implements IInit { 
 
 	public DataLogConfig() {
 		Log.d("DataLogConfig");
@@ -92,5 +98,32 @@ public class DataLogConfig extends DBOptions {
 	public String logEndpoint;
 
 	public String getDataEndpoint;
+
+	Map<String, Object> tagHandlers = new HashMap();
+	
+	public void setTagHandler(String tag, Supplier supplier) {
+		tagHandlers.put(tag, supplier);
+	}
+
+	@Override
+	public void init() {
+		try {
+			// convert settings into supplier functions
+			// status: not yet used!
+			for(String k : tagHandlers.keySet()) {
+				Object v = tagHandlers.get(k);
+				if (v instanceof String) {
+					v = Class.forName((String) v);
+				}
+				if (v instanceof Class) {
+					v = ((Class) v).getConstructor();
+					tagHandlers.put(k, v);
+				}
+			}
+		} catch(Throwable ex) {
+			// swallow and carry on
+			Log.e("DataLogConfig", ex);
+		}
+	}
 
 }

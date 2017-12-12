@@ -12,9 +12,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.winterwell.es.client.ESHttpResponse;
+import com.winterwell.maths.chart.LogGridInfo;
+import com.winterwell.maths.stats.distributions.d1.ExponentialDistribution1D;
+import com.winterwell.maths.stats.distributions.d1.HistogramData;
+import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.ListDataStream;
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.Dt;
@@ -32,7 +37,28 @@ public class ESStorageTest {
 		DataLog.dflt = new DataLogImpl(config);
 		DataLog.setConfig(config);
 	}
+
 	
+	@Test
+	public void testHistogram() throws InterruptedException, ExecutionException {
+		DataLogConfig config = DataLog.getImplementation().getConfig();
+		String tag = "distrotest_"+Utils.getRandomString(4);
+		// count upto ~1 billion in 30 buckets
+		config.setTagHandler(tag, () -> new HistogramData(new LogGridInfo(30)));
+		
+		DataLogImpl dl = (DataLogImpl) DataLog.getImplementation();
+		ExponentialDistribution1D exp = new ExponentialDistribution1D(0.1);
+		for(int i=0; i<100; i++) {
+			double x = exp.sample();			
+			dl.mean(x, tag);
+		}
+		
+		MeanRate mr = dl.getMean(tag);
+		IDistribution1D histo = mr.x;
+		assert histo instanceof HistogramData : histo;
+		assert MathUtils.approx(histo.getMean(), 10) : histo;
+	}
+
 	
 	@Test
 	public void testGetData() throws InterruptedException, ExecutionException {		
