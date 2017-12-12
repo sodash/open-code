@@ -197,7 +197,7 @@ public class WebUtils {
 	 * 
 	 * See #URL {@link winterwell.jtwitter.Regex#VALID_URL}, which is more flexible */
 	public static final Pattern URL_REGEX = Pattern
-			.compile("[hf]tt?ps?://([a-zA-Z0-9_\\-\\.]+)\\/?([a-zA-Z0-9_%\\-\\.,\\?&\\/=\\+'~#!\\*:]+[a-zA-Z0-9_%\\-&\\/=\\+])?");
+			.compile("[a-z]{3,6}://([a-zA-Z0-9_\\-\\.]+)\\/?([a-zA-Z0-9_%\\-\\.,\\?&\\/=\\+'~#!\\*:]+[a-zA-Z0-9_%\\-&\\/=\\+])?");
 
 	private static final Pattern URL_WEB_DOMAIN_FALLBACK_REGEX = Pattern.compile(URL_REGEX.pattern()+"|[a-z0-9_\\-\\.]+\\.(\\w{2,24})");
 

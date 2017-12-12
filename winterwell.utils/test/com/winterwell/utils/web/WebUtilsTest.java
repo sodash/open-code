@@ -41,6 +41,7 @@ public class WebUtilsTest extends TestCase {
 		String u1 = "https://lookup.london/philpot-lane-mice-londons-tiniest-sculpture/";
 		String u3 = WebUtils.getHost(u1);
 		System.out.println(u3);
+		assert u3.equals("lookup.london");
 	}
 	
 	

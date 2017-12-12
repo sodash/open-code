@@ -31,7 +31,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 
 //	public static final Time startTime = new Time();
 	
-	protected static JettyLauncher jl;
+	protected JettyLauncher jl;
 	
 	/**
 	 * aka app name
