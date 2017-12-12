@@ -50,7 +50,7 @@ public abstract class ADistribution1D extends ADistributionBase<Double>
 			"mean", getMean(),
 			"var", MathUtils.isFinite(getVariance())? getVariance() : null,
 			"max", MathUtils.isFinite(range.high)? range.high : null,
-			"min", MathUtils.isFinite(range.low)? range.low : null
+			"min", MathUtils.isFinite(range.low)? range.low : null			
 		);
 	}
 

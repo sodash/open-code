@@ -78,7 +78,8 @@ public class ESStorage implements IDataLogStorage {
 			IDistribution1D distro = tm.getValue();
 			DataLogEvent event = event4tag(tm.getKey(), distro.getMean());
 			if (distro instanceof IHasJson) {
-				Map jobj = (Map) ((IHasJson) distro).toJson2(); 
+				Map jobj = (Map) ((IHasJson) distro).toJson2();
+				foo gson
 				event.setExtraResults(new ArrayMap(jobj));
 			}
 			events.add(event);
@@ -263,7 +264,8 @@ public class ESStorage implements IDataLogStorage {
 				.property(DataLogEvent.EVENTTYPE, keywordy)
 				.property("time", new ESType().date())
 				.property("count", new ESType().DOUBLE())
-				.property("props", props);			
+				.property("props", props);		
+		// common probs...
 		for(Entry<String, Class> cp : DataLogEvent.COMMON_PROPS.entrySet()) {
 			// HACK to turn Class into ESType
 			ESType est = keywordy.copy();
@@ -281,6 +283,8 @@ public class ESStorage implements IDataLogStorage {
 				if ("geo".equals(cp.getKey())) {
 					est = new ESType().geo_point();
 				}
+			} else if (cp.getValue()==hm .class) {
+				no index
 			}
 			simpleEvent.property(cp.getKey(), est);
 		}

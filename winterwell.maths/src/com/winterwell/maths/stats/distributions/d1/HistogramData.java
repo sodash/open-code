@@ -322,18 +322,18 @@ implements ITrainable.Unsupervised.Weighted<Double>, IHasJson
 
 	@Override
 	public Map<String, Object> toJson2() throws UnsupportedOperationException {
-		Map<String, Object> map = super.toJson2();
-
-		// add in bucket info	
-		List bucketInfo = new ArrayList();
-		for(int i=0; i<backing.length; i++) {
-			bucketInfo.add(new ArrayMap(
-					"min", gridInfo.getBucketBottom(i),
-					"max", gridInfo.getBucketTop(i),
-					"count", backing[i]
-					));
-		}
-		map.put("buckets", bucketInfo);
+		Map<String, Object> map = super.toJson2();		
+		
+//		// add in bucket info	
+//		List bucketInfo = new ArrayList();
+//		for(int i=0; i<backing.length; i++) {
+//			bucketInfo.add(new ArrayMap(
+//					"min", gridInfo.getBucketBottom(i),
+//					"max", gridInfo.getBucketTop(i),
+//					"count", backing[i]
+//					));
+//		}
+//		map.put("buckets", bucketInfo);
 		
 		return map;
 	}

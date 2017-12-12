@@ -22,6 +22,7 @@ import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
@@ -41,6 +42,7 @@ public class ESStorageTest {
 	
 	@Test
 	public void testHistogram() throws InterruptedException, ExecutionException {
+		Time start = new Time();
 		DataLogConfig config = DataLog.getImplementation().getConfig();
 		String tag = "distrotest_"+Utils.getRandomString(4);
 		// count upto ~1 billion in 30 buckets
@@ -61,8 +63,13 @@ public class ESStorageTest {
 		// save
 		dl.flush();
 		Utils.sleep(1000);
+		Time end = new Time();
 		
-		
+		IFuture<MeanRate> m = dl.getMean(start, end, tag);
+		MeanRate mr2 = m.get();
+		IDistribution1D histo2 = mr2.x;
+		assert histo2 instanceof HistogramData : histo2;
+		assert MathUtils.approx(histo2.getMean(), 10) : histo2;
 	}
 
 	

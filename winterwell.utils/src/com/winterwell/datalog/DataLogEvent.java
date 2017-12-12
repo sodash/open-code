@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.KErrorPolicy;
@@ -264,8 +265,9 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		return map;
 	}
 
-	public void setExtraResults(ArrayMap arrayMap) {
+	public void setExtraResults(Map map) {
 		// TODO store extra outputs		
+		throw new TodoException()
 	}
 	
 }
