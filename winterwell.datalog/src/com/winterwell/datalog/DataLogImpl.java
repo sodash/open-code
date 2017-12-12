@@ -105,7 +105,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 	
 	@Override
 	public IFuture<MeanRate> getMean(Time start, Time end, String... tagBits) {
-		String tag = DataLog.tag(tagBits);
+		StatReq<IDataStream> mdata = getMeanData(start, end, KInterpolate.SKIP_ZEROS, null, tagBits);
 		return new FixedFuture(getMean(tagBits)); // Wrong! But returns plausible lies
 //		FIXME return storage.getMean(start, end, tag);
 	}

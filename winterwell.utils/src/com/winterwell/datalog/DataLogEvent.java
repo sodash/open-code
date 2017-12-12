@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.winterwell.utils.Null;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
@@ -33,6 +34,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 * 
 	 * HACK: use StringBuilder.class as a marker for "text with tokenisation"
 	 * HACK: use Object.class to mark special-case
+	 * HACK: use Null to mark no-index
 	 */
 	public static final Map<String, Class> COMMON_PROPS = 
 			new HashMap(new ArrayMap(			
@@ -94,7 +96,9 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"lng", Double.class,
 			// browser info
 			"mbl", Boolean.class,
-			"ua", StringBuilder.class // user agent
+			"ua", StringBuilder.class, // user agent
+			// no-index (object)
+			"xtra", Null.class
 			));
 
 	public static final String simple = "simple";
@@ -237,10 +241,11 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			Object v = pv.getValue();
 			if ( ! Utils.truthy(v)) continue;
 			Class proptype = COMMON_PROPS.get(pv.getKey());
-			if (proptype!=null) {
+			if (proptype!=null) {				
 				// privileged props
 				if (v instanceof Map && proptype!=Object.class) {
 					// no objects here (otherwise ES will throw an error)
+					// NB: this will catch xtra (no-index props)
 					String vs = new SimpleJson().toJson(v);
 					v = vs;
 				}
@@ -266,8 +271,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	}
 
 	public void setExtraResults(Map map) {
-		// TODO store extra outputs		
-		throw new TodoException()
+		map.put("xtra", map);
 	}
 	
 }

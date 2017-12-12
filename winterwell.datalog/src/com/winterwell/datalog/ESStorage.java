@@ -34,6 +34,7 @@ import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.client.agg.Aggregations;
+import com.winterwell.gson.Gson;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
@@ -41,6 +42,7 @@ import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Null;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
@@ -54,6 +56,7 @@ import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
+import com.winterwell.utils.web.XStreamUtils;
 
 /**
  * ElasticSearch backed storage for DataLog
@@ -77,10 +80,15 @@ public class ESStorage implements IDataLogStorage {
 		for(Entry<String, IDistribution1D> tm : tag2mean.entrySet()) {
 			IDistribution1D distro = tm.getValue();
 			DataLogEvent event = event4tag(tm.getKey(), distro.getMean());
-			if (distro instanceof IHasJson) {
-				Map jobj = (Map) ((IHasJson) distro).toJson2();
-				foo gson
-				event.setExtraResults(new ArrayMap(jobj));
+			// stash the whole thing, pref using json (but encoded as a string, so that ES won't go wild on index fields)
+			if (Dep.has(Gson.class)) {
+				Gson gson = Dep.get(Gson.class);
+				Object json = gson.toJson(distro);
+				ArrayMap xtra = new ArrayMap("gson", json);				
+				event.setExtraResults(xtra);
+			} else {
+				ArrayMap xtra = new ArrayMap("xml", XStreamUtils.serialiseToXml(distro));				
+				event.setExtraResults(xtra);
 			}
 			events.add(event);
 		}
@@ -148,14 +156,28 @@ public class ESStorage implements IDataLogStorage {
 
 	@Override
 	public IFuture<MeanRate> getMean(Time start, Time end, String tag) {
+		// TODO aggregate down in ES?
+		StatReq<IDataStream> mdata = getMeanData(tag, start, end, KInterpolate.SKIP_ZEROS, null);
 		// TODO Auto-generated method stub
 		throw new TodoException();
 	}
 
 	@Override
 	public StatReq<IDataStream> getMeanData(String tag, Time start, Time end, KInterpolate fn, Dt bucketSize) {
-		// TODO Auto-generated method stub
-		return null;
+		DataLogEvent spec = eventspec4tag(tag);
+		SearchResponse sr = getData2(spec, start, end, true);
+		List<Map<String, Object>> hits = sr.getSearchResults();
+		ListDataStream list = new ListDataStream(1);
+		for (Map hit : hits) {
+			Object t = hit.get("time");
+			Object xtra = hit.get("xtra");
+			Time time = Time.of(t.toString());
+			Number count = (Number) hit.get("count");
+			Datum d = new Datum(time, count.doubleValue(), tag);
+			list.add(d);
+		}
+		// TODO interpolate and buckets
+		return new StatReqFixed<IDataStream>(list);
 	}
 
 	@Override
@@ -276,15 +298,15 @@ public class ESStorage implements IDataLogStorage {
 			} else if (cp.getValue()==Double.class) {
 				est = new ESType().DOUBLE();
 			} else if (cp.getValue()==Integer.class) {
-					est = new ESType().INTEGER();
+				est = new ESType().INTEGER();
 			} else if (cp.getValue()==Long.class) {
 				est = new ESType().LONG();					 
 			} else if (cp.getValue()==Object.class) {
 				if ("geo".equals(cp.getKey())) {
 					est = new ESType().geo_point();
 				}
-			} else if (cp.getValue()==hm .class) {
-				no index
+			} else if (cp.getValue()==Null.class) {
+				est = new ESType().object().noIndex();
 			}
 			simpleEvent.property(cp.getKey(), est);
 		}
