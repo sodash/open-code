@@ -126,4 +126,9 @@ public class DataLogConfig extends DBOptions implements IInit {
 		}
 	}
 
+	public Supplier getTagHandler(String topTag) {
+		Object th = tagHandlers.get(topTag);
+		return (Supplier) th;
+	}
+
 }

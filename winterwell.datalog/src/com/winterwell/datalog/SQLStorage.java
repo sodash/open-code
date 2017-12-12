@@ -10,8 +10,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.winterwell.datalog.DataLog.KInterpolate;
+import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair2;
@@ -124,7 +126,7 @@ public class SQLStorage implements IDataLogStorage {
 	}
 	
 	@Override
-	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {		
+	public void save(Period period, Map<String, Double> tag2count, Map<String, IDistribution1D> tag2mean) {		
 		initStatDB();
 		if ( ! initFlag) {
 			// Can't save!
@@ -154,16 +156,20 @@ public class SQLStorage implements IDataLogStorage {
 			}
 	
 			for (String tag : tag2mean.keySet()) {
-				MeanVar1D value = tag2mean.get(tag);
+				IDistribution1D value = tag2mean.get(tag);
 //				Log.v(Stat.LOGTAG, "saving " + tag + "=" + value + " to db");
-	
+				double min = value.getSupport().low;
+				double max = value.getSupport().high;
+				// protect SQL from infinity
+				if ( ! MathUtils.isFinite(min)) min = 0;
+				if ( ! MathUtils.isFinite(max)) max = 0;
 				String values = "values (" 	+
 						mid.getTime() 			+ ", " +
 						SqlUtils.sqlEncode(tag)	+ ", " +
 						value.getMean() 		+ ", " +
 						value.getVariance() 	+ ", " +
-						value.getMin() 			+ ", " +
-						value.getMax()			
+						min 			+ ", " +
+						max			
 //						value.getCount() TODO
 						+ ");";
 				String sql = sqlPrefix + " ( " + COLUMNS_DISTR + " ) " + values;

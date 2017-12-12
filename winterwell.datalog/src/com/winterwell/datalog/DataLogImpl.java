@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 
 import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.maths.ITrainable;
-import com.winterwell.maths.ITrainable.Unsupervised;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
@@ -95,7 +94,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 
 
 	@Deprecated // A test only method??
-	public void save(Period period, Map<String, Double> _tag2count, Map<String, ITrainable.Unsupervised> tag2mean) {
+	public void save(Period period, Map<String, Double> _tag2count, Map<String, IDistribution1D> tag2mean) {
 		storage.save(period, _tag2count, tag2mean);
 	}
 
@@ -191,7 +190,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 	 */
 	ConcurrentMap<String,Double> tag2count = newMap();
 
-	ConcurrentMap<String, ITrainable.Unsupervised> tag2dist = newMap();
+	ConcurrentMap<String, IDistribution1D> tag2dist = newMap();
 
 	ConcurrentMap<String, DataLogEvent> id2event = newMap();
 
@@ -288,7 +287,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 
 	protected synchronized void doSave() {
 		Map<String, Double> old = tag2count;		
-		Map<String, ITrainable.Unsupervised> oldMean = tag2dist;
+		Map<String, IDistribution1D> oldMean = tag2dist;
 		Map<String, DataLogEvent> oldid2event = id2event;
 		Map<Pair2<String, Time>, Double> oldTagTimeCount = tagTime2count;
 		Map<Pair2<String, Time>, Double> oldTagTimeSet = tagTime2set;
@@ -417,12 +416,12 @@ public class DataLogImpl implements Closeable, IDataLog {
 		for(Object tg : tagBits) {
 			String stag = parseTag(tg, tag);			
 			if (topTag==null) topTag = stag;
-			ITrainable.Unsupervised dist = tag2dist.get(stag);
+			IDistribution1D dist = tag2dist.get(stag);
 			if (dist==null) {
 				dist = newDistribution(topTag, stag); // use mean-var
 				tag2dist.put(stag, dist);
 			}
-			dist.train1(x);
+			((ITrainable.Unsupervised)dist).train1(x);
 		}
 
 		// track our own size
@@ -431,8 +430,8 @@ public class DataLogImpl implements Closeable, IDataLog {
 		}
 	}
 
-	ITrainable.Unsupervised newDistribution(String topTag, String stag) {
-		Supplier th = getConfig().getTagHandler(topTag);
+	IDistribution1D newDistribution(String topTag, String stag) {
+		Supplier<IDistribution1D> th = getConfig().getTagHandler(topTag);
 		if (th != null) {
 			return th.get();
 		}
@@ -442,7 +441,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 	@Override
 	public MeanRate getMean(String... tagBits) {
 		String tag = DataLog.tag(tagBits);
-		ITrainable.Unsupervised dist = tag2dist.get(tag);
+		IDistribution1D dist = tag2dist.get(tag);
 		return new MeanRate((IDistribution1D) dist, getPeriod());
 	}
 

@@ -57,6 +57,12 @@ public class ESStorageTest {
 		IDistribution1D histo = mr.x;
 		assert histo instanceof HistogramData : histo;
 		assert MathUtils.approx(histo.getMean(), 10) : histo;
+		
+		// save
+		dl.flush();
+		Utils.sleep(1000);
+		
+		
 	}
 
 	
@@ -162,20 +168,24 @@ public class ESStorageTest {
 		Time end = start.plus(10, TUnit.SECOND);
 		Period p = new Period(start, end);
 
+		String tag1 = "test_hello"+Utils.getRandomString(6);
+		String tag2 = "test_world"+Utils.getRandomString(6);
+		
 		Map<String, Double> tag2count = new HashMap<String, Double>();
-		tag2count.put("hello", 4.0);
+		tag2count.put(tag1, 4.0);
 
-		Map<String, MeanVar1D> tag2mean = new HashMap<String, MeanVar1D>();
+		Map<String, IDistribution1D> tag2mean = new HashMap<>();
 		MeanVar1D mv = new MeanVar1D();
 		mv.train1(1.0);
 		mv.train1(2.0);
-		tag2mean.put("world", mv);
+		tag2mean.put(tag2, mv);
 		
 		ESStorage storage = new ESStorage();
 		storage.init(new DataLogConfig());
 		storage.save(p, tag2count, tag2mean);
-		assertEquals(4.0, storage.getTotal("hello", p.first, p.second).get());
-		ListDataStream stream = (ListDataStream) storage.getData("world", p.first, p.second, null, null).get();
+		Utils.sleep(1500);
+		assertEquals(4.0, storage.getTotal(tag1, p.first, p.second).get());
+		ListDataStream stream = (ListDataStream) storage.getData(tag2, p.first, p.second, null, null).get();
 		assertEquals(1.5, stream.get(0).x());
 	}
 }

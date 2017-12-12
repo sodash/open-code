@@ -13,6 +13,7 @@ import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.datalog.MeanRate;
+import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.Dep;
@@ -25,6 +26,7 @@ import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.IHasJson;
 import com.winterwell.web.FakeBrowser;
 
 /**
@@ -48,17 +50,20 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	}
 
 	@Override
-	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {
+	public void save(Period period, Map<String, Double> tag2count, Map<String, IDistribution1D> tag2mean) {
 		Collection<DataLogEvent> events = new ArrayList();
 		for(Entry<String, Double> tc : tag2count.entrySet()) {
 			DataLogEvent event = new DataLogEvent(tc.getKey(), tc.getValue());
 			events.add(event);
 		}
-		for(Entry<String, MeanVar1D> tm : tag2mean.entrySet()) {
-			DataLogEvent event = new DataLogEvent(tm.getKey(), tm.getValue().getMean());
-			event.setExtraResults(new ArrayMap(
-					tm.getValue().toJson2()
-					));
+		for(Entry<String, IDistribution1D> tm : tag2mean.entrySet()) {
+			IDistribution1D distro = tm.getValue();
+			DataLogEvent event = new DataLogEvent(tm.getKey(), distro.getMean());
+			if (distro instanceof IHasJson) {
+				// paranoid defensive copy
+				ArrayMap json = new ArrayMap(((IHasJson) distro).toJson2());
+				event.setExtraResults(json);
+			}
 			events.add(event);
 		}
 		saveEvents(events, period);

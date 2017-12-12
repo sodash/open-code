@@ -34,6 +34,7 @@ import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.client.agg.Aggregations;
+import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.IDataStream;
@@ -52,24 +53,34 @@ import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.IHasJson;
 
+/**
+ * ElasticSearch backed storage for DataLog
+ * 
+ * @testedby {@link ESStorageTest}
+ * @author daniel
+ *
+ */
 public class ESStorage implements IDataLogStorage {
 
 	private ESConfig esConfig;
 	private DataLogConfig config;
 	
 	@Override
-	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {
+	public void save(Period period, Map<String, Double> tag2count, Map<String, IDistribution1D> tag2mean) {
 		Collection<DataLogEvent> events = new ArrayList();
 		for(Entry<String, Double> tc : tag2count.entrySet()) {
 			DataLogEvent event = event4tag(tc.getKey(), tc.getValue());
 			events.add(event);
 		}
-		for(Entry<String, MeanVar1D> tm : tag2mean.entrySet()) {
-			DataLogEvent event = event4tag(tm.getKey(), tm.getValue().getMean());
-			event.setExtraResults(new ArrayMap(
-					tm.getValue().toJson2()
-					));
+		for(Entry<String, IDistribution1D> tm : tag2mean.entrySet()) {
+			IDistribution1D distro = tm.getValue();
+			DataLogEvent event = event4tag(tm.getKey(), distro.getMean());
+			if (distro instanceof IHasJson) {
+				Map jobj = (Map) ((IHasJson) distro).toJson2(); 
+				event.setExtraResults(new ArrayMap(jobj));
+			}
 			events.add(event);
 		}
 		saveEvents(events, period);
@@ -372,18 +383,21 @@ public class ESStorage implements IDataLogStorage {
 		return total;
 	}
 	
-	SearchResponse getData2(DataLogEvent spec, Time start, Time end, boolean sortByTime) {
+	SearchResponse getData2(DataLogEvent spec, Time start, Time end, boolean sortByTime) {		
 		DataLogConfig config = Dep.get(DataLogConfig.class);		
 		String index = indexFromDataspace(spec.dataspace);
 		SearchRequestBuilder search = client(spec.dataspace).prepareSearch(index);
 		search.setType(typeFromEventType(spec.eventType));
 		search.setSize(config.maxDataPoints);
-		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
-				.from(start.toISOString()) //, true)
-				.to(end.toISOString()); //, true);
-		
-		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
-				.must(timeFilter);
+		BoolQueryBuilder filter = QueryBuilders.boolQuery();
+				
+		// time box?
+		if (start !=null || end != null) {
+			RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time");
+			if (start!=null) timeFilter = timeFilter.from(start.toISOString());
+			if (end!=null) timeFilter = timeFilter.to(end.toISOString());			
+			filter = filter.must(timeFilter);
+		}
 		
 		// HACK tag match
 		String tag = (String) spec.props.get("tag");

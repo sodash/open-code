@@ -1,10 +1,13 @@
 package com.winterwell.maths.stats.distributions.d1;
 
+import java.util.Map;
+
 import com.winterwell.maths.GridInfo;
 import com.winterwell.maths.stats.distributions.ADistributionBase;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Range;
 
 /**
@@ -39,6 +42,16 @@ public abstract class ADistribution1D extends ADistributionBase<Double>
 				return x;
 		}
 		return high;
+	}
+	
+	public Map<String,Object> toJson2() {
+		Range range = getSupport();
+		return new ArrayMap(
+			"mean", getMean(),
+			"var", MathUtils.isFinite(getVariance())? getVariance() : null,
+			"max", MathUtils.isFinite(range.high)? range.high : null,
+			"min", MathUtils.isFinite(range.low)? range.low : null
+		);
 	}
 
 	/*

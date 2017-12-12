@@ -15,6 +15,7 @@ import com.winterwell.utils.containers.Range;
  */
 public interface IDistribution1D extends IDistributionBase<Double> {
 
+	
 	/**
 	 * The probability density at a point
 	 * 

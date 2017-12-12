@@ -111,9 +111,19 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 	 * @param keyValuePairs
 	 */
 	public ArrayMap(Object... keyValuePairs) {
+		int n = Math.max(keyValuePairs.length / 2, 1);
+		keys = new ArrayList<K>(n);
+		values = new ArrayList<V>(n);
+		// wrong constructor?
+		if (keyValuePairs.length==1 && keyValuePairs[0] instanceof Map) {
+			// should have been a call to the copy constructor! Handle it here anyway
+			Map<K,V> copyMe = (Map) keyValuePairs[0];
+			for (K k : copyMe.keySet()) {
+				put(k, copyMe.get(k));
+			}	
+			return;
+		}
 		assert keyValuePairs.length % 2 == 0;
-		keys = new ArrayList<K>(keyValuePairs.length / 2);
-		values = new ArrayList<V>(keyValuePairs.length / 2);
 		for (int i = 0; i < keyValuePairs.length; i += 2) {
 			keys.add((K) keyValuePairs[i]);
 			values.add((V) keyValuePairs[i + 1]);

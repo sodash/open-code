@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.junit.Test;
 
+import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.Utils;
@@ -253,7 +254,7 @@ public class SQLStorageTest extends DatalogTestCase {
 		tag2count.put("hello", 4.0);
 		tag2count.put(sqlNightmare, 5.0);
 
-		Map<String, MeanVar1D> tag2mean = new HashMap<String, MeanVar1D>();
+		Map<String, IDistribution1D> tag2mean = new HashMap<>();
 		MeanVar1D mv = new MeanVar1D();
 		mv.train1(1.0);
 		mv.train1(2.0);

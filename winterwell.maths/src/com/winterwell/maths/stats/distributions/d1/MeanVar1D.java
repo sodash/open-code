@@ -11,6 +11,7 @@ import com.winterwell.maths.ITrainable;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Range;
 import com.winterwell.utils.log.Log;
 
 /**
@@ -77,6 +78,11 @@ public class MeanVar1D extends ADistribution1D implements
 
 	public final double getMin() {
 		return min;
+	}
+	
+	@Override
+	public Range getSupport() {
+		return new Range(min, max);
 	}
 
 	@Override

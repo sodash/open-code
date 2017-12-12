@@ -59,7 +59,8 @@ public final class Range implements Serializable, Comparable<Range> {
 	}
 
 	/**
-	 * Like union, but not quite. So the max() of two ranges contains both.
+	 * Like union, but not quite, as the union of two Ranges might not be a Range. 
+	 * The max() of two ranges contains both (and potentially the gap in between, which is how it differs from union).
 	 * 
 	 * @param b
 	 * @return [min(), max()]

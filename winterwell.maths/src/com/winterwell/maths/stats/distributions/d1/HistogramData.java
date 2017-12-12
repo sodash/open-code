@@ -1,6 +1,9 @@
 package com.winterwell.maths.stats.distributions.d1;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import com.winterwell.maths.GridInfo;
 import com.winterwell.maths.IGridInfo;
@@ -11,7 +14,9 @@ import com.winterwell.maths.stats.distributions.discrete.IntegerDistribution;
 import com.winterwell.maths.timeseries.ArrayDataStream;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Range;
+import com.winterwell.utils.web.IHasJson;
 
 /**
  * A frequency-count distribution based on buckets. Use with Distribution1DChart for a histogram.
@@ -32,7 +37,7 @@ import com.winterwell.utils.containers.Range;
  * @author daniel
  */
 public final class HistogramData extends ADistribution1D 
-implements ITrainable.Unsupervised.Weighted<Double>
+implements ITrainable.Unsupervised.Weighted<Double>, IHasJson
 {
 	
 	@Override
@@ -169,6 +174,7 @@ implements ITrainable.Unsupervised.Weighted<Double>
 		for (int i = 0; i < pts.length; i++) {
 			var += backing[i] * MathUtils.sq(m - pts[i]);
 		}
+		// TODO normalise by sum backing??
 		return var;
 	}
 
@@ -312,6 +318,24 @@ implements ITrainable.Unsupervised.Weighted<Double>
 			i++;
 			train1(x, w);
 		}
+	}
+
+	@Override
+	public Map<String, Object> toJson2() throws UnsupportedOperationException {
+		Map<String, Object> map = super.toJson2();
+
+		// add in bucket info	
+		List bucketInfo = new ArrayList();
+		for(int i=0; i<backing.length; i++) {
+			bucketInfo.add(new ArrayMap(
+					"min", gridInfo.getBucketBottom(i),
+					"max", gridInfo.getBucketTop(i),
+					"count", backing[i]
+					));
+		}
+		map.put("buckets", bucketInfo);
+		
+		return map;
 	}
 
 }

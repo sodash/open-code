@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.maths.ITrainable;
+import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.containers.Pair2;
@@ -26,7 +27,7 @@ public interface IDataLogStorage {
 	 * @param tag2count
 	 * @param tag2mean
 	 */
-	public abstract void save(Period period, Map<String, Double> tag2count, Map<String, ITrainable.Unsupervised> tag2mean);
+	public abstract void save(Period period, Map<String, Double> tag2count, Map<String, IDistribution1D> tag2mean);
 	
 	/**
 	 * Save tags at the specified time, instead of the one of the current bucket. 

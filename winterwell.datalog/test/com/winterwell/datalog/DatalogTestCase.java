@@ -3,6 +3,7 @@ package com.winterwell.datalog;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.ListDataStream;
@@ -80,7 +81,7 @@ public class DatalogTestCase {
 		Period period = new Period(ts1, te1);
 		
 		Map<String, Double> old = si.tag2count;		
-		Map<String, MeanVar1D> oldMean = si.tag2dist;	
+		Map<String, IDistribution1D> oldMean = si.tag2dist;	
 		
 		si.save(period, old, oldMean);
 		si.tag2count = new ConcurrentHashMap();

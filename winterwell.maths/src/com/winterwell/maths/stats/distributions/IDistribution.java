@@ -42,7 +42,8 @@ public interface IDistribution extends IDistributionBase<Vector> {
 
 	/**
 	 * @return the range for each dimension. Outside this range, the
-	 *         distribution is always zero, or at least, below machine epsilon
+	 *         distribution is always zero, or at least, below machine epsilon.
+	 *         Can use infinity.
 	 */
 	Range[] getSupport();
 

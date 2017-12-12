@@ -14,6 +14,8 @@ import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.depot.Depot;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.MetaData;
+import com.winterwell.maths.ITrainable;
+import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.TodoException;
@@ -72,7 +74,7 @@ public class CSVStorage implements IDataLogStorage {
 	 * @param tag2mean
 	 */	
 	@Override
-	public void save(Period period, Map<String, Double> tag2count, Map<String, MeanVar1D> tag2mean) {
+	public void save(Period period, Map<String, Double> tag2count, Map<String, IDistribution1D> tag2mean) {
 		File csv = getFile(period.getStart());
 		Log.d(DataLog.LOGTAG, "saving "+tag2count.size()+" to "+csv+": "+tag2count);
 		csv.getParentFile().mkdirs();
@@ -95,12 +97,15 @@ public class CSVStorage implements IDataLogStorage {
 				w.write(mid.getTime(), e.getKey(), e.getValue());
 			}
 			
-			for(Map.Entry<String,MeanVar1D> e : tag2mean.entrySet()) {
+			for(Map.Entry<String,IDistribution1D> e : tag2mean.entrySet()) {
 //				Log.v(Stat.LOGTAG, "saving "+e.getKey()+"="+e.getValue()+" to "+csv);	
-				MeanVar1D mv = e.getValue();
+				IDistribution1D mv = e.getValue();
 	//			String lbl = tag2event.get(e.getKey()); ??
 				// mean first, so if you're just grabbing the 1st value you get the "right" one
-				w.write(mid.getTime(), e.getKey(), mv.getMean(), mv.getVariance(), mv.getMin(), mv.getMax());
+				double min = mv.getSupport().low;
+				double max = mv.getSupport().high;
+				w.write(mid.getTime(), e.getKey(), mv.getMean(), mv.getVariance(), min, max);	
+							
 			}
 			w.close();
 			
