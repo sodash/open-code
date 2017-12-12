@@ -1,5 +1,6 @@
 package com.winterwell.depot;
 
+
 /**
  * For artifacts which can create a Desc description of themselves.
  * <p>
@@ -24,6 +25,5 @@ public interface IHasDesc {
 	 *         binding as something done by depot, or explicitly.
 	 */
 	Desc getDesc();
-
 
 }

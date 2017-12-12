@@ -57,7 +57,7 @@ public class Bob {
 
 	private static final Bob dflt = new Bob();
 
-	static Map<Class, Time> time4task = new HashMap<Class, Time>();
+	private static Map<BuildTask, Time> time4task = new HashMap<>();
 
 	private static volatile Time runStart;
 
@@ -100,7 +100,7 @@ public class Bob {
 
 	public static Time getLastRunDate(BuildTask buildTask) {
 		assert buildTask != null;
-		Time t = time4task.get(buildTask.getClass());
+		Time t = time4task.get(buildTask);
 		if (t != null)
 			return t;
 //		// FIXME BU != BU :(
@@ -165,7 +165,7 @@ public class Bob {
 	}
 
 	public static void setLastRunDate(BuildTask buildTask) {
-		time4task.put(buildTask.getClass(), new Time());
+		time4task.put(buildTask, new Time());
 	}
 
 	/**

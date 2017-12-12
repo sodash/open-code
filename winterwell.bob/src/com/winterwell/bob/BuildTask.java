@@ -84,7 +84,7 @@ public abstract class BuildTask implements Closeable, IHasDesc {
 		// FIXME debug
 		if (this instanceof BuildUtils) {
 			String vrsn = XStreamUtils.serialiseToXml(this);
-			Log.i(LOGTAG, "Desc vstamp: "+vrsn);			
+			Log.i(LOGTAG, "Desc vstamp: "+vrsn+" for: "+desc);			
 		}
 		
 		return desc;
@@ -92,12 +92,12 @@ public abstract class BuildTask implements Closeable, IHasDesc {
 	
 	
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return getDesc().hashCode();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -259,6 +259,8 @@ public abstract class BuildTask implements Closeable, IHasDesc {
 	 */
 	@Test
 	public final void run() throws RuntimeException {
+		// fix desc if it wasn't before
+		getDesc().getId();
 		// Add an output and error listener
 		if (verbosity!=Level.OFF) bob.addOutputFile(bob.getLogFile(this));
 		report("Running " + toString() + " at "
