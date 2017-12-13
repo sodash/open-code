@@ -303,8 +303,11 @@ public class DataLog {
 			Class<?> klass = Class.forName(CLASS_DATALOGIMPL);
 			Constructor<?> cons = klass.getConstructor(DataLogConfig.class);
 			dflt = (IDataLog) cons.newInstance(myConfig);
+			// init
+			dflt.init();
 			return dflt;
 		} catch (Throwable ex) {
+			ex.printStackTrace();
 			Log.e(LOGTAG, "Error creating "+CLASS_DATALOGIMPL+" with config "+XStreamUtils.serialiseToXml(myConfig));
 			Log.e(LOGTAG, Utils.getRootCause(ex));
 			throw Utils.runtime(ex);

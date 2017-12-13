@@ -22,12 +22,15 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 	
 	ListMap<String,Callback> callbacksForDataspace = new ListMap();
 	
-	public CallbackManager() {
-	
-	}
+	public CallbackManager() {		
+	}	
 	
 	@Override
 	public void init() {
+		if (DataLog.getImplementation().getConfig().noCallbacks) {
+			return;
+		}
+		// HACK remove this hard-coded callback, and make it a dynamic setup
 		// a call to adserver
 		KServerType mtype = AppUtils.getServerType(null);
 		String protocol = mtype==KServerType.LOCAL? "http" : "https"; 		
@@ -39,7 +42,10 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 	}
 
 	@Override
-	protected void consume(DataLogEvent msg, Actor sender) throws Exception {		
+	protected void consume(DataLogEvent msg, Actor sender) throws Exception {
+		if (DataLog.getImplementation().getConfig().noCallbacks) {
+			return;
+		}
 		List<Callback> cbs = callbacksForDataspace.get(msg.dataspace);
 		if (cbs==null) return;
 		for (Callback callback : cbs) {

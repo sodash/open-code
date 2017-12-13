@@ -222,6 +222,10 @@ public class DataLogImpl implements Closeable, IDataLog {
 		this(new DataLogConfig());
 	}
 
+	/**
+	 * The caller MUST call init() before using. See {@link DataLog#setConfig(DataLogConfig)}
+	 * @param config
+	 */
 	public DataLogImpl(DataLogConfig config) {
 		this.config = config;
 		// Create the storage
@@ -235,8 +239,6 @@ public class DataLogImpl implements Closeable, IDataLog {
 			Log.e(DataLog.LOGTAG, "storage creation failed for "+config.storageClass);
 			throw Utils.runtime(ex);
 		}
-		// init
-		init();
 	}
 	
 	@Override
@@ -244,7 +246,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 		return storage;
 	}
 
-	private void init() {
+	public void init() {
 		if (init) return;
 		init = true;
 		// give nice slicing

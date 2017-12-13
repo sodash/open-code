@@ -78,21 +78,30 @@ public class ESStorage implements IDataLogStorage {
 			events.add(event);
 		}
 		for(Entry<String, IDistribution1D> tm : tag2mean.entrySet()) {
-			IDistribution1D distro = tm.getValue();
-			DataLogEvent event = event4tag(tm.getKey(), distro.getMean());
-			// stash the whole thing, pref using json (but encoded as a string, so that ES won't go wild on index fields)
-			if (Dep.has(Gson.class)) {
-				Gson gson = Dep.get(Gson.class);
-				Object json = gson.toJson(distro);
-				ArrayMap xtra = new ArrayMap("gson", json);				
-				event.setExtraResults(xtra);
-			} else {
-				ArrayMap xtra = new ArrayMap("xml", XStreamUtils.serialiseToXml(distro));				
-				event.setExtraResults(xtra);
-			}
+			DataLogEvent event = event4distro(tm.getKey(), tm.getValue());
 			events.add(event);
 		}
 		saveEvents(events, period);
+	}
+
+	/**
+	 * make an event to store a distribution stat
+	 * @param tm
+	 * @return
+	 */
+	DataLogEvent event4distro(String stag, IDistribution1D distro) {
+		DataLogEvent event = event4tag(stag, distro.getMean());
+		// stash the whole thing, pref using json (but encoded as a string, so that ES won't go wild on index fields)
+		if (Dep.has(Gson.class)) {
+			Gson gson = Dep.get(Gson.class);
+			Object json = gson.toJson(distro);
+			ArrayMap xtra = new ArrayMap("gson", json);				
+			event.setExtraResults(xtra);
+		} else {
+			ArrayMap xtra = new ArrayMap("xml", XStreamUtils.serialiseToXml(distro));				
+			event.setExtraResults(xtra);
+		}
+		return event;
 	}
 
 	@Override

@@ -100,6 +100,9 @@ public class DataLogConfig extends DBOptions implements IInit {
 	public String getDataEndpoint;
 
 	Map<String, Object> tagHandlers = new HashMap();
+
+	@Option
+	public boolean noCallbacks;
 	
 	public void setTagHandler(String tag, Supplier supplier) {
 		tagHandlers.put(tag, supplier);

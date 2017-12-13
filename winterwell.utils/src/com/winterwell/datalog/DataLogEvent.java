@@ -112,7 +112,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	/**
 	 * never null
 	 */
-	final Map<String, ?> props;
+	final Map<String, Object> props;
 
 	public Object getProp(String prop) {
 		return props.get(prop);
@@ -157,7 +157,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 * @param dataspace e.g. "default" (which becomes datalog.default in ES)
 	 * @param count e.g. 1
 	 * @param eventType e.g. "evt.pick"
-	 * @param properties e.g. {url, user}
+	 * @param properties e.g. {url, user} This is used directly and can be modified!
 	 */
 	public DataLogEvent(String dataspace, double count, String eventType, Map<String,?> properties) {
 		this.dataspace = StrUtils.normalise(dataspace, KErrorPolicy.ACCEPT).toLowerCase().trim();
@@ -165,7 +165,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 //		assert dataspace.equals(StrUtils.toCanonical(dataspace)) : dataspace +" v "+StrUtils.toCanonical(dataspace); 
 		this.count = count;
 		this.eventType = eventType;
-		this.props = properties == null? Collections.EMPTY_MAP : properties;
+		this.props = properties == null? Collections.EMPTY_MAP : (Map) properties;
 		this.id = makeId();
 		assert ! Utils.isBlank(eventType);
 		// set time??
@@ -245,7 +245,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 				// privileged props
 				if (v instanceof Map && proptype!=Object.class) {
 					// no objects here (otherwise ES will throw an error)
-					// NB: this will catch xtra (no-index props)
+					// NB: this will catch xtra (no-index props) which have proptype Null.class
 					String vs = new SimpleJson().toJson(v);
 					v = vs;
 				}
@@ -271,7 +271,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	}
 
 	public void setExtraResults(Map map) {
-		map.put("xtra", map);
+		props.put("xtra", map);
 	}
 	
 }

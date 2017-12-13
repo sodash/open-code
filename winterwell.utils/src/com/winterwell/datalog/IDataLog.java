@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.winterwell.datalog.DataLog.KInterpolate;
+import com.winterwell.depot.IInit;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
@@ -22,7 +23,7 @@ import com.winterwell.utils.time.Time;
  *         library. In particular, licenses for the com.winterwell.utils library do
  *         not apply to this file.
  */
-public interface IDataLog extends Closeable, Flushable {
+public interface IDataLog extends Closeable, Flushable, IInit {
 	
 	/**
 	 * The memory used by the JVM -- this should be saved by IStat implementations, so it can also be used as a heartbeat for Stat.

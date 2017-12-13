@@ -176,7 +176,10 @@ class DummyDataLog implements IDataLog {
 
 	@Override
 	public DataLogConfig getConfig() {
-		return null;
+		if (warnings < 3)
+			Log.w(LOGTAG, err);
+		warnings++;
+		return new DataLogConfig();
 	}
 
 	@Override
@@ -205,6 +208,10 @@ class DummyDataLog implements IDataLog {
 		return null;
 	}
 
+	@Override
+	public void init() {
+		
+	}
 }
 
 class DummyDataLogAdmin implements IDataLogAdmin {

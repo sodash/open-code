@@ -18,30 +18,41 @@ public final class LogGridInfo extends VariableGridInfo implements IGridInfo {
 	 * @param buckets
 	 */
 	public LogGridInfo(double max, int buckets) {
-		this(max, buckets, 0);
+		this(max, buckets, 0, 10);
 	}
 	
 	/**
+	 * HACK:
+	 * If max > 1, then [0,1] is the smallest possible bucket
+	 * If max = 1, then it will break [0,1] into pieces.
 	 * 
 	 * @param max
 	 * @param buckets
 	 * @param minBucketSize Normally 0. If >0, no bucket will be smaller than this, which can
 	 * result in the early buckets being uniform size for a while (so not quite a log scale).
 	 * use-case: For integer-valued data, to avoid having the early buckets be 0.1, 0.2... etc.
+	 * @param base usually 10
 	 */
-	public LogGridInfo(double max, int buckets, double minBucketSize) {
+	public LogGridInfo(double max, int buckets, double minBucketSize, double base) {
 		super(new double[buckets + 1]);
 		assert max > 0 && buckets > 0;
 		// setup buckets
 		times[0] = 0;
-		times[times.length - 1] = max;		
-		double dexp = Math.log10(max) / buckets;
+		times[times.length - 1] = max;
+		double dexp;
+		if (base==10) dexp = Math.log10(max) / buckets;
+		else dexp = (Math.log(max) / Math.log(base)) / buckets;
+		if (max==1) {
+			// HACK just slice by powers
+			dexp = -1;
+		}
 		for (int i = 1; i < times.length - 1; i++) {
-			double ti = Math.pow(10, i * dexp);
+			int j = dexp>0? i : times.length - i -1;
+			double ti = Math.pow(base, i * dexp);
 			if (ti < minBucketSize*i) {
-				times[i] = i*minBucketSize;
+				times[j] = i*minBucketSize;
 			} else {
-				times[i] = ti;
+				times[j] = ti;
 			}
 		}
 	}
