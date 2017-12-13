@@ -12,8 +12,7 @@ import com.winterwell.utils.web.WebUtils;
 
 public class DotPrinterTest {
 
-	@Test
-	
+	@Test	
 	public void testCreatePng() throws IOException {
 		DiGraph g = new DiGraph();
 		DiNode a = g.addNode("A");
@@ -31,6 +30,7 @@ public class DotPrinterTest {
 
 		GuiUtils.popupAndBlock(GuiUtils.load(imgFile));
 	}
+	
 	
 	
 	@Test	

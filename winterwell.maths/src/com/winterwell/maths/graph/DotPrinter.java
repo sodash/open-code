@@ -136,6 +136,10 @@ public class DotPrinter<N> {
 	}
 
 	private IGraph<N> graph;
+	private String title;
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
 	/**
 	 * Override the {@link #getEdgeStyle(IEdge)} and
@@ -156,7 +160,8 @@ public class DotPrinter<N> {
 		// weighted?
 		if (edge instanceof IEdge.Weighted) {
 			double w = ((IEdge.Weighted) edge).getWeight();
-			if (w>0) {
+			// w=0 is probably an unset weight 
+			if (w!=0 && w!=1) { // no need to show weight=1, which is default
 				return "label=\""+StrUtils.toNSigFigs(w, 2)+"\"";
 			}
 		}		
@@ -210,6 +215,11 @@ public class DotPrinter<N> {
 			sb.append("graph G {\n");
 			e = "--";
 		}
+		// title?
+		if (title!=null) {
+			sb.append("labelloc=\"t\"\nlabel=\""+title+"\"");
+		}	    
+		
 		Collection<? extends N> nodes = graph.getNodes();
 		for (N object : nodes) {
 			assert object != null;
