@@ -1,6 +1,10 @@
 package com.winterwell.web.app;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,9 +29,14 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.io.CSVSpec;
+import com.winterwell.utils.io.CSVWriter;
+import com.winterwell.utils.web.SimpleJson;
+import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JsonResponse;
+import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.SField;
 import com.winterwell.youagain.client.AuthToken;
@@ -320,7 +329,12 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		List hits2 = Containers.apply(hits, h -> h.get("_source"));
 		
-		
+		// HACK: send back csv?
+		if (state.getResponseType() == KResponseType.csv) {
+			doSendCsv(state, hits2);
+			return;
+		}
+			
 		long total = sr.getTotal();
 		String json = Dep.get(Gson.class).toJson(
 				new ArrayMap(
@@ -330,8 +344,74 @@ public abstract class CrudServlet<T> implements IServlet {
 		JsonResponse output = new JsonResponse(state).setCargoJson(json);
 		WebUtils2.sendJson(output, state);		
 	}
-
 	
+	
+	protected void doSendCsv(WebRequest state, List<Map> hits2) {
+		// ?? maybe refactor and move into a default method in IServlet?
+		StringWriter sout = new StringWriter();
+		CSVWriter w = new CSVWriter(sout, new CSVSpec());
+	
+		// what headers??
+		ArrayMap<String, String> hs = doSendCsv2_getHeaders(state, hits2);
+		
+		// write
+		w.write(hs.values());
+		for (Map hit : hits2) {
+			List<Object> line = Containers.apply(hs, h -> {
+				String[] p = h.split("\\.");
+				return SimpleJson.get(hit, p);
+			});
+			w.write(line);
+		}
+		w.close();
+		// send
+		String csv = sout.toString();
+		state.getResponse().setContentType(WebUtils.MIME_TYPE_CSV); // + utf8??
+		WebUtils2.sendText(csv, state.getResponse());
+	}
+	
+
+	/**
+	 * 
+	 * @param state
+	 * @param hits2 
+	 * @return
+	 */
+	protected ArrayMap<String,String> doSendCsv2_getHeaders(WebRequest state, List<Map> hits2) {
+		if (hits2.isEmpty()) return new ArrayMap();
+		Map hit = hits2.get(0);
+		ArrayMap map = new ArrayMap();
+		for(Object k : hit.keySet()) {
+			map.put(""+k, ""+k);
+		}
+		return map;
+//		// TODO proper recursive
+//		ObjectDistribution<String> headers = new ObjectDistribution();
+//		for (Map<String,Object> hit : hits2) {
+//			getHeaders(hit, new ArrayList(), headers);
+//		}
+//		// prune
+//		if (hits2.size() >= 1) {
+//			int min = (int) (hits2.size() * 0.2);
+//			if (min>0) headers.pruneBelow(min);
+//		}
+//		// sort
+//		ArrayList<String> hs = new ArrayList(headers.keySet());
+//		// all the level 1 headers
+//		List<String> level1 = Containers.filter(hs, h -> ! h.contains("."));
+//		hs.removeAll(level1);
+//		Collections.sort(hs);
+//		Collections.sort(level1);		
+//		// start with ID, name
+//		level1.remove("name");
+//		level1.remove("@id");
+//		Collections.reverse(level1);
+//		level1.add("name");
+//		level1.add("@id");		
+//		level1.forEach(h -> hs.add(0, h));
+//		hs.removeIf(h -> h.contains("@type") || h.contains("value100"));
+	}
+
 
 
 	/**

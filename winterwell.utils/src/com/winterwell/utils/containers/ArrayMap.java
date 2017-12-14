@@ -201,6 +201,7 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 	 */
 	@Override
 	public Iterator<K> iterator() {
+		// copy keys to allow editing
 		return new ArrayList(keys).iterator();
 	}
 
