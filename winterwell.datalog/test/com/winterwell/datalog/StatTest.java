@@ -14,7 +14,7 @@ public class StatTest extends DatalogTestCase {
 	public StatTest() {
 		DataLogConfig config = new DataLogConfig();
 		config.interval = TUnit.MINUTE.dt;
-		DataLog.setConfig(config);
+		DataLog.init(config);
 	}
 	
 	@Test

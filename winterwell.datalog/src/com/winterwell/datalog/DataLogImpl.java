@@ -223,7 +223,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 	}
 
 	/**
-	 * The caller MUST call init() before using. See {@link DataLog#setConfig(DataLogConfig)}
+	 * The caller MUST call init() before using. See {@link DataLog#init(DataLogConfig)}
 	 * @param config
 	 */
 	public DataLogImpl(DataLogConfig config) {

@@ -27,7 +27,7 @@ public class DataLogStressTest extends DatalogTestCase {
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = CSVStorage.class;
 		DataLog.dflt = new DataLogImpl(config);
-		DataLog.setConfig(config);
+		DataLog.init(config);
 		stress();
 	}
 	
@@ -38,7 +38,7 @@ public class DataLogStressTest extends DatalogTestCase {
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = SQLStorage.class;
 		DataLog.dflt = new DataLogImpl(config);
-		DataLog.setConfig(config);
+		DataLog.init(config);
 		stress();
 	}
 	

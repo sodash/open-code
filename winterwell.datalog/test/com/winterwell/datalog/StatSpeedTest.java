@@ -18,7 +18,7 @@ public class StatSpeedTest extends DatalogTestCase {
 	public void testSmoke() throws IOException {
 		DataLogConfig config = new DataLogConfig();
 		config.interval = TUnit.SECOND.dt;
-		DataLog.setConfig(config);
+		DataLog.init(config);
 //		assert Stat.saveThread != null;
 		Time start = new Time();
 		Utils.sleep(30000); // wait for it to start saving

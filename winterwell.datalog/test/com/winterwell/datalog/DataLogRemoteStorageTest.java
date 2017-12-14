@@ -21,7 +21,7 @@ public class DataLogRemoteStorageTest {
 		dc.storageClass = DataLogRemoteStorage.class;
 		dc.logEndpoint = "http://locallg.good-loop.com/lg";
 		dc.getDataEndpoint = "http://locallg.good-loop.com/data";
-		DataLog.setConfig(dc);
+		DataLog.init(dc);
 		
 		DataLog.count(1, "testSaveEvent");
 		DataLog.flush();

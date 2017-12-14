@@ -36,7 +36,7 @@ public class ESStorageTest {
 		config.interval = new Dt(1, TUnit.SECOND);
 		config.storageClass = ESStorage.class;
 		DataLog.dflt = new DataLogImpl(config);
-		DataLog.setConfig(config);
+		DataLog.init(config);
 	}
 
 	

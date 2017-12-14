@@ -366,6 +366,8 @@ public class MathUtils {
 	 */
 	public static final double TOO_BIG = Math.pow(Double.MAX_VALUE, 0.2);
 
+	private static double MAX_DOUBLE_INT = 0;
+
 	/**
 	 * 
 	 * @param xs
@@ -652,6 +654,33 @@ public class MathUtils {
 			if ( ! isFinite(d)) return false;
 		}
 		return true;
+	}
+
+	/**
+	 * @return The point at which double loses integer level precision.
+	 * (actually, this is half the true value for safety).
+	 */
+	public static double getMaxIntWithDouble() {
+		if (MAX_DOUBLE_INT != 0) return MAX_DOUBLE_INT;
+		long step = 1000l * Integer.MAX_VALUE;		
+		double mdi = 0;
+		for(int i=0; i<100000000; i++) {
+			double md1 = mdi + step;
+			long step2 = step -1;
+			double md2 = mdi + step2;
+			if (md1 == md2) {
+				step = step / 2;
+				if (step==0) {
+					break; // happens at i = ~4k
+				}
+				continue;
+			}
+			mdi = md1;
+		}
+		// allow a little leeway
+		MAX_DOUBLE_INT = mdi / 2;
+		assert MAX_DOUBLE_INT != mdi; 
+		return MAX_DOUBLE_INT;
 	}
 	
 }

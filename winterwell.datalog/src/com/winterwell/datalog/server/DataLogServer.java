@@ -53,7 +53,7 @@ public class DataLogServer {
 		assert settings != null;
 		Dep.set(DataLogConfig.class, settings);
 		// set the config
-		DataLog.setConfig(settings);		
+		DataLog.init(settings);		
 		ManifestServlet.addConfig(settings);
 		ManifestServlet.addConfigBuilder(cb);
 		

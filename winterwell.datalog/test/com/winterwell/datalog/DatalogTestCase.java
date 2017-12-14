@@ -43,7 +43,7 @@ public class DatalogTestCase {
 		config.dbPassword = "winterwell";
 		
 		DataLog.dflt = new DataLogImpl(config);
-		DataLog.setConfig(config);
+		DataLog.init(config);
 	}
 	
 	private void setupDB() {
@@ -63,7 +63,7 @@ public class DatalogTestCase {
 		config.interval = new Dt(5, TUnit.SECOND);
 		config.storageClass = CSVStorage.class;
 		DataLog.dflt = new DataLogImpl(config);
-		DataLog.setConfig(config);
+		DataLog.init(config);
 	}
 	
 	/**

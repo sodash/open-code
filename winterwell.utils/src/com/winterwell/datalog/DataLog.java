@@ -53,6 +53,25 @@ import com.winterwell.utils.web.XStreamUtils;
 public class DataLog {
 
 	/**
+	 * Default init: load config from config/datalog.properties then init.
+	 * @throws RuntimeException
+	 */
+	public static void init() throws RuntimeException {
+		DataLogConfig dlConfig = init2_getDefaultConfig();
+		init(dlConfig);
+	}
+	
+
+	public static DataLogConfig init2_getDefaultConfig() {
+		DataLogConfig dlConfig = new ConfigBuilder(new DataLogConfig())
+				.setDebug(true)
+				.set(new File("config/datalog.properties"))
+				.get();
+		return dlConfig;
+	}
+
+
+	/**
 	 * Access admin functions.
 	 */
 	public static IDataLogAdmin getAdmin() {
@@ -109,25 +128,26 @@ public class DataLog {
 		dflt.flush();
 	}
 
-	static IDataLog dflt = initDflt();
+	static IDataLog dflt = new DummyDataLog(new IllegalStateException("DataLog has not been initialised. Call init()"));
 
+	/**
+	 * @deprecated Let's move to an explicit init() call setup.
+	 * No init -> DummyDataLog
+	 * @return
+	 */
 	private static IDataLog initDflt() {
 		try {
-			DataLogConfig dlConfig = new ConfigBuilder(new DataLogConfig())
-				.setDebug(true)
-				.set(new File("config/datalog.properties"))
-				.get();
-			IDataLog dl = setConfig(dlConfig);
-//			IDataLog dl = (IDataLog) Class.forName(CLASS_DATALOGIMPL)
-//					.newInstance();
-//			Dep.set(DataLogConfig.class, dl.getConfig());
-			return dl;
+			init();
+			return dflt;
 		} catch (Exception e) {
 			// Bad!
 			Log.e(LOGTAG, e);
 			// Let stuff continue without exceptions elsewhere
 			return new DummyDataLog(e);
 		}
+	}
+	static { // TODO remove
+		initDflt();
 	}
 
 	/**
@@ -284,7 +304,7 @@ public class DataLog {
 	 * @param myConfig
 	 * @return 
 	 */
-	public static IDataLog setConfig(DataLogConfig myConfig) {
+	public static IDataLog init(DataLogConfig myConfig) {
 		if (dflt != null) {
 			try {
 				dflt.close();

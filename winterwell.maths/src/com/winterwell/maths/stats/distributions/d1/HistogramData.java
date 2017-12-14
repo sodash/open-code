@@ -16,10 +16,13 @@ import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Range;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.IHasJson;
 
 /**
  * A frequency-count distribution based on buckets. Use with Distribution1DChart for a histogram.
+ * Thread safety: train1() is thread-safe, normalise() is not.
+ * Big data safety: Tests for overrun and keeps within integer precision limits.
  * 
  * <h3>Lifecycle</h3>
  * <ol>
@@ -48,11 +51,6 @@ implements ITrainable.Unsupervised.Weighted<Double>, IHasJson
 	@Override
 	public void train(Iterable<? extends Double> data) {
 		super.train(data);
-	}
-	
-	@Override
-	public void train1(Double x) {
-		count(x);
 	}
 	
 	/**
@@ -104,16 +102,7 @@ implements ITrainable.Unsupervised.Weighted<Double>, IHasJson
 		return copy;
 	}
 
-	/**
-	 * 
-	 * @param x
-	 *            If this is outside the grid, it be capped at the min or max
-	 */
-	public void count(double x) {
-		assert ! normalised;
-		int i = gridInfo.getBucket(x);
-		backing[i]++;
-	}
+	
 	
 
 	public void count(double[] xs) {
@@ -304,10 +293,44 @@ implements ITrainable.Unsupervised.Weighted<Double>, IHasJson
 	}
 
 	@Override
-	public void train1(Double x, double weight) {
+	public synchronized void train1(Double x, double weight) {
 		assert ! normalised;
 		int i = gridInfo.getBucket(x);
 		backing[i] += weight;
+		// Defend against over-run
+		overrunDefence(i);
+	}
+
+	/**
+	 * 		// The underlying doubles would keep going for ages, then stop incrementing.
+		// You lose +1 precision at about 10 trillion!
+		// At 10^15 we slightly reset the counts by reducing by 10^3
+	 * @param i bucket that was modified
+	 */
+	private void overrunDefence(int i) {
+		if (backing[i] < MathUtils.getMaxIntWithDouble()) return;
+		Log.w("HistogramData", "Bucket "+i+" "+gridInfo.getBucketBottom(i)+" has reached max int level accuracy - reducing all counts by 1024");
+		for (int j = 0; j < backing.length; j++) {
+			backing[j] = backing[j] / 1024;
+		}		
+	}
+
+	@Override
+	public void train1(Double x) {
+		count(x);
+	}
+	
+	/**
+	 * Identical to {@link #train1(Double)} (but fractionally faster as it uses primitive double).
+	 * 
+	 * @param x
+	 *            If this is outside the grid, it be capped at the min or max
+	 */
+	public synchronized void count(double x) {
+		assert ! normalised;
+		int i = gridInfo.getBucket(x);
+		backing[i]++;
+		overrunDefence(i);
 	}
 	
 	@Override
@@ -324,16 +347,21 @@ implements ITrainable.Unsupervised.Weighted<Double>, IHasJson
 	public Map<String, Object> toJson2() throws UnsupportedOperationException {
 		Map<String, Object> map = super.toJson2();		
 		
-//		// add in bucket info	
-//		List bucketInfo = new ArrayList();
-//		for(int i=0; i<backing.length; i++) {
-//			bucketInfo.add(new ArrayMap(
-//					"min", gridInfo.getBucketBottom(i),
-//					"max", gridInfo.getBucketTop(i),
-//					"count", backing[i]
-//					));
-//		}
-//		map.put("buckets", bucketInfo);
+		// add in bucket info			
+		// HACK: neater for uniform grids
+		if (gridInfo instanceof GridInfo) {
+			map.put("counts", Arrays.copyOf(backing, backing.length));
+		} else {
+			List bucketInfo = new ArrayList();
+			for(int i=0; i<backing.length; i++) {
+				bucketInfo.add(new ArrayMap(
+						"min", gridInfo.getBucketBottom(i),
+						"max", gridInfo.getBucketTop(i),
+						"count", backing[i]
+						));
+			}
+			map.put("buckets", bucketInfo);
+		}		
 		
 		return map;
 	}

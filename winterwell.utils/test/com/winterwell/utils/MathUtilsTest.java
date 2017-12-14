@@ -186,7 +186,20 @@ public class MathUtilsTest extends TestCase {
 		} while ((1.0 + (machEps / 2.0)) != 1.0);
 
 		System.out.println("Calculated Machine epsilon: " + machEps);
+		assert machEps == MathUtils.getMachineEpsilon();
 	}
+	
+	
+	public void testMaxInt() {
+		double m = MathUtils.getMaxIntWithDouble();
+		System.out.println("Largest safe double int: "+m);		
+		assert m - 10 != m;
+		assert m - 5 != m;
+		assert m - 2 != m;
+		assert m - 1 != m;		
+		assert (10*m + 1001) == (10*m + 1002);
+	}
+
 
 	public void testMax() {
 		assert MathUtils.max(0.0) == 0.0;
