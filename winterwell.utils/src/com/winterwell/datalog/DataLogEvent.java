@@ -96,9 +96,9 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"lng", Double.class,
 			// browser info
 			"mbl", Boolean.class,
-			"ua", StringBuilder.class, // user agent
+			"ua", StringBuilder.class // user agent
 			// no-index (object)
-			"xtra", Null.class
+//			"xtra", Null.class FIXME this was causing bugs :(
 			));
 
 	public static final String simple = "simple";
