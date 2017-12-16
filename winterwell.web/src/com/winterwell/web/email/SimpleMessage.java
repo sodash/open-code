@@ -268,7 +268,17 @@ public class SimpleMessage extends MimeMessage {
 	public SimpleMessage(InternetAddress from, InternetAddress to,
 			String subject, String bodyPlain, String bodyHtml) {
 		this(from, to, subject, bodyPlain);
-		try {
+		setHtmlContent(bodyHtml, bodyPlain);
+	}
+	
+	public SimpleMessage setHtmlContent(String bodyHtml, String bodyPlain) {		
+		try {			
+			// no plain text?
+			if (bodyPlain==null) {
+				// ??should we extract plain text from the html instead??
+				setContent(bodyHtml, WebUtils.MIME_TYPE_HTML_UTF8);
+				return this;
+			}
 			MimeBodyPart plainTextPart = new MimeBodyPart();
 			plainTextPart.setText(bodyPlain, "utf-8", "plain");
 			MimeBodyPart htmlTextPart = new MimeBodyPart();
@@ -277,11 +287,12 @@ public class SimpleMessage extends MimeMessage {
 			multiPart.addBodyPart(plainTextPart);
 			multiPart.addBodyPart(htmlTextPart);
 			this.setContent(multiPart);
+			return this;
 		} catch (MessagingException e) {
 			throw new ExternalServiceException(e);
 		}
 	}
-	
+
 	/**
 	 * Create a blank message -- use the setX methods to build it up before sending.
 	 * @param from
@@ -898,11 +909,7 @@ public class SimpleMessage extends MimeMessage {
 
 
 	public void setHtmlContent(String html) {
-		try {
-			setContent(html, WebUtils.MIME_TYPE_HTML_UTF8);
-		} catch (MessagingException e) {
-			throw new ExternalServiceException(e);
-		}
+		setHtmlContent(html, null);
 	}
 
 	/**
