@@ -299,6 +299,15 @@ public class DataLog {
 	}
 
 	/**
+	 * @deprecated old name for init()
+	 * @param myConfig
+	 * @return
+	 */
+	public static IDataLog setConfig(DataLogConfig myConfig) {
+		return init(myConfig);
+	}
+	
+	/**
 	 * Replace the default DataLog with a new one, as specified by config.
 	 *
 	 * @param myConfig
