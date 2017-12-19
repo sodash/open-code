@@ -28,4 +28,10 @@ public class EmailConfig {
 		return ld;
 	}
 
+	@Override
+	public String toString() {
+		return "EmailConfig [emailServer=" + emailServer + ", emailFrom=" + emailFrom + ", emailPort=" + emailPort
+				+ ", emailSSL=" + emailSSL + "]";
+	}
+
 }

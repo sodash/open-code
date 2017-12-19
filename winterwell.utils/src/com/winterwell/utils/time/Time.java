@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
 
 /**
  * A simple immutable alternative to the built-in mess of Date. This just holds
@@ -37,8 +38,6 @@ public class Time implements Serializable, Comparable<Time> {
 
 	private static GregorianCalendar getCal(int year, int month, int day,
 			int hour, int min, int sec) {
-		assert month > 0 && month < 13 : month;
-		assert day > 0 && day < 32 : day;
 		// get a GMT time zone
 		assert TimeUtils._GMT_TIMEZONE != null;
 		GregorianCalendar cal = new GregorianCalendar(TimeUtils._GMT_TIMEZONE);
@@ -48,6 +47,11 @@ public class Time implements Serializable, Comparable<Time> {
 		// if (year<0) {
 		// cal.set(Calendar.ERA, GregorianCalendar.BC);
 		// }
+		// Allow overflow, as calendar handles it nicely. But log a warning, as it could be a bug symptom
+		if (month <= 0 || month > 12 || day <= 0 || day > 32) {
+			Log.i("Time.getCal", "Odd day or month "+day+" of "+month+" in "+cal);
+		}
+//		assert day > 0 && day < 32 : day;
 		return cal;
 	}
 

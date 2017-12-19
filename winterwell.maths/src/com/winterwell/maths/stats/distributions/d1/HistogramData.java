@@ -37,6 +37,7 @@ import com.winterwell.utils.web.IHasJson;
  * 
  * @see IntDistribution
  * @see IntegerDistribution
+ * @testedby {@link HistogramDataTest}
  * @author daniel
  */
 public final class HistogramData extends ADistribution1D 

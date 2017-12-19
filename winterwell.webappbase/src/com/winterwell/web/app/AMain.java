@@ -109,10 +109,14 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 
 	protected Emailer init3_emailer() {
-		if (Dep.has(Emailer.class)) return Dep.get(Emailer.class);
+		if (Dep.has(Emailer.class)) return Dep.get(Emailer.class);		
 		EmailConfig ec = AppUtils.getConfig(projectName, new EmailConfig(), null);
+		Log.i("init", "Emailer with config "+ec);
 		LoginDetails ld = ec.getLoginDetails();
-		if (ld == null) return null;
+		if (ld == null) {
+			Log.i("init", "No Emailer: no login details");
+			return null;
+		}
 		Emailer emailer = new Emailer(ld);
 		Dep.set(Emailer.class, emailer);
 		return emailer;
