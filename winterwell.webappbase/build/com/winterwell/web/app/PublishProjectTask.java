@@ -30,6 +30,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.LogFile;
 import com.winterwell.web.email.SimpleMessage;
 import com.winterwell.youagain.client.BuildYouAgainJavaClient;
 
@@ -70,6 +71,8 @@ public class PublishProjectTask extends BuildTask {
 	protected String codePart = "everything";
 
 	protected boolean compile;
+
+	private LogFile logfile;
 			
 	/**
 	 * 
@@ -87,6 +90,7 @@ public class PublishProjectTask extends BuildTask {
 		this.remoteWebAppDir = remoteWebAppDir;
 		// local
 		this.localWebAppDir = localWebAppDir;
+		logfile = new LogFile();
 		localLib = new File(localWebAppDir,"tmp-lib");
 		jarFile = new File(localLib, projectName+".jar");
 		bashScript = "./publish-"+projectName+".sh";		
