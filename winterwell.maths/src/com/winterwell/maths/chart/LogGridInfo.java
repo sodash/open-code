@@ -36,6 +36,7 @@ public final class LogGridInfo extends VariableGridInfo implements IGridInfo {
 	public LogGridInfo(double max, int buckets, double minBucketSize, double base) {
 		super(new double[buckets + 1]);
 		assert max > 0 && buckets > 0;
+		assert base > 0 : "try base=10";
 		// setup buckets
 		times[0] = 0;
 		times[times.length - 1] = max;
