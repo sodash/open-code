@@ -27,6 +27,7 @@ import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -60,15 +61,6 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 	public static void initManifest() {
 		if (initFlag) return;
 		initFlag = true;
-		// stick version info into ManifestServlet
-		try {
-			File f = new File("config/version.properties");
-			if (f.isFile()) {
-				configFiles.add(f);
-			}
-		} catch(Throwable ex) {
-			Log.e("manifest", ex);
-		}		
 		// log config
 		try {
 			addConfig(Log.getConfig());
@@ -76,59 +68,7 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			Log.e("manifest", ex);
 		}		
 	}
-	
-//	/**
-//	 * Create version.properties
-//	 */
-//	public static void setVersionProperties(Properties props) {
-//		try {
-//			// set the publish time
-//			props.setProperty(PROPERTY_PUBLISH_DATE, ""+System.currentTimeMillis());
-//			// TIMESTAMP code to avoid caching issues: epoch-seconds, mod 10000 to shorten it
-//			String timestampCode = "" + ((System.currentTimeMillis()/1000) % 10000);
-//			props.setProperty("timecode", ""+timestampCode);
-//			
-//			// set info on the git branch
-//			String branch = GitTask.getGitBranch(null);
-//			props.setProperty(PROPERTY_GIT_BRANCH, branch);
-//			// ...and commit IDs
-//			for(String repo : new String[]{"open-code"}) {
-//				File repodir = new File(FileUtils.getWinterwellDir(), repo);
-//				try {
-//					Map<String, Object> info = GitTask.getLastCommitInfo(repodir);
-//					props.setProperty(PROPERTY_GIT_COMMIT_ID+"."+repo, (String)info.get("hash"));
-//					props.setProperty(PROPERTY_GIT_COMMIT_INFO+"."+repo, StrUtils.compactWhitespace(XStreamUtils.serialiseToXml(info)));
-//	//				TODO props.setProperty(Creole.PROPERTY_GIT_BRANCH+"."+repo, (String)info.get("branch"));
-//				} catch(Throwable ex) {
-//					// oh well;
-//					Log.d("git.info", ex);
-//				}
-//				try {
-//					String rbranch = GitTask.getGitBranch(repodir);
-//					props.setProperty(PROPERTY_GIT_BRANCH+"."+repo, rbranch);
-//				} catch(Throwable ex) {
-//					// oh well
-//					Log.d("git.info", ex);
-//				}
-//			}
-//	
-//			// Who did the push?
-//			try {
-//				props.setProperty("origin", WebUtils2.hostname());
-//			} catch(Exception ex) {
-//				// oh well
-//			}
-//
-//		} catch (Throwable ex) {
-//			Log.e("debug", ex);
-//		}
-//	}
 
-	static final Collection<File> configFiles = new ArraySet<>();
-	
-	public static void addConfigFiles(Collection<File> configFiles) {
-		ManifestServlet.configFiles.addAll(configFiles);
-	}
 
 	private static Time startTime = new Time();
 	
@@ -142,7 +82,7 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		}
 	}
 	
-	static List<Object> configs = new ArrayList();
+	static ArraySet configs = new ArraySet();
 	
 	public static void addConfig(Object config) {
 		configs.add(config);		
@@ -152,6 +92,9 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		
 		ArrayMap cargo = new ArrayMap();
 		// what did we load from?
+		List<ConfigBuilder> cbs = ConfigFactory.get().getHistory();
+		List<List<File>> cfs = Containers.apply(cbs, ConfigBuilder::getFileSources);
+		List<File> configFiles = Containers.flatten(cfs);
 		cargo.put("configFiles", configFiles);
 		
 		// server type
@@ -159,8 +102,10 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 				
 		// what config did we pick up?
 		// Screen for sensitive keys, e.g. passwords
-		Map configsjson = new ArrayMap();		
-		for(Object c : configs) {
+		Map configsjson = new ArrayMap();
+		ArraySet allConfigs = new ArraySet<>(configs);
+		allConfigs.addAll(Containers.apply(cbs, ConfigBuilder::get));
+		for(Object c : allConfigs) {
 			ArrayMap<String, Object> vs = new ArrayMap(Containers.objectAsMap(c));
 			for(String k : vs.keySet()) {
 				boolean protect = ConfigBuilder.protectPasswords(k);
@@ -254,15 +199,6 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			manifestFromJar.put("error", ex);
 		}
 		return manifestFromJar;
-	}
-
-	public static void addConfigBuilder(ConfigBuilder cb) {
-		// TODO store more from cb
-		for(Object s : cb.getSources()) {
-			if (s instanceof File) {
-				addConfigFiles(Arrays.asList((File)s));
-			}
-		}
 	}
 	
 	

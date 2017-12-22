@@ -625,6 +625,10 @@ public class ConfigBuilder {
 		debug = b;
 		return this;
 	}
+
+	public List<File> getFileSources() {
+		return Containers.filterByClass(getSources(), File.class);
+	}
 	
 
 }

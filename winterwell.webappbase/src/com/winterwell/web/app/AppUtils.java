@@ -33,6 +33,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
@@ -67,7 +68,7 @@ public class AppUtils {
 
 	
 	/**
-	 * TODO refactor into AppUtils
+	 * @deprecated Use {@link ConfigFactory}
 	 * @param config
 	 * @param args
 	 * @return
@@ -92,15 +93,14 @@ public class AppUtils {
 			// live, local, test?			
 			.set(new File("config/"+serverType.toString().toLowerCase()+".properties"))
 			// this machine specific
-			.set(new File("config/"+WebUtils2.hostname()+".properties"))
+			.set(new File("config/"+machine+".properties"))
 			// args
 			.setFromMain(args)
 			.get();
 		// set Dep
 		Dep.set((Class)config.getClass(), config);		
 		// set them for manifest
-		ManifestServlet.addConfig(config);
-		ManifestServlet.addConfigBuilder(cb);
+		ManifestServlet.addConfig(config);;
 		assert config != null;
 		return config;		
 	}

@@ -987,7 +987,7 @@ public final class Containers  {
 	 * @param nestedCollections
 	 * @return all the non-collection elements of nestedCollections
 	 */
-	public static <X> List<X> flatten(Collection<? extends X> nestedCollections) {
+	public static <X> List<X> flatten(Collection nestedCollections) {
 		ArrayList list = new ArrayList();
 		flatten2(list, nestedCollections);
 		return list;
@@ -1803,8 +1803,8 @@ public final class Containers  {
 	 * @param klass
 	 * @return
 	 */
-	public static <X> List<X> filterByClass(Iterable<X> list, Class klass) {
-		return filter(list, IFilter.byClass(klass));
+	public static <X, Y extends X> List<Y> filterByClass(Iterable<X> list, Class<Y> klass) {
+		return (List) filter(list, IFilter.byClass(klass));
 	}
 	
 	/**

@@ -7,6 +7,7 @@ import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.IDataLogAdmin;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
@@ -42,20 +43,13 @@ public class DataLogServer {
 	}
 
 	private static void init(String[] args) {
-		ConfigBuilder cb = new ConfigBuilder(new DataLogConfig());
-		settings = cb
-				.setDebug(true)
-				.setFromSystemProperties(null)
-				.set(new File("config/datalog.properties"))
-				.set(new File("config/datalog.local.properties"))
-				.setFromMain(args)
-				.get();
+		ConfigFactory cf = ConfigFactory.get();
+		settings = cf.getConfig(DataLogConfig.class);
 		assert settings != null;
 		Dep.set(DataLogConfig.class, settings);
 		// set the config
 		DataLog.init(settings);		
 		ManifestServlet.addConfig(settings);
-		ManifestServlet.addConfigBuilder(cb);
 		
 		logFile = new LogFile(DataLogServer.settings.logFile)
 				// keep 6 weeks of log files so we can do 1 month reports

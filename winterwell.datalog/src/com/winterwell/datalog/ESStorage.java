@@ -50,6 +50,7 @@ import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
@@ -195,26 +196,31 @@ public class ESStorage implements IDataLogStorage {
 	}
 
 	public IDataLogStorage init(DataLogConfig config) {
-		ConfigBuilder cb = new ConfigBuilder(new ESConfig());
 		this.config = config;
 		// ES config
 		if (esConfig == null) {
+			ConfigFactory cf = ConfigFactory.get();
+			ConfigBuilder cb = cf.getConfigBuilder(ESConfig.class);
+			// also look in config/datalog.properties (as well as es.properties)
 			esConfig = cb.set(new File("config/datalog.properties")).get();
 		}
 		// Support per-namespace ESConfigs
 		if (config.namespaceConfigs!=null) {
 			synchronized (config4dataspace) {
 				for (String n : config.namespaceConfigs) {
+					// also look in config/datalog.namespace.properties
 					File f = new File("config/datalog."+n.toLowerCase()+".properties");
 					Log.d("DataLog.init", "Looking for special namespace "+n+" config in "+f+" file-exists: "+f.exists());
 					if ( ! f.exists()) {
 						Log.w("DataLog.init", "No special config file "+f.getAbsoluteFile());
 						continue;
 					}
-					ESConfig esConfig4n = new ConfigBuilder(new ESConfig())
+					ConfigFactory cf = ConfigFactory.get();
+					ConfigBuilder cb = cf.getConfigBuilder(ESConfig.class);
+					ESConfig esConfig4n = cb
 							.set(new File("config/datalog.properties"))
-							.set(f).
-							get();
+							.set(f)
+							.get();
 					config4dataspace.put(n, esConfig4n);					
 				}
 			}
