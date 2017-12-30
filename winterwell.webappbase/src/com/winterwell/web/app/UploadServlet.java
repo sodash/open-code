@@ -15,6 +15,7 @@ import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.data.XId;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.IFn;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
@@ -62,6 +63,20 @@ public final class UploadServlet implements IServlet {
 
 	public static final FileUploadField UPLOAD = new FileUploadField("upload");
 	
+	File webRoot = new File("web"); // = Dep.get(ISiteConfig.class).getWebRootDir();
+	
+	public void setWebRoot(File webRoot) {
+		this.webRoot = webRoot;
+	}
+	
+	IFn<File,String> urlFromFile = file -> {
+		String p = FileUtils.getRelativePath(file, webRoot);
+		return p;
+	};
+	
+	public void setUrlFromFile(IFn<File, String> urlFromFile) {
+		this.urlFromFile = urlFromFile;
+	}
 
 	public UploadServlet() {
 	}
@@ -95,7 +110,8 @@ public final class UploadServlet implements IServlet {
 		cargo.put("fileFormat", WebUtils2.getMimeType(_asset));
 		cargo.put("name", _asset.getName());
 		cargo.put("absolutePath", _asset.getAbsolutePath());
-		cargo.put("url", _asset.getPath().replaceFirst("web", ""));
+		String url = urlFromFile.apply(_asset);
+		cargo.put("url", url);
 		
 
 		state.put(UPLOAD, _asset);

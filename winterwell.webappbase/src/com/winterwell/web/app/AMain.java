@@ -152,6 +152,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 
 	/**
+	 * TODO move this into ISiteConfig
 	 * Override!
 	 * @return
 	 */
