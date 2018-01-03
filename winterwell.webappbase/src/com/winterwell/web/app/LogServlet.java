@@ -3,6 +3,7 @@ package com.winterwell.web.app;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Period;
@@ -11,6 +12,7 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.SafeString;
+import com.winterwell.youagain.client.YouAgainClient;
 
 
 /**
@@ -39,7 +41,15 @@ public class LogServlet implements IServlet {
 	
 	@Override
 	public void process(WebRequest state) throws Exception {
-		// Provide Ajax logging NB: This opens us to a very subtle attack where you poke stuff into our logs
+		// try to login, so the log messages have a user-id
+		try {
+			YouAgainClient yac = Dep.get(YouAgainClient.class);
+			yac.getAuthTokens(state);
+		} catch(Throwable ex) {
+			Log.e(AJAX_TAG_PREFIX+"login", ex);
+		}
+		// Provide Ajax logging 
+		// NB: This opens us to a very subtle attack where you poke stuff into our logs
 		String msg = state.get(MSG);
 		if (msg!=null) {
 			String tag = state.get(TAG, "log");
