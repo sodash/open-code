@@ -177,6 +177,8 @@ public class Log {
 				}
 			};
 		}
+		// all set (let's log that)
+		Log.i("log", "setConfig "+ReflectionUtils.getSomeStack(10));
 	}
 
 	/**

@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.winterwell.utils.io.Option;
 
+/**
+ * Typically loaded from config/log.properties
+ * @author daniel
+ *
+ */
 class LogConfig {
 
 	@Option
