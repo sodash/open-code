@@ -825,6 +825,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		if (from.readOnly) throw new IllegalArgumentException(from+" is read-only");
 		assert from != null && src != null;
 		assert ! src.equals(from) : "loopy: "+src;
+		assert from.symlink : "not a symlink "+from+" -- call Desc.setSymLink()";
 		// ?? maybe use actual symlinks in file-based IStores for a bit of extra speed??
 		base.put(from, src);		
 	}

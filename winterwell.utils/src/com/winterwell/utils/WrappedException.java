@@ -15,11 +15,13 @@ public class WrappedException extends RuntimeException {
 
 	public WrappedException(String msg, Throwable e) {
 		super(msg, e);
+		assert e != null;
 		// assert ! (e instanceof WrappedException) : e; TODO
 	}
 
 	public WrappedException(Throwable e) {
 		super(e);
+		assert e != null;
 		// assert ! (e instanceof WrappedException) : e; TODO
 	}
 

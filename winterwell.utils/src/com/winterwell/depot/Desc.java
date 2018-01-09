@@ -723,7 +723,6 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 * sym-links
 	 */
 	boolean symlink;
-
 	
 	boolean readOnly;
 

@@ -17,4 +17,24 @@ public class ConfigFactoryTest {
 		System.out.println(dlc);
 	}
 
+	
+	@Test
+	public void testGetConfigPrivateClass() {
+		ConfigFactory cf = ConfigFactory.get();
+		assert cf != null;
+		PrivateConfig dlc = cf.getConfig(PrivateConfig.class);
+		System.out.println(dlc);
+	}
+
+}
+
+class PrivateConfig {
+	
+	private PrivateConfig() {
+		
+	}
+	
+	@Option
+	String foo = "bar";
+	
 }

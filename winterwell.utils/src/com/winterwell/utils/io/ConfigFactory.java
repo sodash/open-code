@@ -1,6 +1,7 @@
 package com.winterwell.utils.io;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,8 +141,19 @@ public class ConfigFactory {
 	 * @return
 	 */
 	public ConfigBuilder getConfigBuilder(Class configClass) {
+		if (configClass==null) throw new NullPointerException();
 		try {
-			final ConfigBuilder cb = new ConfigBuilder(configClass.newInstance());
+			// make a config object
+			Object c;
+			try {
+				c = configClass.newInstance();
+			} catch(Exception ex) {
+				Log.d("ConfigBuilder", "1st try of new "+configClass.getSimpleName()+": "+ex);
+				Constructor cons = configClass.getDeclaredConstructor();
+				if ( ! cons.isAccessible()) cons.setAccessible(true);
+				c = cons.newInstance();	
+			}			
+			final ConfigBuilder cb = new ConfigBuilder(c);
 			cb.setDebug(debug);
 			// system props
 			cb.setFromSystemProperties(null);
