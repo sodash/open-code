@@ -3,15 +3,18 @@ package com.winterwell.web.app;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
+import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Logger;
@@ -19,6 +22,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
@@ -127,6 +131,10 @@ class DummyLogger implements Logger {
 	@Override
 	public void warn(Throwable arg0) {
 		return;
+	}
+
+	@Override
+	public void debug(String arg0, long arg1) {	
 	}
 
 }
@@ -331,23 +339,26 @@ public class JettyLauncher {
 		}
 		server = new Server();
 
-		Connector connector = new SelectChannelConnector();
+		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(port);
 		server.setConnectors(new Connector[] { connector });
-
-		QueuedThreadPool threadPool = new QueuedThreadPool();
-		threadPool.setName("JettyWebServer");
+		
 		if (oneThread) {
-			Log.d(LOGTAG, "Single-thread pool");
-			threadPool.setMaxThreads(1);
-			server.setThreadPool(threadPool);
+			Log.e(LOGTAG, "TODO oneThread support");
+//			QueuedThreadPool threadPool = new QueuedThreadPool();
+//			threadPool.setName("JettyWebServer");
+//			Log.d(LOGTAG, "Single-thread pool");
+//			threadPool.setMaxThreads(1);
+//			Handler handler;
+//			server.setHandler(handler);			
 		}
-		root = new ServletContextHandler(server, "/",
-				ServletContextHandler.SESSIONS);
+		root = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
 
 		// Switch off jsessionid-in-the-url badness
-		root.getSessionHandler().getSessionManager()
-				.setSessionIdPathParameterName("none");		
+		Set<SessionTrackingMode> sessionModes = root.getSessionHandler().getEffectiveSessionTrackingModes();
+		Set<SessionTrackingMode> sessionTrackingModes = new ArraySet();
+		root.getSessionHandler().setSessionTrackingModes(sessionTrackingModes);
+//				.setSessionIdPathParameterName("none");		
 		root.setResourceBase(webRootDir.getAbsolutePath());
 
 		// Attempted fix for Egan's transfer bug, Doesn't work :(

@@ -22,7 +22,6 @@
 	<classpathentry kind="lib" path="/middleware/jetty/jetty-server.jar" sourcepath="/middleware/jetty/jetty-server-7.5.4.v20111024-sources.jar"/>
 	<classpathentry kind="lib" path="/middleware/jetty/jetty-servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="/middleware/jetty/jetty-util.jar" sourcepath="/middleware/jetty/jetty-http-7.5.4.v20111024-sources.jar"/>
-	<classpathentry kind="lib" path="/middleware/jetty/jetty-websocket.jar"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="/middleware/servlet/servlet-api-3.0.jar" sourcepath="/middleware/servlet/servlet-api-3.0.20100224-sources.jar"/>
 	<classpathentry kind="lib" path="/middleware/tagsoup/tagsoup.jar"/>
@@ -30,5 +29,7 @@
 	<classpathentry exported="true" kind="lib" path="/middleware/javamail/javax.mail.jar" sourcepath="/middleware/javamail/javamail-1.5.5-src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry kind="lib" path="/middleware/guava/guava.jar" sourcepath="/middleware/guava/src.zip"/>
+	<classpathentry exported="true" kind="lib" path="/middleware/jetty/jetty-util-ajax.jar"/>
+	<classpathentry kind="lib" path="/middleware/servlet/servlet-api-3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

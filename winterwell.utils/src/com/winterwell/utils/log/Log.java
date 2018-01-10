@@ -100,6 +100,9 @@ public class Log {
 	}
 
 	private static void stdInit() {
+		// switch off logging during log init
+		Level minLevel = MIN_LEVEL;
+		setMinLevel(OFF);
 		// Add a simple console output listener
 		addListener(new ILogListener() {
 			@Override
@@ -116,10 +119,12 @@ public class Log {
 			config = new ConfigBuilder(new LogConfig())
 					.set(new File("config/log.properties"))
 					.get();
-			setConfig(config);			
+			setConfig(config);
 		} catch(Throwable ex) {
 			// How can we report this bad config issue? Only to std-error :(
 			System.err.println(ex);
+		} finally {
+			setMinLevel(minLevel);
 		}
 	}
 	
