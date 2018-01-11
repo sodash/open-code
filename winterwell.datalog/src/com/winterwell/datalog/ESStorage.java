@@ -364,7 +364,7 @@ public class ESStorage implements IDataLogStorage {
 		long secs = bucketPeriod.getEnd().getTime() % 1000;
 		String id = event.getId()+"_"+secs;
 		ESHttpClient client = client(dataspace);
-		client.debug = true; // FIXME
+//		client.debug = true; // FIXME
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
 		if (event.time==null) event.time = bucketPeriod.getEnd();
 		// set doc

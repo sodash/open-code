@@ -124,12 +124,12 @@ public class AppUtils {
 	 */
 	public static <X> X get(ESPath path, Class<X> klass) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-		ESHttpClient.debug = true;
 
 		GetRequestBuilder s = new GetRequestBuilder(client);
 		// Minor TODO both indices in one call
 		s.setIndices(path.indices[0]).setType(path.type).setId(path.id);
 		s.setSourceOnly(true);
+//		s.setDebug(true);
 		GetResponse sr = s.get();
 		if (sr.isSuccess()) {
 			if (klass!=null) {

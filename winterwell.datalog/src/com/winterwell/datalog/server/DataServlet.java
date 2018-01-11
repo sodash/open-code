@@ -176,7 +176,7 @@ public class DataServlet implements IServlet {
 //		DataLog.getData(start, end, null, TUnit.HOUR.dt, tagBits);
 //		DataLog.getData(start, end, sum/as-is, bucket, DataLogEvent filter, breakdown);
 		
-		esc.debug = true;
+//		esc.debug = true;
 		SearchResponse sr = search.get();
 		sr.check();
 		

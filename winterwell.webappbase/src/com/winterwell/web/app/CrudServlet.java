@@ -313,7 +313,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		// TODO paging!
 		s.setSize(10000);
-		es.debug = true;
+		s.setDebug(true);
 		SearchResponse sr = s.get();
 		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();

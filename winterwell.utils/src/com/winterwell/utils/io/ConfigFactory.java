@@ -32,6 +32,16 @@ public class ConfigFactory {
 	private boolean debug = true;
 	private final List<ConfigBuilder> history = new ArrayList();
 	
+	private boolean strict;
+	
+	/**
+	 * If true, then duplicate config loading will cause an exception.
+	 * @param strict
+	 */
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
+	
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 	}
@@ -63,7 +73,23 @@ public class ConfigFactory {
 		this.machine = machine;
 	}
 	
-	public final <X> X getConfig(Class<X> configClass) {
+	/**
+	 * 
+	 * @param configClass
+	 * @return
+	 * @throws IllegalStateException if the config has already been created
+	 */
+	public final <X> X getConfig(Class<X> configClass) throws IllegalStateException {
+		// try to avoid duplicate config loading
+		if (Dep.has(configClass)) {
+			String msg = "Duplicate call to ConfigFactory.getConfig() for "+configClass
+					+" Use Dep.has() / Dep.get() for subsequent calls, or set(null) or use getConfigBuilder() if you need to recreate one.";
+			if (strict) {
+				throw new IllegalStateException(msg);
+			} else {
+				Log.w("config", msg);
+			}
+		}
 		try {
 			ConfigBuilder cb = getConfigBuilder(configClass);
 			X config = cb.get();
