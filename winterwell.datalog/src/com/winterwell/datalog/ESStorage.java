@@ -203,6 +203,9 @@ public class ESStorage implements IDataLogStorage {
 			ConfigBuilder cb = cf.getConfigBuilder(ESConfig.class);
 			// also look in config/datalog.properties (as well as es.properties)
 			esConfig = cb.set(new File("config/datalog.properties")).get();
+			// check the connection
+			ESHttpClient es = new ESHttpClient(esConfig);
+			es.checkConnection();
 		}
 		// Support per-namespace ESConfigs
 		if (config.namespaceConfigs!=null) {

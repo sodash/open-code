@@ -57,9 +57,21 @@ public final class Dep {
 		return context;
 	}
 	
-	public static <X> void setIfAbsent(Class<X> klass, X value) {
-		if (has(klass)) return;
+	/**
+	 * aka get-with-default
+	 * NB: not thread-safe
+	 * @param klass
+	 * @param value
+	 * @return the value held/set
+	 */
+	public static <X> X setIfAbsent(Class<X> klass, X value) {
+		if (has(klass)) {
+			X got = get(klass);
+			assert got != null : klass;
+			return got;	
+		}
 		set(klass, value);
+		return value;
 	}
 
 
@@ -157,6 +169,8 @@ public final class Dep {
 	 * @return true if set, either by value or a supplier
 	 */
 	public static boolean has(Class class1) {
+		// NB: don't just use get() to avoid calling on a supplier function
+		// -- though do we really care if we do??
 		DepContext ctxt = getContext();
 		while(ctxt != null) {
 			DKey klass = key(class1, ctxt);

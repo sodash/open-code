@@ -63,7 +63,7 @@ public class ConfigFactory {
 		this.machine = machine;
 	}
 	
-	public <X> X getConfig(Class<X> configClass) {
+	public final <X> X getConfig(Class<X> configClass) {
 		try {
 			ConfigBuilder cb = getConfigBuilder(configClass);
 			X config = cb.get();
@@ -80,10 +80,6 @@ public class ConfigFactory {
 		}
 	}
 	
-	public void setOnCreate() {
-		
-	}
-
 	/**
 	 * This is the core bit, which determines what files to look at (and in what order)
 	 * @param configClass
@@ -114,7 +110,8 @@ public class ConfigFactory {
 
 	public synchronized static ConfigFactory get() {
 		if (Dep.has(ConfigFactory.class)) {
-			return Dep.get(ConfigFactory.class);
+			ConfigFactory cf = Dep.get(ConfigFactory.class);
+			return cf;
 		}
 		// Set a default (which has no app-name or Main args)
 		ConfigFactory cf = new ConfigFactory();
@@ -144,15 +141,7 @@ public class ConfigFactory {
 		if (configClass==null) throw new NullPointerException();
 		try {
 			// make a config object
-			Object c;
-			try {
-				c = configClass.newInstance();
-			} catch(Exception ex) {
-				Log.d("ConfigBuilder", "1st try of new "+configClass.getSimpleName()+": "+ex);
-				Constructor cons = configClass.getDeclaredConstructor();
-				if ( ! cons.isAccessible()) cons.setAccessible(true);
-				c = cons.newInstance();	
-			}			
+			Object c = getConfigBuilder2_newConfigObject(configClass);
 			final ConfigBuilder cb = new ConfigBuilder(c);
 			cb.setDebug(debug);
 			// system props
@@ -171,6 +160,17 @@ public class ConfigFactory {
 		} catch(Exception ex) {
 			throw Utils.runtime(ex);
 		}
+	}
+
+	protected Object getConfigBuilder2_newConfigObject(Class configClass) throws Exception {
+		try {
+			return configClass.newInstance();
+		} catch(Exception ex) {
+			Log.d("ConfigBuilder", "1st try of new "+configClass.getSimpleName()+": "+ex);
+			Constructor cons = configClass.getDeclaredConstructor();
+			if ( ! cons.isAccessible()) cons.setAccessible(true);
+			return cons.newInstance();	
+		}			
 	}
 
 	public List<ConfigBuilder> getHistory() {

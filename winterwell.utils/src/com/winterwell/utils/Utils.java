@@ -19,6 +19,7 @@ import com.winterwell.utils.io.FastByteArrayInputStream;
 import com.winterwell.utils.io.FastByteArrayOutputStream;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.WeirdException;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
@@ -504,10 +505,14 @@ public final class Utils {
 	 * a bit less painful (trys to avoid the "SQLException caused by: see next
 	 * exception, which you can't do now, mwhaha" message).
 	 * 
-	 * @param e Should not be null (although that isn't enforced to avoid error-on-error badness)
+	 * @param e Should not be null (although that isn't enforced to avoid error-on-error badness
+	 *  -- null will throw a WeirdException)
 	 * @return original exception if {@link RuntimeException}, or a {@link WrappedException}
 	 */
 	public static RuntimeException runtime(Throwable e) {
+		if (e==null) {
+			throw new WeirdException("Huh? null Throwable");
+		}
 		if (e instanceof RuntimeException)
 			return (RuntimeException) e;
 		// SQL exceptions are horrible - throw the cause instead
