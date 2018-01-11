@@ -321,6 +321,19 @@ public class ConfigBuilder {
 
 	Map<Field,Object> source4setFields = new ArrayMap();
 
+	/**
+	 * Debug info: how was a field set?
+	 * @param fieldName
+	 * @return source e.g. File, or null
+	 */
+	public Object getSourceForField(String fieldName) {
+		Utils.check4null(fieldName);
+		for(Field f : source4setFields.keySet()) {
+			if (f.getName().equals(fieldName)) return source4setFields.get(f);
+		}
+		return null;
+	}
+	
 	private boolean debug;
 
 	private final List<Object> sources = new ArrayList();
