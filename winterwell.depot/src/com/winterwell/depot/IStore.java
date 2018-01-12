@@ -1,6 +1,8 @@
 package com.winterwell.depot;
 
 import java.io.File;
+import java.io.Flushable;
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -11,7 +13,7 @@ import java.util.Set;
  * @author daniel
  *
  */
-public interface IStore {
+public interface IStore extends Flushable {
 
 	/**
 	 * Use-case: Damage limitation only. For handling damaged artifacts, which can't be de-seraliased.
@@ -21,6 +23,11 @@ public interface IStore {
 	String getRaw(Desc desc);
 	
 	void remove(Desc arg0);
+	
+	/**
+	 * force an immediate save
+	 */
+	void flush();
 	
 	boolean contains(Desc desc);
 	

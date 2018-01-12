@@ -30,7 +30,7 @@ import com.winterwell.utils.time.TimeUtils;
  * @param <V>
  */
 public class SlowStorage extends SlowActor<Desc> 
-implements IStore , Flushable, Closeable
+implements IStore, Flushable, Closeable
 {
 	
 	@Override
