@@ -25,6 +25,7 @@ import com.winterwell.utils.log.Log;
  */
 public class ConfigFactory {
 
+	private static final String LOGTAG = ConfigBuilder.LOGTAG;
 	private String[] args;
 	private String appName;
 	String serverType;
@@ -65,6 +66,7 @@ public class ConfigFactory {
 	 */
 	public void setServerType(String serverType) {
 		this.serverType = serverType;
+		Log.d(LOGTAG, "serverType: "+serverType);
 	}	
 	public void setArgs(String[] args) {
 		this.args = args;
@@ -87,7 +89,7 @@ public class ConfigFactory {
 			if (strict) {
 				throw new IllegalStateException(msg);
 			} else {
-				Log.w("config", msg);
+				Log.w(LOGTAG, msg);
 			}
 		}
 		try {
@@ -150,7 +152,7 @@ public class ConfigFactory {
 	 * @return cf for chaining
 	 */
 	public static ConfigFactory set(ConfigFactory cf) {
-		Log.d("ConfigFactory", "set "+cf);
+		Log.i(LOGTAG, "set global ConfigFactory "+cf);
 		Dep.set(ConfigFactory.class, cf);
 		return cf;
 	}
@@ -192,7 +194,7 @@ public class ConfigFactory {
 		try {
 			return configClass.newInstance();
 		} catch(Exception ex) {
-			Log.d("ConfigBuilder", "1st try of new "+configClass.getSimpleName()+": "+ex);
+			Log.d(LOGTAG, "1st try of new "+configClass.getSimpleName()+": "+ex);
 			Constructor cons = configClass.getDeclaredConstructor();
 			if ( ! cons.isAccessible()) cons.setAccessible(true);
 			return cons.newInstance();	

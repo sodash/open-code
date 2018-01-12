@@ -278,7 +278,7 @@ public class ConfigBuilder {
 				// TODO refactor setOneKeyValue() so this can use the same get-field
 				Field field = token2field.get(a);
 				if (field == null) {
-					Log.w("init", config.getClass()+" Unrecognised option: "+a+" from main args "+Printer.toString(args));
+					Log.w(LOGTAG, config.getClass()+" Unrecognised option: "+a+" from main args "+Printer.toString(args));
 					// advance i anyway??
 					if (args.length > i+1 && ! args[i+1].startsWith("-")) i++;
 					continue;
@@ -296,6 +296,8 @@ public class ConfigBuilder {
 		}
 	}
 
+	public static final String LOGTAG = "config";
+	
 	private int parse2_1arg(String[] args, int i, Field field) throws IllegalAccessException, ParseException 
 	{
 		if (field.getType() == Boolean.class
@@ -346,7 +348,7 @@ public class ConfigBuilder {
 		Object prev = source4setFields.put(field, Utils.or(source, "unknown"));
 		if (prev!=null) {
 			// log the override
-			Log.i("config", "... "+config.getClass().getSimpleName()+"."+field.getName()+" source "+source+" overrode "+prev);
+			Log.i(LOGTAG, "... "+config.getClass().getSimpleName()+"."+field.getName()+" source "+source+" overrode "+prev);
 		}
 		field.set(config, v);
 	}
@@ -361,7 +363,7 @@ public class ConfigBuilder {
 	public ConfigBuilder set(File propertiesFile) {
 		if (propertiesFile==null) return this;		
 		if ( ! propertiesFile.exists()) {
-			Log.d("config", config.getClass()+": No properties file: "+propertiesFile+" = "+propertiesFile.getAbsolutePath());
+			Log.d(LOGTAG, config.getClass()+": No properties file: "+propertiesFile+" = "+propertiesFile.getAbsolutePath());
 			return this;
 		}		
 		source = propertiesFile.getAbsoluteFile();
@@ -396,13 +398,13 @@ public class ConfigBuilder {
 		if (debug) {
 			try {
 				for(Field f : source4setFields.keySet()) {
-					Log.d("config", config.getClass().getSimpleName()+"."+f.getName()
+					Log.d(LOGTAG, config.getClass().getSimpleName()+"."+f.getName()
 									+" was set from "+source4setFields.get(f)
 									+(protectPasswords(f.getName())? "" : " to "+f.get(config))
 									);
 				}
 			} catch(Exception ex) {
-				Log.e("config.debug.fail", ex);
+				Log.e(LOGTAG+".debug.fail", ex);
 			}
 		}
 		return (S) config;
