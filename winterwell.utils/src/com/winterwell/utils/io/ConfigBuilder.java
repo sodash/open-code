@@ -178,7 +178,7 @@ public class ConfigBuilder {
 
 	private boolean parseFlag;
 
-	private String[] remainderArgs;
+	private List<String> remainderArgs;
 
 
 	/**
@@ -248,7 +248,7 @@ public class ConfigBuilder {
 	 * After {@link #setFromMain(String[])}, this will hold the remaining unused arguments
 	 * @return
 	 */
-	public String[] getRemainderArgs() {
+	public List<String> getRemainderArgs() {
 		return remainderArgs;
 	}
 	
@@ -287,7 +287,7 @@ public class ConfigBuilder {
 				i = parse2_1arg(args, i, field);
 			}
 			// return remainder
-			remainderArgs = Arrays.copyOfRange(args, i, args.length);
+			remainderArgs = Arrays.asList(Arrays.copyOfRange(args, i, args.length));
 			return this;
 		} catch (Exception e) {
 			throw Utils.runtime(e);

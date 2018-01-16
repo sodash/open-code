@@ -63,16 +63,20 @@ public class ConfigFactory {
 	/**
 	 * e.g. local / test / production. See {@link KServerType}
 	 * @param serverType
+	 * @return 
 	 */
-	public void setServerType(String serverType) {
+	public ConfigFactory setServerType(String serverType) {
 		this.serverType = serverType;
 		Log.d(LOGTAG, "serverType: "+serverType);
+		return this;
 	}	
-	public void setArgs(String[] args) {
+	public ConfigFactory setArgs(String[] args) {
 		this.args = args;
+		return this;
 	}
-	public void setMachine(String machine) {
+	public ConfigFactory setMachine(String machine) {
 		this.machine = machine;
+		return this;
 	}
 	
 	/**
