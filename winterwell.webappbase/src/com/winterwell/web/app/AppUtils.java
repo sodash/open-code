@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.eclipse.jetty.util.ajax.JSON;
+
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
@@ -36,6 +38,7 @@ import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
@@ -245,6 +248,12 @@ public class AppUtils {
 		
 		// TODO check security with YouAgain!
 		
+		// debug FIXME		
+		String json = item.string();
+		Object start = SimpleJson.get(item.map(), "projects", 0, "start");
+		Object startraw = SimpleJson.get(item.map(), "projects", 0, "start_raw");
+
+		
 		// update status TODO factor out the status logic
 		Object s = item.map().get("status");
 		if (Utils.streq(s, KStatus.PUBLISHED)) {
@@ -252,6 +261,12 @@ public class AppUtils {
 		} else {
 			item.put("status", KStatus.DRAFT);
 		}
+		
+		// debug FIXME		
+		String json2 = item.string();
+		Object start2 = SimpleJson.get(item.map(), "projects", 0, "start");
+		Object startraw2 = SimpleJson.get(item.map(), "projects", 0, "start_raw");
+		
 		// talk to ES
 		return doSaveEdit2(path, item, state);
 	}
@@ -263,17 +278,24 @@ public class AppUtils {
 	 * @param stateCanBeNull
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest stateCanBeNull) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));		
 		// save update
 		
-		// prep object
+		JThing item2 = Utils.copy(item);
+		String json = item2.string();
+		Object start = SimpleJson.get(item2.map(), "projects", 0, "start");
+		Object startraw = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
+		
+		// prep object via IInit? (IInit is checked within JThing)
 		// e.g. set the suggest field for NGO 
-		if (item.java() instanceof IInit) {
-			((IInit) item.java()).init();
-			// force a refresh of map and json, so they get any edits made by init()
-			item.setJava(item.java());
-		}
+		Object jobj = item.java();
+
+		item2 = Utils.copy(item);
+		String json2 = item2.string();
+		Object start2 = SimpleJson.get(item2.map(), "projects", 0, "start");
+		Object startraw2 = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
 		
 		// sanity check id matches path
 		String id = (String) item.map().get("@id"); //mod.getId();
@@ -284,10 +306,17 @@ public class AppUtils {
 		}
 		assert id != null && ! id.equals("new") : "use action=new "+stateCanBeNull;
 		assert id.equals(path.id) : path+" vs "+id;
+		
+		item2 = Utils.copy(item);
+		String json3 = item2.string();
+		Object start3 = SimpleJson.get(item2.map(), "projects", 0, "start");
+		Object startraw3 = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
+		
 		// save to ES
 		UpdateRequestBuilder up = client.prepareUpdate(path);
 		// This should merge against what's in the DB
-		up.setDoc(item.map());
+		Map map = item.map();
+		up.setDoc(map);
 		up.setDocAsUpsert(true);
 		// TODO delete stuff?? fields or items from a list
 //		up.setScript(script)
@@ -409,7 +438,13 @@ public class AppUtils {
 	}
 
 
-	public static void initESMappings(KStatus[] statuses, Class[] dbclasses, ArrayMap<Class,Map> mappingFromClass) {
+	/**
+	 * Create mappings. Some common fields are set: "name", "id", "@type"
+	 * @param statuses
+	 * @param dbclasses
+	 * @param mappingFromClass Setup more fields. Can be null
+	 */
+	public static void initESMappings(KStatus[] statuses, Class[] dbclasses, Map<Class,Map> mappingFromClass) {
 		IESRouter esRouter = Dep.get(IESRouter.class);
 		ESHttpClient es = Dep.get(ESHttpClient.class);
 		ESException err = null;
@@ -447,13 +482,14 @@ public class AppUtils {
 		if (err != null) throw err;
 	}
 
-	private static void initESMappings2_putMapping(ArrayMap<Class, Map> mappingFromClass, ESHttpClient es, Class k,
-			ESPath path, String index) {
+	private static void initESMappings2_putMapping(Map<Class, Map> mappingFromClass, ESHttpClient es, Class k,
+			ESPath path, String index) 
+	{
 		PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(
 				index, path.type);
 		ESType dtype = new ESType();
 		// passed in
-		Map mapping = mappingFromClass.get(k);
+		Map mapping = mappingFromClass==null? null : mappingFromClass.get(k);
 		if (mapping != null) {
 			// merge in
 			// NB: done here, so that it doesn't accidentally trash the settings below

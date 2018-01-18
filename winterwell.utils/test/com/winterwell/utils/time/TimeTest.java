@@ -27,8 +27,16 @@ public class TimeTest {
 	
 	@Test
 	public void testISO8601Format() {
-		String iso = new Time().toISOString();
-		Time t = new Time(iso);		
+		Time t0 = new Time();
+		String iso = t0.toISOString();
+		Time t = new Time(iso);
+		assert Math.abs(t.getTime() - t0.getTime()) < 1001;
+	}
+	
+	@Test
+	public void testISO8601DateOnlyFormat() {
+		String iso = new Time(2018, 1, 12, 9, 30, 0).toISOStringDateOnly();
+		assert iso.equals("2018-01-12");
 	}
 
 	/**

@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -25,6 +26,7 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -426,13 +428,34 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	protected void doSave(WebRequest state) {
+		// debug FIXME		
+		String json = getJson(state);
+		Object jobj = JSON.parse(json);
+		Object start = SimpleJson.get(jobj, "projects", 0, "start");
+		
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
 		T thing = getThing(state);
 		assert thing != null : state;
-		// set modified = true
-		jthing.put("modified", true);
-		// run via Java, to trigger IInit
+		// HACK set modified = true on maps
+		if (thing instanceof Map) {
+			((Map) thing).put("modified", true);	
+		} else {
+			// should we have an interface for this??
+//			ReflectionUtils.setPrivateField(thing, fieldName, value);
+			// NB: avoiding jthing.put() as that re-makes the java object, which is wasteful and confusing
+//			jthing.put("modified", true);
+		}
+		
+		// This has probably been done already in getThing(), but harmless to repeat
+		// run the object through Java, to trigger IInit
 		jthing.java();
+		
+		// FIXME debug
+		Object start2 = SimpleJson.get(jthing.map(), "projects", 0, "start");
+		Object startraw = SimpleJson.get(jthing.map(), "projects", 0, "start_raw");
+		T ngo = jthing.java();
+		 
+		
 		{	// update
 			String id = getId(state);
 			ESPath path = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);

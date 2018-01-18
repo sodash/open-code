@@ -47,8 +47,8 @@ public final class Period extends Pair<Time> {
 	}
 
 	/**
-	 * @param start
-	 * @param end
+	 * @param start Cannot be null
+	 * @param end Cannot be null, must be after or equal to start
 	 */
 	public Period(Time start, Time end) {
 		super(start, end);

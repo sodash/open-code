@@ -1,8 +1,10 @@
 package com.winterwell.utils;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 
 /**
@@ -84,7 +86,10 @@ public final class Dep {
 	public static <X> X set(Class<X> klass, X value) {
 		Log.d("dep", "set "+klass+" = "+value+" "+ReflectionUtils.getSomeStack(6, Dep.class.getName()));
 		DepContext ctxt = getContext();
-		stash.put(key(klass, ctxt), value);
+		DKey key = key(klass, ctxt);
+		stash.put(key, value);
+		// as a debug aid 
+		key.stacktrace = ReflectionUtils.getSomeStack(12);
 		return value;
 	}
 	
@@ -99,6 +104,28 @@ public final class Dep {
 		return get(class1, ctxt);
 	}
 
+	/**
+	 * What bit of code made this object?
+	 * @param class1
+	 * @return stacktrace or null
+	 */
+	public static List<StackTraceElement> getStackTrace(Class class1) {
+		DepContext ctxt = getContext();
+		while(ctxt!=null) {		
+			DKey key = key(class1, ctxt);
+			if (stash.containsKey(key)) {
+				DKey originalKey = Containers.first(stash.keySet(), k -> key.equals(k));
+				return originalKey.stacktrace;
+			}
+			if (factory.containsKey(key)) {
+				DKey originalKey = Containers.first(factory.keySet(), k -> key.equals(k));
+				return originalKey.stacktrace;
+			}
+			ctxt = ctxt.parent;
+		}
+		return null;
+	}
+	
 	public static <X> X get(Class<X> class1, DepContext ctxt) throws DepNotSetException {
 		assert ! ctxt.closed;
 		while(ctxt!=null) {			
@@ -112,14 +139,7 @@ public final class Dep {
 			}
 			ctxt = ctxt.parent;
 		}
-//		// try a vanilla constructor - no someone should knowingly set the value		
-//		try {
-//			X x = class1.newInstance();
-//			set(class1, x);
-//			return x;
-//		} catch (InstantiationException | IllegalAccessException e) {
-//			throw Utils.runtime(e);
-//		}
+		// try a vanilla constructor? - no someone should knowingly set the value		
 		// should we return null? Typical use case is for key config objects where a null might be problematic.
 		throw new DepNotSetException("No value set for "+class1+". Note: you can use Dep.has() to check.");
 	}
@@ -191,7 +211,12 @@ final class DKey {
 
 	private final DepContext context;
 	private final Class klass;
-
+	
+	/**
+	 * for debug use. NOT used in equals / hashcode
+	 */
+	transient List<StackTraceElement> stacktrace;
+	
 	public DKey(Class klass, DepContext context) {
 		this.klass = klass;
 		this.context = context;
