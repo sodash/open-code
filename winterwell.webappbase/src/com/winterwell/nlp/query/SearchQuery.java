@@ -1,4 +1,4 @@
-package com.winterwell.datalog.server;
+package com.winterwell.nlp.query;
 
 import static com.winterwell.utils.containers.Containers.last;
 
@@ -11,13 +11,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jetty.util.ajax.JSON;
+//import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.utils.Mutable;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.web.IHasJson;
+import com.winterwell.utils.web.SimpleJson;
 
 /**
  * NB: copy-pasta then simplified from SoDash's SearchSpec
@@ -718,7 +719,7 @@ public class SearchQuery implements Serializable, IHasJson {
 
 	@Override
 	public String toJSONString() {
-		return JSON.toString(toJson2());
+		return new SimpleJson().toJson(toJson2());
 	}
 
 

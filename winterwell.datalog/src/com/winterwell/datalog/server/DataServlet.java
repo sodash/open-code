@@ -18,6 +18,7 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
+import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -27,6 +28,7 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.ajax.JsonResponse;
+import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.IntField;
@@ -170,29 +172,7 @@ public class DataServlet implements IServlet {
 	private BoolQueryBuilder makeQueryFilter(String q, Time start, Time end) {		
 		if (q==null) q = "";
 		SearchQuery sq = new SearchQuery(q);
-		
-		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
-				.from(start.toISOString()) //, true) ES versioning pain
-				.to(end.toISOString()); //, true);
-		
-		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
-				.must(timeFilter);		
-		
-		// filters TODO a true recursive SearchQuery -> ES query mapping
-		// TODO this is just a crude 1-level thing
-		List ptree = sq.getParseTree();
-		for (Object clause : ptree) {
-			if (clause instanceof List) {
-				assert ((List) clause).size() == 2 : clause+" from "+sq;
-				List<String> propVal = (List) clause;
-				String prop = propVal.get(0);
-				String val = propVal.get(1);
-				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, val);
-				filter = filter.must(kvFilter);
-			}
-//			QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
-//			filter = filter.must(kvFilter);			
-		}
+		BoolQueryBuilder filter = AppUtils.makeESFilterFromSearchQuery(sq, start, end);
 		return filter;
 	}
 

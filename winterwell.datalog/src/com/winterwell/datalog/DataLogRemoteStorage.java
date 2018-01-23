@@ -39,6 +39,26 @@ import com.winterwell.web.FakeBrowser;
 public class DataLogRemoteStorage implements IDataLogStorage
 {
 
+	/**
+	 * @deprecated This is inefficient
+	 * HACK a direct call to the remote server
+	 * @param server
+	 * @param event
+	 * @return
+	 */
+	public static boolean saveToRemoteServer(String server, DataLogEvent event) {
+		DataLogRemoteStorage dlrs = new DataLogRemoteStorage();
+		DataLogConfig remote = new DataLogConfig();
+		// add https and endpoint
+		if ( ! server.startsWith("http")) server = "https://"+server;
+		if ( ! server.endsWith("/lg")) server += "/lg";
+		
+		remote.logEndpoint = server;
+		dlrs.init(remote);
+		Object ok = dlrs.saveEvent(event.dataspace, event, new Period(event.time));
+		return true;
+	}
+	
 	private String logEndpoint;
 	private String getDataEndpoint;
 

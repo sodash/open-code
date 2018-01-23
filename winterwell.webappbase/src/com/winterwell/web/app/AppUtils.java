@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.jetty.util.ajax.JSON;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
@@ -30,6 +34,7 @@ import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.fail.ESException;
 import com.winterwell.gson.Gson;
+import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -38,6 +43,7 @@ import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
@@ -534,6 +540,35 @@ public class AppUtils {
 		// store it NB: the only data is the id, so there's no issue with race conditions
 		AppUtils.doSaveEdit(path, new JThing().setJava(peep), null);
 		return peep;
+	}
+
+
+	public static BoolQueryBuilder makeESFilterFromSearchQuery(SearchQuery sq, Time start, Time end) {
+
+		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
+				.from(start.toISOString()) //, true) ES versioning pain
+				.to(end.toISOString()); //, true);
+		
+		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
+				.must(timeFilter);		
+		
+		// filters TODO a true recursive SearchQuery -> ES query mapping
+		// TODO this is just a crude 1-level thing
+		List ptree = sq.getParseTree();
+		for (Object clause : ptree) {
+			if (clause instanceof List) {
+				assert ((List) clause).size() == 2 : clause+" from "+sq;
+				List<String> propVal = (List) clause;
+				String prop = propVal.get(0);
+				String val = propVal.get(1);
+				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, val);
+				filter = filter.must(kvFilter);
+			}
+//			QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
+//			filter = filter.must(kvFilter);			
+		}
+		
+		return filter;
 	}
 
 

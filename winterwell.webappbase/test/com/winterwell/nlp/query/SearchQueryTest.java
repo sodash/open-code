@@ -1,8 +1,10 @@
-package com.winterwell.datalog.server;
+package com.winterwell.nlp.query;
 
 import java.util.List;
 
 import org.junit.Test;
+
+import com.winterwell.nlp.query.SearchQuery;
 
 public class SearchQueryTest {
 
