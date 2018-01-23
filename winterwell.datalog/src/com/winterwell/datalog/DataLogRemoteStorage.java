@@ -30,10 +30,11 @@ import com.winterwell.utils.web.IHasJson;
 import com.winterwell.web.FakeBrowser;
 
 /**
+ * This is a kind of DatalogClient API class
  * TODO Remote server storage for DataLog
  * So the adserver can log stuff into lg.
  * @author daniel
- *
+ * @testedby {@link DataLogRemoteStorageTest}
  */
 public class DataLogRemoteStorage implements IDataLogStorage
 {
@@ -138,7 +139,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	}
 
 	@Override
-	public Object saveEvent(String dataspace, DataLogEvent event, Period period) {
+	public Object saveEvent(String dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
 		FakeBrowser fb = new FakeBrowser();
 		fb.setDebug(true);
 		Map<String, String> vars = new ArrayMap(

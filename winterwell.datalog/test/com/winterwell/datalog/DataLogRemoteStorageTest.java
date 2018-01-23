@@ -14,6 +14,13 @@ public class DataLogRemoteStorageTest {
 	public void testGetDataStringTimeTimeKInterpolateDt() {
 		fail("Not yet implemented");
 	}
+	
+	DataLogRemoteStorage dlrs = new DataLogRemoteStorage();
+	DataLogConfig remote = new DataLogConfig();
+	remote.logEndpoint = "https://lg.good-loop.com/lg";
+	dlrs.init(remote);
+	dlrs.saveEvent(dataspace, event, null);
+
 
 	@Test
 	public void testSaveEvent() {				
