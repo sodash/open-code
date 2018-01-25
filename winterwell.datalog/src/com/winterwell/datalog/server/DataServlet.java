@@ -109,6 +109,7 @@ public class DataServlet implements IServlet {
 			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
 					"by_"+StrUtils.join(b,'_'), b[0]);
 			byTag.setSize(numTerms);
+			byTag.setMissing("unset");
 			Aggregation leaf = byTag;
 			if (b.length > 1) {
 				if (b[1].equals("time")) {
@@ -119,6 +120,7 @@ public class DataServlet implements IServlet {
 				} else {
 					com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);
 					byHost.setSize(numTerms);
+					byHost.setMissing("unset");
 					byTag.subAggregation(byHost);
 					leaf = byHost;
 				}
@@ -131,7 +133,7 @@ public class DataServlet implements IServlet {
 			String json = bd.substring(bd.indexOf("{"), bd.length());
 			Map<String,String> output = (Map) JSON.parse(json);
 			for(String k : output.keySet()) {
-				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);			
+				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
 				leaf.subAggregation(myCount);
 				// filter 0s ??does this work??
 				filter.must(QueryBuilders.rangeQuery(k).gt(0));
