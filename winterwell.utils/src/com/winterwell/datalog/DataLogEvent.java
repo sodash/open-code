@@ -121,6 +121,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		return props.get(prop);
 	}
 	
+	public Map<String, Object> getProps() {
+		return props;
+	}
+	
 	/**
 	 * Does NOT include time-period or dataspace. This is added by the DataLog based on how
 	 * it buckets stuff.
