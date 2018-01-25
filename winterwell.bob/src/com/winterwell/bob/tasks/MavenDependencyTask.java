@@ -7,6 +7,7 @@ import java.util.List;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Proc;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
@@ -68,7 +69,13 @@ public class MavenDependencyTask extends BuildTask {
 		return this;
 	}
 	
+	/**
+	 * Normally it will just find pom.bob.xml. Use this if you have to explicitly set the pom.
+	 * @param pom
+	 * @return
+	 */
 	public MavenDependencyTask setPom(File pom) {
+		Log.d(LOGTAG, "Set pom "+pom+" "+ReflectionUtils.getSomeStack(8));
 		this.pom = pom;
 		return this;
 	}
@@ -80,7 +87,7 @@ public class MavenDependencyTask extends BuildTask {
 			outDir = new File(projectDir, "dependencies");
 		}
 		if (dependencies.isEmpty()) {
-			if (pom==null) pom = FileUtils.or(new File(projectDir, "pom.xml"), new File(projectDir, "pom.bob.xml"));
+			if (pom==null) pom = FileUtils.or(new File(projectDir, "pom.bob.xml"), new File(projectDir, "pom.xml"));
 			if (pom==null || ! pom.isFile()) {
 				throw new IllegalStateException("No pom.xml found and no in-Java dependencies were added: "+pom+" "+projectDir);
 			}
@@ -104,7 +111,7 @@ public class MavenDependencyTask extends BuildTask {
 			if ( ! pom.equals(pomProper)) {
 				FileUtils.copy(pom, pomProper);
 			}
-			assert pomProper.exists():  "no pom file?! "+new File(outDir, "pom.xml");
+			assert pomProper.exists():  "no pom file?! "+pomProper+" should be a copy of "+pom;
 			
 			Proc proc = new Proc("mvn org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies"
 					+( ! keepJarVersioning? " -Dmdep.stripVersion=true" : "")
