@@ -865,7 +865,7 @@ public class WebRequest implements IProperties, Closeable {
 	
 	/**
 	 * Convenience for might-be-null
-	 * @param i
+	 * @param i 0-indexed
 	 * @return slug-bit i or null
 	 */
 	public final String getSlugBits(int i) {
