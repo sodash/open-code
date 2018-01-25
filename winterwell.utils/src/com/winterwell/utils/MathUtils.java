@@ -565,7 +565,7 @@ public class MathUtils {
 	/**
 	 * Lenient but vanilla convertor -- accepts String or any Number subclass.
 	 * @param object Can be null (returns 0). Must be a simple number format - this method does NOT try
-	 * to read e.g. "10%" or "5k".
+	 * to read e.g. "10%" or "5k" or "1,000".
 	 * @return
 	 * @see #getNumber(Object)
 	 */
