@@ -240,9 +240,9 @@ public class LgServlet {
 		String msgPlus = msg+" ENDMSG "+state.getReferer()+" "+state.getRemoteAddr();
 		
 		// error or warning?
-		if ("error".equals(tag)) {
+		if (tag.contains("error")) {
 			Log.e(tag, msgPlus); // NB: In Good-Loop or SoGive, this should then get picked up by logstash monitoring
-		} else if ("warning".equals(tag)) {
+		} else if (tag.contains("warning")) {
 			Log.w(tag, msgPlus);
 		} else {
 			// normal case
