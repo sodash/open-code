@@ -561,8 +561,14 @@ public class AppUtils {
 				List<String> propVal = (List) clause;
 				String prop = propVal.get(0);
 				String val = propVal.get(1);
-				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, val);
-				filter = filter.must(kvFilter);
+				if ("unset".equals(val)) {
+					QueryBuilder setFilter = QueryBuilders.existsQuery(prop);
+					filter = filter.mustNot(setFilter);
+				} else {
+					// normal key=value case
+					QueryBuilder kvFilter = QueryBuilders.termQuery(prop, val);
+					filter = filter.must(kvFilter);
+				}				
 			}
 //			QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
 //			filter = filter.must(kvFilter);			
