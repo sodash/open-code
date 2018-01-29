@@ -24,6 +24,10 @@ public final class JThing<T> {
 	private T java;
 	private Class<T> type;
 	
+	/**
+	 * Equivalent to new JThing().setJava(item)
+	 * @param item the Java POJO
+	 */
 	public JThing(T item) {
 		setJava(item);
 	}

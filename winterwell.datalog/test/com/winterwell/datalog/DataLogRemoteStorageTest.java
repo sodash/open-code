@@ -16,6 +16,19 @@ public class DataLogRemoteStorageTest {
 		fail("Not yet implemented");
 	}
 	
+	
+	@Test
+	public void testHackUse() {
+		{
+			String dataspace = "test";
+			double count = 2.1;
+			DataLogEvent event = new DataLogEvent(dataspace, count, "woot", 
+					new ArrayMap("n", 7, "w", 100));
+			boolean ok = DataLogRemoteStorage.saveToRemoteServer("http://locallg.good-loop.com", event);
+			assert ok;
+		}
+	}
+
 
 	@Test
 	public void testDirectUse() {				

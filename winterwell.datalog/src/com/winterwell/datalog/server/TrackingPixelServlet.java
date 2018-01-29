@@ -67,7 +67,7 @@ public class TrackingPixelServlet implements IServlet {
 			dataspace = "trk";
 		}
 		// Count it
-		LgServlet.doLog(state, dataspace, tag, via, null, true);
+		LgServlet.doLog(state, dataspace, tag, 1, via, null, true);
 
 		
 		// log it

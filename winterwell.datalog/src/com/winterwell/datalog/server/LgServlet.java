@@ -24,6 +24,7 @@ import com.winterwell.web.app.KServerType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.fields.BoolField;
+import com.winterwell.web.fields.DoubleField;
 import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
 
@@ -41,7 +42,7 @@ import com.winterwell.web.fields.SField;
  * <p>
  * TODO filter by time
  * @author daniel
- *
+ * @testedby {@link LgServletTest}
  */
 public class LgServlet {
 
@@ -68,6 +69,7 @@ public class LgServlet {
 		String ds = state.getRequired(DATASPACE);
 		// TODO security check the dataspace?
 		String tag = state.getRequired(TAG);
+		double count = state.get(new DoubleField("count"), 1.0);
 		String via = req.getParameter("via");
 		// NB: dont IP/user track simple events, which are server-side
 		boolean stdTrackerParams = ! DataLogEvent.simple.equals(tag) && state.get(new BoolField("track"), true);
@@ -86,7 +88,7 @@ public class LgServlet {
 			params.remove("track");
 		}
 		
-		boolean logged = doLog(state, ds, tag, via, params, stdTrackerParams);
+		boolean logged = doLog(state, ds, tag, count, via, params, stdTrackerParams);
 		
 		// Reply
 		// .gif?
@@ -100,8 +102,10 @@ public class LgServlet {
 		WebUtils2.sendText(logged? "OK" : "not logged", resp);
 	}
 
-	static boolean doLog(WebRequest state, String dataspace, String tag, String via, Map params, boolean stdTrackerParams) {
-		assert dataspace != null;
+	static boolean doLog(WebRequest state, String dataspace, String tag, double count, 
+			String via, Map params, boolean stdTrackerParams) 
+	{
+		assert dataspace != null;		
 		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		// special vars
 		if (stdTrackerParams) {			
@@ -128,7 +132,7 @@ public class LgServlet {
 		}
 		
 		// write to log file
-		doLogToFile(dataspace, tag, params, trckId, via, state);
+		doLogToFile(dataspace, tag, count, params, trckId, via, state);
 				
 		// write to Stat / ES
 		// ...which dataspaces?
@@ -141,7 +145,7 @@ public class LgServlet {
 //		);
 //		for(String ds : dataspaces) {
 //			if (ds==null) continue;
-		DataLogEvent event = new DataLogEvent(dataspace, 1, tag, params);
+		DataLogEvent event = new DataLogEvent(dataspace, count, tag, params);
 //		event.time = state.get(time); FIXME
 		DataLog.count(event);
 //		}
@@ -222,8 +226,9 @@ public class LgServlet {
 
 	static List<String> OUR_IPS = Arrays.asList("62.30.12.102", "62.6.190.196", "82.37.169.72");
 	
-	private static void doLogToFile(String dataspace, String tag, Map params, String trckId, String via, WebRequest state) {
+	private static void doLogToFile(String dataspace, String tag, double count, Map params, String trckId, String via, WebRequest state) {
 		String msg = params == null? "" : Printer.toString(params, ", ", ": ");
+		if (count != 1) msg += "\tcount:"+count;
 		msg += "\ttracker:"+trckId+"\tref:"+state.getReferer()+"\tip:"+state.getRemoteAddr();
 		if (via!=null) msg += " via:"+via;
 		// Guard against giant objects getting put into log, which is almost
