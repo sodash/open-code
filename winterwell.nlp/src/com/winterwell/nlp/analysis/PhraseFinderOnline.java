@@ -21,6 +21,7 @@ import com.winterwell.nlp.io.SentenceStream;
 import com.winterwell.nlp.io.Tkn;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
@@ -52,6 +53,8 @@ ITrainable.Unsupervised.Weighted<IDocument>, IPhraseFinder {
 	private boolean oncePerDocument = true;
 	private int overlapPenalty = 3;
 
+	private boolean includeNumbers;
+	
 	@Deprecated // TODO delete in 2016
 	private transient Set<String> stopwords;
 	
@@ -363,10 +366,17 @@ ITrainable.Unsupervised.Weighted<IDocument>, IPhraseFinder {
 		String rawText = WebUtils2.getPlainText(x.getContents());
 		// split on phrase boundaries, then get words
 		SentenceStream sentencer = new SentenceStream();
-		ITokenStream sentences = sentencer.factory(rawText);		
+		ITokenStream sentences = sentencer.factory(rawText);						
 		for (Tkn s : sentences) {			
 			ITokenStream tokens = tokeniser.factory(s.getText());
 			List<Tkn> words = Containers.getList(tokens);
+			
+			// Filter? Note: we've already stop-word filtered in the tokeniser (or if we haven't, that was a user setting)
+			if ( ! Utils.yes(includeNumbers)) {
+				words = Containers.filter(words, w -> ! StrUtils.isNumber(w.getText()));
+			}
+			
+			// train phrases
 			train1b(x, rawText, words, weight);
 		}
 	}
@@ -417,8 +427,7 @@ ITrainable.Unsupervised.Weighted<IDocument>, IPhraseFinder {
 			for(int pi=0; pi<phraseLength; pi++) {
 				Tkn w = words.get(i + pi);
 				phrase.add(w.getText());
-			}
-			// Filter? Note: we've already stop-word filtered in the tokeniser (or if we haven't, that was a user setting)
+			}			
 			// Reverse map back to examples
 			// TODO how can we get unsafe strings??
 			int s = words.get(i).start;
