@@ -746,11 +746,13 @@ public class SqlUtils {
 	 * @param columnInfo
 	 * @param whereClause
 	 * @param upsert
+	 * @param leaveMissingAlone 
 	 * @return "update table set stuff where whereClause;"
 	 */
 	static void upsert2_update(String table, Map<String, ?> col2val,
 			boolean specialCaseId, List<Pair<String>> columnInfo,
-			StringBuilder whereClause, StringBuilder upsert) {
+			StringBuilder whereClause, StringBuilder upsert, boolean leaveMissingAlone) 
+	{
 		// ... create a=:a parameters
 		upsert.append("update " + table + " set ");
 		for (Pair<String> colInfo : columnInfo) {
@@ -758,10 +760,13 @@ public class SqlUtils {
 			if (specialCaseId && "id".equals(colInfo.first)) {
 				continue;
 			}
-
+			
+			Object v = col2val.get(colInfo.first);
+			if (v == null && leaveMissingAlone) {
+				continue;
+			}
 			// Keep Hibernate happy - avoid oid and setParameter with null
-			if ("oid".equals(colInfo.second)
-					|| col2val.get(colInfo.first) == null) {
+			if ("oid".equals(colInfo.second) || v == null) {				
 				upsert.append(colInfo.first + "=null,");
 				continue;
 			}
@@ -1014,7 +1019,34 @@ public class SqlUtils {
 	 * @return An upsert query, with it's parameters set.
 	 */
 	public static Object upsert(Connection em, String table,
-			String[] idColumns, Map<String, ?> col2val, boolean specialCaseId) {
+			String[] idColumns, Map<String, ?> col2val, boolean specialCaseId) 
+	{
+		return upsert(em, table, idColumns, col2val, specialCaseId, false);
+	}
+		
+
+	/**
+	 * upsert = update if exists + insert if new
+	 * 
+	 * @param table
+	 * @param idColumns
+	 *            The columns which identify the row. E.g. the primary key. Must
+	 *            not contain any nulls. Should be a subset of columns.
+	 * @param col2val
+	 *            The values to set for every non-null column. Any missing
+	 *            columns will be set to null.
+	 * @param specialCaseId
+	 *            If true, the "id" column is treated specially --
+	 *            nextval(hibernate_sequence) is used for the insert, and no
+	 *            change is made on update. This is a hack 'cos row ids don't
+	 *            travel across servers.
+	 * @param leaveMissingAlone If true, then update will only affect those columns which are specified in col2val
+	 * (by default a missing column sets the database value to null).           
+	 * @return An upsert query, with it's parameters set.
+	 */
+	public static Object upsert(Connection em, String table,
+			String[] idColumns, Map<String, ?> col2val, boolean specialCaseId, boolean leaveMissingAlone) 
+	{	
 		List<Pair<String>> columnInfo = upsert2_columnInfo(em, table,
 				idColumns, col2val, specialCaseId);
 
@@ -1024,7 +1056,7 @@ public class SqlUtils {
 
 		// 1. update where exists
 		SqlUtils.upsert2_update(table, col2val, specialCaseId, columnInfo,
-				whereClause, upsert);
+				whereClause, upsert, leaveMissingAlone);
 
 		// 2. insert where not exists
 		SqlUtils.upsert2_insert(table, col2val, specialCaseId, columnInfo,
