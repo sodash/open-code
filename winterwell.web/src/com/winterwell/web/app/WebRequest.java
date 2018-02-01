@@ -23,6 +23,7 @@ import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
@@ -1028,9 +1029,9 @@ public class WebRequest implements IProperties, Closeable {
 	 * using the referer http header.
 	 * 
 	 * @return true if a redirect was sent, false otherwise
-	 * @throws IOException
+	 * @throws WrappedException of IOException
 	 */
-	public boolean sendRedirect() throws IOException {
+	public boolean sendRedirect() {
 		if (redirect == null)
 			return false;
 		if (REDIRECT_REQUEST_BACK.equals(redirect)) {
@@ -1052,10 +1053,14 @@ public class WebRequest implements IProperties, Closeable {
 		}
 		assert ! response.isCommitted();
 		
-		response.sendRedirect(redirect);
-		
-		assert !isOpen();
-		return true;
+		try {
+			response.sendRedirect(redirect);
+
+			assert !isOpen();
+			return true;
+		} catch (IOException e) {
+			throw Utils.runtime(e);
+		}		
 	}
 
 	public void setPage(IBuildStrings page) {
