@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -281,7 +282,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
 		/// which index? draft (which should include copies of published) by default
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
-		if (status!=null) {
+		if (status!=null && status != KStatus.ALL_BAR_TRASH) {
 			s.setIndex(
 					esRouter.getPath(dataspace, type, null, status).index()
 					);
@@ -329,7 +330,28 @@ public abstract class CrudServlet<T> implements IServlet {
 //			hitsPreferDraft.add(src);
 //		}
 		
+		// NB: may be Map or AThing
 		List hits2 = Containers.apply(hits, h -> h.get("_source"));
+		
+		// de-dupe by status
+		if (status==KStatus.ALL_BAR_TRASH) {
+			HashSet pubIds = new HashSet();
+			for(Object hit : hits2) {
+				Object id = getId(hit);
+				String hs = getStatus(hit);
+				if ("PUBLISHED".equals(hs)) {
+					pubIds.add(id);
+				}
+			}
+			hits2 = Containers.filter(hits2, h -> {
+				String hs = getStatus(h);
+				if ("DRAFT".equals(hs)) {
+					boolean dupe = pubIds.contains(getId(h));
+					return ! dupe;
+				}
+				return true;
+			});
+		}
 		
 		// HACK: send back csv?
 		if (state.getResponseType() == KResponseType.csv) {
@@ -348,6 +370,24 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 	
 	
+	private String getStatus(Object h) {
+		Object s;
+		if (h instanceof Map) s = ((Map)h).get("status");
+		else s = ((AThing)h).getStatus();
+		return String.valueOf(s);
+	}
+
+
+
+	private Object getId(Object hit) {
+		Object id;
+		if (hit instanceof Map) id = ((Map)hit).get("id");
+		else id = ((AThing)hit).getId();
+		return id;
+	}
+
+
+
 	protected void doSendCsv(WebRequest state, List<Map> hits2) {
 		// ?? maybe refactor and move into a default method in IServlet?
 		StringWriter sout = new StringWriter();

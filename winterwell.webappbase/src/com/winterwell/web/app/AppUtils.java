@@ -63,6 +63,7 @@ public class AppUtils {
 
 	public static final JsonField ITEM = new JsonField("item");
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
+	
 	private static final List<String> LOCAL_MACHINES = Arrays.asList(
 			"stross", "aardvark"
 			);
