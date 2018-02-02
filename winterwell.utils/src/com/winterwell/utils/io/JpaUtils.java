@@ -254,7 +254,7 @@ public class JpaUtils {
 
 		// 1. update where exists
 		SqlUtils.upsert2_update(table, col2val, specialCaseId, columnInfo,
-				whereClause, upsert);
+				whereClause, upsert, false);
 
 		// 2. insert where not exists
 		SqlUtils.upsert2_insert(table, col2val, specialCaseId, columnInfo,
@@ -314,7 +314,7 @@ public class JpaUtils {
 
 		// 1. update
 		SqlUtils.upsert2_update(table, col2val, specialCaseId, columnInfo,
-				whereClause, upsert);
+				whereClause, upsert, false);
 
 		// create query
 		Query q = em.createNativeQuery(upsert.toString());
