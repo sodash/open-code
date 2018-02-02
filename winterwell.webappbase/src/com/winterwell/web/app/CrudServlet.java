@@ -333,7 +333,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		// NB: may be Map or AThing
 		List hits2 = Containers.apply(hits, h -> h.get("_source"));
 		
-		// de-dupe by status
+		// de-dupe by status: remove draft, etc if we have published
+		// NB: assumes you can't have same status and same ID (so no need to de-dupe)
 		if (status==KStatus.ALL_BAR_TRASH) {
 			HashSet pubIds = new HashSet();
 			for(Object hit : hits2) {
@@ -345,7 +346,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			}
 			hits2 = Containers.filter(hits2, h -> {
 				String hs = getStatus(h);
-				if ("DRAFT".equals(hs)) {
+				if ( ! "PUBLISHED".equals(hs)) {
 					boolean dupe = pubIds.contains(getId(h));
 					return ! dupe;
 				}
