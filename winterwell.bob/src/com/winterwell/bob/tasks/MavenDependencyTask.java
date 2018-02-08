@@ -1,8 +1,11 @@
 package com.winterwell.bob.tasks;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.FailureException;
@@ -58,6 +61,10 @@ public class MavenDependencyTask extends BuildTask {
 	private File pom;
 	
 	private boolean keepJarVersioning;
+	private boolean forceUpdate;
+	public void setForceUpdate(boolean forceUpdate) {
+		this.forceUpdate = forceUpdate;
+	}
 	
 	/**
 	 * By default, stripVersion so jars have stable names.
@@ -121,6 +128,7 @@ public class MavenDependencyTask extends BuildTask {
 			
 			Proc proc = new Proc(
 					"mvn "
+					+ (forceUpdate? "-U " : "")
 					+ (incSrc? "dependency:sources ": "") // This will stick the sources into ~/.m2/repository :(
 					// TODO copy sources into somewhere local
 					+"org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies"
@@ -137,7 +145,7 @@ public class MavenDependencyTask extends BuildTask {
 			Log.d(LOGTAG, proc.getOutput());
 			// copy sources
 			if (incSrc) {
-				
+				doTask2_sources(proc.getOutput());
 			}
 			
 			// did it work??		
@@ -152,6 +160,33 @@ public class MavenDependencyTask extends BuildTask {
 				FileUtils.delete(pomProper);
 			}
 		}
+	}
+
+	private void doTask2_sources(String output) throws IOException {
+		String home = System.getProperty("user.home");
+		if (Utils.isBlank(home)) home = "~";
+		File localRepo = new File(home, ".m2/repository").getCanonicalFile();
+		if ( ! localRepo.isDirectory()) {			
+			Log.w(LOGTAG, "incSrc: Cannot find Maven local repository to look for sources: Not a directory: "+localRepo);
+			return;
+		}
+		// TODO find the right jars
+		List<File> found = FileUtils.find(localRepo, ".+-sources\\.jar");
+		for (File file : found) {
+			if (output.contains(file.getName())) {				
+				File out = new File(outDir, stripVersion(file.getName()));
+				FileUtils.copy(file, out);
+			}
+		}
+		System.out.println(found);		 	
+	}
+
+	private String stripVersion(String name) {
+		Pattern p = Pattern.compile("(.+)-[^-]+-sources.jar");
+		Matcher m = p.matcher(name);
+		boolean ok = m.matches();
+		if ( ! ok) return null;
+		return m.group(1)+"-sources.jar";
 	}
 
 	private void doMakePom(File pom) {

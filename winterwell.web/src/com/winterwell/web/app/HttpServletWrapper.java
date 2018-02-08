@@ -8,11 +8,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 
-public class HttpServletWrapper extends HttpServlet {
+/**
+ * Turn IServlet classes (which get created fresh for each request) into HttpServlet objects (which stick around).
+ * Adds in resource clean-up and error handling.
+ * @author daniel
+ *
+ */
+public final class HttpServletWrapper extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	Supplier<IServlet> factory;
@@ -26,6 +33,20 @@ public class HttpServletWrapper extends HttpServlet {
 	
 	public HttpServletWrapper(Supplier<IServlet> factory) {
 		this.factory = factory;
+	}
+
+	/**
+	 * Convenient way to make a wrapper
+	 * @param servlet
+	 */
+	public HttpServletWrapper(Class<? extends IServlet> servlet) {
+		this(() -> {
+			try {
+				return servlet.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw Utils.runtime(e);
+			}
+		});
 	}
 
 	@Override

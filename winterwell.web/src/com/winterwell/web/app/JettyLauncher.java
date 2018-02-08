@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.HttpServlet;
@@ -15,6 +16,11 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SessionIdManager;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.session.DefaultSessionIdManager;
+import org.eclipse.jetty.server.session.SessionContext;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
@@ -26,6 +32,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 class AdminServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -220,7 +227,11 @@ public class JettyLauncher {
 		if (path.equals("/") || path.equals("/*")) {
 			catchAllServletDefined = true;
 		}		
-		root.addServlet(new ServletHolder(servlet), path);
+		root.addServletWithMapping(new ServletHolder(servlet), path);
+	}
+	
+	public void addServlet(String path, Class<? extends IServlet> servlet) {
+		addServlet(path, new HttpServletWrapper(servlet));
 	}
 
 	public ServletHandler getRootContext() {
@@ -234,6 +245,14 @@ public class JettyLauncher {
 		return server;
 	}
 
+	public void stop() {
+		try {
+			server.stop();
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		}
+	}
+	
 	/**
 	 * Calls setup first
 	 */
@@ -244,18 +263,28 @@ public class JettyLauncher {
 			FileServlet fs = new FileServlet();
 			fs.setBaseDir(webRootDir);
 			String path = "/";
-			root.addServlet(new ServletHolder(fs), path);
+			addServlet(path, fs);
 			Printer.out("	Adding " + fs.getClass().getName() + " at " + path);
 		}
 		// Special admin servlet?
 		if (canShutdown) {
 			addAdminServlet(server, root);
-		}
+		}				
 		// GO!!!
 		try {
 			Log.i(LOGTAG, "Starting Jetty server on port "+port);
 			server.start();
-			server.join();
+//			server.join();
+			
+			// Switch off jsessionid-in-the-url badness
+			ServletContext sc = root.getServletContext();
+//			SessionIdManager sid = server.getSessionIdManager();		
+//			Set<SessionTrackingMode> sessionModes = sc.getEffectiveSessionTrackingModes();
+			Set<SessionTrackingMode> sessionTrackingModes = new ArraySet();
+			sc.setSessionTrackingModes(sessionTrackingModes);
+//					.setSessionIdPathParameterName("none");		
+//			root.setResourceBase(webRootDir.getAbsolutePath());
+
 		} catch (Exception e) {
 			Log.report(e);
 			throw Utils.runtime(e);
@@ -353,17 +382,27 @@ public class JettyLauncher {
 //			Handler handler;
 //			server.setHandler(handler);			
 		}
-		root = new ServletHandler(server, "/", ServletContextHandler.SESSIONS);
+		root = new ServletHandler();		
+//		server, "/", ServletContextHandler.SESSIONS);
 
-		// Switch off jsessionid-in-the-url badness
-		Set<SessionTrackingMode> sessionModes = root.getSessionHandler().getEffectiveSessionTrackingModes();
-		Set<SessionTrackingMode> sessionTrackingModes = new ArraySet();
-		root.getSessionHandler().setSessionTrackingModes(sessionTrackingModes);
-//				.setSessionIdPathParameterName("none");		
-		root.setResourceBase(webRootDir.getAbsolutePath());
+		// Specify the Session ID Manager (otherwise you get No SessionManager errors if you try to use a session)
+        SessionIdManager idmanager = new DefaultSessionIdManager(server);
+        server.setSessionIdManager(idmanager);
+        
+//        // Sessions are bound to a context.
+//        ContextHandler context = new ContextHandler("/");
+//        server.setHandler(context);
 
+        // Create the SessionHandler (wrapper) to handle the sessions        
+        SessionHandler sessions = new SessionHandler();
+        Set<SessionTrackingMode> sessionTrackingModes = new ArraySet();
+		sessions.setSessionTrackingModes(sessionTrackingModes);
+        
+        server.setHandler(sessions);      
+        sessions.setHandler(root);
+        
 		// Attempted fix for Egan's transfer bug, Doesn't work :(
-		root.setMaxFormContentSize(1000000);
+//		root.setMaxFormContentSize(1000000);
 
 		// Add servlets from web.xml
 		if (webXmlFile != null) {

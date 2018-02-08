@@ -27,15 +27,6 @@ public class FormTest extends TestCase {
 				"</form>"));
 	}
 
-	public void testBasic2() {
-		StringBuilder page = new StringBuilder("<html><body>");
-		Form form = new Form("servletLogin");
-		form.appendHtmlTo(page);
-		page.append("</body></html>");
-		assertTrue(page.toString(), page.toString().contains(
-				"<html><body>\n<form action='servletLogin' method='post'> <input type='submit' value='Submit Form'> </form>\n"));
-	}
-
 // This methor is not implemented as the test suggests
 //	public void testSetAction() {
 //		Form form = new Form(null);

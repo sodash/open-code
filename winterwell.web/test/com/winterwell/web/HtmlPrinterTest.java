@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.winterwell.utils.containers.ArrayMap;
+
 import junit.framework.TestCase;
 
 public class HtmlPrinterTest extends TestCase {
@@ -45,12 +47,14 @@ public class HtmlPrinterTest extends TestCase {
 
 	// instance of Map
 	public void testToStringObject6() {
-		Map<String, Double> map = new HashMap<String, Double>();
+		Map<String, Double> map = new ArrayMap<String, Double>();
 		map.put("first", 1.4);
 		map.put("second", 0.0);
 		String hmap = HtmlPrinter.toString(map);
-		assertEquals("<table><tr><td>second</td><td>0</td></tr>"
-				+ "<tr><td>first</td><td>1.4</td></tr></table>",
+		assertEquals("<table>"
+				+"<tr><td>first</td><td>1.4</td></tr>"
+				+"<tr><td>second</td><td>0</td></tr>"				
+				+"</table>",
 				hmap);
 	}
 

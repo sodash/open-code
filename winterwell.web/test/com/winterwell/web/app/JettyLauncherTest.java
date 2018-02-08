@@ -35,6 +35,8 @@ public class JettyLauncherTest {
 		String ok2 = fb.getPage("http://localhost:9627/test.json?site=foo");
 		assert ok2 != null;
 		assert ok2.equals("OK: foo") : ok;
+		
+		jl.stop();
 	}
 
 }

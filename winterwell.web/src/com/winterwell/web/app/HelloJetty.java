@@ -13,7 +13,7 @@ import org.eclipse.jetty.server.Server;
 /**
  * A very simple web-app using Jetty. Included here as an example.
  */
-public class HelloJetty extends HttpServlet {
+public class HelloJetty implements IServlet {
 
 	private static final long serialVersionUID = 1L;
 
@@ -21,30 +21,22 @@ public class HelloJetty extends HttpServlet {
 		// Create a Jetty server listening on port 8001
 		JettyLauncher jl = new JettyLauncher(null, 8001);
 		// Add a servlet - this will respond to http://localhost:8001/hello
-		HttpServlet servlet = new HelloJetty();
+		HttpServlet servlet = new HttpServletWrapper(HelloJetty::new);
 		String path = "/hello";
-		jl.addServlet("/hello", new HttpServletWrServletHolder(servlet), path);
+		jl.addServlet("/hello", servlet);
 		// Start the server
-		server.start();
+		jl.run();
 		// That's it - the server will stay running until stopped
 	}
 
-	/**
-	 * Handle a web page request in the normal J2EE way - by over-riding methods
-	 * in HttpServlet.
-	 */
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		try {
+	public void process(WebRequest state) throws Exception {		
 		// Set mime type to html
+		HttpServletResponse resp = state.getResponse();
 		resp.setContentType("text/html");
 		// Write a web page
 		PrintWriter writer = resp.getWriter();
 		writer.append("<html><body><h1>Hello World!</h1></body></html>");
 		writer.close();
-		} finally {
-			WebRequest.close(req, resp);
-		}
 	}
 }

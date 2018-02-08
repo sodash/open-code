@@ -42,10 +42,11 @@ public class TimeFieldTest {
 
 	@Test
 	public void testTimeOfDay() throws Exception {
-		{String date = "5pm";
-		TimeField df = new TimeField("test");
-		Callable<Time> x = df.fromString(date);
-		System.out.println(x+" "+x.call());
+		{
+			String date = "5pm";
+			TimeField df = new TimeField("test");
+			Callable<Time> x = df.fromString(date);
+			System.out.println(x+" "+x.call());
 		}
 		{
 			String date = "10:30";

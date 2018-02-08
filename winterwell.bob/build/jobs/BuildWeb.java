@@ -13,6 +13,7 @@ public class BuildWeb extends BuildWinterwellProject {
 	public BuildWeb() {
 		super("winterwell.web");
 		incSrc=true;	
+		setScpToWW(false);
 	}
 	
 	@Override
