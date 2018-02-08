@@ -593,10 +593,17 @@ public class WebUtils2 extends WebUtils {
 		return link.toString();
 	}
 
+	@Deprecated
 	public static File getWebAppBaseDir(ServletConfig config) {
 		ServletContext ctxt = config.getServletContext();
-		String realPath = ctxt.getRealPath(""); // eg
-												// /home/daniel/winterwell/code/creole/web
+		String realPath;
+		if (ctxt==null) {
+			Log.w("web", "No ServletContext?! "+config);
+			realPath = new File(FileUtils.getWorkingDirectory(), "web").toString(); 
+		} else {
+			realPath = ctxt.getRealPath(""); // eg
+												///home/daniel/winterwell/code/creole/web
+		}
 		File webDir = new File(realPath);
 		if ( ! new File(webDir, "WEB-INF").exists() 
 				&& ! new File(webDir, "static").exists()
