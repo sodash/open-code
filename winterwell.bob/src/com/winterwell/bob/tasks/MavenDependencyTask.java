@@ -38,6 +38,12 @@ public class MavenDependencyTask extends BuildTask {
 
 	File outDir;
 	File projectDir = FileUtils.getWorkingDirectory();
+
+	boolean incSrc;
+	
+	public void setIncSrc(boolean incSrc) {
+		this.incSrc = incSrc;
+	}
 	
 	public MavenDependencyTask setOutputDirectory(File outDir) {
 		this.outDir = outDir;
@@ -113,9 +119,15 @@ public class MavenDependencyTask extends BuildTask {
 			}
 			assert pomProper.exists():  "no pom file?! "+pomProper+" should be a copy of "+pom;
 			
-			Proc proc = new Proc("mvn org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies"
+			Proc proc = new Proc(
+					"mvn "
+					+ (incSrc? "dependency:sources ": "") // This will stick the sources into ~/.m2/repository :(
+					// TODO copy sources into somewhere local
+					+"org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies"
 					+( ! keepJarVersioning? " -Dmdep.stripVersion=true" : "")
-					+ " -DoutputDirectory="+outDir);
+					+ " -DoutputDirectory="+outDir					
+					);
+			
 			proc.setDirectory(projectDir);
 			Log.d(LOGTAG, "dir: "+projectDir+" run: "+proc.getCommand());
 			proc.start();
@@ -123,6 +135,11 @@ public class MavenDependencyTask extends BuildTask {
 			proc.close();
 			Log.w(LOGTAG, proc.getError());
 			Log.d(LOGTAG, proc.getOutput());
+			// copy sources
+			if (incSrc) {
+				
+			}
+			
 			// did it work??		
 			if ( ! proc.getOutput().contains("BUILD SUCCESS")) {
 				throw new FailureException(proc.getError());

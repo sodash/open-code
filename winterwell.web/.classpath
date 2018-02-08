@@ -7,6 +7,12 @@
 	<classpathentry kind="lib" path="/middleware/MimeUtil/dist/mime-util.jar" sourcepath="/middleware/MimeUtil/src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/middleware/jakarta/commons-lang.jar" sourcepath="/middleware/jakarta/commons-lang3-3.1-sources.jar"/>
 	<classpathentry kind="lib" path="/middleware/java2html/java2html.jar" sourcepath="/middleware/java2html/java2html_src.zip"/>
+	<classpathentry kind="lib" path="dependencies/javax.servlet-api.jar"/>
+	<classpathentry kind="lib" path="dependencies/jetty-http.jar"/>
+	<classpathentry kind="lib" path="dependencies/jetty-io.jar"/>
+	<classpathentry kind="lib" path="dependencies/jetty-server.jar"/>
+	<classpathentry kind="lib" path="dependencies/jetty-util.jar"/>
+	<classpathentry kind="lib" path="dependencies/jetty-util-ajax.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-4.X.jar" sourcepath="/middleware/jakarta/httpclient-4.1.2-src.zip"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-cache-4.X.jar"/>
@@ -15,21 +21,11 @@
 	<classpathentry kind="lib" path="/middleware/log4j/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-io-2.X.jar" sourcepath="/middleware/jakarta/commons-io-2.4-sources.jar"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-collections-3.2.1.jar"/>
-	<classpathentry kind="lib" path="/middleware/jetty/jetty-continuation.jar"/>
-	<classpathentry kind="lib" path="/middleware/jetty/jetty-http.jar"/>
-	<classpathentry kind="lib" path="/middleware/jetty/jetty-io.jar"/>
-	<classpathentry kind="lib" path="/middleware/jetty/jetty-security.jar"/>
-	<classpathentry kind="lib" path="/middleware/jetty/jetty-server.jar" sourcepath="/middleware/jetty/jetty-server-7.5.4.v20111024-sources.jar"/>
-	<classpathentry kind="lib" path="/middleware/jetty/jetty-servlet.jar"/>
-	<classpathentry exported="true" kind="lib" path="/middleware/jetty/jetty-util.jar" sourcepath="/middleware/jetty/jetty-http-7.5.4.v20111024-sources.jar"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-logging.jar"/>
-	<classpathentry exported="true" kind="lib" path="/middleware/servlet/servlet-api-3.0.jar" sourcepath="/middleware/servlet/servlet-api-3.0.20100224-sources.jar"/>
 	<classpathentry kind="lib" path="/middleware/tagsoup/tagsoup.jar"/>
 	<classpathentry kind="lib" path="/middleware/dnsjava/dnsjava.jar" sourcepath="/middleware/dnsjava/dnsjava-2.1.3-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/middleware/javamail/javax.mail.jar" sourcepath="/middleware/javamail/javamail-1.5.5-src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry kind="lib" path="/middleware/guava/guava.jar" sourcepath="/middleware/guava/src.zip"/>
-	<classpathentry exported="true" kind="lib" path="/middleware/jetty/jetty-util-ajax.jar"/>
-	<classpathentry kind="lib" path="/middleware/servlet/servlet-api-3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

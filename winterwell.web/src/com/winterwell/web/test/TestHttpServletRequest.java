@@ -26,9 +26,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 
@@ -165,12 +167,7 @@ public class TestHttpServletRequest implements HttpServletRequest {
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
 		Logd("TestHttpServletRequest", "method not implemented "+ReflectionUtils.stacktrace());
-		return new ServletInputStream() {			
-			@Override
-			public int read() throws IOException {
-				return -1;
-			}
-		};
+		throw new TodoException();
 	}
 
 	@Override
@@ -649,5 +646,23 @@ public class TestHttpServletRequest implements HttpServletRequest {
 		headers.put(name, val);
 	}
 	final Map<String,String> headers = new HashMap();
+
+	@Override
+	public long getContentLengthLong() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public String changeSessionId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

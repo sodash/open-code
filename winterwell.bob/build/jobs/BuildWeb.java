@@ -2,6 +2,7 @@ package jobs;
 
 import java.io.File;
 
+import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.utils.io.FileUtils;
 
 public class BuildWeb extends BuildWinterwellProject {
@@ -16,18 +17,13 @@ public class BuildWeb extends BuildWinterwellProject {
 	
 	@Override
 	public void doTask() throws Exception {
+		
+		MavenDependencyTask mdt = new MavenDependencyTask();
+		mdt.setProjectDir(projectDir);
+		mdt.run();
+		
 		super.doTask();
-		
-		// For coinvent
-		File coinvent = new File(FileUtils.getWinterwellDir(), "coinvent/integration+UI/web/WEB-INF/lib");
-		if (coinvent.isDirectory()) {
-			FileUtils.copy(jarFile, coinvent);
-		}
-		File coinvent2 = new File(FileUtils.getWinterwellDir(), "coinvent/simple-server/web/WEB-INF/lib");
-		if (coinvent2.isDirectory()) {
-			FileUtils.copy(jarFile, coinvent2);
-		}
-		
+				
 //		File juice = new File(FileUtils.getWinterwellDir(), "juice/libs");
 //		if (juice.isDirectory()) {
 //			FileUtils.copy(jarFile, juice);
