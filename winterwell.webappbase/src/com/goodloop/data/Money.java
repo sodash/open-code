@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import com.winterwell.data.AThing;
+import com.winterwell.es.ESType;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
@@ -18,6 +19,18 @@ import com.winterwell.utils.web.IHasJson;
 public final class Money 
 extends AThing // dubious -- no id, no url
 implements Comparable<Money>, IHasJson {
+	
+	public static final ESType ESTYPE = new ESType().object()
+			// core
+			.property("currency", new ESType().keyword())
+			.property("value", new ESType().keyword())
+			.property("value100p", new ESType().LONG())
+			// less core
+			.property("@type", new ESType().keyword().noAnalyzer().noIndex())			
+			.property("start", new ESType().date())
+			.property("end", new ESType().date())
+			.property("year", new ESType().INTEGER())
+			.lock();
 	
 	private static final long serialVersionUID = 1L;
 	private Time start;

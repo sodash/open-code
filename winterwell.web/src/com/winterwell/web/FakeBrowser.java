@@ -436,8 +436,11 @@ public class FakeBrowser {
 	 * @param encodedPostBody
 	 *            ??
 	 * @return
+	 * @throws WrappedException of IOException
 	 */
-	public String post(String uri, String contentType, String encodedPostBody) {
+	public String post(String uri, String contentType, String encodedPostBody) 
+	throws WrappedException
+	{
 		// People are never too fast
 		if (slowPosts) {
 			Utils.sleep(new Random().nextInt(750));

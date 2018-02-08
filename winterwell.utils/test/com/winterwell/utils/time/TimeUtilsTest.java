@@ -115,6 +115,39 @@ public class TimeUtilsTest {
 		assert f.equals(new Time(3001, 1, 1)) : f;
 	}
 	
+
+	@Test
+	public void parseExperimental_iso() {
+		{
+			Time f = TimeUtils.parseExperimental("2017-12-2");
+			assert f.getMonth() == 12;
+			assert f.getDayOfMonth() == 2;
+			assert f.getYear() == 2017;
+		}		
+	}
+	
+	@Test
+	public void parseExperimental_underspecified() {
+		{
+			Time f = TimeUtils.parseExperimental("23 dec");
+			assert f.getMonth() == 12;
+			assert f.getDayOfMonth() == 23;
+			assert f.getYear() == new Time().getYear();
+		}
+		{
+			Time f = TimeUtils.parseExperimental("dec 12");
+			assert f.getMonth() == 12;
+			assert f.getDayOfMonth() == 12;
+			assert f.getYear() == new Time().getYear();
+		}
+		{
+			Time f = TimeUtils.parseExperimental("dec 2016");
+			assert f.getMonth() == 12;
+			assert f.getDayOfMonth() == 1;
+			assert f.getYear() == 2016;
+		}
+	}
+	
 	@Test
 	public void parseExperimental_testLastSunday() {
 		{

@@ -66,9 +66,11 @@ public class DataLogConfig extends DBOptions implements IInit {
 	
 	/**
 	 * These namespaces have their own config overrides.
+	 * 
+	 * HACK include gl as standard namespace 
 	 */
 	@Option
-	public List<String> namespaceConfigs = Arrays.asList("default");
+	public List<String> namespaceConfigs = Arrays.asList("default", "gl");
 
 	public Dt filePeriod = TUnit.DAY.dt;
 	

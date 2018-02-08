@@ -24,6 +24,7 @@ import com.winterwell.web.app.KServerType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.fields.BoolField;
+import com.winterwell.web.fields.DoubleField;
 import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
 
@@ -41,7 +42,7 @@ import com.winterwell.web.fields.SField;
  * <p>
  * TODO filter by time
  * @author daniel
- *
+ * @testedby {@link LgServletTest}
  */
 public class LgServlet {
 
@@ -68,6 +69,7 @@ public class LgServlet {
 		String ds = state.getRequired(DATASPACE);
 		// TODO security check the dataspace?
 		String tag = state.getRequired(TAG);
+		double count = state.get(new DoubleField("count"), 1.0);
 		String via = req.getParameter("via");
 		// NB: dont IP/user track simple events, which are server-side
 		boolean stdTrackerParams = ! DataLogEvent.simple.equals(tag) && state.get(new BoolField("track"), true);
@@ -86,7 +88,7 @@ public class LgServlet {
 			params.remove("track");
 		}
 		
-		boolean logged = doLog(state, ds, tag, via, params, stdTrackerParams);
+		boolean logged = doLog(state, ds, tag, count, via, params, stdTrackerParams);
 		
 		// Reply
 		// .gif?
@@ -100,35 +102,14 @@ public class LgServlet {
 		WebUtils2.sendText(logged? "OK" : "not logged", resp);
 	}
 
-	static boolean doLog(WebRequest state, String dataspace, String tag, String via, Map params, boolean stdTrackerParams) {
-		assert dataspace != null;
+	static boolean doLog(WebRequest state, String dataspace, String tag, double count, 
+			String via, Map params, boolean stdTrackerParams) 
+	{
+		assert dataspace != null;		
 		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		// special vars
-		if (stdTrackerParams) {
-			// TODO allow the caller to explicitly set some of these if they want to
-			if (params==null) params = new ArrayMap();
-			// Replace $user with tracking-id, and $
-			params.putIfAbsent("user", trckId);			
-			// ip: $ip
-			params.putIfAbsent("ip", state.getRemoteAddr());
-			// Browser info
-			String ua = state.getUserAgent();			
-			params.putIfAbsent("ua", ua);
-			BrowserType bt = new BrowserType(ua);
-			boolean mobile = bt.isMobile();
-			params.putIfAbsent("mbl", mobile);
-			// what page?
-			String ref = state.getReferer();
-			if (ref==null) ref = state.get("site"); // DfP hack
-			// remove some gumpf (UTM codes)
-			String cref = WebUtils2.cleanUp(ref);
-			if (cref != null) {
-				params.putIfAbsent("url", cref);
-				// domain (e.g. sodash.com) & host (e.g. www.sodash.com)				
-				params.putIfAbsent("domain", WebUtils2.getDomain(cref)); 
-				// host is the one to use!
-				params.putIfAbsent("host", WebUtils2.getHost(cref)); // matches publisher in adverts
-			}
+		if (stdTrackerParams) {			
+			params = doLog2_addStdTrackerParams(state, params, trckId);
 		}
 		
 		// HACK remove Hetzner from the ip param 
@@ -151,7 +132,7 @@ public class LgServlet {
 		}
 		
 		// write to log file
-		doLogToFile(dataspace, tag, params, trckId, via, state);
+		doLogToFile(dataspace, tag, count, params, trckId, via, state);
 				
 		// write to Stat / ES
 		// ...which dataspaces?
@@ -164,10 +145,43 @@ public class LgServlet {
 //		);
 //		for(String ds : dataspaces) {
 //			if (ds==null) continue;
-		DataLogEvent event = new DataLogEvent(dataspace, 1, tag, params);		
+		DataLogEvent event = new DataLogEvent(dataspace, count, tag, params);
+//		event.time = state.get(time); FIXME
 		DataLog.count(event);
 //		}
 		return true;
+	}
+
+	private static Map doLog2_addStdTrackerParams(WebRequest state, Map params, String trckId) {
+		// TODO allow the caller to explicitly set some of these if they want to
+		if (params==null) params = new ArrayMap();
+		// Replace $user with tracking-id, and $
+		params.putIfAbsent("user", trckId);			
+		// ip: $ip
+		params.putIfAbsent("ip", state.getRemoteAddr());
+		// Browser info
+		String ua = state.getUserAgent();			
+		params.putIfAbsent("ua", ua);
+		BrowserType bt = new BrowserType(ua);
+		boolean mobile = bt.isMobile();
+		params.putIfAbsent("mbl", mobile);
+		// OS
+		String os = bt.getOS();
+		params.putIfAbsent("os", os);
+		
+		// what page?
+		String ref = state.getReferer();
+		if (ref==null) ref = state.get("site"); // DfP hack
+		// remove some gumpf (UTM codes)
+		String cref = WebUtils2.cleanUp(ref);
+		if (cref != null) {
+			params.putIfAbsent("url", cref);
+			// domain (e.g. sodash.com) & host (e.g. www.sodash.com)				
+			params.putIfAbsent("domain", WebUtils2.getDomain(cref)); 
+			// host is the one to use!
+			params.putIfAbsent("host", WebUtils2.getHost(cref)); // matches publisher in adverts
+		}
+		return params;
 	}
 
 	
@@ -202,6 +216,7 @@ public class LgServlet {
 				if (url.contains("live-demo")) return true;
 				if (url.contains("//www.good-loop.com")) return true;
 				if (url.contains("//good-loop.com")) return true;
+				if (url.contains("//as.good-loop.com")) return true;
 			}
 			Log.d("lg", "skip url "+url+" event: "+tag+params);
 			return false;
@@ -211,8 +226,9 @@ public class LgServlet {
 
 	static List<String> OUR_IPS = Arrays.asList("62.30.12.102", "62.6.190.196", "82.37.169.72");
 	
-	private static void doLogToFile(String dataspace, String tag, Map params, String trckId, String via, WebRequest state) {
+	private static void doLogToFile(String dataspace, String tag, double count, Map params, String trckId, String via, WebRequest state) {
 		String msg = params == null? "" : Printer.toString(params, ", ", ": ");
+		if (count != 1) msg += "\tcount:"+count;
 		msg += "\ttracker:"+trckId+"\tref:"+state.getReferer()+"\tip:"+state.getRemoteAddr();
 		if (via!=null) msg += " via:"+via;
 		// Guard against giant objects getting put into log, which is almost
@@ -228,9 +244,16 @@ public class LgServlet {
 		// Add in referer and IP
 		// Tab-separating elements on this line is useless, as Report.toString() will immediately convert \t to space.
 		String msgPlus = msg+" ENDMSG "+state.getReferer()+" "+state.getRemoteAddr();
-//		Report rep = new Report(tag, null, msgPlus, Level.INFO);
-		Log.i(tag, msgPlus);
-//		DataLogServer.logFile.listen2(rep.toStringShort(), rep.getTime());
+		
+		// error or warning?
+		if (tag.contains("error")) {
+			Log.e(tag, msgPlus); // NB: In Good-Loop or SoGive, this should then get picked up by logstash monitoring
+		} else if (tag.contains("warning")) {
+			Log.w(tag, msgPlus);
+		} else {
+			// normal case
+			Log.i(tag, msgPlus);
+		}
 	}
 
 }

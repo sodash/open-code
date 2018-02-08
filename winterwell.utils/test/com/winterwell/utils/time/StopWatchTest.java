@@ -8,15 +8,15 @@ public class StopWatchTest extends TestCase {
 
 	public void testPause() {
 		StopWatch stopwatch = new StopWatch();
-		Utils.sleep(500);
+		Utils.sleep(50);
 		assert !stopwatch.isPaused();
 
 		stopwatch.pause();
 
 		assert stopwatch.isPaused();
-		Utils.sleep(1000);
+		Utils.sleep(100);
 		long t1 = stopwatch.getTime();
-		Utils.sleep(1000);
+		Utils.sleep(100);
 		assert stopwatch.isPaused();
 		long t1b = stopwatch.getTime();
 		assert t1b == t1;
@@ -24,10 +24,10 @@ public class StopWatchTest extends TestCase {
 		stopwatch.start();
 
 		assert !stopwatch.isPaused();
-		Utils.sleep(1000);
+		Utils.sleep(100);
 		long t2 = stopwatch.getTime();
-		assert Math.abs(t1 - 500) < 100 : t1;
-		assert Math.abs(t2 - 1500) < 100 : t2;
+		assert Math.abs(t1 - 50) < 10 : t1;
+		assert Math.abs(t2 - 150) < 10 : t2;
 	}
 
 }

@@ -711,13 +711,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 	
 	
 	public synchronized void flush() {
-		if (base instanceof Flushable) {
-			try {
-				((Flushable) base).flush();
-			} catch (IOException e) {
-				throw Utils.runtime(e);
-			}
-		}
+		base.flush();		
 	}
 	
 	/**

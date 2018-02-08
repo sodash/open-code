@@ -2,7 +2,10 @@ package com.winterwell.depot;
 
 import java.io.File;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.winterwell.depot.IHasVersion.IHasBefore;
 import com.winterwell.es.ESType;
 import com.winterwell.es.client.DeleteRequestBuilder;
@@ -29,6 +32,8 @@ import com.winterwell.utils.web.XStreamUtils;
  *
  */
 public class ESStore implements IStore {
+
+	private Cache<String, String> indexCache  = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
 
 	@Override
 	public void init() {
@@ -99,7 +104,19 @@ public class ESStore implements IStore {
 //		String json = gson.toJson(artifact);		
 		IndexRequestBuilder put = esc.prepareIndex(index, type, desc.getId());;
 		put.setBodyDoc(new ESStoreWrapper(artifact));
-		IESResponse resp = put.get().check();		
+		IESResponse resp = put.get().check();	
+		indexCache.put(index, desc.getTag());
+	}
+	
+	
+	
+	
+	@Override
+	public void flush() {
+		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		String indexList = StrUtils.join(indexCache.asMap().keySet(), ",");
+		// recent indices
+		// TODO call /indexList/_refresh
 	}
 
 	@Override

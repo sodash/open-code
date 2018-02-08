@@ -26,15 +26,13 @@ public class SlowActor<Msg> extends Actor<Msg> implements Flushable {
 	}
 
 	@Override
-	public void flush() throws IOException {
+	public void flush() {
 		// send it all through receive
 		Queue<Packet<Msg>> _q = getQ();
 		try {
 			for (Packet<Msg> packet : _q) {				
 				consume(packet.msg, packet.from);
 			}
-		} catch (IOException e) {
-			throw e;
 		} catch (Exception e) {
 			throw Utils.runtime(e);
 		}

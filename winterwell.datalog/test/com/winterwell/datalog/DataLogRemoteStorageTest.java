@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.winterwell.maths.timeseries.IDataStream;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 
@@ -13,6 +14,33 @@ public class DataLogRemoteStorageTest {
 //	@Test
 	public void testGetDataStringTimeTimeKInterpolateDt() {
 		fail("Not yet implemented");
+	}
+	
+	
+	@Test
+	public void testHackUse() {
+		{
+			String dataspace = "test";
+			double count = 2.1;
+			DataLogEvent event = new DataLogEvent(dataspace, count, "woot", 
+					new ArrayMap("n", 7, "w", 100));
+			boolean ok = DataLogRemoteStorage.saveToRemoteServer("http://locallg.good-loop.com", event);
+			assert ok;
+		}
+	}
+
+
+	@Test
+	public void testDirectUse() {				
+		DataLogRemoteStorage dlrs = new DataLogRemoteStorage();
+		DataLogConfig remote = new DataLogConfig();
+		remote.logEndpoint = "https://lg.good-loop.com/lg";
+		dlrs.init(remote);
+		String dataspace = "test";
+		DataLogEvent event = new DataLogEvent(dataspace, 2, "woot", 
+				new ArrayMap("n", 7, "w", 100));
+		Object ok = dlrs.saveEvent(dataspace, event, null);
+		System.out.println(ok);
 	}
 
 	@Test

@@ -990,7 +990,7 @@ public class WebUtils2 extends WebUtils {
 			// set mime and character encoding
 			// HACK: Is it an old IE?
 			BrowserType bt = req.getBrowserType();
-			if (bt.getMake()==BrowserType.MAKE_IE && bt.getVersion() < 10) {
+			if (bt.getBrowserMake()==BrowserType.MAKE_IE && bt.getVersion() < 10) {
 				response.setContentType(WebUtils.MIME_TYPE_TXT_UTF8);
 			} else {
 				response.setContentType(WebUtils.MIME_TYPE_JSON + "; charset=UTF-8");

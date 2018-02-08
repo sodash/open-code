@@ -443,6 +443,8 @@ public class TimeUtils {
 	 * @param s
 	 * @param isRelative Can be null. If provided, will be set to true for relative times, such as "today" or "yesterday"
 	 * @return
+	 * 
+	 * TODO it'd be nice to use TimeFragment here
 	 */
 	public static Time parseExperimental(String s, AtomicBoolean isRelative) throws IllegalArgumentException {
 		Period period = parsePeriod(s, isRelative);
@@ -529,7 +531,7 @@ public class TimeUtils {
 			Date date = null;
 			while (m.find()) {
 				int dayMonth = Integer.parseInt(m.group());
-				String formatted = day + " " + dayMonth + " " + month + " " + year;
+				String formatted = (day==null? "" : day + " ") + dayMonth + " " + month + " " + year;
 				try {
 					date = df.parse(formatted);
 					break;

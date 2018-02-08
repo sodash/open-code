@@ -10,6 +10,12 @@ import java.util.Set;
  */
 public abstract class AStore implements IStore {
 
+
+	@Override
+	public void flush() {
+		base.flush();
+	}
+	
 	@Override
 	public String getRaw(Desc desc) {
 		return base.getRaw(desc);

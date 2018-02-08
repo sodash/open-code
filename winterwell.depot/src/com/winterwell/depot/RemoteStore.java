@@ -35,6 +35,10 @@ import com.winterwell.utils.time.TUnit;
 public class RemoteStore implements IStore {
 
 	@Override
+	public void flush() {	
+	}
+	
+	@Override
 	public String getRaw(Desc desc) {
 		return localStore.getRaw(desc);
 	}

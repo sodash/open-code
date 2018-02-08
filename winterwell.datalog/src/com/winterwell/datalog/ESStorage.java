@@ -203,6 +203,9 @@ public class ESStorage implements IDataLogStorage {
 			ConfigBuilder cb = cf.getConfigBuilder(ESConfig.class);
 			// also look in config/datalog.properties (as well as es.properties)
 			esConfig = cb.set(new File("config/datalog.properties")).get();
+			// check the connection
+			ESHttpClient es = new ESHttpClient(esConfig);
+			es.checkConnection();
 		}
 		// Support per-namespace ESConfigs
 		if (config.namespaceConfigs!=null) {
@@ -289,7 +292,7 @@ public class ESStorage implements IDataLogStorage {
 //		String v = _client.getConfig().getIndexAliasVersion();
 		PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, esType);
 		// See DataLogEvent.COMMON_PROPS and toJson()
-		ESType keywordy = new ESType().keyword().norms(false);
+		ESType keywordy = new ESType().keyword().norms(false).lock();
 		// Huh? Why were we using type text with keyword analyzer??
 //				.text().analyzer("keyword")					
 //				.fielddata(true);
@@ -298,7 +301,7 @@ public class ESStorage implements IDataLogStorage {
 				.property("v", new ESType().text().norms(false))
 				.property("n", new ESType().DOUBLE());
 		ESType simpleEvent = new ESType()
-				.property(DataLogEvent.EVENTTYPE, keywordy)
+				.property(DataLogEvent.EVENTTYPE, keywordy.copy()) // ?? should we set fielddata=true??
 				.property("time", new ESType().date())
 				.property("count", new ESType().DOUBLE())
 				.property("props", props);		
@@ -361,7 +364,7 @@ public class ESStorage implements IDataLogStorage {
 		long secs = bucketPeriod.getEnd().getTime() % 1000;
 		String id = event.getId()+"_"+secs;
 		ESHttpClient client = client(dataspace);
-		client.debug = true; // FIXME
+//		client.debug = true; // FIXME
 		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
 		if (event.time==null) event.time = bucketPeriod.getEnd();
 		// set doc

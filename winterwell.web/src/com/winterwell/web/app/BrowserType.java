@@ -22,6 +22,10 @@ public class BrowserType {
 	 */
 	public static final String OS_IOS = "ios";
 
+
+	private static final String OS_MAC_DESKTOP = "applemac";
+	private static final String OS_WINDOWS = "windows";
+	
 	/**
 	 * Internet Explorer
 	 */
@@ -29,22 +33,59 @@ public class BrowserType {
 
 	public static final String FACEBOOK = "facebook";
 
+	public static final String OS_KINDLE = "kindle";
+
+	public static final String OS_WINDOWSPHONE = "windowsphone";
+
+	public static final String OS_IPAD = "ipad";
+
+	public static final String OS_IPHONE = "iphone";
+
+	public static final String OS_CHROMEBOOK = "chromebook";
+
+
 	private String os;
 	
 	public String getOS() {
-		if (ua.contains("android")) {
-			os = OS_ANDROID;
-		} else if (ua.contains("blackberry")) {
-			os = OS_BLACKBERRY;
-		} else if (ua.contains("apple")) {
-			os = OS_IOS; // This may be a bit loose -- looks like all webkit
-							// browsers namecheck apple
-		} else {
-			os = "?";
-		}
+		if (os==null) os = getOS2();
 		return os;
 	}
 	
+	private String getOS2() {
+		if (ua.contains("android")) {
+			return OS_ANDROID;
+		}
+		if (ua.contains("blackberry")) {
+			return OS_BLACKBERRY;
+		}
+		if (ua.contains("intel mac os")) {
+			return OS_MAC_DESKTOP;
+		}
+		if (ua.contains("windows nt")) {
+			return OS_WINDOWS;
+		}
+		if (ua.contains("kindle")) {
+			return OS_KINDLE;
+		}
+		if (ua.contains("windows phone")) {
+			return OS_WINDOWSPHONE;
+		}
+		if (userAgent.contains("iPad;")) {
+			return OS_IPAD;
+		}
+		if (userAgent.contains("CPU iPhone OS;")) {
+			return OS_IPHONE;
+		}
+		if (userAgent.contains("CrOS")) {
+			return OS_CHROMEBOOK;
+		}
+		if (ua.contains("apple")) {
+			return OS_IOS; // This may be a bit loose -- looks like all webkit
+							// browsers namecheck apple
+		}
+		return "?";
+	}
+
 	/**
 	 * Lower-case version of userAgent
 	 */
@@ -108,7 +149,7 @@ public class BrowserType {
 		// http://stackoverflow.com/questions/3514784/what-is-the-best-way-to-detect-a-handheld-device-in-jquery/3540295#3540295
 		// See http://detectmobilebrowsers.com/ for a bigger list
 		for (String m : new String[] { "mobile", "android", "webos", "iphone",
-				"ipad", "ipod", "blackberry", "kindle" }) {
+				"ipad", "ipod", "blackberry", "kindle", "windows phone"}) {
 			if (ua.contains(m))
 				return true;
 		}
@@ -128,7 +169,11 @@ public class BrowserType {
 
 	private static final Pattern MSIE = Pattern.compile("\\bMSIE (\\d+\\.\\d+)");
 	
-	public String getMake() {
+	/**
+	 * TODO What Browser software is it? e.g. IE vs chrome Status: only half-implemented!
+	 * @return
+	 */
+	public String getBrowserMake() {
 		Matcher m = MSIE.matcher(userAgent);
 		if (m.find()) {
 			make = MAKE_IE;

@@ -46,9 +46,11 @@ public abstract class ADistribution1D extends ADistributionBase<Double>
 	
 	public Map<String,Object> toJson2() {
 		Range range = getSupport();
+		double mean = getMean();
+		double variance = getVariance();
 		return new ArrayMap(
-			"mean", getMean(),
-			"var", MathUtils.isFinite(getVariance())? getVariance() : null,
+			"mean", MathUtils.isFinite(mean)? mean : null,
+			"var", MathUtils.isFinite(variance)? variance : null,
 			"max", MathUtils.isFinite(range.high)? range.high : null,
 			"min", MathUtils.isFinite(range.low)? range.low : null			
 		);

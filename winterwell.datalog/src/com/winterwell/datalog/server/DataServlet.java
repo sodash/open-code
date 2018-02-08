@@ -18,6 +18,7 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
+import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -27,6 +28,8 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.ajax.JsonResponse;
+import com.winterwell.web.app.AppUtils;
+import com.winterwell.web.app.CommonFields;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.IntField;
@@ -86,44 +89,14 @@ public class DataServlet implements IServlet {
 		
 		// search parameters
 		// time box
-		ICallable<Time> cstart = state.get(new TimeField("start"));
+		ICallable<Time> cstart = state.get(CommonFields.START);
 		Time start = cstart==null? new Time().minus(TUnit.MONTH) : cstart.call();
 		ICallable<Time> cend = state.get(new TimeField("end").setPreferEnd(true));
 		Time end = cend==null? new Time() : cend.call();
-		// query
+
+		// query e.g. host:thetimes.com
 		String q = state.get("q");
-		if (q==null) q = "";
-		SearchQuery sq = new SearchQuery(q);
-		
-		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
-				.from(start.toISOString()) //, true) ES versioning pain
-				.to(end.toISOString()); //, true);
-		
-		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
-				.must(timeFilter);		
-		
-		// filters TODO a true recursive SearchQuery -> ES query mapping
-		// TODO this is just a crude 1-level thing
-		List ptree = sq.getParseTree();
-		for (Object clause : ptree) {
-			if (clause instanceof List) {
-				assert ((List) clause).size() == 2 : clause+" from "+sq;
-				List<String> propVal = (List) clause;
-				String prop = propVal.get(0);
-				String val = propVal.get(1);
-				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, val);
-				filter = filter.must(kvFilter);
-			}
-//			QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
-//			filter = filter.must(kvFilter);			
-		}
-//		for(String prop : "evt host campaign".split(" ")) {
-//			String host = sq.getProp(prop);
-//			if (host!=null) {
-//				QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
-//				filter = filter.must(kvFilter);
-//			}
-//		}
+		BoolQueryBuilder filter = makeQueryFilter(q, start, end);
 				
 		for(final String bd : breakdown) {
 			if (bd==null) {
@@ -137,6 +110,7 @@ public class DataServlet implements IServlet {
 			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
 					"by_"+StrUtils.join(b,'_'), b[0]);
 			byTag.setSize(numTerms);
+			byTag.setMissing("unset");
 			Aggregation leaf = byTag;
 			if (b.length > 1) {
 				if (b[1].equals("time")) {
@@ -147,6 +121,7 @@ public class DataServlet implements IServlet {
 				} else {
 					com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);
 					byHost.setSize(numTerms);
+					byHost.setMissing("unset");
 					byTag.subAggregation(byHost);
 					leaf = byHost;
 				}
@@ -159,7 +134,7 @@ public class DataServlet implements IServlet {
 			String json = bd.substring(bd.indexOf("{"), bd.length());
 			Map<String,String> output = (Map) JSON.parse(json);
 			for(String k : output.keySet()) {
-				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);			
+				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
 				leaf.subAggregation(myCount);
 				// filter 0s ??does this work??
 				filter.must(QueryBuilders.rangeQuery(k).gt(0));
@@ -176,7 +151,7 @@ public class DataServlet implements IServlet {
 //		DataLog.getData(start, end, null, TUnit.HOUR.dt, tagBits);
 //		DataLog.getData(start, end, sum/as-is, bucket, DataLogEvent filter, breakdown);
 		
-		esc.debug = true;
+//		esc.debug = true;
 		SearchResponse sr = search.get();
 		sr.check();
 		
@@ -189,6 +164,19 @@ public class DataServlet implements IServlet {
 		aggregations.put("examples", sr.getHits());
 		JsonResponse jr = new JsonResponse(state, aggregations);
 		WebUtils2.sendJson(jr, state);
+	}
+
+	/**
+	 * @param state
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	private BoolQueryBuilder makeQueryFilter(String q, Time start, Time end) {		
+		if (q==null) q = "";
+		SearchQuery sq = new SearchQuery(q);
+		BoolQueryBuilder filter = AppUtils.makeESFilterFromSearchQuery(sq, start, end);
+		return filter;
 	}
 
 }

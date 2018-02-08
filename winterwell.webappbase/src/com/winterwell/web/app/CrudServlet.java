@@ -5,9 +5,11 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -25,6 +27,7 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -279,7 +282,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
 		/// which index? draft (which should include copies of published) by default
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
-		if (status!=null) {
+		if (status!=null && status != KStatus.ALL_BAR_TRASH) {
 			s.setIndex(
 					esRouter.getPath(dataspace, type, null, status).index()
 					);
@@ -313,7 +316,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		// TODO paging!
 		s.setSize(10000);
-		es.debug = true;
+		s.setDebug(true);
 		SearchResponse sr = s.get();
 		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();
@@ -327,7 +330,29 @@ public abstract class CrudServlet<T> implements IServlet {
 //			hitsPreferDraft.add(src);
 //		}
 		
+		// NB: may be Map or AThing
 		List hits2 = Containers.apply(hits, h -> h.get("_source"));
+		
+		// de-dupe by status: remove draft, etc if we have published
+		// NB: assumes you can't have same status and same ID (so no need to de-dupe)
+		if (status==KStatus.ALL_BAR_TRASH) {
+			HashSet pubIds = new HashSet();
+			for(Object hit : hits2) {
+				Object id = getId(hit);
+				String hs = getStatus(hit);
+				if ("PUBLISHED".equals(hs)) {
+					pubIds.add(id);
+				}
+			}
+			hits2 = Containers.filter(hits2, h -> {
+				String hs = getStatus(h);
+				if ( ! "PUBLISHED".equals(hs)) {
+					boolean dupe = pubIds.contains(getId(h));
+					return ! dupe;
+				}
+				return true;
+			});
+		}
 		
 		// HACK: send back csv?
 		if (state.getResponseType() == KResponseType.csv) {
@@ -346,6 +371,24 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 	
 	
+	private String getStatus(Object h) {
+		Object s;
+		if (h instanceof Map) s = ((Map)h).get("status");
+		else s = ((AThing)h).getStatus();
+		return String.valueOf(s);
+	}
+
+
+
+	private Object getId(Object hit) {
+		Object id;
+		if (hit instanceof Map) id = ((Map)hit).get("id");
+		else id = ((AThing)hit).getId();
+		return id;
+	}
+
+
+
 	protected void doSendCsv(WebRequest state, List<Map> hits2) {
 		// ?? maybe refactor and move into a default method in IServlet?
 		StringWriter sout = new StringWriter();
@@ -426,13 +469,34 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	protected void doSave(WebRequest state) {
+		// debug FIXME		
+		String json = getJson(state);
+		Object jobj = JSON.parse(json);
+		Object start = SimpleJson.get(jobj, "projects", 0, "start");
+		
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
 		T thing = getThing(state);
 		assert thing != null : state;
-		// set modified = true
-		jthing.put("modified", true);
-		// run via Java, to trigger IInit
+		// HACK set modified = true on maps
+		if (thing instanceof Map) {
+			((Map) thing).put("modified", true);	
+		} else {
+			// should we have an interface for this??
+//			ReflectionUtils.setPrivateField(thing, fieldName, value);
+			// NB: avoiding jthing.put() as that re-makes the java object, which is wasteful and confusing
+//			jthing.put("modified", true);
+		}
+		
+		// This has probably been done already in getThing(), but harmless to repeat
+		// run the object through Java, to trigger IInit
 		jthing.java();
+		
+		// FIXME debug
+		Object start2 = SimpleJson.get(jthing.map(), "projects", 0, "start");
+		Object startraw = SimpleJson.get(jthing.map(), "projects", 0, "start_raw");
+		T ngo = jthing.java();
+		 
+		
 		{	// update
 			String id = getId(state);
 			ESPath path = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);

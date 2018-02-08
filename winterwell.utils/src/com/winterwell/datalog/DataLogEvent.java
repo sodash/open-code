@@ -67,7 +67,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"bid", String.class,
 			"variant", String.class,
 			"campaign", String.class,
-			"cid", String.class, // SoGive charity-ID
+			"cid", String.class, // SoGive charity-ID. This is preferred to 'charity' as a property-name
 			// text properties (support tokenisation)
 			"place", StringBuilder.class,
 			"locn", StringBuilder.class,
@@ -98,7 +98,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"lng", Double.class,
 			// browser info
 			"mbl", Boolean.class,
-			"ua", StringBuilder.class // user agent
+			"ua", StringBuilder.class, // user agent
+			"os", String.class
 			// no-index (object)
 //			"xtra", Null.class FIXME this was causing bugs :(
 			));
@@ -118,6 +119,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 
 	public Object getProp(String prop) {
 		return props.get(prop);
+	}
+	
+	public Map<String, Object> getProps() {
+		return props;
 	}
 	
 	/**

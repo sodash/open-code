@@ -178,7 +178,7 @@ public class ConfigBuilder {
 
 	private boolean parseFlag;
 
-	private String[] remainderArgs;
+	private List<String> remainderArgs;
 
 
 	/**
@@ -248,7 +248,7 @@ public class ConfigBuilder {
 	 * After {@link #setFromMain(String[])}, this will hold the remaining unused arguments
 	 * @return
 	 */
-	public String[] getRemainderArgs() {
+	public List<String> getRemainderArgs() {
 		return remainderArgs;
 	}
 	
@@ -278,7 +278,7 @@ public class ConfigBuilder {
 				// TODO refactor setOneKeyValue() so this can use the same get-field
 				Field field = token2field.get(a);
 				if (field == null) {
-					Log.w("init", config.getClass()+" Unrecognised option: "+a+" from main args "+Printer.toString(args));
+					Log.w(LOGTAG, config.getClass()+" Unrecognised option: "+a+" from main args "+Printer.toString(args));
 					// advance i anyway??
 					if (args.length > i+1 && ! args[i+1].startsWith("-")) i++;
 					continue;
@@ -287,7 +287,7 @@ public class ConfigBuilder {
 				i = parse2_1arg(args, i, field);
 			}
 			// return remainder
-			remainderArgs = Arrays.copyOfRange(args, i, args.length);
+			remainderArgs = Arrays.asList(Arrays.copyOfRange(args, i, args.length));
 			return this;
 		} catch (Exception e) {
 			throw Utils.runtime(e);
@@ -296,6 +296,8 @@ public class ConfigBuilder {
 		}
 	}
 
+	public static final String LOGTAG = "config";
+	
 	private int parse2_1arg(String[] args, int i, Field field) throws IllegalAccessException, ParseException 
 	{
 		if (field.getType() == Boolean.class
@@ -321,6 +323,19 @@ public class ConfigBuilder {
 
 	Map<Field,Object> source4setFields = new ArrayMap();
 
+	/**
+	 * Debug info: how was a field set?
+	 * @param fieldName
+	 * @return source e.g. File, or null
+	 */
+	public Object getSourceForField(String fieldName) {
+		Utils.check4null(fieldName);
+		for(Field f : source4setFields.keySet()) {
+			if (f.getName().equals(fieldName)) return source4setFields.get(f);
+		}
+		return null;
+	}
+	
 	private boolean debug;
 
 	private final List<Object> sources = new ArrayList();
@@ -333,7 +348,7 @@ public class ConfigBuilder {
 		Object prev = source4setFields.put(field, Utils.or(source, "unknown"));
 		if (prev!=null) {
 			// log the override
-			Log.i("config", "... "+config.getClass().getSimpleName()+"."+field.getName()+" source "+source+" overrode "+prev);
+			Log.i(LOGTAG, "... "+config.getClass().getSimpleName()+"."+field.getName()+" source "+source+" overrode "+prev);
 		}
 		field.set(config, v);
 	}
@@ -348,7 +363,7 @@ public class ConfigBuilder {
 	public ConfigBuilder set(File propertiesFile) {
 		if (propertiesFile==null) return this;		
 		if ( ! propertiesFile.exists()) {
-			Log.d("config", config.getClass()+": No properties file: "+propertiesFile+" = "+propertiesFile.getAbsolutePath());
+			Log.d(LOGTAG, config.getClass()+": No properties file: "+propertiesFile+" = "+propertiesFile.getAbsolutePath());
 			return this;
 		}		
 		source = propertiesFile.getAbsoluteFile();
@@ -383,13 +398,13 @@ public class ConfigBuilder {
 		if (debug) {
 			try {
 				for(Field f : source4setFields.keySet()) {
-					Log.d("config", config.getClass().getSimpleName()+"."+f.getName()
+					Log.d(LOGTAG, config.getClass().getSimpleName()+"."+f.getName()
 									+" was set from "+source4setFields.get(f)
 									+(protectPasswords(f.getName())? "" : " to "+f.get(config))
 									);
 				}
 			} catch(Exception ex) {
-				Log.e("config.debug.fail", ex);
+				Log.e(LOGTAG+".debug.fail", ex);
 			}
 		}
 		return (S) config;

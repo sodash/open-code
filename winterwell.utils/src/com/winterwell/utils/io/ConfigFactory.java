@@ -25,12 +25,23 @@ import com.winterwell.utils.log.Log;
  */
 public class ConfigFactory {
 
+	private static final String LOGTAG = ConfigBuilder.LOGTAG;
 	private String[] args;
 	private String appName;
 	String serverType;
 	private String machine;
 	private boolean debug = true;
 	private final List<ConfigBuilder> history = new ArrayList();
+	
+	private boolean strict;
+	
+	/**
+	 * If true, then duplicate config loading will cause an exception.
+	 * @param strict
+	 */
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
 	
 	public void setDebug(boolean debug) {
 		this.debug = debug;
@@ -52,18 +63,39 @@ public class ConfigFactory {
 	/**
 	 * e.g. local / test / production. See {@link KServerType}
 	 * @param serverType
+	 * @return 
 	 */
-	public void setServerType(String serverType) {
+	public ConfigFactory setServerType(String serverType) {
 		this.serverType = serverType;
+		Log.d(LOGTAG, "serverType: "+serverType);
+		return this;
 	}	
-	public void setArgs(String[] args) {
+	public ConfigFactory setArgs(String[] args) {
 		this.args = args;
+		return this;
 	}
-	public void setMachine(String machine) {
+	public ConfigFactory setMachine(String machine) {
 		this.machine = machine;
+		return this;
 	}
 	
-	public <X> X getConfig(Class<X> configClass) {
+	/**
+	 * 
+	 * @param configClass
+	 * @return
+	 * @throws IllegalStateException if the config has already been created
+	 */
+	public final <X> X getConfig(Class<X> configClass) throws IllegalStateException {
+		// try to avoid duplicate config loading
+		if (Dep.has(configClass)) {
+			String msg = "Duplicate call to ConfigFactory.getConfig() for "+configClass
+					+" Use Dep.has() / Dep.get() for subsequent calls, or set(null) or use getConfigBuilder() if you need to recreate one.";
+			if (strict) {
+				throw new IllegalStateException(msg);
+			} else {
+				Log.w(LOGTAG, msg);
+			}
+		}
 		try {
 			ConfigBuilder cb = getConfigBuilder(configClass);
 			X config = cb.get();
@@ -80,10 +112,6 @@ public class ConfigFactory {
 		}
 	}
 	
-	public void setOnCreate() {
-		
-	}
-
 	/**
 	 * This is the core bit, which determines what files to look at (and in what order)
 	 * @param configClass
@@ -114,7 +142,8 @@ public class ConfigFactory {
 
 	public synchronized static ConfigFactory get() {
 		if (Dep.has(ConfigFactory.class)) {
-			return Dep.get(ConfigFactory.class);
+			ConfigFactory cf = Dep.get(ConfigFactory.class);
+			return cf;
 		}
 		// Set a default (which has no app-name or Main args)
 		ConfigFactory cf = new ConfigFactory();
@@ -127,7 +156,7 @@ public class ConfigFactory {
 	 * @return cf for chaining
 	 */
 	public static ConfigFactory set(ConfigFactory cf) {
-		Log.d("ConfigFactory", "set "+cf);
+		Log.i(LOGTAG, "set global ConfigFactory "+cf);
 		Dep.set(ConfigFactory.class, cf);
 		return cf;
 	}
@@ -144,15 +173,7 @@ public class ConfigFactory {
 		if (configClass==null) throw new NullPointerException();
 		try {
 			// make a config object
-			Object c;
-			try {
-				c = configClass.newInstance();
-			} catch(Exception ex) {
-				Log.d("ConfigBuilder", "1st try of new "+configClass.getSimpleName()+": "+ex);
-				Constructor cons = configClass.getDeclaredConstructor();
-				if ( ! cons.isAccessible()) cons.setAccessible(true);
-				c = cons.newInstance();	
-			}			
+			Object c = getConfigBuilder2_newConfigObject(configClass);
 			final ConfigBuilder cb = new ConfigBuilder(c);
 			cb.setDebug(debug);
 			// system props
@@ -171,6 +192,17 @@ public class ConfigFactory {
 		} catch(Exception ex) {
 			throw Utils.runtime(ex);
 		}
+	}
+
+	protected Object getConfigBuilder2_newConfigObject(Class configClass) throws Exception {
+		try {
+			return configClass.newInstance();
+		} catch(Exception ex) {
+			Log.d(LOGTAG, "1st try of new "+configClass.getSimpleName()+": "+ex);
+			Constructor cons = configClass.getDeclaredConstructor();
+			if ( ! cons.isAccessible()) cons.setAccessible(true);
+			return cons.newInstance();	
+		}			
 	}
 
 	public List<ConfigBuilder> getHistory() {

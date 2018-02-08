@@ -65,7 +65,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 
 	/**
-	 * Calls initConfig() then init(config)
+	 * Calls initConfig() then init2(config)
 	 * @param args
 	 */
 	protected final void init(String[] args) {
@@ -95,6 +95,11 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		init(new String[0]);
 	}
 
+	/**
+	 * called after config has been loaded.
+	 * This is the recommended method to override for custom init stuff
+	 * @param config
+	 */
 	protected void init2(ConfigType config) {
 		if (initFlag) return;
 		initFlag = true;		

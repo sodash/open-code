@@ -55,10 +55,6 @@ public class AThing implements IInit {
 	public String url;
 	public String id;
 	KStatus status;
-	/**
-	 * @deprecated
-	 */
-	Boolean modified;
 	
 	/**
 	 * Check (and patch) the data in this Thing.
@@ -73,7 +69,7 @@ public class AThing implements IInit {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"[name=" + name + ", id=" + id + ", status=" + status + ", modified=" + modified
+		return getClass().getSimpleName()+"[name=" + name + ", id=" + id + ", status=" + status
 				+ "]";
 	}
 

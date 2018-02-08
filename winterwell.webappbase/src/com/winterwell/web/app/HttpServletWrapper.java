@@ -37,7 +37,7 @@ public class HttpServletWrapper extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			WebRequest state = new WebRequest(req, resp);			
-			IServlet servlet = factory.get();
+			IServlet servlet = getServlet(state);
 			// log everything?
 			if (debug) {
 				Log.d(servlet.getClass().getSimpleName(), state);
@@ -48,6 +48,10 @@ public class HttpServletWrapper extends HttpServlet {
 		} finally {
 			WebRequest.close(req, resp);
 		}
+	}
+
+	protected IServlet getServlet(WebRequest state) {
+		 return factory.get();
 	}
 
 	public static void doCatch(Throwable ex, HttpServletResponse resp) {

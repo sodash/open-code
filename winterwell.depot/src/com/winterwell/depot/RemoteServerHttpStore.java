@@ -20,7 +20,7 @@ import com.winterwell.web.FakeBrowser;
  * @testedby {@link RemoteServerHttpStoreTest}
  */
 public class RemoteServerHttpStore extends AStore {
-
+	
 	/**
 	 * Default winterwell.com setup!
 	 */

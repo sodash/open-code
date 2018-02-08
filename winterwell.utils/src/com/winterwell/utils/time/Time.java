@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.winterwell.utils.StrUtils;
@@ -155,7 +156,7 @@ public class Time implements Serializable, Comparable<Time> {
 		ut = parse(date);
 	}	
 
-	private static final Pattern DATE_ONLY = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+	private static final Pattern DATE_ONLY = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
 	
 	private static long parse(String date) {
 		// Is it a timecode?
@@ -167,7 +168,13 @@ public class Time implements Serializable, Comparable<Time> {
 			return 0;
 		}
 		// ISO date only?
-		if (DATE_ONLY.matcher(date).matches()) {
+		Matcher m = DATE_ONLY.matcher(date);
+		if (m.matches()) {
+			// patch 0 prefixing (otherwise ZonedDateTime.parse will fail below for e.g. 2017-2-2 )
+			if (date.length() != 10) {
+				date = m.group(1)+"-"+oh(m.group(2))+"-"+oh(m.group(3));
+			}
+			assert date.length() == 10;
 			date += "T00:00:00Z"; // make it midnight GMT
 		}				
 		// Try ISO 8601 format
@@ -197,6 +204,15 @@ public class Time implements Serializable, Comparable<Time> {
 				throw new IllegalArgumentException(StrUtils.ellipsize(date, 100));
 			}
 		}			
+	}
+
+	/**
+	 * zero pad to 2 digits
+	 * @param digits
+	 * @return e.g. "7" -> "07"
+	 */
+	private static String oh(String digits) {
+		return digits.length()==1? "0"+digits : digits;
 	}
 
 	/**
@@ -517,6 +533,13 @@ public class Time implements Serializable, Comparable<Time> {
 		} catch(Exception ex) {
 			return null;
 		}
+	}
+
+	/**
+	 * @return ISO 8601 format yyyy-MM-dd (i.e. without the time or time-zone part)
+	 */
+	public String toISOStringDateOnly() {
+		return format("yyyy-MM-dd"); // NB: we could make this faster by doing it directly without date-format
 	}
 
 }

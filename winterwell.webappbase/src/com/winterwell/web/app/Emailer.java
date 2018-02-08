@@ -38,7 +38,12 @@ public class Emailer implements Closeable {
 	private boolean closed;
 	private SMTPClient smtpClient;
 
+	public InternetAddress getFrom() {
+		return getBotEmail();
+	}
+	
 	/**
+	 * aka getFrom()
 	 * sodash_notifications@sodash.net
 	 * Email address to use for automated site email. This is also
 	 * the login for the bot user, who performs other site actions

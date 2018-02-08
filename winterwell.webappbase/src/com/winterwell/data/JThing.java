@@ -1,6 +1,7 @@
 package com.winterwell.data;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.util.ajax.JSON;
@@ -23,6 +24,10 @@ public final class JThing<T> {
 	private T java;
 	private Class<T> type;
 	
+	/**
+	 * Equivalent to new JThing().setJava(item)
+	 * @param item the Java POJO
+	 */
 	public JThing(T item) {
 		setJava(item);
 	}
@@ -87,9 +92,11 @@ public final class JThing<T> {
 	
 	public T java() {
 		if (java!=null) return java;
-		if (string() != null) {
+		String sjson = string();
+		if (sjson != null) {
 			assert type != null : "Call setType() first "+this;
-			T pojo = Dep.get(Gson.class).fromJson(string(), type);
+			Gson gson = Dep.get(Gson.class);			
+			T pojo = gson.fromJson(sjson, type);
 			if (pojo instanceof IInit) {
 				((IInit) pojo).init();				
 			}

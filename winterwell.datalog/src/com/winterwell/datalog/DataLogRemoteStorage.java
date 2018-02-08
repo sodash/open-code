@@ -30,14 +30,35 @@ import com.winterwell.utils.web.IHasJson;
 import com.winterwell.web.FakeBrowser;
 
 /**
+ * This is a kind of DatalogClient API class
  * TODO Remote server storage for DataLog
  * So the adserver can log stuff into lg.
  * @author daniel
- *
+ * @testedby {@link DataLogRemoteStorageTest}
  */
 public class DataLogRemoteStorage implements IDataLogStorage
 {
 
+	/**
+	 * @deprecated This is inefficient
+	 * HACK a direct call to the remote server
+	 * @param server
+	 * @param event
+	 * @return
+	 */
+	public static boolean saveToRemoteServer(String server, DataLogEvent event) {
+		DataLogRemoteStorage dlrs = new DataLogRemoteStorage();
+		DataLogConfig remote = new DataLogConfig();
+		// add https and endpoint
+		if ( ! server.startsWith("http")) server = "https://"+server;
+		if ( ! server.endsWith("/lg")) server += "/lg";
+		
+		remote.logEndpoint = server;
+		dlrs.init(remote);
+		Object ok = dlrs.saveEvent(event.dataspace, event, new Period(event.time));
+		return true;
+	}
+	
 	private String logEndpoint;
 	private String getDataEndpoint;
 
@@ -138,14 +159,18 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	}
 
 	@Override
-	public Object saveEvent(String dataspace, DataLogEvent event, Period period) {
+	public Object saveEvent(String dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
+		// See LgServlet which reads these
 		FakeBrowser fb = new FakeBrowser();
 		fb.setDebug(true);
 		Map<String, String> vars = new ArrayMap(
 			event.toJson2()
 				);
-		vars.put("d", dataspace);
+		vars.put("d", dataspace);		
 		vars.put("t", event.eventType); // type
+		String p = JSON.toString(event.getProps());
+		vars.put("p", p);				
+		// TODO String r = referer		
 		String res = fb.getPage(logEndpoint, vars);
 		return res;
 	}

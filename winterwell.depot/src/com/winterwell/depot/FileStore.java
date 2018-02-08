@@ -52,7 +52,11 @@ public class FileStore implements IStore {
 		md.file = getLocalPath(desc);
 		return md;
 	}
-	
+
+	@Override
+	public void flush() {
+		// no-op
+	}
 
 	/**
 	 * type directory/id based file name
