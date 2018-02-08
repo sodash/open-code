@@ -25,13 +25,14 @@ import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
+import org.eclipse.jetty.servlet.ServletHandler;
 
 class AdminServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private final ServletContextHandler root;
+	private final ServletHandler root;
 	private final Server server;
 
-	public AdminServlet(Server server, ServletContextHandler root) {
+	public AdminServlet(Server server, ServletHandler root) {
 		this.server = server;
 		this.root = root;
 	}
@@ -157,7 +158,7 @@ public class JettyLauncher {
 	boolean oneThread;
 	private final int port;
 
-	private ServletContextHandler root;
+	private ServletHandler root;
 
 	private Server server;
 
@@ -199,7 +200,7 @@ public class JettyLauncher {
 	 * @param srvr
 	 * @param root
 	 */
-	private void addAdminServlet(Server srvr, ServletContextHandler rt) {
+	private void addAdminServlet(Server srvr, ServletHandler rt) {
 		AdminServlet sh = new AdminServlet(srvr, rt);
 		addServlet("/jettyadmin", sh);
 	}
@@ -222,7 +223,7 @@ public class JettyLauncher {
 		root.addServlet(new ServletHolder(servlet), path);
 	}
 
-	public ServletContextHandler getRootContext() {
+	public ServletHandler getRootContext() {
 		return root;
 	}
 
@@ -254,6 +255,7 @@ public class JettyLauncher {
 		try {
 			Log.i(LOGTAG, "Starting Jetty server on port "+port);
 			server.start();
+			server.join();
 		} catch (Exception e) {
 			Log.report(e);
 			throw Utils.runtime(e);
@@ -351,7 +353,7 @@ public class JettyLauncher {
 //			Handler handler;
 //			server.setHandler(handler);			
 		}
-		root = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
+		root = new ServletHandler(server, "/", ServletContextHandler.SESSIONS);
 
 		// Switch off jsessionid-in-the-url badness
 		Set<SessionTrackingMode> sessionModes = root.getSessionHandler().getEffectiveSessionTrackingModes();

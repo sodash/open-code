@@ -26,6 +26,11 @@
 			<artifactId>jetty-util-ajax</artifactId>
 			<version>9.4.8.v20171121</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>9.4.8.v20171121</version>
+		</dependency>
 	</dependencies>
 
 	<groupId>com.example</groupId>

@@ -13,6 +13,8 @@
 	<classpathentry kind="lib" path="dependencies/jetty-server.jar"/>
 	<classpathentry kind="lib" path="dependencies/jetty-util.jar"/>
 	<classpathentry kind="lib" path="dependencies/jetty-util-ajax.jar"/>
+	<classpathentry kind="lib" path="dependencies/jetty-security.jar"/>
+	<classpathentry kind="lib" path="dependencies/jetty-servlet.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-4.X.jar" sourcepath="/middleware/jakarta/httpclient-4.1.2-src.zip"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-cache-4.X.jar"/>
