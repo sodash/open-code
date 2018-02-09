@@ -75,7 +75,7 @@ public class FileServlet extends HttpServlet {
 	/**
 	 * Can be set explicitly, or will try to guess this from the ServletConfig.
 	 */
-	private File baseDir;
+	File baseDir;
 
 	public FileServlet() {
 		super();

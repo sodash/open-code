@@ -604,6 +604,10 @@ public class WebUtils2 extends WebUtils {
 			realPath = ctxt.getRealPath(""); // eg
 												///home/daniel/winterwell/code/creole/web
 		}
+		if (realPath==null) {
+			Log.w("web.init", "How is realPath null here? "+ctxt+" "+config);
+			realPath = new File(FileUtils.getWorkingDirectory(), "web").toString();
+		}
 		File webDir = new File(realPath);
 		if ( ! new File(webDir, "WEB-INF").exists() 
 				&& ! new File(webDir, "static").exists()

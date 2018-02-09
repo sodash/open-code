@@ -41,6 +41,7 @@ import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.FileUploadField;
 import com.winterwell.web.fields.MissingFieldException;
 import com.winterwell.web.fields.SField;
+import com.winterwell.web.test.TestHttpSession;
 
 /**
  * The state of this request. Has properties and some special fields.
@@ -291,6 +292,8 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	protected IProperties user;
 
+	private transient HttpSession tempSession;
+
 	public WebRequest(HttpServletRequest request, HttpServletResponse response) {
 		this(null, request, response);
 	}
@@ -386,7 +389,7 @@ public class WebRequest implements IProperties, Closeable {
 	public final void addMessage(AjaxMsg message) {
 		assert message!=null;
 		// Allow messages to travel across requests  within a session
-		HttpSession session = request.getSession();
+		HttpSession session = getSession();
 		List<AjaxMsg> msgs = WebUtils2.getAttribute(session, KEY_MESSAGES);
 		if (msgs == null) {
 			msgs = new ArrayList<AjaxMsg>(4);
@@ -396,6 +399,20 @@ public class WebRequest implements IProperties, Closeable {
 		// log all messages
 		Log.i("AjaxMsg", message.getText()+"\tid:"+message.getId()+"\tstate:"+this);
 	}		
+	
+	public HttpSession getSession() {
+		HttpSession s = request.getSession();
+		if (s!=null) {
+			if (tempSession!=null) {
+				Log.e("web", "Transient and proper session?! "+this);
+			}
+			return s;
+		}
+		// hack
+		Log.w("web", "Using a transient 'session' which will not persist across requests.");
+		tempSession = new TestHttpSession();
+		return tempSession;
+	}
 
 	/**
 	 * Close the request.input & response.output streams.
@@ -793,7 +810,7 @@ public class WebRequest implements IProperties, Closeable {
 	@SuppressWarnings("unchecked")
 	public <X> X getSessionAttribute(Key<X> key) {
 		if (NO_SESSIONS) return null;
-		HttpSession session = getRequest().getSession();
+		HttpSession session = getSession();
 		Object v = session.getAttribute(key.getName());
 		return (X) v;
 	}
@@ -905,14 +922,14 @@ public class WebRequest implements IProperties, Closeable {
 	 * @return often empty, never null
 	 */
 	public List<AjaxMsg> popMessages() {
-		HttpSession session = getRequest().getSession();
+		HttpSession session = getSession();
 		List<AjaxMsg> alerts = WebUtils2.getAttribute(session, KEY_MESSAGES);
 		WebUtils2.setAttribute(session, KEY_MESSAGES, null);
 		return alerts;
 	}
 
 	public boolean containsMessageWithId(String id) {
-		HttpSession session = getRequest().getSession();
+		HttpSession session = getSession();
 		List<AjaxMsg> alerts = WebUtils2.getAttribute(session, KEY_MESSAGES);
 		if (alerts == null) return false;
 		for (AjaxMsg alert :alerts){
@@ -1088,7 +1105,7 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	public <X> void setSessionAttribute(Key<X> key, X value) {
 		if (NO_SESSIONS) return;
-		HttpSession session = getRequest().getSession();
+		HttpSession session = getSession();
 		if (value == null) {
 			session.removeAttribute(key.getName());
 			return;

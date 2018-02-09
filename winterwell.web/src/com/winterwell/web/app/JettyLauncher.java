@@ -395,7 +395,7 @@ public class JettyLauncher {
 
         // Create the SessionHandler (wrapper) to handle the sessions        
         SessionHandler sessions = new SessionHandler();
-        Set<SessionTrackingMode> sessionTrackingModes = new ArraySet();
+        Set<SessionTrackingMode> sessionTrackingModes = new ArraySet(SessionTrackingMode.COOKIE);
 		sessions.setSessionTrackingModes(sessionTrackingModes);
         
         server.setHandler(sessions);      
