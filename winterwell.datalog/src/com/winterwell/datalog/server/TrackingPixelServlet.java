@@ -28,12 +28,13 @@ public class TrackingPixelServlet implements IServlet {
 
 
 	/**
+	 * TODO move into YouAgain Client
 	 * @param state
 	 * @return A nonce@trk XId. Can be null for do-not-track. Repeated calls will return the same uid. 
 	 */
 	public static String getCreateCookieTrackerId(WebRequest state) {
 		if (state==null) return null;
-		String uid = state.getCookie("trkid");		
+		String uid = state.getCookie("trkid");	
 		if (uid!=null) return uid;
 		boolean dnt = state.isDoNotTrack();
 		// TODO if this user has opted-in, we can ignore DNT 
