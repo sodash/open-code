@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -744,6 +745,27 @@ public class ReflectionUtils {
 				a -> annotationName.equals(a.getClass().getSimpleName())
 				);
 		return anno!=null;
+	}
+
+	public static Class loadClassFromFile(File classDir, File classFile) {
+		try {
+		    // Convert File to a URL
+		    URL url = classDir.toURL();          // file:/c:/myclasses/
+		    URL[] urls = new URL[]{url};
+
+		    // Create a new class loader with the directory
+		    ClassLoader cl = new URLClassLoader(urls);
+
+		    // Load in the class; MyClass.class should be located in
+		    // the directory file:/c:/myclasses/com/mycompany
+//		    "com.mycompany.MyClass";
+		    String rel = FileUtils.getRelativePath(classFile, classDir);
+		    rel = rel.substring(0, rel.length() - 6); // pop .class
+		    Class cls = cl.loadClass(rel.replace('/', '.'));
+		    return cls;
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		}
 	}
 
 }

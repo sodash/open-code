@@ -31,6 +31,10 @@ public class BuildWinterwellProject extends BuildTask {
 		return jarFile;
 	}
 	
+	public void setMainClass(Class mainClass) {
+		setMainClass(mainClass.getCanonicalName());
+	}
+	
 	public void setMainClass(String mainClass) {
 		this.mainClass = mainClass;
 	}
@@ -45,7 +49,7 @@ public class BuildWinterwellProject extends BuildTask {
 
 	private boolean compile;
 
-	private boolean scpToWW = true;
+	private boolean scpToWW;
 
 	protected String projectName;
 	

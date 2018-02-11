@@ -32,7 +32,6 @@ import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.web.email.SimpleMessage;
-import com.winterwell.youagain.client.BuildYouAgainJavaClient;
 
 import jobs.BuildBob;
 import jobs.BuildDataLog;
@@ -42,6 +41,7 @@ import jobs.BuildMaths;
 import jobs.BuildUtils;
 import jobs.BuildWeb;
 import jobs.BuildWinterwellProject;
+import jobs.BuildYouAgainJavaClient;
 
 
 /**

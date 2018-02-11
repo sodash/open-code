@@ -97,7 +97,7 @@ public class MavenDependencyTask extends BuildTask {
 	protected void doTask() throws Exception {
 		// files
 		if (outDir==null) {
-			outDir = new File(projectDir, "dependencies");
+			setOutputDirectory(new File(projectDir, "dependencies"));
 		}
 		if (dependencies.isEmpty()) {
 			if (pom==null) pom = FileUtils.or(new File(projectDir, "pom.bob.xml"), new File(projectDir, "pom.xml"));

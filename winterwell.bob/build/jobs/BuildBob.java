@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.utils.io.FileUtils;
@@ -19,6 +20,7 @@ public class BuildBob extends BuildWinterwellProject {
 		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.bob"));
 		incSrc = true;
 		jarFile = new File(projectDir, "bob.jar");
+		setMainClass(Bob.class);
 	}
 
 	@Override

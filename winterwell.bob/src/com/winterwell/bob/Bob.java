@@ -7,10 +7,18 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
+import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.FailureException;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Pair;
+import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.ArgsParser;
+import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.io.ConfigFactory;
+import com.winterwell.utils.io.ConfigFactoryTest;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
@@ -66,25 +74,50 @@ public class Bob {
 	public static final String LOGTAG = "bob";
 
 	/**
-	 * @throws ClassNotFoundException 
+	 * @throws Exception 
 	 */
-	private static Class getClass(String className) throws ClassNotFoundException {
+	private static Class getClass(String classOrFileName) throws Exception {
+		String className = classOrFileName;
 		// Strip endings if they were used
-		if (className.endsWith(".java")) {
-			className = className.substring(0, className.length()
-					- ".java".length());
+		if (classOrFileName.endsWith(".java")) {
+			className = classOrFileName.substring(0, classOrFileName.length() - 5);
 		}
-		if (className.endsWith(".class")) {
-			className = className.substring(0, className.length()
-					- ".class".length());
+		if (classOrFileName.endsWith(".class")) {
+			className = classOrFileName.substring(0, classOrFileName.length() - 6);
 		}
 		try {
 			Class<?> clazz = Class.forName(className);
 			return clazz;
 		} catch(ClassNotFoundException ex) {
-			// TODO can we compile it here and now??
+			Pair2<File, File> klass = compileClass(classOrFileName);
+			if (klass != null) {
+				// dynamically load a class from a file?
+				Class clazz = ReflectionUtils.loadClassFromFile(klass.first, klass.second);
+				return clazz;
+			}
 			throw ex;
 		}
+	}
+
+	private static Pair<File> compileClass(String classOrFileName) throws Exception {
+		// TODO can we compile it here and now?? But how would we load it?
+		String fileName = classOrFileName;
+		if ( ! classOrFileName.endsWith(".java")) fileName = classOrFileName+".java";
+		File f = new File(fileName);
+		// sniff package
+		String src = FileUtils.read(f);
+		String[] fnd = StrUtils.find("package (.+);", src);
+		String cn = fnd[1]+"."+new File(FileUtils.getBasename(f)).getName();
+		
+		File tempDir = FileUtils.createTempDir();
+		CompileTask cp = new CompileTask(null, tempDir);
+		cp.setSrcFiles(f);
+		cp.doTask();
+		File klass = new File(tempDir, cn.replace('.', '/')+".class");
+		if (klass.isFile()) {
+			return new Pair<File>(tempDir, klass);
+		}
+		throw new FailureException("Bootstrap compile failed for "+classOrFileName+" = "+f);
 	}
 
 	private static void classNotFoundMessage(Throwable e) {
@@ -127,8 +160,12 @@ public class Bob {
 	 */
 	public static void main(String[] args) {
 		Bob bob = getSingleton();
-		// // Load settings
-		ArgsParser.getConfig(bob.settings, args, null, null);
+		// Load settings
+//		ConfigFactory cf = ConfigFactory.get(); TODO
+		ConfigBuilder cb = new ConfigBuilder(bob.settings);
+		cb.setFromMain(args);
+		cb.get();
+		
 		try {
 			if (args.length == 0)
 				throw new IOException();
@@ -175,28 +212,13 @@ public class Bob {
 
 	private volatile boolean initFlag;
 
-//	Set<File> outputFiles = new HashSet<File>();
-
 	private BobSettings settings = new BobSettings();
 
-private LogFile logfile;
-
-//	PrintStream sharedErrorStream;
-//
-//	PrintStream sharedOutputStream;
-//
-//	private PrintStream sysErr;
-//
-//	private PrintStream sysOut;
+	private LogFile logfile;
 
 	private Bob() {
 	}
 
-	@Deprecated
-	public void addOutputFile(File file) {
-		// Add to shared output
-//		outputFiles.add(file);
-	}
 
 	public int adjustBobCount(int dn) {
 		return bobCount.addAndGet(dn);
@@ -247,17 +269,6 @@ private LogFile logfile;
 		// ?? how do we want to log stuff??
 		logfile = new LogFile(new File("bob.log"));
 		
-		// for dispose() to restore
-//		sysOut = System.out;
-//		sysErr = System.err;
-//		// set wrapped out and err
-//		sharedOutputStream = new IndentedStream(new SharedOutputStream(this,
-//				System.out));
-//		sharedErrorStream = new IndentedStream(new SharedOutputStream(this,
-//				System.err));
-//		System.setOut(sharedOutputStream);
-//		System.setErr(sharedErrorStream);
-
 		try {
 			settings.logDir.mkdirs();
 		} catch (Exception e) {
@@ -271,13 +282,6 @@ private LogFile logfile;
 		if ( ! Dep.has(TaskRunner.class)) {
 			Dep.set(TaskRunner.class, new TaskRunner(10)); // TODO config num threads
 		}
-	}
-
-	@Deprecated
-	public void removeOutputFile(File file) {
-//		sharedOutputStream.flush();
-//		sharedErrorStream.flush();
-//		outputFiles.remove(file);
 	}
 
 	/**
@@ -309,213 +313,3 @@ private LogFile logfile;
 	}
 
 }
-
-///**
-// * Add indents to the output messages.
-// * 
-// * @author daniel
-// * 
-// */
-//class IndentedStream extends PrintStream {
-//
-//	/**
-//	 * Avoid writing multiple indents due to multiple flushes.
-//	 */
-//	private boolean empty = true;
-//
-//	public IndentedStream(OutputStream out) {
-//		super(out);
-//	}
-//
-//	@Override
-//	public void flush() {
-//		super.flush();
-//		if (!empty) {
-//			String indent = Environment.get().get(Printer.INDENT);
-//			try {
-//				write(indent.getBytes());
-//			} catch (IOException e) {
-//				setError();
-//			}
-//			empty = true;
-//		}
-//	}
-//
-//	@Override
-//	public void write(byte[] b) throws IOException {
-//		super.write(b);
-//		if (b.length != 0)
-//			empty = false;
-//	}
-//
-//	@Override
-//	public void write(byte[] b, int off, int len) {
-//		super.write(b, off, len);
-//		if (len != 0)
-//			empty = false;
-//	}
-//
-//	@Override
-//	public void write(int b) {
-//		super.write(b);
-//		empty = false;
-//	}
-//
-//}
-
-///**
-// * Send output to normal output + files.
-// * 
-// * @author daniel
-// * 
-// */
-//class SharedOutputStream extends PrintStream {
-//	Bob bob;
-//	ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-//
-//	public SharedOutputStream(Bob bob, OutputStream out) {
-//		super(out, true);
-//		this.bob = bob;
-//	}
-//
-//	// StringBuilder buffer = new StringBuilder();
-//	@Override
-//	public void flush() {
-//		super.flush();
-//		byte[] b = buffer.toByteArray();
-//		int len = b.length; // buffer.getSize();
-//		buffer = new ByteArrayOutputStream();
-//		// Save to files
-//		for (File f : bob.outputFiles) {
-//			try {
-//				// open as append
-//				FileOutputStream fout = new FileOutputStream(f, true);
-//				fout.write(b, 0, len);
-//				fout.close();
-//			} catch (IOException e) {
-//				// Oh dear - don't print to System.out as that could create a
-//				// loop
-//				PrintStream dump = new PrintStream(out);
-//				e.printStackTrace(dump);
-//				dump.flush();
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public void write(byte[] b) throws IOException {
-//		super.write(b);
-//		if (bob.getSettings().loggingOff)
-//			return;
-//		buffer.write(b);
-//	}
-//
-//	@Override
-//	public void write(byte[] buf, int off, int len) {
-//		super.write(buf, off, len);
-//		if (bob.getSettings().loggingOff)
-//			return;
-//		buffer.write(buf, off, len);
-//	}
-//
-//	@Override
-//	public void write(int c) {
-//		super.write(c);
-//		if (bob.getSettings().loggingOff)
-//			return;
-//		buffer.write(c);
-//	}
-//
-//}
-
-///**
-// * TODO
-// * 
-// * @author daniel
-// * 
-// */
-//class SpecialClassLoader extends ClassLoader {
-//	// TODO public Class loadClass(String name) {
-//	// Class<?> clazz = null;
-//	// // Full name
-//	// try {
-//	// clazz = Class.forName(name);
-//	// return clazz;
-//	// } catch (ClassNotFoundException ex) {
-//	// // oh well
-//	// }
-//	// // Short name
-//	// int i = name.lastIndexOf('.');
-//	// String shortName = name;
-//	// if (i!=-1) {
-//	// shortName = name.substring(i+1);
-//	// try {
-//	// clazz = Class.forName(shortName);
-//	// return clazz;
-//	// } catch (ClassNotFoundException ex) {
-//	// // oh well
-//	// }
-//	// }
-//	// // Local Java file?
-//	// File jf = new File(shortName+".java");
-//	// clazz = compileAndLoadClass(jf);
-//	// if (clazz != null) return clazz;
-//	//
-//	// return null;
-//	// }
-//
-//	// /**
-//	// *
-//	// * @param javaFile
-//	// * @return Class object created from javaFile, or null
-//	// * Note: As a special case, attempting to create {@link CompileTask}Config
-//	// always returns null.
-//	// */
-//	// private Class<?> compileAndLoadClass(File javaFile) {
-//	// if ( ! javaFile.exists()) return null;
-//	// // Special case: prevent loops
-//	// if (javaFile.getName().endsWith(CompileTask.class.getSimpleName()+
-//	// "Config.java")) {
-//	// return null;
-//	// }
-//	// // Temp output dir
-//	// File tempOut;
-//	// try {
-//	// tempOut = File.createTempFile("bob", "dir");
-//	// } catch (IOException e) {
-//	// throw new WrappedException(e);
-//	// }
-//	// FileUtils.delete(tempOut);
-//	// boolean ok = tempOut.mkdirs();
-//	// if ( ! ok) throw new WrappedException("Could not create "+tempOut);
-//	// // Compile
-//	// CompileTask comp = new CompileTask(Arrays.asList(javaFile), tempOut);
-//	// comp.run();
-//	// ClassLoader loader = new SpecialClassLoader(tempOut);
-//	// String cName = javaFile.getName().substring(0,
-//	// javaFile.getName().length()-5);
-//	// try {
-//	// Class<?> clazz = loader.loadClass(cName);
-//	// return clazz;
-//	// } catch (ClassNotFoundException e) {
-//	// return null;
-//	// }
-//	// }
-//
-//	private final File binDir;
-//
-//	public SpecialClassLoader(File tempOut) {
-//		binDir = tempOut;
-//	}
-//
-//	@Override
-//	protected URL findResource(String name) {
-//		File f = new File(binDir, name);
-//		try {
-//			return f.toURI().toURL();
-//		} catch (MalformedURLException e) {
-//			return null;
-//		}
-//	}
-//
-//}

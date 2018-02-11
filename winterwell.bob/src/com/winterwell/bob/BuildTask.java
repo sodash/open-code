@@ -79,12 +79,11 @@ public abstract class BuildTask implements Closeable, IHasDesc {
 		if (this.desc!=null) return desc;
 		desc = new Desc("BuildTask", getClass());
 		desc.setTag("bob");
-		desc.setVersionStamp(this);
-		
-		// FIXME debug
-		if (this instanceof BuildUtils) {
-			String vrsn = XStreamUtils.serialiseToXml(this);
-			Log.i(LOGTAG, "Desc vstamp: "+vrsn+" for: "+desc);			
+		try {
+			desc.setVersionStamp(this);
+		} catch(Throwable ex) {
+			Log.w(LOGTAG, "Reflection based versioning failed: "+ex+". Using unique versioning.");
+			desc.put("vuniq", Utils.getRandom().nextDouble());
 		}
 		
 		return desc;
@@ -262,7 +261,6 @@ public abstract class BuildTask implements Closeable, IHasDesc {
 		// fix desc if it wasn't before
 		getDesc().getId();
 		// Add an output and error listener
-		if (verbosity!=Level.OFF) bob.addOutputFile(bob.getLogFile(this));
 		report("Running " + toString() + " at "
 				+ TimeUtils.getTimeStamp() + "...", Level.FINE);
 		bob.adjustBobCount(1);
@@ -292,11 +290,6 @@ public abstract class BuildTask implements Closeable, IHasDesc {
 			if (timeOut!=null) timeOut.cancel();
 			// Adjust count
 			int bc = bob.adjustBobCount(-1);
-			// remove indent
-			if (verbosity!=Level.OFF) {
-				bob.removeOutputFile(bob.getLogFile(this)); // FIXME what if we have			
-				// a nested call?
-			}
 			Printer.removeIndent("   ");
 			// clean up
 			try {

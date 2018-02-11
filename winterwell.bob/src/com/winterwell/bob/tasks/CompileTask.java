@@ -3,6 +3,7 @@ package com.winterwell.bob.tasks;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,6 +44,7 @@ public class CompileTask extends BuildTask {
 	private final File srcDir;
 	
 	private List<String> classpath;
+	private List<File> srcFiles;
 
 	/**
 	 * Compile Java code.
@@ -201,6 +203,9 @@ public class CompileTask extends BuildTask {
 	}
 
 	private ArrayList<File> getFiles() {
+		if (srcFiles != null) {
+			return new ArrayList(srcFiles);
+		}
 		List<File> files = FileUtils.find(srcDir, ".*\\.java");
 		ArrayList<File> jFiles = new ArrayList<File>(files.size());
 		// Remove dirs from files 'cos the compiler gets upset
@@ -270,6 +275,10 @@ public class CompileTask extends BuildTask {
 
 	public List<String> getClasspath() {
 		return classpath;
+	}
+
+	public void setSrcFiles(File... files) {
+		this.srcFiles = Arrays.asList(files);
 	}
 
 }
