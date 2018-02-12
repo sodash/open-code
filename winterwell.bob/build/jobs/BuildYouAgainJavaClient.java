@@ -12,7 +12,7 @@ public class BuildYouAgainJavaClient extends BuildWinterwellProject {
 	public BuildYouAgainJavaClient() {
 		super(new File(FileUtils.getWinterwellDir(), "open-code/youagain-java-client"));
 		setIncSrc(true);
-		setVersion("0.2.1");
+		setVersion("0.2.2");
 	}
 
 	@Override
