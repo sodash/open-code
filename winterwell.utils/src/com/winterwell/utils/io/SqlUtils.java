@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1021,7 +1022,7 @@ public class SqlUtils {
 	public static Object upsert(Connection em, String table,
 			String[] idColumns, Map<String, ?> col2val, boolean specialCaseId) 
 	{
-		return upsert(em, table, idColumns, col2val, specialCaseId, false);
+		return upsert(em, table, idColumns, col2val, specialCaseId, false, null);
 	}
 		
 
@@ -1041,11 +1042,13 @@ public class SqlUtils {
 	 *            change is made on update. This is a hack 'cos row ids don't
 	 *            travel across servers.
 	 * @param leaveMissingAlone If true, then update will only affect those columns which are specified in col2val
-	 * (by default a missing column sets the database value to null).           
-	 * @return An upsert query, with it's parameters set.
+	 * (by default a missing column sets the database value to null).  
+	 * @param insertOnlyCol2val Allow for initial defaults to be set on insert. Can be null.
+	 * @return output from {@link #executeUpdate(String, Connection)}
 	 */
-	public static Object upsert(Connection em, String table,
-			String[] idColumns, Map<String, ?> col2val, boolean specialCaseId, boolean leaveMissingAlone) 
+	public static int upsert(Connection em, String table,
+			String[] idColumns, Map<String, ?> col2val, boolean specialCaseId, 
+			boolean leaveMissingAlone, Map<String, ?> insertOnlyCol2val) 
 	{	
 		List<Pair<String>> columnInfo = upsert2_columnInfo(em, table,
 				idColumns, col2val, specialCaseId);
@@ -1059,14 +1062,20 @@ public class SqlUtils {
 				whereClause, upsert, leaveMissingAlone);
 
 		// 2. insert where not exists
-		SqlUtils.upsert2_insert(table, col2val, specialCaseId, columnInfo,
+		// Allow for initial defaults to be set on insert
+		Map<String, Object> insertCol2val = (Map) col2val;
+		if (insertOnlyCol2val != null) {
+			insertCol2val = new HashMap(insertOnlyCol2val);
+			insertCol2val.putAll(col2val);
+		}
+		SqlUtils.upsert2_insert(table, insertCol2val, specialCaseId, columnInfo,
 				whereClause, upsert);
 
 		// HACK sub vars TODO refactor to not use vars 
 		// This code here is not 100% safe! 
 		String sql = upsert.toString();
-		for(String k : col2val.keySet()) {
-			Object v = col2val.get(k);
+		for(String k : insertCol2val.keySet()) {
+			Object v = insertCol2val.get(k);
 			String vs = sqlEncode(v);
 			sql = sql.replaceAll(":\\b"+k+"\\b", vs);
 		}
