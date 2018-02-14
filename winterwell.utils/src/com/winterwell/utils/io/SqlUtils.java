@@ -251,8 +251,10 @@ public class SqlUtils {
 			}
 			stmnt = con.createStatement();
 			int rs = stmnt.executeUpdate(sql);
-			if (!con.getAutoCommit())
+			if ( ! con.getAutoCommit()) {
 				con.commit();
+			}
+			Log.i("sql", sql);
 			return rs;
 		} catch (Exception e) {
 			Log.report("db", Utils.getRootCause(e), Level.WARNING);
