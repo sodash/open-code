@@ -544,8 +544,15 @@ public class AppUtils {
 	}
 
 
+	/**
+	 * 
+	 * @param sq never null
+	 * @param start
+	 * @param end
+	 * @return
+	 */
 	public static BoolQueryBuilder makeESFilterFromSearchQuery(SearchQuery sq, Time start, Time end) {
-
+		assert sq != null;
 		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
 				.from(start.toISOString()) //, true) ES versioning pain
 				.to(end.toISOString()); //, true);
