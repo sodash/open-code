@@ -56,6 +56,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		remote.logEndpoint = server;
 		dlrs.init(remote);
 		Object ok = dlrs.saveEvent(event.dataspace, event, new Period(event.time));
+		Log.d("datalog.remote", "Save to "+server+" "+event);
 		return true;
 	}
 	
