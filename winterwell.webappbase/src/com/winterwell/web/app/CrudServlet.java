@@ -238,14 +238,14 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected final Class<T> type;
 	protected JThing<T> jthing;
 
-	final IESRouter esRouter;
+	protected final IESRouter esRouter;
 	
 	/**
 	 * The focal thing's ID.
 	 * This might be newly minted for a new thing
 	 */
 	private String _id;
-	private String dataspace = null;
+	protected String dataspace = null;
 
 	protected JThing<T> doPublish(WebRequest state) {
 		String id = getId(state);
