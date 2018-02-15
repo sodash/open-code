@@ -7,7 +7,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.web"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.bob"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/jose4j.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jose4j.jar" sourcepath="dependencies/jose4j-sources.jar"/>
 	<classpathentry kind="lib" path="dependencies/slf4j-api.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

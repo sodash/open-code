@@ -171,7 +171,7 @@ public final class XId implements Serializable, IHasJson {
 	}
 	
 	private boolean notNullNameCheck() {
-		if (name.length()==0) return false;
+		if (name==null || name.length()==0) return false;
 		if (name.equals("null") && ! "twitter".equals(service)) return false;
 		return true;
 	}

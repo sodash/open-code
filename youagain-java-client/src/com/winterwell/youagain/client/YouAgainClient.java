@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import javax.mail.internet.InternetAddress;
 
 import org.eclipse.jetty.util.ajax.JSON;
+import org.jose4j.jwa.AlgorithmFactoryFactory;
 import org.jose4j.jwt.JwtClaims;
 import org.junit.runner.notification.RunListener.ThreadSafe;
 
@@ -119,7 +120,7 @@ public final class YouAgainClient {
 	 * 
 	 * @param jwt
 	 * @param state Can be null. For sending messages back
-	 * @return
+	 * @return verified auth tokens
 	 */
 	List<AuthToken> verify(List<String> jwt, WebRequest state) {
 		Log.d(LOGTAG, "verify: "+jwt);
@@ -135,7 +136,7 @@ public final class YouAgainClient {
 				list.add(token);
 			} catch (Throwable e) {
 				Log.w(LOGTAG, e);
-				// pass back to the user
+				// pass back to the user but keep on trucking
 				if (state!=null) {
 					state.addMessage(new AjaxMsg(KNoteType.warning, "JWT token error", e.toString()));
 				}

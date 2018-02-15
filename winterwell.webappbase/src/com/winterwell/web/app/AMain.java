@@ -3,6 +3,7 @@ package com.winterwell.web.app;
 import java.io.File;
 import java.util.function.Supplier;
 
+import com.winterwell.datalog.DataLog;
 import com.winterwell.es.XIdTypeAdapter;
 import com.winterwell.gson.Gson;
 import com.winterwell.gson.GsonBuilder;
@@ -103,6 +104,8 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	protected void init2(ConfigType config) {
 		if (initFlag) return;
 		initFlag = true;		
+		// init DataLog
+		DataLog.getImplementation();
 		try {
 			init3_emailer();			
 		} catch(Throwable ex) {
