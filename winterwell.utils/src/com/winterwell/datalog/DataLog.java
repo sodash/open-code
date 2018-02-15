@@ -139,7 +139,7 @@ public class DataLog {
 		try {
 			init();
 			return dflt;
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			// Bad!
 			Log.e(LOGTAG, e);
 			// Let stuff continue without exceptions elsewhere

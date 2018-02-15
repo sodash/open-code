@@ -19,6 +19,7 @@ import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.XStreamUtils;
@@ -98,14 +99,15 @@ public class ESStore implements IStore {
 	@Override
 	public <X> void put(Desc<X> desc, X artifact) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		String index = "depot_"+Utils.or(desc.getTag(), "untagged");
+		String tag = Utils.or(desc.getTag(), "untagged");
+		String index = "depot_"+tag;
 		String type = "artifact";
 //		FlexiGson gson = Dep.get(FlexiGson.class);
 //		String json = gson.toJson(artifact);		
 		IndexRequestBuilder put = esc.prepareIndex(index, type, desc.getId());;
 		put.setBodyDoc(new ESStoreWrapper(artifact));
 		IESResponse resp = put.get().check();	
-		indexCache.put(index, desc.getTag());
+		indexCache.put(index, tag);
 	}
 	
 	
@@ -117,6 +119,7 @@ public class ESStore implements IStore {
 		String indexList = StrUtils.join(indexCache.asMap().keySet(), ",");
 		// recent indices
 		// TODO call /indexList/_refresh
+		throw new TodoException();
 	}
 
 	@Override

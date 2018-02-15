@@ -30,7 +30,7 @@ public class DataLogEventTest {
 		DataLogEvent de = ess.event4distro("testDistro", mv);
 		Map<String, ?> json = de.toJson2();
 		// check it has the extra distro info in it
-		assert json.containsKey("xtra");
+		assert json.containsKey("xtra") : json;
 		String xtra = (String) json.get("xtra");
 		assert xtra.contains("mean");
 		System.out.println(json);

@@ -21,7 +21,7 @@ class DummyDataLog implements IDataLog {
 	int warnings = 0;
 	private final String err;
 
-	public DummyDataLog(Exception e) {
+	public DummyDataLog(Throwable e) {
 		err = "" + e;
 	}
 
