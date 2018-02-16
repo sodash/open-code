@@ -19,7 +19,7 @@ import com.winterwell.web.WebEx;
  * @author daniel
  *
  */
-public final class HttpServletWrapper extends HttpServlet {
+public class HttpServletWrapper extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	Supplier<IServlet> factory;
