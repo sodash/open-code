@@ -191,6 +191,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			}
 			return null;
 		}
+		// TODO should set jthing?? for consistency with getThing()??
 		return new JThing().setType(type).setJava(obj);
 	}
 
