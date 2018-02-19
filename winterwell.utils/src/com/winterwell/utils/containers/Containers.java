@@ -305,7 +305,6 @@ public final class Containers  {
 		return after;
 	}
 
-
 	/**
 	 * Lazily produces a new Iterable of values by mapping each value in through
 	 * a transformation function.
