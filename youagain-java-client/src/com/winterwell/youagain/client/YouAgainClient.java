@@ -122,7 +122,7 @@ public final class YouAgainClient {
 	 * @param state Can be null. For sending messages back
 	 * @return verified auth tokens
 	 */
-	List<AuthToken> verify(List<String> jwt, WebRequest state) {
+	public List<AuthToken> verify(List<String> jwt, WebRequest state) {
 		Log.d(LOGTAG, "verify: "+jwt);
 		List<AuthToken> list = new ArrayList();
 		if (jwt.isEmpty()) return list;
