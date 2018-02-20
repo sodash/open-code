@@ -553,12 +553,15 @@ public class AppUtils {
 	 */
 	public static BoolQueryBuilder makeESFilterFromSearchQuery(SearchQuery sq, Time start, Time end) {
 		assert sq != null;
-		RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time")
-				.from(start.toISOString()) //, true) ES versioning pain
-				.to(end.toISOString()); //, true);
 		
-		BoolQueryBuilder filter = QueryBuilders.boolQuery()		
-				.must(timeFilter);		
+		BoolQueryBuilder filter = QueryBuilders.boolQuery();
+		
+		if (start != null || end != null) {
+			RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time");
+			if (start!=null) timeFilter = timeFilter.from(start.toISOString()); //, true) ES versioning pain
+			if (end!=null) timeFilter = timeFilter.to(end.toISOString()); //, true);
+			filter = filter.must(timeFilter);
+		}
 		
 		// filters TODO a true recursive SearchQuery -> ES query mapping
 		// TODO this is just a crude 1-level thing
