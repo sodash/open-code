@@ -16,5 +16,36 @@ public class SearchQueryTest {
 		String host = sq.getProp("host");
 		assert host.equals("localpub.com") : sq;
 	}
+	
+
+	@Test
+	public void testWordsKeyVal() {
+		SearchQuery sq = new SearchQuery("hello world host:localpub.com");
+		List pt = sq.getParseTree();
+		System.out.println(pt);
+		String host = sq.getProp("host");
+		assert host.equals("localpub.com") : sq;
+	}
+	
+	@Test
+	public void testBadSyntax() {
+		try {
+			SearchQuery sq = new SearchQuery("hello OR");
+			List pt = sq.getParseTree();
+			assert false;
+		} catch(Exception ex) {
+			// ok
+		}
+	}
+
+	
+	@Test
+	public void testKeyValKeyVal() {
+		SearchQuery sq = new SearchQuery("vert:cadburys host:localpub.com");
+		List pt = sq.getParseTree();
+		System.out.println(pt);
+		String host = sq.getProp("host");
+		assert host.equals("localpub.com") : sq;
+	}
 
 }

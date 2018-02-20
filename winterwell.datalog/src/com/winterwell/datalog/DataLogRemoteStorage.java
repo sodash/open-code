@@ -173,6 +173,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		vars.put("p", p);				
 		// TODO String r = referer		
 		String res = fb.getPage(logEndpoint, vars);
+		Log.d("datalog.remote", "called "+fb.getLocation()+" return: "+res);
 		return res;
 	}
 

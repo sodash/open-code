@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import com.winterwell.utils.Mutable;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.SimpleJson;
@@ -38,8 +39,17 @@ public class SearchQuery implements Serializable, IHasJson {
 			IllegalArgumentException {
 		private static final long serialVersionUID = 1L;
 
+		/**
+		 * 
+		 * @param msg NB: sometimes repeats a (fragment of) raw
+		 * @param raw Always provide the full raw string, as the error may have been earlier
+		 */
 		public SearchFormatException(String msg, String raw) {
 			super(msg + " in " + raw);
+		}
+		
+		public SearchFormatException(String raw, Throwable cause) {
+			super("raw: "+raw, cause);
 		}
 	}
 
@@ -421,16 +431,24 @@ public class SearchQuery implements Serializable, IHasJson {
 		output.add(KEYWORD_AND);
 		ArrayList<List> stack = new ArrayList();
 		stack.add(output);
-		parse2(searchTerm, 0, stack, output);
-		// drop the leading AND if it's not needed
-		if (output.size() == 2 && output.get(0) == KEYWORD_AND
-			&& output.get(1) instanceof List) {
-			return (List) output.get(1);
+		// Parse!
+		try {
+			parse2(searchTerm, 0, stack, output);
+			// drop the leading AND if it's not needed
+			if (output.size() == 2 && output.get(0) == KEYWORD_AND
+				&& output.get(1) instanceof List) {
+				return (List) output.get(1);
+			}
+			// convert key:value
+			parse2_keyvalue(output);
+			this.parseTree = output;
+			return output;
+		} catch(SearchFormatException ex) {
+			throw ex;
+		} catch(Throwable ex) {
+			// for debug: add in the causing string 
+			throw new SearchFormatException(raw, ex);
 		}
-		// convert key:value
-		parse2_keyvalue(output);
-		this.parseTree = output;
-		return output;
 	}
 	
 	static Pattern kv = Pattern.compile("([a-z]+):(.+)");
@@ -445,8 +463,11 @@ public class SearchQuery implements Serializable, IHasJson {
 			// k:v?
 			String sbit = (String) bit;
 			Matcher m = kv.matcher(sbit);
-			// avoid breaking up urls
-			if (m.matches() && ! m.group(1).startsWith("http") && ! m.group(2).startsWith("//")) {
+			if (m.matches()) {
+				// avoid breaking up urls, which will also match k:v
+				if (m.group(1).startsWith("http") || m.group(2).startsWith("//")) {
+					continue;
+				}
 				output.set(i, Arrays.asList(m.group(1), m.group(2)));
 			}
 		}
@@ -485,7 +506,7 @@ public class SearchQuery implements Serializable, IHasJson {
 				if (strict && stack.size() == 1) { 
 					throw new SearchFormatException(
 						"Bad Syntax: improper \")\" nesting at index:"
-								+ (i.value - 1), searchTerm); 
+								+ (i.value - 1)+" in "+searchTerm, raw); 
 				}
 				// or be generous around bad syntax
 				open = parse4_close(stack);
@@ -600,7 +621,7 @@ public class SearchQuery implements Serializable, IHasJson {
 		}
 		if (strict) {
 			if (quoted) { 
-				throw new SearchFormatException("Bad syntax, incorrect quoting nesting", searchTerm); 
+				throw new SearchFormatException("Bad syntax, incorrect quoting nesting "+searchTerm, raw); 
 			}
 		}
 		return word.toString();
