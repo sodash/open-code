@@ -2,7 +2,9 @@ package com.winterwell.gson;
 
 import java.lang.reflect.Type;
 
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.time.TimeUtils;
 import com.winterwell.utils.web.IHasJson;
 
 /**
@@ -28,6 +30,8 @@ public class StandardAdapters {
  * Warning: This loses the type info! 
  * It looks cleaner, but the inverse only works if the field is of type Time (and it is is slightly slower). 
  * Use-case: good for Elastic-Search
+ * Experimental: This can handle flexible time inputs, like "tomorrow". 
+ * But ISO format yyyy-mm-dd is strongly recommended!
  * @author daniel
  */
 public static class TimeTypeAdapter implements JsonSerializer<Time>, JsonDeserializer<Time> {
@@ -48,7 +52,11 @@ public static class TimeTypeAdapter implements JsonSerializer<Time>, JsonDeseria
 			return new Time(utv);
 		}
 		String s = json.getAsString();
-		return new Time(s);
+		if (Utils.isBlank(s)) {
+			return null;
+		}
+		Time t = TimeUtils.parseExperimental(s);
+		return t;
 	}
 }
 
