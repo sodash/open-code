@@ -459,8 +459,10 @@ public class AppUtils {
 			for(Class k : dbclasses) {
 				ESPath path = esRouter.getPath(null, k, null, status);
 				try {
+					// Normal setup
 					String index = path.index();
 					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
+					
 				} catch(ESException ex) {
 					// map the base index (so we can do a reindex with the right mapping)
 					String index = path.index()
