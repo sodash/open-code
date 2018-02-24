@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebInputException;
 
@@ -139,6 +140,10 @@ public class Checkbox extends AField<Boolean> {
 		} catch (Exception ex) {
 			// a bogus url, e.g. /foo?site=%%SITIE%% can break the above :(
 			String qs = req.getQueryString();
+			if (qs==null) {
+				// no ?query string in the url
+				return false;
+			}
 			String p = WebUtils2.getQueryParameter(qs, getName());
 			return p != null;
 		}

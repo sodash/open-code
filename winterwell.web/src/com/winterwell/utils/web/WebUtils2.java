@@ -515,6 +515,7 @@ public class WebUtils2 extends WebUtils {
 	 * ??How to send "please delete this setting" vs null??
 	 */
 	public static String getQueryParameter(String url, String param) {
+		assert url != null : "null url for get param "+param;
 		assert WebUtils.urlEncode(param).equals(param) : param;
 		Pattern keyVal = Pattern.compile("([&?]|^)" + param + "=(.*?)(&|$)");
 		Matcher m = keyVal.matcher(url);
