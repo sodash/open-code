@@ -203,6 +203,7 @@ public class SQLStorage implements IDataLogStorage {
 	 * old one if exists.
 	 */
 	private void saveHistory2(Map<Pair2<String, Time>, Double> tag2time2count, boolean setOrAdd) {
+		if (tag2time2count.isEmpty()) return;
 		initStatDB();
 		if ( ! initFlag) {
 			// Can't save!
