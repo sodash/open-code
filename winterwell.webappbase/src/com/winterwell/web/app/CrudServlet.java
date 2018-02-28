@@ -34,6 +34,7 @@ import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
@@ -120,7 +121,10 @@ public abstract class CrudServlet<T> implements IServlet {
 			return;
 		}
 		// logged in?					
-		if (Utils.isEmpty(tokens)) throw new NoAuthException(state);
+		if (Utils.isEmpty(tokens)) {
+			Log.w("crud", "No auth tokens for "+this+" "+state);
+			throw new NoAuthException(state);
+		}
 	}
 
 
