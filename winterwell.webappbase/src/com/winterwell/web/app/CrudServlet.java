@@ -25,6 +25,8 @@ import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
+import com.winterwell.es.client.query.ESQueryBuilder;
+import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
@@ -300,23 +302,24 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		// query
 		String q = state.get("q");
-		QueryBuilder qb = null;
+		ESQueryBuilder qb = null;
 		if ( q != null) {
 			// TODO match on all?
 			QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
 //			multimatchquery, 
 //					"id", "name", "keywords")
 //							.operator(Operator.AND);
-			qb = qsq;
+			qb = ESQueryBuilder.make(qsq);
 		}
-		QueryBuilder exq = doList2_query(state);
-		if (exq!=null) {
-			if (qb==null) {
-				qb = exq;
-			} else {
-				qb = QueryBuilders.boolQuery().must(exq).must(qb);
-			}
-		}
+		ESQueryBuilder exq = doList2_query(state);
+		qb = ESQueryBuilders.must(qb, exq);
+//		if (exq!=null) {
+//			if (qb==null) {
+//				qb = exq;
+//			} else {
+//				qb = QueryBuilders.boolQuery().must(exq).must(qb);
+//			}
+//		}
 		if (qb!=null) s.setQuery(qb);
 		
 		// TODO paging!
@@ -467,7 +470,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param state
 	 * @return null or a query
 	 */
-	protected QueryBuilder doList2_query(WebRequest state) {
+	protected ESQueryBuilder doList2_query(WebRequest state) {
 		return null;
 	}
 
