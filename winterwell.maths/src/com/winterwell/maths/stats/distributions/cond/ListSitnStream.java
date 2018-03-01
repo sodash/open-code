@@ -21,9 +21,9 @@ public class ListSitnStream<X> implements ISitnStream<X> {
 
 	public ListSitnStream(List<Sitn<X>> list) {
 		this(list,
-			// just take the first sig?!
-			list.get(0).context.sig
-			);
+			// just take the first sig, if one exists?!
+			list.size() > 0 ? list.get(0).context.sig : new String[]{}
+		);
 	}
 
 	public ListSitnStream(List<Sitn<X>> list, String[] sig) {

@@ -28,4 +28,15 @@ public class ListSitnStreamTest {
 		assert s.equals("DearAlice") : s;
 	}
 
+	@Test
+	public void testEmptyList() {
+		ListSitnStream<String> lss = new ListSitnStream<>(Arrays.asList());
+		String s = "";
+		for (Sitn<String> sitn : lss) {
+			s += sitn.outcome;
+		}
+
+		assertEquals(s, "");
+	}
+
 }
