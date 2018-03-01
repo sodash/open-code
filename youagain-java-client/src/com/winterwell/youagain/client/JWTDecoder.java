@@ -30,6 +30,7 @@ public class JWTDecoder {
 	
 
 	public JwtClaims decryptJWT(String jwt) throws InvalidJwtException {
+		assert ! jwt.endsWith("temp") : jwt;
 	    // Use JwtConsumerBuilder to construct an appropriate JwtConsumer, which will
 	    // be used to validate and process the JWT.
 	    // The specific validation requirements for a JWT are context dependent, however,

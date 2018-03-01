@@ -75,7 +75,8 @@ public final class YouAgainClient {
 	 * This will also call state.setUser(). 
 	 * Caches the return so repeated calls are fast.
 	 * @param state
-	 * @return null if not logged in at all, otherwise list of AuthTokens
+	 * @return null if not logged in at all, otherwise list of AuthTokens.
+	 * WARNING: This can include anonymous temporary "nonce@temp" tokens!
 	 */
 	public List<AuthToken> getAuthTokens(WebRequest state) {
 		List<AuthToken> tokens = state.get(AUTHS);
@@ -120,7 +121,7 @@ public final class YouAgainClient {
 	 * 
 	 * @param jwt
 	 * @param state Can be null. For sending messages back
-	 * @return verified auth tokens
+	 * @return verified auth tokens and unverified nonce@temp tokens
 	 */
 	public List<AuthToken> verify(List<String> jwt, WebRequest state) {
 		Log.d(LOGTAG, "verify: "+jwt);
@@ -129,6 +130,13 @@ public final class YouAgainClient {
 		for (String jt : jwt) {
 			try {
 				AuthToken token = new AuthToken(jt);
+				// HACK include temp tokens!
+				if (isTempId(jt)) {
+					token.xid = new XId(jt, false);
+					list.add(token);
+					continue;
+				}
+				// TODO a better appraoch would be for the browser to make a proper JWT for @temp
 				// decode the token
 				JWTDecoder dec = getDecoder(); //"local".equals(state.get("login")));
 				JwtClaims decd = dec.decryptJWT(jt);
@@ -144,6 +152,11 @@ public final class YouAgainClient {
 		}
 		return list;		
 	}
+
+	private boolean isTempId(String jt) {
+		return jt!=null && jt.endsWith("@temp");
+	}
+
 
 	static JWTDecoder dec = new JWTDecoder();
 	
