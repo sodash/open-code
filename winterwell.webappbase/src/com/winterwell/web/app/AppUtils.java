@@ -13,6 +13,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 
+import com.winterwell.data.AThing;
 import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
@@ -205,6 +206,16 @@ public class AppUtils {
 		return doPublish(draft, draftPath, publishPath, false, false);
 	}
 	
+	public static JThing doPublish(AThing item, boolean forceRefresh, boolean deleteDraft) {
+		IESRouter esr = Dep.get(IESRouter.class);
+		Class type = item.getClass();
+		String id = item.getId();
+		ESPath draftPath = esr.getPath(type, id, KStatus.DRAFT);
+		ESPath publishPath = esr.getPath(type, id, KStatus.PUBLISHED);
+		JThing draft = new JThing(item);
+		return doPublish(draft, draftPath, publishPath, forceRefresh, deleteDraft);
+	}
+	
 	/**
 	 * 
 	 * @param draft
@@ -261,29 +272,15 @@ public class AppUtils {
 	}
 
 	public static JThing doSaveEdit(ESPath path, JThing item, WebRequest state) {
-		assert path.index().toLowerCase().contains("draft") : path;
-		
-		// TODO check security with YouAgain!
-		
-		// debug FIXME		
-		String json = item.string();
-		Object start = SimpleJson.get(item.map(), "projects", 0, "start");
-		Object startraw = SimpleJson.get(item.map(), "projects", 0, "start_raw");
-
-		
+		assert path.index().toLowerCase().contains("draft") : path;		
+		// TODO check security with YouAgain!		
 		// update status TODO factor out the status logic
 		Object s = item.map().get("status");
 		if (Utils.streq(s, KStatus.PUBLISHED)) {
 			item.put("status", KStatus.MODIFIED);
 		} else {
 			item.put("status", KStatus.DRAFT);
-		}
-		
-		// debug FIXME		
-		String json2 = item.string();
-		Object start2 = SimpleJson.get(item.map(), "projects", 0, "start");
-		Object startraw2 = SimpleJson.get(item.map(), "projects", 0, "start_raw");
-		
+		}		
 		// talk to ES
 		return doSaveEdit2(path, item, state);
 	}
