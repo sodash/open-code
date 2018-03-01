@@ -32,6 +32,7 @@ import com.winterwell.es.client.ReindexRequest;
 import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.es.fail.ESException;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
@@ -201,10 +202,19 @@ public class AppUtils {
 	
 
 	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath) {
-		return doPublish(draft, draftPath, publishPath, false);
+		return doPublish(draft, draftPath, publishPath, false, false);
 	}
 	
-	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath, boolean forceRefresh) {
+	/**
+	 * 
+	 * @param draft
+	 * @param draftPath
+	 * @param publishPath
+	 * @param forceRefresh
+	 * @param deleteDraft Normally we leave the draft, for future editing. But if the object is not editable once published - delete the draft.
+	 * @return
+	 */
+	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath, boolean forceRefresh, boolean deleteDraft) {
 		// prefer being given the draft to avoid ES race conditions
 		if (draft==null) {
 			Map<String, Object> draftMap = get(draftPath, null);
@@ -228,23 +238,23 @@ public class AppUtils {
 		
 		// Also update draft		
 		if ( ! draftPath.equals(publishPath)) {
-			UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
-			upd.setDoc(draft.map());
-			upd.setDocAsUpsert(true);
-			if (forceRefresh) upd.setRefresh("true");
-			IESResponse respd = upd.get().check();
+			if (deleteDraft) {
+				doDelete(draftPath);
+			} else {
+				UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
+				upd.setDoc(draft.map());
+				upd.setDocAsUpsert(true);
+				if (forceRefresh) upd.setRefresh("true");
+				IESResponse respd = upd.get().check();
+			}
 		}
-		
-		// Keep the draft!
-//		// OK - delete the draft (ignoring the race condition!)
-//		DeleteRequestBuilder del = client.prepareDelete(draftPath.index(), draftPath.type, draftPath.id);
-//		IESResponse ok = del.get().check();		
 
 		return draft;
 	}
 	
 	
-	public static  void doDelete(ESPath path) {		
+	public static  void doDelete(ESPath path) {
+		Log.d("delete", path+" possible-state:"+WebRequest.getCurrent());
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		DeleteRequestBuilder del = client.prepareDelete(path.index(), path.type, path.id);
 		IESResponse ok = del.get().check();		
@@ -526,20 +536,30 @@ public class AppUtils {
 	/**
 	 * 
 	 * @param from
+	 * @param info Optional {name, img, description, url}
 	 * @return
 	 */
-	public static PersonLite getCreatePersonLite(XId from) {
+	public static PersonLite getCreatePersonLite(XId from, Map info) {
 		// it is strongly recommended that the router treat PersonLite == Person 
 		IESRouter router = Dep.get(IESRouter.class);
 		ESPath path = router.getPath(PersonLite.class, from.toString(), KStatus.PUBLISHED);
 		PersonLite peep = get(path, PersonLite.class);
-		if (peep!=null) return peep;
+		if (peep!=null) {
+			// not saving any edits here?!
+			if (info != null) peep.setInfo(info);
+			return peep;
+		}
 		// draft?
 		path = router.getPath(PersonLite.class, from.toString(), KStatus.DRAFT);
 		peep = get(path, PersonLite.class);		
-		if (peep!=null) return peep;
-		// make it
+		if (peep!=null) {
+			// not saving any edits here?!
+			if (info != null) peep.setInfo(info);
+			return peep;
+		}
+		// make it		
 		peep = new PersonLite(from);
+		if (info != null) peep.setInfo(info);
 		// store it NB: the only data is the id, so there's no issue with race conditions
 		AppUtils.doSaveEdit(path, new JThing().setJava(peep), null);
 		return peep;
@@ -574,7 +594,7 @@ public class AppUtils {
 				List<String> propVal = (List) clause;
 				String prop = propVal.get(0);
 				String val = propVal.get(1);
-				if ("unset".equals(val)) {
+				if (ESQueryBuilders.UNSET.equals(val)) {
 					QueryBuilder setFilter = QueryBuilders.existsQuery(prop);
 					filter = filter.mustNot(setFilter);
 				} else {
@@ -583,8 +603,7 @@ public class AppUtils {
 					filter = filter.must(kvFilter);
 				}				
 			}
-//			QueryBuilder kvFilter = QueryBuilders.termQuery(prop, host);
-//			filter = filter.must(kvFilter);			
+
 		}
 		
 		return filter;

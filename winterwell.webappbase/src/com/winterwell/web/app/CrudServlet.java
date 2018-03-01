@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -255,6 +256,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected String dataspace = null;
 
 	protected JThing<T> doPublish(WebRequest state) {
+		return doPublish(state, false, false);
+	}
+	protected JThing<T> doPublish(WebRequest state, boolean forceRefresh, boolean deleteDraft) {
 		String id = getId(state);
 		Utils.check4null(id); 
 		ESPath draftPath = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
@@ -264,7 +268,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (jthing==null) {
 			jthing = getThingFromDB(state);
 		}
-		JThing obj = AppUtils.doPublish(jthing, draftPath, publishPath);
+		JThing obj = AppUtils.doPublish(jthing, draftPath, publishPath, forceRefresh, deleteDraft);
 		return obj.setType(type);
 	}
 
@@ -286,6 +290,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected void doList(WebRequest state) throws IOException {
 		// copied from SoGive SearchServlet
+		// TODO refactor to use makeESFilterFromSearchQuery
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
 		/// which index? draft (which should include copies of published) by default
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
@@ -305,11 +310,19 @@ public abstract class CrudServlet<T> implements IServlet {
 		ESQueryBuilder qb = null;
 		if ( q != null) {
 			// TODO match on all?
-			QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
-//			multimatchquery, 
-//					"id", "name", "keywords")
-//							.operator(Operator.AND);
-			qb = ESQueryBuilder.make(qsq);
+			// HACK strip out unset
+			if (q.contains(":unset")) {
+				m = Pattern.matcher("");
+				q2 = ;
+				prop = ;
+				q = q2;
+				QueryBuilder setFilter = QueryBuilders.existsQuery(prop);
+				qb = ESQueryBuilders.boolQuery().mustNot(q);
+			}	
+			if ( ! Utils.isBlank(q)) {
+				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
+				qb = ESQueryBuilders.must(qb, qsq);
+			}
 		}
 		ESQueryBuilder exq = doList2_query(state);
 		qb = ESQueryBuilders.must(qb, exq);

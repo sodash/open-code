@@ -22,10 +22,16 @@ public class PersonLite extends AThing {
 		this(new XId(
 				(String) Utils.or(jobj.get("xid"), jobj.get("id"), jobj.get("@id"))
 				));
-		img = (String) jobj.get("img");
-		description = (String) jobj.get("description");
-		name = (String) jobj.get("name");
-		url = (String) jobj.get("url");
+		setInfo(jobj);
+	}
+
+	public PersonLite setInfo(Map<String, Object> jobj) {
+		// NB: don't overwrite existing data with null
+		if (jobj.containsKey("img")) img = (String) jobj.get("img");
+		if (jobj.containsKey("description")) description = (String) jobj.get("description");
+		if (jobj.containsKey("name")) name = (String) jobj.get("name");
+		if (jobj.containsKey("url")) url = (String) jobj.get("url");
+		return this;
 	}
 
 	public String img;

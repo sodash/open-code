@@ -18,6 +18,7 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
+import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
@@ -110,7 +111,7 @@ public class DataServlet implements IServlet {
 			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
 					"by_"+StrUtils.join(b,'_'), b[0]);
 			byTag.setSize(numTerms);
-			byTag.setMissing("unset");
+			byTag.setMissing(ESQueryBuilders.UNSET);
 			Aggregation leaf = byTag;
 			if (b.length > 1) {
 				if (b[1].equals("time")) {
@@ -121,7 +122,7 @@ public class DataServlet implements IServlet {
 				} else {
 					com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);
 					byHost.setSize(numTerms);
-					byHost.setMissing("unset");
+					byHost.setMissing(ESQueryBuilders.UNSET);
 					byTag.subAggregation(byHost);
 					leaf = byHost;
 				}
