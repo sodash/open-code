@@ -8,12 +8,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 
 import com.winterwell.data.AThing;
 import com.winterwell.data.JThing;
@@ -312,12 +314,13 @@ public abstract class CrudServlet<T> implements IServlet {
 			// TODO match on all?
 			// HACK strip out unset
 			if (q.contains(":unset")) {
-				m = Pattern.matcher("");
-				q2 = ;
-				prop = ;
+				Matcher m = Pattern.compile("(\\w+):unset").matcher(q);
+				m.find();
+				String prop = m.group(1);
+				String q2 = m.replaceAll("").trim();
 				q = q2;
-				QueryBuilder setFilter = QueryBuilders.existsQuery(prop);
-				qb = ESQueryBuilders.boolQuery().mustNot(q);
+				ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
+				qb = ESQueryBuilders.boolQuery().mustNot(setFilter);
 			}	
 			if ( ! Utils.isBlank(q)) {
 				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
@@ -326,14 +329,23 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		ESQueryBuilder exq = doList2_query(state);
 		qb = ESQueryBuilders.must(qb, exq);
-//		if (exq!=null) {
-//			if (qb==null) {
-//				qb = exq;
-//			} else {
-//				qb = QueryBuilders.boolQuery().must(exq).must(qb);
-//			}
-//		}
+
 		if (qb!=null) s.setQuery(qb);
+		
+		
+		// Sort
+		String sort = state.get("sort");
+		if (sort!=null) {
+			// HACK: order?
+			SortOrder order = SortOrder.ASC;
+			if (sort.endsWith("-desc")) {
+				sort = sort.substring(0, sort.length()-5);
+				order = SortOrder.DESC;
+			} else if (sort.endsWith("-asc")) {
+				sort = sort.substring(0, sort.length()-4);
+			}
+			s.addSort(sort, order);
+		}
 		
 		// TODO paging!
 		s.setSize(10000);
@@ -343,13 +355,6 @@ public abstract class CrudServlet<T> implements IServlet {
 		List<Map> hits = sr.getHits();
 
 		// prefer draft? No - in the ad portal, draft holds a copy of all ads, pubs
-//		List hitSourcePreferDraft = new ArrayList(); 
-//		for (Map hit : hits) {
-//			Object index = hit.get("_index");
-//			Object src = hit.get("_source");
-//			System.out.println(hit);
-//			hitsPreferDraft.add(src);
-//		}
 		
 		// NB: may be Map or AThing
 		List hits2 = Containers.apply(hits, h -> h.get("_source"));
