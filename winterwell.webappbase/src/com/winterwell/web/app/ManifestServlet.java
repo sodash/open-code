@@ -28,6 +28,7 @@ import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
+import com.winterwell.utils.io.ConfigFactoryTest;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -115,6 +116,8 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		String uptime = TimeUtils.toString(startTime.dt(new Time()));
 		cargo.put("uptime", uptime);
 		
+		process2_versionProps(cargo);
+		
 		// origin -- maybe
 		try {
 			Properties props = Dep.get(Properties.class);
@@ -133,6 +136,23 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		
 		JsonResponse output = new JsonResponse(state, cargo);
 		WebUtils2.sendJson(output, state);
+	}
+
+	private void process2_versionProps(ArrayMap cargo) {
+		File creolePropertiesForSite = new File("config", "version.properties");
+		if ( ! creolePropertiesForSite.exists()) return;
+		try {
+			Properties versionProps = FileUtils.loadProperties(creolePropertiesForSite);
+//				ArrayMap vps = new ArrayMap(versionProps);				
+			cargo.put("version", versionProps);
+			// HACK
+			String pubDate = versionProps.getProperty("publishDate");
+			if (pubDate!=null) {
+				cargo.put("version_published_date", new Time(pubDate).toString());
+			}
+		} catch(Exception ex) {
+			cargo.put("error", ex);
+		}		
 	}
 
 	private void addConfigInfo(Map cargo) {

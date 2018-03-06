@@ -10,6 +10,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.WebUtils;
 
 /**
  * This applies a "default" lookup strategy for properties files to the use of {@link ConfigBuilder} and {@link Dep}.
@@ -29,7 +30,7 @@ public class ConfigFactory {
 	private String[] args;
 	private String appName;
 	String serverType;
-	private String machine;
+	private String machine = WebUtils.hostname();
 	private boolean debug = true;
 	private final List<ConfigBuilder> history = new ArrayList();
 	
@@ -74,6 +75,11 @@ public class ConfigFactory {
 		this.args = args;
 		return this;
 	}
+	/**
+	 * Not normally needed - defaults to hostname
+	 * @param machine
+	 * @return
+	 */
 	public ConfigFactory setMachine(String machine) {
 		this.machine = machine;
 		return this;

@@ -13,6 +13,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
@@ -37,7 +38,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	/**
 	 * aka app name
 	 */
-	public static String projectName;
+	public static String appName;
 	
 	public static LogFile logFile;
 
@@ -51,7 +52,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		this(FileUtils.getWorkingDirectory().getName().toLowerCase());
 	}
 	public AMain(String projectName) {
-		this.projectName = projectName;
+		this.appName = projectName;
 	}
 
 	public ConfigType getConfig() {
@@ -59,7 +60,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 	
 	public void doMain(String[] args) {
-		logFile = new LogFile(new File(projectName+".log"))
+		logFile = new LogFile(new File(appName+".log"))
 					.setLogRotation(TUnit.DAY.dt, 14);
 		init(args);
 		launchJetty();
@@ -71,8 +72,16 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 */
 	protected final void init(String[] args) {
 		main = this;
+		init2a_configFactory();
 		config = init2_config(args);
 		init2(config);
+	}
+	
+	private void init2a_configFactory() {
+		ConfigFactory cf = ConfigFactory.get();
+		cf.setAppName(appName);
+		KServerType serverType = AppUtils.getServerType(null);
+		cf.setServerType(serverType.toString());
 	}
 	
 	/**
@@ -118,7 +127,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 
 	protected Emailer init3_emailer() {
 		if (Dep.has(Emailer.class)) return Dep.get(Emailer.class);		
-		EmailConfig ec = AppUtils.getConfig(projectName, new EmailConfig(), null);
+		EmailConfig ec = AppUtils.getConfig(appName, EmailConfig.class, null);
 		Log.i("init", "Emailer with config "+ec);
 		LoginDetails ld = ec.getLoginDetails();
 		if (ld == null) {
@@ -176,6 +185,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 */
 	protected void addJettyServlets(JettyLauncher jl) {
 		jl.addServlet("/manifest", new HttpServletWrapper(ManifestServlet::new));
+		jl.addServlet("/test", new HttpServletWrapper(TestServlet::new));
 	}
 
 }

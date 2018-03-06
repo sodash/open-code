@@ -52,7 +52,7 @@ public class Emailer implements Closeable {
 	public InternetAddress getBotEmail() {
 		try {
 			InternetAddress addr = new InternetAddress(ld.loginName,					 
-					StrUtils.toTitleCase(AMain.projectName)+" Notifications");
+					StrUtils.toTitleCase(AMain.appName)+" Notifications");
 			return addr;
 		} catch (Exception e) {
 			throw Utils.runtime(e);

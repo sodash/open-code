@@ -80,41 +80,18 @@ public class AppUtils {
 
 	
 	/**
-	 * @deprecated Use {@link ConfigFactory}
+	 * Use ConfigFactory to get a config from standard places
 	 * @param config
 	 * @param args
 	 * @return
 	 */
-	public static <X> X getConfig(String appName, X config, String[] args) {
-		String thingy = config.getClass().getSimpleName().toLowerCase().replace("config", "");
-		final ConfigBuilder cb = new ConfigBuilder(config);
-		cb.setDebug(true);
-		String machine = WebUtils2.hostname();
-		KServerType serverType = AppUtils.getServerType(null);
-
-		config = cb
-			.setDebug(true)
-			// check several config files
-			.set(new File("config/"+appName.toLowerCase()+".properties"))
-			.set(new File("config/"+thingy+".properties"))
-			.set(new File("config/"+AppUtils.getServerType(null).toString().toLowerCase()+".properties"))
-			// or in logins, for passwords?
-			.set(new File("config/logins.properties"))
-			.set(new File(FileUtils.getWinterwellDir(), "logins/logins."+appName.toLowerCase()+".properties"))
-			.set(new File(FileUtils.getWinterwellDir(), "logins/"+thingy+".properties"))
-			// live, local, test?			
-			.set(new File("config/"+serverType.toString().toLowerCase()+".properties"))
-			// this machine specific
-			.set(new File("config/"+machine+".properties"))
-			// args
-			.setFromMain(args)
-			.get();
-		// set Dep
-		Dep.set((Class)config.getClass(), config);		
+	public static <X> X getConfig(String appName, Class<X> config, String[] args) {
+		ConfigFactory cf = ConfigFactory.get();
+		X c = cf.getConfig(config);
 		// set them for manifest
-		ManifestServlet.addConfig(config);;
+		ManifestServlet.addConfig(c);
 		assert config != null;
-		return config;		
+		return c;		
 	}
 		
 	
@@ -613,6 +590,12 @@ public class AppUtils {
 		}
 		
 		return filter;
+	}
+
+
+	@Deprecated
+	public static <X> X getConfig(String appName, X config, String[] args) {
+		return (X) getConfig(appName, config.getClass(), args);
 	}
 
 

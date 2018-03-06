@@ -944,6 +944,7 @@ public class WebUtils {
 	 *
 	 * @return e.g. "egan" not "egan.soda.sh", or null if the lookup fails Note:
 	 *         this is cached.
+	 *  Never throws an exception.
 	 */
 	public static String hostname() {
 		if (hostname != null)
