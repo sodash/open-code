@@ -95,12 +95,12 @@ public class AppUtils {
 		config = cb
 			.setDebug(true)
 			// check several config files
-			.set(new File("config/"+appName+".properties"))
+			.set(new File("config/"+appName.toLowerCase()+".properties"))
 			.set(new File("config/"+thingy+".properties"))
 			.set(new File("config/"+AppUtils.getServerType(null).toString().toLowerCase()+".properties"))
 			// or in logins, for passwords?
 			.set(new File("config/logins.properties"))
-			.set(new File(FileUtils.getWinterwellDir(), "logins/logins."+appName+".properties"))
+			.set(new File(FileUtils.getWinterwellDir(), "logins/logins."+appName.toLowerCase()+".properties"))
 			.set(new File(FileUtils.getWinterwellDir(), "logins/"+thingy+".properties"))
 			// live, local, test?			
 			.set(new File("config/"+serverType.toString().toLowerCase()+".properties"))

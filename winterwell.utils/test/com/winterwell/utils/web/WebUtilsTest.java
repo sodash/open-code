@@ -36,8 +36,9 @@ import junit.framework.TestCase;
  */
 public class WebUtilsTest extends TestCase {
 
-	public void testRenderToPDF_HelloWorld() throws IOException {		
-		String html = "<html><body><h1>Hello World!</h1><p>Here is a paragraph.</p><ol><li>List item one</li><li>two</li></ol>"
+	public void testRenderToPDF_HelloWorld() throws IOException {
+		// nope moznomarginboxes mozdisallowselectionprint
+		String html = "<html><head></head><body><h1>Hello World!</h1><p>Here is a paragraph.</p><ol><li>List item one</li><li>two</li></ol>"
 				+"<img src='https://help.soda.sh/static/images/photos/people/dan.png'>"
 				+ "</body></html>";
 		File file = File.createTempFile("test", ".pdf");

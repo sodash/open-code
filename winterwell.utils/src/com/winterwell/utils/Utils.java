@@ -499,6 +499,14 @@ public final class Utils {
 		String os = getOperatingSystem();
 		return os.contains("linux") || os.contains("unix");
 	}
+	
+	/**
+	 * @return true for Windows
+	 */
+	public static boolean OSisWindows() {
+		String os = getOperatingSystem();
+		return os.contains("windows");
+	}
 
 	/**
 	 * Includes some special case handling for SQL exceptions, to make debugging

@@ -399,14 +399,15 @@ public class Proc implements Closeable {
 	 * @param timeout
 	 *            time in milliseconds to allow before giving up. 0 or -1
 	 *            indicate to wait forever
+	 * @return 
 	 * @return the exit code from the process. usually 0 for fine, other for
 	 *         error.
 	 * @throws wrapped
 	 *             InterruptedException If the timeout is exceeded (or something
 	 *             else interrupts).
 	 */
-	public void waitFor(Dt dt) {
-		waitFor(dt.getMillisecs());
+	public int waitFor(Dt dt) {
+		return waitFor(dt.getMillisecs());
 	}
 
 	/**

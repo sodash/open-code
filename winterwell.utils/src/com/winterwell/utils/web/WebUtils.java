@@ -58,6 +58,7 @@ import com.winterwell.utils.Key;
 import com.winterwell.utils.NotUniqueException;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Proc;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
@@ -1224,6 +1225,9 @@ public class WebUtils {
 	 * @testedby {@link WebUtilsTest#testRenderToPdf()}
 	 */
 	public static void renderToPdf(String html, File file, boolean printStyle, String footer) {
+		// insert no-Google-header-footer
+		String html2 = html.replaceFirst("</(head|HEAD)>", "<style>@page { margin:0; size:A4; }\n body { margin: 1.6cm; }\n }</style>$0");
+		html = html2;
 		File temp1 = null;
 		try { 			
 			temp1 = File.createTempFile("page", ".html");
@@ -1272,10 +1276,9 @@ public class WebUtils {
 	}
 
 	/**
-	 * This relies on: linux, and PhantomJS and render-webpage.js (see config/bin) being installed and on the path.
+	 * This uses headless chrome and relies on: chromium-browser being installed and on the path.
 	 * 
-	 * WARNING: render-webpage contains some SoDash-reports-specific code and settings! It may not render other
-	 * pages so well.
+	 * TODO puppeteer provides more control over headless chrome
 	 * 
 	 * @param html
 	 * @param file
@@ -1286,45 +1289,28 @@ public class WebUtils {
 	 * @testedby {@link WebUtilsTest#testRenderToPdf()}
 	 */
 	public static void renderUrlToPdf(String url, File file, boolean printStyle, String footer, Dt waitFor) {
-		// STRANGE It looks like you don't want to 'encode' the url for Proc
-		// However if you take the command and run it in bacj -- you should encode it!
 		Proc p = null;
-		try { 
-			List<String> lcmd = new ArrayList(Arrays.asList(renderWebpage(),
-					url,// Input
-					file.getAbsolutePath(), // Ouput
-					"A4",
-					"default"));
-			if (footer != null) lcmd.add(footer);
-			p = new Proc(lcmd);
-
-			String cmd = p.getCommand();
-			Log.d("render", cmd);
-//			p.setEcho(true);
+		try {
+			String dgpu = Utils.OSisWindows()? "--disable-gpu " : "";
+			p = new Proc(
+					"chromium-browser --headless "+dgpu+"--print-to-pdf=\""+file+"\" "+url				
+					);
 			p.start();
-			int done = p.waitFor(waitFor.getMillisecs());
-
-			if (! file.exists())
-				throw new IOException("render failed: " + cmd + " failed to create " + file + "\t"
-						+ p.getError());
+			int done = p.waitFor(waitFor);
+			Log.d("html",
+					"RenderToPdf: " + p.getOutput() + "\t" + p.getError());
+			
+			if ( ! file.exists())
+				throw Utils.runtime(new IOException("render failed: " + p.getCommand() + " failed to create " + file + "\t"
+						+ p.getError()));
 			else if (file.length()==0)
-				throw new IOException("render failed: " + cmd + " created but failed to write to " + file + "\t"
-						+ p.getError());
-			if (p.getOutput().contains("cannot connect to X server")
-					|| p.getError().contains("cannot connect to X server"))
-				throw new IOException(
-						"render failed: render-webpage couldn't connect to an X server. Command: " + cmd);
+				throw Utils.runtime(new IOException("render failed: " + p.getCommand() + " created but failed to write to " + file + "\t"
+						+ p.getError()));
 			if (done!=0) { // TODO throw an exception??
-				Log.e("html", "RenderToPdf Fail?! " + p.getError() + " exit-code: " + done + " Command: " + cmd);
+				Log.e("html", "RenderToPdf Fail?! " + p.getError() + " exit-code: " + done + " Command: " + p.getCommand());
 			}
-			// debug spew
-			Log.report("html",
-					"RenderToPdf: " + p.getOutput() + "\t" + p.getError(),
-					Level.FINE);
-		} catch (Exception e) {
-			throw Utils.runtime(e);
+			
 		} finally {
-			// clean up
 			FileUtils.close(p);
 		}
 	}
