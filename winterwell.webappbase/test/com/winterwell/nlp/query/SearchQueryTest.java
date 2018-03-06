@@ -1,5 +1,6 @@
 package com.winterwell.nlp.query;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -8,6 +9,25 @@ import com.winterwell.nlp.query.SearchQuery;
 
 public class SearchQueryTest {
 
+	@Test
+	public void testQuotedKeyVal() {
+		SearchQuery sq = new SearchQuery("campaign:\"Villa Plus\"");
+		List pt = sq.getParseTree();
+		System.out.println(pt);
+		String host = sq.getProp("campaign");
+		assert host.equals("Villa Plus") : sq;
+	}
+	
+	@Test
+	public void testSimpleQuotedTerm() {
+		SearchQuery sq = new SearchQuery("\"hello world\"");
+		List pt = sq.getParseTree();
+		System.out.println(pt);				
+		assert pt.toString().equals("[\", hello world]") : pt;
+		assert pt.get(1).equals("hello world");
+		assert pt.get(0) == SearchQuery.KEYWORD_QUOTED;
+	}
+	
 	@Test
 	public void testSimple() {
 		SearchQuery sq = new SearchQuery("host:localpub.com");

@@ -427,7 +427,7 @@ public class SearchQuery implements Serializable, IHasJson {
 	List parse() {
 		if (parseTree!=null) return parseTree;
 		String searchTerm = raw;
-		ArrayList output = new ArrayList();
+		List output = new ArrayList();
 		output.add(KEYWORD_AND);
 		ArrayList<List> stack = new ArrayList();
 		stack.add(output);
@@ -436,8 +436,9 @@ public class SearchQuery implements Serializable, IHasJson {
 			parse2(searchTerm, 0, stack, output);
 			// drop the leading AND if it's not needed
 			if (output.size() == 2 && output.get(0) == KEYWORD_AND
-				&& output.get(1) instanceof List) {
-				return (List) output.get(1);
+				&& output.get(1) instanceof List) 
+			{
+				output = (List) output.get(1);
 			}
 			// convert key:value
 			parse2_keyvalue(output);
@@ -468,7 +469,10 @@ public class SearchQuery implements Serializable, IHasJson {
 				if (m.group(1).startsWith("http") || m.group(2).startsWith("//")) {
 					continue;
 				}
-				output.set(i, Arrays.asList(m.group(1), m.group(2)));
+				String k = m.group(1);
+				String v = m.group(2);
+				// ??Is list the right thing here?? Would Map be more clear??
+				output.set(i, Arrays.asList(k, v));
 			}
 		}
 	}
@@ -479,6 +483,7 @@ public class SearchQuery implements Serializable, IHasJson {
 		String word=null, prevTerm = null;
 		while (i.value < searchTerm.length()) {
 			prevTerm = word;
+			int startI = i.value;
 			word = parse3_nextWord(searchTerm, i);
 			if (word.isEmpty()) continue;
 			List open = stack.get(stack.size() - 1);
@@ -533,7 +538,7 @@ public class SearchQuery implements Serializable, IHasJson {
 			// Just a normal keyword
 			// - was it quoted? (different match behaviour)
 			// Note: i>1 since we've pulled a word off
-			if (searchTerm.charAt(i.value - 1) == '"') {
+			if (searchTerm.charAt(startI) == '"') {
 				open.add(Arrays.asList(KEYWORD_QUOTED, word));
 			} else {
 				open.add(word);
@@ -751,7 +756,8 @@ public class SearchQuery implements Serializable, IHasJson {
 
 	/**
 	 * Convenience method.
-	 * IF propName occurs at the top-level, then return the value
+	 * IF propName occurs at the top-level, then return the value.
+	 * WARNING: key:val props can occur lower-down, e.g. in and/or/not clauses, and this method does NOT handle that. 
 	 * @param {*} propName 
 	 */
 	public String getProp(String propName) {
