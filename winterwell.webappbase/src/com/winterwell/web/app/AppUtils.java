@@ -206,10 +206,10 @@ public class AppUtils {
 		return doPublish(draft, draftPath, publishPath, false, false);
 	}
 	
-	public static JThing doPublish(AThing item, boolean forceRefresh, boolean deleteDraft) {
+	public static JThing doPublish(AThing item, boolean forceRefresh, boolean deleteDraft) {		
 		IESRouter esr = Dep.get(IESRouter.class);
 		Class type = item.getClass();
-		String id = item.getId();
+		String id = item.getId();		
 		ESPath draftPath = esr.getPath(type, id, KStatus.DRAFT);
 		ESPath publishPath = esr.getPath(type, id, KStatus.PUBLISHED);
 		JThing draft = new JThing(item);
@@ -225,7 +225,9 @@ public class AppUtils {
 	 * @param deleteDraft Normally we leave the draft, for future editing. But if the object is not editable once published - delete the draft.
 	 * @return
 	 */
-	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath, boolean forceRefresh, boolean deleteDraft) {
+	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath, boolean forceRefresh, boolean deleteDraft) 
+	{
+		Log.d("doPublish", "to "+publishPath+"... deleteDraft "+deleteDraft);
 		// prefer being given the draft to avoid ES race conditions
 		if (draft==null) {
 			Map<String, Object> draftMap = get(draftPath, null);
@@ -247,11 +249,13 @@ public class AppUtils {
 		// NB: this doesn't return the merged item :(
 		IESResponse resp = up.get().check();
 		
-		// Also update draft		
+		// Also update draft?
+		Log.d("doPublish", publishPath+" deleteDraft: "+deleteDraft);
 		if ( ! draftPath.equals(publishPath)) {
 			if (deleteDraft) {
 				doDelete(draftPath);
 			} else {
+				Log.d("doPublish", "also update draft "+draftPath);
 				UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
 				upd.setDoc(draft.map());
 				upd.setDocAsUpsert(true);
@@ -264,11 +268,16 @@ public class AppUtils {
 	}
 	
 	
-	public static  void doDelete(ESPath path) {
-		Log.d("delete", path+" possible-state:"+WebRequest.getCurrent());
-		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-		DeleteRequestBuilder del = client.prepareDelete(path.index(), path.type, path.id);
-		IESResponse ok = del.get().check();		
+	public static void doDelete(ESPath path) {
+		try {
+			Log.d("delete", path+" possible-state:"+WebRequest.getCurrent());
+			ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
+			DeleteRequestBuilder del = client.prepareDelete(path.index(), path.type, path.id);
+			IESResponse ok = del.get().check();
+		} catch(WebEx.E404 ex) {
+			// oh well
+			Log.d("delete", path+" 404 - already deleted?");
+		}
 	}
 
 	public static JThing doSaveEdit(ESPath path, JThing item, WebRequest state) {

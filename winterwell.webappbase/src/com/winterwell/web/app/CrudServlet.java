@@ -107,6 +107,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (jthing==null) jthing = getThingFromDB(state); 
 		if (jthing != null) {			
 			String json = jthing.string();
+			// TODO privacy: potentially filter some stuff from the json!
 			JsonResponse output = new JsonResponse(state).setCargoJson(json);			
 			WebUtils2.sendJson(output, state);
 			return;
@@ -260,8 +261,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected JThing<T> doPublish(WebRequest state) {
 		return doPublish(state, false, false);
 	}
-	protected JThing<T> doPublish(WebRequest state, boolean forceRefresh, boolean deleteDraft) {
+	protected JThing<T> doPublish(WebRequest state, boolean forceRefresh, boolean deleteDraft) {		
 		String id = getId(state);
+		Log.d("crud", "doPublish "+id+" "+state+" deleteDraft: "+deleteDraft);
 		Utils.check4null(id); 
 		ESPath draftPath = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
 		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
@@ -380,6 +382,8 @@ public abstract class CrudServlet<T> implements IServlet {
 			});
 		}
 		
+		hits2 = cleanse(hits2, state);
+		
 		// HACK: send back csv?
 		if (state.getResponseType() == KResponseType.csv) {
 			doSendCsv(state, hits2);
@@ -395,8 +399,20 @@ public abstract class CrudServlet<T> implements IServlet {
 		JsonResponse output = new JsonResponse(state).setCargoJson(json);
 		WebUtils2.sendJson(output, state);		
 	}
-	
-	
+
+
+	/**
+	 * TODO remove sensitive details for privacy
+	 * @param hits2
+	 * @param state
+	 * @return
+	 */
+	protected List cleanse(List hits2, WebRequest state) {
+		return hits2;
+	}
+
+
+
 	private String getStatus(Object h) {
 		Object s;
 		if (h instanceof Map) s = ((Map)h).get("status");

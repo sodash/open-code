@@ -81,7 +81,8 @@ public class Actor<Msg> {
 	 * Forwards to the consumer. 
 	 * If you don't want to use a consumer, just override this method
 	 * @param msg
-	 * @throws Exception 
+	 * @throws Exception Exceptions are swallowed, with a message to Log.e. 
+	 * The last exception and cause are stashed - see {@link #peekLastException()}
 	 */
 	protected void consume(Msg msg, Actor from) throws Exception {
 		if (consumer==null) throw new IllegalStateException("No Actor code! Either override consume() or call setConsumer()");

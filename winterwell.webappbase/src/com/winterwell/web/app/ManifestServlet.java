@@ -91,29 +91,9 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 	public void process(WebRequest state) throws IOException {	
 		
 		ArrayMap cargo = new ArrayMap();
-		// what did we load from?
-		List<ConfigBuilder> cbs = ConfigFactory.get().getHistory();
-		List<List<File>> cfs = Containers.apply(cbs, ConfigBuilder::getFileSources);
-		List<File> configFiles = Containers.flatten(cfs);
-		cargo.put("configFiles", configFiles);
 		
 		// server type
 		cargo.put("serverType", AppUtils.getServerType(null));
-				
-		// what config did we pick up?
-		// Screen for sensitive keys, e.g. passwords
-		Map configsjson = new ArrayMap();
-		ArraySet allConfigs = new ArraySet<>(configs);
-		allConfigs.addAll(Containers.apply(cbs, ConfigBuilder::get));
-		for(Object c : allConfigs) {
-			ArrayMap<String, Object> vs = new ArrayMap(Containers.objectAsMap(c));
-			for(String k : vs.keySet()) {
-				boolean protect = ConfigBuilder.protectPasswords(k);
-				if (protect) vs.put(k, "****");
-			}
-			configsjson.put(c.getClass().getSimpleName(), vs);
-		}
-		cargo.put("config", configsjson);
 		
 		ArrayList repos = new ArrayList();
 //		// Extra Branch Info, if we have it
@@ -143,25 +123,9 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			cargo.put("origin", origin);
 		} catch(Exception ex) {
 			// oh well
-		}
+		}		
 		
-		File creolePropertiesForSite = new File("config", "version.properties");
-		if (creolePropertiesForSite.exists()) {
-			try {
-				Properties versionProps = FileUtils.loadProperties(creolePropertiesForSite);
-//				ArrayMap vps = new ArrayMap(versionProps);				
-				cargo.put("version", versionProps);
-				// HACK
-				String pubDate = versionProps.getProperty("publishDate");
-				if (pubDate!=null) {
-					cargo.put("version_published_date", new Time(pubDate).toString());
-				}
-			} catch(Exception ex) {
-				cargo.put("error", ex);
-			}
-		} else {
-			cargo.put("version", "no file at "+creolePropertiesForSite);
-		}
+		addConfigInfo(cargo);
 		
 		Map<String,Object> manifests = getJarManifests();
 		cargo.put(("jarManifests"), manifests);
@@ -169,6 +133,29 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		
 		JsonResponse output = new JsonResponse(state, cargo);
 		WebUtils2.sendJson(output, state);
+	}
+
+	private void addConfigInfo(Map cargo) {
+		// what did we load from?
+		List<ConfigBuilder> cbs = ConfigFactory.get().getHistory();
+		List<List<File>> cfs = Containers.apply(cbs, ConfigBuilder::getFileSources);
+		List<File> configFiles = Containers.flatten(cfs);
+		cargo.put("configFiles", configFiles);
+
+		// what config did we pick up?
+		// Screen for sensitive keys, e.g. passwords
+		Map configsjson = new ArrayMap();
+		ArraySet allConfigs = new ArraySet<>(configs);
+		allConfigs.addAll(Containers.apply(cbs, ConfigBuilder::get));
+		for(Object c : allConfigs) {
+			ArrayMap<String, Object> vs = new ArrayMap(Containers.objectAsMap(c));
+			for(String k : vs.keySet()) {
+				boolean protect = ConfigBuilder.protectPasswords(k);
+				if (protect) vs.put(k, "****");
+			}
+			configsjson.put(c.getClass().getSimpleName(), vs);
+		}
+		cargo.put("config", configsjson);
 	}
 
 	/**
