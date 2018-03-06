@@ -36,6 +36,16 @@ import junit.framework.TestCase;
  */
 public class WebUtilsTest extends TestCase {
 
+	public void testRenderToPDF_HelloWorld() throws IOException {		
+		String html = "<html><body><h1>Hello World!</h1><p>Here is a paragraph.</p><ol><li>List item one</li><li>two</li></ol>"
+				+"<img src='https://help.soda.sh/static/images/photos/people/dan.png'>"
+				+ "</body></html>";
+		File file = File.createTempFile("test", ".pdf");
+		boolean printStyle = true;
+		String footer = null;
+		WebUtils.renderToPdf(html, file, printStyle, footer);
+		WebUtils.display(file);
+	}
 
 	public void testGetHost() {
 		String u1 = "https://lookup.london/philpot-lane-mice-londons-tiniest-sculpture/";
@@ -299,21 +309,21 @@ public class WebUtilsTest extends TestCase {
 		{
 			String html = "<html><head></head><body><h1>PDF ROCKS</h1></body></html>";
 			File pdf = new File("test/pdftest1.pdf");
-			WebUtils.renderToPdf(html, pdf, null, false);
+			WebUtils.renderToPdf(html, pdf, false);
 			Proc p = new Proc("gnome-open " + pdf.getAbsolutePath());
 			p.run();
 		}
 		{
 			String html = "<html><head></head><body><h1>PDF ROCKS</h1></body></html>";
 			File pdf = new File("test/pdftest1.pdf");
-			WebUtils.renderToPdf(html, pdf, null, true);
+			WebUtils.renderToPdf(html, pdf, true);
 			Proc p = new Proc("gnome-open " + pdf.getAbsolutePath());
 			p.run();
 		}
 		{
 			String html = "<html><head></head><body>PDF <script>document.write(' + Javascript '); /*setTimeout(\"document.append('Rocks!');\",100);*/</script></body></html>";
 			File pdf = new File("test/pdftest2.pdf");
-			WebUtils.renderToPdf(html, pdf, null, false);
+			WebUtils.renderToPdf(html, pdf, false);
 			// "--window-status FLOT_DONE"); //"--javascript-delay 2000");
 			Proc p = new Proc("gnome-open " + pdf.getAbsolutePath());
 			p.run();

@@ -987,7 +987,7 @@ public class WebUtils {
 		assert cmd.equals("render");
 		String html = FileUtils.read(new File(args[1]));
 		File pdf = new File(args[2]);
-		renderToPdf(html, pdf, null, false);
+		renderToPdf(html, pdf, false);
 		Printer.out("Rendered pdf at: " + pdf);
 	}
 
@@ -1206,11 +1206,11 @@ public class WebUtils {
 	}
 
 	public static void renderToPdf(String html, File file) {
-		renderToPdf(html, file, null, true);
+		renderToPdf(html, file, true);
 	}
 
-	public static void renderToPdf(String html, File file, String waitFor, boolean printStyle) {
-		renderToPdf(html, file, waitFor, printStyle, null);
+	public static void renderToPdf(String html, File file, boolean printStyle) {
+		renderToPdf(html, file, printStyle, null);
 	}
 
 	/**
@@ -1219,15 +1219,11 @@ public class WebUtils {
 	 * @param html
 	 * @param file
 	 *            target pdf file
-	 * @param waitFor
-	 *            null or "--window-status FLOT_DONE", "--javascript-delay 2000"
-	 *            to allow time for ajax to run. FIXME these options seems to be
-	 *            buggy (Kubuntu, wkhtmltopdf 0.11.0rc1)
 	 * @param printStyle true to use print media styling, false for WYSIWYG browser-styling.
 	 *
 	 * @testedby {@link WebUtilsTest#testRenderToPdf()}
 	 */
-	public static void renderToPdf(String html, File file, String waisstFor, boolean printStyle, String footer) {
+	public static void renderToPdf(String html, File file, boolean printStyle, String footer) {
 		File temp1 = null;
 		try { 			
 			temp1 = File.createTempFile("page", ".html");
@@ -1253,7 +1249,7 @@ public class WebUtils {
 		File temp1 = null;
 		try {
 			temp1 = File.createTempFile("chart", ".pdf");
-			renderToPdf(html, temp1, "--javascript-delay 1000", false); // FIXME
+			renderToPdf(html, temp1, false); // FIXME
 			assert temp1.exists() && temp1.length() > 0;
 
 			// 2. Render, trim and convert to PNG with convert

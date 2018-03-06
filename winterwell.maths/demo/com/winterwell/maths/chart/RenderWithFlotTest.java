@@ -265,7 +265,7 @@ public class RenderWithFlotTest {
 
 		// test pdf
 		File pdf = new File("test/test-chart.pdf");
-		WebUtils.renderToPdf(page, pdf, "--window-status FLOT_DONE", false);
+		WebUtils.renderToPdf(page, pdf, false);
 		Proc p = new Proc("evince " + pdf.getAbsolutePath());
 		p.run();
 	}
