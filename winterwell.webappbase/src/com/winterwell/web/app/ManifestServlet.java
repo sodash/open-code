@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -159,7 +160,7 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		// what did we load from?
 		List<ConfigBuilder> cbs = ConfigFactory.get().getHistory();
 		List<List<File>> cfs = Containers.apply(cbs, ConfigBuilder::getFileSources);
-		List<File> configFiles = Containers.flatten(cfs);
+		Collection<File> configFiles = new HashSet(Containers.flatten(cfs));
 		cargo.put("configFiles", configFiles);
 
 		// what config did we pick up?
