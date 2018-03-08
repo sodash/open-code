@@ -4,7 +4,7 @@ server {
         root /home/daniel/winterwell/open-code/winterwell.datalog/web;
         index index.html;
 
-        server_name locallg.good-loop.com;
+        server_name locallg.good-loop.com lg.good-loop.com;
 
         location / {
                 try_files $uri $uri/ @backend;
