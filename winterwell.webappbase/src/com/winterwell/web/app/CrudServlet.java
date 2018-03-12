@@ -335,7 +335,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (qb!=null) s.setQuery(qb);
 		
 		
-		// Sort
+		// Sort e.g. sort=date-desc
 		String sort = state.get("sort");
 		if (sort!=null) {
 			// HACK: order?

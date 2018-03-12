@@ -135,7 +135,7 @@ public class MavenDependencyTask extends BuildTask {
 					+( ! keepJarVersioning? " -Dmdep.stripVersion=true" : "")
 					+ " -DoutputDirectory="+outDir					
 					);
-			
+						
 			proc.setDirectory(projectDir);
 			Log.d(LOGTAG, "dir: "+projectDir+" run: "+proc.getCommand());
 			proc.start();
@@ -143,6 +143,7 @@ public class MavenDependencyTask extends BuildTask {
 			proc.close();
 			Log.w(LOGTAG, proc.getError());
 			Log.d(LOGTAG, proc.getOutput());
+			// TODO store version info somewhere?? e.g. in a versions.txt file??
 			// copy sources
 			if (incSrc) {
 				doTask2_sources(proc.getOutput());

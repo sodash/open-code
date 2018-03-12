@@ -81,8 +81,6 @@ import com.winterwell.utils.time.TUnit;
  * @see WebUtils2
  */
 public class WebUtils {
-
-
 	
 	private static String _RENDER_WEBPAGE_JS;
 	
@@ -1258,14 +1256,7 @@ public class WebUtils {
 			assert temp1.exists() && temp1.length() > 0;
 
 			// 2. Render, trim and convert to PNG with convert
-			Proc p2 = new Proc("convert -trim -antialias -density 300 "
-					+ temp1.getAbsolutePath() + " " + file.getAbsolutePath());
-			p2.run();
-			p2.waitFor(TUnit.MINUTE.getMillisecs());
-
-			if (!file.exists())
-				throw new IOException("Failed to create " + file + "\t"
-						+ p2.getError());
+			pngFromPdf(file, temp1);
 		} catch (Exception e) {
 			throw Utils.runtime(e);
 		} finally {
@@ -1274,6 +1265,17 @@ public class WebUtils {
 				FileUtils.delete(temp1);
 			}
 		}
+	}
+
+	public static void pngFromPdf(File pdfIn, File pngOut) throws IOException {
+		Proc p2 = new Proc("convert -trim -antialias -density 300 "
+				+ pdfIn.getAbsolutePath() + " " + pngOut.getAbsolutePath());
+		p2.run();
+		p2.waitFor(TUnit.MINUTE.getMillisecs());
+
+		if ( ! pngOut.exists())
+			throw new IOException("Failed to create " + pngOut + "\t"
+					+ p2.getError());
 	}
 
 	/**
