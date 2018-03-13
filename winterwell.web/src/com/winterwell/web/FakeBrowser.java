@@ -671,10 +671,12 @@ public class FakeBrowser {
 	 * Set basic authentication
 	 * @param name Can be null (unusual but valid)
 	 * @param password
+	 * @return 
 	 */
-	public void setAuthentication(String name, String password) {
+	public FakeBrowser setAuthentication(String name, String password) {
 		this.name = name;
 		this.password = password;
+		return this;
 	}
 
 	/**
@@ -923,10 +925,13 @@ public class FakeBrowser {
 	/**
 	 * @param token
 	 * See https://en.wikipedia.org/wiki/JSON_Web_Token#Use
+	 * @return 
 	 */
-	public void setAuthenticationByJWT(String token) {		
-		setRequestHeader("Authorization", "Bearer "+token);		
+	public FakeBrowser setAuthenticationByJWT(String token) {		
+		setRequestHeader("Authorization", "Bearer "+token);
+		return this;
 	}
 
+	
 }
 
