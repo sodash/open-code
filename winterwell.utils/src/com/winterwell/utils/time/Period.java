@@ -79,10 +79,23 @@ public final class Period extends Pair<Time> {
 		return second;
 	}
 
+
+	/**
+	 * @return length start to end
+	 * @see #getDt() which is equivalent but typed
+	 */
 	public long getMillisecs() {
 		long ms = getEnd().getTime() - getStart().getTime();
 		assert ms >= 0 : this;
 		return ms;
+	}
+	
+	/**
+	 * @return length start to end
+	 * @see #getMillisecs() which is equivalent but returns raw milliseconds
+	 */
+	public Dt getDt() {
+		return getStart().dt(getEnd());
 	}
 
 	/**

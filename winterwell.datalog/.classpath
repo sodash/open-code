@@ -11,7 +11,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.depot"/>
 	<classpathentry kind="lib" path="/middleware/postgresql/postgresql.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.bob"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client-es2"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.webappbase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/youagain-java-client"/>
 	<classpathentry kind="output" path="bin"/>

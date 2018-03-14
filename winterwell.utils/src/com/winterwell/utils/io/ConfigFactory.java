@@ -204,7 +204,7 @@ public class ConfigFactory {
 		try {
 			return configClass.newInstance();
 		} catch(Exception ex) {
-			Log.d(LOGTAG, "1st try of new "+configClass.getSimpleName()+": "+ex);
+//			NO need to log this. If the code below fails, it will throw an exception Log.d(LOGTAG, "1st try of new "+configClass.getSimpleName()+": "+ex);
 			Constructor cons = configClass.getDeclaredConstructor();
 			if ( ! cons.isAccessible()) cons.setAccessible(true);
 			return cons.newInstance();	
