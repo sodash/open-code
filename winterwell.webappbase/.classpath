@@ -8,11 +8,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.web"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client-es2"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/flexi-gson"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.depot"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/youagain-java-client"/>
 	<classpathentry kind="lib" path="/middleware/lombok/lombok.jar"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-fileupload-1.2.1.jar" sourcepath="/middleware/jakarta/commons-fileupload-1.2.1-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
