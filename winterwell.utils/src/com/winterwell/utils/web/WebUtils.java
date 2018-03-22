@@ -1293,6 +1293,7 @@ public class WebUtils {
 	 */
 	public static void renderUrlToPdf(String url, File file, boolean printStyle, String footer, Dt waitFor) {
 		Proc p = null;
+		if (waitFor==null) waitFor = TUnit.MINUTE.dt;
 		try {
 			String dgpu = Utils.OSisWindows()? "--disable-gpu " : "";
 			p = new Proc(
