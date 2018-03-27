@@ -365,6 +365,7 @@ public class AccuracyScore<Tag> implements IHasJson  {
 				"correct", correct,
 				"ppv", ppv,
 				"sensitivity", sensitivity,
+				"fScore", getFScore(1),
 				"count", count
 				);
 	}	
