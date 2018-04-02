@@ -305,7 +305,11 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 		if (vs!=null) {
 			for (String _v : vs) {
 				if (Utils.isBlank(_v)) continue;
-				// ??should we also screen out "null" and "undefined"??
+				// ??should we also screen out "null" and "undefined"?? 
+				// They almost certainly are blanks rather than input.  
+				if ("undefined".equals(_v)) {
+					continue;
+				}
 				v = _v;
 				break;
 			}
