@@ -34,6 +34,18 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 		<!-- script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js"></script -->		
 		<!-- everything else comes via webpack -->
-		<script src="/build/js/bundle.js"></script>	
+		<script>
+			// never cache in dev
+			var cachebuster = '';
+			if (window.location.host.indexOf('local') !== -1 || window.location.host.indexOf('test') !== -1) {
+				cachebuster = Math.round(Math.random()*100000);
+			}
+			let script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.src = "/build/js/bundle.js?cachebuster="+cachebuster;
+			var head = document.getElementsByTagName("head")[0];
+			(head || document.body).appendChild(script);
+		</script>
+
 	</body>
 </html>
