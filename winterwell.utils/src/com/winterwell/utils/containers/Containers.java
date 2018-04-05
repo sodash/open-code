@@ -274,7 +274,7 @@ public final class Containers  {
 	 * This is equivalent to <code>list.stream().map(fn).collect(Collectors.toList())</code> 
 	 * -- but less typing, easier to debug, and faster!
 	 * 
-	 * @param list
+	 * @param list Cannot be null
 	 * @param fn
 	 * 
 	 * @return [fn applied to each member of list]

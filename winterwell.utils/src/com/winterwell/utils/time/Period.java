@@ -150,4 +150,14 @@ public final class Period extends Pair<Time> {
 		return new Time((getStart().getTime() + getEnd().getTime()) / 2);
 	}
 
+	/**
+	 * Like new Period(), except it handles nulls, by using far past/future backstops.
+	 * @param start Can be null
+	 * @param end Can be null
+	 * @return Period
+	 */
+	public static Period make(Time start, Time end) {
+		return new Period(start==null? TimeUtils.WELL_OLD : start, end==null? TimeUtils.WELL_FUTURE : end);
+	}
+
 }

@@ -4,6 +4,17 @@ import org.junit.Test;
 
 public class PeriodTest {
 
+
+	@Test
+	public void testContains() {	
+		Time t = new Time();
+		assert Period.make(null, null).contains(t);
+		assert ! Period.make(null, t.minus(TUnit.DAY.dt)).contains(t);
+		assert ! Period.make(t.plus(TUnit.DAY.dt), null).contains(t);
+		assert Period.make(t.minus(TUnit.HOUR), t.plus(TUnit.HOUR)).contains(t);
+	}
+	
+	
 	@Test
 	public void testToString() {
 		// shortish gap
