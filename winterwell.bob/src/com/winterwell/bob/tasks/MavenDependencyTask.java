@@ -133,7 +133,7 @@ public class MavenDependencyTask extends BuildTask {
 					// TODO copy sources into somewhere local
 					+"org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies"
 					+( ! keepJarVersioning? " -Dmdep.stripVersion=true" : "")
-					+ " -DoutputDirectory="+outDir					
+					+ " -DoutputDirectory="+outDir.getAbsoluteFile()					
 					);
 						
 			proc.setDirectory(projectDir);

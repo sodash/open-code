@@ -28,7 +28,29 @@ public class BuildWinterwellProject extends BuildTask {
 	 * @return the jar file (after building!)
 	 */
 	public File getJar() {
-		return jarFile;
+		if (_jarFile==null) {
+			return new File(getOutputDir(), projectName+ ".jar");
+		}
+		return _jarFile;
+	}
+	
+	private File getOutputDir() {
+		if (outDir==null) {
+			return projectDir;
+		}
+		return outDir;
+	}
+
+	/**
+	 * null by default. If set, put output files into here
+	 */
+	File outDir;
+	
+	/**
+	 * null by default. If set, put output files into here
+	 */
+	public void setOutDir(File outDir) {
+		this.outDir = outDir;
 	}
 	
 	public void setMainClass(Class mainClass) {
@@ -43,7 +65,7 @@ public class BuildWinterwellProject extends BuildTask {
 
 	public final File projectDir;
 	protected boolean incSrc;
-	protected File jarFile;
+	private File _jarFile;
 
 	private String version;
 
@@ -89,8 +111,7 @@ public class BuildWinterwellProject extends BuildTask {
 		this.projectDir = projectDir;
 		assert projectDir.isDirectory() : projectDir+" "+this;
 		if (projectName==null) projectName = projectDir.getName();
-		this.projectName = projectName;
-		jarFile = new File(projectDir, projectName+ ".jar");
+		this.projectName = projectName;		
 	}
 
 	public BuildWinterwellProject(File projectDir) {
@@ -108,8 +129,8 @@ public class BuildWinterwellProject extends BuildTask {
 		doTask2_compile(srcDir, binDir);
 		
 		// Jar		
-		FileUtils.delete(jarFile);
-		JarTask jar = new JarTask(jarFile, getBinDir());
+		FileUtils.delete(getJar());
+		JarTask jar = new JarTask(getJar(), getBinDir());
 		jar.setAppend(false);
 		jar.setManifestProperty(JarTask.MANIFEST_TITLE, 
 				projectDir.getName()+" library (c) Winterwell. All rights reserved.");
@@ -139,7 +160,7 @@ public class BuildWinterwellProject extends BuildTask {
 		
 		// source code?
 		if (incSrc) {
-			JarTask jar2 = new JarTask(jarFile, new File(projectDir, "src"));
+			JarTask jar2 = new JarTask(getJar(), new File(projectDir, "src"));
 			jar2.setAppend(true);
 			jar2.run();			
 		}
@@ -151,13 +172,13 @@ public class BuildWinterwellProject extends BuildTask {
 		// copy into code/lib
 		File lib = new File(FileUtils.getWinterwellDir(), "code/lib");
 		lib.mkdirs();
-		FileUtils.copy(jarFile, lib);
-		Log.d(LOGTAG, "Copied "+jarFile.getName()+" to "+lib);
+		FileUtils.copy(getJar(), lib);
+		Log.d(LOGTAG, "Copied "+getJar().getName()+" to "+lib);
 		
 		// attempt to upload (but don't block)
 		if (scpToWW) {
-			SCPTask scp = new SCPTask(jarFile, "winterwell@winterwell.com",				
-					"/home/winterwell/public-software/"+jarFile.getName());
+			SCPTask scp = new SCPTask(getJar(), "winterwell@winterwell.com",				
+					"/home/winterwell/public-software/"+getJar().getName());
 			// this is online at: https://www.winterwell.com/software/downloads
 			scp.setMkdirTask(false);
 			scp.runInThread();
