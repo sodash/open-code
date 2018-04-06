@@ -217,8 +217,15 @@ implements Comparable<Money>, IHasJson {
 		return currency;
 	}
 
+	/**
+	 * 
+	 * @param c
+	 * @param v100p value in hundredth of a pence, e.g. £1 = 10000 !
+	 * @return
+	 */
 	public static Money from100p(KCurrency c, Number v100p) {
 		return new Money(c, MathUtils.cast(BigDecimal.class, v100p).divide(P100));
 	}
+
 	
 }

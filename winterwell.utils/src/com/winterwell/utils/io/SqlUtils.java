@@ -1086,6 +1086,14 @@ public class SqlUtils {
 		return executeUpdate(sql, em);
 	}
 
+	/**
+	 * Check the type of object, and encode appropriately.
+	 * 
+	 * See also: {@link #sqlEncode(String)} which this will use for Strings only.
+	 *
+	 * @param v Can be null (returns "null").
+	 * @return e.g. don't => 'don''t', 7 => 7
+	 */
 	public static String sqlEncode(Object v) {
 		if (v instanceof String) return SqlUtils.sqlEncode((String)v);
 		if (v==null) return "null";
