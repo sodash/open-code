@@ -51,7 +51,7 @@ public final class YouAgainClient {
 
 	
 	static final String ENDPOINT = 
-				"https://youagain.winterwell.com/youagain.json";
+				"https://youagain.good-loop.com/youagain.json";
 //				"http://localyouagain.winterwell.com/youagain.json";
 
 	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
