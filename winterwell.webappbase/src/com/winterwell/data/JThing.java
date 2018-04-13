@@ -7,6 +7,7 @@ import java.util.Map;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.depot.IInit;
+import com.winterwell.depot.INotSerializable;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
@@ -17,12 +18,19 @@ import com.winterwell.utils.StrUtils;
  * @author daniel
  *
  */
-public final class JThing<T> {
+public final class JThing<T> 
+implements INotSerializable // serialize the json not this wrapper 
+{
 
 	private String json;
 	private Map<String,Object> map;
 	private T java;
 	private Class<T> type;
+	
+	/**
+	 * Optionally used for ES version control
+	 */
+	public Object version;
 	
 	/**
 	 * Equivalent to new JThing().setJava(item)
