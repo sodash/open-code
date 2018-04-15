@@ -290,6 +290,9 @@ public class AppUtils {
 	 */
 	@SuppressWarnings("unused")
 	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest stateCanBeNull) {
+		return doSaveEdit2(path, item, stateCanBeNull, false);
+	}
+	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest stateCanBeNull, boolean instant) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));		
 		// save update
 		
@@ -328,6 +331,8 @@ public class AppUtils {
 		Map map = item.map();
 		up.setDoc(map);
 		up.setDocAsUpsert(true);
+		// force an instant refresh?
+		if (instant) up.setRefresh("true");
 		// TODO delete stuff?? fields or items from a list
 //		up.setScript(script)
 		// NB: this doesn't return the merged item :(
