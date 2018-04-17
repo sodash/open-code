@@ -80,7 +80,7 @@ public class AppUtils {
 
 	
 	/**
-	 * Use ConfigFactory to get a config from standard places
+	 * Use ConfigFactory to get a config from standard places. This is for loading configs during initialisation.
 	 * @param config
 	 * @param args
 	 * @return
@@ -591,8 +591,7 @@ public class AppUtils {
 		
 		return filter;
 	}
-
-
+	
 	@Deprecated
 	public static <X> X getConfig(String appName, X config, String[] args) {
 		return (X) getConfig(appName, config.getClass(), args);
