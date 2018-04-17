@@ -7,6 +7,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import java.util.jar.Manifest;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.time.Time;
 
 import sun.misc.SharedSecrets;
 
@@ -441,6 +444,56 @@ public class ReflectionUtils {
 		f.setAccessible(true);
 		try {
 			f.set(obj, value);
+		} catch(IllegalArgumentException ex) {
+			// coerce type?
+			try {
+				Class<?> ft = f.getType();
+				if (ReflectionUtils.isaNumber(ft)) {
+					// coerce
+					double dbl = MathUtils.toNum(value);
+					if (ft == Integer.class || ft==int.class) {
+						f.set(obj, (int) dbl);
+						return;
+					}
+					if (ft == Long.class || ft==long.class) {
+						f.set(obj, (long) dbl);
+						return;
+					} 
+					if (ft == Float.class || ft==float.class) {
+						f.set(obj, (float) dbl);
+						return;
+					}
+					if (ft == BigDecimal.class) {
+						f.set(obj, new BigDecimal(dbl));
+						return;
+					}
+					if (ft == BigInteger.class) {
+						f.set(obj, new BigInteger(value.toString()));
+						return;
+					}
+				}
+				if (ft == Time.class) {
+					f.set(obj, new Time(value.toString()));
+					return;
+				}
+				if (ft.isEnum()) {
+					Object[] cs = ft.getEnumConstants();
+					for (Object c : cs) {
+						if (c.toString().equals(value)) {
+							f.set(obj, c);
+							return;
+						}
+					}
+				}
+				if (ft == String.class) {
+					f.set(obj, value.toString());
+					return;
+				}
+			} catch(Exception ex2) {
+				// fail :(
+				ex2.printStackTrace();
+			}
+			throw Utils.runtime(ex);
 		} catch (Exception e) {
 			throw Utils.runtime(e);
 		}

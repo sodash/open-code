@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.jetty.util.ajax.JSON;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -112,12 +113,16 @@ public class AppUtils {
 	 * @return
 	 */
 	public static <X> X get(ESPath path, Class<X> klass) {
+		return get(path, klass, null);
+	}
+	
+	public static <X> X get(ESPath path, Class<X> klass, AtomicLong version) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 
 		GetRequestBuilder s = new GetRequestBuilder(client);
 		// Minor TODO both indices in one call
 		s.setIndices(path.indices[0]).setType(path.type).setId(path.id);
-		s.setSourceOnly(true);
+		if (version==null) s.setSourceOnly(true);
 //		s.setDebug(true);
 		GetResponse sr = s.get();
 		if (sr.isSuccess()) {
@@ -125,6 +130,11 @@ public class AppUtils {
 				Gson gson = Dep.get(Gson.class);
 				String json = sr.getSourceAsString();
 				X item = gson.fromJson(json, klass);
+				// version?
+				if (version!=null) {
+					Long v = sr.getVersion();
+					version.set(v);
+				}
 				return item;
 			}
 			Map<String, Object> json = sr.getSourceAsMap(); //SourceAsString();
@@ -280,6 +290,9 @@ public class AppUtils {
 	 */
 	@SuppressWarnings("unused")
 	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest stateCanBeNull) {
+		return doSaveEdit2(path, item, stateCanBeNull, false);
+	}
+	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest stateCanBeNull, boolean instant) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));		
 		// save update
 		
@@ -318,6 +331,8 @@ public class AppUtils {
 		Map map = item.map();
 		up.setDoc(map);
 		up.setDocAsUpsert(true);
+		// force an instant refresh?
+		if (instant) up.setRefresh("true");
 		// TODO delete stuff?? fields or items from a list
 //		up.setScript(script)
 		// NB: this doesn't return the merged item :(
