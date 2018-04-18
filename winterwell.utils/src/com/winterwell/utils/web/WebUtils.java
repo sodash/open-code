@@ -7,6 +7,7 @@ package com.winterwell.utils.web;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -1271,6 +1272,7 @@ public class WebUtils {
 	}
 
 	public static void pngFromPdf(File pdfIn, File pngOut) throws IOException {
+		if ( ! pdfIn.exists()) throw new FileNotFoundException("missing pdf input file: "+pdfIn);
 		Proc p2 = new Proc("convert -trim -antialias -density 300 "
 				+ pdfIn.getAbsolutePath() + " " + pngOut.getAbsolutePath());
 		p2.run();
