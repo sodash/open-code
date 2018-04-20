@@ -211,7 +211,8 @@ implements Comparable<Money>, IHasJson {
 	public Map<String,Object> toJson2() {
 		return new ArrayMap(
 			"currency", currency,
-			"value", value
+			"value", value,
+			"value100p", value100p
 				);
 	}
 
