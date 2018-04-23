@@ -442,7 +442,7 @@ public class AppUtils {
 					CreateIndexRequest pi = es.admin().indices().prepareCreate(baseIndex);
 					pi.setFailIfAliasExists(true);
 					pi.setAlias(index);
-					IESResponse r = pi.get();
+					IESResponse r = pi.get().check();
 				} catch(ESException ex) {
 					Log.e("ES.init", ex.toString());
 					err = ex;
