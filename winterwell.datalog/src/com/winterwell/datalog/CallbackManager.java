@@ -37,7 +37,7 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 		String url = protocol+"://"+(mtype==KServerType.PRODUCTION? "" : mtype.toString().toLowerCase())
 				+"as.good-loop.com/lgwebhook";
 		// minview is where money gets spent. donation is when a user picks a charity.		
-		for(String evt : new String[] {"minview","donation"}) {
+		for(String evt : new String[] {"minview","click","donation"}) {
 			Callback cb = new Callback("gl", evt, url);
 			callbacksForDataspace.add("gl", cb);
 		}
