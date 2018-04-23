@@ -512,7 +512,7 @@ public final class Containers  {
 	
 	/**
 	 * Wrapper for {@link Arrays#asList(Object...)} which can handle arrays of primitives,
-	 * e.g. int[] or double[].
+	 * e.g. int[] or double[]. It can also handle Lists, so if you're not sure whether you've got a List or array -- this is your method.
 	 * Throws an IllegalArgumentException if 'array' is not an array or a List (eg. an int
 	 * value)
 	 * @param array array or list

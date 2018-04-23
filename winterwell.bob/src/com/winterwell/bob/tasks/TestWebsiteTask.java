@@ -25,11 +25,12 @@ public class TestWebsiteTask extends BuildTask {
 	
 	@Override
 	protected void doTask() throws Exception {
+		outputDir.mkdirs();
 		for(String u : testUrls) {
 			URI ru = WebUtils.resolveUri(baseUrl, u);
 			File file = File.createTempFile(FileUtils.safeFilename("test_"+ru.getHost()), ".pdf");
 			WebUtils.renderUrlToPdf(ru.toString(), file, false, null, TUnit.MINUTE.dt);
-			File pngOut = new File(outputDir, FileUtils.safeFilename(ru.toString()+".png"));
+			File pngOut = new File(outputDir, FileUtils.safeFilename(ru.toString()+".png"));			
 			WebUtils.pngFromPdf(file, pngOut);
 		}
 	}

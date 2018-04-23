@@ -18,9 +18,8 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildBobRelease extends BuildWinterwellProject {
 
 	public BuildBobRelease() {
-		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.bob"));
+		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.bob"), "bob.all");
 		incSrc = false;
-		jarFile = new File(projectDir, "bob.all.jar");
 		setMainClass(Bob.class);
 	}
 
@@ -34,7 +33,7 @@ public class BuildBobRelease extends BuildWinterwellProject {
 				new BuildWeb()
 		}) {
 			File ubin = bwp.getBinDir();
-			JarTask jar = new JarTask(jarFile, ubin);
+			JarTask jar = new JarTask(getJar(), ubin);
 			jar.setAppend(true);
 			jar.run();
 			jar.close();

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,6 +24,17 @@ public class TimeUtilsTest {
 	public void testScratch() {
 		SimpleDateFormat sdf = new SimpleDateFormat();
 		String out = sdf.format(new Time().getDate());
+		
+		for(String s : new String[] {
+//				"2017-09-13T10:36:40+01", 
+				"2017-09-13"
+				}
+		) {
+			OffsetDateTime odt = OffsetDateTime.parse(s);
+			System.out.println(odt);
+			Date date = new Date(odt.toEpochSecond()*1000);			
+			System.out.println(date);
+		}
 	}
 	
 	/**

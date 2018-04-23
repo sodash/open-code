@@ -1,6 +1,7 @@
 package com.winterwell.utils.time;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +30,14 @@ public final class Dt implements Comparable<Dt>, Serializable, IHasJson {
 		assert unit != null;
 	}
 
+	/**
+	 * @return ISO 8601 duration format PdateTtime
+	 * See https://en.wikipedia.org/wiki/ISO_8601#Durations
+	 */
+	public String toISOString() {
+		return "P"+(unit.millisecs < TUnit.DAY.millisecs? "T" : "")+n+unit.toString().substring(0, 1);		
+	}
+	
 	/**
 	 * Convenience for a Dt measured in milliseconds.
 	 * 

@@ -17,9 +17,8 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildBob extends BuildWinterwellProject {
 
 	public BuildBob() {
-		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.bob"));
+		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.bob"), "bob");
 		incSrc = true;
-		jarFile = new File(projectDir, "bob.jar");
 		setMainClass(Bob.class);
 	}
 

@@ -200,9 +200,11 @@ public class FileServlet extends HttpServlet {
 	 * Simples
 	 * 
 	 * @param baseDir
+	 * @return 
 	 */
-	public void setBaseDir(File baseDir) {
+	public FileServlet setBaseDir(File baseDir) {
 		this.baseDir = baseDir;
+		return this;
 	}
 
 }

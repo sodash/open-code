@@ -16,7 +16,7 @@ import com.winterwell.utils.web.IHasJson;
  * Support values down to 0.01p (a hundredth of a pence)
  * (i.e. £0.10 CPM is the lowest value)
  */
-public final class Money 
+public class Money 
 extends AThing // dubious -- no id, no url
 implements Comparable<Money>, IHasJson {
 	
@@ -49,14 +49,19 @@ implements Comparable<Money>, IHasJson {
 	 */
 	private static final BigDecimal P100 = new BigDecimal(10000);
 
-	Money() {	
+	protected Money() {	
 	}
 	
 	public KCurrency currency = KCurrency.GBP;
 	/**
-	 * Support values down to 0.01p (a hundredth of a pence)
+	 * Support values down to 0.01p (a hundredth of a pence).
+	 * This is the canonical value of the Money object.
 	 */
 	private long value100p;
+	
+	@Deprecated // HACK to upgrade old objects
+	private Object value100;
+	
 	private transient BigDecimal _value;
 
 	/**
@@ -184,9 +189,15 @@ implements Comparable<Money>, IHasJson {
 		if (value100p==0 && value!=null && ! "0".equals(value)) {
 			value100p = new BigDecimal(value).multiply(P100).longValue();
 		}
+		// HACK old format (this code added Apr 2018)
+		if (value100p==0 && value==null && value100!=null) {
+			value100p = new BigDecimal(value100.toString()).multiply(new BigDecimal(100)).longValue();
+		}
+		value100 = null;
+		// end hack
 		if (value==null) {
 			value = new BigDecimal(value100p).divide(P100).toPlainString();
-		}
+		}		
 	}
 
 
@@ -200,7 +211,8 @@ implements Comparable<Money>, IHasJson {
 	public Map<String,Object> toJson2() {
 		return new ArrayMap(
 			"currency", currency,
-			"value", value
+			"value", value,
+			"value100p", value100p
 				);
 	}
 
@@ -217,8 +229,15 @@ implements Comparable<Money>, IHasJson {
 		return currency;
 	}
 
+	/**
+	 * 
+	 * @param c
+	 * @param v100p value in hundredth of a pence, e.g. £1 = 10000 !
+	 * @return
+	 */
 	public static Money from100p(KCurrency c, Number v100p) {
 		return new Money(c, MathUtils.cast(BigDecimal.class, v100p).divide(P100));
 	}
+
 	
 }

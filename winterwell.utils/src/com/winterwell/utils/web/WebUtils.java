@@ -7,6 +7,7 @@ package com.winterwell.utils.web;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -1227,11 +1228,12 @@ public class WebUtils {
 	 */
 	public static void renderToPdf(String html, File file, boolean printStyle, String footer) {
 		// insert no-Google-header-footer
-		String html2 = html.replaceFirst("</(head|HEAD)>", "<style>@page { margin:0; size:A4; }\n body { margin: 1.6cm; }\n }</style>$0");
+		String html2 = html.replaceFirst("</(head|HEAD)>", "\n<style>\n	@page { margin:0; size:A4; }\n	body { margin: 1.6cm; }\n</style>\n$0");
 		html = html2;
 		File temp1 = null;
 		try { 			
 			temp1 = File.createTempFile("page", ".html");
+			System.out.println(temp1);
 			FileUtils.write(temp1, html);
 			assert temp1.exists();
 			renderUrlToPdf(WebUtils.URI(temp1), file, printStyle, footer, TUnit.MINUTE.dt);
@@ -1270,6 +1272,7 @@ public class WebUtils {
 	}
 
 	public static void pngFromPdf(File pdfIn, File pngOut) throws IOException {
+		if ( ! pdfIn.exists()) throw new FileNotFoundException("missing pdf input file: "+pdfIn);
 		Proc p2 = new Proc("convert -trim -antialias -density 300 "
 				+ pdfIn.getAbsolutePath() + " " + pngOut.getAbsolutePath());
 		p2.run();
@@ -1300,11 +1303,11 @@ public class WebUtils {
 			String dgpu = Utils.OSisWindows()? "--disable-gpu " : "";
 			p = new Proc(
 					"chromium-browser --headless "+dgpu+"--print-to-pdf=\""+file+"\" "+url				
-					);
+					);			
 			p.start();
 			int done = p.waitFor(waitFor);
 			Log.d("html",
-					"RenderToPdf: " + p.getOutput() + "\t" + p.getError());
+					"RenderToPdf: Command: "+p.getCommand()+" output: " + p.getOutput() + "\t" + p.getError());
 			
 			if ( ! file.exists())
 				throw Utils.runtime(new IOException("render failed: " + p.getCommand() + " failed to create " + file + "\t"
