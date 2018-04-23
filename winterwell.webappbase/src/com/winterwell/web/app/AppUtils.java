@@ -590,24 +590,82 @@ public class AppUtils {
 		// filters TODO a true recursive SearchQuery -> ES query mapping
 		// TODO this is just a crude 1-level thing
 		List ptree = sq.getParseTree();
-		for (Object clause : ptree) {
-			if (clause instanceof List) {
-				assert ((List) clause).size() == 2 : clause+" from "+sq;
-				List<String> propVal = (List) clause;
-				String prop = propVal.get(0);
-				String val = propVal.get(1);
+		try {
+			filter = filter.must(parseTreeToQuery(ptree));
+		} catch (AssertionError e) {
+			// Put full query info on an assertion failure
+			assert (false) : e.getMessage() + " from " + sq;
+		}
+		
+		return filter;
+	}
+	
+	
+	private static BoolQueryBuilder parseTreeToQuery(Object rawClause) {
+		BoolQueryBuilder filter = QueryBuilders.boolQuery();
+		
+		// Map means propname=value constraint.
+		if (rawClause instanceof Map) {
+			Map<String, Object> clause = (Map<String, Object>) rawClause;
+			// We expect only one pair per clause, but no reason not to tolerate multiples.
+			for (String prop : clause.keySet()) {
+				String val = (String) clause.get(prop);
 				if (ESQueryBuilders.UNSET.equals(val)) {
 					QueryBuilder setFilter = QueryBuilders.existsQuery(prop);
-					filter = filter.mustNot(setFilter);
+					return filter.mustNot(setFilter);
 				} else {
 					// normal key=value case
 					QueryBuilder kvFilter = QueryBuilders.termQuery(prop, val);
-					filter = filter.must(kvFilter);
-				}				
+					return filter.must(kvFilter);
+				}	
 			}
-
+		}
+	
+		assert (rawClause instanceof List) : "clause is not list or map: " + rawClause;
+		
+		List clause = (List) rawClause;
+		assert (! clause.isEmpty()) : "empty clause";
+		
+		// Only one element?
+		if (clause.size() < 2) {
+			Object entry = clause.get(0);
+			// empty query string yields degenerate parse tree with just ["and"]
+			if (entry instanceof String && SearchQuery.KEYWORD_AND.equalsIgnoreCase((String) entry)) {
+				return filter;
+			}
+			// Well, try and parse it.
+			return parseTreeToQuery(entry);
 		}
 		
+		// 2+ elements, first is a String - is it a Boolean operator?
+		Object maybeOperator = clause.get(0);
+		if (maybeOperator instanceof String) {
+			// Is it an explicit NOT clause, ie (NOT, x=y)?
+			if (SearchQuery.KEYWORD_NOT.equals((String) maybeOperator)) {
+				assert (clause.size() == 2) : "Explicit NOT clause with >1 operand??: " + clause;
+				return filter.mustNot(parseTreeToQuery(clause.get(1)));
+			}
+			
+			if (SearchQuery.KEYWORD_AND.equals((String) maybeOperator)) {
+				for (Object term : clause.subList(1, clause.size())) {
+					filter = filter.must(parseTreeToQuery(term));
+				}
+				return filter;
+			}
+			
+			if (SearchQuery.KEYWORD_OR.equals((String) maybeOperator)) {
+				for (Object term : clause.subList(1, clause.size())) {
+					filter = filter.should(parseTreeToQuery(term));
+				}
+				return filter;
+			}
+		}
+		
+		// Fall-through clause: 2+ elements, first isn't a Boolean operator
+		// Assume it's an implicit AND of all elements in list.
+		for (Object term : clause) {
+			filter = filter.must(parseTreeToQuery((List) term));
+		}
 		return filter;
 	}
 
