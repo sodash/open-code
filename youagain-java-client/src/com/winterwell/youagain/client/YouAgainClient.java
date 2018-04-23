@@ -1,10 +1,13 @@
 package com.winterwell.youagain.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.mail.internet.InternetAddress;
 
@@ -308,6 +311,36 @@ public final class YouAgainClient {
 		state.setUser(uxid, user);
 		// done
 		return uxid;
+	}
+	
+	
+	public List<String> getSharedWith(String authToken) {
+		FakeBrowser fb = new FakeBrowser();
+		fb.setAuthenticationByJWT(authToken);
+		String response = fb.getPage(ENDPOINT, new ArrayMap(
+				"app", app, 
+				"action", "shared-with"));
+		
+		Map jobj = (Map) JSON.parse(response);
+		Object shares = SimpleJson.get(jobj, "cargo");
+		if (shares instanceof Object[]) {
+			return Arrays.stream((Object[]) shares).map(share -> (String) SimpleJson.get(share, "item")).collect(Collectors.toList());
+		}
+		return Collections.emptyList();
+	}
+	
+	public boolean share(String authToken, String targetUser, String item) {
+		FakeBrowser fb = new FakeBrowser();
+		fb.setAuthenticationByJWT(authToken);
+		String response = fb.getPage(ENDPOINT, new ArrayMap(
+				"app", app,
+				"shareWith", targetUser,
+				"entity", item,
+				"action", "shared"));
+		
+		Map jobj = (Map) JSON.parse(response);
+		Object success = SimpleJson.get(jobj, "success");
+		return (success instanceof Boolean) ? (Boolean) success : false;
 	}
 
 	public void setDebug(boolean b) {

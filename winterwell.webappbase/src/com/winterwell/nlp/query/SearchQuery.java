@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -472,7 +473,8 @@ public class SearchQuery implements Serializable, IHasJson {
 				String k = m.group(1);
 				String v = m.group(2);
 				// ??Is list the right thing here?? Would Map be more clear??
-				output.set(i, Arrays.asList(k, v));
+				// output.set(i, Arrays.asList(k, v));
+				output.set(i, Collections.singletonMap(k, v));
 			}
 		}
 	}
