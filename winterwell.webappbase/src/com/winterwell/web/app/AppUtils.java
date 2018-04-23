@@ -480,7 +480,7 @@ public class AppUtils {
 					if ( ! es.admin().indices().indexExists(index)) {
 						CreateIndexRequest pi = es.admin().indices().prepareCreate(index);
 //						pi.setFailIfAliasExists(true);
-//						pi.setAlias(path.index());
+//						pi.setAlias(path.index()); // no alias - the old version is still in place
 						IESResponse r = pi.get().check();
 					}
 					// setup the right mapping
@@ -491,6 +491,10 @@ public class AppUtils {
 					// and shout fail!
 					//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
 					// c.f. https://issues.soda.sh/stream?tag=35538&as=su
+					
+					// After this, the sysadmin should (probably) remove the link old-base -> alias, 
+					// and put in a new-base -> alias link
+					
 					err = ex;
 					Log.e("init", ex.toString());
 				}
