@@ -913,4 +913,20 @@ public class TimeUtils {
 		}
 		return m1Slots;		
 	}
+
+	/**
+	 * @deprecated a bit of a hack, and not all implemented
+	 * @param s
+	 * @return
+	 */
+	public static TUnit getTUnit(String s) {
+		s = s.toLowerCase();
+		switch(s) {
+		case "ms": return TUnit.MILLISECOND;
+		case "s": return TUnit.SECOND;
+		case "m": return TUnit.MINUTE;	
+		case "h": return TUnit.HOUR;	
+		}
+		return null;
+	}
 }
