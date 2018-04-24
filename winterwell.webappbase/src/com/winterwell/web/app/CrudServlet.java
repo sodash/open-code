@@ -257,6 +257,12 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	private String _id;
 	protected String dataspace = null;
+	
+	/**
+	 * suggested: date-desc
+	 */
+	protected String defaultSort;
+	
 	public static final SField SORT = new SField("sort");
 
 	protected JThing<T> doPublish(WebRequest state) {
@@ -336,7 +342,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (qb!=null) s.setQuery(qb);
 				
 		// Sort e.g. sort=date-desc for most recent first
-		String sort = state.get(SORT, "date-desc");
+		String sort = state.get(SORT, defaultSort);
 		if (sort!=null) {
 			// HACK: order?
 			SortOrder order = SortOrder.ASC;
