@@ -25,6 +25,8 @@ implements Comparable<Money>, IHasJson {
 			.property("currency", new ESType().keyword())
 			.property("value", new ESType().keyword())
 			.property("value100p", new ESType().LONG())
+			// old data!
+			.property("value100", new ESType().DOUBLE()) 
 			// less core
 			.property("@type", new ESType().keyword().noAnalyzer().noIndex())			
 			.property("start", new ESType().date())
