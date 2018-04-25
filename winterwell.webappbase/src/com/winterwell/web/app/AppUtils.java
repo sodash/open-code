@@ -542,6 +542,7 @@ public class AppUtils {
 	 * @return
 	 */
 	public static PersonLite getCreatePersonLite(XId from, Map info) {
+		assert from != null : info;
 		// it is strongly recommended that the router treat PersonLite == Person 
 		IESRouter router = Dep.get(IESRouter.class);
 		ESPath path = router.getPath(PersonLite.class, from.toString(), KStatus.PUBLISHED);

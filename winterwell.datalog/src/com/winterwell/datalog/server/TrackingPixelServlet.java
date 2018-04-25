@@ -28,8 +28,9 @@ public class TrackingPixelServlet implements IServlet {
 
 
 	/**
+	 * Make/retrieve a tracker cookie
 	 * TODO move into YouAgain Client
-	 * @param state
+	 * @param state Can be null (returns null)
 	 * @return A nonce@trk XId. Can be null for do-not-track. Repeated calls will return the same uid. 
 	 */
 	public static String getCreateCookieTrackerId(WebRequest state) {
