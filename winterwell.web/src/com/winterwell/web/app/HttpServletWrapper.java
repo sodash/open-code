@@ -80,7 +80,7 @@ public class HttpServletWrapper extends HttpServlet {
 		if (wex.code >= 500) {
 			Log.e("error."+wex.getClass().getSimpleName(), ex);
 		} else {
-			Log.i(wex.getClass().getSimpleName(), ex);
+			Log.w(wex.getClass().getSimpleName(), ex);
 		}
 		WebUtils2.sendError(wex.code, wex.getMessage(), resp);
 	}

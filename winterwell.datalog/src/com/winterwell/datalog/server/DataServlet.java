@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jetty.util.ajax.JSON;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -23,6 +24,7 @@ import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
@@ -99,6 +101,7 @@ public class DataServlet implements IServlet {
 		String q = state.get("q");
 		BoolQueryBuilder filter = makeQueryFilter(q, start, end);
 				
+		Set<String> allOutputs = new ArraySet<>();
 		for(final String bd : breakdown) {
 			if (bd==null) {
 				Log.w(LOGTAG, "null breakdown?! in "+breakdown+" from "+state);
@@ -135,13 +138,20 @@ public class DataServlet implements IServlet {
 			String json = bd.substring(bd.indexOf("{"), bd.length());
 			Map<String,String> output = (Map) JSON.parse(json);
 			for(String k : output.keySet()) {
+				allOutputs.add(k);
 				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
 				leaf.subAggregation(myCount);
 				// filter 0s ??does this work??
 				filter.must(QueryBuilders.rangeQuery(k).gt(0));
 			}						
-			search.addAggregation(byTag);
+			search.addAggregation(byTag);						
 		} // ./breakdown
+		
+		// TODO add a total count as well
+		for(String k : allOutputs) {
+			com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
+			search.addAggregation(myCount);	
+		}
 		
 		// Set filter
 		search.setFilter(filter);
