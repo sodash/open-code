@@ -77,6 +77,10 @@ implements INotSerializable // serialize the json not this wrapper
 		return json;
 	}
 	
+	/**
+	 * @return An unmodifiable map view.
+	 * @see #put(String, Object)
+	 */
 	public Map<String, Object> map() {
 		if (map==null && string()!=null) {
 			map = (Map<String, Object>) JSON.parse(json);

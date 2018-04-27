@@ -105,13 +105,14 @@ public abstract class CrudServlet<T> implements IServlet {
 		// return json?
 		getThing(state);
 		if (jthing==null) jthing = getThingFromDB(state); 
-		if (jthing != null) {			
+		if (jthing != null) {						
 			String json = jthing.string();
 			// TODO privacy: potentially filter some stuff from the json!
 			JsonResponse output = new JsonResponse(state).setCargoJson(json);			
 			WebUtils2.sendJson(output, state);
 			return;
 		}
+		// return blank / messages
 		if (state.getAction()==null) {
 			// no thing?
 			throw new WebEx.E404(state.getRequestUrl());
@@ -188,21 +189,35 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	protected JThing<T> getThingFromDB(WebRequest state) {		
 		ESPath path = getPath(state);
-		T obj = AppUtils.get(path, type);
-		if (obj==null) {
-			// Not found :(
-			// was version=draft?
-			if (state.get(AppUtils.STATUS)==KStatus.DRAFT) {
-				// Try for the published version
-				// NB: all published should be in draft, so this should be redundant
-				WebRequest state2 = new WebRequest(state.request, state.response);
-				state2.put(AppUtils.STATUS, KStatus.PUBLISHED);
-				return getThingFromDB(state2);
+		KStatus status = state.get(AppUtils.STATUS);
+		// fetch from DB
+		T obj = AppUtils.get(path, type);		
+		if (obj!=null) {
+			JThing thing = new JThing().setType(type).setJava(obj);
+			// HACK force status?
+			if (status==KStatus.DRAFT && AppUtils.getStatus(thing) == KStatus.PUBLISHED) {
+				thing = AppUtils.setStatus(thing, status);
 			}
-			return null;
+			// success
+			return thing;
 		}
-		// TODO should set jthing?? for consistency with getThing()??
-		return new JThing().setType(type).setJava(obj);
+		
+		// Not found :(
+		// was version=draft?
+		if (status == KStatus.DRAFT) {			
+			// Try for the published version
+			// NB: all published should be in draft, so this should be redundant
+			WebRequest state2 = new WebRequest(state.request, state.response);
+			state2.put(AppUtils.STATUS, KStatus.PUBLISHED);
+			JThing<T> pubThing = getThingFromDB(state2);
+			if (pubThing != null) {
+				// NB: this won't exist in the draft DB yet (so that merely viewing an item in an editor doesn't make a draft)
+				// -- but if it is edited, then save-edits should make a draft
+				JThing<T> draftThing = AppUtils.setStatus(pubThing, KStatus.DRAFT);
+				return draftThing;
+			}
+		}
+		return null;
 	}
 
 	protected ESPath getPath(WebRequest state) {

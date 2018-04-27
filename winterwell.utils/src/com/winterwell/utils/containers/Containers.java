@@ -343,6 +343,12 @@ public final class Containers  {
 		return after;
 	}
 
+	/**
+	 * Apply a function to change map values (and filter nulls)
+	 * @param map
+	 * @param fn
+	 * @return
+	 */
 	public static <K, I, O> Map<K,O> applyToMap(Map<? extends K, ? extends I> map, java.util.function.BiFunction<K, I, O> fn) {
 		HashMap after = new HashMap(map.size());
 		for (K k : map.keySet()) {
