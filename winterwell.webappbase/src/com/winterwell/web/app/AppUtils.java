@@ -169,7 +169,7 @@ public class AppUtils {
 			thing.put("modified", false);
 		}
 		// set status
-		thing.put("status", newStatus);
+		thing = setStatus(thing, newStatus);		
 		// update draft // TODO just an update script to set status
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		UpdateRequestBuilder up = client.prepareUpdate(draftPath);
@@ -226,7 +226,7 @@ public class AppUtils {
 			draft.put("modified", false);
 		}
 		// set status
-		draft.put("status", KStatus.PUBLISHED);
+		draft = setStatus(draft, KStatus.PUBLISHED);
 		// publish
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		UpdateRequestBuilder up = client.prepareUpdate(publishPath);
@@ -273,9 +273,9 @@ public class AppUtils {
 		// update status TODO factor out the status logic
 		Object s = item.map().get("status");
 		if (Utils.streq(s, KStatus.PUBLISHED)) {
-			item.put("status", KStatus.MODIFIED);
+			AppUtils.setStatus(item, KStatus.MODIFIED);
 		} else {
-			item.put("status", KStatus.DRAFT);
+			AppUtils.setStatus(item, KStatus.DRAFT);
 		}		
 		// talk to ES
 		return doSaveEdit2(path, item, state);
@@ -542,6 +542,7 @@ public class AppUtils {
 	 * @return
 	 */
 	public static PersonLite getCreatePersonLite(XId from, Map info) {
+		assert from != null : info;
 		// it is strongly recommended that the router treat PersonLite == Person 
 		IESRouter router = Dep.get(IESRouter.class);
 		ESPath path = router.getPath(PersonLite.class, from.toString(), KStatus.PUBLISHED);
@@ -672,6 +673,23 @@ public class AppUtils {
 	@Deprecated
 	public static <X> X getConfig(String appName, X config, String[] args) {
 		return (X) getConfig(appName, config.getClass(), args);
+	}
+
+
+	public static <T> JThing<T> setStatus(JThing<T> thing, KStatus newStatus) {
+		Utils.check4null(thing, newStatus);
+		thing.put("status", newStatus);
+		return thing;
+	}
+
+
+	public static KStatus getStatus(JThing thing) {
+		Object s = thing.map().get("status");
+		if (s==null) {
+			return null; // odd
+		}
+		if (s instanceof KStatus) return (KStatus) s;
+		return KStatus.valueOf((String) s);
 	}
 
 

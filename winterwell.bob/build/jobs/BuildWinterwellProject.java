@@ -28,10 +28,19 @@ public class BuildWinterwellProject extends BuildTask {
 	 * @return the jar file (after building!)
 	 */
 	public File getJar() {
-		if (_jarFile==null) {
+		if (jarFile==null) {
 			return new File(getOutputDir(), projectName+ ".jar");
 		}
-		return _jarFile;
+		return jarFile;
+	}
+	
+	/**
+	 * This is normally auto-set.
+	 * Use this only if you need to give the jar a special name.
+	 * @param _jarFile
+	 */
+	public void setJar(File _jarFile) {
+		this.jarFile = _jarFile;
 	}
 	
 	private File getOutputDir() {
@@ -65,7 +74,7 @@ public class BuildWinterwellProject extends BuildTask {
 
 	public final File projectDir;
 	protected boolean incSrc;
-	private File _jarFile;
+	protected File jarFile;
 
 	private String version;
 
