@@ -56,10 +56,13 @@ implements Comparable<Money>, IHasJson {
 	
 	public KCurrency currency = KCurrency.GBP;
 	/**
+	 * This SHOULD be a Long.
+	 * But we allow for other number types to exist without error.
+	 * 
 	 * Support values down to 0.01p (a hundredth of a pence).
 	 * This is the canonical value of the Money object.
 	 */
-	private long value100p;
+	private Number value100p;
 	
 	@Deprecated // HACK to upgrade old objects
 	private Object value100;
@@ -152,13 +155,13 @@ implements Comparable<Money>, IHasJson {
 
 
 	public boolean isZero() {
-		return value100p==0;
+		return value100p != null && value100p.longValue()==0;
 	}
 
 	public BigDecimal getValue() {
 		if (_value==null) {
 			init();
-			_value = new BigDecimal(value100p).divide(P100);
+			_value = new BigDecimal(value100p.longValue()).divide(P100);
 		}
 		return _value;
 	}
@@ -188,24 +191,24 @@ implements Comparable<Money>, IHasJson {
 	public void init() {
 		super.init();
 		// value
-		if (value100p==0 && value!=null && ! "0".equals(value)) {
+		if (value100p==null && value!=null && ! "0".equals(value)) {
 			value100p = new BigDecimal(value).multiply(P100).longValue();
 		}
 		// HACK old format (this code added Apr 2018)
-		if (value100p==0 && value==null && value100!=null) {
+		if (value100p==null && value==null && value100!=null) {
 			value100p = new BigDecimal(value100.toString()).multiply(new BigDecimal(100)).longValue();
 		}
 		value100 = null;
 		// end hack
 		if (value==null) {
-			value = new BigDecimal(value100p).divide(P100).toPlainString();
+			value = new BigDecimal(value100p==null? 0 : value100p.longValue()).divide(P100).toPlainString();
 		}		
 	}
 
 
 	@Override
 	public int compareTo(Money o) {
-		return Long.compare(value100p, o.value100p);
+		return MathUtils.compare(value100p, o.value100p);
 	}
 
 
@@ -224,7 +227,7 @@ implements Comparable<Money>, IHasJson {
 	 */
 	public long getValue100p() {
 		init();
-		return value100p;
+		return value100p==null? 0 : value100p.longValue();
 	}
 
 	public KCurrency getCurrency() {
