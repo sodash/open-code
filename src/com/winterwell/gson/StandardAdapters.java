@@ -72,12 +72,26 @@ public static class TimeTypeAdapter implements JsonSerializer<Time>, JsonDeseria
  *
  */
 public static class LenientLongAdapter extends TypeAdapter<Long>{
+	
+	private final Long nullValue;
+
+	public LenientLongAdapter() {
+		this(null);
+	}
+	
+	/**
+	 * @param nullValue 0 or null
+	 */
+	public LenientLongAdapter(Long nullValue) {
+		this.nullValue = nullValue;
+		assert nullValue == 0 || nullValue == null : nullValue;
+	}
     
 	@Override
     public Long read(JsonReader reader) throws IOException {
         if(reader.peek() == JsonToken.NULL){
             reader.nextNull();
-            return null; // should this be 0?
+            return nullValue;
         }
         String stringValue = reader.nextString();
         try{
@@ -92,7 +106,11 @@ public static class LenientLongAdapter extends TypeAdapter<Long>{
     @Override
     public void write(JsonWriter writer, Long value) throws IOException {
         if (value == null) {
-            writer.nullValue();
+        	if (nullValue==null) {
+        		writer.nullValue();
+        	} else {
+        		writer.value(nullValue);
+        	}
             return;
         }
         writer.value(value);

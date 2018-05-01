@@ -66,6 +66,22 @@ public class StandardAdaptersTest {
 	}
 	
 	@Test
+	public void testLenientlongnull() {
+		Type longType = long.class;
+		Gson gsonWith = new GsonBuilder()
+						.registerTypeAdapter(longType, new StandardAdapters.LenientLongAdapter(0L))
+						.create();
+		
+		NumGen n1 = new NumGen();
+		
+		String gson1 = Gson.toJSON(n1);		
+		System.out.println(gson1);
+		// avoids an NPE
+		Numlong n2 = gsonWith.fromJson(gson1, Numlong.class);
+		assert n2.a == 0;		
+	}
+	
+	@Test
 	public void testLenientLonglong() {
 		Gson gsonWith = new GsonBuilder()
 						.registerTypeAdapter(long.class, new StandardAdapters.LenientLongAdapter())
