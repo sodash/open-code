@@ -2,6 +2,7 @@ package com.winterwell.gson;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 import org.junit.Test;
@@ -24,6 +25,64 @@ public class StandardAdaptersTest {
 		System.out.println(gson1);
 		Time now2 = gsonWith.fromJson(gson1, Time.class);
 		assert now.equals(now2);
+	}
+	
+	@Test
+	public void testLenientLong() {
+		Gson gsonWith = new GsonBuilder()
+						.registerTypeAdapter(Long.class, new StandardAdapters.LenientLongAdapter())
+						.create();
+		
+		NumGen n1 = new NumGen();
+		n1.a = 17.0000001;
+		
+		String gson1 = Gson.toJSON(n1);		
+		System.out.println(gson1);
+		
+		NumLong n2 = gsonWith.fromJson(gson1, NumLong.class);
+		assert n2.a == 17;
+	}
+	
+	
+	@Test
+	public void testLenientlong() {
+		Type longType = long.class;
+		Gson gsonWith = new GsonBuilder()
+						.registerTypeAdapter(longType, new StandardAdapters.LenientLongAdapter())
+						.create();
+		
+		NumGen n1 = new NumGen();
+		n1.a = 17.0000001;
+		
+		String gson1 = Gson.toJSON(n1);		
+		System.out.println(gson1);
+		
+		Numlong n2 = gsonWith.fromJson(gson1, Numlong.class);
+		assert n2.a == 17;
+		
+		// fails
+//		NumLong n3 = gsonWith.fromJson(gson1, NumLong.class);
+//		assert n3.a == 17;
+	}
+	
+	@Test
+	public void testLenientLonglong() {
+		Gson gsonWith = new GsonBuilder()
+						.registerTypeAdapter(long.class, new StandardAdapters.LenientLongAdapter())
+						.registerTypeAdapter(Long.class, new StandardAdapters.LenientLongAdapter())
+						.create();
+		
+		NumGen n1 = new NumGen();
+		n1.a = 17.0000001;
+		
+		String gson1 = Gson.toJSON(n1);		
+		System.out.println(gson1);
+		
+		Numlong n2 = gsonWith.fromJson(gson1, Numlong.class);
+		assert n2.a == 17;
+		
+		NumLong n3 = gsonWith.fromJson(gson1, NumLong.class);
+		assert n3.a == 17;
 	}
 	
 	@Test
@@ -108,6 +167,18 @@ public class StandardAdaptersTest {
 	}
 }
 
+
+class NumGen {
+	public Number a;
+}
+
+class Numlong {
+	public long a;
+}
+
+class NumLong {
+	public Long a;
+}
 
 class MyObj {
 

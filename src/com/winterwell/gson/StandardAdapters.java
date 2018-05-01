@@ -1,7 +1,12 @@
 package com.winterwell.gson;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 
+import com.winterwell.gson.stream.JsonReader;
+import com.winterwell.gson.stream.JsonToken;
+import com.winterwell.gson.stream.JsonWriter;
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
@@ -58,6 +63,40 @@ public static class TimeTypeAdapter implements JsonSerializer<Time>, JsonDeseria
 		Time t = TimeUtils.parseExperimental(s);
 		return t;
 	}
+}
+
+/**
+ * Can coerce floating points into Longs -- this allows for robustness against floating point issues.
+ * Can be registered for Long.class and/or long.class  -- they are separate.
+ * @author daniel
+ *
+ */
+public static class LenientLongAdapter extends TypeAdapter<Long>{
+    
+	@Override
+    public Long read(JsonReader reader) throws IOException {
+        if(reader.peek() == JsonToken.NULL){
+            reader.nextNull();
+            return null; // should this be 0?
+        }
+        String stringValue = reader.nextString();
+        try{
+            Long value = Long.valueOf(stringValue);
+            return value;
+        } catch(NumberFormatException e){
+        	Double v = Double.valueOf(stringValue);
+            return (long) Math.round(v);
+        }
+    }
+    
+    @Override
+    public void write(JsonWriter writer, Long value) throws IOException {
+        if (value == null) {
+            writer.nullValue();
+            return;
+        }
+        writer.value(value);
+    }
 }
 
 	/**
