@@ -9,4 +9,7 @@ public interface IServlet {
 
 	public void process(WebRequest state) throws Exception;
 
+	default String LOGTAG() {
+		return getClass().getSimpleName();
+	}
 }

@@ -3,6 +3,7 @@ package com.winterwell.datalog.server;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
@@ -55,6 +57,8 @@ public class LgServlet {
 	
 	static JsonField PARAMS = new JsonField("p");
 	
+	static final List<String> NOTP = Arrays.asList(TAG.getName(), DATASPACE.getName(), "via", "track");
+	
 	/**
 	 * Log msg to fast.log file.  
 	 * @param req
@@ -73,7 +77,8 @@ public class LgServlet {
 		String via = req.getParameter("via");
 		// NB: dont IP/user track simple events, which are server-side
 		boolean stdTrackerParams = ! DataLogEvent.simple.equals(tag) && state.get(new BoolField("track"), true);
-		Map params = (Map) state.get(PARAMS);
+		// Read the "extra" event parameters
+		Map params = (Map) state.get(PARAMS);		
 		if (params==null) {
 			// params from the url?
 			// e.g. 
@@ -81,13 +86,21 @@ public class LgServlet {
 			// &fire_adid={fire_adid}&win_udid={win_udid}&ua={user_agent}&ip={ip_address}&country={country}
 			// &time={created_at}&app_id={app_id}&app_name={app_name}&store={store}&tracker_name={tracker_name}&tracker={tracker}
 			// &bid={dcp_bid}
-			params = state.getMap();
-			params.remove(TAG);
-			params.remove(DATASPACE);
-			params.remove("via");
-			params.remove("track");
+			// or use p.param for unambiguity
+			// TODO which would we prefer??
+			Map<String, String> smap = state.getMap();			
+			params = new HashMap();
+			for(Map.Entry<String, String> kv : smap.entrySet()) {
+				String v = kv.getValue();
+				if (v==null || v.isEmpty()) continue;
+				String k = kv.getKey();
+				if (NOTP.contains(k)) continue;
+				if (k.startsWith("p.")) k = k.substring(2);				
+				params.put(k, v);
+			}
 		}
 		
+		// log it!
 		boolean logged = doLog(state, ds, tag, count, via, params, stdTrackerParams);
 		
 		// Reply

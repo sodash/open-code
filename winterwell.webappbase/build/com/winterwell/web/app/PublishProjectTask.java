@@ -73,18 +73,25 @@ public class PublishProjectTask extends BuildTask {
 	protected boolean compile;
 
 	private LogFile logfile;
+
+	private boolean noPublishJustBuild;
 			
+	public PublishProjectTask setNoPublishJustBuild(boolean noPublishJustBuild) {
+		this.noPublishJustBuild = noPublishJustBuild;
+		return this;
+	}
+	
 	/**
 	 * 
 	 * @param projectName
 	 * @param remoteWebAppDir  
 	 * @throws Exception
 	 */
-	public PublishProjectTask(String projectName, String remoteWebAppDir) throws Exception {
+	public PublishProjectTask(String projectName, String remoteWebAppDir) {
 		this(projectName, remoteWebAppDir, FileUtils.getWorkingDirectory());
 	}
 	
-	public PublishProjectTask(String projectName, String remoteWebAppDir, File localWebAppDir) throws Exception {
+	public PublishProjectTask(String projectName, String remoteWebAppDir, File localWebAppDir) {
 		Utils.check4null(projectName, remoteWebAppDir);
 		this.projectName = projectName;
 		this.remoteWebAppDir = remoteWebAppDir;
@@ -203,6 +210,10 @@ public class PublishProjectTask extends BuildTask {
 				jarTask.run();
 				jarTask.close();
 			}
+		}
+		
+		if (noPublishJustBuild) {
+			return;
 		}
 		
 //		// Bash script which does the rsync work
