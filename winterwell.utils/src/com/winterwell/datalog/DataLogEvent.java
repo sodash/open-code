@@ -32,7 +32,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 * these get special treatment - as direct properties not key/value props.
 	 * Which means nicer json + they can have a type in ES.
 	 * 
-	 * HACK: use StringBuilder.class as a marker for "text with tokenisation"
+	 * HACK: use StringBuilder.class as a marker for "text with tokenisation", and String.class for keywords.
 	 * HACK: use Object.class to mark special-case
 	 * HACK: use Null to mark no-index
 	 */
@@ -67,7 +67,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"bid", String.class,
 			"variant", String.class,
 			"campaign", String.class,
-			"cid", String.class, // SoGive charity-ID. This is preferred to 'charity' as a property-name
+			"cid", String.class, // SoGive charity-ID. This is preferred to 'charity' as a property-name			
+			"via", String.class, // exchange / DSP / agency used to make the connection. ??Can be a list.??is that supported
 			// text properties (support tokenisation)
 			"place", StringBuilder.class,
 			"locn", StringBuilder.class,
@@ -86,6 +87,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"note", StringBuilder.class,
 			"notes", StringBuilder.class, 
 			"score", Double.class,
+			"amount", Double.class,
+			"currency", String.class,
 			"w", Integer.class, // width
 			"h", Integer.class, // height
 			"winw", Integer.class, // window-width
@@ -95,7 +98,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"z", Double.class,
 			"geo", Object.class,
 			"lat", Double.class,
-			"lng", Double.class,
+			"lng", Double.class,			
 			// browser info
 			"mbl", Boolean.class,
 			"ua", StringBuilder.class, // user agent
