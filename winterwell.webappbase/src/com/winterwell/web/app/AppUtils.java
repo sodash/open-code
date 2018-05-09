@@ -39,6 +39,7 @@ import com.winterwell.es.fail.ESException;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
@@ -595,7 +596,7 @@ public class AppUtils {
 			filter = filter.must(parseTreeToQuery(ptree));
 		} catch (AssertionError e) {
 			// Put full query info on an assertion failure
-			assert (false) : e.getMessage() + " from " + sq;
+			assert (false) : Printer.toString(e, true) + " from " + sq;
 		}
 		
 		return filter;
