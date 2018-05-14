@@ -64,7 +64,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"ad", String.class,
 			"vert", String.class,
 			"vertiser", String.class,
-			"bid", String.class,
+			"bid", String.class, // Our Bid ID
+			"xbid", String.class, // someone elses (possibly broken) bid id
 			"variant", String.class,
 			"campaign", String.class,
 			"cid", String.class, // SoGive charity-ID. This is preferred to 'charity' as a property-name			
