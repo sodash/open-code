@@ -274,9 +274,6 @@ public class ESStorage implements IDataLogStorage {
 			pc.setAlias(index);
 			IESResponse cres = pc.get();
 			cres.check();
-	//		IndicesAliasesRequest ar = _client.admin().indices().prepareAliases();
-	//		ar.addAlias(baseIndex, index);
-	//		ar.get().check();
 		
 		// register some standard event types??
 			initIndex3_registerEventType(_client, index, DataLogEvent.simple);
