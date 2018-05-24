@@ -695,5 +695,21 @@ public class AppUtils {
 	}
 
 
+	/**
+	 * 
+	 * @param mtype
+	 * @param domain e.g. "as.good-loop.com"
+	 * @return e.g. "https://testas.good-loop.com"
+	 */
+	public static StringBuilder getServerUrl(KServerType mtype, String domain) {
+		assert ! domain.startsWith("http") && ! domain.endsWith("/") : domain;
+		StringBuilder url = new StringBuilder();
+		url.append(mtype==KServerType.LOCAL? "http" : "https"); 		
+		url.append("://"); url.append(mtype==KServerType.PRODUCTION? "" : mtype.toString().toLowerCase());
+		url.append(domain);
+		return url;
+	}
+
+
 	
 }
