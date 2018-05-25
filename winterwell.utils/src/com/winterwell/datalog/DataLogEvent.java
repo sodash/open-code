@@ -150,14 +150,14 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 */
 	public Time time = new Time();
 	
-	/**
-	 * @deprecated Use the other constructor
-	 * @param eventType
-	 * @param properties
-	 */
-	public DataLogEvent(String eventType, Map<String,?> properties) {
-		this(DataLog.getDataspace(), 1, eventType, properties);
-	}
+//	/**
+//	 * @deprecated Use the other constructor
+//	 * @param eventType
+//	 * @param properties
+//	 */
+//	public DataLogEvent(String eventType, Map<String,?> properties) {
+//		this(DataLog.getDataspace(), 1, eventType, properties);
+//	}
 	
 	public DataLogEvent(String tag, double count) {
 		this(DataLog.getDataspace(), count, simple, new ArrayMap("tag", tag));
@@ -283,6 +283,11 @@ public final class DataLogEvent implements Serializable, IHasJson {
 
 	public void setExtraResults(Map map) {
 		props.put("xtra", map);
+	}
+
+	public static DataLogEvent fromESHit(Map eg) {
+		// TODO Auto-generated method stub
+		throw new TodoException(eg);
 	}
 	
 }
