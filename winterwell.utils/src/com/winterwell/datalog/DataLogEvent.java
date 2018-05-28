@@ -87,7 +87,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			// a few scoring/results properties
 			"start", Time.class,
 			"end", Time.class,
-			"dt", Long.class,
+			"dt", Long.class, // milliseconds
 			"note", StringBuilder.class,
 			"notes", StringBuilder.class, 
 			"score", Double.class,
