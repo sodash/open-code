@@ -10,7 +10,8 @@ public class DataLogHttpClientTest {
 
 	@Test
 	public void testGetEvents() {
-		DataLogHttpClient dlc = new DataLogHttpClient("gl");
+		// get all
+		DataLogHttpClient dlc = new DataLogHttpClient(null, "gl");
 		List<DataLogEvent> events = dlc.getEvents(null, 5);
 		System.out.println(events);
 	}

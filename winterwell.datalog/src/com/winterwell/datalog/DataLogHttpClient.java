@@ -9,6 +9,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 import com.winterwell.datalog.server.DataServlet;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
@@ -26,8 +27,24 @@ public class DataLogHttpClient {
 	
 	String ENDPOINT = "https://lg.good-loop.com/data";
 	
-	public DataLogHttpClient(String namespace) {
+	@Override
+	public String toString() {
+		return "DataLogHttpClient [namespace=" + namespace + ", ENDPOINT=" + ENDPOINT + "]";
+	}
+
+	/**
+	 * 
+	 * @param endpoint Can be null (uses the default {@link #ENDPOINT})
+	 * @param namespace
+	 */
+	public DataLogHttpClient(String endpoint, String namespace) {
+		if (endpoint!=null) {			
+			assert endpoint.contains("://") && endpoint.contains("/data") : endpoint;
+			ENDPOINT = endpoint;
+		}
 		this.namespace = namespace;
+		Utils.check4null(namespace);
+		assert ! namespace.contains(".") : "server / namespace mixup? "+namespace;
 	}
 	
 	public List<DataLogEvent> getEvents(String q, int maxResults) {
@@ -36,7 +53,7 @@ public class DataLogHttpClient {
 		// TODO auth!
 //		fb.setAuthenticationByJWT(token);
 		
-		String json = fb.getPage(ENDPOINT, new ArrayMap("q", q, "size", maxResults));
+		String json = fb.getPage(ENDPOINT, new ArrayMap("dataspace", namespace, "q", q, "size", maxResults));
 		
 		Map jobj = (Map) JSON.parse(json);
 		
@@ -44,7 +61,7 @@ public class DataLogHttpClient {
 		List<DataLogEvent> des = new ArrayList();
 		// Convert into DataLogEvents
 		for (Map eg : egs) {
-			DataLogEvent de = DataLogEvent.fromESHit(eg);
+			DataLogEvent de = DataLogEvent.fromESHit(namespace, (Map)eg.get("_source"));
 			des.add(de);
 		}
 		
