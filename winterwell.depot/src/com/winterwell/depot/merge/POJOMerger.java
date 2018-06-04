@@ -3,6 +3,7 @@ package com.winterwell.depot.merge;
 import java.util.Map;
 
 import com.winterwell.utils.TodoException;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 
 /**
@@ -12,12 +13,17 @@ import com.winterwell.utils.containers.Containers;
  */
 public class POJOMerger extends AMerger<Object> implements IMerger<Object> {
 
+	/**
+	 * 
+	 * @param merger The merger to be used for recursive calls on fields.
+	 */
 	public POJOMerger(Merger merger) {
 		super(merger);
 	}
 
 	@Override
 	public Diff diff(Object before, Object after) {
+		if (before==null) before = new ArrayMap();
 		if (before.equals(after)) return null;
 		// treat as map
 		Map<String, Object> bmap = Containers.objectAsMap(before);
@@ -37,8 +43,11 @@ public class POJOMerger extends AMerger<Object> implements IMerger<Object> {
 
 	@Override
 	public Object stripDiffs(Object v) {
-		// TODO Auto-generated method stub
-		throw new TodoException();
+		if (v instanceof Diff) {
+			Object v2 = ((Diff) v).diff;
+			return stripDiffs(v2);
+		}
+		return recursiveMerger.stripDiffs(v);
 	}
 
 }
