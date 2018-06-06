@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogEvent;
+import com.winterwell.datalog.DataLogRemoteStorage;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -114,6 +115,7 @@ public class LgServlet {
 		WebUtils2.sendText(logged!=null? "OK" : "not logged", resp);
 	}
 
+	
 	/**
 	 * 
 	 * @param state
