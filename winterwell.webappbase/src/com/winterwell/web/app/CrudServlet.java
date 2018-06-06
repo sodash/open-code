@@ -170,7 +170,18 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	protected JThing<T> doDelete(WebRequest state) {
 		String id = getId(state);
+		// try to copy to trash
+		try {
+			JThing<T> thing = getThingFromDB(state);
+			if (thing != null) {
+				ESPath path = esRouter.getPath(dataspace, type, id, KStatus.TRASH);
+				AppUtils.doSaveEdit2(path, thing, state, false);
+			}
+		} catch(Throwable ex) {
+			Log.e(LOGTAG(), "copy to trash failed: "+state+" -> "+ex);
+		}
 		for(KStatus s : KStatus.main()) {
+			if (s==KStatus.TRASH) continue;
 			try {
 				ESPath path = esRouter.getPath(dataspace,type, id, s);
 				DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);

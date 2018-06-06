@@ -28,12 +28,12 @@ public enum KStatus {
 	PENDING,
 
 	/**
-	 * The object is published (status=2)
+	 * The object is published
 	 */
 	PUBLISHED,
 
 	/**
-	 * Still in the back catalogue.
+	 * Still in the back catalogue. @deprecated Not currently used
 	 *  */
 	ARCHIVED,
 
@@ -44,9 +44,10 @@ public enum KStatus {
 	ALL_BAR_TRASH;
 
 	/**
-	 * We only create two ES indices, matching published and draft 
+	 * We only have three main ES indices, published and draft (which holds all the non-published)
+	 * and trash index, but this is not normally searched.
 	 */
 	public static KStatus[] main() {
-		return new KStatus[] {PUBLISHED, DRAFT};
+		return new KStatus[] {PUBLISHED, DRAFT, TRASH};
 	}
 }
