@@ -1,6 +1,9 @@
 package com.winterwell.datalog;
 
 import java.io.Closeable;
+import java.lang.management.ManagementFactory;
+
+import com.sun.management.OperatingSystemMXBean;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -585,7 +588,10 @@ public class DataLogImpl implements Closeable, IDataLog {
 				else doSave();
 				// heart beat: check things are working by storing some useful stats
 				DataLog.set(ReflectionUtils.getUsedMemory(), STAT_MEM_USED);
-				DataLog.set(ReflectionUtils.getAvailableMemory(), "mem_free");
+				DataLog.set(ReflectionUtils.getAvailableMemory(), "mem_free");								
+				DataLog.set(ReflectionUtils.getSystemCPU(), "cpu_sys");
+				DataLog.set(ReflectionUtils.getJavaCPU(), "cpu_java");
+				
 				// and the time, for testing
 				DataLog.set(new Time().getMinutes(), "time.minutes");
 				

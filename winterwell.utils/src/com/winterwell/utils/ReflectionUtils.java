@@ -3,6 +3,7 @@ package com.winterwell.utils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -21,6 +22,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import com.sun.management.OperatingSystemMXBean;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;
@@ -818,6 +820,36 @@ public class ReflectionUtils {
 		    return cls;
 		} catch (Exception e) {
 			throw Utils.runtime(e);
+		}
+	}
+
+	
+	/**
+	 * 
+	 * @return system level cpu use, or 0 if unknown
+	 */
+	public static double getSystemCPU() {
+		try {
+			// see https://stackoverflow.com/questions/47177/how-do-i-monitor-the-computers-cpu-memory-and-disk-usage-in-java
+			OperatingSystemMXBean operatingSystemMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+			double cpuLoad = operatingSystemMXBean.getSystemCpuLoad();		
+			return cpuLoad;
+		} catch(Throwable ex) {
+			return 0;
+		}
+	}
+	/**
+	 * 
+	 * @return JVM cpu use, or 0 if unknown
+	 */
+	public static double getJavaCPU() {
+		try {
+			// see https://stackoverflow.com/questions/47177/how-do-i-monitor-the-computers-cpu-memory-and-disk-usage-in-java
+			OperatingSystemMXBean operatingSystemMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+			double cpuLoad = operatingSystemMXBean.getProcessCpuLoad();		
+			return cpuLoad;
+		} catch(Throwable ex) {
+			return 0;
 		}
 	}
 
