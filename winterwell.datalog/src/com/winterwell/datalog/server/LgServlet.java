@@ -100,7 +100,7 @@ public class LgServlet {
 		}
 		
 		// log it!
-		boolean logged = doLog(state, ds, tag, count, params, stdTrackerParams);
+		DataLogEvent logged = doLog(state, ds, tag, count, params, stdTrackerParams);
 		
 		// Reply
 		// .gif?
@@ -111,10 +111,20 @@ public class LgServlet {
 		if (DataLogServer.settings.CORS) {
 			WebUtils2.CORS(state, false);
 		}
-		WebUtils2.sendText(logged? "OK" : "not logged", resp);
+		WebUtils2.sendText(logged!=null? "OK" : "not logged", resp);
 	}
 
-	static boolean doLog(WebRequest state, String dataspace, String tag, double count, 
+	/**
+	 * 
+	 * @param state
+	 * @param dataspace
+	 * @param tag
+	 * @param count
+	 * @param params can be null
+	 * @param stdTrackerParams
+	 * @return
+	 */
+	public static DataLogEvent doLog(WebRequest state, String dataspace, String tag, double count, 
 			Map params, boolean stdTrackerParams) 
 	{
 		assert dataspace != null;		
@@ -140,7 +150,7 @@ public class LgServlet {
 		
 		// screen out our IPs?
 		if ( ! accept(dataspace, tag, params)) {
-			return false;
+			return null;
 		}
 		
 		// write to log file
@@ -161,7 +171,7 @@ public class LgServlet {
 //		event.time = state.get(time); FIXME
 		DataLog.count(event);
 //		}
-		return true;
+		return event;
 	}
 
 	private static Map doLog2_addStdTrackerParams(WebRequest state, Map params, String trckId) {
