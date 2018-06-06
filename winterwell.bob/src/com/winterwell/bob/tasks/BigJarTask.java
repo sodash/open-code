@@ -42,6 +42,10 @@ public class BigJarTask extends JarTask {
 			ZipEntry entry = zin.getNextEntry();
 			while (entry != null) {
 				String name = entry.getName();
+//				if (entry.isDirectory()) {
+//					entry = zin.getNextEntry();
+//					continue;
+//				}
 				addFile2(name, zin, out);
 				entry = zin.getNextEntry();
 			}			
