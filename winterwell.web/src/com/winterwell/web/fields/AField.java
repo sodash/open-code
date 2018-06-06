@@ -98,7 +98,7 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	private Boolean lenient;
 	
 	/**
-	 * If true, this will try to intepret badly formatted urls
+	 * If true, this will try to interpret badly formatted urls
 	 * @param lenient
 	 * @return 
 	 */

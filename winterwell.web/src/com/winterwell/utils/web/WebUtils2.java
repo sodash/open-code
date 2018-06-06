@@ -511,6 +511,7 @@ public class WebUtils2 extends WebUtils {
 	 * @param url A full url, or just the query string
 	 * @param param
 	 * @return the value of parameter, or null if unset/blank.
+	 * This tries to url-decode, but it DOES allow bad syntax to be returned.
 	 * 
 	 * ??How to send "please delete this setting" vs null??
 	 */
@@ -529,7 +530,12 @@ public class WebUtils2 extends WebUtils {
 		if (val.equals("undefined") || val.equals("null")) {
 			return null;
 		}
-		val = WebUtils.urlDecode(val);
+		try {
+			// decode if we can
+			val = WebUtils.urlDecode(val);
+		} catch(Exception ex) {
+			Log.w("WebUtils2", url+" -> "+ex);			
+		}
 		return val;
 	}
 
