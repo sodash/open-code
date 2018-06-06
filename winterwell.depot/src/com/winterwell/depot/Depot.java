@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
 import com.thoughtworks.xstream.XStreamException;
+import com.thoughtworks.xstream.converters.ConversionException;
 import com.winterwell.datalog.DataLog;
 import com.winterwell.depot.merge.Merger;
 import com.winterwell.utils.Printer;
@@ -499,7 +500,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 			}
 		}
 		assert myDesc.equals(realDesc);		
-	}
+	}	
 	
 	// NB: ?? bind is done in get not here??
 	private <X2> X2 get2(final Desc<X2> desc) {
@@ -511,7 +512,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		bv = get3_cached(desc);
 		if (bv!=null) return bv;
 		// From the store...
-		KErrorPolicy popPolicy = ModularConverter.setOnNotFound(KErrorPolicy.THROW_EXCEPTION);
+		KErrorPolicy popPolicy = ModularConverter.setOnNotFound(config.onArtifactModuleNotFound);
 		try { // Do we need 2 levels of try?? But the catches here could be nasty if mis-triggered
 			X2 x = base.get(desc);			
 			
@@ -590,9 +591,9 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 				} else {
 					Log.e(TAG, "NOT deleting "+desc+" for " + Printer.toString(e, true));
 				}
-			case RETURN_NULL: case IGNORE:
-				Log.report(TAG, "Returning null; Error reading " +desc
-						+ ": " + e, Level.SEVERE);
+				// ...and return null
+			case RETURN_NULL: case IGNORE: case REPORT:
+				Log.w(TAG, "Returning null; Error reading " +desc+ ": " + e);
 				return null;
 			case ASK:
 				// For convenient uploading of missing files
@@ -609,9 +610,6 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 				System.exit(1);
 			case THROW_EXCEPTION: case ACCEPT:
 				throw Utils.runtime(e);
-			case REPORT:
-				Log.e(TAG, e);
-				return null;
 			}
 			throw Utils.runtime(e);
 		} finally {

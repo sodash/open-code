@@ -87,6 +87,13 @@ public class DepotConfig {
 	@Option
 	public String tags = "untagged";
 
+	/**
+	 * If part of a modular object is not found - should the whole get() fail? 
+	 * Or should that part be treated as null?
+	 */
+	@Option
+	public KErrorPolicy onArtifactModuleNotFound = KErrorPolicy.THROW_EXCEPTION;
+
 	public IStore getStore(Depot depot) {
 		IStore s;
 		// Try for a constructor which takes in a DepotConfig object.

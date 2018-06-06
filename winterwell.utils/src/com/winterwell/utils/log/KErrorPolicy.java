@@ -3,7 +3,10 @@ package com.winterwell.utils.log;
 public enum KErrorPolicy {
 	/** Keep the error as is (throw an exception if this is not possible) */
 	ACCEPT,
-	/** Remove the file or whatever was to blame */
+	/** Remove the file or whatever was to blame.
+	 * 
+	 * Warning: In Depot (to avoid trashing valued data) this only deletes in a couple of cases.
+	 *  */
 	DELETE_CAUSE,
 	/**
 	 * There is no point in going on.
