@@ -507,15 +507,16 @@ public class WebUtils2 extends WebUtils {
 	private static final String ALLOW_CREDENTIALS_HEADER = "Access-Control-Allow-Credentials";
 
 
-	/**
+	/**	
 	 * @param url A full url, or just the query string
 	 * @param param
+	 * @param err If provided, this will return the error if any
 	 * @return the value of parameter, or null if unset/blank.
-	 * This tries to url-decode, but it DOES allow bad syntax to be returned.
+	 * This tries to url-decode, which can cause an exception if bad syntax is provided
 	 * 
 	 * ??How to send "please delete this setting" vs null??
 	 */
-	public static String getQueryParameter(String url, String param) {
+	public static String getQueryParameter(String url, String param) throws RuntimeException {
 		assert url != null : "null url for get param "+param;
 		assert WebUtils.urlEncode(param).equals(param) : param;
 		Pattern keyVal = Pattern.compile("([&?]|^)" + param + "=(.*?)(&|$)");
@@ -530,12 +531,8 @@ public class WebUtils2 extends WebUtils {
 		if (val.equals("undefined") || val.equals("null")) {
 			return null;
 		}
-		try {
-			// decode if we can
-			val = WebUtils.urlDecode(val);
-		} catch(Exception ex) {
-			Log.w("WebUtils2", url+" -> "+ex);			
-		}
+		// decode if we can
+		val = WebUtils.urlDecode(val);
 		return val;
 	}
 
@@ -1329,6 +1326,21 @@ public class WebUtils2 extends WebUtils {
 			return new WebEx.E50X(wrap.getCause());	
 		}
 		return new WebEx.E50X(wrap);
+	}
+
+	/**
+	 * Like {@link #getQueryParameter(String, String)} but it swallows any url encoding exceptions
+	 * @param url
+	 * @param param
+	 * @return
+	 */
+	public static String getQueryParameterQuiet(String url, String param) {
+		try {
+			return getQueryParameter(url, param);
+		} catch(Exception ex) {
+			Log.w("WebUtils", param+" from "+url+" -> "+ex);
+			return null;
+		}
 	}
 
 }

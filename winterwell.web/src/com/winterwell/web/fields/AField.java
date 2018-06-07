@@ -98,7 +98,8 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	private Boolean lenient;
 	
 	/**
-	 * If true, this will try to interpret badly formatted urls
+	 * If true, this will try to interpret badly formatted urls.
+	 * And bad inputs will return null rather than throw an error. 
 	 * @param lenient
 	 * @return 
 	 */
@@ -332,7 +333,7 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 		} else if (Utils.yes(lenient)) {
 			String qs = request.getQueryString();
 			if (qs != null) {
-				v = WebUtils2.getQueryParameter(qs, getName());				
+				v = WebUtils2.getQueryParameterQuiet(qs, getName());				
 			}
 		}
 		// null? (or "" or " ", since those would fail the isBlank() above)
@@ -390,16 +391,19 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	 */
 	/* TODO: Consider refactoring to take a RequestState */
 	public final X getValue(HttpServletRequest request)
-			throws WebInputException {
+			throws WebInputException 
+	{
 		String v = getStringValue(request);
 		if (v == null)
 			return null;
 		try {
 			return fromString(v);
-		} catch (WebInputException e) {
-			throw e;
 		} catch (Exception e) {
-			Log.w("web.input", e);
+			if (lenient) {
+				Log.w(getClass().getSimpleName()+"."+name, v+" -> "+e);
+				return null;
+			}
+			if (e instanceof WebInputException) throw (WebInputException) e;
 			throw new WebInputException("Form value for " + getName()
 					+ " is invalid: " +StrUtils.ellipsize(v, 300), e);
 		}
