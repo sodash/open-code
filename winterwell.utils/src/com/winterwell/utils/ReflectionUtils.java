@@ -826,7 +826,7 @@ public class ReflectionUtils {
 	
 	/**
 	 * 
-	 * @return system level cpu use, or 0 if unknown
+	 * @return system level cpu use, or -1 if unknown
 	 */
 	public static double getSystemCPU() {
 		try {
@@ -835,12 +835,12 @@ public class ReflectionUtils {
 			double cpuLoad = operatingSystemMXBean.getSystemCpuLoad();		
 			return cpuLoad;
 		} catch(Throwable ex) {
-			return 0;
+			return -1;
 		}
 	}
 	/**
 	 * 
-	 * @return JVM cpu use, or 0 if unknown
+	 * @return JVM cpu use, or -1 if unknown
 	 */
 	public static double getJavaCPU() {
 		try {
@@ -849,7 +849,7 @@ public class ReflectionUtils {
 			double cpuLoad = operatingSystemMXBean.getProcessCpuLoad();		
 			return cpuLoad;
 		} catch(Throwable ex) {
-			return 0;
+			return -1;
 		}
 	}
 

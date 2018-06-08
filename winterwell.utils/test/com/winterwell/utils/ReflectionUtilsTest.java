@@ -2,6 +2,8 @@ package com.winterwell.utils;
 
 import static org.junit.Assert.*;
 
+import java.math.BigInteger;
+
 import org.junit.Test;
 
 public class ReflectionUtilsTest {
@@ -22,7 +24,27 @@ public class ReflectionUtilsTest {
 		assert foo.getBarInteger() == 5;
 	}
 
+	@Test
+	public void testCPU() {
+		System.out.println(ReflectionUtils.getJavaCPU());
+		System.out.println(ReflectionUtils.getSystemCPU());
+		// now lets use some CPU
+		for(int i=0; i<2000; i += 200) {
+			BigInteger big = factorial(new BigInteger(""+i));
+			System.out.println("Java:	"+ReflectionUtils.getJavaCPU()+"	System:	"+ReflectionUtils.getSystemCPU());			
+		}
+	}
+
+	private BigInteger factorial(BigInteger bigInteger) {
+		BigInteger one = new BigInteger("1");
+		if (bigInteger.compareTo(one) < 1) {
+			return one;
+		}
+		return bigInteger.multiply(factorial(bigInteger.subtract(one)));
+	}
+	
 }
+
 
 
 class Foo {
