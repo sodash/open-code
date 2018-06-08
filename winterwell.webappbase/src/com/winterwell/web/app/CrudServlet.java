@@ -5,9 +5,11 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -158,7 +160,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (state.actionIs(ACTION_PUBLISH)) {
 			jthing = doPublish(state);
 			assert jthing.string().contains(KStatus.PUBLISHED.toString()) : jthing;
-		}		
+		}
 	}
 
 
@@ -388,32 +390,45 @@ public abstract class CrudServlet<T> implements IServlet {
 		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();
 
-		// prefer draft? No - in the ad portal, draft holds a copy of all ads, pubs
+		// If user requests ALL_BAR_TRASH, they want to see draft versions of items which have been edited
+		// So when de-duping, give priority to entries from .draft indices where the object is status: DRAFT
+		List hits2 = new ArrayList<Map>();
 		
-		// NB: may be Map or AThing
-		List hits2 = Containers.apply(hits, h -> h.get("_source"));
-		
-		// de-dupe by status: remove draft, etc if we have published
-		// NB: assumes you can't have same status and same ID (so no need to de-dupe)
-		if (status==KStatus.ALL_BAR_TRASH) {
-			HashSet pubIds = new HashSet();
-			for(Object hit : hits2) {
+		if (status == KStatus.ALL_BAR_TRASH) {
+			List<Object> idOrder = new ArrayList<Object>(); // original ordering
+			Map<Object, Object> things = new HashMap<Object, Object>(); // to hold "expected" version of each hit
+			
+			for (Map h : hits) {
+				// pull out the actual object from the hit (NB: may be Map or AThing)
+				Object hit = h.get("_source");
+				if (hit == null) continue;
 				Object id = getId(hit);
-				String hs = getStatus(hit);
-				if ("PUBLISHED".equals(hs)) {
-					pubIds.add(id);
+				
+				// First time we've seen this object? Save it.
+				if (!things.containsKey(id)) {
+					idOrder.add(id);
+					things.put(id, hit);
+					continue;
+				}
+				// Is this an object from .draft with non-published status? Overwrite the previous entry.
+				Object index = h.get("_index");
+				if (index != null && index.toString().contains(".draft")) {
+					KStatus hitStatus = KStatus.valueOf(getStatus(hit));
+					if (KStatus.DRAFT.equals(hitStatus) || KStatus.MODIFIED.equals(hitStatus)) {
+						things.put(id, hit);
+					}
 				}
 			}
-			hits2 = Containers.filter(hits2, h -> {
-				String hs = getStatus(h);
-				if ( ! "PUBLISHED".equals(hs)) {
-					boolean dupe = pubIds.contains(getId(h));
-					return ! dupe;
-				}
-				return true;
-			});
+			// Put the deduped hits in the list in their original order.
+			for (Object id : idOrder) {
+				if (things.containsKey(id)) hits2.add(things.get(id));
+			}
+		} else {
+			// One index = no deduping necessary.
+			hits2 = Containers.apply(hits, h -> h.get("_source"));
 		}
 		
+		// sanitise for privacy
 		hits2 = cleanse(hits2, state);
 		
 		// HACK: send back csv?
