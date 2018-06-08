@@ -549,7 +549,7 @@ public class WebRequest implements IProperties, Closeable {
 				if (cv != null)
 					return (T) field.fromString(cv);
 			} catch (MissingFieldException e) {
-				// ignore
+				// ignore -- why?! ^Dan W June 2018
 			} catch (Exception e) {
 				throw Utils.runtime(e);
 			}

@@ -487,8 +487,9 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 		this.onChange = onChange;
 	}
 
-	public void setRequired(boolean required) {
+	public AField<X> setRequired(boolean required) {
 		this.required = required;
+		return this;
 	}
 
 	/**

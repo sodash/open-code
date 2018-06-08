@@ -185,7 +185,8 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 */
 	protected void addJettyServlets(JettyLauncher jl) {
 		jl.addServlet("/manifest", new HttpServletWrapper(ManifestServlet::new));
-		jl.addServlet("/test", new HttpServletWrapper(TestServlet::new));
+		// NB: not "test" cos there's often a test directory, and nginx gets confused
+		jl.addServlet("/testme/*", new HttpServletWrapper(TestmeServlet::new));
 	}
 
 }
