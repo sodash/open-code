@@ -2,17 +2,20 @@ package com.winterwell.datalog;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Null;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -64,7 +67,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"ad", String.class,
 			"vert", String.class,
 			"vertiser", String.class,
-			"bid", String.class,
+			"bid", String.class, // Our Bid ID
+			"xbid", String.class, // someone elses (possibly broken) bid id
 			"variant", String.class,
 			"campaign", String.class,
 			"cid", String.class, // SoGive charity-ID. This is preferred to 'charity' as a property-name			
@@ -83,7 +87,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			// a few scoring/results properties
 			"start", Time.class,
 			"end", Time.class,
-			"dt", Long.class,
+			"dt", Long.class, // milliseconds
 			"note", StringBuilder.class,
 			"notes", StringBuilder.class, 
 			"score", Double.class,
@@ -149,14 +153,14 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 */
 	public Time time = new Time();
 	
-	/**
-	 * @deprecated Use the other constructor
-	 * @param eventType
-	 * @param properties
-	 */
-	public DataLogEvent(String eventType, Map<String,?> properties) {
-		this(DataLog.getDataspace(), 1, eventType, properties);
-	}
+//	/**
+//	 * @deprecated Use the other constructor
+//	 * @param eventType
+//	 * @param properties
+//	 */
+//	public DataLogEvent(String eventType, Map<String,?> properties) {
+//		this(DataLog.getDataspace(), 1, eventType, properties);
+//	}
 	
 	public DataLogEvent(String tag, double count) {
 		this(DataLog.getDataspace(), count, simple, new ArrayMap("tag", tag));
@@ -282,6 +286,44 @@ public final class DataLogEvent implements Serializable, IHasJson {
 
 	public void setExtraResults(Map map) {
 		props.put("xtra", map);
+	}
+
+	/**
+	 * HACK This method inverts {@link #toJson2()}
+	 * @param _dataspace
+	 * @param esResult
+	 * @return
+	 */
+	public static DataLogEvent fromESHit(String _dataspace, Map<String,?> hit) {
+		String etype = (String) hit.get(EVENTTYPE);
+		if (etype==null) throw new IllegalArgumentException("Not a DataLogEVent "+hit);
+		Time _time = new Time((String)hit.get("time"));
+		double cnt = MathUtils.toNum(hit.get("count"));
+		Map<String, Object> properties = new ArrayMap();
+		// common props
+		List<String> NOT_COMMON = Arrays.asList(EVENTTYPE, "time","count", "dataspace", "id", "props");
+		for(Entry<String, ?> pv : hit.entrySet()) {
+			if (NOT_COMMON.contains(pv.getKey())) {
+				continue;
+			}
+			Object v = pv.getValue();
+			if ( ! Utils.truthy(v)) continue;
+			properties.put(pv.getKey(), v);			
+		}		
+		// other props
+		List<Map> hprops = Containers.asList(hit.get("props"));
+		if (hprops!=null) {
+			for (Map hp : hprops) {
+				String k = (String) hp.get("k");
+				Object n = hp.get("n");
+				Object v = hp.get("v");
+				properties.put(k, Utils.or(v, n));
+			}
+		}
+		// OK - build it
+		DataLogEvent dle = new DataLogEvent(_dataspace, cnt, etype, properties);
+		dle.time = _time;
+		return dle;
 	}
 	
 }

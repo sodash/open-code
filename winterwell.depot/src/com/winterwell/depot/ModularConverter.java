@@ -240,11 +240,14 @@ public class ModularConverter implements Converter {
 				// pain to track down! But Desc.markForMerge() calling Utils.copy() wants it quiet.
 				if (err==null) err=KErrorPolicy.RETURN_NULL;
 				switch(err) {
-				 case REPORT:
+				case DELETE_CAUSE:
+					// TODO sometimes delete as per top level??
+				case REPORT:
+					 // log then return null...
 					 Log.w("xstream", new NotInDepotException(d));
 				 case ACCEPT: case IGNORE: case RETURN_NULL:
 					 return null;
-				 case THROW_EXCEPTION:
+				 case THROW_EXCEPTION:					 
 					 throw new NotInDepotException(d);
 				 case DIE: 
 					 Log.e("xstream", new NotInDepotException(d));
@@ -271,6 +274,8 @@ public class ModularConverter implements Converter {
 }
 
 class NotInDepotException extends NullPointerException {
+
+	private static final long serialVersionUID = 1L;
 
 	public NotInDepotException(Desc d) {
 		super(d.toString());

@@ -19,6 +19,7 @@ import com.winterwell.utils.Printer;
  * 
  * @author daniel
  * @testeby RateCounterTest
+ * @see Rate, which is an immutable measure of Rate (with no counting code itself).
  */
 public class RateCounter {
 

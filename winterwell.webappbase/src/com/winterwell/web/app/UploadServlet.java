@@ -69,17 +69,11 @@ public final class UploadServlet implements IServlet {
 		this.webRoot = webRoot;
 	}
 	
-	IFn<File,String> urlFromFile = file -> {
-		String p = FileUtils.getRelativePath(file, webRoot);
-		return p;
-	};
-	
-	public void setUrlFromFile(IFn<File, String> urlFromFile) {
-		this.urlFromFile = urlFromFile;
-	}
 
 	public UploadServlet() {
 	}
+	
+	String server = "/";
 	
 	/**
 	 * Uploads, renames, (adjusts images), creates and publishes an asset.
@@ -110,7 +104,9 @@ public final class UploadServlet implements IServlet {
 		cargo.put("fileFormat", WebUtils2.getMimeType(_asset));
 		cargo.put("name", _asset.getName());
 		cargo.put("absolutePath", _asset.getAbsolutePath());
-		String url = urlFromFile.apply(_asset);
+		
+		String relpath = FileUtils.getRelativePath(_asset, webRoot);
+		String url = server +"/"+relpath;
 		cargo.put("url", url);
 		
 
@@ -119,6 +115,14 @@ public final class UploadServlet implements IServlet {
 		// all OK
 		state.addMessage(Printer.format("File {0} uploaded", _asset.getName()));
 		return _asset;
+	}
+	
+	/**
+	 * 
+	 * @param server e.g. "https://as.good-loop.com" NB: No trailing /
+	 */
+	public void setServer(String server) {
+		this.server = server;
 	}
 	
 	

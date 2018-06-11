@@ -140,6 +140,10 @@ public class CSVWriter implements Closeable, Flushable {
 		this.file = dest;
 	}
 
+	public CSVWriter(File dest) {
+		this(dest, new CSVSpec());
+	}
+
 	/**
 	 * Flush & close the underlying file writer
 	 */

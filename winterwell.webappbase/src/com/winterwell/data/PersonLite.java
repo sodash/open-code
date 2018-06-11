@@ -12,6 +12,8 @@ import com.winterwell.web.data.XId;
  */
 public class PersonLite extends AThing {
 
+	public String username;
+
 	// NB: name and id are defined in AThing
 	
 	public PersonLite(XId from) {
@@ -30,6 +32,7 @@ public class PersonLite extends AThing {
 		if (jobj.containsKey("img")) img = (String) jobj.get("img");
 		if (jobj.containsKey("description")) description = (String) jobj.get("description");
 		if (jobj.containsKey("name")) name = (String) jobj.get("name");
+		if (jobj.containsKey("username")) username = (String) jobj.get("username");
 		if (jobj.containsKey("url")) url = (String) jobj.get("url");
 		return this;
 	}

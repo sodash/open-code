@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogEvent;
+import com.winterwell.datalog.DataLogRemoteStorage;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -74,7 +75,6 @@ public class LgServlet {
 		// TODO security check the dataspace?
 		String tag = state.getRequired(TAG);
 		double count = state.get(new DoubleField("count"), 1.0);
-		String via = req.getParameter("via");
 		// NB: dont IP/user track simple events, which are server-side
 		boolean stdTrackerParams = ! DataLogEvent.simple.equals(tag) && state.get(new BoolField("track"), true);
 		// Read the "extra" event parameters
@@ -101,7 +101,7 @@ public class LgServlet {
 		}
 		
 		// log it!
-		boolean logged = doLog(state, ds, tag, count, via, params, stdTrackerParams);
+		DataLogEvent logged = doLog(state, ds, tag, count, params, stdTrackerParams);
 		
 		// Reply
 		// .gif?
@@ -112,11 +112,22 @@ public class LgServlet {
 		if (DataLogServer.settings.CORS) {
 			WebUtils2.CORS(state, false);
 		}
-		WebUtils2.sendText(logged? "OK" : "not logged", resp);
+		WebUtils2.sendText(logged!=null? "OK" : "not logged", resp);
 	}
 
-	static boolean doLog(WebRequest state, String dataspace, String tag, double count, 
-			String via, Map params, boolean stdTrackerParams) 
+	
+	/**
+	 * 
+	 * @param state
+	 * @param dataspace
+	 * @param tag
+	 * @param count
+	 * @param params can be null
+	 * @param stdTrackerParams
+	 * @return
+	 */
+	public static DataLogEvent doLog(WebRequest state, String dataspace, String tag, double count, 
+			Map params, boolean stdTrackerParams) 
 	{
 		assert dataspace != null;		
 		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
@@ -141,11 +152,11 @@ public class LgServlet {
 		
 		// screen out our IPs?
 		if ( ! accept(dataspace, tag, params)) {
-			return false;
+			return null;
 		}
 		
 		// write to log file
-		doLogToFile(dataspace, tag, count, params, trckId, via, state);
+		doLogToFile(dataspace, tag, count, params, trckId, state);
 				
 		// write to Stat / ES
 		// ...which dataspaces?
@@ -162,7 +173,7 @@ public class LgServlet {
 //		event.time = state.get(time); FIXME
 		DataLog.count(event);
 //		}
-		return true;
+		return event;
 	}
 
 	private static Map doLog2_addStdTrackerParams(WebRequest state, Map params, String trckId) {
@@ -239,11 +250,10 @@ public class LgServlet {
 
 	static List<String> OUR_IPS = Arrays.asList("62.30.12.102", "62.6.190.196", "82.37.169.72");
 	
-	private static void doLogToFile(String dataspace, String tag, double count, Map params, String trckId, String via, WebRequest state) {
+	private static void doLogToFile(String dataspace, String tag, double count, Map params, String trckId, WebRequest state) {
 		String msg = params == null? "" : Printer.toString(params, ", ", ": ");
 		if (count != 1) msg += "\tcount:"+count;
 		msg += "\ttracker:"+trckId+"\tref:"+state.getReferer()+"\tip:"+state.getRemoteAddr();
-		if (via!=null) msg += " via:"+via;
 		// Guard against giant objects getting put into log, which is almost
 		// certainly a careless error
 		if (msg.length() > Log.MAX_LENGTH) {

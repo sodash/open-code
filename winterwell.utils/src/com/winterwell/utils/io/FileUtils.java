@@ -576,7 +576,7 @@ public class FileUtils {
 	 *
 	 * @param baseDir
 	 * @param filter
-	 * @return
+	 * @return Can be empty, never null
 	 */
 	public static List<File> find(File baseDir, FileFilter filter) {
 		return find(baseDir, filter, true);
@@ -593,7 +593,7 @@ public class FileUtils {
 	 *            sub-directories. A file is considered hidden if:
 	 *            {@link File#isHidden()} returns true or the file name begins
 	 *            with a .
-	 * @return
+	 * @return Can be empty, never null
 	 */
 	public static List<File> find(File baseDir, FileFilter filter,
 			boolean includeHiddenFiles) {

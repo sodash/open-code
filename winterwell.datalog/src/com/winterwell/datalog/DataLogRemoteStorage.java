@@ -28,6 +28,8 @@ import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.app.AppUtils;
+import com.winterwell.web.app.KServerType;
 
 /**
  * This is a kind of DatalogClient API class
@@ -59,6 +61,23 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		Log.d("datalog.remote", "Save to "+server+" "+event+" response: "+ok);
 		return true;
 	}
+	
+	
+	/**
+	 * // HACK log to lg (this should really be done by altering the DataLog settings)
+	 * @param event
+	 * @param state
+	 */
+	public static void hackRemoteDataLog(DataLogEvent event) {
+		try {
+			KServerType st = AppUtils.getServerType(null);
+			String LG_SERVER = AppUtils.getServerUrl(st, "lg.good-loop.com").toString();
+			DataLogRemoteStorage.saveToRemoteServer(LG_SERVER, event);
+		} catch(Throwable ex) {
+			Log.e("datalog.hack (swallowed)", ex);
+		}
+	}
+
 	
 	private String logEndpoint;
 	private String getDataEndpoint;

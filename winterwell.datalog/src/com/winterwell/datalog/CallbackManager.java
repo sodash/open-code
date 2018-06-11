@@ -33,12 +33,11 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 		// HACK remove this hard-coded callback, and make it a dynamic setup
 		// a call to adserver
 		KServerType mtype = AppUtils.getServerType(null);
-		String protocol = mtype==KServerType.LOCAL? "http" : "https"; 		
-		String url = protocol+"://"+(mtype==KServerType.PRODUCTION? "" : mtype.toString().toLowerCase())
-				+"as.good-loop.com/lgwebhook";
+		StringBuilder url = AppUtils.getServerUrl(mtype, "as.good-loop.com");
+		url.append("/lgwebhook");
 		// minview is where money gets spent. donation is when a user picks a charity.		
 		for(String evt : new String[] {"minview","click","donation"}) {
-			Callback cb = new Callback("gl", evt, url);
+			Callback cb = new Callback("gl", evt, url.toString());
 			callbacksForDataspace.add("gl", cb);
 		}
 	}

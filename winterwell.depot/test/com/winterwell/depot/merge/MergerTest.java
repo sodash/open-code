@@ -26,7 +26,32 @@ public class MergerTest {
 		WebPage m = (WebPage) merger.doMerge(before, after, latest);
 
 		assert m != null;
-		assert m.getStylesheets().contains("mystyle.css");
+		assert m.getStylesheets().contains("mystyle.css") : m.getStylesheets();
+		assert m.getTitle().equals("After Title");
+	}
+	
+	@Test
+	public void testDoMergeCustom() {
+		// what shall we test on? how about a WebPage?
+		WebPage before = new WebPage();
+		
+		WebPage after = new WebPage();
+		after.setTitle("After Title");
+		after.append("Hello After-World :)");
+		
+		WebPage latest = new WebPage();
+		latest.addStylesheet("mystyle.css");
+		
+		Merger merger = new Merger();
+		IMerger noop = new UseLatestMerger();
+		merger.addMerge(StringBuilder.class, noop);
+		merger.addMerge(String.class, noop);
+		merger.addMerge(WebPage.class, new POJOMerger(merger));
+		
+		WebPage m = (WebPage) merger.doMerge(before, after, latest);
+
+		assert m != null;
+		assert m.getStylesheets().contains("mystyle.css") : m.getStylesheets();
 		assert m.getTitle().equals("After Title");
 	}
 

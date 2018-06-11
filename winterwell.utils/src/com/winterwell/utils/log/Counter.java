@@ -1,6 +1,7 @@
 package com.winterwell.utils.log;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 
 import com.winterwell.utils.Printer;
@@ -13,25 +14,34 @@ import com.winterwell.utils.Printer;
  * @author Dan
  * 
  */
-public final class Counter {
-	private final AtomicInteger cnt = new AtomicInteger();
-	private String desc = "	{0}";
+public final class Counter extends Number {
+	private static final long serialVersionUID = 1L;
+	private final AtomicLong cnt = new AtomicLong();
+	private String desc = "... {0}";
 	private final int period;
 
+	public Counter() {
+		this(1000);
+	}
+	
 	public Counter(int period) {
 		this.period = period;
 	}
 
-	public int get() {
+	public long get() {
 		return cnt.get();
 	}
 
-	public void inc() {
-		int v = cnt.incrementAndGet();
+	public long incrementAndGet() {
+		long v = cnt.incrementAndGet();
 		if (v % period == 0) {
-			Log.report(Printer.format(desc, v), Level.INFO);
-			// Utils.sleep(1000); // This was to stop Joe's laptop overheating
+			Log.i(Printer.format(desc, v));
 		}
+		return v;
+	}
+		
+	public void inc() {
+		incrementAndGet();
 	}
 
 	/**
@@ -41,6 +51,26 @@ public final class Counter {
 	 */
 	public void setDescription(String desc) {
 		this.desc = desc;
+	}
+
+	@Override
+	public int intValue() {
+		return cnt.intValue();
+	}
+
+	@Override
+	public long longValue() {
+		return cnt.longValue();
+	}
+
+	@Override
+	public float floatValue() {
+		return cnt.floatValue();
+	}
+
+	@Override
+	public double doubleValue() {
+		return cnt.doubleValue();
 	}
 
 }

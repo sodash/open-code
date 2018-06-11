@@ -10,7 +10,7 @@ import com.winterwell.utils.log.Log;
 /**
  * Collect together all the standard mergers.
  * @author daniel
- *
+ * @testedby {@link MergerTest}
  */
 public class Merger implements IMerger<Object> {
 
@@ -87,7 +87,7 @@ public class Merger implements IMerger<Object> {
 		Class type = after.getClass();
 		IMerger m = mergers.get(type);
 		if (m==null) {
-			Log.e(TAG, "No merger for "+type);
+			Log.e(TAG, "No merger for "+type+" - returning unmodified after");
 			return after;
 		}
 		return m.doMerge(before, after, latest);
@@ -106,6 +106,10 @@ public class Merger implements IMerger<Object> {
 	@Override
 	public Object applyDiff(Object a, Diff diff) {
 		if (diff==null) return a;
+		if (a==null) {
+			Object v = stripDiffs(diff);
+			return v;
+		}
 		Class type = a.getClass();
 		IMerger m = mergers.get(type);
 		if (m==null) {

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,6 +27,7 @@ import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.IWidget;
 import com.winterwell.web.WebInputException;
+import com.winterwell.web.app.WebRequest;
 
 /**
  * Describes a form field. toString() returns the field's name.
@@ -92,6 +94,19 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	 * the field!
 	 */
 	private String type;
+
+	private Boolean lenient;
+	
+	/**
+	 * If true, this will try to interpret badly formatted urls.
+	 * And bad inputs will return null rather than throw an error. 
+	 * @param lenient
+	 * @return 
+	 */
+	public AField<X> setLenient(boolean lenient) {
+		this.lenient = lenient;
+		return this;
+	}
 
 	/**
 	 * Convenience for making a simple text field from a Key
@@ -300,7 +315,9 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 		
 		// This should perform url decoding
 		// Get the array, in case we have some nulls (as a checkbox hack we use can create)
-		String[] vs = request.getParameterValues(getName());
+		// Badly formatted urls can break this :(
+		// e.g. http://localas.good-loop.com/unit.js?gl.via=loop.me&site=%%SITE%%&gl_url=%%PATTERN:url%%&width=300&height=250&adunit=%%ADUNIT%%&cb=%%CACHEBUSTER%%
+		String[] vs = request.getParameterValues(getName());	
 		String v = null;
 		if (vs!=null) {
 			for (String _v : vs) {
@@ -312,6 +329,11 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 				}
 				v = _v;
 				break;
+			}
+		} else if (Utils.yes(lenient)) {
+			String qs = request.getQueryString();
+			if (qs != null) {
+				v = WebUtils2.getQueryParameterQuiet(qs, getName());				
 			}
 		}
 		// null? (or "" or " ", since those would fail the isBlank() above)
@@ -369,16 +391,19 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	 */
 	/* TODO: Consider refactoring to take a RequestState */
 	public final X getValue(HttpServletRequest request)
-			throws WebInputException {
+			throws WebInputException 
+	{
 		String v = getStringValue(request);
 		if (v == null)
 			return null;
 		try {
 			return fromString(v);
-		} catch (WebInputException e) {
-			throw e;
 		} catch (Exception e) {
-			Log.w("web.input", e);
+			if (lenient) {
+				Log.w(getClass().getSimpleName()+"."+name, v+" -> "+e);
+				return null;
+			}
+			if (e instanceof WebInputException) throw (WebInputException) e;
 			throw new WebInputException("Form value for " + getName()
 					+ " is invalid: " +StrUtils.ellipsize(v, 300), e);
 		}
@@ -462,8 +487,9 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 		this.onChange = onChange;
 	}
 
-	public void setRequired(boolean required) {
+	public AField<X> setRequired(boolean required) {
 		this.required = required;
+		return this;
 	}
 
 	/**

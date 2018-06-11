@@ -31,6 +31,30 @@ public class DotPrinterTest {
 		GuiUtils.popupAndBlock(GuiUtils.load(imgFile));
 	}
 	
+	@Test	
+	public void testGLStack() throws IOException {
+		DiGraph g = new DiGraph();
+		DiNode a = g.addNode("video / VAST / VPAID");
+		DiNode b = g.addNode("Good-Loop AdUnit .js");
+		DiNode c = g.addNode("Browser (optionally with SafeFrame)");
+		DiNode d = g.addNode("AdServer");
+		DiNode e = g.addNode("Logger");
+		g.addEdge(a, b, null);
+		g.addEdge(b, e, null);
+		g.addEdge(d, e, null);
+		g.addEdge(e, c, null);
+		DotPrinter dp = new DotPrinter(g);
+		
+		File dotFile = File.createTempFile("dot", ".dot");
+		FileUtils.write(dotFile, dp.out());
+		Printer.out(dotFile);
+
+		File imgFile = File.createTempFile("dot", ".png");
+		DotPrinter.create(dotFile, "png", imgFile);
+		Printer.out(imgFile);
+
+		GuiUtils.popupAndBlock(GuiUtils.load(imgFile));
+	}
 	
 	
 	@Test	

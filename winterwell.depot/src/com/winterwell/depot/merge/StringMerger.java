@@ -14,7 +14,7 @@ public class StringMerger extends AMerger<String> {
 	}
 
 	@Override
-	public Diff diff(String before, String after) {
+	public Diff diff(String before, String after) {		
 		throw new TodoException();
 	}
 

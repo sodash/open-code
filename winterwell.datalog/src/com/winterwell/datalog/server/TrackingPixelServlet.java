@@ -61,8 +61,7 @@ public class TrackingPixelServlet implements IServlet {
 		// Who are they? Track them across pages
 		String uid = getCreateCookieTrackerId(state);
 		String ref = Utils.or(state.get("ref"), state.getReferer());
-		// transfer link properties to cookie? -- like the affiliate
-		String via = processViaAffiliateTracking(state, ref);
+		// ??transfer link properties to cookie? -- like the affiliate
 		// serve the resource, so we can release the request
 		try {
 			FileServlet.serveFile(PIXEL, state);
@@ -77,11 +76,11 @@ public class TrackingPixelServlet implements IServlet {
 			dataspace = "trk";
 		}
 		// Count it
-		LgServlet.doLog(state, dataspace, tag, 1, via, null, true);
+		LgServlet.doLog(state, dataspace, tag, 1, null, true);
 
 		
 		// log it
-		Log.d("track", state.getReferer()+" via: "+via+" uid: "+uid);		
+		Log.d("track", state.getReferer()+" uid: "+uid);		
 
 //		// TODO Tag the email / tweet
 //		XId xid = state.get(Fields.XID);
@@ -104,63 +103,6 @@ public class TrackingPixelServlet implements IServlet {
 //		}
 	}
 
-
-//	public static String[] statTag(String grp, XId parentTemplateText) {
-//		 return new String[]{grp+"_"+Tripwire.OPENED_TAG, String.valueOf(parentTemplateText)};
-//	}
-
-	
-	public static final SField VIA = new SField("via");
-	
-	/** TODO also track affiliate events server-side 
-	 * @return via or null*/
-	private String processViaAffiliateTracking(WebRequest state, String ref) {
-		if (ref==null) return null;				
-		String viav = VIA.getValue(ref);
-		
-//		// ??Does this work, or is it too sensitive to the ordering?? 
-//		// intro: first-visit-only affiliate tracking. 
-//		// If this is the first visit to the domain, then the introducer gets via (affiliate) credit.
-//		// But if they reached this page as part of their journey, then there's no credit.
-//		// Use-case: A reseller has their own landing pages on your site.
-//		String domain = WebUtils2.getDomain(ref);				
-//		if (domain!=null) {			
-//			String intro = INTRO.getValue(ref);
-//			String intro_d = "intro_"+domain;
-//			String oldIntro = WebUtils2.getCookie(state.getRequest(), intro_d);
-//			if (oldIntro==null) {
-//				WebUtils2.addCookie(state.getResponse(), intro_d, Utils.or(intro, "organic"), TUnit.MONTH.dt, ".soda.sh");
-//				// upgrade the intro to a via
-//				if (viav==null) viav = intro;	
-//			}			
-//		}
-		
-		// via affiliate tracking		
-		if (viav==null) {
-//			Log.d("track", ref+" no via");
-			return null;
-		}
-//		Log.d("track", ref+" via "+viav);
-		// 1st affiliate wins -- 2nd affiliate does not override
-		String oldVia = state.getCookie(VIA.getName());
-		if (oldVia==null) {
-			state.setCookie(VIA.getName(), viav, TUnit.MONTH.dt, ".soda.sh");
-		} else if ( ! oldVia.equals(viav)) {
-			Log.d("track", ref+" new-via "+viav+" skipped due to old-via "+oldVia);
-		}
-		// but do put all the affiliates into a chain
-		String via2 = state.getCookie("via2");
-		if (Utils.isBlank(via2)) {
-			via2= viav; 
-		} else if (via2.endsWith(viav)) {
-			// no op (avoid repeats)
-			return oldVia;
-		} else {
-			via2 += ","+viav; 
-		}
-		state.setCookie("via2", via2, TUnit.YEAR.dt, ".soda.sh");
-		return oldVia==null? viav : oldVia;
-	}
 
 	
 }

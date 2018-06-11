@@ -297,19 +297,19 @@ public class AppUtils {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));		
 		// save update
 		
-		JThing item2 = Utils.copy(item);
-		String json = item2.string();
-		Object start = SimpleJson.get(item2.map(), "projects", 0, "start");
-		Object startraw = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
+//		JThing item2 = Utils.copy(item);
+//		String json = item2.string();
+//		Object start = SimpleJson.get(item2.map(), "projects", 0, "start");
+//		Object startraw = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
 		
 		// prep object via IInit? (IInit is checked within JThing)
 		// e.g. set the suggest field for NGO 
 		Object jobj = item.java();
 
-		item2 = Utils.copy(item);
-		String json2 = item2.string();
-		Object start2 = SimpleJson.get(item2.map(), "projects", 0, "start");
-		Object startraw2 = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
+//		item2 = Utils.copy(item);
+//		String json2 = item2.string();
+//		Object start2 = SimpleJson.get(item2.map(), "projects", 0, "start");
+//		Object startraw2 = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
 		
 		// sanity check id matches path
 		String id = (String) item.map().get("@id"); //mod.getId();
@@ -321,10 +321,10 @@ public class AppUtils {
 		assert id != null && ! id.equals("new") : "use action=new "+stateCanBeNull;
 		assert id.equals(path.id) : path+" vs "+id;
 		
-		item2 = Utils.copy(item);
-		String json3 = item2.string();
-		Object start3 = SimpleJson.get(item2.map(), "projects", 0, "start");
-		Object startraw3 = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
+//		item2 = Utils.copy(item);
+//		String json3 = item2.string();
+//		Object start3 = SimpleJson.get(item2.map(), "projects", 0, "start");
+//		Object startraw3 = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
 		
 		// save to ES
 		UpdateRequestBuilder up = client.prepareUpdate(path);
@@ -691,6 +691,22 @@ public class AppUtils {
 		}
 		if (s instanceof KStatus) return (KStatus) s;
 		return KStatus.valueOf((String) s);
+	}
+
+
+	/**
+	 * 
+	 * @param mtype
+	 * @param domain e.g. "as.good-loop.com"
+	 * @return e.g. "https://testas.good-loop.com"
+	 */
+	public static StringBuilder getServerUrl(KServerType mtype, String domain) {
+		assert ! domain.startsWith("http") && ! domain.endsWith("/") : domain;
+		StringBuilder url = new StringBuilder();
+		url.append(mtype==KServerType.LOCAL? "http" : "https"); 		
+		url.append("://"); url.append(mtype==KServerType.PRODUCTION? "" : mtype.toString().toLowerCase());
+		url.append(domain);
+		return url;
 	}
 
 
