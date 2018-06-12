@@ -62,6 +62,12 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	public void doMain(String[] args) {
 		logFile = new LogFile(new File(appName+".log"))
 					.setLogRotation(TUnit.DAY.dt, 14);
+		try {
+			assert "foo".contains("bar");
+			Log.e("run", "Running Java WITHOUT assertions - please use the -ea flag!");
+		} catch(AssertionError e) {
+			// ok
+		}
 		init(args);
 		launchJetty();
 	}
