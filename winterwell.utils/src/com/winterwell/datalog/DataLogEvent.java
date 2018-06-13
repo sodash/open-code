@@ -84,6 +84,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"txid", String.class,
 			"uxid", String.class,
 			"su",String.class,
+			"gby", String.class, // group-by ID -- for collating events together into one summary event
 			// a few scoring/results properties
 			"start", Time.class,
 			"end", Time.class,
