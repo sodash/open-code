@@ -20,7 +20,6 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
 import com.winterwell.data.AThing;
-import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.depot.IInit;
 import com.winterwell.es.ESPath;
@@ -46,6 +45,7 @@ import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.data.XId;

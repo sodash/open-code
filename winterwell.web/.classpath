@@ -29,5 +29,6 @@
 	<classpathentry exported="true" kind="lib" path="/middleware/javamail/javax.mail.jar" sourcepath="/middleware/javamail/javamail-1.5.5-src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry kind="lib" path="/middleware/guava/guava.jar" sourcepath="/middleware/guava/src.zip"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/flexi-gson"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -15,7 +15,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 
 import com.winterwell.data.AThing;
-import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
 import com.winterwell.depot.IInit;
@@ -52,6 +51,7 @@ import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.EnumField;
 import com.winterwell.web.fields.JsonField;
@@ -594,9 +594,9 @@ public class AppUtils {
 		List ptree = sq.getParseTree();
 		try {
 			filter = filter.must(parseTreeToQuery(ptree));
-		} catch (AssertionError e) {
+		} catch (Throwable e) {
 			// Put full query info on an assertion failure
-			assert (false) : Printer.toString(e, true) + " from " + sq;
+			throw new WebEx.E40X(400, "bad query "+sq, e);
 		}
 		
 		return filter;
@@ -604,6 +604,10 @@ public class AppUtils {
 	
 	
 	private static BoolQueryBuilder parseTreeToQuery(Object rawClause) {
+		if ( ! (rawClause instanceof List) && ! (rawClause instanceof Map)) {
+			throw new IllegalArgumentException("clause is not list or map: " + rawClause);
+		}		
+		
 		BoolQueryBuilder filter = QueryBuilders.boolQuery();
 		
 		// Map means propname=value constraint.
@@ -621,9 +625,7 @@ public class AppUtils {
 					return filter.must(kvFilter);
 				}	
 			}
-		}
-	
-		assert (rawClause instanceof List) : "clause is not list or map: " + rawClause;
+		}			
 		
 		List clause = (List) rawClause;
 		assert (! clause.isEmpty()) : "empty clause";

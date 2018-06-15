@@ -996,12 +996,12 @@ public class WebUtils2 extends WebUtils {
 	 * @throws IOException
 	 * @testedby {@link CGIUtilsTest#testSendJson}
 	 */
-	public static void sendJson(JsonResponse output, WebRequest req) throws IOException {
-		HttpServletResponse response = req.getResponse();
+	public static void sendJson(JsonResponse output, WebRequest req) throws IOException {		
 		// convert to JSON
 		String json = output.toJSON();
 		BufferedWriter out = null;
 		try {
+			HttpServletResponse response = req.getResponse();
 			// set mime and character encoding
 			// HACK: Is it an old IE?
 			BrowserType bt = req.getBrowserType();
@@ -1021,6 +1021,30 @@ public class WebUtils2 extends WebUtils {
 			} else {
 				out.append(json);
 			}
+		} finally {
+			FileUtils.close(out);
+		}
+	}
+
+	public static void sendJson(WebRequest req, String json) throws RuntimeException {		
+		BufferedWriter out = null;
+		try {
+			HttpServletResponse response = req.getResponse();
+			// set mime and character encoding
+			// HACK: Is it an old IE?
+			BrowserType bt = req.getBrowserType();
+			if (bt.getBrowserMake()==BrowserType.MAKE_IE && bt.getVersion() < 10) {
+				response.setContentType(WebUtils.MIME_TYPE_TXT_UTF8);
+			} else {
+				response.setContentType(WebUtils.MIME_TYPE_JSON + "; charset=UTF-8");
+			}
+			// TODO use response.getWriter() instead? Does this affect encoding
+			// issues at all?
+			// PrintWriter pw = response.getWriter();
+			out = FileUtils.getWriter(response.getOutputStream());
+			out.append(json);	
+		} catch(IOException ex) {
+			throw Utils.runtime(ex);
 		} finally {
 			FileUtils.close(out);
 		}
