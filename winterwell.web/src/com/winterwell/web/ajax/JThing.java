@@ -1,4 +1,4 @@
-package com.winterwell.data;
+package com.winterwell.web.ajax;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +12,7 @@ import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.web.IHasJson;
 
 /**
  * Wrapper for json objects
@@ -19,7 +20,7 @@ import com.winterwell.utils.StrUtils;
  *
  */
 public final class JThing<T> 
-implements INotSerializable // serialize the json not this wrapper 
+implements INotSerializable, IHasJson // serialize the json not this wrapper 
 {
 
 	private String json;
@@ -102,6 +103,13 @@ implements INotSerializable // serialize the json not this wrapper
 		return this;
 	}
 	
+	public JThing<T> setJson(String json) {
+		this.json = json;
+		this.java = null;
+		this.map = null;
+		return this;
+	}
+	
 	public T java() {
 		if (java!=null) return java;
 		String sjson = string();
@@ -139,5 +147,15 @@ implements INotSerializable // serialize the json not this wrapper
 		java = null;
 		json = null;
 		return this;
+	}
+
+	public Object toJson2() {
+		// is it an object? (the normal case)
+		if (map!=null) return map();
+		if (json!=null && json.startsWith("{")) {
+			return map();
+		}
+		if (string()==null) return null;
+		return JSON.parse(string());		
 	}
 }

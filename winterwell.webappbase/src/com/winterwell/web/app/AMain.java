@@ -110,6 +110,13 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	public final void init() {
 		init(new String[0]);
 	}
+	
+	public void stop() {
+		if (jl!=null) {
+			jl.stop();
+			jl = null;
+		}
+	}
 
 	/**
 	 * called after config has been loaded.

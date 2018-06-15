@@ -15,7 +15,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 
 import com.winterwell.data.AThing;
-import com.winterwell.data.JThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
 import com.winterwell.depot.IInit;
@@ -52,6 +51,7 @@ import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.EnumField;
 import com.winterwell.web.fields.JsonField;

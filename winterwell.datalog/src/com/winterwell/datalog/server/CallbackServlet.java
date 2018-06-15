@@ -1,11 +1,11 @@
 package com.winterwell.datalog.server;
 
-import com.winterwell.data.JThing;
 import com.winterwell.datalog.Callback;
 import com.winterwell.datalog.CallbackManager;
 import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.es.FixedESRouter;
 import com.winterwell.utils.Utils;
+import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.app.CrudServlet;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
