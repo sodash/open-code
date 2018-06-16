@@ -19,6 +19,7 @@ public class BuildDataLog extends BuildWinterwellProject {
 		
 		MavenDependencyTask mdt = new MavenDependencyTask();
 		mdt.addDependency("com.hazelcast","hazelcast", "3.10.2");
+		mdt.setOutputDirectory(new File(projectDir, "tmp-lib"));
 		mdt.run();
 		
 		super.doTask();

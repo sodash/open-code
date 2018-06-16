@@ -10,6 +10,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.depot"/>
 	<classpathentry kind="lib" path="/middleware/postgresql/postgresql.jar"/>
+	<classpathentry kind="lib" path="tmp-lib/hazelcast.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.bob"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.webappbase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/youagain-java-client"/>
