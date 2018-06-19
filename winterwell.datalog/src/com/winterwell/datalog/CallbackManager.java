@@ -50,7 +50,7 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 		List<Callback> cbs = callbacksForDataspace.get(msg.dataspace);
 		if (cbs==null) return;
 		for (Callback callback : cbs) {
-			if (callback.evt!=null && ! callback.evt.equals(msg.eventType)) {
+			if (callback.evt!=null && ! callback.evt.equals(msg.getEventType())) {
 				continue;
 			}
 			try {

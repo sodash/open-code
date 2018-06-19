@@ -48,6 +48,7 @@ public interface IDataLogStorage {
 	 * @param tag
 	 * @param start Can be null (includes all)
 	 * @param end Can be null (includes all)
+	 * @param fn How to interpolate buckets (if bucketSize is set)
 	 * @param bucketSize Can be null for "as it is stored"
 	 * @return never null! May be empty.
 	 */

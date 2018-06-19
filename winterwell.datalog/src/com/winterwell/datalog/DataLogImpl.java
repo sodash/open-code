@@ -127,7 +127,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 
 	@Override
 	public IDataLogReq<Double> getTotal(Time start, Time end, String... tagBits) {
-		String tag = DataLog.tag(tagBits);
+		String tag = DataLog.tag(tagBits);		
 		return storage.getTotal(tag, start, end);
 	}
 
@@ -290,16 +290,19 @@ public class DataLogImpl implements Closeable, IDataLog {
 		return null;
 	}
 
-	protected synchronized void doSave() {
+	protected synchronized void doSave() {		
 		Map<String, Double> old = tag2count;		
 		Map<String, IDistribution1D> oldMean = tag2dist;
 		Map<String, DataLogEvent> oldid2event = id2event;
 		Map<Pair2<String, Time>, Double> oldTagTimeCount = tagTime2count;
 		Map<Pair2<String, Time>, Double> oldTagTimeSet = tagTime2set;
-		old.put("stat_bucket_count", 1.0*old.size());
-		old.put("stat_bucket_dist", 1.0*oldMean.size());
-		old.put("stat_bucket_retro_count", 1.0*oldTagTimeCount.size());
-		old.put("stat_bucket_retro_set", 1.0*oldTagTimeSet.size());
+
+		// save internal stats? (skip 0s)
+		if ( ! old.isEmpty()) old.put("stat_bucket_count", 1.0*old.size());
+		if ( ! oldMean.isEmpty()) old.put("stat_bucket_dist", 1.0*oldMean.size());
+		if ( ! oldTagTimeCount.isEmpty()) old.put("stat_bucket_retro_count", 1.0*oldTagTimeCount.size());
+		if ( ! oldTagTimeSet.isEmpty()) old.put("stat_bucket_retro_set", 1.0*oldTagTimeSet.size());
+		
 		Period period = getCurrentBucket();
 
 		// new buckets
@@ -317,7 +320,9 @@ public class DataLogImpl implements Closeable, IDataLog {
 			start = period.second;
 		}
 		// save the counters!
-		Log.d(DataLog.LOGTAG, "Saving "+old.size()+" simple + "+oldMean.size()+" dist + "+oldTagTimeCount.size()+" historical "+oldTagTimeSet.size()+"...");
+		if ( ! old.isEmpty()) {
+			Log.d(DataLog.LOGTAG, "Saving "+old.size()+" simple + "+oldMean.size()+" dist + "+oldTagTimeCount.size()+" historical "+oldTagTimeSet.size()+"...");
+		}
 		storage.save(period, old, oldMean);
 		storage.saveHistory(oldTagTimeCount);
 		storage.setHistory(oldTagTimeSet);
@@ -586,6 +591,9 @@ public class DataLogImpl implements Closeable, IDataLog {
 			try {				
 				if (closed) cancel();
 				else doSave();
+				if (config.noSystemStats) {
+					return;
+				}
 				// heart beat: check things are working by storing some useful stats
 				DataLog.set(ReflectionUtils.getUsedMemory(), STAT_MEM_USED);
 				DataLog.set(ReflectionUtils.getAvailableMemory(), "mem_free");								
@@ -646,11 +654,12 @@ public class DataLogImpl implements Closeable, IDataLog {
 		assert ! Utils.isBlank(dataspace) : "no dataspace?! event:"+event;
 		// dataspace_eventType=$eventType
 		StringBuilder stag = new StringBuilder(dataspace);
-		String eventType = (String) event.remove(DataLogEvent.EVENTTYPE);
-		stag.append("_evt="+eventType);
+		String[] eventType = DataLogEvent.getEventTypeFromMap(event);
+		stag.append("_evt="+eventType[0]);
 		// a-z params
 		event.keySet().stream().sorted().forEach(k -> {
 			// exclude the non-params
+			if (DataLogEvent.EVENTTYPE.equals(k)) return;
 			if ("count".equals(k)) return;
 			if ("dataspace".equals(k)) return;
 			if ("time".equals(k)) return;			

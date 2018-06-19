@@ -3,15 +3,22 @@ package com.winterwell.datalog;
 import static junit.framework.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.ESHttpResponse;
+import com.winterwell.es.client.SearchResponse;
+import com.winterwell.es.client.admin.DeleteIndexRequest;
+import com.winterwell.gson.Gson;
 import com.winterwell.maths.chart.LogGridInfo;
 import com.winterwell.maths.stats.distributions.d1.ExponentialDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.HistogramData;
@@ -19,22 +26,32 @@ import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.ListDataStream;
+import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.SimpleJson;
 
 public class ESStorageTest {
 
 	@BeforeClass
 	public static void setup() {
 		DataLogConfig config = new DataLogConfig();
+		
+		// 1 second saves!!
 		config.interval = new Dt(1, TUnit.SECOND);
+		
 		config.storageClass = ESStorage.class;
+		
+		config.noSystemStats = true;
+		
 		DataLog.dflt = new DataLogImpl(config);
 		DataLog.init(config);
 	}
@@ -73,6 +90,100 @@ public class ESStorageTest {
 		assert MathUtils.approx(histo2.getMean(), 10) : histo2;
 	}
 
+	
+	@Test
+	public void testSaveOverlappingEvents() throws InterruptedException, ExecutionException {				
+		Time start = new Time().minus(TUnit.MINUTE);
+		ESStorage storage = (ESStorage) DataLog.getImplementation().getStorage();						
+		storage.init(new DataLogConfig());
+		String gby = Utils.getRandomString(4);
+		String dataspace = "testoverlapspace";
+		
+		ESHttpClient esjc = storage.client(dataspace);
+		// clean out old
+		DeleteIndexRequest del = esjc.admin().indices().prepareDelete(storage.indexFromDataspace(dataspace));
+		del.get();
+		Utils.sleep(100);
+
+		DataLogEvent event = new DataLogEvent(dataspace, 
+				gby,
+				1, new String[] {"testoverlap1"}, new ArrayMap(
+				"w", 11, // diff num in both
+				"pub", "egpub1", // diff in both
+				"cid", "oxfam1", // only in event 1
+				"tracker", "foo1@trk", // diff props in both
+				"blah1prop", "blah1"
+				));
+		
+		storage.registerDataspace(dataspace);
+		storage.registerEventType(dataspace, event.getEventType0());
+		
+		Period period = new Period(start, new Time());
+		// save it!
+		Future<ESHttpResponse> res = storage.saveEvent(dataspace, event, period);
+		ESHttpResponse r = res.get();
+		r.check();
+		// pause for ES
+		Utils.sleep(1500);
+
+		// save again -- different event, same group		
+		DataLogEvent event2 = new DataLogEvent(dataspace, 
+				gby,
+				1, new String[] {"testoverlap2"}, new ArrayMap(
+				"w", 12,
+				"pub", "egpub2",
+				"tracker", "bar2@trk",
+				"campaign", "Test2", // only in event 2
+				"blah2prop", "blah2"
+				));
+		assert event.getId().equals(event2.getId());
+		Printer.out("ID: "+event.getId());
+		Future<ESHttpResponse> res2 = storage.saveEvent(dataspace, event2, period);
+		ESHttpResponse r2 = res2.get();
+		r2.check();
+		
+		// pause for ES
+		Utils.sleep(1500);
+		
+		// get
+		
+		String index = storage.indexFromDataspace(dataspace);		
+		String eid = event.getId(); //dataspace+"/"+gby;
+		Map<String, Object> evt = esjc.get(index, storage.typeFromEventType("session"), eid);
+		assert evt != null;
+		Printer.out("---------");
+		Printer.out(evt);
+		Printer.out("---------");
+		assert Containers.same(Containers.asList(evt.get("evt")), Arrays.asList("testoverlap1","testoverlap2"));
+		DataLogEvent dle = DataLogEvent.fromESHit(dataspace, evt);
+		assert dle!=null;
+		Object p = dle.getProp("tracker");
+		assert p.equals("bar2@trk") : del;
+		assert dle.getProp("blah1prop").equals("blah1");
+		assert dle.getProp("blah2prop").equals("blah2");
+		assert dle.getProp("cid").equals("oxfam1");
+		assert dle.getProp("campaign").equals("Test2");
+		
+		Time end = new Time();
+		StatReq<IDataStream> data1 = storage.getData("testoverlap1", start, end, null, null);
+		StatReq<IDataStream> data2 = storage.getData("testoverlap2", start, end, null, null);
+		
+		List<String> breakdown = Arrays.asList("evt");
+		SearchResponse events = storage.doSearchEvents(dataspace, 10, 10, start, end, new SearchQuery(""), breakdown);
+		Map aggs = events.getAggregations();
+		Printer.out("---------");
+		Printer.out(aggs); // the event gets counted under both tags :)
+		Printer.out("---------");
+		Number c1 = SimpleJson.get(aggs, "by_evt", "buckets", 0, "doc_count");
+		Number c2 = SimpleJson.get(aggs, "by_evt", "buckets", 1, "doc_count");
+		assert c1.intValue() == 1 : aggs;
+		assert c2.intValue() == 1 : aggs;
+		
+		List<Map> egs = events.getHits();
+		Printer.out(egs);
+		System.out.println(egs);
+	}
+	
 	
 	@Test
 	public void testGetData() throws InterruptedException, ExecutionException {		
@@ -125,15 +236,17 @@ public class ESStorageTest {
 	
 	@Test
 	public void testGetTotal() throws IOException {
-		Time s = new Time();
+		Time s = new Time().minus(TUnit.MINUTE);
 		String salt = Utils.getRandomString(4);
+		String stag = "testtotal"+salt;
 		for(int i=0; i<10; i++) {
 			Utils.sleep(300);
-			DataLog.count(1, "testTotal"+salt);
+			DataLog.count(1, stag);
 		}
 		DataLog.flush();
-		Utils.sleep(10000);
-		IDataLogReq<Double> total = DataLog.getTotal(s, new Time(), "testTotal"+salt);
+		Utils.sleep(1500);
+		Time now = new Time(); //.plus(TUnit.MINUTE)
+		IDataLogReq<Double> total = DataLog.getTotal(s, now, stag);
 		Double v = total.get();
 		assert v == 10 : v;
 	}

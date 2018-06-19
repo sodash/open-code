@@ -187,7 +187,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 			event.toJson2()
 				);
 		vars.put("d", dataspace);		
-		vars.put("t", event.eventType); // type
+		vars.put("t", event.getEventType0()); // type
 		String p = JSON.toString(event.getProps());
 		vars.put("p", p);				
 		// TODO String r = referer		

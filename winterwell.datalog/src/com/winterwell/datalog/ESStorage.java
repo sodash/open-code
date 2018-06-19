@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -22,24 +23,31 @@ import org.elasticsearch.search.sort.SortOrder;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.winterwell.datalog.DataLog.KInterpolate;
+import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.IndexRequestBuilder;
+import com.winterwell.es.client.PainlessScriptBuilder;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
+import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
+import com.winterwell.es.client.query.ESQueryBuilder;
+import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.gson.Gson;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.ListDataStream;
+import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Null;
@@ -52,12 +60,14 @@ import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.WeirdException;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.XStreamUtils;
+import com.winterwell.web.app.AppUtils;
 
 /**
  * ElasticSearch backed storage for DataLog
@@ -68,6 +78,7 @@ import com.winterwell.utils.web.XStreamUtils;
  */
 public class ESStorage implements IDataLogStorage {
 
+	private static final String LOGTAG = "DataLog.ES";
 	private ESConfig esConfig;
 	private DataLogConfig config;
 	
@@ -213,9 +224,9 @@ public class ESStorage implements IDataLogStorage {
 				for (String n : config.namespaceConfigs) {
 					// also look in config/datalog.namespace.properties
 					File f = new File("config/datalog."+n.toLowerCase()+".properties");
-					Log.d("DataLog.init", "Looking for special namespace "+n+" config in "+f+" file-exists: "+f.exists());
+					Log.d(LOGTAG, "Looking for special namespace "+n+" config in "+f+" file-exists: "+f.exists());
 					if ( ! f.exists()) {
-						Log.w("DataLog.init", "No special config file "+f.getAbsoluteFile());
+						Log.w(LOGTAG, "No special config file "+f.getAbsoluteFile());
 						continue;
 					}
 					ConfigFactory cf = ConfigFactory.get();
@@ -275,10 +286,10 @@ public class ESStorage implements IDataLogStorage {
 			IESResponse cres = pc.get();
 			cres.check();
 		
-		// register some standard event types??
+			// register some standard event types??
 			initIndex3_registerEventType(_client, index, DataLogEvent.simple);
 		} catch(Throwable ex) {
-			Log.e(DataLog.LOGTAG, ex);
+			Log.e(LOGTAG, ex);
 			// swallow and carry on -- an out of date schema may not be a serious issue
 		}
 	}
@@ -352,21 +363,56 @@ public class ESStorage implements IDataLogStorage {
 	 */
 	@Override
 	public Future<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period bucketPeriod) {
+		if (event.dataspace!=null && ! event.dataspace.equals(dataspace)) {
+			Log.e(LOGTAG, new WeirdException("(swallowing) Dataspace mismatch: "+dataspace+" vs "+event.dataspace+" in "+event));
+		}
 //		Log.d("datalog.es", "saveEvent: "+event);		
 		String index = indexFromDataspace(dataspace);
 		// init?
 		initIndex(dataspace, index);
-		String type = typeFromEventType(event.eventType);
-		// put a time marker on it -- the end in seconds is enough
-		long secs = bucketPeriod.getEnd().getTime() % 1000;
-		String id = event.getId()+"_"+secs;
+		String type = typeFromEventType(event.getEventType()[0]);
+		
+		// ID
+		String id;
+		boolean grpById = event.groupById!=null; 
+		if (grpById) {
+			// HACK group by means no time bucketing
+			id = event.getId();
+		} else {
+			// put a time marker on it -- the end in seconds is enough
+			long secs = bucketPeriod.getEnd().getTime() % 1000;
+			id = event.getId()+"_"+secs;
+		}
+		
+		// always have a time
+		if (event.time==null) {
+			event.time = bucketPeriod.getEnd();
+		}
+		
 		ESHttpClient client = client(dataspace);
-//		client.debug = true; // FIXME
-		IndexRequestBuilder prepIndex = client.prepareIndex(index, type, id);
-		if (event.time==null) event.time = bucketPeriod.getEnd();
-		// set doc
-		prepIndex.setBodyMap(event.toJson2());
-		Future<ESHttpResponse> f = prepIndex.execute();
+		
+		client.debug = true;
+		
+		// save -- update for grouped events, index otherwise
+		ESPath path = new ESPath(index, type, id);
+		Future<ESHttpResponse> f;
+		if (grpById) {
+			UpdateRequestBuilder saveReq = client.prepareUpdate(path);			
+			// set doc
+			Map<String, Object> doc = event.toJson2();
+			PainlessScriptBuilder psb = PainlessScriptBuilder.fromJsonObject(doc);
+			saveReq.setScript(psb);
+			// upsert		
+			saveReq.setUpsert(doc);
+			f = saveReq.execute();
+		} else {
+			IndexRequestBuilder saveReq = client.prepareIndex(path);
+			if (event.time==null) event.time = bucketPeriod.getEnd();
+			// set doc
+			Map<String, Object> doc = event.toJson2();			
+			saveReq.setBodyMap(doc);
+			f = saveReq.execute();
+		}		
 		client.close();
 		
 		// log stuff ??does this create a resource leak??
@@ -392,8 +438,9 @@ public class ESStorage implements IDataLogStorage {
 	 * @return
 	 */
 	public String typeFromEventType(String eventType) {
-		assert ! eventType.startsWith("evt.");
-		return "evt."+StrUtils.toCanonical(eventType);
+		return "evt"; // all under one type! 'cos (a) we can collate several events into one session event, and (b) ES is deprecating types anyway.
+//		assert ! eventType.startsWith("evt.");
+//		return "evt."+StrUtils.toCanonical(eventType);
 	}
 
 	@Override
@@ -424,30 +471,37 @@ public class ESStorage implements IDataLogStorage {
 		return total;
 	}
 	
-	SearchResponse getData2(DataLogEvent spec, Time start, Time end, boolean sortByTime) {		
+	SearchResponse getData2(DataLogEvent spec, Time start, Time end, boolean sortByTime) {
+		
+		if end
+		DataLogImpl dl = (DataLogImpl) DataLog.getImplementation();
+		Period bucketPeriod = dl.getBucket(event.time);
+		end in 
+		end at end of bucket
+		
 		DataLogConfig config = Dep.get(DataLogConfig.class);		
 		String index = indexFromDataspace(spec.dataspace);
 		SearchRequestBuilder search = client(spec.dataspace).prepareSearch(index);
-		search.setType(typeFromEventType(spec.eventType));
+		search.setType(typeFromEventType(spec.getEventType()[0]));
 		search.setSize(config.maxDataPoints);
-		BoolQueryBuilder filter = QueryBuilders.boolQuery();
+		
+		com.winterwell.es.client.query.BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
+//		BoolQueryBuilder filter = QueryBuilders.boolQuery();
 				
 		// time box?
 		if (start !=null || end != null) {
-			RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time");
-			if (start!=null) timeFilter = timeFilter.from(start.toISOString());
-			if (end!=null) timeFilter = timeFilter.to(end.toISOString());			
+			ESQueryBuilder timeFilter = ESQueryBuilders.dateRangeQuery("time", start, end);			
 			filter = filter.must(timeFilter);
 		}
 		
 		// HACK tag match
 		String tag = (String) spec.props.get("tag");
 		if (tag!=null) {
-			QueryBuilder tagFilter = QueryBuilders.termQuery("tag", tag);
+			ESQueryBuilder tagFilter = ESQueryBuilders.termQuery("tag", tag);
 			filter = filter.must(tagFilter);
 		}		
 		
-		search.setFilter(filter);
+		search.setQuery(filter);
 		if (sortByTime) {
 			search.addSort("time", SortOrder.ASC);
 		}
@@ -486,6 +540,89 @@ public class ESStorage implements IDataLogStorage {
 	public void registerDataspace(String dataspace) {
 		String index = indexFromDataspace(dataspace);
 		initIndex(dataspace, index);
+	}
+
+	public SearchResponse doSearchEvents(String dataspace, 
+			int numResults, int numExamples, 
+			Time start, Time end, 
+			SearchQuery query, List<String> breakdown) 
+	{
+		BoolQueryBuilder filter = AppUtils.makeESFilterFromSearchQuery(query, start, end);
+		
+		String index = "datalog."+dataspace;
+		ESHttpClient esc = client(dataspace);
+		
+		SearchRequestBuilder search = esc.prepareSearch(index);
+//		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
+		// size controls
+		search.setSize(numExamples);
+		
+		
+		// search parameters				
+		Set<String> allOutputs = new ArraySet<>();
+		for(final String bd : breakdown) {
+			if (bd==null) {
+				Log.w("DataLog.ES", "null breakdown?! in "+breakdown);
+			}
+			// tag & time
+			// e.g. tag/time {count:avg}
+			// TODO proper recursive handling
+			String[] breakdown_output = bd.split("\\{");
+			String[] b = breakdown_output[0].trim().split("/");
+			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
+					"by_"+StrUtils.join(b,'_'), b[0]);
+			byTag.setSize(numResults);
+			byTag.setMissing(ESQueryBuilders.UNSET);
+			Aggregation leaf = byTag;
+			if (b.length > 1) {
+				if (b[1].equals("time")) {
+					com.winterwell.es.client.agg.Aggregation byTime = Aggregations.dateHistogram("by_time", "time");
+					byTime.put("interval", "hour");			
+					byTag.subAggregation(byTime);
+					leaf = byTime;
+				} else {
+					com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);
+					byHost.setSize(numResults);
+					byHost.setMissing(ESQueryBuilders.UNSET);
+					byTag.subAggregation(byHost);
+					leaf = byHost;
+				}
+			}				
+			// add a count handler?
+			if (breakdown_output.length <= 1) { // no - done
+				search.addAggregation(byTag);
+				continue;
+			}
+			String json = bd.substring(bd.indexOf("{"), bd.length());
+			Map<String,String> output = (Map) JSON.parse(json);
+			for(String k : output.keySet()) {
+				allOutputs.add(k);
+				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
+				leaf.subAggregation(myCount);
+				// filter 0s ??does this work??
+				filter.must(QueryBuilders.rangeQuery(k).gt(0));
+			}						
+			search.addAggregation(byTag);						
+		} // ./breakdown
+		
+		// TODO add a total count as well
+		for(String k : allOutputs) {
+			com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
+			search.addAggregation(myCount);	
+		}
+		
+		// Set filter
+		search.setFilter(filter);
+		
+		// TODO unify the ES search above with the DataLog interface call below
+		// i.e. define a Java interface to match the above 
+//		String[] tagBits = null;
+//		DataLog.getData(start, end, null, TUnit.HOUR.dt, tagBits);
+//		DataLog.getData(start, end, sum/as-is, bucket, DataLogEvent filter, breakdown);
+		
+//		esc.debug = true;
+		SearchResponse sr = search.get();
+		return sr;
 	}
 	
 }
