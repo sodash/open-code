@@ -17,6 +17,9 @@ import com.winterwell.youagain.client.YouAgainClient;
 
 /**
  * Runs this for a standalone DataLog micro-service server.
+ * 
+ * TODO move to extends AMain
+ * 
  * @author daniel
  *
  */

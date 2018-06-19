@@ -40,7 +40,8 @@ public class ESStorageTest {
 	}
 
 	
-	@Test
+	
+//	@Test
 	public void testHistogram() throws InterruptedException, ExecutionException {
 		Time start = new Time();
 		DataLogConfig config = DataLog.getImplementation().getConfig();

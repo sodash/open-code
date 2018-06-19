@@ -449,7 +449,7 @@ public class ESStorage implements IDataLogStorage {
 		
 		search.setFilter(filter);
 		if (sortByTime) {
-			search.addSort("time", SortOrder.DESC);
+			search.addSort("time", SortOrder.ASC);
 		}
 
 		// stats or just sum??
