@@ -15,6 +15,7 @@ import java.util.List;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.Log;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
@@ -46,6 +47,8 @@ final class HtmlTestReport implements TestListener {
 		// Get list of all classes in the path
 		List<String> classNames = HtmlTestReport.getAllClasses(directory);
 
+		List notFound = new ArrayList();
+		
 		for (String className : classNames) {
 			try {
 				Class clazz = Class.forName(className);
@@ -76,8 +79,12 @@ final class HtmlTestReport implements TestListener {
 				}
 
 			} catch (ClassNotFoundException exception) {
-				// Ignore
+				notFound.add(className);
+				// Ignore (log a bit later)
 			}
+		}
+		if ( ! notFound.isEmpty()) {
+			Log.d("JUnitTask", "Some ClassNotFoundExceptions: "+notFound);
 		}
 
 		return suite;
@@ -568,6 +575,7 @@ public class JUnitTask extends BuildTask {
 		// Create a HTML report instance
 		report = new HtmlTestReport(sourceDirectory, classDirectory);
 		report.setOutputFile(outputFile);
+		outputFile.getParentFile().mkdirs();
 		// Run the tests!
 		report.print();
 		// report

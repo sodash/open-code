@@ -31,6 +31,7 @@ import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.AjaxMsg;
 import com.winterwell.web.ajax.AjaxMsg.KNoteType;
+import com.winterwell.web.ajax.JSend;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.XIdField;
@@ -112,9 +113,10 @@ public final class YouAgainClient {
 				"action", "login", 
 				"person", email,
 				"password", password));
-		// FIXME
-		Map jobj = (Map) JSON.parse(response);
-		Map user = SimpleJson.get(jobj, "cargo", "user");
+		// FIXME		
+//		Map jobj = (Map) JSON.parse(response);
+		JSend jsend = JSend.parse(response);
+		Map user = (Map) jsend.getData().map().get("user"); //SimpleJson.get(jobj, "cargo", "user");
 		AuthToken at = new AuthToken(user);
 //		token.xid = new XId(email, "email");
 		return at;

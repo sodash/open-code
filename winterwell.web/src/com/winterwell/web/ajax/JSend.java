@@ -1,17 +1,35 @@
 package com.winterwell.web.ajax;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.WebEx;
 import com.winterwell.web.app.WebRequest;
 
 /**
- * c.f. https://stackoverflow.com/questions/50873541/should-i-use-jsend-for-wrapping-json-ajax-responses-or-is-there-a-more-standard
+ * 
+ * {
+status: "success"|"fail"|"error", 
+message: String, // optional error message 
+data: any, // the ajax payload
+code: Number // optional numeric code for errors
+}
+ *
+ * Note - this can co-exist with {@link JsonResponse}
+ * 
+ * c.f. 
+ * https://labs.omniti.com/labs/jsend
+ * https://stackoverflow.com/questions/50873541/should-i-use-jsend-for-wrapping-json-ajax-responses-or-is-there-a-more-standard
+ * 
  * @author daniel
  *
  */
@@ -46,8 +64,24 @@ public class JSend implements IHasJson {
 		return this;
 	}
 
-	public JThing getData() {		
+	public JThing getData() {
+		if (data==null && status!=KAjaxStatus.success) {
+			check();
+		}
 		return data;
+	}
+
+	public JSend check() {
+		if (status==KAjaxStatus.success) {
+			return this;
+		}
+		if (code==null) {
+			throw new FailureException(getMessage());
+		}
+		if (code == 404) {
+			throw new WebEx.E404(null, getMessage());
+		}
+		throw new FailureException(getMessage());
 	}
 
 	public JSend setData(Map data) {
@@ -104,18 +138,56 @@ public class JSend implements IHasJson {
 				);
 	}
 	
+	@Override
+	public String toString() {
+		return "JSend[ " + toJSONString() + " ]";
+	}
+
 	public static JSend parse(String json) {
 		Map jobj = (Map) JSON.parse(json);
 		JSend jsend = new JSend();
 		jsend.setCode((Integer) jobj.get("code"));
-		jsend.setMessage((String) jobj.get("message"));
+		
+		String msg = (String) jobj.get("message");
+		// HACK a JsonResponse format?
+		if (msg==null) {
+			Object msgs = jobj.get("messages");
+			if (msgs!=null) {
+				List<Object> listmsgs = Containers.asList(msgs);
+				if ( ! listmsgs.isEmpty()) {
+					Object m0 = listmsgs.get(0);
+					if (m0 instanceof Map && jsend.code==null) {
+						Object code = ((Map) m0).get("code");
+						if (code!=null) jsend.setCode((int) MathUtils.toNum(code));
+					}
+					msg = m0.toString();
+				}
+			}
+		}		
+		jsend.setMessage(msg);
+		
 		Object s = jobj.get("status");
+		if (s==null) {
+			// HACK a JsonResponse format?
+			Object success = jobj.get("success");
+			if (success!=null) {
+				if (Utils.yes(success)) {
+					s = KAjaxStatus.success;
+				} else {
+					// check code??
+					s = KAjaxStatus.error;
+				}
+			}
+		}
 		if (s instanceof String) s = KAjaxStatus.valueOf((String)s);
 		jsend.setStatus((KAjaxStatus) s);
 		Object _data = jobj.get("data");
-		if (_data != null) {
-			String djson = JSON.toString(_data);
-			jsend.setData(new JThing().setJson(djson));
+		// HACK: JsonResponse format?
+		if (_data==null) {
+			_data = jobj.get("cargo");		
+		}
+		if (_data != null) {						
+			jsend.setData(new JThing().setJsonObject(_data));
 		}
 		return jsend;
 	}

@@ -18,13 +18,8 @@ import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.SafeString;
 
 /**
- * TODO it might be nice to replace this with JSend which is 
- * https://labs.omniti.com/labs/jsend
- * success:Boolean -> status:String
- * cargo -> data
- * messages:Object[] -> message:String (hm, not sure on that)
- * Note - the two formats can co-exist
- * 
+ * TODO replace this with JSend 
+ *  
  * Use with
  * {@link WebUtils2#sendJson(JsonResponse, javax.servlet.http.HttpServletResponse)}.
  * Typical output:

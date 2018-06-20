@@ -158,4 +158,20 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 		if (string()==null) return null;
 		return JSON.parse(string());		
 	}
+
+	/**
+	 * @param data A json object (from a parse). Normally a Map, but it could be an array/list or a primitive.
+	 * @return this
+	 */
+	public JThing<T> setJsonObject(Object _data) {
+		// no unnecessary seialisation work for maps
+		if (_data instanceof Map) {
+			setMap((Map) _data);
+			return this;
+		}
+		// play it safe -- set as a json string
+		String djson = JSON.toString(_data);
+		setJson(djson);
+		return this;
+	}
 }

@@ -406,7 +406,8 @@ public class ESStorage implements IDataLogStorage {
 	}
 	
 	/**
-	 * 
+	 * WARNING TODO: historical events (which we don't really use) will get saved into the current base index.
+	 * That's probably not what you want. Although it's currently completely harmless.
 	 * 
 	 * @param cnt
 	 * @param dataspace
