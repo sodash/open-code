@@ -472,12 +472,12 @@ public class ESStorage implements IDataLogStorage {
 	}
 	
 	SearchResponse getData2(DataLogEvent spec, Time start, Time end, boolean sortByTime) {
-		
-		if end
-		DataLogImpl dl = (DataLogImpl) DataLog.getImplementation();
-		Period bucketPeriod = dl.getBucket(event.time);
-		end in 
-		end at end of bucket
+		// hm - ??possibly we should extend time to the end of the current bucket
+		// -- but that only affects the corner case of flush().
+//		if end
+//		DataLogImpl dl = (DataLogImpl) DataLog.getImplementation();
+//		Period bucketPeriod = dl.getBucket(event.time);
+//		if end in bucket, end at end of bucket
 		
 		DataLogConfig config = Dep.get(DataLogConfig.class);		
 		String index = indexFromDataspace(spec.dataspace);
