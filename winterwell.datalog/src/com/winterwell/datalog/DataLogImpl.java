@@ -268,7 +268,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 		}
 		// start-up the new
 		saveThread = new Timer("DataLog.save", true);
-		saveThread.scheduleAtFixedRate(new SystemStatsTask(), first.getDate(), config.interval.getMillisecs());
+		saveThread.scheduleAtFixedRate(new SaveAndSystemStatsTask(), first.getDate(), config.interval.getMillisecs());
 		Log.i(DataLog.LOGTAG, "1st save at "+first+" ("+TimeUtils.toString(new Time().dt(first))+")");
 		// prepare for callbacks
 		if ( ! Dep.has(CallbackManager.class)) {
@@ -585,27 +585,24 @@ public class DataLogImpl implements Closeable, IDataLog {
 	}
 	
 
-	class SystemStatsTask extends TimerTask {
+	class SaveAndSystemStatsTask extends TimerTask {
 		@Override
 		public void run() {
 			try {				
-				if (closed) cancel();
-				else doSave();
+				if (closed) {
+					cancel();
+					return;
+				}
+				
+				// Save!
+				doSave();
+				
+				// system stats
 				if (config.noSystemStats) {
 					return;
 				}
-				// heart beat: check things are working by storing some useful stats
-				DataLog.set(ReflectionUtils.getUsedMemory(), STAT_MEM_USED);
-				DataLog.set(ReflectionUtils.getAvailableMemory(), "mem_free");								
-				DataLog.set(ReflectionUtils.getSystemCPU(), "cpu_sys");
-				DataLog.set(ReflectionUtils.getJavaCPU(), "cpu_java");
+				statSystemStats();
 				
-				// and the time, for testing
-				DataLog.set(new Time().getMinutes(), "time.minutes");
-				
-//				int[] info = SqlUtils.getPostgresThreadInfo("sodash");
-//				DataLog.set(info[0], "postgres_sodash_processes");
-//				DataLog.set(info[1], "postgres_sodash_idle");
 			} catch(Throwable t) {
 				try {
 					Log.e(DataLog.LOGTAG, t);
@@ -647,6 +644,21 @@ public class DataLogImpl implements Closeable, IDataLog {
 		// callback
 		CallbackManager cbman = Dep.get(CallbackManager.class);
 		cbman.send(event);		
+	}
+
+	void statSystemStats() {
+		// heart beat: check things are working by storing some useful stats
+		DataLog.set(ReflectionUtils.getUsedMemory(), STAT_MEM_USED);
+		DataLog.set(ReflectionUtils.getAvailableMemory(), "mem_free");								
+		DataLog.set(ReflectionUtils.getSystemCPU(), "cpu_sys");
+		DataLog.set(ReflectionUtils.getJavaCPU(), "cpu_java");
+		
+		// and the time, for testing
+		DataLog.set(new Time().getMinutes(), "time.minutes");
+		
+//		int[] info = SqlUtils.getPostgresThreadInfo("sodash");
+//		DataLog.set(info[0], "postgres_sodash_processes");
+//		DataLog.set(info[1], "postgres_sodash_idle");
 	}
 
 	public static String event2tag(String dataspace, Map event) {

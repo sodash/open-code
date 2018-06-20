@@ -8,6 +8,7 @@ import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
+import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.utils.Utils;
@@ -215,6 +216,18 @@ public class BuildWinterwellProject extends BuildTask {
 		nonJava.setNegativeFilter(".*\\.java");
 		nonJava.setIncludeHiddenFiles(false);
 		nonJava.run();
+	}
+	
+	public int doTest() {		
+		File outputFile = new File(projectDir, "test-output/unit-tests-report.html");
+		JUnitTask junit = new JUnitTask(
+				null,
+				getBinDir(),
+				outputFile);		
+		junit.run();		
+		int good = junit.getSuccessCount();
+		int bad = junit.getFailureCount();
+		return bad;
 	}
 
 }

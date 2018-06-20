@@ -195,10 +195,19 @@ public class ESStorageTest {
 	public void testGetData() throws InterruptedException, ExecutionException {		
 		ESStorage storage = (ESStorage) DataLog.getImplementation().getStorage();
 		
-		StatReq<Double> total = storage.getTotal("mem_used", new Time().minus(TUnit.DAY), new Time());
-		assert total.get() != null;
+		// make sure some stats are in the system
+		DataLogImpl dli = (DataLogImpl) DataLog.getImplementation();
+		dli.statSystemStats();
+		dli.flush();
+		Utils.sleep(1200);
 		
-		StatReq<IDataStream> data = storage.getData("mem_used", new Time().minus(TUnit.DAY), new Time(), null, null);
+		Time end = new Time().plus(TUnit.MINUTE);
+		Time s = end.minus(TUnit.DAY);
+		StatReq<Double> total = storage.getTotal("mem_used", s, end);
+		assert total.get() != null;
+		assert total.get() > 0;
+		
+		StatReq<IDataStream> data = storage.getData("mem_used", s, end, null, null);
 		assert ! data.get().isEmpty();
 	}
 	

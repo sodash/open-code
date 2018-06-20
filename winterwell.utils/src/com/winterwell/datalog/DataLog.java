@@ -460,6 +460,11 @@ public class DataLog {
 		}
 	}
 
+	/**
+	 * @return DataLogImpl
+	 * 
+	 * NB: This wrapper class is in utils -- it has a dynamic run-time dependency on the "actual" code in datalog.
+	 */
 	public static IDataLog getImplementation() {
 		return dflt;
 	}
