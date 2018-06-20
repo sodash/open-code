@@ -41,8 +41,14 @@ import com.winterwell.utils.web.SimpleJson;
 
 public class ESStorageTest {
 
+	private static boolean setupFlag;
+
+
+
 	@BeforeClass
 	public static void setup() {
+		if ( setupFlag) return;
+		setupFlag = true;
 		DataLogConfig config = new DataLogConfig();
 		
 		// 1 second saves!!
@@ -236,16 +242,17 @@ public class ESStorageTest {
 	
 	@Test
 	public void testGetTotal() throws IOException {
+		setup();
 		Time s = new Time().minus(TUnit.MINUTE);
 		String salt = Utils.getRandomString(4);
 		String stag = "testtotal"+salt;
 		for(int i=0; i<10; i++) {
-			Utils.sleep(300);
+			Utils.sleep(100);
 			DataLog.count(1, stag);
 		}
 		DataLog.flush();
-		Utils.sleep(1500);
-		Time now = new Time(); //.plus(TUnit.MINUTE)
+		Utils.sleep(1200);
+		Time now = new Time().plus(5, TUnit.MINUTE);
 		IDataLogReq<Double> total = DataLog.getTotal(s, now, stag);
 		Double v = total.get();
 		assert v == 10 : v;
