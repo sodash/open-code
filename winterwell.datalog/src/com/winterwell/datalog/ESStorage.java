@@ -391,7 +391,7 @@ public class ESStorage implements IDataLogStorage {
 		
 		ESHttpClient client = client(dataspace);
 		
-		client.debug = true;
+//		client.debug = true;
 		
 		// save -- update for grouped events, index otherwise
 		ESPath path = new ESPath(index, type, id);
