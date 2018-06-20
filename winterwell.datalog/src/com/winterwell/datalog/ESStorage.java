@@ -272,7 +272,7 @@ public class ESStorage implements IDataLogStorage {
 	 * @param now NB: This is to allow testing to simulate time passing
 	 * @return
 	 */
-	private synchronized boolean registerDataspace2(Dataspace dataspace, String baseIndex, ESHttpClient _client, Time now) {
+	private synchronized boolean registerDataspace3_doIt(Dataspace dataspace, String baseIndex, ESHttpClient _client, Time now) {
 		// race condition - check it hasn't been made
 		if (_client.admin().indices().indexExists(baseIndex)) {
 			knownBaseIndexes.add(baseIndex);
@@ -610,7 +610,7 @@ public class ESStorage implements IDataLogStorage {
 			return false;
 		}
 		// make it, with a base and an alias
-		return registerDataspace2(dataspace, baseIndex, _client, now);
+		return registerDataspace3_doIt(dataspace, baseIndex, _client, now);
 	}
 
 	private void registerDataspace3_patchAliases(ESHttpClient _client, Dataspace dataspace, String baseIndex, Time now) {
@@ -635,8 +635,12 @@ public class ESStorage implements IDataLogStorage {
 		for (String ow : otherWriters) {
 			aliasEdit.removeAlias(ow, writeIndex);
 		}
-		if ( ! aliasEdit.isEmpty()) {
+		if ( ! aliasEdit.isEmpty()) {		
+			aliasEdit.setDebug(true);
 			IESResponse ok = aliasEdit.get().check();
+			Log.d(LOGTAG, "registerDataspace - patchAliases for "+dataspace+" = "+baseIndex+": "+aliasEdit.getBodyJson());
+		} else {
+			Log.d(LOGTAG, "registerDataspace - patchAliases - no action for "+dataspace+" = "+baseIndex);
 		}
 		return;
 	}

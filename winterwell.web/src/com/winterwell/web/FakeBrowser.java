@@ -367,14 +367,14 @@ public class FakeBrowser {
 		}
 		if (depth > MAX_REDIRECTS) {
 			// Give up (let's call it a 500 since it's the remote server's fault)
-			throw new WebEx.E50X(500, "Too many redirects "+uri); 
+			throw new WebEx.E50X(500, uri, "Too many redirects"); 
 		}
 		// Handle a redirect
 		String redirect = e.to;
 		URI r2 = WebUtils.resolveUri(uri, redirect);
 		redirect = r2.toString();
 		if (redirect.equals(uri)) {
-			throw new WebEx.E50X(500, "Loopy redirect "+uri);
+			throw new WebEx.E50X(500, uri, "Loopy redirect");
 		}
 		// Redirect
 		connection.disconnect();
@@ -640,7 +640,7 @@ public class FakeBrowser {
 		}
 		// Server error
 		if (code >= 500) {			
-			throw new WebEx.E50X(code, url+" (server error): " + errorMessage);
+			throw new WebEx.E50X(code, url, "(server error): " + errorMessage);
 		}
 		// ?
 		throw new IOException(code + " (unrecognised error): " + errorMessage);

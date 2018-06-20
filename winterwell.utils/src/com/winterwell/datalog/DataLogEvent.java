@@ -99,6 +99,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"currency", String.class,
 			"w", Integer.class, // width
 			"h", Integer.class, // height
+			"size", String.class, // size could be e.g. "300x250", "billboard", or a number. So lets just store it as a keyword.
 			"winw", Integer.class, // window-width
 			"winh", Integer.class, // window-height
 			"x", Double.class,

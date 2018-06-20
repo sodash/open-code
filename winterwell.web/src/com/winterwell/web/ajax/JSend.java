@@ -81,7 +81,7 @@ public class JSend implements IHasJson {
 		if (code == 404) {
 			throw new WebEx.E404(null, getMessage());
 		}
-		throw new FailureException(getMessage());
+		throw WebEx.fromErrorCode(code, null, getMessage());
 	}
 
 	public JSend setData(Map data) {
@@ -190,5 +190,9 @@ public class JSend implements IHasJson {
 			jsend.setData(new JThing().setJsonObject(_data));
 		}
 		return jsend;
+	}
+
+	public boolean isSuccess() {
+		return getStatus()==KAjaxStatus.success;
 	}
 }

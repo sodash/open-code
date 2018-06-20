@@ -113,12 +113,8 @@ public final class YouAgainClient {
 				"action", "login", 
 				"person", email,
 				"password", password));
-		// FIXME		
-//		Map jobj = (Map) JSON.parse(response);
-		JSend jsend = JSend.parse(response);
-		Map user = (Map) jsend.getData().map().get("user"); //SimpleJson.get(jobj, "cargo", "user");
+		Map user = userFromResponse(response);
 		AuthToken at = new AuthToken(user);
-//		token.xid = new XId(email, "email");
 		return at;
 	}
 
@@ -249,12 +245,7 @@ public final class YouAgainClient {
 				"action", "login",
 				"person", usernameUsuallyAnEmail,
 				"password", password));
-		Map jobj = (Map) JSON.parse(response);
-		if ( ! Utils.yes(jobj.get("success"))) {
-			Object msg = SimpleJson.get(jobj, "messages", 0);
-			throw new LoginFailedException(""+msg);
-		}
-		Map user = SimpleJson.get(jobj, "cargo", "user");
+		Map user = userFromResponse(response);
 		AuthToken at = new AuthToken(user);
 		return at;
 	}
@@ -267,10 +258,16 @@ public final class YouAgainClient {
 				"action", "signup",
 				"person", usernameUsuallyAnEmail,
 				"password", password));
-		Map jobj = (Map) JSON.parse(response);
-		Map user = SimpleJson.get(jobj, "cargo", "user");
+		Map user = userFromResponse(response);
 		AuthToken at = new AuthToken(user);
 		return at;
+	}
+
+	private Map userFromResponse(String response) {
+		JSend jsend = JSend.parse(response);
+		Map cargo = jsend.getData().map();
+		Map user = (Map) cargo.get("user");
+		return user;
 	}
 
 	/**
@@ -339,10 +336,8 @@ public final class YouAgainClient {
 				"shareWith", targetUser,
 				"entity", item,
 				"action", "shared"));
-		
-		Map jobj = (Map) JSON.parse(response);
-		Object success = SimpleJson.get(jobj, "success");
-		return (success instanceof Boolean) ? (Boolean) success : false;
+		JSend jsend = JSend.parse(response);
+		return jsend.isSuccess();
 	}
 
 	public void setDebug(boolean b) {

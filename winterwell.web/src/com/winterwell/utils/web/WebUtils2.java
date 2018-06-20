@@ -1188,7 +1188,7 @@ public class WebUtils2 extends WebUtils {
 				}
 				// error
 				if (code >= 400) {
-					if (error!=null) error.value = WebEx.fromErrorCode(code, url);
+					if (error!=null) error.value = WebEx.fromErrorCode(code, url, null);
 					URL u = connection.getURL();
 					return u.toString();
 				}
@@ -1213,7 +1213,7 @@ public class WebUtils2 extends WebUtils {
 			}
 		}
 		// Give up (same behaviour as FakeBrowser)
-		if (error!=null) error.value = new WebEx.E50X(500, "Too many redirects "+url);
+		if (error!=null) error.value = new WebEx.E50X(500, url, "Too many redirects");
 		return url;
 	}
 
