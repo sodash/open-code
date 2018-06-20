@@ -73,6 +73,11 @@ public final class YouAgainClient {
 		setDebug(true); // FIXME
 	}	
 	
+	@Override
+	public String toString() {
+		return "YouAgainClient [app=" + app + "]";
+	}
+
 	/**
 	 * This is the method you want :)
 	 * 
@@ -108,11 +113,12 @@ public final class YouAgainClient {
 	private AuthToken verifyNamePassword(String email, String password) {
 		Utils.check4null(email, password);
 		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(debug);
 		String response = fb.getPage(ENDPOINT, new ArrayMap(
 				"app", app, 
 				"action", "login", 
 				"person", email,
-				"password", password));
+				"password", password));		
 		Map user = userFromResponse(response);
 		AuthToken at = new AuthToken(user);
 		return at;
