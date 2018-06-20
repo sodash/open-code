@@ -198,7 +198,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		this.count = count;
 		this.eventType = eventType;
 		this.props = properties == null? Collections.EMPTY_MAP : (Map) properties;
-		this.groupById = groupById;
+		this.groupById = Utils.isBlank(groupById)? null : groupById;
 		this.id = makeId(groupById);
 		assert ! Utils.isBlank(eventType[0]);
 		// set time??

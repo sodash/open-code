@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.DataLog.KInterpolate;
+import com.winterwell.datalog.server.DataServlet;
+import com.winterwell.datalog.server.LgServlet;
 import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.datalog.MeanRate;
@@ -187,6 +189,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 			event.toJson2()
 				);
 		vars.put("d", dataspace);		
+		vars.put(LgServlet.GBY.getName(), event.groupById); // group it?
 		vars.put("t", event.getEventType0()); // type
 		String p = JSON.toString(event.getProps());
 		vars.put("p", p);				

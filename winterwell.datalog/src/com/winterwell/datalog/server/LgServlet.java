@@ -62,7 +62,7 @@ public class LgServlet {
 	/**
 	 * group-by ID for merging several events into one.
 	 */
-	static final SField GBY = new SField("gby");
+	public static final SField GBY = new SField("gby");
 	
 	/**
 	 * Log msg to fast.log file.  
