@@ -15,6 +15,7 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogImpl;
 import com.winterwell.datalog.DataLogSecurity;
+import com.winterwell.datalog.Dataspace;
 import com.winterwell.datalog.ESStorage;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.SearchRequestBuilder;
@@ -65,7 +66,7 @@ public class DataServlet implements IServlet {
 //          "count": 7571440.0,
 //          "tag": "mem_used",
 				
-		String dataspace = state.get(DATASPACE, "default");				
+		Dataspace dataspace = new Dataspace(state.get(DATASPACE, "default"));				
 		// Uses "paths" of breakdown1/breakdown2/... {field1:operation, field2}
 		List<String> breakdown = state.get(
 				new ListField<String>("breakdown").setSplitPattern(",")

@@ -59,7 +59,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		
 		remote.logEndpoint = server;
 		dlrs.init(remote);
-		Object ok = dlrs.saveEvent(event.dataspace, event, new Period(event.time));
+		Object ok = dlrs.saveEvent(new Dataspace(event.dataspace), event, new Period(event.time));
 		Log.d("datalog.remote", "Save to "+server+" "+event+" response: "+ok);
 		return true;
 	}
@@ -181,14 +181,14 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	}
 
 	@Override
-	public Object saveEvent(String dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
+	public Object saveEvent(Dataspace dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
 		// See LgServlet which reads these
 		FakeBrowser fb = new FakeBrowser();
 		fb.setDebug(true);
 		Map<String, String> vars = new ArrayMap(
 			event.toJson2()
 				);
-		vars.put("d", dataspace);		
+		vars.put("d", dataspace.name);		
 		vars.put(LgServlet.GBY.getName(), event.groupById); // group it?
 		vars.put("t", event.getEventType0()); // type
 		String p = JSON.toString(event.getProps());
@@ -203,12 +203,12 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	public void saveEvents(Collection<DataLogEvent> events, Period period) {
 		// TODO use a batch-save for speed
 		for (DataLogEvent e : events) {
-			saveEvent(e.dataspace, e, period);
+			saveEvent(new Dataspace(e.dataspace), e, period);
 		}
 	}
 
 	@Override
-	public void registerEventType(String dataspace, String eventType) {
+	public void registerEventType(Dataspace dataspace, String eventType) {
 		// no-op??
 	}
 }

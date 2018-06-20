@@ -65,7 +65,6 @@ public class DataLogServer {
 		// register the tracking event
 		IDataLogAdmin admin = DataLog.getAdmin();
 		admin.registerDataspace(DataLog.getDataspace());
-		admin.registerEventType(DataLog.getDataspace(), TrackingPixelServlet.DATALOG_EVENT_TYPE);
 	}
 
 

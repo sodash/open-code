@@ -19,7 +19,7 @@ import com.winterwell.youagain.client.YouAgainClient;
  */
 public class DataLogSecurity {
 
-	public static void check(WebRequest state, String dataspace, List<String> breakdown) {
+	public static void check(WebRequest state, Dataspace dataspace, List<String> breakdown) {
 		// TODO insist on login
 //		if (true) return;
 		XId user = state.getUserId();

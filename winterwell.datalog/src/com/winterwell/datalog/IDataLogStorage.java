@@ -88,9 +88,9 @@ public interface IDataLogStorage {
 	 * @param period
 	 * @return an object representing the save -- details depend on the class -- can be null.
 	 */
-	Object saveEvent(String dataspace, DataLogEvent event, Period period);
+	Object saveEvent(Dataspace dataspace, DataLogEvent event, Period period);
 
 	void saveEvents(Collection<DataLogEvent> values, Period period);
 
-	void registerEventType(String dataspace, String eventType);	
+	void registerEventType(Dataspace dataspace, String eventType);	
 }

@@ -9,14 +9,14 @@ public class DataLogAdmin implements IDataLogAdmin {
 	}
 
 	@Override
-	public void registerEventType(String dataspace, String eventType) {
-		datalog.storage.registerEventType(dataspace, eventType);		
+	public void registerEventType(CharSequence dataspace, String eventType) {
+		datalog.storage.registerEventType(new Dataspace(dataspace), eventType);		
 	}
 
 	@Override
-	public void registerDataspace(String dataspace) {
+	public void registerDataspace(CharSequence dataspace) {
 		if (datalog.storage instanceof ESStorage) {
-			((ESStorage)datalog.storage).registerDataspace(dataspace);
+			((ESStorage)datalog.storage).registerDataspace(new Dataspace(dataspace));
 		}
 	}
 

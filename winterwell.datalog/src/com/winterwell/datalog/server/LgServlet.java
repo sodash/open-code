@@ -175,7 +175,7 @@ public class LgServlet {
 //		);
 //		for(String ds : dataspaces) {
 //			if (ds==null) continue;
-		DataLogEvent event = new DataLogEvent(dataspace,gby, count, new String[] { tag}, params);
+		DataLogEvent event = new DataLogEvent(dataspace, gby, count, new String[] { tag}, params);
 //		event.time = state.get(time); FIXME
 		DataLog.count(event);
 //		}

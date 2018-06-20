@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -16,8 +17,12 @@ import org.junit.Test;
 
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.ESHttpResponse;
+import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.admin.DeleteIndexRequest;
+import com.winterwell.es.client.admin.GetAliasesRequest;
+import com.winterwell.es.client.admin.IndexSettingsRequest;
+import com.winterwell.es.client.admin.IndicesAdminClient;
 import com.winterwell.gson.Gson;
 import com.winterwell.maths.chart.LogGridInfo;
 import com.winterwell.maths.stats.distributions.d1.ExponentialDistribution1D;
@@ -43,7 +48,74 @@ public class ESStorageTest {
 
 	private static boolean setupFlag;
 
+	@Test
+	public void testIndexSwapping() {
+		
+		DataLogImpl dl = DataLog.getImplementation();
+		ESStorage ess = (ESStorage) dl.getStorage();
+		Dataspace ds = new Dataspace("swaptest");
+		ESHttpClient esjc = ess.client(ds);
+		IndicesAdminClient indices = esjc.admin().indices();
+		
+		// delete previous indices
+		IESResponse del = indices.prepareDelete("datalog.swaptest*").get();
+		
+		// register ds
+		boolean yes = ess.registerDataspace(ds);
+		assert yes;
+		
+		// we should have read & write indices		
+		String readIndex = ess.readIndexFromDataspace(ds);		
+		boolean ier = indices.indexExists(readIndex);
+		String writeIndex = ess.writeIndexFromDataspace(ds);
+		final Time now = new Time();
+		String baseIndex = ess.baseIndexFromDataspace(ds, now);
+		boolean iew = indices.indexExists(writeIndex);
+		assert ier && iew;
+		IESResponse isw = indices.indexSettings(writeIndex).get();
+		IESResponse isr = indices.indexSettings(readIndex).get();
+				
+		// save an event
+		String tag = "test_"+Utils.getRandomString(4);
+		DataLogEvent event1 = new DataLogEvent(ds, 1, tag, null);
+		Period bucketPeriod = dl.getCurrentBucket();
+		ess.saveEvent(ds, event1, bucketPeriod);
+		Utils.sleep(1100);
 
+		// find it again
+		// NB: add an hour to avoid odd issues around bucketing seen in testing
+		SearchResponse sr = ess.getData2(event1, bucketPeriod.getStart(), bucketPeriod.getEnd().plus(TUnit.HOUR), true);
+		List<Map> hits = sr.getHits();
+		assert ! hits.isEmpty();
+		
+		// re-register is a no-op
+		boolean noop = ess.registerDataspace(ds);
+		assert ! noop;
+				
+		// progress a month
+		Time nextMon = now.plus(TUnit.MONTH);
+		boolean op = ess.registerDataspace2(ds, nextMon);
+		assert op;
+		String newBaseIndex = ess.baseIndexFromDataspace(ds, nextMon);
+		
+		// TODO the underlying base for write should have moved, and read should have two bases
+		IESResponse isw3 = indices.indexSettings(writeIndex).get();
+		IESResponse isr3 = indices.indexSettings(readIndex).get();
+		IESResponse baseAliases = indices.getAliases(baseIndex).get();
+		IESResponse newBaseAliases = indices.getAliases(newBaseIndex).get();
+		
+		IESResponse readAliases = indices.getAliases(readIndex).get();
+		Set<String> ras = GetAliasesRequest.getBaseIndices(readAliases);
+		assert ras.contains(newBaseIndex);
+		assert ras.contains(baseIndex);
+		
+		IESResponse writeAliases = indices.getAliases(writeIndex).get();
+		Set<String> was = GetAliasesRequest.getBaseIndices(writeAliases);
+		assert was.contains(newBaseIndex);
+		assert ! was.contains(baseIndex);
+		
+	}
+	
 
 	@BeforeClass
 	public static void setup() {
@@ -103,11 +175,11 @@ public class ESStorageTest {
 		ESStorage storage = (ESStorage) DataLog.getImplementation().getStorage();						
 		storage.init(new DataLogConfig());
 		String gby = Utils.getRandomString(4);
-		String dataspace = "testoverlapspace";
+		Dataspace dataspace = new Dataspace("testoverlapspace");
 		
 		ESHttpClient esjc = storage.client(dataspace);
 		// clean out old
-		DeleteIndexRequest del = esjc.admin().indices().prepareDelete(storage.indexFromDataspace(dataspace));
+		DeleteIndexRequest del = esjc.admin().indices().prepareDelete(storage.writeIndexFromDataspace(dataspace));
 		del.get();
 		Utils.sleep(100);
 
@@ -151,11 +223,10 @@ public class ESStorageTest {
 		// pause for ES
 		Utils.sleep(1500);
 		
-		// get
-		
-		String index = storage.indexFromDataspace(dataspace);		
+		// get		
+		String index = storage.readIndexFromDataspace(dataspace);		
 		String eid = event.getId(); //dataspace+"/"+gby;
-		Map<String, Object> evt = esjc.get(index, storage.typeFromEventType("session"), eid);
+		Map<String, Object> evt = esjc.get(index, storage.ESTYPE, eid);
 		assert evt != null;
 		Printer.out("---------");
 		Printer.out(evt);
@@ -221,13 +292,14 @@ public class ESStorageTest {
 		// ref:http://www.good-loop.com/live-demo 
 		// ip:88.98.205.94 
 		// ENDMSG http://www.good-loop.com/live-demo 88.98.205.94
-		DataLogEvent event = new DataLogEvent("testdataspace", 3.5, "testevent", new ArrayMap(
+		Dataspace ds = new Dataspace("testdataspace");
+		DataLogEvent event = new DataLogEvent(ds, 3.5, "testevent", new ArrayMap(
 				"publisher", "egpub",
 				"tracker", "szkpogoeegglvcszwtao@trk"
 				));
 		Period period = new Period(new Time().minus(TUnit.MINUTE), new Time());
 		Future<ESHttpResponse> res = storage.saveEvent(
-				"testdataspace", event, period);
+				ds, event, period);
 		ESHttpResponse r = res.get();
 		r.check();
 		// pause for ES
@@ -235,7 +307,7 @@ public class ESStorageTest {
 		// get it
 		Time start = new Time().minus(TUnit.DAY.dt);
 		Time end = new Time();
-		DataLogEvent event2 = new DataLogEvent("testdataspace", 0, "testevent", new ArrayMap(
+		DataLogEvent event2 = new DataLogEvent(ds, 0, "testevent", new ArrayMap(
 				"publisher", "egpub"
 				));
 		double total = storage.getEventTotal(start, end, event2);

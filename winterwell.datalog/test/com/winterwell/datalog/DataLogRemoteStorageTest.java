@@ -36,7 +36,7 @@ public class DataLogRemoteStorageTest {
 		DataLogConfig remote = new DataLogConfig();
 		remote.logEndpoint = "https://lg.good-loop.com/lg";
 		dlrs.init(remote);
-		String dataspace = "test";
+		Dataspace dataspace = new Dataspace("test");
 		DataLogEvent event = new DataLogEvent(dataspace, 2, "woot", 
 				new ArrayMap("n", 7, "w", 100));
 		Object ok = dlrs.saveEvent(dataspace, event, null);

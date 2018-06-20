@@ -2,8 +2,15 @@ package com.winterwell.datalog;
 
 public interface IDataLogAdmin {
 
-	void registerEventType(String dataspace, String eventType);
+	/**
+	 * @deprecated This is problematic - How to maintain non-standard events across months?
+	 * So it is (with ESStorage) a no-op
+	 * 
+	 * @param dataspace
+	 * @param eventType
+	 */
+	void registerEventType(CharSequence dataspace, String eventType);
 
-	void registerDataspace(String dataspace);
+	void registerDataspace(CharSequence dataspace);
 	
 }

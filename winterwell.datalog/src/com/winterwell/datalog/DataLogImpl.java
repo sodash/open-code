@@ -619,7 +619,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 		// HACK just save it to ES? Yes, unless it looks like a very simple stat.
 		// Tracker events are unlikely to duplicate, so there's no advantage to batching them -- and there is a memory issue.
 		if (storage instanceof ESStorage && event.props!=null && event.props.size() > 1) {
-			storage.saveEvent(event.dataspace, event, getCurrentBucket());
+			storage.saveEvent(new Dataspace(event.dataspace), event, getCurrentBucket());
 			// callback
 			CallbackManager cbman = Dep.get(CallbackManager.class);
 			cbman.send(event);		

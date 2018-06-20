@@ -179,7 +179,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 * @param eventType e.g. "evt.pick" This will be converted to lower-case (mainly 'cos it avoids confusing ES case related errors)
 	 * @param properties e.g. {url, user} This is used directly and can be modified!
 	 */
-	public DataLogEvent(String dataspace, double count, String eventType, Map<String,?> properties) {
+	public DataLogEvent(CharSequence dataspace, double count, String eventType, Map<String,?> properties) {
 		this(dataspace, null, count, new String[] {eventType.toLowerCase()}, properties);
 	}
 	
@@ -189,10 +189,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 * @param groupById This will be used to make the ID. can be null. Allows for grouping several events into one.
 	 * @param count e.g. 1
 	 * @param eventType e.g. "minview"
-	 * @param properties e.g. {url, pub} This is used directly and can be modified!
+	 * @param properties e.g. {url, pub} This is used directly and can be modified! Can be null
 	 */
-	public DataLogEvent(String dataspace, String groupById, double count, String[] eventType, Map<String,?> properties) {
-		this.dataspace = StrUtils.normalise(dataspace, KErrorPolicy.ACCEPT).toLowerCase().trim();
+	public DataLogEvent(CharSequence _dataspace, String groupById, double count, String[] eventType, Map<String,?> properties) {
+		this.dataspace = StrUtils.normalise(_dataspace.toString(), KErrorPolicy.ACCEPT).toLowerCase().trim();
 		assert ! dataspace.isEmpty() && ! dataspace.contains("/") : dataspace;
 //		assert dataspace.equals(StrUtils.toCanonical(dataspace)) : dataspace +" v "+StrUtils.toCanonical(dataspace); 
 		this.count = count;
@@ -321,7 +321,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 * @param esResult
 	 * @return
 	 */
-	public static DataLogEvent fromESHit(String _dataspace, Map<String,?> hit) {
+	public static DataLogEvent fromESHit(CharSequence _dataspace, Map<String,?> hit) {
 		String[] etypes = getEventTypeFromMap(hit);
 		
 		Time _time = new Time((String)hit.get("time"));
@@ -383,7 +383,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	public String getEventType0() {
 		assert eventType.length == 1 : this;
 		return eventType[0];
-	}
+	}	
 
 	
 }

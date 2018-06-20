@@ -465,8 +465,8 @@ public class DataLog {
 	 * 
 	 * NB: This wrapper class is in utils -- it has a dynamic run-time dependency on the "actual" code in datalog.
 	 */
-	public static IDataLog getImplementation() {
-		return dflt;
+	public static <DataLogImpl extends IDataLog> DataLogImpl getImplementation() {
+		return (DataLogImpl) dflt;
 	}
 
 	public static IFuture<MeanRate> getMean(Time start, Time end, String... tagBits) {

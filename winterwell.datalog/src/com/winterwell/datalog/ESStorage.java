@@ -2,6 +2,7 @@ package com.winterwell.datalog;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +37,9 @@ import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
+import com.winterwell.es.client.admin.GetAliasesRequest;
+import com.winterwell.es.client.admin.IndicesAdminClient;
+import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
@@ -56,6 +60,7 @@ import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
@@ -64,6 +69,7 @@ import com.winterwell.utils.log.WeirdException;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
+import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.XStreamUtils;
@@ -80,7 +86,6 @@ public class ESStorage implements IDataLogStorage {
 
 	private static final String LOGTAG = "DataLog.ES";
 	private ESConfig esConfig;
-	private DataLogConfig config;
 	
 	@Override
 	public void save(Period period, Map<String, Double> tag2count, Map<String, IDistribution1D> tag2mean) {
@@ -207,7 +212,7 @@ public class ESStorage implements IDataLogStorage {
 	}
 
 	public IDataLogStorage init(DataLogConfig config) {
-		this.config = config;
+//		this.config = config; only used here
 		// ES config
 		if (esConfig == null) {
 			ConfigFactory cf = ConfigFactory.get();
@@ -235,19 +240,19 @@ public class ESStorage implements IDataLogStorage {
 							.set(new File("config/datalog.properties"))
 							.set(f)
 							.get();
-					config4dataspace.put(n, esConfig4n);					
+					Dataspace ds = new Dataspace(n);
+					config4dataspace.put(ds, esConfig4n);					
 				}
 			}
 		}
 		// init
-		ArraySet<String> dataspaces = new ArraySet();
-		if (config.namespace!=null) dataspaces.add(config.namespace);
+		ArraySet<Dataspace> dataspaces = new ArraySet();
+		if (config.namespace!=null) dataspaces.add(new Dataspace(config.namespace));
 		if (config.namespaceConfigs!=null) {
-			dataspaces.addAll(config.namespaceConfigs);
+			dataspaces.addAll(Containers.apply(config.namespaceConfigs, Dataspace::new));
 		}
-		for (String d : dataspaces) {
-			String idx = indexFromDataspace(d);
-			initIndex(d, idx);			
+		for (Dataspace d : dataspaces) {			
+			registerDataspace(d);
 		}
 		// share via Dep
 		Dep.setIfAbsent(ESStorage.class, this);
@@ -255,49 +260,80 @@ public class ESStorage implements IDataLogStorage {
 	}
 
 	
-	final Set<String> knownIndexes = new HashSet();
+	final Set<String> knownBaseIndexes = new HashSet();
 	
-	private void initIndex(String dataspace, String index) {
-		if (knownIndexes.contains(index)) return;
-		ESHttpClient _client = client(dataspace);
-		if (_client.admin().indices().indexExists(index)) {
-			knownIndexes.add(index);
-			assert knownIndexes.size() < 100000;
-			return;
-		}
-		// make it, with a base and an alias
-		initIndex2(index, _client);
-	}
+	
 
-	private synchronized void initIndex2(String index, ESHttpClient _client) {
-		// rcae condition - check it hasn't been made
-		if (_client.admin().indices().indexExists(index)) {
-			knownIndexes.add(index);
-			return;
+	/**
+	 * 
+	 * @param dataspace
+	 * @param baseIndex
+	 * @param _client
+	 * @param now NB: This is to allow testing to simulate time passing
+	 * @return
+	 */
+	private synchronized boolean registerDataspace2(Dataspace dataspace, String baseIndex, ESHttpClient _client, Time now) {
+		// race condition - check it hasn't been made
+		if (_client.admin().indices().indexExists(baseIndex)) {
+			knownBaseIndexes.add(baseIndex);
+			return false;
 		}
-		try {			
+		try {
 			// HACK
-			String v = _client.getConfig().getIndexAliasVersion();
-			String baseIndex = index+"_"+v;
-			CreateIndexRequest pc = _client.admin().indices().prepareCreate(baseIndex);
-			pc.setFailIfAliasExists(true); // this is synchronized, but what about other servers?
+			CreateIndexRequest pc = _client.admin().indices().prepareCreate(baseIndex);			
+//			actually, you can have multiple for all pc.setFailIfAliasExists(true); // this is synchronized, but what about other servers?
 			pc.setDefaultAnalyzer(Analyzer.keyword);
-			pc.setAlias(index);
+			// aliases: index and index.all both point to baseIndex  
+			// Set the query index here. The write one is set later as an atomic swap.			
+			pc.setAlias(readIndexFromDataspace(dataspace));
 			IESResponse cres = pc.get();
 			cres.check();
-		
+
 			// register some standard event types??
-			initIndex3_registerEventType(_client, index, DataLogEvent.simple);
+			registerEventType2(_client, dataspace, now);
+
+			// swap the write index over
+			IndicesAliasesRequest aliasSwap = _client.admin().indices().prepareAliases();
+			aliasSwap.setDebug(true);
+			aliasSwap.setRetries(2);
+			String writeIndex = writeIndexFromDataspace(dataspace);
+			aliasSwap.addAlias(baseIndex, writeIndex);			
+			// remove the write alias for the previous month
+			Time prevMonth = now.minus(TUnit.MONTH);
+			assert prevMonth.getMonth() % 12 == (now.getMonth() - 1) % 12 : prevMonth;
+			String prevBaseIndex = baseIndexFromDataspace(dataspace, prevMonth);
+			// does it exist?
+			boolean prevExists = _client.admin().indices().indexExists(prevBaseIndex);
+			if (prevExists) {
+				aliasSwap.removeAlias(prevBaseIndex, writeIndex);
+			}
+			aliasSwap.get().check(); // What happens if we fail here??		
+			return true;
+			
 		} catch(Throwable ex) {
 			Log.e(LOGTAG, ex);
 			// swallow and carry on -- an out of date schema may not be a serious issue
+			return false;
 		}
 	}
 
-	private void initIndex3_registerEventType(ESHttpClient _client, String index, String type) 
+	/**
+	 * per-month index blocks
+	 * @param time
+	 * @return the base index name
+	 */
+	String baseIndexFromDataspace(Dataspace dataspace, Time time) {
+		// replaces _client.getConfig().getIndexAliasVersion()
+		String v = time.format("MMMyy").toLowerCase();
+		String index = writeIndexFromDataspace(dataspace);
+		return index+"_"+v;
+	}
+
+	private void registerEventType2(ESHttpClient _client, Dataspace dataspace, Time now) 
 	{
-		String esType = typeFromEventType(type);
+		String esType = ESTYPE;
 //		String v = _client.getConfig().getIndexAliasVersion();
+		String index = baseIndexFromDataspace(dataspace, now);
 		PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, esType);
 		// See DataLogEvent.COMMON_PROPS and toJson()
 		ESType keywordy = new ESType().keyword().norms(false).lock();
@@ -342,10 +378,27 @@ public class ESStorage implements IDataLogStorage {
 		res.check();
 	}
 
-	public static String indexFromDataspace(String dataspace) {
+	/**
+	 * 
+	 * @param dataspace
+	 * @return an alias which should always point to one base-index
+	 */
+	public static String writeIndexFromDataspace(Dataspace dataspace) {
 		assert ! Utils.isBlank(dataspace);
-		assert ! dataspace.startsWith("datalog.") : dataspace;
+		assert ! dataspace.name.startsWith("datalog.") : dataspace;
 		String idx = "datalog."+dataspace;
+		return idx;
+	}
+	
+	/**
+	 * 
+	 * @param dataspace
+	 * @return an alias which should point to all indices
+	 */
+	public static String readIndexFromDataspace(Dataspace dataspace) {
+		assert ! Utils.isBlank(dataspace);
+		assert ! dataspace.name.startsWith("datalog.") : dataspace;
+		String idx = "datalog."+dataspace+".all";
 		return idx;
 	}
 
@@ -362,15 +415,13 @@ public class ESStorage implements IDataLogStorage {
 	 * @return 
 	 */
 	@Override
-	public Future<ESHttpResponse> saveEvent(String dataspace, DataLogEvent event, Period bucketPeriod) {
-		if (event.dataspace!=null && ! event.dataspace.equals(dataspace)) {
+	public Future<ESHttpResponse> saveEvent(Dataspace dataspace, DataLogEvent event, Period bucketPeriod) {
+		if (event.dataspace!=null && ! event.dataspace.equals(dataspace.name)) {
 			Log.e(LOGTAG, new WeirdException("(swallowing) Dataspace mismatch: "+dataspace+" vs "+event.dataspace+" in "+event));
 		}
-//		Log.d("datalog.es", "saveEvent: "+event);		
-		String index = indexFromDataspace(dataspace);
 		// init?
-		initIndex(dataspace, index);
-		String type = typeFromEventType(event.getEventType()[0]);
+		registerDataspace(dataspace);
+		String type = ESTYPE;
 		
 		// ID
 		String id;
@@ -393,6 +444,7 @@ public class ESStorage implements IDataLogStorage {
 		
 //		client.debug = true;
 		
+		String index = writeIndexFromDataspace(dataspace);
 		// save -- update for grouped events, index otherwise
 		ESPath path = new ESPath(index, type, id);
 		Future<ESHttpResponse> f;
@@ -432,24 +484,14 @@ public class ESStorage implements IDataLogStorage {
 	}
 
 	/**
-	 * 
-	 * @param eventType Could come from the wild, so lets not use it directly.
-	 * Lets insist on latin chars and protect the base namespace.
-	 * @return
+	 * All get stored as one type in ES 'cos multiple types is being deprecated as "kind of broken"
 	 */
-	public String typeFromEventType(String eventType) {
-		return "evt"; // all under one type! 'cos (a) we can collate several events into one session event, and (b) ES is deprecating types anyway.
-//		assert ! eventType.startsWith("evt.");
-//		return "evt."+StrUtils.toCanonical(eventType);
-	}
+	static final String ESTYPE = "evt";
 
 	@Override
-	public void registerEventType(String dataspace, String eventType) {
-		String index = indexFromDataspace(dataspace);
-		initIndex(dataspace, index);
-		
+	public void registerEventType(Dataspace dataspace, String eventType) {		
 		ESHttpClient _client = client(dataspace);
-		initIndex3_registerEventType(_client, index, eventType);
+		registerEventType2(_client, dataspace, new Time());
 	}
 	
 	public double getEventTotal(Time start, Time end, DataLogEvent spec) {
@@ -480,9 +522,10 @@ public class ESStorage implements IDataLogStorage {
 //		if end in bucket, end at end of bucket
 		
 		DataLogConfig config = Dep.get(DataLogConfig.class);		
-		String index = indexFromDataspace(spec.dataspace);
-		SearchRequestBuilder search = client(spec.dataspace).prepareSearch(index);
-		search.setType(typeFromEventType(spec.getEventType()[0]));
+		final Dataspace dataspace = new Dataspace(spec.dataspace);
+		String index = readIndexFromDataspace(dataspace);
+		SearchRequestBuilder search = client(dataspace).prepareSearch(index);
+		search.setType(ESTYPE);
 		search.setSize(config.maxDataPoints);
 		
 		com.winterwell.es.client.query.BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
@@ -520,10 +563,9 @@ public class ESStorage implements IDataLogStorage {
 		return sr;
 	}
 
-	static Map<String, ESConfig> config4dataspace = new HashMap();
+	static Map<Dataspace, ESConfig> config4dataspace = new HashMap();
 	
-	public ESHttpClient client(String dataspace) {
-		assert ! dataspace.startsWith("datalog.") : dataspace;
+	public ESHttpClient client(Dataspace dataspace) {		
 		ESConfig _config = Utils.or(config4dataspace.get(dataspace), esConfig);
 		assert _config != null : dataspace+" "+esConfig;
 		return new ESHttpClient(_config);
@@ -533,23 +575,80 @@ public class ESStorage implements IDataLogStorage {
 	public void saveEvents(Collection<DataLogEvent> events, Period period) {
 		// TODO use a batch-save for speed
 		for (DataLogEvent e : events) {
-			saveEvent(e.dataspace, e, period);
+			saveEvent(new Dataspace(e.dataspace), e, period);
 		}
 	}
 
-	public void registerDataspace(String dataspace) {
-		String index = indexFromDataspace(dataspace);
-		initIndex(dataspace, index);
+	/**
+	 * Repeated calls are fast and harmless
+	 * @param dataspace
+	 */
+//	@Override TODO
+	public boolean registerDataspace(Dataspace dataspace) {
+		return registerDataspace2(dataspace, new Time());
+	}
+	
+	/**
+	 * NB: split out for testing reasons, so we can poke at older dataspaces
+	 * @param dataspace
+	 * @param now
+	 * @return
+	 */
+	boolean registerDataspace2(Dataspace dataspace, Time now) {
+		String baseIndex = baseIndexFromDataspace(dataspace, now);
+		// fast check of cache
+		if (knownBaseIndexes.contains(baseIndex)) return false;
+		ESHttpClient _client = client(dataspace);
+		if (_client.admin().indices().indexExists(baseIndex)) {
+			knownBaseIndexes.add(baseIndex);
+			assert knownBaseIndexes.size() < 100000;
+			
+			// HACK: patch old setups which might not have aliases
+			registerDataspace3_patchAliases(_client, dataspace, baseIndex, now);			
+			
+			return false;
+		}
+		// make it, with a base and an alias
+		return registerDataspace2(dataspace, baseIndex, _client, now);
 	}
 
-	public SearchResponse doSearchEvents(String dataspace, 
+	private void registerDataspace3_patchAliases(ESHttpClient _client, Dataspace dataspace, String baseIndex, Time now) {
+		String readIndex = readIndexFromDataspace(dataspace);
+		String writeIndex = writeIndexFromDataspace(dataspace);
+		
+		IndicesAdminClient indices = _client.admin().indices();
+		IESResponse ra = indices.getAliases(readIndex).get();
+		Set<String> readIndices = GetAliasesRequest.getBaseIndices(ra);
+		IESResponse wa = indices.getAliases(writeIndex).get();
+		Set<String> writeIndices = GetAliasesRequest.getBaseIndices(wa);
+		
+		IndicesAliasesRequest aliasEdit = indices.prepareAliases();
+		if ( ! readIndices.contains(baseIndex)) {
+			aliasEdit.addAlias(baseIndex, readIndex);
+		}
+		if ( ! writeIndices.contains(baseIndex)) {
+			aliasEdit.addAlias(baseIndex, writeIndex);
+		}
+		ArrayList<String> otherWriters = new ArrayList(writeIndices);
+		otherWriters.remove(baseIndex);
+		for (String ow : otherWriters) {
+			aliasEdit.removeAlias(ow, writeIndex);
+		}
+		if ( ! aliasEdit.isEmpty()) {
+			IESResponse ok = aliasEdit.get().check();
+		}
+		return;
+	}
+	
+
+	public SearchResponse doSearchEvents(Dataspace dataspace, 
 			int numResults, int numExamples, 
 			Time start, Time end, 
 			SearchQuery query, List<String> breakdown) 
 	{
 		BoolQueryBuilder filter = AppUtils.makeESFilterFromSearchQuery(query, start, end);
 		
-		String index = "datalog."+dataspace;
+		String index = readIndexFromDataspace(dataspace);
 		ESHttpClient esc = client(dataspace);
 		
 		SearchRequestBuilder search = esc.prepareSearch(index);
