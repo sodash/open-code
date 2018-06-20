@@ -17,6 +17,9 @@ import com.winterwell.youagain.client.YouAgainClient;
 
 /**
  * Runs this for a standalone DataLog micro-service server.
+ * 
+ * TODO move to extends AMain
+ * 
  * @author daniel
  *
  */
@@ -62,7 +65,6 @@ public class DataLogServer {
 		// register the tracking event
 		IDataLogAdmin admin = DataLog.getAdmin();
 		admin.registerDataspace(DataLog.getDataspace());
-		admin.registerEventType(DataLog.getDataspace(), TrackingPixelServlet.DATALOG_EVENT_TYPE);
 	}
 
 

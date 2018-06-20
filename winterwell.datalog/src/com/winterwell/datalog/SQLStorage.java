@@ -122,7 +122,7 @@ public class SQLStorage implements IDataLogStorage {
 	}
 
 	@Override
-	public void registerEventType(String dataspace, String eventType) {
+	public void registerEventType(Dataspace dataspace, String eventType) {
 	}
 	
 	@Override
@@ -364,7 +364,7 @@ public class SQLStorage implements IDataLogStorage {
 	}
 
 	@Override
-	public Object saveEvent(String dataspace, DataLogEvent event, Period period) {
+	public Object saveEvent(Dataspace dataspace, DataLogEvent event, Period period) {
 		throw new TodoException();
 	}
 

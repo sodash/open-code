@@ -220,14 +220,14 @@ public final class ListDataStream extends ADataStream implements
 	 * Add a new piece of data to the end of the stream. This method is not
 	 * threadsafe.
 	 * 
-	 * @param d
+	 * @param d MUST be dated later than previous data in the list
 	 */
 	@Override
-	public boolean add(Datum d) {
+	public boolean add(Datum d) throws IllegalArgumentException {
 		// safety check ordering
 		if ( ! data.isEmpty() 
 			&& Containers.last(data).getTime().isAfter(d.getTime())) {
-			throw new IllegalArgumentException("order! "		
+			throw new IllegalArgumentException("Data sort order! "		
 				+ data.get(data.size() - 1).getTime() + " to " + d.getTime());
 		}
 		assert d.getDim() == getDim() : "List-dim " + getDim() + " vs "

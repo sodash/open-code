@@ -216,11 +216,11 @@ class DummyDataLog implements IDataLog {
 
 class DummyDataLogAdmin implements IDataLogAdmin {
 	@Override
-	public void registerEventType(String dataspace, String eventType) {		
+	public void registerEventType(CharSequence dataspace, String eventType) {		
 	}
 
 	@Override
-	public void registerDataspace(String dataspace) {		
+	public void registerDataspace(CharSequence dataspace) {		
 	}	
 }
 

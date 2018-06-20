@@ -12,7 +12,10 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 
+import com.winterwell.datalog.DataLog;
+import com.winterwell.datalog.DataLogImpl;
 import com.winterwell.datalog.DataLogSecurity;
+import com.winterwell.datalog.Dataspace;
 import com.winterwell.datalog.ESStorage;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.SearchRequestBuilder;
@@ -62,9 +65,8 @@ public class DataServlet implements IServlet {
 //          "time": "2017-06-30T14:00:00Z",
 //          "count": 7571440.0,
 //          "tag": "mem_used",
-		
-		ESStorage ess = Dep.get(ESStorage.class);
-		String dataspace = state.get(DATASPACE, "default");				
+				
+		Dataspace dataspace = new Dataspace(state.get(DATASPACE, "default"));				
 		// Uses "paths" of breakdown1/breakdown2/... {field1:operation, field2}
 		List<String> breakdown = state.get(
 				new ListField<String>("breakdown").setSplitPattern(",")
@@ -77,93 +79,24 @@ public class DataServlet implements IServlet {
 		// security: on the dataspace, and optionally on the breakdown
 		DataLogSecurity.check(state, dataspace, breakdown);
 
-		String index = "datalog."+dataspace;
-		ESHttpClient esc = ess.client(dataspace);
-		
-		SearchRequestBuilder search = esc.prepareSearch(index);
-//		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
-		// size controls
 		// num results
 		int numTerms = state.get(new IntField("termsSize"), 1000);		
 		// num examples
-		Integer size = state.get(new IntField("size"), 10);
-		search.setSize(size);
-		
-		
-		// search parameters
-		// time box
+		int size = state.get(new IntField("size"), 10);
+		// time window
 		ICallable<Time> cstart = state.get(CommonFields.START);
 		Time start = cstart==null? new Time().minus(TUnit.MONTH) : cstart.call();
 		ICallable<Time> cend = state.get(new TimeField("end").setPreferEnd(true));
 		Time end = cend==null? new Time() : cend.call();
-
 		// query e.g. host:thetimes.com
 		String q = state.get("q");
-		BoolQueryBuilder filter = makeQueryFilter(q, start, end);
-				
-		Set<String> allOutputs = new ArraySet<>();
-		for(final String bd : breakdown) {
-			if (bd==null) {
-				Log.w(LOGTAG, "null breakdown?! in "+breakdown+" from "+state);
-			}
-			// tag & time
-			// e.g. tag/time {count:avg}
-			// TODO proper recursive handling
-			String[] breakdown_output = bd.split("\\{");
-			String[] b = breakdown_output[0].trim().split("/");
-			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
-					"by_"+StrUtils.join(b,'_'), b[0]);
-			byTag.setSize(numTerms);
-			byTag.setMissing(ESQueryBuilders.UNSET);
-			Aggregation leaf = byTag;
-			if (b.length > 1) {
-				if (b[1].equals("time")) {
-					com.winterwell.es.client.agg.Aggregation byTime = Aggregations.dateHistogram("by_time", "time");
-					byTime.put("interval", "hour");			
-					byTag.subAggregation(byTime);
-					leaf = byTime;
-				} else {
-					com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);
-					byHost.setSize(numTerms);
-					byHost.setMissing(ESQueryBuilders.UNSET);
-					byTag.subAggregation(byHost);
-					leaf = byHost;
-				}
-			}				
-			// add a count handler?
-			if (breakdown_output.length <= 1) { // no - done
-				search.addAggregation(byTag);
-				continue;
-			}
-			String json = bd.substring(bd.indexOf("{"), bd.length());
-			Map<String,String> output = (Map) JSON.parse(json);
-			for(String k : output.keySet()) {
-				allOutputs.add(k);
-				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
-				leaf.subAggregation(myCount);
-				// filter 0s ??does this work??
-				filter.must(QueryBuilders.rangeQuery(k).gt(0));
-			}						
-			search.addAggregation(byTag);						
-		} // ./breakdown
+		SearchQuery filter = makeQueryFilter(q, start, end);
+
+		DataLogImpl dl = (DataLogImpl) DataLog.getImplementation();
+		ESStorage ess = (ESStorage) dl.getStorage();
+//		ESStorage ess = Dep.get(ESStorage.class);
 		
-		// TODO add a total count as well
-		for(String k : allOutputs) {
-			com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
-			search.addAggregation(myCount);	
-		}
-		
-		// Set filter
-		search.setFilter(filter);
-		
-		// TODO unify the ES search above with the DataLog interface call below
-		// i.e. define a Java interface to match the above 
-//		String[] tagBits = null;
-//		DataLog.getData(start, end, null, TUnit.HOUR.dt, tagBits);
-//		DataLog.getData(start, end, sum/as-is, bucket, DataLogEvent filter, breakdown);
-		
-//		esc.debug = true;
-		SearchResponse sr = search.get();
+		SearchResponse sr = ess.doSearchEvents(dataspace, numTerms, size, start, end, filter, breakdown);
 		sr.check();
 		
 		Map aggregations = sr.getAggregations();
@@ -183,11 +116,10 @@ public class DataServlet implements IServlet {
 	 * @param end
 	 * @return
 	 */
-	private BoolQueryBuilder makeQueryFilter(String q, Time start, Time end) {		
+	private SearchQuery makeQueryFilter(String q, Time start, Time end) {		
 		if (q==null) q = "";
-		SearchQuery sq = new SearchQuery(q);
-		BoolQueryBuilder filter = AppUtils.makeESFilterFromSearchQuery(sq, start, end);
-		return filter;
+		SearchQuery sq = new SearchQuery(q);		
+		return sq;
 	}
 
 }

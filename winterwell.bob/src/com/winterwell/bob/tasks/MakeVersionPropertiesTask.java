@@ -14,6 +14,11 @@ import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.utils.web.XStreamUtils;
 
+/**
+ * Where did this code come from? put git and source machine info  into version.properties
+ * @author daniel
+ *
+ */
 public class MakeVersionPropertiesTask extends BuildTask {
 
 	private File configDir;
@@ -78,6 +83,18 @@ public class MakeVersionPropertiesTask extends BuildTask {
 		BufferedWriter w = FileUtils.getWriter(creolePropertiesForSite);
 		props.store(w, null);
 		FileUtils.close(w);
+		
+		// also update .js??
+		doUpdateJSVersionInfo();
+	}
+
+	private void doUpdateJSVersionInfo() {
+		File c = new File(appDir, "src/js/C.js");
+		if ( ! c.isFile()) return;
+		// But what would we do here?? the info is in /manifest
+//		String cjs = FileUtils.read(c);
+//		cjs = cjs.replace("(version:\\w*{app:\\w*['\"]).+(['\"])}", newChar);
+//		FileUtils.write(c, cjs);
 	}
 
 	public void setProperties(Properties props) {

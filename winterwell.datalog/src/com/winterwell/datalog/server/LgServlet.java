@@ -59,6 +59,10 @@ public class LgServlet {
 	static JsonField PARAMS = new JsonField("p");
 	
 	static final List<String> NOTP = Arrays.asList(TAG.getName(), DATASPACE.getName(), "via", "track");
+	/**
+	 * group-by ID for merging several events into one.
+	 */
+	public static final SField GBY = new SField("gby");
 	
 	/**
 	 * Log msg to fast.log file.  
@@ -100,8 +104,9 @@ public class LgServlet {
 			}
 		}
 		
+		String gby = state.get(GBY);
 		// log it!
-		DataLogEvent logged = doLog(state, ds, tag, count, params, stdTrackerParams);
+		DataLogEvent logged = doLog(state, ds, gby, tag, count, params, stdTrackerParams);
 		
 		// Reply
 		// .gif?
@@ -126,10 +131,11 @@ public class LgServlet {
 	 * @param stdTrackerParams
 	 * @return
 	 */
-	public static DataLogEvent doLog(WebRequest state, String dataspace, String tag, double count, 
+	public static DataLogEvent doLog(WebRequest state, String dataspace, String gby, String tag, double count, 
 			Map params, boolean stdTrackerParams) 
 	{
 		assert dataspace != null;		
+		assert tag != null : state;
 		String trckId = TrackingPixelServlet.getCreateCookieTrackerId(state);
 		// special vars
 		if (stdTrackerParams) {			
@@ -169,7 +175,7 @@ public class LgServlet {
 //		);
 //		for(String ds : dataspaces) {
 //			if (ds==null) continue;
-		DataLogEvent event = new DataLogEvent(dataspace, count, tag, params);
+		DataLogEvent event = new DataLogEvent(dataspace, gby, count, new String[] { tag}, params);
 //		event.time = state.get(time); FIXME
 		DataLog.count(event);
 //		}

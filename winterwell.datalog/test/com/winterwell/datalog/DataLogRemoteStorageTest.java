@@ -36,19 +36,22 @@ public class DataLogRemoteStorageTest {
 		DataLogConfig remote = new DataLogConfig();
 		remote.logEndpoint = "https://lg.good-loop.com/lg";
 		dlrs.init(remote);
-		String dataspace = "test";
+		Dataspace dataspace = new Dataspace("test");
 		DataLogEvent event = new DataLogEvent(dataspace, 2, "woot", 
 				new ArrayMap("n", 7, "w", 100));
 		Object ok = dlrs.saveEvent(dataspace, event, null);
 		System.out.println(ok);
 	}
 
+	/**
+	 * Warning: Tests against testlg -- which is often not running the latest code.
+	 */
 	@Test
 	public void testSaveEvent() {				
 		DataLogConfig dc = new DataLogConfig();
 		dc.storageClass = DataLogRemoteStorage.class;
-		dc.logEndpoint = "http://locallg.good-loop.com/lg";
-		dc.getDataEndpoint = "http://locallg.good-loop.com/data";
+		dc.logEndpoint = "https://testlg.good-loop.com/lg";
+		dc.getDataEndpoint = "https://testlg.good-loop.com/data";
 		DataLog.init(dc);
 		
 		DataLog.count(1, "testSaveEvent");

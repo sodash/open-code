@@ -17,6 +17,12 @@ public class BuildDataLog extends BuildWinterwellProject {
 	public Collection<? extends BuildTask> getDependencies() {
 		return Arrays.asList(new BuildUtils(), new BuildWeb());
 	}
+	
+	@Override
+	public void doTask() throws Exception {	
+		super.doTask();
+		doTest();
+	}
 
 
 }

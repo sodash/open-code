@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.DataLog.KInterpolate;
+import com.winterwell.datalog.server.DataServlet;
+import com.winterwell.datalog.server.LgServlet;
 import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.datalog.MeanRate;
@@ -57,7 +59,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		
 		remote.logEndpoint = server;
 		dlrs.init(remote);
-		Object ok = dlrs.saveEvent(event.dataspace, event, new Period(event.time));
+		Object ok = dlrs.saveEvent(new Dataspace(event.dataspace), event, new Period(event.time));
 		Log.d("datalog.remote", "Save to "+server+" "+event+" response: "+ok);
 		return true;
 	}
@@ -179,15 +181,16 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	}
 
 	@Override
-	public Object saveEvent(String dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
+	public Object saveEvent(Dataspace dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
 		// See LgServlet which reads these
 		FakeBrowser fb = new FakeBrowser();
 		fb.setDebug(true);
 		Map<String, String> vars = new ArrayMap(
 			event.toJson2()
 				);
-		vars.put("d", dataspace);		
-		vars.put("t", event.eventType); // type
+		vars.put("d", dataspace.name);		
+		vars.put(LgServlet.GBY.getName(), event.groupById); // group it?
+		vars.put("t", event.getEventType0()); // type
 		String p = JSON.toString(event.getProps());
 		vars.put("p", p);				
 		// TODO String r = referer		
@@ -200,12 +203,12 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	public void saveEvents(Collection<DataLogEvent> events, Period period) {
 		// TODO use a batch-save for speed
 		for (DataLogEvent e : events) {
-			saveEvent(e.dataspace, e, period);
+			saveEvent(new Dataspace(e.dataspace), e, period);
 		}
 	}
 
 	@Override
-	public void registerEventType(String dataspace, String eventType) {
+	public void registerEventType(Dataspace dataspace, String eventType) {
 		// no-op??
 	}
 }

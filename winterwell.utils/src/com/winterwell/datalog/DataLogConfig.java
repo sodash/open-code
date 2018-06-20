@@ -105,6 +105,10 @@ public class DataLogConfig extends DBOptions implements IInit {
 
 	@Option
 	public boolean noCallbacks;
+
+	
+	@Option(description="Switch off logging of system stats such as mem_free, cpu_java, etc")
+	public boolean noSystemStats;
 	
 	public void setTagHandler(String tag, Supplier supplier) {
 		tagHandlers.put(tag, supplier);

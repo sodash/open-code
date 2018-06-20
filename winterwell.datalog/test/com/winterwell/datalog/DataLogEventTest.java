@@ -10,6 +10,7 @@ import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.web.SimpleJson;
+import com.winterwell.utils.web.XStreamUtils;
 
 public class DataLogEventTest {
 
@@ -30,9 +31,14 @@ public class DataLogEventTest {
 		DataLogEvent de = ess.event4distro("testDistro", mv);
 		Map<String, ?> json = de.toJson2();
 		// check it has the extra distro info in it
-		assert json.containsKey("xtra") : json;
-		String xtra = (String) json.get("xtra");
-		assert xtra.contains("mean");
-		System.out.println(json);
+		Object xtra = de.getProp("xtra");
+		assert xtra != null;		
+//		assert json.containsKey("xtra") : json;
+//		String xtra = (String) json.get("xtra");
+//		assert xtra.contains("mean");		
+		String xml = (String) ((Map) xtra).get("xml");
+		MeanVar1D obj = XStreamUtils.serialiseFromXml(xml);
+		System.out.println(obj);
+		assert obj.getMean() == mv.getMean() : obj;
 	}
 }

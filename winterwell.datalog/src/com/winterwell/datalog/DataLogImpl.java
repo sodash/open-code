@@ -127,7 +127,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 
 	@Override
 	public IDataLogReq<Double> getTotal(Time start, Time end, String... tagBits) {
-		String tag = DataLog.tag(tagBits);
+		String tag = DataLog.tag(tagBits);		
 		return storage.getTotal(tag, start, end);
 	}
 
@@ -268,7 +268,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 		}
 		// start-up the new
 		saveThread = new Timer("DataLog.save", true);
-		saveThread.scheduleAtFixedRate(new SystemStatsTask(), first.getDate(), config.interval.getMillisecs());
+		saveThread.scheduleAtFixedRate(new SaveAndSystemStatsTask(), first.getDate(), config.interval.getMillisecs());
 		Log.i(DataLog.LOGTAG, "1st save at "+first+" ("+TimeUtils.toString(new Time().dt(first))+")");
 		// prepare for callbacks
 		if ( ! Dep.has(CallbackManager.class)) {
@@ -290,16 +290,19 @@ public class DataLogImpl implements Closeable, IDataLog {
 		return null;
 	}
 
-	protected synchronized void doSave() {
+	protected synchronized void doSave() {		
 		Map<String, Double> old = tag2count;		
 		Map<String, IDistribution1D> oldMean = tag2dist;
 		Map<String, DataLogEvent> oldid2event = id2event;
 		Map<Pair2<String, Time>, Double> oldTagTimeCount = tagTime2count;
 		Map<Pair2<String, Time>, Double> oldTagTimeSet = tagTime2set;
-		old.put("stat_bucket_count", 1.0*old.size());
-		old.put("stat_bucket_dist", 1.0*oldMean.size());
-		old.put("stat_bucket_retro_count", 1.0*oldTagTimeCount.size());
-		old.put("stat_bucket_retro_set", 1.0*oldTagTimeSet.size());
+
+		// save internal stats? (skip 0s)
+		if ( ! old.isEmpty()) old.put("stat_bucket_count", 1.0*old.size());
+		if ( ! oldMean.isEmpty()) old.put("stat_bucket_dist", 1.0*oldMean.size());
+		if ( ! oldTagTimeCount.isEmpty()) old.put("stat_bucket_retro_count", 1.0*oldTagTimeCount.size());
+		if ( ! oldTagTimeSet.isEmpty()) old.put("stat_bucket_retro_set", 1.0*oldTagTimeSet.size());
+		
 		Period period = getCurrentBucket();
 
 		// new buckets
@@ -317,7 +320,9 @@ public class DataLogImpl implements Closeable, IDataLog {
 			start = period.second;
 		}
 		// save the counters!
-		Log.d(DataLog.LOGTAG, "Saving "+old.size()+" simple + "+oldMean.size()+" dist + "+oldTagTimeCount.size()+" historical "+oldTagTimeSet.size()+"...");
+		if ( ! old.isEmpty()) {
+			Log.d(DataLog.LOGTAG, "Saving "+old.size()+" simple + "+oldMean.size()+" dist + "+oldTagTimeCount.size()+" historical "+oldTagTimeSet.size()+"...");
+		}
 		storage.save(period, old, oldMean);
 		storage.saveHistory(oldTagTimeCount);
 		storage.setHistory(oldTagTimeSet);
@@ -580,24 +585,24 @@ public class DataLogImpl implements Closeable, IDataLog {
 	}
 	
 
-	class SystemStatsTask extends TimerTask {
+	class SaveAndSystemStatsTask extends TimerTask {
 		@Override
 		public void run() {
 			try {				
-				if (closed) cancel();
-				else doSave();
-				// heart beat: check things are working by storing some useful stats
-				DataLog.set(ReflectionUtils.getUsedMemory(), STAT_MEM_USED);
-				DataLog.set(ReflectionUtils.getAvailableMemory(), "mem_free");								
-				DataLog.set(ReflectionUtils.getSystemCPU(), "cpu_sys");
-				DataLog.set(ReflectionUtils.getJavaCPU(), "cpu_java");
+				if (closed) {
+					cancel();
+					return;
+				}
 				
-				// and the time, for testing
-				DataLog.set(new Time().getMinutes(), "time.minutes");
+				// Save!
+				doSave();
 				
-//				int[] info = SqlUtils.getPostgresThreadInfo("sodash");
-//				DataLog.set(info[0], "postgres_sodash_processes");
-//				DataLog.set(info[1], "postgres_sodash_idle");
+				// system stats
+				if (config.noSystemStats) {
+					return;
+				}
+				statSystemStats();
+				
 			} catch(Throwable t) {
 				try {
 					Log.e(DataLog.LOGTAG, t);
@@ -614,7 +619,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 		// HACK just save it to ES? Yes, unless it looks like a very simple stat.
 		// Tracker events are unlikely to duplicate, so there's no advantage to batching them -- and there is a memory issue.
 		if (storage instanceof ESStorage && event.props!=null && event.props.size() > 1) {
-			storage.saveEvent(event.dataspace, event, getCurrentBucket());
+			storage.saveEvent(new Dataspace(event.dataspace), event, getCurrentBucket());
 			// callback
 			CallbackManager cbman = Dep.get(CallbackManager.class);
 			cbman.send(event);		
@@ -641,16 +646,32 @@ public class DataLogImpl implements Closeable, IDataLog {
 		cbman.send(event);		
 	}
 
+	void statSystemStats() {
+		// heart beat: check things are working by storing some useful stats
+		DataLog.set(ReflectionUtils.getUsedMemory(), STAT_MEM_USED);
+		DataLog.set(ReflectionUtils.getAvailableMemory(), "mem_free");								
+		DataLog.set(ReflectionUtils.getSystemCPU(), "cpu_sys");
+		DataLog.set(ReflectionUtils.getJavaCPU(), "cpu_java");
+		
+		// and the time, for testing
+		DataLog.set(new Time().getMinutes(), "time.minutes");
+		
+//		int[] info = SqlUtils.getPostgresThreadInfo("sodash");
+//		DataLog.set(info[0], "postgres_sodash_processes");
+//		DataLog.set(info[1], "postgres_sodash_idle");
+	}
+
 	public static String event2tag(String dataspace, Map event) {
 		assert ! event.isEmpty();
 		assert ! Utils.isBlank(dataspace) : "no dataspace?! event:"+event;
 		// dataspace_eventType=$eventType
 		StringBuilder stag = new StringBuilder(dataspace);
-		String eventType = (String) event.remove(DataLogEvent.EVENTTYPE);
-		stag.append("_evt="+eventType);
+		String[] eventType = DataLogEvent.getEventTypeFromMap(event);
+		stag.append("_evt="+eventType[0]);
 		// a-z params
 		event.keySet().stream().sorted().forEach(k -> {
 			// exclude the non-params
+			if (DataLogEvent.EVENTTYPE.equals(k)) return;
 			if ("count".equals(k)) return;
 			if ("dataspace".equals(k)) return;
 			if ("time".equals(k)) return;			

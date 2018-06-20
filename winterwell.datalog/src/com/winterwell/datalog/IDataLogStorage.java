@@ -48,6 +48,7 @@ public interface IDataLogStorage {
 	 * @param tag
 	 * @param start Can be null (includes all)
 	 * @param end Can be null (includes all)
+	 * @param fn How to interpolate buckets (if bucketSize is set)
 	 * @param bucketSize Can be null for "as it is stored"
 	 * @return never null! May be empty.
 	 */
@@ -87,9 +88,9 @@ public interface IDataLogStorage {
 	 * @param period
 	 * @return an object representing the save -- details depend on the class -- can be null.
 	 */
-	Object saveEvent(String dataspace, DataLogEvent event, Period period);
+	Object saveEvent(Dataspace dataspace, DataLogEvent event, Period period);
 
 	void saveEvents(Collection<DataLogEvent> values, Period period);
 
-	void registerEventType(String dataspace, String eventType);	
+	void registerEventType(Dataspace dataspace, String eventType);	
 }

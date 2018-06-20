@@ -521,11 +521,12 @@ public final class Containers  {
 	 * e.g. int[] or double[]. It can also handle Lists, so if you're not sure whether you've got a List or array -- this is your method.
 	 * Throws an IllegalArgumentException if 'array' is not an array or a List (eg. an int
 	 * value)
-	 * @param array array or list
+	 * @param array array or List or Set
 	 * @return List
 	 */
 	public static <X> List<X> asList(final Object array) {		
 		if (array instanceof List) return (List) array;
+		if (array instanceof Collection) return getList((Collection)array);
 		if ( ! array.getClass().isArray())
 			throw new IllegalArgumentException("Backing object is not an array: "+array.getClass());
 		// the primitive types
