@@ -1,6 +1,8 @@
 package com.winterwell.web.app;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.mail.internet.InternetAddress;
 
@@ -50,6 +52,11 @@ public class TestmeServlet implements IServlet {
 			StatsRequest sr = esc.admin().indices().listIndices();
 			StatsResponse sresp = sr.get();
 			WebUtils2.sendJson(new JsonResponse(state, sresp.getJsonMap()), state);
+			return;
+		
+		case "thread":
+			Map<Thread, StackTraceElement[]> threads = Thread.getAllStackTraces();
+			WebUtils2.sendJson(new JsonResponse(state, threads), state);
 			return;
 		}		
 	}

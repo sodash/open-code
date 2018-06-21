@@ -45,9 +45,11 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 	@Override
 	protected void consume(DataLogEvent msg, Actor sender) throws Exception {
 		if (DataLog.getImplementation().getConfig().noCallbacks) {
+			Log.d(LOGTAG, "config: no callbacks");
 			return;
 		}
 		List<Callback> cbs = callbacksForDataspace.get(msg.dataspace);
+		Log.d(LOGTAG, "callbacks: "+cbs+" for "+msg);
 		if (cbs==null) return;
 		for (Callback callback : cbs) {
 			if (callback.evt!=null && ! callback.evt.equals(msg.getEventType())) {
