@@ -14,6 +14,7 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.ManifestServlet;
+import com.winterwell.web.app.TestmeServlet;
 import com.winterwell.web.app.WebRequest;
 
 /**
@@ -96,7 +97,10 @@ public class MasterHttpServlet extends HttpServlet {
 				new ManifestServlet().process(request);
 				return;
 			}
-			
+			if (path.startsWith("/testme")) {
+				new TestmeServlet().process(request);
+				return;
+			}
 			WebUtils2.sendError(500, "TODO", resp);
 		} catch(Throwable ex) {
 			WebEx wex = WebUtils2.runtime(ex);
