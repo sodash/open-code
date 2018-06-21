@@ -1105,6 +1105,11 @@ public final class Containers  {
 		return list;
 	}
 
+	/**
+	 * 
+	 * @param props
+	 * @return a fresh (shallow-copy) map
+	 */
 	public static Map<String, Object> getMap(IProperties props) {
 		Collection<Key> keys = props.getKeys();
 		Map<String, Object> map = new HashMap<String, Object>(keys.size());

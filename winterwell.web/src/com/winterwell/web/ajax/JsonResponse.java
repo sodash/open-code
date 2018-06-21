@@ -11,6 +11,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.ajax.AjaxMsg.KNoteType;
@@ -32,6 +33,11 @@ import com.winterwell.web.fields.SafeString;
  */
 public class JsonResponse implements IProperties {
 
+	/**
+	 * If true, also include jsend info in {@link #toJSON()}
+	 */
+	public static boolean INCLUDE_JSEND;
+	
 	/**
 	 * Specifies a function to be used for a jsonp response. NB: not actively
 	 * used within SoDash, but it will be used in the external API.
@@ -169,9 +175,25 @@ public class JsonResponse implements IProperties {
 	}
 	
 	public String toJSON() {
+		// convert properties
 		Map<String, Object> map = Containers.getMap(this);
+		
+		if (INCLUDE_JSEND) {
+			Boolean success = get(JSON_SUCCESS);
+			map.put("status", Utils.yes(success)? "success" : "error");
+			List msgs = get(JSON_MESSAGES);
+			if ( ! Utils.isEmpty(msgs)) {
+				map.put("message", msgs.get(0).toString());
+			}
+			if (cargoJson==null) {
+				map.put("data", getCargo());
+			}
+		}
+		
 		String json = JSON.toString(map);
-		if (cargoJson==null) return json;
+		if (cargoJson==null) {
+			return json;
+		}
 		// HACK direct json cargo + the json for the response wrapper
 		String json2 = "{\"cargo\":"+cargoJson+","+json.substring(1);
 		return json2;
