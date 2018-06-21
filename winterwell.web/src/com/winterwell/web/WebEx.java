@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.data.XId;
 
 public class WebEx extends RuntimeException {
@@ -122,8 +123,8 @@ public class WebEx extends RuntimeException {
 		public E50X(Throwable ex) {
 			super(500, ex.getMessage(), ex);
 		}
-		public E50X(int code, String url) {
-			super(code, url);
+		public E50X(int code, String url, String msg) {
+			super(code, StrUtils.joinWithSkip(" ", msg, url));
 		}
 		private static final long serialVersionUID = 1L;
 		
@@ -189,26 +190,31 @@ public class WebEx extends RuntimeException {
 
 
 	/**
+	 * What error to throw?
 	 * Note: FakeBrowser has separate and better error handling (which draws on more info).
 	 * @param code
 	 * @param url
 	 * @return
 	 */
-	public static Exception fromErrorCode(int code, String url) {
+	public static WebEx fromErrorCode(int code, String url, String msg) {
 		// Not an error?!
 		if (code<300) return null;
 		if (code>=300 && code <400) {
-			return new WebEx.Redirect(code, url, null);
+			String to = null;
+			if (msg!=null && WebUtils2.URL_REGEX.matcher(msg).matches()) {
+				to = msg;
+			}
+			return new WebEx.Redirect(code, url, to);
 		}
 		switch(code) {
-		case 401: return new WebEx.E401(url);
-		case 403: return new WebEx.E403(url);
-		case 404: return new WebEx.E404(url);
-		case 410: return new WebEx.E410(url);
+		case 401: return new WebEx.E401(url, msg);
+		case 403: return new WebEx.E403(url, msg);
+		case 404: return new WebEx.E404(url, msg);
+		case 410: return new WebEx.E410(url, msg);
 		}
-		if (code>=400 && code <500) return new WebEx.E40X(code, url);
-		if (code>=500) return new WebEx.E50X(code, url);
-		return null;
+		if (code>=400 && code <500) return new WebEx.E40X(code, url, msg);
+		if (code>=500) return new WebEx.E50X(code, url, msg);
+		return new WebEx(code, msg);
 	}
 
 }

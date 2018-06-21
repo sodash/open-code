@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Test;
 
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.web.WebEx;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.test.TestHttpServletRequest;
 import com.winterwell.web.test.TestHttpServletResponse;
@@ -33,8 +34,24 @@ public class YouAgainClientRemoteTest {
 		YouAgainClient yac = new YouAgainClient("test");
 		Properties props = new Properties();
 		props.load(FileUtils.getReader(new File("config/local.properties")));
-		AuthToken token = yac.register("spoon.mcguffin@gmail.com", props.getProperty("spoon.password"));
+		String p = props.getProperty("spoon.password");
+		AuthToken token = yac.register("spoon.mcguffin@gmail.com", p);
 		assert token != null;
+	}
+	
+	@Test
+	public void testBadRegisterFromJava() throws IOException {
+		// make sure spoon is registered
+		testRegisterFromJava();
+		
+		try {
+			YouAgainClient yac = new YouAgainClient("test");
+			String p = "not-right";
+			AuthToken token = yac.register("spoon.mcguffin@gmail.com", p);
+			assert false;
+		} catch(WebEx ex) {
+			// OK :)
+		}
 	}
 
 	@Test

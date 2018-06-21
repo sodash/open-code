@@ -218,16 +218,25 @@ public class BuildWinterwellProject extends BuildTask {
 		nonJava.run();
 	}
 	
-	public int doTest() {		
+	/**
+	 * TODO this finds no tests?? maybe cos we have to compile the tests dir too. Dunno -- parking for now.
+	 * @return
+	 */
+	public int doTest() {
+//		if (true) return 0; // FIXME
 		File outputFile = new File(projectDir, "test-output/unit-tests-report.html");
 		JUnitTask junit = new JUnitTask(
 				null,
-				getBinDir(),
+				getTestBinDir(),
 				outputFile);		
 		junit.run();		
 		int good = junit.getSuccessCount();
-		int bad = junit.getFailureCount();
+		int bad = junit.getFailureCount();		
 		return bad;
+	}
+
+	protected File getTestBinDir() {
+		return getBinDir();
 	}
 
 }

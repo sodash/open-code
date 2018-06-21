@@ -292,6 +292,12 @@ public final class Containers  {
 		return after;
 	}
 	
+	/**
+	 * Apply (map) fn to list
+	 * @param list Must not be null
+	 * @param fn
+	 * @return
+	 */
 	public static <I, O> List<O> apply(I[] list, IFn<I, O> fn) {
 		ArrayList after = new ArrayList(list.length);
 		try {

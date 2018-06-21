@@ -31,6 +31,7 @@ import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.AjaxMsg;
 import com.winterwell.web.ajax.AjaxMsg.KNoteType;
+import com.winterwell.web.ajax.JSend;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.XIdField;
@@ -72,6 +73,11 @@ public final class YouAgainClient {
 		setDebug(true); // FIXME
 	}	
 	
+	@Override
+	public String toString() {
+		return "YouAgainClient [app=" + app + "]";
+	}
+
 	/**
 	 * This is the method you want :)
 	 * 
@@ -107,16 +113,14 @@ public final class YouAgainClient {
 	private AuthToken verifyNamePassword(String email, String password) {
 		Utils.check4null(email, password);
 		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(debug);
 		String response = fb.getPage(ENDPOINT, new ArrayMap(
 				"app", app, 
 				"action", "login", 
 				"person", email,
-				"password", password));
-		// FIXME
-		Map jobj = (Map) JSON.parse(response);
-		Map user = SimpleJson.get(jobj, "cargo", "user");
+				"password", password));		
+		Map user = userFromResponse(response);
 		AuthToken at = new AuthToken(user);
-//		token.xid = new XId(email, "email");
 		return at;
 	}
 
@@ -247,12 +251,7 @@ public final class YouAgainClient {
 				"action", "login",
 				"person", usernameUsuallyAnEmail,
 				"password", password));
-		Map jobj = (Map) JSON.parse(response);
-		if ( ! Utils.yes(jobj.get("success"))) {
-			Object msg = SimpleJson.get(jobj, "messages", 0);
-			throw new LoginFailedException(""+msg);
-		}
-		Map user = SimpleJson.get(jobj, "cargo", "user");
+		Map user = userFromResponse(response);
 		AuthToken at = new AuthToken(user);
 		return at;
 	}
@@ -265,10 +264,16 @@ public final class YouAgainClient {
 				"action", "signup",
 				"person", usernameUsuallyAnEmail,
 				"password", password));
-		Map jobj = (Map) JSON.parse(response);
-		Map user = SimpleJson.get(jobj, "cargo", "user");
+		Map user = userFromResponse(response);
 		AuthToken at = new AuthToken(user);
 		return at;
+	}
+
+	private Map userFromResponse(String response) {
+		JSend jsend = JSend.parse(response);
+		Map cargo = jsend.getData().map();
+		Map user = (Map) cargo.get("user");
+		return user;
 	}
 
 	/**
@@ -337,10 +342,8 @@ public final class YouAgainClient {
 				"shareWith", targetUser,
 				"entity", item,
 				"action", "shared"));
-		
-		Map jobj = (Map) JSON.parse(response);
-		Object success = SimpleJson.get(jobj, "success");
-		return (success instanceof Boolean) ? (Boolean) success : false;
+		JSend jsend = JSend.parse(response);
+		return jsend.isSuccess();
 	}
 
 	public void setDebug(boolean b) {

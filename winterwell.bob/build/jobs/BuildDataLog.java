@@ -22,7 +22,12 @@ public class BuildDataLog extends BuildWinterwellProject {
 	public void doTask() throws Exception {	
 		super.doTask();
 		doTest();
+			
 	}
 
+	@Override
+	protected File getTestBinDir() {
+		return new File(projectDir, "bin.test");
+	}
 
 }
