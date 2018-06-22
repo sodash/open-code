@@ -12,10 +12,9 @@ import java.util.stream.Collectors;
 import javax.mail.internet.InternetAddress;
 
 import org.eclipse.jetty.util.ajax.JSON;
-import org.jose4j.jwa.AlgorithmFactoryFactory;
-import org.jose4j.jwt.JwtClaims;
 import org.junit.runner.notification.RunListener.ThreadSafe;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -61,6 +60,11 @@ public final class YouAgainClient {
 	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
 
 	private static final String LOGTAG = "youagain";
+	
+	/**
+	 * @Deprecated This is the YA app itself
+	 */
+	static final String MASTERAPP = "youagain";
 	
 	final String app;
 
@@ -146,7 +150,7 @@ public final class YouAgainClient {
 				// TODO a better appraoch would be for the browser to make a proper JWT for @temp
 				// decode the token
 				JWTDecoder dec = getDecoder(); //"local".equals(state.get("login")));
-				JwtClaims decd = dec.decryptJWT(jt);
+				DecodedJWT decd = dec.decryptJWT(jt);
 				token.xid = new XId(decd.getSubject(), false);
 				list.add(token);
 			} catch (Throwable e) {
@@ -165,9 +169,9 @@ public final class YouAgainClient {
 	}
 
 
-	static JWTDecoder dec = new JWTDecoder();
+	static JWTDecoder dec = new JWTDecoder(MASTERAPP);
 	
-	private JWTDecoder getDecoder() throws Exception {
+	JWTDecoder getDecoder() throws Exception {
 		if (dec.getPublicKey()==null) {
 			String publickeyEndpoint = ENDPOINT.replace("youagain.json", "publickey");
 			// load from the server, so we could change keys
