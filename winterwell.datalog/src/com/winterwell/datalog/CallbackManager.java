@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.winterwell.depot.IInit;
 import com.winterwell.gson.Gson;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.ListMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.Actor;
@@ -52,7 +53,8 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 		Log.d(LOGTAG, "callbacks: "+cbs+" for "+msg);
 		if (cbs==null) return;
 		for (Callback callback : cbs) {
-			if (callback.evt!=null && ! callback.evt.equals(msg.getEventType())) {
+			// does the event match the callback?
+			if ( ! matches(msg, callback)) {
 				continue;
 			}
 			try {
@@ -70,6 +72,16 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 				throw ex;
 			}
 		}
+	}
+
+	private boolean matches(DataLogEvent msg, Callback callback) {
+		if (callback.evt==null) return true; // match all
+		// NPE paranoia
+		if (msg.getEventType()==null) return false;
+		if (Containers.contains(callback.evt, msg.getEventType())) {
+			return true;
+		}
+		return false;
 	}
 	
 }
