@@ -72,6 +72,15 @@ public class WebRequest implements IProperties, Closeable {
 		WebUtils2.addCookie(getResponse(), name, value, timeTolive, cookieDomain);
 	}
 
+	/**
+	 * The request url, without any path info.
+	 * @return e.g. http://bbc.co.uk
+	 */
+	public String getRequestProtocolHost() {
+		StringBuffer rurl = request.getRequestURL();
+		int i = rurl.indexOf("/", 9);
+		return i==-1? rurl.toString() : rurl.substring(0, i);
+	}
 
 	Map<String,String> freshCookies;
 	
@@ -895,6 +904,10 @@ public class WebRequest implements IProperties, Closeable {
 		return stopWatch;
 	}
 
+	/**
+	 * Use with {@link #setUser(XId, IProperties)}
+	 * @return
+	 */
 	public IProperties getUser() {
 		if (user == null) {
 			user = getSessionAttribute(USER);

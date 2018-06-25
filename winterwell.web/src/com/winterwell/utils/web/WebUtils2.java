@@ -69,7 +69,17 @@ import sun.misc.BASE64Decoder;
  * @testedby {@link WebUtils2Test}
  */
 public class WebUtils2 extends WebUtils {
-	
+
+	/**
+	 * What do we have that identifies this device? Not much really! 
+	 * Just the browser & OS via the user-agent string.
+	 * @return
+	 */
+	public static String getDeviceSignature(WebRequest req) {
+		BrowserType browser = req.getBrowserType();
+		return browser.getOS()+" "+browser.getBrowserMake();
+	}
+
 
 	public static boolean isHtmlDoc(String html) {
 		// TOTAL HACK (but fast)
