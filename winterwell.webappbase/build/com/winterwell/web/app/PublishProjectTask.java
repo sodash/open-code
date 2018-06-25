@@ -182,19 +182,7 @@ public class PublishProjectTask extends BuildTask {
 				}
 				FileUtils.copy(jar, localJar);
 			}
-	//		// Remove unwanted jars
-	//		for (File jar : localLib.listFiles()) {
-	//			boolean found = false;
-	//			for (File jar2 : jars) {
-	//				if (jar.getName().equals(jar2.getName())) found = true;
-	//			}
-	//			if (!found) {
-	//				// This was in the lib directory, but not in the classpath
-	//				Log.w("publish", "Deleteing apparently unwanted file " + jar.getAbsolutePath());
-	//				FileUtils.delete(jar);
-	//			}
-	//		}
-			
+	//		// Remove unwanted jars -- no too dangerous
 			// WW jars
 			Collection<? extends BuildTask> deps = getDependencies();
 			for (BuildTask buildTask : deps) {
@@ -224,7 +212,9 @@ public class PublishProjectTask extends BuildTask {
 		ProcessTask pubas = new ProcessTask(bashScript+" "+typeOfPublish + " "+codePart+" "+preClean);
 		pubas.setEcho(true);
 		pubas.run();
-		System.out.println(pubas.getError());
+		if ( ! Utils.isBlank(pubas.getError())) {
+			Log.w(pubas.getCommand(), pubas.getError());
+		}
 		pubas.close();
 		Log.d(pubas.getCommand(), pubas.getOutput());
 		
