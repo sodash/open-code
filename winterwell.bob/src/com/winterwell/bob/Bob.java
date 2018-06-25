@@ -63,7 +63,7 @@ import com.winterwell.utils.time.TimeUtils;
  */
 public class Bob {
 
-	private static final Bob dflt = new Bob();
+	private static Bob dflt;
 
 	private static Map<BuildTask, Time> time4task = new HashMap<>();
 
@@ -76,7 +76,7 @@ public class Bob {
 	/**
 	 * @throws Exception 
 	 */
-	private static Class getClass(String classOrFileName) throws Exception {
+	static Class getClass(String classOrFileName) throws Exception {
 		String className = classOrFileName;
 		// Strip endings if they were used
 		if (classOrFileName.endsWith(".java")) {
@@ -107,7 +107,7 @@ public class Bob {
 		// sniff package
 		String src = FileUtils.read(f);
 		String[] fnd = StrUtils.find("package (.+);", src);
-		String cn = fnd[1]+"."+new File(FileUtils.getBasename(f)).getName();
+		String cn = (fnd==null? "" : fnd[1]+".") + new File(FileUtils.getBasename(f)).getName();
 		
 		File tempDir = FileUtils.createTempDir();
 		CompileTask cp = new CompileTask(null, tempDir);
@@ -149,6 +149,11 @@ public class Bob {
 	}
 
 	public static Bob getSingleton() {
+		if (dflt!=null) {
+			return dflt;
+		}
+		// make it
+		dflt = new Bob(new BobSettings());
 		dflt.init();
 		return dflt;
 	}
@@ -159,24 +164,24 @@ public class Bob {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Bob bob = getSingleton();
 		// Load settings
-//		ConfigFactory cf = ConfigFactory.get(); TODO
-		ConfigBuilder cb = new ConfigBuilder(bob.settings);
-		cb.setFromMain(args);
-		cb.get();
+		ConfigFactory cf = ConfigFactory.get();
+		ConfigBuilder cb = cf.getConfigBuilder(BobSettings.class);
+		BobSettings _settings = cb.get();
+		// Make Bob
+		Bob bob = new Bob(_settings);
+		dflt = bob;
+		bob.init();		
 		
-		try {
-			if (args.length == 0)
-				throw new IOException();
-		} catch (IOException e) {
+		if (args.length == 0 || "--help".equals(args[0])) {
 			System.err.println(StrUtils.LINEEND + "Bob the Builder"
 					+ StrUtils.LINEEND + "---------------"
 					+ StrUtils.LINEEND
-					+ "Usage: java -jar bob.jar [-cp CLASSPATH] [options] TargetBuildTasks..."
+					+ "Usage: java -jar bob-all.jar [-cp CLASSPATH] [options] TargetBuildTasks..."
 					+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
 			System.exit(1);
 		}
+		
 		// Build each target
 		for (String clazzName : args) {
 			try {
@@ -212,11 +217,12 @@ public class Bob {
 
 	private volatile boolean initFlag;
 
-	private BobSettings settings = new BobSettings();
+	private BobSettings settings;
 
 	private LogFile logfile;
 
-	private Bob() {
+	private Bob(BobSettings settings) {
+		this.settings = settings;
 	}
 
 
@@ -297,6 +303,7 @@ public class Bob {
 		settings.loggingOff = !on;
 	}
 
+	@Deprecated // normally set by main()
 	public void setSettings(BobSettings settings) {
 		this.settings = settings;
 	}
