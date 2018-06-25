@@ -727,5 +727,39 @@ public class AppUtils {
 	}
 
 
+	/**
+	 * Std implementation of IESRouter
+	 * @param dataspaceIgnored
+	 * @param type
+	 * @param id
+	 * @param status
+	 * @return
+	 */
+	public static ESPath getPath(String dataspaceIgnored, Class type, String id, Object status) {		 
+		String stype = type==null? null : type.getSimpleName().toLowerCase();
+		// HACK NGO -> charity
+		if ("ngo".equals(stype)) stype = "charity";
+		// HACK map personlite and person to the same DB
+		if (type==PersonLite.class) stype = "person";
+		
+		String index = stype;
+		KStatus ks = (KStatus) status;
+		if (ks==null) ks = KStatus.PUBLISHED;
+		switch(ks) {
+		case PUBLISHED:
+			break;
+		case DRAFT: case PENDING: case REQUEST_PUBLISH: case MODIFIED:
+			index += ".draft";
+			break;
+		case TRASH:
+			index += ".trash";
+			break;
+		default:
+			throw new IllegalArgumentException(type+" "+status);
+		}
+		return new ESPath(index, stype, id);
+	}
+
+
 	
 }
