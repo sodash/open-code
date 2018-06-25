@@ -346,6 +346,7 @@ public class MathUtils {
 	 * @param a
 	 * @param b
 	 * @return a compareTo b. If a or b are null, this treats null as a low number.
+	 * -1 if a is less than b
 	 */
 	public static int compare(Number a, Number b) {
 		return COMPARE.compare(a, b);
@@ -698,13 +699,13 @@ final class NumberComparator implements Comparator<Number> {
 		// unavoidably ugly
 		if (a instanceof BigInteger) {
 			BigInteger bigB = b instanceof BigInteger ? (BigInteger) b
-					: new BigInteger(b.toString());
+					: new BigInteger(String.valueOf(b.intValue())); // othewise 1.0 causes an error :(
 			int c = ((BigInteger) a).compareTo(bigB);
 			return c;
 		}
 		if (b instanceof BigInteger) {
 			BigInteger bigA = a instanceof BigInteger ? (BigInteger) a
-					: new BigInteger(a.toString());
+					: new BigInteger(String.valueOf(a.intValue()));
 			int c = bigA.compareTo((BigInteger) b);
 			return c;
 		}

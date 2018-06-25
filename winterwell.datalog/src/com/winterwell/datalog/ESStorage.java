@@ -651,7 +651,7 @@ public class ESStorage implements IDataLogStorage {
 			Time start, Time end, 
 			SearchQuery query, List<String> breakdown) 
 	{
-		BoolQueryBuilder filter = AppUtils.makeESFilterFromSearchQuery(query, start, end);
+		com.winterwell.es.client.query.BoolQueryBuilder filter = AppUtils.makeESFilterFromSearchQuery(query, start, end);
 		
 		String index = readIndexFromDataspace(dataspace);
 		ESHttpClient esc = client(dataspace);
@@ -704,7 +704,7 @@ public class ESStorage implements IDataLogStorage {
 				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
 				leaf.subAggregation(myCount);
 				// filter 0s ??does this work??
-				filter.must(QueryBuilders.rangeQuery(k).gt(0));
+				filter.must(ESQueryBuilders.rangeQuery(k, 0, null));
 			}						
 			search.addAggregation(byTag);						
 		} // ./breakdown
@@ -716,7 +716,7 @@ public class ESStorage implements IDataLogStorage {
 		}
 		
 		// Set filter
-		search.setFilter(filter);
+		search.setQuery(filter);
 		
 		// TODO unify the ES search above with the DataLog interface call below
 		// i.e. define a Java interface to match the above 
