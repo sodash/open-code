@@ -95,7 +95,9 @@ public class AppUtils {
 
 	
 	/**
-	 * Use ConfigFactory to get a config from standard places. This is for loading configs during initialisation.
+	 * Use ConfigFactory to get a config from standard places. 
+	 * This is for loading configs during initialisation.
+	 * It also calls Dep.set()
 	 * @param config
 	 * @param args
 	 * @return

@@ -86,6 +86,9 @@ public class ConfigFactory {
 	}
 	
 	/**
+	 * Load a config from standard sources
+	 * AND set it in Dep, 
+	 * plus (if debug is on) keep the ConfigBuilder in history
 	 * 
 	 * @param configClass
 	 * @return
