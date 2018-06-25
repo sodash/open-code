@@ -23,7 +23,8 @@ import com.winterwell.utils.web.WebUtils2;
  *
  */
 public class BuildWinterwellProject extends BuildTask {
-	private String mainClass;
+	
+	protected String mainClass;
 
 	/**
 	 * @return the jar file (after building!)
