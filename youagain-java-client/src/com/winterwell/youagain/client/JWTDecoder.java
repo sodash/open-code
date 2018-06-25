@@ -11,6 +11,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.log.Log;
 
 /**
@@ -54,9 +55,12 @@ public class JWTDecoder {
 		JWTVerifier verifier = JWT.require(algorithm)
 				.withIssuer(issuer)
 				.build();
-		
-		DecodedJWT decoded = verifier.verify(jwt);
-		Log.d(LOGTAG, "verified "+jwt+" -> "+decoded);
+		try {
+			DecodedJWT decoded = verifier.verify(jwt);
+			Log.d(LOGTAG, "verified "+jwt+" -> "+decoded);
+		} catch(Exception ex) {
+			throw new WrappedException("JWT verify failed for '"+jwt+"'", ex);
+		}
 	}
 
 	private Algorithm algorithm() {

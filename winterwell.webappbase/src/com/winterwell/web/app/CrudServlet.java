@@ -125,6 +125,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 	protected void doSecurityCheck(WebRequest state) throws SecurityException {
 		YouAgainClient ya = Dep.get(YouAgainClient.class);
+		ReflectionUtils.setPrivateField(state, "debug", true); // FIXME
 		List<AuthToken> tokens = ya.getAuthTokens(state);
 		if (state.getAction() == null) {
 			return;

@@ -92,8 +92,12 @@ public final class YouAgainClient {
 	 * WARNING: This can include anonymous temporary "nonce@temp" tokens!
 	 */
 	public List<AuthToken> getAuthTokens(WebRequest state) {
+		// check cache
 		List<AuthToken> tokens = state.get(AUTHS);
-		if (tokens!=null) return tokens;
+		if (tokens!=null) {
+			return tokens;
+		}
+		
 		List<String> jwt = getAllJWTTokens(state);
 		// basic auth?
 		AuthToken basicToken = null;
@@ -103,8 +107,13 @@ public final class YouAgainClient {
 			basicToken = verifyNamePassword(np.first, np.second);
 		}
 		if (jwt.isEmpty() && basicToken==null) return null;
-		// verify the tokens
-		tokens = verify(jwt, state);
+		if ( ! jwt.isEmpty()) {
+			// verify the tokens
+			tokens = verify(jwt, state);
+		} else {
+			// just name/password
+			tokens = new ArrayList();
+		}
 		// add the name/password user first, if set
 		if (basicToken!=null) tokens.add(0, basicToken);
 		// stash them
