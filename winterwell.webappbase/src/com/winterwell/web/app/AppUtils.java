@@ -30,9 +30,12 @@ import com.winterwell.es.client.GetRequestBuilder;
 import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.ReindexRequest;
+import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.es.fail.ESException;
 import com.winterwell.gson.Gson;
@@ -64,6 +67,16 @@ import com.winterwell.web.fields.JsonField;
  */
 public class AppUtils {
 
+	public static SearchResponse search(ESPath path, SearchQuery q) {
+		ESHttpClient esjc = Dep.get(ESHttpClient.class);
+		SearchRequestBuilder s = new SearchRequestBuilder(esjc);
+		s.setPath(path);
+		com.winterwell.es.client.query.BoolQueryBuilder f = makeESFilterFromSearchQuery(q, null, null);
+		s.setQuery(f);
+		SearchResponse sr = s.get();
+		return sr;
+	}
+	
 
 	public static final JsonField ITEM = new JsonField("item");
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
@@ -571,21 +584,22 @@ public class AppUtils {
 
 
 	/**
+	 *  NB: not in {@link ESQueryBuilders} 'cos that cant see the SearchQuery class
 	 * 
 	 * @param sq never null
 	 * @param start
 	 * @param end
 	 * @return
 	 */
-	public static BoolQueryBuilder makeESFilterFromSearchQuery(SearchQuery sq, Time start, Time end) {
+	public static com.winterwell.es.client.query.BoolQueryBuilder makeESFilterFromSearchQuery(SearchQuery sq, Time start, Time end) {
 		assert sq != null;
 		
-		BoolQueryBuilder filter = QueryBuilders.boolQuery();
+		com.winterwell.es.client.query.BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
 		
 		if (start != null || end != null) {
-			RangeQueryBuilder timeFilter = QueryBuilders.rangeQuery("time");
-			if (start!=null) timeFilter = timeFilter.from(start.toISOString()); //, true) ES versioning pain
-			if (end!=null) timeFilter = timeFilter.to(end.toISOString()); //, true);
+			ESQueryBuilder timeFilter = ESQueryBuilders.dateRangeQuery("time", start, end);
+//			if (start!=null) timeFilter = timeFilter.from(start.toISOString()); //, true) ES versioning pain
+//			if (end!=null) timeFilter = timeFilter.to(end.toISOString()); //, true);
 			filter = filter.must(timeFilter);
 		}
 		
@@ -603,12 +617,12 @@ public class AppUtils {
 	}
 	
 	
-	private static BoolQueryBuilder parseTreeToQuery(Object rawClause) {
+	private static com.winterwell.es.client.query.BoolQueryBuilder parseTreeToQuery(Object rawClause) {
 		if ( ! (rawClause instanceof List) && ! (rawClause instanceof Map)) {
 			throw new IllegalArgumentException("clause is not list or map: " + rawClause);
 		}		
 		
-		BoolQueryBuilder filter = QueryBuilders.boolQuery();
+		com.winterwell.es.client.query.BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
 		
 		// Map means propname=value constraint.
 		if (rawClause instanceof Map) {
@@ -617,11 +631,11 @@ public class AppUtils {
 			for (String prop : clause.keySet()) {
 				String val = (String) clause.get(prop);
 				if (ESQueryBuilders.UNSET.equals(val)) {
-					QueryBuilder setFilter = QueryBuilders.existsQuery(prop);
+					ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
 					return filter.mustNot(setFilter);
 				} else {
 					// normal key=value case
-					QueryBuilder kvFilter = QueryBuilders.termQuery(prop, val);
+					ESQueryBuilder kvFilter = ESQueryBuilders.termQuery(prop, val);
 					return filter.must(kvFilter);
 				}	
 			}
@@ -652,7 +666,8 @@ public class AppUtils {
 			
 			if (SearchQuery.KEYWORD_AND.equals((String) maybeOperator)) {
 				for (Object term : clause.subList(1, clause.size())) {
-					filter = filter.must(parseTreeToQuery(term));
+					com.winterwell.es.client.query.BoolQueryBuilder andTerm = parseTreeToQuery(term);
+					filter = filter.must(andTerm);
 				}
 				return filter;
 			}

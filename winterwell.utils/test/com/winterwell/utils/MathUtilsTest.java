@@ -14,6 +14,7 @@ import junit.framework.TestCase;
 
 public class MathUtilsTest extends TestCase {
 
+	
 	@Test public void testNumDisplay() {
 		DecimalFormat format = new DecimalFormat("#,###.##");
 		System.out.println(format.format(123));
@@ -46,6 +47,11 @@ public class MathUtilsTest extends TestCase {
 		List<Number> list = Arrays.asList((Number)1,null,0.5,-2.5,null);
 		Collections.sort(list, MathUtils.COMPARE);
 		assert list.equals(Arrays.asList(null,null,-2.5,0.5,1)) : list;
+		
+		{
+			int x = MathUtils.compare(1.0, BigInteger.valueOf(7));
+			assert x == -1 : x;
+		}
 	}
 
 	@Test
