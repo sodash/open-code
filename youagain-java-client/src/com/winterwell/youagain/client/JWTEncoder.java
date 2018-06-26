@@ -42,9 +42,7 @@ public class JWTEncoder {
 
 	String app;
 
-	private String deviceSignature;
-
-	private static Encoder base64encoder = Base64.getEncoder();
+	private String deviceSignature;	
 	
 	public JWTEncoder(String app) {
 		this.app = app;
@@ -91,7 +89,7 @@ public class JWTEncoder {
 	    JWTDecoder dec = new JWTDecoder(app);
 	    dec.setPublicKey(getPublicKey());
 	    DecodedJWT decd = dec.decryptJWT(jwt);
-	    Log.d("ya", "decodes "+jwt+" to "+decd);
+	    Log.d("ya", "decodes "+jwt+" to JWT for "+decd.getSubject()+" w public key "+dec.getPublicKey());
 	    
 	    return jwt;
 	}
@@ -146,25 +144,15 @@ public class JWTEncoder {
 		}
 	}
 
-	public String getPublicKey() {
-		try {
-			PublicKey pkey = getKey(YouAgainClient.MASTERAPP).publicKey;
-			return getPublicKey2_string(pkey);
-		} catch (Exception ex) {
-			throw Utils.runtime(ex);
-		}
+	public PublicKey getPublicKey() {
+		PublicKey pkey = getKey(YouAgainClient.MASTERAPP).publicKey;
+		return pkey;
 	}
 	
 	public String getPublicKeyId() {
 		RSAKeyPair webKey = getKey(YouAgainClient.MASTERAPP);
 		String kid = webKey.id;
 		return kid;
-	}
-
-	public String getPublicKey2_string(PublicKey pkey) throws NoSuchAlgorithmException, InvalidKeySpecException {
-		KeyFactory fact = KeyFactory.getInstance("RSA");
-	    X509EncodedKeySpec spec = fact.getKeySpec(pkey, X509EncodedKeySpec.class);
-	    return base64encoder.encodeToString(spec.getEncoded());
 	}
 
 

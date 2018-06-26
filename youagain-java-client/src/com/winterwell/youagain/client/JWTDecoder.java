@@ -1,8 +1,10 @@
 package com.winterwell.youagain.client;
 
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Base64.Decoder;
@@ -11,6 +13,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.log.Log;
 
@@ -24,14 +27,23 @@ import com.winterwell.utils.log.Log;
  */
 public class JWTDecoder {
 
+	public static PublicKey keyFromString(String skey) throws NoSuchAlgorithmException, InvalidKeySpecException {		
+		byte[] data = base64decoder.decode(skey);
+		KeyFactory fact = KeyFactory.getInstance("RSA");
+	    X509EncodedKeySpec spec = new X509EncodedKeySpec(data);	    
+	    PublicKey pubKey = fact.generatePublic(spec);
+	    return pubKey;
+	}
+
+	private static Decoder base64decoder = Base64.getDecoder();
+
+	
 	private static final String LOGTAG = "JWTDecoder";
 
 	String app;
 
 	private PublicKey pubKey;
 
-	private static Decoder base64decoder = Base64.getDecoder();
-	
 	/**
 	 * Usually get via {@link YouAgainClient#getDecoder()}
 	 */
@@ -59,7 +71,7 @@ public class JWTDecoder {
 			DecodedJWT decoded = verifier.verify(jwt);
 			Log.d(LOGTAG, "verified "+jwt+" -> "+decoded);
 		} catch(Exception ex) {
-			throw new WrappedException("JWT verify failed for '"+jwt+"'", ex);
+			throw new WrappedException("JWT verify failed for '"+jwt+"' w public key "+getPublicKey(), ex);
 		}
 	}
 
@@ -71,12 +83,9 @@ public class JWTDecoder {
 	}
 
 
-	public JWTDecoder setPublicKey(String key) throws Exception {
-		Log.d("ya.init", "decoder Public key: "+key);
-	    byte[] data = base64decoder.decode(key);
-	    X509EncodedKeySpec spec = new X509EncodedKeySpec(data);
-	    KeyFactory fact = KeyFactory.getInstance("RSA");
-	    pubKey = fact.generatePublic(spec);
+	public JWTDecoder setPublicKey(PublicKey key) throws Exception {
+		Log.d("ya.init", "set decoder Public key: "+key+" via "+ReflectionUtils.getSomeStack(8));
+		pubKey = key;
 	    return this;
 	}
 

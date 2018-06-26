@@ -1,5 +1,6 @@
 package com.winterwell.youagain.client;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,7 +56,7 @@ public final class YouAgainClient {
 	
 	static final String ENDPOINT = 
 				"https://youagain.good-loop.com/youagain.json";
-//				"http://localyouagain.winterwell.com/youagain.json";
+//				"http://localyouagain.good-loop.com/youagain.json";
 
 	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
 
@@ -180,13 +181,14 @@ public final class YouAgainClient {
 
 	static JWTDecoder dec = new JWTDecoder(MASTERAPP);
 	
-	JWTDecoder getDecoder() throws Exception {
+	public JWTDecoder getDecoder() throws Exception {
 		if (dec.getPublicKey()==null) {
 			String publickeyEndpoint = ENDPOINT.replace("youagain.json", "publickey");
 			// load from the server, so we could change keys
-			String pkey = new FakeBrowser().getPage(publickeyEndpoint);
-//			String pkey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu3njghYwWN8Bf/f6FndCr3h3/uzPNctZZf2qLHqGicZaQQvjMqFfr2tz/JGsFkxeCSeEuLqzHjBoc8P9S2aKb7X04b/OfTJkSjH/5UArKuAGZL1/hVFwZwnSoQOhklElHtq/RwGUgemmu7QIjTcgKEINUNzC537vWOtiQkWAO/abqwpfQgKPvMNvViPMrJtk8A07bFetQKjU4A6do6E3BvTItzgMZJLmMVePn8Yo3uH/7rLtKybl2tn8BhOWPGLnEyZiPZ2f8V/56hR1zsHr9i9QMjLX8O18+w4pno04jST2Yp7yxTNN3mttqgyl8s8oFMptSG2/3g+WqwwwBTbGgQIDAQAB";			
-			dec.setPublicKey(pkey);			
+			String skey = new FakeBrowser().getPage(publickeyEndpoint);
+			PublicKey pkey = JWTDecoder.keyFromString(skey);
+			dec.setPublicKey(pkey);
+			Log.d(LOGTAG, "GOT key "+pkey+" = "+dec.getPublicKey()+" from "+publickeyEndpoint);
 		}
 		return dec;
 	}

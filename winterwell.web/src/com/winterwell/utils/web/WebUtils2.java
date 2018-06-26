@@ -204,6 +204,7 @@ public class WebUtils2 extends WebUtils {
 		cookie.setPath("/");
 		// FIXME WHy is Jetty sometimes wrapping names in quotes? It seems to happen if the name uses a % encoding.		
 		response.addCookie(cookie);
+		Log.d("cookie", "add "+name+" = "+value);
 	}
 
 	/**
