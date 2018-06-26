@@ -891,13 +891,20 @@ public class WebRequest implements IProperties, Closeable {
 	}
 	
 	/**
-	 * Convenience for might-be-null
+	 * Convenience for might-be-null/undefined
 	 * @param i 0-indexed
 	 * @return slug-bit i or null
 	 */
 	public final String getSlugBits(int i) {
 		String[] bits = getSlugBits();
-		return bits.length > i && ! Utils.isBlank(bits[i])? bits[i] : null;
+		if (bits.length >= i) return null;
+		String bi = bits[i];
+		// Treat undefined and null as badly handled nulls
+		if (Utils.isBlank(bi) || "undefined".equals(bi) || "null".equals(bi)) {
+			Log.w("web", "Interpreted-as-null "+i+"="+bi+" in url "+getRequestUrl());
+			return null;
+		}
+		return bi;
 	}
 
 	public StopWatch getStopWatch() {
