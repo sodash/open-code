@@ -71,7 +71,8 @@ public class JWTDecoder {
 			DecodedJWT decoded = verifier.verify(jwt);
 			Log.d(LOGTAG, "verified "+jwt+" -> "+decoded);
 		} catch(Exception ex) {
-			throw new WrappedException("JWT verify failed for '"+jwt+"' w public key "+getPublicKey(), ex);
+			DecodedJWT djwt = JWT.decode(jwt);
+			throw new WrappedException("JWT verify failed for '"+jwt+"' w public key "+getPublicKey()+" payload: "+djwt.getPayload(), ex);
 		}
 	}
 
