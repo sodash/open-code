@@ -63,7 +63,9 @@ public class JWTEncoder {
 	    // Create the Claims, which will be the content of the JWT
 		Algorithm alg = algorithm();
 		Builder jwtb = JWT.create();
-	    if (app!=null) jwtb.withIssuer(app);  // who creates the token and signs it
+	    if (app!=null) {
+	    	jwtb.withIssuer(app);  // who creates the token and signs it
+	    }
 //	    claims.setAudience("Audience"); // to whom the token is intended to be sent
 //	    claims.setExpirationTimeMinutesInTheFuture(10); // time when the token will expire (10 minutes from now)
 	    jwtb.withJWTId(Utils.getUID()); // a unique identifier for the token

@@ -609,7 +609,10 @@ public class AppUtils {
 		// TODO this is just a crude 1-level thing
 		List ptree = sq.getParseTree();
 		try {
-			filter = filter.must(parseTreeToQuery(ptree));
+			com.winterwell.es.client.query.BoolQueryBuilder q = parseTreeToQuery(ptree);
+			if ( ! q.isEmpty()) {
+				filter = filter.must(q);
+			}
 		} catch (Throwable e) {
 			// Put full query info on an assertion failure
 			throw new WebEx.E40X(400, "bad query "+sq, e);
