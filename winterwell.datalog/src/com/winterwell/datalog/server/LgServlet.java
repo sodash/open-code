@@ -193,8 +193,10 @@ public class LgServlet {
 		String ua = state.getUserAgent();			
 		params.putIfAbsent("ua", ua);
 		BrowserType bt = new BrowserType(ua);
-		boolean mobile = bt.isMobile();
+		boolean mobile = bt.isMobile();		
 		params.putIfAbsent("mbl", mobile);
+		// browser
+		params.putIfAbsent("browser", bt.getBrowserMake()+"_"+bt.getVersion());
 		// OS
 		String os = bt.getOS();
 		params.putIfAbsent("os", os);
