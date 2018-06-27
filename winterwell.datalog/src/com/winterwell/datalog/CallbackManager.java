@@ -58,11 +58,7 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 				continue;
 			}
 			try {
-				Log.d(LOGTAG, callback.url+" for "+msg);
-				FakeBrowser fb = new FakeBrowser();
-				fb.setDebug(true);
-				String json = Gson.toJSON(msg);
-				String ok = fb.post(callback.url, json);
+				consume2_doCallback(msg, callback);
 			} catch(Exception ex) {
 				// retry once
 				if (sender != this) {
@@ -72,6 +68,14 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 				throw ex;
 			}
 		}
+	}
+
+	void consume2_doCallback(DataLogEvent msg, Callback callback) {
+		Log.d(LOGTAG, callback.url+" for "+msg);
+		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(true);
+		String json = Gson.toJSON(msg);
+		String ok = fb.post(callback.url, json);
 	}
 
 	private boolean matches(DataLogEvent msg, Callback callback) {

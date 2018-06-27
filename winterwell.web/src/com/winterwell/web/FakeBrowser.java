@@ -44,6 +44,7 @@ import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.Cooldown;
 import com.winterwell.utils.web.WebUtils;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.data.XId;
 
 import lgpl.haustein.Base64Encoder;
@@ -451,7 +452,8 @@ public class FakeBrowser {
 				Object v = reqHeaders.get(h);
 				return v==null? "" : " -H '"+h+": "+v+"'";
 			}), " ");
-			String curl = StrUtils.compactWhitespace("curl -XPOST -d '"+encodedPostBody+"'"+sheaders+" '"+uri+"'");
+			String postBody = WebUtils2.urlDecode(encodedPostBody);
+			String curl = StrUtils.compactWhitespace("curl -XPOST -d '"+postBody+"'"+sheaders+" '"+uri+"'");
 			Log.d(LOGTAG, curl);
 		}
 		try {
