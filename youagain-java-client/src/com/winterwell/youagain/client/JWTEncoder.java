@@ -29,6 +29,7 @@ import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.utils.web.XStreamUtils;
 import com.winterwell.web.data.XId;
 
@@ -66,6 +67,8 @@ public class JWTEncoder {
 	    if (app!=null) {
 	    	jwtb.withIssuer(app);  // who creates the token and signs it
 	    }
+	    // for debugging -- where did this come from?
+	    jwtb.withClaim("server", WebUtils2.fullHostname());
 //	    claims.setAudience("Audience"); // to whom the token is intended to be sent
 //	    claims.setExpirationTimeMinutesInTheFuture(10); // time when the token will expire (10 minutes from now)
 	    jwtb.withJWTId(Utils.getUID()); // a unique identifier for the token
