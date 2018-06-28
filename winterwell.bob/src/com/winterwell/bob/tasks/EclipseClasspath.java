@@ -244,6 +244,11 @@ public class EclipseClasspath {
 			} catch(Exception ex) {
 				Log.w("eclipse", ex);
 			}
+			// HACK add in the project jar?
+			File projectJar = new File(fp, p+".jar");
+			if (projectJar.isFile()) {
+				libs.add(projectJar);
+			}
 		}
 	}
 
