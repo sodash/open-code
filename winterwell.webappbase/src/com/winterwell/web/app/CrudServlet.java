@@ -589,6 +589,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		{	// update
 			String id = getId(state);
+			assert id != null : "No id? cant save! "+state; 
 			ESPath path = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
 			AppUtils.doSaveEdit(path, jthing, state);
 		}

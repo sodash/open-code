@@ -309,6 +309,7 @@ public class AppUtils {
 		return doSaveEdit2(path, item, stateCanBeNull, false);
 	}
 	public static JThing doSaveEdit2(ESPath path, JThing item, WebRequest stateCanBeNull, boolean instant) {
+		assert path.id != null : "need an id in path to save "+item;
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));		
 		// save update
 		

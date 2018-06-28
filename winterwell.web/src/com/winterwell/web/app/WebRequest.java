@@ -897,7 +897,7 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	public final String getSlugBits(int i) {
 		String[] bits = getSlugBits();
-		if (bits.length >= i) return null;
+		if (bits.length <= i) return null;
 		String bi = bits[i];
 		// Treat undefined and null as badly handled nulls
 		if (Utils.isBlank(bi) || "undefined".equals(bi) || "null".equals(bi)) {
