@@ -232,14 +232,10 @@ public class EclipseClasspath {
 		projects.add(pro);
 		List<String> pros = getReferencedProjects();
 		for (String p : pros) {
-			if (projects.contains(p)) continue;
+			if (projects.contains(p)) continue;			
 			// prefer top level projects
-			File fp = new File(FileUtils.getWinterwellDir(), p);
-			if ( ! fp.exists()) {
-				fp = new File(FileUtils.getWinterwellDir(), "code/"+p);
-			}
-			if ( ! fp.exists()) {
-				Log.w("EclipseClasspath", "Could not locate project "+p);
+			File fp = findProject(p);
+			if (fp==null) {				
 				continue;
 			}
 			try {
@@ -250,6 +246,30 @@ public class EclipseClasspath {
 			}
 		}
 	}
+
+	/**
+	 * HACK check WW folders
+	 * @param p
+	 * @return
+	 */
+	protected File findProject(String p) {
+		for(File workspaceDir : new File[] {
+				projectDir.getParentFile(), 
+				FileUtils.getWinterwellDir(),
+				new File(FileUtils.getWinterwellDir(), "open-code"),
+				new File(FileUtils.getWinterwellDir(), "code")
+				}) 
+		{
+			File fp = new File(workspaceDir, p);
+			if (fp.exists()) {
+				return fp;
+			}			
+		}		
+		Log.w(LOGTAG, "Could not locate project "+p);
+		return null;
+	}
+	
+	static final String LOGTAG = "EclipseClasspath";
 
 	private String getProjectName() {
 		File dotProject = new File(file.getParentFile(),".project");
