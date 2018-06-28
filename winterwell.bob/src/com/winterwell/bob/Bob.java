@@ -3,6 +3,7 @@ package com.winterwell.bob;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -65,7 +66,7 @@ public class Bob {
 
 	private static Bob dflt;
 
-	private static Map<BuildTask, Time> time4task = new HashMap<>();
+	private static Map<Runnable, Time> time4task = new HashMap<>();
 
 	private static volatile Time runStart;
 
@@ -174,12 +175,19 @@ public class Bob {
 		bob.init();		
 		
 		if (args.length == 0 || "--help".equals(args[0])) {
-			System.err.println(StrUtils.LINEEND + "Bob the Builder"
-					+ StrUtils.LINEEND + "---------------"
-					+ StrUtils.LINEEND
-					+ "Usage: java -jar bob-all.jar [-cp CLASSPATH] [options] TargetBuildTasks..."
-					+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
-			System.exit(1);
+			
+			// find a file?
+			File buildFile = args.length==0? findBuildScript() : null;
+			if (buildFile != null) {
+				args = new String[] { buildFile.toString() };
+			} else {			
+				System.err.println(StrUtils.LINEEND + "Bob the Builder"
+						+ StrUtils.LINEEND + "---------------"
+						+ StrUtils.LINEEND
+						+ "Usage: java -jar bob-all.jar [-cp CLASSPATH] [options] [TargetBuildTasks...]"
+						+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
+				System.exit(1);
+			}
 		}
 		
 		// Build each target
@@ -197,6 +205,22 @@ public class Bob {
 				bob.maybeCarryOn(e);
 			}
 		}
+	}
+
+	private static File findBuildScript() {
+		File baseDir = FileUtils.getWorkingDirectory();
+		File bdir = new File(baseDir, "builder");
+		if ( ! bdir.isDirectory()) {
+			return null;
+		}
+		List<File> files = FileUtils.find(bdir, ".*Build.*\\.java");
+		if (files.isEmpty()) return null;
+		if (files.size()==1) {
+			Log.w(LOGTAG, "Auto-build: found file "+files.get(0));
+			return files.get(0);
+		}
+		Log.w(LOGTAG, "Auto-build: could not pick between files "+files);
+		return null;
 	}
 
 	private void maybeCarryOn(Throwable e) {
@@ -231,7 +255,7 @@ public class Bob {
 	}
 
 	public void build(Class clazz) throws Exception {
-		BuildTask script = (BuildTask) clazz.newInstance();
+		Runnable script = (Runnable) clazz.newInstance();
 		// Run it
 		script.run();
 		// Done

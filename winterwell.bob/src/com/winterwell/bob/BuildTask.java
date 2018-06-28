@@ -67,10 +67,11 @@ import jobs.BuildUtils;
  * me.
  * </p>
  * <p>To run from the command line: see {@link Bob} or bob.sh</p>
+ * java -cp ../winterwell.bob/bob-all.jar BobBuild
  * @author daniel
  * 
  */
-public abstract class BuildTask implements Closeable, IHasDesc {
+public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 
 	private Desc desc;
 
