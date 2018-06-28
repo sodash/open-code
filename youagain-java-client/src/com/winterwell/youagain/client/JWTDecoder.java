@@ -14,6 +14,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.log.Log;
 
@@ -65,14 +66,19 @@ public class JWTDecoder {
 		
 		assert ! jwt.endsWith("temp") : jwt;
 		JWTVerifier verifier = JWT.require(algorithm)
-				.withIssuer(issuer)
+//				.withIssuer(issuer) TODO
 				.build();
 		try {
 			DecodedJWT decoded = verifier.verify(jwt);
 			Log.d(LOGTAG, "verified "+jwt+" -> "+decoded);
+
+			// debugging
+			if ( ! Utils.equals(issuer, decoded.getIssuer())) {
+				Log.e(LOGTAG, "verify - issuer mismatch! expected: "+issuer+" got: "+decoded.getIssuer()+" from "+jwt+" "+ReflectionUtils.getSomeStack(12));
+			}
 		} catch(Exception ex) {
 			DecodedJWT djwt = JWT.decode(jwt);
-			throw new WrappedException("JWT verify failed for '"+jwt+"' w public key "+getPublicKey()+" payload: "+djwt.getPayload(), ex);
+			throw new WrappedException("JWT verify failed for '"+jwt+"' for issuer "+issuer+" public key "+getPublicKey()+" payload: "+djwt.getPayload(), ex);
 		}
 	}
 

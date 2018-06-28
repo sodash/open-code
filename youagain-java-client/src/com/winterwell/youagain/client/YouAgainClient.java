@@ -179,17 +179,24 @@ public final class YouAgainClient {
 	}
 
 
-	static JWTDecoder dec = new JWTDecoder(MASTERAPP);
+	JWTDecoder dec;
+	
+	/**
+	 * NB: the signing key is the youagain key, shared by all apps
+	 */
+	static PublicKey yaPubKey;
 	
 	public JWTDecoder getDecoder() throws Exception {
-		if (dec.getPublicKey()==null) {
+		if (dec!=null) return dec;		
+		dec = new JWTDecoder(app);
+		if (yaPubKey==null) {
 			String publickeyEndpoint = ENDPOINT.replace("youagain.json", "publickey");
 			// load from the server, so we could change keys
 			String skey = new FakeBrowser().getPage(publickeyEndpoint);
-			PublicKey pkey = JWTDecoder.keyFromString(skey);
-			dec.setPublicKey(pkey);
-			Log.d(LOGTAG, "GOT key "+pkey+" = "+dec.getPublicKey()+" from "+publickeyEndpoint);
+			yaPubKey = JWTDecoder.keyFromString(skey);
+			Log.d(LOGTAG, "GOT key "+yaPubKey+" from "+publickeyEndpoint);	
 		}
+		dec.setPublicKey(yaPubKey);
 		return dec;
 	}
 
