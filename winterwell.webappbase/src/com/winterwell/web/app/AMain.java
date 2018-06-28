@@ -48,9 +48,13 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 
 	public static AMain main;
 
+	/**
+	 * @deprecated This will guess the appName from the folder -- better to sepcify it. 
+	 */
 	public AMain() {
 		this(FileUtils.getWorkingDirectory().getName().toLowerCase());
 	}
+	
 	public AMain(String projectName) {
 		this.appName = projectName;
 	}
