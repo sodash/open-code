@@ -16,6 +16,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 import org.junit.runner.notification.RunListener.ThreadSafe;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -24,6 +25,8 @@ import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.containers.Properties;
+import com.winterwell.utils.io.ConfigFactory;
+import com.winterwell.utils.io.Option;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
@@ -54,7 +57,10 @@ public final class YouAgainClient {
 	}
 
 	
-	static final String ENDPOINT = 
+	/**
+	 * For testing, this can be set via config/youagainclient.properties endpoint=
+	 */
+	static String ENDPOINT = 
 				"https://youagain.good-loop.com/youagain.json";
 //				"http://localyouagain.good-loop.com/youagain.json";
 
@@ -70,14 +76,32 @@ public final class YouAgainClient {
 	final String app;
 
 	private boolean debug;
+	private static boolean initFlag;
 	
 	public YouAgainClient(String app) {
 		assert ! Utils.isBlank(app);
 		this.app = app;
-		
+		init();
 		setDebug(true); // FIXME
 	}	
 	
+	/**
+	 * Allows for config to override the endpoint used
+	 */
+	private void init() {
+		if (initFlag) return;		
+		initFlag = true;
+		try {			
+			ConfigFactory cf = ConfigFactory.get();
+			YouAgainClientConfig yac = cf.getConfig(YouAgainClientConfig.class);
+			if ( ! Utils.isBlank(yac.endpoint)) {
+				this.ENDPOINT = yac.endpoint;
+			}
+		} catch(Throwable ex) {
+			Log.e(LOGTAG, ex); // swallow
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "YouAgainClient [app=" + app + "]";
@@ -372,4 +396,10 @@ public final class YouAgainClient {
 		this.debug = b;
 	}
 
+}
+
+
+class YouAgainClientConfig {
+	@Option
+	String endpoint;
 }
