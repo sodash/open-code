@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.annotation.Generated;
 
+import com.winterwell.utils.Utils;
 import com.winterwell.web.data.XId;
 
 /**
@@ -20,6 +21,14 @@ public class AuthToken {
 	 * @return a JWT token
 	 */
 	public String getToken() {
+		if (token==null) {			
+			try {
+				// this shouldn't happen, but I guess its OK to make a fresh token
+				token = new JWTEncoder(app).encryptJWT(xid);
+			} catch (Exception e) {
+				throw Utils.runtime(e);
+			}
+		}
 		return token;
 	}
 	

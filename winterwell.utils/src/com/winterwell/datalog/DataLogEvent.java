@@ -96,7 +96,11 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"notes", StringBuilder.class, 
 			"score", Double.class,
 			"amount", Double.class,
-			"currency", String.class,
+			"price", Double.class,
+			/** Use a distinct param for donation amount, so theres no clashes when grouping events together */
+			"dntn", Double.class,
+			"currency", String.class, // deprecated
+			"curr", String.class,
 			"w", Integer.class, // width
 			"h", Integer.class, // height
 			"size", String.class, // size could be e.g. "300x250", "billboard", or a number. So lets just store it as a keyword.

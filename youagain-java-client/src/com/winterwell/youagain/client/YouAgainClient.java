@@ -59,11 +59,20 @@ public final class YouAgainClient {
 	
 	/**
 	 * For testing, this can be set via config/youagainclient.properties endpoint=
+	 * Or by calling {@link #setENDPOINT(String)}
 	 */
 	static String ENDPOINT = 
 				"https://youagain.good-loop.com/youagain.json";
 //				"http://localyouagain.good-loop.com/youagain.json";
 
+	/**
+	 * @deprecated for testing only
+	 * @param eNDPOINT
+	 */
+	public static void setENDPOINT(String eNDPOINT) {
+		ENDPOINT = eNDPOINT;
+	}
+	
 	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
 
 	private static final String LOGTAG = "youagain";
@@ -140,7 +149,9 @@ public final class YouAgainClient {
 			tokens = new ArrayList();
 		}
 		// add the name/password user first, if set
-		if (basicToken!=null) tokens.add(0, basicToken);
+		if (basicToken!=null) {
+			tokens.add(0, basicToken);
+		}
 		// stash them
 		state.put(AUTHS, tokens);
 		// set user?
