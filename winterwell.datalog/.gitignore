@@ -7,3 +7,6 @@ web/style/*.css
 local-config
 temp-iso
 */local-config
+pom.xml
+**/pom.xml
+pom.bob.xml

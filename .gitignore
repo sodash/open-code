@@ -17,3 +17,5 @@ lg.txt
 node_modules
 winterwell.datalog/web/build
 testFiles
+pom.bob.xml
+pom.xml
