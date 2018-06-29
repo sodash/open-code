@@ -199,11 +199,12 @@ public final class YouAgainClient {
 				token.xid = new XId(decd.getSubject(), false);
 				list.add(token);
 			} catch (Throwable e) {
-				Log.w(LOGTAG, e);
-				// pass back to the user but keep on trucking
-				if (state!=null) {
-					state.addMessage(new AjaxMsg(KNoteType.warning, "JWT token error", e.toString()));
-				}
+				Log.i(LOGTAG, e);
+				// issuer mismatch is fine - e.g. a SoGive + Good-Loop user 
+//				// pass back to the user but keep on trucking
+//				if (state!=null) {
+//					state.addMessage(new AjaxMsg(KNoteType.warning, "JWT token error", e.toString()));
+//				}
 			}
 		}
 		return list;		

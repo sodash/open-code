@@ -74,7 +74,7 @@ public class JWTDecoder {
 
 			// debugging
 			if ( ! Utils.equals(issuer, decoded.getIssuer())) {
-				Log.e(LOGTAG, "verify - issuer mismatch! expected: "+issuer+" got: "+decoded.getIssuer()+" from "+jwt+" "+ReflectionUtils.getSomeStack(12));
+				Log.d(LOGTAG, "verify - issuer mismatch! expected: "+issuer+" got: "+decoded.getIssuer()+" from "+jwt+" "+ReflectionUtils.getSomeStack(12));
 			}
 		} catch(Exception ex) {
 			throw new WrappedException("JWT verify failed for '"+jwt+"' for issuer "+issuer+" public key "+getPublicKey(), ex);
