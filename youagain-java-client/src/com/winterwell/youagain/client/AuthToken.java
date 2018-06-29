@@ -16,6 +16,36 @@ import com.winterwell.web.data.XId;
  */
 public class AuthToken {
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((app == null) ? 0 : app.hashCode());
+		result = prime * result + getXId().hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AuthToken other = (AuthToken) obj;
+		if (app == null) {
+			if (other.app != null)
+				return false;
+		} else if (!app.equals(other.app))
+			return false;
+		if (xid == null) {
+			if (other.xid != null)
+				return false;
+		} else if (!xid.equals(other.xid))
+			return false;
+		return true;
+	}
 	public String app;
 	
 	/**
