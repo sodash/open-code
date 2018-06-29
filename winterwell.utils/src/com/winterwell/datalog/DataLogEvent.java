@@ -111,6 +111,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			// browser info
 			"mbl", Boolean.class,
 			"ua", StringBuilder.class, // user agent
+			"browser", String.class,
+			"env", String.class, // environment -- possibly this should be StringBuilder for word handling?? but does bby then break??
 			"os", String.class,
 			// no-index (object)
 			"xtra", Null.class // FIXME this was causing bugs :(

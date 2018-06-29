@@ -2,10 +2,15 @@ package com.winterwell.datalog.server;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.FakeBrowser;
+
+import ua_parser.Client;
+import ua_parser.Parser;
 
 public class LgServletTest {
 
@@ -25,4 +30,10 @@ public class LgServletTest {
 		
 	}
 
+	@Test
+	public void testParser() throws IOException {
+		Parser p = LgServlet.uaParser();
+		Client c = p.parse("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36");
+		assert "Chrome 67".equals(c.userAgent.family+" "+c.userAgent.major);
+	}
 }
