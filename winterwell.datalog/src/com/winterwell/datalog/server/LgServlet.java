@@ -31,6 +31,9 @@ import com.winterwell.web.fields.DoubleField;
 import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
 
+import ua_parser.Client;
+import ua_parser.Parser;
+
 
 /**
  * Fast Ajax logging of stats.
@@ -181,6 +184,9 @@ public class LgServlet {
 //		}
 		return event;
 	}
+		
+	static ua_parser.Parser parser;
+	
 
 	private static Map doLog2_addStdTrackerParams(WebRequest state, Map params, String trckId) {
 		// TODO allow the caller to explicitly set some of these if they want to
@@ -192,11 +198,21 @@ public class LgServlet {
 		// Browser info
 		String ua = state.getUserAgent();			
 		params.putIfAbsent("ua", ua);
+			
 		BrowserType bt = new BrowserType(ua);
 		boolean mobile = bt.isMobile();		
-		params.putIfAbsent("mbl", mobile);
+		params.putIfAbsent("mbl", mobile);		
 		// browser
-		params.putIfAbsent("browser", bt.getBrowserMake()+"_"+bt.getVersion());
+		String browser;
+		try {
+			ua_parser.Parser _parser = uaParser();
+			Client uac = _parser.parse(ua);
+			browser = uac.userAgent.family+"_"+uac.userAgent.major;
+		} catch(Throwable ex) {
+			Log.d("lg", ex);
+			browser = bt.getBrowserMake()+"_"+bt.getVersion();
+		}
+		params.putIfAbsent("browser", browser);
 		// OS
 		String os = bt.getOS();
 		params.putIfAbsent("os", os);
@@ -217,6 +233,14 @@ public class LgServlet {
 	}
 
 	
+	static Parser uaParser() throws IOException {
+		if (parser==null) {
+			parser = new Parser();
+		}
+		return parser;
+	}
+
+
 	/**
 	 * HACK screen off our IPs and test sites
 	 * 
