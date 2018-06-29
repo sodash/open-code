@@ -302,7 +302,8 @@ public class LgServlet {
 		
 		// error or warning?
 		if (tag.contains("error")) {
-			Log.e(tag, msgPlus); // NB: In Good-Loop or SoGive, this should then get picked up by logstash monitoring
+			// Reduced to "warning" so we don't spam LogStash alert emails.
+			Log.w(tag, msgPlus); 
 		} else if (tag.contains("warning")) {
 			Log.w(tag, msgPlus);
 		} else {
