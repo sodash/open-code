@@ -75,7 +75,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"variant", String.class,
 			"campaign", String.class,
 			"cid", String.class, // SoGive charity-ID. This is preferred to 'charity' as a property-name			
-			"via", String.class, // exchange / DSP / agency used to make the connection. ??Can be a list.??is that supported
+			"via", String.class, // exchange / DSP / agency used to make the connection. ??Can be a list.??is that supported			
+			"invalid", String.class, // keyword for "bot" | "test" (ie us or the publisher). Blank for fine!
 			// text properties (support tokenisation)
 			"place", StringBuilder.class,
 			"locn", StringBuilder.class,
