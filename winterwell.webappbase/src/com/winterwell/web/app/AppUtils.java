@@ -741,7 +741,7 @@ public class AppUtils {
 	 * @param status
 	 * @return
 	 */
-	public static ESPath getPath(String dataspaceIgnored, Class type, String id, Object status) {		 
+	public static ESPath getPath(CharSequence dataspaceIgnored, Class type, String id, Object status) {		 
 		String stype = type==null? null : type.getSimpleName().toLowerCase();
 		// HACK NGO -> charity
 		if ("ngo".equals(stype)) stype = "charity";

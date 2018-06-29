@@ -6,7 +6,14 @@ import com.winterwell.utils.AString;
 import com.winterwell.utils.web.IHasJson;
 
 /**
- * Just a String wrapper for some type safety
+ * A dataspace is a set of data sharing broad access rules
+ *  -- e.g. data from an app or a specific CRM.
+ *  
+ * In DataLog, it is typically *your* app.
+ * 
+ * In Profiler, it is typically the website/app from which the data comes.
+ * 
+ * Just a String wrapper for some type safety.
  * @author daniel
  *
  */

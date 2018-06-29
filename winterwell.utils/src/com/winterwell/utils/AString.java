@@ -15,20 +15,20 @@ import com.winterwell.utils.web.IHasJson;
 public class AString implements IHasJson, Serializable, CharSequence  {
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return name.hashCode();
 	}
 
 	/**
 	 * 
-	 * @param name String or an AString wrapper
+	 * @param name String or an AString wrapper. Cannot be null
 	 */
 	public AString(CharSequence name) {
 		this.name = name.toString();		
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -43,27 +43,27 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 	public final String name;
 
 	@Override
-	public String toJson2() throws UnsupportedOperationException {
+	public final String toJson2() throws UnsupportedOperationException {
 		return name;
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		return name;
 	}
 
 	@Override
-	public int length() {
+	public final int length() {
 		return name.length();
 	}
 
 	@Override
-	public char charAt(int index) {
+	public final char charAt(int index) {
 		return name.charAt(index);
 	}
 
 	@Override
-	public CharSequence subSequence(int start, int end) {
+	public final CharSequence subSequence(int start, int end) {
 		return name.subSequence(start, end);
 	}
 	
