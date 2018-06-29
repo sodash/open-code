@@ -21,6 +21,8 @@ import com.winterwell.web.WebEx;
  */
 public class HttpServletWrapper extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
+	private static boolean debugAll;
 	
 	Supplier<IServlet> factory;
 
@@ -60,7 +62,7 @@ public class HttpServletWrapper extends HttpServlet {
 			WebRequest state = new WebRequest(req, resp);			
 			IServlet servlet = getServlet(state);
 			// log everything?
-			if (debug) {
+			if (debug || debugAll) {
 				Log.d(servlet.getClass().getSimpleName(), state);
 			}
 			servlet.process(state);
@@ -98,6 +100,10 @@ public class HttpServletWrapper extends HttpServlet {
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doGet(req, resp);
+	}
+
+	public static void setDebugAll(boolean b) {
+		debugAll = b;
 	}
 	
 //	@Override

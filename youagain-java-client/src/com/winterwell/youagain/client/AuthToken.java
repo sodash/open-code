@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.annotation.Generated;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.winterwell.utils.Utils;
 import com.winterwell.web.data.XId;
 
@@ -51,6 +52,16 @@ public class AuthToken {
 	@Override
 	public String toString() {
 		return "AuthToken["+xid+"]";
+	}
+
+	public XId getXId() {
+		if (xid==null) {
+			// get from token
+			DecodedJWT decd = new JWTDecoder(app).decryptJWT(getToken());
+			String subj = decd.getSubject();
+			xid = new XId(subj, false);
+		}
+		return xid;
 	}
 	
 }
