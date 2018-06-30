@@ -653,6 +653,7 @@ public class WebUtils2 extends WebUtils {
 	 * Extract a plausible name from an email address.
 	 * 
 	 * @return e.g. "John Smith" given "john.smith@whatever.com"
+	 * Never null. Does not do much clean up.
 	 * @see #guessNameFromEmail(InternetAddress) which is a bit better
 	 */
 	public static String guessNameFromEmail(String email) {
