@@ -1272,7 +1272,7 @@ public class WebUtils2 extends WebUtils {
 		Object already = state.get(new Key("CORS_set"));
 		state.put(new Key("CORS_set"), true);
 		if (Utils.yes(already)) {
-			Log.e("web", "CORS set twice: "+ReflectionUtils.getSomeStack(8)+" "+state);
+			Log.e("web", "potential header x2 bug - CORS set twice: "+ReflectionUtils.getSomeStack(8)+" "+state);
 		}
 		
 		// Note: wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header 
