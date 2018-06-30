@@ -9,7 +9,7 @@ public class PublishDataServer extends PublishProjectTask {
 			
 	public PublishDataServer() throws Exception {
 		super("lg", "/home/winterwell/lg.good-loop.com/");
-		typeOfPublish = KPubType.test;
+		typeOfPublish = KPubType.production;
 //		codePart = "backend";
 //		jarFile = null;
 	}
