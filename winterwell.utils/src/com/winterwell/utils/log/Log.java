@@ -134,6 +134,7 @@ public class Log {
 
 	/**
 	 * Allows a config file change to downgrade severe reports (to stop unwanted alerts)
+	 * @see LogConfig#downgrade
 	 */
 	private static IFilter<String> downgradeFilter;
 	

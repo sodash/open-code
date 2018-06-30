@@ -21,6 +21,6 @@ class LogConfig {
 	@Option(description="reports to filter out.")
 	List<String> exclude;
 	
-	@Option(description="reports to downgrade from error or warning to just info.")
+	@Option(description="reports to downgrade from error or warning to just info. Uses case-sensitive keyword matching.")
 	List<String> downgrade;
 }
