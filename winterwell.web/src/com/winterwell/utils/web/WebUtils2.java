@@ -36,6 +36,7 @@ import com.winterwell.utils.IProperties;
 import com.winterwell.utils.IReplace;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Mutable;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
@@ -1265,6 +1266,13 @@ public class WebUtils2 extends WebUtils {
 			String caller = state.get("caller");
 //			Printer.out(ref);
 //			Printer.out(caller);
+		}
+		
+		// DEBUG - how can we get true,true?? June 2018
+		Object already = state.get(new Key("CORS_set"));
+		state.put(new Key("CORS_set"), true);
+		if (Utils.yes(already)) {
+			Log.e("web", "CORS set twice: "+ReflectionUtils.getSomeStack(8)+" "+state);
 		}
 		
 		// Note: wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header 
