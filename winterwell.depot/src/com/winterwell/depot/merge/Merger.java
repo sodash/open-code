@@ -98,7 +98,11 @@ public class Merger implements IMerger<Object> {
 		Class type = after.getClass();
 		IMerger m = mergers.get(type);
 		if (m==null) {
-			throw new IllegalStateException("No merger for "+type);
+			m = new UseLatestMerger();
+			Log.w(TAG, new IllegalStateException("No merger for "+type
+					+" (swallowed error, and using UseLatestMerger)"
+					+" after: "+after
+					));
 		}
 		return m.diff(before, after);
 	}
