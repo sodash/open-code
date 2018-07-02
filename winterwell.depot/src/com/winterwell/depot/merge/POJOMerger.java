@@ -8,6 +8,10 @@ import com.winterwell.utils.containers.Containers;
 
 /**
  * Merge any object!
+ * 
+ * Currently, this is NOT auto selected -- you must request it via
+ * merger.addMerge(class, new POJOMerger(merger));
+ * 
  * @author daniel
  *
  */

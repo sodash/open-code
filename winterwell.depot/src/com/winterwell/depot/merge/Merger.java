@@ -57,6 +57,9 @@ public class Merger implements IMerger<Object> {
 		if (mergers.get(Array.class)==null) {
 			addMerge(Array.class, new ArrayMerger(this));
 		}
+		if (mergers.get(Boolean.class)==null) {
+			addMerge(Boolean.class, new SimpleMerger());
+		}
 		if (false && mergers.get(String.class)==null) {
 			addMerge(String.class, new StringMerger());
 		}
@@ -67,8 +70,11 @@ public class Merger implements IMerger<Object> {
 	}
 
 	public void addMerge(Class handles, IMerger merger) {
-		mergers.put(handles, merger);
+		IMerger was = mergers.put(handles, merger);
 		mergers.put(merger.getClass(), merger);
+		if (was !=null && was != merger) {
+			Log.d(TAG, "Replaced merger for "+handles+" "+was+" -> "+merger);
+		}
 	}
 
 	public ClassMap<IMerger> getMergers() {
@@ -115,9 +121,11 @@ public class Merger implements IMerger<Object> {
 			return v;
 		}
 		Class type = a.getClass();
-		IMerger m = mergers.get(type);
+		IMerger m = mergers.get(diff.mergerClass);		
 		if (m==null) {
-			throw new IllegalStateException("No merger for "+type);
+			m = mergers.get(type);
+			Log.e(TAG, "No merger for "+diff);
+			if (m==null) throw new IllegalStateException("No merger for "+type+" in "+diff);
 		}
 		return m.applyDiff(a, diff);
 	}

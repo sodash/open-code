@@ -2,6 +2,8 @@ package com.winterwell.depot.merge;
 
 import org.junit.Test;
 
+import com.winterwell.utils.Mutable;
+import com.winterwell.utils.Mutable.Bool;
 import com.winterwell.utils.Printer;
 import com.winterwell.web.WebPage;
 
@@ -21,6 +23,38 @@ public class POJOMergerTest {
 		Printer.out(diff);
 	}
 
+	@Test
+	public void testBooleanDiff() {
+		Merger merger = new Merger();
+		merger.addMerge(Mutable.Bool.class, new POJOMerger(new Merger()));
+		{	// null -> true
+			Mutable.Bool before = new Mutable.Bool();
+			Mutable.Bool after = new Mutable.Bool(true);
+			
+			
+			Diff diff = merger.diff(before, after);
+			Printer.out(diff);
+			
+
+			Mutable.Bool before2 = new Mutable.Bool();
+			Mutable.Bool after2 = (Bool) merger.applyDiff(before2, diff);
+			assert after2.equals(after) : after2+" != "+after;
+		}
+		
+		{	// true -> false
+			Mutable.Bool before = new Mutable.Bool(true);
+			Mutable.Bool after = new Mutable.Bool(false);
+			
+			Diff diff = merger.diff(before, after);
+			Printer.out(diff);
+			
+			Mutable.Bool before2 = new Mutable.Bool(false);
+			Mutable.Bool after2 = (Bool) merger.applyDiff(before2, diff);
+			assert after2.equals(after);
+		}
+	}
+
+	
 	@Test
 	public void testDoMergeNumPOJO() {
 		// what shall we test on? how about a WebPage?
@@ -77,7 +111,10 @@ public class POJOMergerTest {
 	
 	@Test
 	public void testDoMergeNumPOJO_NewSubObject() {
-		// what shall we test on? how about a WebPage?
+		Merger merger = new Merger();
+		POJOMerger pmerger = new POJOMerger(merger);
+		merger.addMerge(NumThing.class, pmerger);
+
 		NumThing before = new NumThing();
 		
 		NumThing after = new NumThing();
@@ -89,8 +126,7 @@ public class POJOMergerTest {
 		latest.sub.x = 1;
 		latest.sub.y = 1;
 		
-		POJOMerger merger = new POJOMerger(new Merger());
-		NumThing m = (NumThing) merger.doMerge(before, after, latest);
+		NumThing m = (NumThing) pmerger.doMerge(before, after, latest);
 		
 		assert m != null;
 		assert m.sub != null;

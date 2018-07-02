@@ -5,7 +5,9 @@ import java.util.Collection;
 import com.winterwell.utils.Utils;
 
 /**
- * The Latest value wins if set. i.e. latest + diff = latest, except null + diff = diff. 
+ * The Latest value wins if set. i.e. latest + diff = latest, except null + diff = diff.
+ * 
+ *  @see SimpleMerger
  * @author daniel
  *
  */
