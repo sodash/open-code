@@ -11,7 +11,9 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
+import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.SField;
+import com.winterwell.youagain.client.AuthToken;
 
 /**
  * See {@link Tripwire} E.g. use: <img src='http://myworkspace.soda.sh/trk?via=areseller'>
@@ -22,8 +24,13 @@ import com.winterwell.web.fields.SField;
  *
  */
 public class TrackingPixelServlet implements IServlet {
+	public static final String trkid = "trkid";
 	private static final long serialVersionUID = 1L;
-	static final String DATALOG_EVENT_TYPE = "pxl";	
+	static final String DATALOG_EVENT_TYPE = "pxl";
+	/**
+	 * GL "tracking" as an app for You-Again
+	 */
+	public static final String APP = "trk";	
 	
 
 
@@ -35,7 +42,7 @@ public class TrackingPixelServlet implements IServlet {
 	 */
 	public static String getCreateCookieTrackerId(WebRequest state) {
 		if (state==null) return null;
-		String uid = state.getCookie("trkid");	
+		String uid = state.getCookie(trkid);
 		if (uid!=null) return uid;
 		// Do not track?
 		boolean dnt = state.isDoNotTrack();
@@ -50,7 +57,7 @@ public class TrackingPixelServlet implements IServlet {
 		}
 		uid = Utils.getRandomString(20)+"@trk";
 		DataLogConfig dls = Dep.get(DataLogConfig.class);
-		state.setCookie("trkid", uid, TUnit.YEAR.dt, dls.COOKIE_DOMAIN);
+		state.setCookie(trkid, uid, TUnit.YEAR.dt, dls.COOKIE_DOMAIN);
 		return uid;
 	}
 	
@@ -73,7 +80,7 @@ public class TrackingPixelServlet implements IServlet {
 		// Default to dataspace "trk" but allow override
 		String dataspace = state.get(LgServlet.DATASPACE);
 		if (dataspace == null) {
-			dataspace = "trk";
+			dataspace = APP;
 		}
 		String gby = state.get(LgServlet.GBY);
 		// Count it
@@ -102,6 +109,20 @@ public class TrackingPixelServlet implements IServlet {
 //				Stat.count(1, statTag(grp, parent));
 //			}
 //		}
+	}
+
+
+	/**
+	 * 
+	 * @param state
+	 * @return tracking-ID as an AuthToken or null
+	 */
+	public static AuthToken getAuthToken(WebRequest state) {
+		String trkId = state.getCookie(TrackingPixelServlet.trkid);
+		if (trkId == null) return null;
+		String token = null;
+		AuthToken ta = new AuthToken(token).setApp(APP).setXId(new XId(trkId, false));
+		return ta;
 	}
 
 

@@ -46,7 +46,8 @@ public class AuthToken {
 			return false;
 		return true;
 	}
-	public String app;
+	
+	private String app;
 	
 	/**
 	 * @return a JWT token
@@ -72,6 +73,8 @@ public class AuthToken {
 	}
 	/**
 	 * A token which can be verified with the YouAgain server.
+	 * 
+	 * Can be null for tracking-tokens
 	 */
 	String token;
 	/**
@@ -92,6 +95,16 @@ public class AuthToken {
 			xid = new XId(subj, false);
 		}
 		return xid;
+	}
+
+	public AuthToken setApp(String app) {
+		this.app = app;
+		return this;
+	}
+
+	public AuthToken setXId(XId xid) {
+		this.xid = xid;
+		return this;
 	}
 	
 }
