@@ -10,8 +10,10 @@ import java.util.regex.Pattern;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.SimpleJson;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.LoginDetails;
 
 /**
@@ -185,6 +187,12 @@ public final class XId implements Serializable, IHasJson {
 	public XId(String id, boolean canonicaliseName) {
 		assert ! canonicaliseName;
 		int i = id.lastIndexOf('@');
+		// handle unescaped web inputs -- with some log noise 'cos we don't want this
+		if (i==-1 && id.contains("%40")) {
+			Log.e("XId", "(handling smoothly) Unescaped url id: "+id);
+			id = WebUtils2.urlDecode(id);
+			i = id.lastIndexOf('@');
+		}
 		assert i>0 : id;
 		this.service = id.substring(i+1);
 		this.name = id.substring(0, i);
