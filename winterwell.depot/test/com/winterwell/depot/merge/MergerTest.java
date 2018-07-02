@@ -12,6 +12,10 @@ public class MergerTest {
 	
 	@Test
 	public void testDoMergePOJO() {
+		Merger merger = new Merger();
+		POJOMerger pmerger = new POJOMerger(merger);
+		merger.addMerge(WebPage.class, pmerger);
+		
 		// what shall we test on? how about a WebPage?
 		WebPage before = new WebPage();
 		
@@ -22,7 +26,6 @@ public class MergerTest {
 		WebPage latest = new WebPage();
 		latest.addStylesheet("mystyle.css");
 		
-		Merger merger = new Merger();
 		WebPage m = (WebPage) merger.doMerge(before, after, latest);
 
 		assert m != null;

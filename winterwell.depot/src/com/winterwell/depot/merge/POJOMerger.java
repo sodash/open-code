@@ -27,7 +27,7 @@ public class POJOMerger extends AMerger<Object> implements IMerger<Object> {
 
 	@Override
 	public Diff diff(Object before, Object after) {
-		if (before==null) before = new ArrayMap();
+		if (before==null) before = new Object();
 		if (before.equals(after)) return null;
 		// treat as map
 		Map<String, Object> bmap = Containers.objectAsMap(before);

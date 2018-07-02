@@ -104,9 +104,10 @@ public class Merger implements IMerger<Object> {
 		Class type = after.getClass();
 		IMerger m = mergers.get(type);
 		if (m==null) {
-			m = new UseLatestMerger();
+			m = new SimpleMerger();
+			addMerge(type, m);
 			Log.w(TAG, new IllegalStateException("No merger for "+type
-					+" (swallowed error, and using UseLatestMerger)"
+					+" (swallowed error, and using SimpleMerger)"
 					+" after: "+after
 					));
 		}
@@ -125,7 +126,9 @@ public class Merger implements IMerger<Object> {
 		if (m==null) {
 			m = mergers.get(type);
 			Log.e(TAG, "No merger for "+diff);
-			if (m==null) throw new IllegalStateException("No merger for "+type+" in "+diff);
+			if (m==null) {
+				throw new IllegalStateException("No merger for "+type+" in "+diff);
+			}
 		}
 		return m.applyDiff(a, diff);
 	}

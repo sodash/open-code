@@ -154,37 +154,41 @@ public class MapMerger<K,V> extends AMerger<Map<K,V>> implements IMerger<Map<K,V
 		for(Map.Entry me : diff.entrySet()) {
 			Object k = me.getKey();
 			Object v = me.getValue();
-			// special remove marker?
-			if (v instanceof String && REMOVEREGEX.matcher((String)v).matches()) {
-				String sv = (String) v;
-				if (sv.length()==REMOVE.length()) {
-					a.remove(k);
-					continue;
-				} else {
-					v = sv.substring(1);
-				}
-			} 
-			
-			// If v is a number, shall we use Containers.plus which is a bit more thread safe??
-			// But no: if you need thread safety, you must not do it half-heartedly.
-
-			Object incumbent = a.get(k);
-			// recurse on others?
-			if (v instanceof Diff) {				
-				Object i2 = applySubDiff(incumbent, (Diff)v);
-				a.put(k, i2);
-				continue;
-			}			
-			if (incumbent == null) {
-				a.put(k, v);
-				continue;
-			}
-			// Case: a new key-value was added to both branches of the artifact. 
-			// merge v and incumbent
-			Object mergedIncumbent = recursiveMerger.doMerge(null, v, incumbent);
-			a.put(k, mergedIncumbent);			
+			applyDiff2_kv(a, k, v);
 		}
 		return a;
+	}
+
+
+	private void applyDiff2_kv(Map a, Object k, Object v) {
+		// special remove marker?
+		if (v instanceof String && REMOVEREGEX.matcher((String)v).matches()) {
+			String sv = (String) v;
+			if (sv.length()==REMOVE.length()) {
+				a.remove(k);
+				return;
+			}
+			v = sv.substring(1); // Huh??			
+		}
+		
+		// If v is a number, shall we use Containers.plus which is a bit more thread safe??
+		// But no: if you need thread safety, you must not do it half-heartedly.
+
+		Object incumbent = a.get(k);
+		// recurse on others?
+		if (v instanceof Diff) {				
+			Object i2 = applySubDiff(incumbent, (Diff)v);
+			a.put(k, i2);
+			return;
+		}			
+		if (incumbent == null) {
+			a.put(k, v);
+			return;
+		}
+		// Case: a new key-value was added to both branches of the artifact. 
+		// merge v and incumbent
+		Object mergedIncumbent = recursiveMerger.doMerge(null, v, incumbent);
+		a.put(k, mergedIncumbent);			
 	}
 
 

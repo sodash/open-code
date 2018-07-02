@@ -78,7 +78,10 @@ public class POJOMergerTest {
 	
 	@Test
 	public void testDoMergeNumPOJO2_Recursive() {
-		// what shall we test on? how about a WebPage?
+		Merger merger = new Merger();
+		POJOMerger pmerger = new POJOMerger(merger);
+		merger.addMerge(NumThing.class, pmerger);
+
 		NumThing before = new NumThing();
 		before.x = 1;
 		before.y = 1;
@@ -97,7 +100,6 @@ public class POJOMergerTest {
 		latest.sub.x = 1;
 		latest.sub.y = 1;
 		
-		POJOMerger merger = new POJOMerger(new Merger());
 		NumThing m = (NumThing) merger.doMerge(before, after, latest);
 		
 		assert m != null;
@@ -126,6 +128,9 @@ public class POJOMergerTest {
 		latest.sub.x = 1;
 		latest.sub.y = 1;
 		
+		Diff diff = pmerger.diff(before, after);
+		System.out.println(diff);
+		
 		NumThing m = (NumThing) pmerger.doMerge(before, after, latest);
 		
 		assert m != null;
@@ -134,7 +139,32 @@ public class POJOMergerTest {
 		assert m.sub.x == 9 : m.sub;
 	}
 
-	
+	@Test
+	public void testDiffNumThing() {
+		Merger merger = new Merger();
+		POJOMerger pmerger = new POJOMerger(merger);
+		merger.addMerge(NumThing.class, pmerger);
+		
+		NumThing a = new NumThing();
+		a.x = 8;
+		
+		NumThing b = new NumThing();
+		b.x = 1;
+		b.y = 1;
+		
+		Diff diff = pmerger.diff(a, b);
+		System.out.println(diff);
+		
+		Diff diffFromNull = pmerger.diff(null, a);
+		System.out.println(diffFromNull);
+		
+		NumThing m = (NumThing) pmerger.doMerge(null, a, b);
+		
+		assert m != null;
+		assert m.y == 1 : m;
+		assert m.x == 9 : m;
+	}
+
 
 	@Test
 	public void testDiffNumPOJO_NewSubObject() {

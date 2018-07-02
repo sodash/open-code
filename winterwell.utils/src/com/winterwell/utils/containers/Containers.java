@@ -2204,6 +2204,11 @@ final class ObjectMap extends AbstractMap2<String, Object> {
 			throw Utils.runtime(e);
 		}
 	}
+	
+	@Override
+	public Object remove(Object key) {
+		return put((String) key, null);
+	}
 
 	@Override
 	public Set<String> keySet() throws UnsupportedOperationException {
