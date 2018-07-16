@@ -45,6 +45,7 @@ public class EclipseClasspath {
 	 * will do fine, thank you.
 	 */
 	public EclipseClasspath(File file) {
+		assert file != null;
 		if (file.isDirectory()) file = new File(file, ".classpath");
 		this.file = file;
 		this.projectDir = file.getParentFile();
@@ -208,7 +209,7 @@ public class EclipseClasspath {
 	}
 
 	/**
-	 * @return all the jar files needed?
+	 * @return all the jar files needed? Never null.
 	 * This does NOT include jars from Eclipse user-libraries :(
 	 */
 	public Set<File> getCollectedLibs() {

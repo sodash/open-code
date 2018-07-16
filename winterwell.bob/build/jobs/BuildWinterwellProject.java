@@ -118,11 +118,11 @@ public class BuildWinterwellProject extends BuildTask {
 	}
 	
 	public BuildWinterwellProject(File projectDir, String projectName) {
-		assert projectDir != null;
+		assert projectDir != null : projectName;
 		this.projectDir = projectDir;
 		assert projectDir.isDirectory() : projectDir+" "+this;
 		if (projectName==null) projectName = projectDir.getName();
-		this.projectName = projectName;		
+		this.projectName = projectName;
 	}
 
 	public BuildWinterwellProject(File projectDir) {
@@ -204,14 +204,17 @@ public class BuildWinterwellProject extends BuildTask {
 		return new File(projectDir, "src");
 	}
 
-	protected void doTask2_compile(File srcDir, File binDir) {
+	protected void doTask2_compile(File srcDir, File binDir) {		
 		// FIXME Compile seeing errors in Windows re XStream dependency!
 		if (compile) {
+			assert projectDir != null : this;
 			CompileTask compile = new CompileTask(srcDir, binDir);
 			// classpath
-			Set<File> libs = new EclipseClasspath(projectDir).getCollectedLibs();
+			EclipseClasspath ec = new EclipseClasspath(projectDir);
+			Set<File> libs = ec.getCollectedLibs();
 			compile.setClasspath(libs);			
 			compile.run();
+			compile.close();
 		}
 		CopyTask nonJava = new CopyTask(srcDir, binDir);
 		nonJava.setNegativeFilter(".*\\.java");
