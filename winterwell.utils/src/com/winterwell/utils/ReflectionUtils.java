@@ -814,7 +814,10 @@ public class ReflectionUtils {
 			if (Utils.isEmpty(classPath)) {
 			    urls = new URL[]{url};				
 			} else {
-				ArrayList<URL> listUrls = Containers.apply(classPath, f -> f.toURL());
+				ArrayList<URL> listUrls = new ArrayList();
+				for(File f : classPath) {
+					listUrls.add(f.toURL());
+				}
 				listUrls.add(url);
 				urls = listUrls.toArray(new URL[0]);
 			}

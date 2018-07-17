@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 import org.junit.Test;
 
+import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasDesc;
 import com.winterwell.utils.Dep;
@@ -184,6 +185,8 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 *         some dependencies. null is also acceptable.
 	 */
 	public Collection<? extends BuildTask> getDependencies() {
+		// ?? What about build tasks from other projects - which aren't on the classpath??
+		// Should we have a WWDepTask, a bit like MavenDependencyTask, which downloads a jar??
 		return Collections.emptyList();
 	}
 
