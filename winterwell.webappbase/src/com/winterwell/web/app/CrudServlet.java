@@ -93,7 +93,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		doSecurityCheck(state);
 		
 		// list?
-		if (state.getSlug().contains("/list")) {
+		String slug = state.getSlug();
+		if (slug.endsWith("/_list") || slug.equals("_list")) {
 			doList(state);
 			return;
 		}
@@ -285,7 +286,16 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * This might be newly minted for a new thing
 	 */
 	private String _id;
-	protected String dataspace = null;
+	
+	/**
+	 * Optional support for dataspace based data access.
+	 */
+	protected CharSequence dataspace = null;
+	
+	public CrudServlet setDataspace(CharSequence dataspace) {
+		this.dataspace = dataspace;
+		return this;
+	}
 	
 	/**
 	 * suggested: date-desc
@@ -314,7 +324,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected String getId(WebRequest state) {
 		if (_id!=null) return _id;
-		_id = state.getSlugBits(1);
+		_id = state.getSlugBits(1); // why 1 not 0??
 		if (ACTION_NEW.equals(_id)) {
 			String nicestart = StrUtils.toCanonical(
 					Utils.or(state.getUserId(), state.get("name"), type.getSimpleName()).toString()
@@ -340,8 +350,8 @@ public abstract class CrudServlet<T> implements IServlet {
 					);
 		} else {
 			s.setIndices(
-					esRouter.getPath(type, null, KStatus.PUBLISHED).index(),
-					esRouter.getPath(type, null, KStatus.DRAFT).index()
+					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
+					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index()
 				);
 		}
 		

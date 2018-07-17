@@ -3,6 +3,7 @@ package com.winterwell.datalog;
 import java.io.Serializable;
 
 import com.winterwell.utils.AString;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.web.IHasJson;
 
 /**
@@ -27,6 +28,9 @@ public final class Dataspace extends AString {
 	public Dataspace(CharSequence name) {
 		super(name);
 		assert ! this.name.startsWith("datalog.") : name;
+		assert ! this.name.equals("_list") : name;
+		// keep it safe
+		assert StrUtils.isWordlike(this.name) : name;
 	}
 	
 }
