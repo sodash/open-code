@@ -294,7 +294,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 	public static final SField SORT = new SField("sort");
 
-	protected JThing<T> doPublish(WebRequest state) {
+	protected final JThing<T> doPublish(WebRequest state) {
 		return doPublish(state, false, false);
 	}
 	protected JThing<T> doPublish(WebRequest state, boolean forceRefresh, boolean deleteDraft) {		
