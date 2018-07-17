@@ -550,7 +550,8 @@ public class ConfigBuilder {
 			}
 			// Get tokens
 			Option arg = field.getAnnotation(Option.class);
-			for (String t : tokens(field, arg).split(",")) {
+			String[] ts = tokens(field, arg).split(",\\w*");
+			for (String t : ts) {
 				if ( ! t.startsWith("-"))
 					throw new IllegalArgumentException(
 							"Invalid token (all tokens must begin with a -): "

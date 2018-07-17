@@ -10,6 +10,6 @@ package com.winterwell.utils;
  */
 public interface IFn<In, Out> {
 
-	Out apply(In value);
+	Out apply(In value); // ??probably a good idea throws Exception;
 
 }

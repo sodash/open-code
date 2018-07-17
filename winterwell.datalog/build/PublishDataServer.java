@@ -1,8 +1,8 @@
 
 
 
-import com.winterwell.web.app.KPubType;
-import com.winterwell.web.app.PublishProjectTask;
+import com.winterwell.web.app.build.KPubType;
+import com.winterwell.web.app.build.PublishProjectTask;
 
 
 public class PublishDataServer extends PublishProjectTask {

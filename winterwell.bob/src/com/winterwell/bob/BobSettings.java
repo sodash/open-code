@@ -1,8 +1,11 @@
 package com.winterwell.bob;
 
 import java.io.File;
+import java.util.List;
 
 import com.winterwell.utils.Key;
+import com.winterwell.utils.Printer;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.Option;
 
 /**
@@ -14,9 +17,17 @@ import com.winterwell.utils.io.Option;
  */
 public class BobSettings {
 
+	@Override
+	public String toString() {
+		return "BobSettings"+Printer.toString(Containers.objectAsMap(this));
+	}
+
 	public static final Key<Boolean> VERBOSE = new Key<Boolean>("verbose");
 
-	@Option(tokens = "-ignore ", description = "Ignore all exceptions")
+	@Option(tokens="-cp,-classpath", description="Classpath used for dynamically compiling build scripts. NB: This is not the classpath used for compile tasks which are part of a build script run.")
+	public List<String> classpath;
+	
+	@Option(tokens = "-ignore", description = "Ignore all exceptions")
 	public boolean ignoreAllExceptions;
 
 	@Option(tokens = "-logdir", description = "Directory to write log files to")
@@ -37,4 +48,9 @@ public class BobSettings {
 
 	@Option(tokens = "-v,-verbose")
 	public boolean verbose;
+
+	public List<File> getClasspathFiles() {
+		if (classpath==null) return null;
+		return Containers.apply(classpath, File::new);
+	}
 }

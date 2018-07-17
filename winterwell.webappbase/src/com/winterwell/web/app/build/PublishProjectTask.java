@@ -1,4 +1,4 @@
-package com.winterwell.web.app;
+package com.winterwell.web.app.build;
 
 
 
@@ -31,6 +31,7 @@ import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
+import com.winterwell.web.app.BuildWWAppBase;
 import com.winterwell.web.email.SimpleMessage;
 import com.winterwell.youagain.client.BuildYouAgainJavaClient;
 

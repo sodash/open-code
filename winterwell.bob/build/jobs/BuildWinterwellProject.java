@@ -1,6 +1,7 @@
 package jobs;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Set;
 
 import com.winterwell.bob.BuildTask;
@@ -12,6 +13,7 @@ import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -31,7 +33,7 @@ public class BuildWinterwellProject extends BuildTask {
 	 */
 	public File getJar() {
 		if (jarFile==null) {
-			return new File(getOutputDir(), projectName+ ".jar");
+			jarFile = new File(getOutputDir(), projectName+ ".jar");
 		}
 		return jarFile;
 	}
@@ -168,6 +170,7 @@ public class BuildWinterwellProject extends BuildTask {
 			jar.setManifestProperty("branch", branch);
 		}
 		jar.run();
+		report.put("jar", getJar().getAbsolutePath());
 		
 		// source code?
 		if (incSrc) {
@@ -180,21 +183,26 @@ public class BuildWinterwellProject extends BuildTask {
 		// "unit-tests.html"));
 		// junit.run();
 		
-		// copy into code/lib
-		File lib = new File(FileUtils.getWinterwellDir(), "code/lib");
-		lib.mkdirs();
-		FileUtils.copy(getJar(), lib);
-		Log.d(LOGTAG, "Copied "+getJar().getName()+" to "+lib);
+//		// copy into code/lib
+//		File lib = new File(FileUtils.getWinterwellDir(), "code/lib");
+//		lib.mkdirs();
+//		File libjar = FileUtils.copy(getJar(), lib);
+//		Log.d(LOGTAG, "Copied "+getJar().getName()+" to "+lib);
+//		report.put("jar-copy", libjar);
 		
 		// attempt to upload (but don't block)
 		if (scpToWW) {
+			String remoteJar = "/home/winterwell/public-software/"+getJar().getName();
 			SCPTask scp = new SCPTask(getJar(), "winterwell@winterwell.com",				
-					"/home/winterwell/public-software/"+getJar().getName());
+					remoteJar);
 			// this is online at: https://www.winterwell.com/software/downloads
 			scp.setMkdirTask(false);
 			scp.runInThread();
+			report.put("scp to remote", "winterwell.com:"+remoteJar);
 		}
 	}
+	
+	
 
 	protected File getBinDir() {
 		return new File(projectDir, "bin");

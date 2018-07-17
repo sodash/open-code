@@ -277,7 +277,8 @@ public final class Containers  {
 	 * @param list Cannot be null
 	 * @param fn
 	 * 
-	 * @return [fn applied to each member of list]
+	 * @return [fn applied to each member of list] 
+	 * This is a fresh ArrayList, and can be modified afterwards.
 	 */
 	public static <I, O> ArrayList<O> apply(Iterable<? extends I> list, IFn<I, O> fn) {
 		ArrayList after = list instanceof Collection? new ArrayList(((Collection) list).size()) : new ArrayList();
@@ -1150,7 +1151,11 @@ public final class Containers  {
 		V v = map.get(key);
 		if (v!=null) return v;
 		// Set the default
-		v = factory.apply(key);
+		try {
+			v = factory.apply(key);
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		}
 		map.put(key, v);		
 		return v;
 	}
