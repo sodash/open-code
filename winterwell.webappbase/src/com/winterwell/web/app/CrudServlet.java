@@ -237,7 +237,11 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected ESPath getPath(WebRequest state) {
 		assert state != null;
-		ESPath path = esRouter.getPath(dataspace,type, getId(state), state.get(AppUtils.STATUS, KStatus.PUBLISHED));
+		String id = getId(state);
+		if ("list".equals(id)) {
+			throw new WebEx.E400("Bad input: 'list' was interpreted as an ID -- use /_list.json to retrieve a list.");
+		}
+		ESPath path = esRouter.getPath(dataspace,type, id, state.get(AppUtils.STATUS, KStatus.PUBLISHED));
 		return path;
 	}
 
