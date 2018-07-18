@@ -81,6 +81,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"place", StringBuilder.class,
 			"locn", StringBuilder.class,
 			"location", StringBuilder.class,
+			"msg", StringBuilder.class,
+			"message", StringBuilder.class,
+			// Can we do an aggregation on message??
+//			"m", String.class, // the keyword version of message (for doing exact-text repeat breakdowns, which are handy)
 			// a few XId properties
 			"id", String.class,
 			"xid", String.class,
@@ -269,7 +273,6 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	/**
 	 * This is for ElasticSearch!
 	 * For external use, use Gson or similar.
-	 * 
 	 * 
 	 * Because this has to handle big data, we economise and store either n or v, not both.
 	 * {k: string, n: ?number, v: ?string}
