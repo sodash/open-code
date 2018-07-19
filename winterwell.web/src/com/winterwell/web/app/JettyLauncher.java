@@ -234,8 +234,11 @@ public class JettyLauncher {
 	/**
 	 * Add a servlet. Should be called after setup() and before run().
 	 * 
-	 * @param path This should usually end with a * to catch the slug bit, e.g. "/myservlet*" will get "/myservlet/foo"
+	 * @param path This should usually end with a /* to catch the slug bit, e.g. "/myservlet/*" will get "/myservlet/foo"
 	 * but "/myservlet" would not!
+	 * Annoyingly there is no way to do a general with/without slug, with/without type path!
+	 * Use a master servlet if that's wanted.
+	 * 
 	 * @param servlet
 	 */
 	public void addServlet(String path, Class<? extends IServlet> servlet) {
