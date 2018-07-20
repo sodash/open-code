@@ -19,3 +19,7 @@ winterwell.datalog/web/build
 testFiles
 pom.bob.xml
 pom.xml
+winterwell.bob/config/version.properties
+version.properties
+temp-iso
+test-output
