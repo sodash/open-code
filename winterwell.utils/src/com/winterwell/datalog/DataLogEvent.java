@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import com.sun.org.apache.xerces.internal.impl.ExternalSubsetResolver;
 import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Mutable.Int;
 import com.winterwell.utils.Null;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
@@ -301,9 +302,24 @@ public final class DataLogEvent implements Serializable, IHasJson {
 					String vs = new SimpleJson().toJson(v);
 					v = vs;
 				}
+				// Defend against numbers in the wrong format causing e.g. 
+				// "mapper_parsing_exception","reason":"failed to parse [dt]"}], "number_format_exception","reason":"For input string: \"4.205515\"
+				if (proptype == Long.class || proptype == Integer.class) {
+					if (v instanceof Long || v instanceof Integer) {
+						// OK
+					} else {
+						double nv = MathUtils.toNum(v);
+						if (nv != Math.round(nv)) {
+							Log.w("DataLogEvent", "Dropping non-int number (bad format, possibly wrong units): "+pv.getKey()+" = "+v+" in "+this);
+							continue;
+						}
+					}
+				}
+				// store the common prop
 				map.put(pv.getKey(), v);
 				continue;
 			}
+			// not common - use key-value
 			ArrayMap<String,Object> prop;
 			if (v instanceof Number) {
 				prop = new ArrayMap(
