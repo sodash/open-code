@@ -90,7 +90,7 @@ public class JWTDecoder {
 
 
 	public JWTDecoder setPublicKey(PublicKey key) throws Exception {
-		Log.d("ya.init", "set decoder Public key: "+key+" via "+ReflectionUtils.getSomeStack(8));
+//		Log.d("ya.init", "set decoder Public key: "+key+" via "+ReflectionUtils.getSomeStack(8));
 		pubKey = key;
 	    return this;
 	}
