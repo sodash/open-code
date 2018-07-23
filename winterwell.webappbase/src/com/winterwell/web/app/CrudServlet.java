@@ -374,11 +374,12 @@ public abstract class CrudServlet<T> implements IServlet {
 				ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
 				qb = ESQueryBuilders.boolQuery().mustNot(setFilter);
 			}	
-			if ( ! Utils.isBlank(q)) {
+			if ( ! Utils.isBlank(q) && ! "ALL".equals(q)) {
 				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
 				qb = ESQueryBuilders.must(qb, qsq);
 			}
 		}
+		// NB: exq can be null for ALL
 		ESQueryBuilder exq = doList2_query(state);
 		qb = ESQueryBuilders.must(qb, exq);
 

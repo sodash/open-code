@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
@@ -84,7 +85,7 @@ public class HttpServletWrapper extends HttpServlet {
 		} else {
 			Log.w(wex.getClass().getSimpleName(), ex);
 		}
-		WebUtils2.sendError(wex.code, wex.getMessage(), resp);
+		WebUtils2.sendError(wex.code, wex.getMessage()+" \n\n"+ReflectionUtils.getSomeStack(8), resp);
 	}
 
 	@Override
