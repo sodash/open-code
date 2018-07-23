@@ -697,6 +697,7 @@ public class ESStorage implements IDataLogStorage {
 				search.addAggregation(byTag);
 				continue;
 			}
+			// e.g. {"count": "avg"}
 			String json = bd.substring(bd.indexOf("{"), bd.length());
 			Map<String,String> output = (Map) JSON.parse(json);
 			for(String k : output.keySet()) {
@@ -709,7 +710,7 @@ public class ESStorage implements IDataLogStorage {
 			search.addAggregation(byTag);						
 		} // ./breakdown
 		
-		// TODO add a total count as well
+		// add a total count as well
 		for(String k : allOutputs) {
 			com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
 			search.addAggregation(myCount);	
