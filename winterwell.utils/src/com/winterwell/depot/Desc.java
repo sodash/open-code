@@ -227,8 +227,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 * @param name
 	 *            Can be null (though name must be set before storing)
 	 * @param type
-	 *            Cannot be null. Sub-class You may wish to specify a
-	 *            super-class or
+	 *            Cannot be null. Artifacts will be grouped by this,
+	 *            so its best to specify a super-class / interface. 
 	 */
 	public Desc(String name, Class<? extends X> type) {
 		this.type = type;

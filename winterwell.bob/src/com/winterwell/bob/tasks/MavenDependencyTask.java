@@ -24,6 +24,9 @@ import com.winterwell.utils.time.TUnit;
  * OR setup via
  * pom.bob.xml
  * 
+ * Warning: This will not overwrite existing .jar files 
+ * ??does setForceUpdate(boolean) affect this??
+ * 
  * See https://stackoverflow.com/questions/1895492/how-can-i-download-a-specific-maven-artifact-in-one-command-line
  * @author daniel
  *
@@ -52,6 +55,12 @@ public class MavenDependencyTask extends BuildTask {
 		this.outDir = outDir;
 		return this;
 	}
+	
+	/**
+	 * Best practice is to call this, for robust composable build scripts. Defaulst to working-dir.
+	 * @param projectDir
+	 * @return
+	 */
 	public MavenDependencyTask setProjectDir(File projectDir) {
 		this.projectDir = projectDir;
 		return this;

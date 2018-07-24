@@ -160,6 +160,7 @@ public class Bob {
 
 	public static Time getLastRunDate(BuildTask buildTask) {
 		assert buildTask != null;
+		// relies on equals()
 		Time t = time4task.get(buildTask);
 		if (t != null)
 			return t;
