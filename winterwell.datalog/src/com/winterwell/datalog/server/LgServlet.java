@@ -19,6 +19,8 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.BrowserType;
@@ -123,6 +125,8 @@ public class LgServlet {
 		WebUtils2.sendText(logged!=null? "OK" : "not logged", resp);
 	}
 
+	static Map<String,String> userTypeForIPorXId = new HashMap();
+	static Time userTypeForIPorXIdFetched;
 	
 	/**
 	 * 
@@ -149,7 +153,7 @@ public class LgServlet {
 		// TODO make this a config setting?? Or even better, the servers report their IP
 		Object ip = params.get("ip");
 		if (ip instanceof String) ip = ((String) ip).split(",\\s*");
-		List<Object> ips = Containers.list(ip);
+		List ips = Containers.list(ip);
 		if (ips.contains("5.9.23.51")) {
 			ips = Containers.filter(ips, a -> ! "5.9.23.51".equals(a));
 			if (ips.size() == 1) {
@@ -162,6 +166,12 @@ public class LgServlet {
 		// screen out our IPs?
 		if ( ! accept(dataspace, tag, params)) {
 			return null;
+		}
+		
+		// Add ip/user type
+		String userType = getInvalidType(ips);
+		if (userType!=null) {
+			params.put("invalid", userType);
 		}
 		
 		// write to log file
@@ -184,7 +194,26 @@ public class LgServlet {
 //		}
 		return event;
 	}
-		
+	
+	
+	/**
+	 * Is it a bot? works with Portal which holds the data
+	 * @param ips
+	 * @return
+	 */
+	private static String getInvalidType(List ips) {
+		if (userTypeForIPorXId==null || userTypeForIPorXIdFetched==null || userTypeForIPorXIdFetched.isBefore(new Time().minus(10, TUnit.MINUTE))) {
+			// TODO fetch data!
+			// Need to make call to portal endpoint
+		}
+		for (Object object : ips) {
+			String ut = userTypeForIPorXId.get(object);
+			if (ut!=null) return ut;
+		}
+		return null;
+	}
+
+
 	static ua_parser.Parser parser;
 	
 
