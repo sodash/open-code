@@ -66,7 +66,7 @@ public class JWTDecoder {
 		
 		assert ! jwt.endsWith("temp") : jwt;
 		JWTVerifier verifier = JWT.require(algorithm)
-				.withIssuer(issuer)
+//				.withIssuer(issuer) // TODO reinstate
 				.build();
 		try {
 			DecodedJWT decoded = verifier.verify(jwt);
@@ -74,10 +74,17 @@ public class JWTDecoder {
 
 			// debugging
 			if ( ! Utils.equals(issuer, decoded.getIssuer())) {
-				Log.d(LOGTAG, "verify - issuer mismatch! expected: "+issuer+" got: "+decoded.getIssuer()+" from "+jwt+" "+ReflectionUtils.getSomeStack(12));
+				Log.w(LOGTAG, "verify - issuer mismatch! expected: "+issuer+" got: "+decoded.getIssuer()+" from "+jwt+" "+ReflectionUtils.getSomeStack(12));
 			}
-		} catch(Exception ex) {
-			throw new WrappedException("JWT verify failed for '"+jwt+"' for issuer "+issuer+" public key "+getPublicKey(), ex);
+		} catch(Throwable ex) {
+			Object token = "";
+			try {
+				token = JWT.decode(jwt);
+			} catch(Throwable ex2) {
+				// oh well
+			}
+			throw new WrappedException("JWT verify failed for "+token+" = '"+jwt+"' for issuer "+issuer
+					+" public key "+getPublicKey(), ex);
 		}
 	}
 
