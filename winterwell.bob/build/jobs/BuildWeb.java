@@ -21,7 +21,9 @@ public class BuildWeb extends BuildWinterwellProject {
 		
 		MavenDependencyTask mdt = new MavenDependencyTask();
 		mdt.setProjectDir(projectDir);
-		if (outDir!=null) mdt.setOutputDirectory(outDir);
+		if (outDir!=null) {
+			mdt.setOutputDirectory(outDir);
+		}
 		mdt.run();
 		
 		super.doTask();

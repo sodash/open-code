@@ -11,10 +11,10 @@
 	<classpathentry kind="lib" path="dependencies/jetty-http.jar"/>
 	<classpathentry kind="lib" path="dependencies/jetty-io.jar"/>
 	<classpathentry kind="lib" path="dependencies/jetty-security.jar"/>
-	<classpathentry kind="lib" path="dependencies/jetty-server.jar" sourcepath="dependencies/jetty-server-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jetty-server.jar" sourcepath="dependencies/jetty-server-sources.jar"/>
 	<classpathentry kind="lib" path="dependencies/jetty-servlet.jar" sourcepath="dependencies/jetty-servlet-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util-ajax.jar"/>
-	<classpathentry kind="lib" path="dependencies/jetty-util.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-4.X.jar" sourcepath="/middleware/jakarta/httpclient-4.1.2-src.zip"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-cache-4.X.jar"/>
