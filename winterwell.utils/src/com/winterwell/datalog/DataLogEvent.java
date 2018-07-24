@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import com.sun.org.apache.xerces.internal.impl.ExternalSubsetResolver;
 import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Mutable.Int;
 import com.winterwell.utils.Null;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
@@ -81,6 +82,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 			"place", StringBuilder.class,
 			"locn", StringBuilder.class,
 			"location", StringBuilder.class,
+			"msg", StringBuilder.class,
+			"message", StringBuilder.class,
+			// Can we do an aggregation on message??
+//			"m", String.class, // the keyword version of message (for doing exact-text repeat breakdowns, which are handy)
 			// a few XId properties
 			"id", String.class,
 			"xid", String.class,
@@ -270,7 +275,6 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 * This is for ElasticSearch!
 	 * For external use, use Gson or similar.
 	 * 
-	 * 
 	 * Because this has to handle big data, we economise and store either n or v, not both.
 	 * {k: string, n: ?number, v: ?string}
 	 * 
@@ -298,9 +302,24 @@ public final class DataLogEvent implements Serializable, IHasJson {
 					String vs = new SimpleJson().toJson(v);
 					v = vs;
 				}
+				// Defend against numbers in the wrong format causing e.g. 
+				// "mapper_parsing_exception","reason":"failed to parse [dt]"}], "number_format_exception","reason":"For input string: \"4.205515\"
+				if (proptype == Long.class || proptype == Integer.class) {
+					if (v instanceof Long || v instanceof Integer) {
+						// OK
+					} else {
+						double nv = MathUtils.toNum(v);
+						if (nv != Math.round(nv)) {
+							Log.w("DataLogEvent", "Dropping non-int number (bad format, possibly wrong units): "+pv.getKey()+" = "+v+" in "+this);
+							continue;
+						}
+					}
+				}
+				// store the common prop
 				map.put(pv.getKey(), v);
 				continue;
 			}
+			// not common - use key-value
 			ArrayMap<String,Object> prop;
 			if (v instanceof Number) {
 				prop = new ArrayMap(

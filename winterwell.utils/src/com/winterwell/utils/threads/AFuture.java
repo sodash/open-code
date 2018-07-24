@@ -74,7 +74,11 @@ public abstract class AFuture<V> implements IFuture<V>, IFuture.IDeferred<V> {
 			if (then.first!=null && then.first != success) {
 				continue;
 			}
-			then.second.apply(out);
+			try {
+				then.second.apply(out);
+			} catch (Exception e) {
+				throw Utils.runtime(e);
+			}
 		}
 		// resolve can be called repeatedly -- fns shouldn't be
 		thens.clear();

@@ -1526,7 +1526,7 @@ public class WebUtils {
 			Pattern p = (Pattern) f.get(null);
 			return p;
 		} catch(Throwable ex) {
-			Log.d("WebUtils.init", "url regex: Oh well, using fallback instead of Twitter's version: "+ex);
+//			Log.d("WebUtils.init", "url regex: Oh well, using fallback instead of Twitter's version: "+ex);
 		}
 		// Fallback to a simpler one (which will catch most cases)
 		Pattern fallback = URL_WEB_DOMAIN_FALLBACK_REGEX;

@@ -1,4 +1,4 @@
-package com.winterwell.web.app;
+package com.winterwell.web.app.build;
 
 import java.io.Closeable;
 import java.io.File;

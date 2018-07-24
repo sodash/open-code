@@ -51,6 +51,7 @@ public class BuildBob extends BuildWinterwellProject {
 		BigJarTask jt = new BigJarTask(fatjar, jars);
 		jt.setManifestProperty(jt.MANIFEST_MAIN_CLASS, mainClass);
 		jt.run();
+		report.put("fat jar", fatjar.getAbsolutePath());
 	}
 
 	@Override

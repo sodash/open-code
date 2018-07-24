@@ -42,6 +42,16 @@ public class WebEx extends RuntimeException {
 		}		
 	}
 	
+	/**
+	 * Wrap an exception to indicate the causing input web parameter
+	 */
+	public static class BadParameterException extends E40X {		
+		public BadParameterException(String parameter, Object value, Throwable ex) {
+			super(400, "Bad parameter: "+parameter+(value==null? "" : "="+value), ex);
+		}
+		private static final long serialVersionUID = 1L;		
+	}
+	
 	public static class RateLimitException extends E40X {
 		private static final long serialVersionUID = 1L;
 		public RateLimitException(XId user, String msg) {

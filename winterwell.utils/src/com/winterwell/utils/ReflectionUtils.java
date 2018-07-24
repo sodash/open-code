@@ -803,10 +803,24 @@ public class ReflectionUtils {
 	}
 
 	public static Class loadClassFromFile(File classDir, File classFile) {
+		return loadClassFromFile(classDir, classFile, null);
+	}
+	
+	public static Class loadClassFromFile(File classDir, File classFile, Collection<File> classPath) {
 		try {
 		    // Convert File to a URL
 		    URL url = classDir.toURL();          // file:/c:/myclasses/
-		    URL[] urls = new URL[]{url};
+			URL[] urls;
+			if (Utils.isEmpty(classPath)) {
+			    urls = new URL[]{url};				
+			} else {
+				ArrayList<URL> listUrls = new ArrayList();
+				for(File f : classPath) {
+					listUrls.add(f.toURL());
+				}
+				listUrls.add(url);
+				urls = listUrls.toArray(new URL[0]);
+			}
 
 		    // Create a new class loader with the directory
 		    ClassLoader cl = new URLClassLoader(urls);

@@ -167,10 +167,16 @@ public class XStreamUtils {
 	@SuppressWarnings("unchecked")
 	public static <X> X serialiseFromXml(String xml) {
 		if (xml == null) return null;
+		// preprocess
 		for(IFn<String,String> prepro : preprocessors) {
-			xml = prepro.apply(xml);
-			assert xml != null;
+			try {
+				xml = prepro.apply(xml);
+				assert xml != null;
+			} catch (Exception e) {
+				throw Utils.runtime(e);
+			}			
 		}
+		// convert
 		try {
 			return (X) xstream().fromXML(xml);
 		} catch(Throwable ex) {

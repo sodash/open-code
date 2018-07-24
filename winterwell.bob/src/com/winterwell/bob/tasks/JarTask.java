@@ -19,6 +19,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -155,7 +156,7 @@ public class JarTask extends BuildTask {
 //		path = path.replace('/', File.separatorChar);		
 		// Ensure only 1 file per path
 		if (filenames.contains(path)) {
-			Log.w("JarTask", "Jar " + jar + " tried to add duplicate entries for "+ path);
+			addIssue("Jar " + jar + " tried to add duplicate entries for "+ path);
 			return;
 		}
 		filenames.add(path);

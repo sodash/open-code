@@ -2,6 +2,7 @@ package com.winterwell.bob;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +12,11 @@ import java.util.logging.Level;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.ArgsParser;
@@ -33,7 +36,7 @@ import com.winterwell.utils.time.TimeUtils;
  * <h2>Usage</h2> 
  * Example:
  * <code>
- * java -classpath bob.jar BobBuild MyBuildScript 
+ * java -classpath bob-all.jar MyBuildScript 
  * </code>
  * <p>
  * The Bob class is for command line usage. For programmatic
@@ -92,8 +95,10 @@ public class Bob {
 		} catch(ClassNotFoundException ex) {
 			Pair2<File, File> klass = compileClass(classOrFileName);
 			if (klass != null) {
+				List<File> cpfiles = getSingleton().getSettings().getClasspathFiles();
+//				classpath = Utils.isEmpty(cp)? null : Containers.
 				// dynamically load a class from a file?
-				Class clazz = ReflectionUtils.loadClassFromFile(klass.first, klass.second);
+				Class clazz = ReflectionUtils.loadClassFromFile(klass.first, klass.second, cpfiles);
 				return clazz;
 			}
 			throw ex;
@@ -112,6 +117,27 @@ public class Bob {
 		
 		File tempDir = FileUtils.createTempDir();
 		CompileTask cp = new CompileTask(null, tempDir);
+		// classpath??
+//		Map<String, String> env = System.getenv();
+//		ClassLoader cl = ClassLoader.getSystemClassLoader();
+		BobSettings _settings = getSingleton().getSettings();
+		if (_settings.classpath!=null && ! _settings.classpath.isEmpty()) {
+			Collection<File> cpfiles = Containers.apply(_settings.classpath, File::new);
+			for (File file : cpfiles) {
+				if ( ! file.exists()) {
+					Log.w(LOGTAG, "Classpath file does not exist: "+file);
+				}
+			}
+			// add in the Bob files
+			String jcp = System.getProperty("java.class.path");
+			if (jcp != null) {
+				String[] jcps = jcp.split(":");
+				for (String j : jcps) {
+					cpfiles.add(new File(j));
+				}
+			}
+			cp.setClasspath(cpfiles);
+		}
 		cp.setSrcFiles(f);
 		cp.doTask();
 		File klass = new File(tempDir, cn.replace('.', '/')+".class");
@@ -167,15 +193,17 @@ public class Bob {
 	public static void main(String[] args) {
 		// Load settings
 		ConfigFactory cf = ConfigFactory.get();
+		cf.setArgs(args);
 		ConfigBuilder cb = cf.getConfigBuilder(BobSettings.class);
 		BobSettings _settings = cb.get();
 		// Make Bob
 		Bob bob = new Bob(_settings);
 		dflt = bob;
-		bob.init();		
+		bob.init();
 		
-		if (args.length == 0 || "--help".equals(args[0])) {
-			
+		List<String> argsLeft = cb.getRemainderArgs();
+		
+		if (argsLeft.size() == 0 || "--help".equals(args[0])) {			
 			// find a file?
 			File buildFile = args.length==0? findBuildScript() : null;
 			if (buildFile != null) {
@@ -191,7 +219,7 @@ public class Bob {
 		}
 		
 		// Build each target
-		for (String clazzName : args) {
+		for (String clazzName : argsLeft) {
 			try {
 				Class clazz = getClass(clazzName);
 				bob.build(clazz);

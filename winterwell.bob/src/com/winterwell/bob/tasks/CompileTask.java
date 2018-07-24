@@ -28,8 +28,7 @@ import com.winterwell.utils.log.Log;
 
 /**
  * Compile Java code. ??Ignores non-Java files! You may wish to use a
- * {@link CopyTask} for these. Uses Java 6's {@link JavaCompiler} class. TODO
- * fall back on Java 5's Javac class in tools.jar
+ * {@link CopyTask} for these. Uses Java 6's {@link JavaCompiler} class.
  * 
  * @author daniel
  * 
@@ -59,6 +58,12 @@ public class CompileTask extends BuildTask {
 		this.outputDir = outputDir;
 	}
 	
+	/**
+	 * Default to the version of Java that's running this code :)
+	 */
+	// NB: paranoid code falls back to Java 8
+	String javaVersion = Utils.or(System.getProperty("java.specification.version"), "1.8");
+	
 //	public static void main(String[] args) {
 //		// download ECJ
 //		// https://mvnrepository.com/artifact/org.eclipse.jdt.core.compiler/ecj
@@ -77,11 +82,12 @@ public class CompileTask extends BuildTask {
 		// quiet
 		options.add("-nowarn");
 		// Java version: 8
-		options.add("-source"); options.add("1.8");
-		options.add("-target"); options.add("1.8");
+		options.add("-source"); options.add(javaVersion);
+		options.add("-target"); options.add(javaVersion);
 		// What a lousy way to set the output dir
 		options.add("-d");
 		options.add(outputDir.getAbsolutePath());
+		// classpath
 		addClasspathToOptions();
 		// Run it!
 		Log.d(LOGTAG, "javac options "+options);		
@@ -155,7 +161,7 @@ public class CompileTask extends BuildTask {
 	}
 
 	private void addClasspathToOptions() {
-		if (classpath != null && !classpath.isEmpty()) {
+		if (classpath != null && ! classpath.isEmpty()) {
 			options.add("-classpath");
 			options.add(Printer.toString(classpath, ":"));
 		}

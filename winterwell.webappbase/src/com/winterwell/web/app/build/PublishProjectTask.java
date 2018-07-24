@@ -1,8 +1,6 @@
-package com.winterwell.web.app;
+package com.winterwell.web.app.build;
 
 
-
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
 
 import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
@@ -21,18 +18,16 @@ import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.MakeVersionPropertiesTask;
 import com.winterwell.bob.tasks.ProcessTask;
-import com.winterwell.es.BuildESJavaClient;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
+import com.winterwell.web.app.BuildWWAppBase;
 import com.winterwell.web.email.SimpleMessage;
-import com.winterwell.youagain.client.BuildYouAgainJavaClient;
 
 import jobs.BuildBob;
 import jobs.BuildDataLog;
@@ -42,6 +37,7 @@ import jobs.BuildMaths;
 import jobs.BuildUtils;
 import jobs.BuildWeb;
 import jobs.BuildWinterwellProject;
+import jobs.WWDependencyTask;
 
 
 /**
@@ -112,10 +108,14 @@ public class PublishProjectTask extends BuildTask {
 				new BuildWeb(),
 				new BuildDataLog(),
 				new BuildDepot(),
-				new BuildESJavaClient(),
-				new BuildFlexiGson(),
-				new BuildYouAgainJavaClient(),
-				new BuildWWAppBase()
+				new BuildWWAppBase(),
+				
+				// these might not be on the classpath
+//				new BuildYouAgainJavaClient(),
+				new WWDependencyTask("youagain-java-client", "com.winterwell.youagain.client.BuildYouAgainJavaClient"),
+//				new BuildESJavaClient(),
+				new WWDependencyTask("elasticsearch-java-client", "com.winterwell.es.BuildESJavaClient"),
+				new BuildFlexiGson()
 				));
 		for (BuildTask buildTask : deps) {
 			if (buildTask instanceof BuildWinterwellProject) {
@@ -151,19 +151,6 @@ public class PublishProjectTask extends BuildTask {
 		// make version.properties					
 		MakeVersionPropertiesTask mvpt = new MakeVersionPropertiesTask().setAppDir(localWebAppDir);
 		Properties props = new Properties();
-		// dep info??
-//		for(BuildTask bt : getDependencies()) {
-//			try {
-//				if (bt instanceof BuildWinterwellProject) {
-//					File jar = ((BuildWinterwellProject) bt).getJar();
-//					Map<String, Object> manifest = JarTask.getManifest(jar);
-//					Map<String, Object> namedManifest = Containers.applyToKeys(manifest, k -> jar.getName()+"."+k);
-//					props.putAll(namedManifest);
-//				}
-//			} catch(Exception ex) {
-//				Log.e("publish", ex);
-//			}
-//		}
 		mvpt.setProperties(props);
 		mvpt.run();
 			

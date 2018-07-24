@@ -14,6 +14,7 @@ import jobs.BuildFlexiGson;
 import jobs.BuildUtils;
 import jobs.BuildWeb;
 import jobs.BuildWinterwellProject;
+import jobs.WWDependencyTask;
 
 public class BuildWWAppBase extends BuildWinterwellProject {
 
@@ -23,9 +24,11 @@ public class BuildWWAppBase extends BuildWinterwellProject {
 				new BuildUtils(),
 				new BuildBob(),
 				new BuildWeb(),
-				new BuildESJavaClient(),
 				new BuildFlexiGson(),
-				new BuildYouAgainJavaClient()
+//				new BuildYouAgainJavaClient()
+				new WWDependencyTask("youagain-java-client", "com.winterwell.youagain.client.BuildYouAgainJavaClient"),
+//				new BuildESJavaClient(),
+				new WWDependencyTask("elasticsearch-java-client", "com.winterwell.es.BuildESJavaClient")
 				);
 	}
 	

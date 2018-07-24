@@ -93,7 +93,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		doSecurityCheck(state);
 		
 		// list?
-		if (state.getSlug().contains("/list")) {
+		String slug = state.getSlug();
+		if (slug.endsWith("/_list") || slug.equals("_list")) {
 			doList(state);
 			return;
 		}
@@ -236,7 +237,11 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected ESPath getPath(WebRequest state) {
 		assert state != null;
-		ESPath path = esRouter.getPath(dataspace,type, getId(state), state.get(AppUtils.STATUS, KStatus.PUBLISHED));
+		String id = getId(state);
+		if ("list".equals(id)) {
+			throw new WebEx.E400("Bad input: 'list' was interpreted as an ID -- use /_list.json to retrieve a list.");
+		}
+		ESPath path = esRouter.getPath(dataspace,type, id, state.get(AppUtils.STATUS, KStatus.PUBLISHED));
 		return path;
 	}
 
@@ -285,7 +290,16 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * This might be newly minted for a new thing
 	 */
 	private String _id;
-	protected String dataspace = null;
+	
+	/**
+	 * Optional support for dataspace based data access.
+	 */
+	protected CharSequence dataspace = null;
+	
+	public CrudServlet setDataspace(CharSequence dataspace) {
+		this.dataspace = dataspace;
+		return this;
+	}
 	
 	/**
 	 * suggested: date-desc
@@ -294,7 +308,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 	public static final SField SORT = new SField("sort");
 
-	protected JThing<T> doPublish(WebRequest state) {
+	protected final JThing<T> doPublish(WebRequest state) {
 		return doPublish(state, false, false);
 	}
 	protected JThing<T> doPublish(WebRequest state, boolean forceRefresh, boolean deleteDraft) {		
@@ -314,7 +328,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected String getId(WebRequest state) {
 		if (_id!=null) return _id;
-		_id = state.getSlugBits(1);
+		_id = state.getSlugBits(1); // why 1 not 0??
 		if (ACTION_NEW.equals(_id)) {
 			String nicestart = StrUtils.toCanonical(
 					Utils.or(state.getUserId(), state.get("name"), type.getSimpleName()).toString()
@@ -340,8 +354,8 @@ public abstract class CrudServlet<T> implements IServlet {
 					);
 		} else {
 			s.setIndices(
-					esRouter.getPath(type, null, KStatus.PUBLISHED).index(),
-					esRouter.getPath(type, null, KStatus.DRAFT).index()
+					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
+					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index()
 				);
 		}
 		
@@ -360,11 +374,12 @@ public abstract class CrudServlet<T> implements IServlet {
 				ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
 				qb = ESQueryBuilders.boolQuery().mustNot(setFilter);
 			}	
-			if ( ! Utils.isBlank(q)) {
+			if ( ! Utils.isBlank(q) && ! "ALL".equals(q)) {
 				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
 				qb = ESQueryBuilders.must(qb, qsq);
 			}
 		}
+		// NB: exq can be null for ALL
 		ESQueryBuilder exq = doList2_query(state);
 		qb = ESQueryBuilders.must(qb, exq);
 

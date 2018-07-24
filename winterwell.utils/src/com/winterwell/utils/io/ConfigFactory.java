@@ -71,10 +71,18 @@ public class ConfigFactory {
 		Log.d(LOGTAG, "serverType: "+serverType);
 		return this;
 	}	
+	
+	/**
+	 * Set the main args for command-line input
+	 *  -- You should probably call this from your main() method.
+	 * @param args
+	 * @return
+	 */
 	public ConfigFactory setArgs(String[] args) {
 		this.args = args;
 		return this;
 	}
+	
 	/**
 	 * Not normally needed - defaults to hostname
 	 * @param machine

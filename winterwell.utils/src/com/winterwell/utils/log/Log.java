@@ -475,7 +475,11 @@ public class Log {
 	 */
 	public static void escalate(Throwable error) {
 		if (error==null) return;
-		ESCALATOR.apply(error);
+		try {
+			ESCALATOR.apply(error);
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		}
 	}
 	
 	static IFn<Throwable,Object> ESCALATOR = new ThrowIt();

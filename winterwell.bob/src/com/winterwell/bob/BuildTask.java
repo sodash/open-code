@@ -3,18 +3,24 @@ package com.winterwell.bob;
 import java.io.Closeable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.junit.Test;
 
+import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasDesc;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TimeOut;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.threads.TaskRunner;
@@ -72,6 +78,9 @@ import jobs.BuildUtils;
  * 
  */
 public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
+
+
+	protected Map<String,Object> report = new ArrayMap();
 
 	private Desc desc;
 
@@ -176,6 +185,8 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 *         some dependencies. null is also acceptable.
 	 */
 	public Collection<? extends BuildTask> getDependencies() {
+		// ?? What about build tasks from other projects - which aren't on the classpath??
+		// Should we have a WWDepTask, a bit like MavenDependencyTask, which downloads a jar??
 		return Collections.emptyList();
 	}
 
@@ -280,10 +291,12 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			doTask();
 
 			// Done
+			reportIssues();
 			Bob.setLastRunDate(this);
 			return;
 
 		} catch (Throwable e) {
+			reportIssues();
 			// Swallow or rethrow exception depending on settings
 			handleException(e);
 			return;
@@ -294,18 +307,50 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			Printer.removeIndent("   ");
 			// clean up
 			try {
-				close();
+				close();				
 			} catch (Exception e) {
 				// Swallow!
-				Log.e(LOGTAG, e);
+				Log.e(LOGTAG, e);				
 			}
 			Log.report(LOGTAG, "...exiting " + toString(), Level.FINE);
 			if (bc == 0) {
 				bob.close();
-				Log.report(LOGTAG, "----- BUILD COMPLETE -----", Level.INFO);
+				Log.i(LOGTAG, "----- BUILD COMPLETE -----");
+				Map success = getReport();
+				if (success!=null && ! success.isEmpty()) {
+					System.out.println(StrUtils.LINEEND+Printer.toString(success, StrUtils.LINEEND, ":\t"));
+				}
 			}
 		}
 	}
+	
+	private void reportIssues() {
+		if (issues==null || issues.isEmpty()) return;
+		Log.w(LOGTAG, issues.size()+" issues: "
+				+StrUtils.ellipsize(Printer.toString(issues, ", "), 280)
+				);
+	}
+
+
+	/**
+	 * If the task can produce a large number of repetitive ignorable issues, 
+	 * then use this to group them. Only a few will be displayed (unless verbose is set)
+	 */
+	protected List<String> issues = new ArrayList();
+
+	protected void addIssue(String msg) {
+		if (getSettings().verbose) {
+			Log.w(LOGTAG, msg);
+			return;
+		}
+		issues.add(msg);
+	}
+
+
+	protected BobSettings getSettings() {
+		return Bob.getSingleton().getSettings();
+	}
+
 
 	/**
 	 * 
@@ -367,6 +412,16 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	@Override
 	public String toString() {	
 		return getClass().getSimpleName();
+	}
+
+
+	/**
+	 * on-success report, which is printed out at the end.
+	 * This can contain useful final info, like jar files made or servers updated.
+	 * @return
+	 */
+	public Map getReport() {
+		return report;
 	}
 
 }

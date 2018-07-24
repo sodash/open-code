@@ -24,6 +24,7 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.nlp.query.SearchQuery;
+import com.winterwell.nlp.query.SearchQuery.SearchFormatException;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -33,6 +34,7 @@ import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.CommonFields;
@@ -116,10 +118,14 @@ public class DataServlet implements IServlet {
 	 * @param end
 	 * @return
 	 */
-	private SearchQuery makeQueryFilter(String q, Time start, Time end) {		
-		if (q==null) q = "";
-		SearchQuery sq = new SearchQuery(q);		
-		return sq;
+	private SearchQuery makeQueryFilter(String q, Time start, Time end) {
+		try {
+			if (q==null) q = "";
+			SearchQuery sq = new SearchQuery(q);		
+			return sq;
+		} catch(SearchFormatException ex) {
+			throw new WebEx.BadParameterException("q", q, ex);
+		}
 	}
 
 }

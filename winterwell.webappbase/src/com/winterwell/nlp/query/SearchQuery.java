@@ -35,9 +35,8 @@ import com.winterwell.utils.web.SimpleJson;
  */
 public class SearchQuery implements Serializable, IHasJson {
 
-
-	public static final class SearchFormatException extends
-			IllegalArgumentException {
+	public static final class SearchFormatException extends IllegalArgumentException 
+	{
 		private static final long serialVersionUID = 1L;
 
 		/**
