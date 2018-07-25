@@ -311,6 +311,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 						double nv = MathUtils.toNum(v);
 						if (nv != Math.round(nv)) {
 							Log.w("DataLogEvent", "Dropping non-int number (bad format, possibly wrong units): "+pv.getKey()+" = "+v+" in "+this);
+							// ?? log a separate error event?
 							continue;
 						}
 					}
