@@ -96,7 +96,9 @@ public class PublishProjectTask extends BuildTask {
 		logfile = new LogFile();
 		localLib = new File(localWebAppDir,"tmp-lib");
 		jarFile = new File(localLib, projectName+".jar");
-		bashScript = "./publish-"+projectName+".sh";		
+//		bashScript = "./publish-"+projectName+".sh";
+		bashScript = "../wwappbase.js/./project-publisher.sh "+projectName+"";
+
 	}
 
 	@Override
