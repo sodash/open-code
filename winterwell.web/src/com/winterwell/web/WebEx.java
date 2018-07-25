@@ -34,7 +34,7 @@ public class WebEx extends RuntimeException {
 		}
 
 		public E40X(int code, String url, String msg) {
-			super(code, StrUtils.joinWithSkip(" ", url, msg));
+			super(code, StrUtils.joinWithSkip(" ", msg, url));
 		}
 		
 		public E40X(int code, String msg, Throwable e) {
@@ -103,6 +103,9 @@ public class WebEx extends RuntimeException {
 	public static class E400 extends E40X {
 		public E400(String msg) {
 			super(400, null, msg);
+		}
+		public E400(String url, String msg) {
+			super(400, url, msg);
 		}		
 		private static final long serialVersionUID = 1L;
 	}
