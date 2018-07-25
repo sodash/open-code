@@ -185,6 +185,12 @@ public class ContainersTest {
 	}
 
 	@Test
+	public void testAsListString() {
+		List<String> l = Containers.asList((Object)new String[] {"a"});
+		assert l.get(0).equals("a") : l;
+	}
+	
+	@Test
 	public void testArrayAsList1() {
 		{	// Is it needed? Only for primitives
 			Object array = new String[] {"A", "B"};
