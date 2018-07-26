@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.util.ajax.JSON;
+
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.datalog.DataLogRemoteStorage;
@@ -22,6 +24,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.BrowserType;
 import com.winterwell.web.app.FileServlet;
@@ -125,7 +128,7 @@ public class LgServlet {
 		WebUtils2.sendText(logged!=null? "OK" : "not logged", resp);
 	}
 
-	static Map<String,String> userTypeForIPorXId = new HashMap();
+	static List<Map> userTypeForIPorXId;
 	static Time userTypeForIPorXIdFetched;
 	
 	/**
@@ -170,6 +173,7 @@ public class LgServlet {
 		
 		// Add ip/user type
 		String userType = getInvalidType(ips);
+		Log.d(userType);
 		if (userType!=null) {
 			params.put("invalid", userType);
 		}
@@ -203,12 +207,30 @@ public class LgServlet {
 	 */
 	private static String getInvalidType(List ips) {
 		if (userTypeForIPorXId==null || userTypeForIPorXIdFetched==null || userTypeForIPorXIdFetched.isBefore(new Time().minus(10, TUnit.MINUTE))) {
-			// TODO fetch data!
-			// Need to make call to portal endpoint
+			//Needs to be set first -- will get caught in a loop otherwise as userTypeForIPorXId is still null
+			userTypeForIPorXIdFetched = new Time();			
+			FakeBrowser fb = new FakeBrowser();
+			fb.setRequestMethod("GET");
+
+			try {
+				//Right now, just set to point at local. TODO read in correct endpoint from state
+				String json= fb.getPage("https://portal.good-loop.com/botip/_list.json");
+				Map response = (Map) JSON.parse(json);
+				Map esres = (Map) response.get("cargo");
+				List<Map> hits = Containers.asList(esres.get("hits"));
+				
+				userTypeForIPorXId = hits;
+			}
+			catch(Exception ex) {
+				ex.printStackTrace();
+			}
 		}
-		for (Object object : ips) {
-			String ut = userTypeForIPorXId.get(object);
-			if (ut!=null) return ut;
+		//At this point, can safely assume that we have a valid list of IPs
+		for (Object userIP : ips) {
+				for(Map botIP : userTypeForIPorXId) {
+					String badIP = (String) botIP.get("ip");
+					if (userIP.equals(badIP)) return (String) botIP.get("type");
+				}
 		}
 		return null;
 	}
