@@ -23,7 +23,7 @@ public class BuildYouAgainJavaClient extends BuildWinterwellProject {
 		mdt.addDependency("com.auth0", "java-jwt", "3.4.0");
 		mdt.setOutputDirectory(new File(projectDir, "dependencies"));
 		mdt.setIncSrc(true);
-		mdt.setForceUpdate(true);
+//		mdt.setForceUpdate(true);
 		mdt.run();
 		
 		super.doTask();
