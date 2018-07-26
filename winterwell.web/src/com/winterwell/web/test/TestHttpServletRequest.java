@@ -56,7 +56,7 @@ public class TestHttpServletRequest implements HttpServletRequest {
 
 	public void setParameters (Map<String, String> parameters){
 		this.parameters = parameters;
-	}
+	}		
 	
 	/*
 	 * (non-Javadoc)
@@ -130,6 +130,15 @@ public class TestHttpServletRequest implements HttpServletRequest {
 	 * dummy uri -- null by default
 	 */
 	private String uri;
+	private String pathInfo = "";
+	
+	public void setPathInfo(String pathInfo) {
+		// URI and request disagree on this :(
+		if (pathInfo!=null && ! pathInfo.startsWith("/")) {
+			pathInfo = "/"+pathInfo;
+		}
+		this.pathInfo = pathInfo;
+	}
 	
 	@Override
 	public Cookie[] getCookies() {
@@ -292,8 +301,7 @@ public class TestHttpServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getPathInfo() {
-	//	Logd("TestHttpServletRequest", "method not implemented "+ReflectionUtils.stacktrace());
-		return ("");
+		return pathInfo;
 
 	}
 

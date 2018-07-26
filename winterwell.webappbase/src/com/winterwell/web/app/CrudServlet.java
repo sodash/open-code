@@ -235,6 +235,11 @@ public abstract class CrudServlet<T> implements IServlet {
 		return null;
 	}
 
+	/**
+	 * Use getId() to make an ESPath 
+	 * @param state
+	 * @return
+	 */
 	protected ESPath getPath(WebRequest state) {
 		assert state != null;
 		String id = getId(state);
@@ -330,19 +335,27 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected String getId(WebRequest state) {
 		if (_id!=null) return _id;
-		_id = state.getSlugBits(1); // why 1 not 0??
-		if (ACTION_NEW.equals(_id)) {
+		// Beware if ID can have a / in it!
+		String sid = state.getSlugBits(1); // NB: slug-bit-0 is the servlet
+		_id = getId2(state, sid);
+		return _id;
+	}
+
+	protected String getId2(WebRequest state, String sid) {
+		if (ACTION_NEW.equals(sid)) {
 			String nicestart = StrUtils.toCanonical(
 					Utils.or(state.getUserId(), state.get("name"), type.getSimpleName()).toString()
 					).replace(' ', '_');
-			_id = nicestart+"_"+Utils.getRandomString(8);
+			sid = nicestart+"_"+Utils.getRandomString(8);
 			// avoid ad, 'cos adblockers dont like it!
-			if (_id.startsWith("ad")) {
-				_id = _id.substring(2, _id.length());
+			if (sid.startsWith("ad")) {
+				sid = sid.substring(2, sid.length());
 			}
 		}
-		return _id;
+		return sid;
 	}
+
+
 
 	protected void doList(WebRequest state) throws IOException {
 		// copied from SoGive SearchServlet
@@ -420,7 +433,7 @@ public abstract class CrudServlet<T> implements IServlet {
 				// pull out the actual object from the hit (NB: may be Map or AThing)
 				Object hit = h.get("_source");
 				if (hit == null) continue;
-				Object id = getId(hit);
+				Object id = getIdFromHit(hit);
 				
 				// First time we've seen this object? Save it.
 				if (!things.containsKey(id)) {
@@ -487,7 +500,12 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 
-	private Object getId(Object hit) {
+	/**
+	 * 
+	 * @param hit Map from ES, or AThing
+	 * @return
+	 */
+	private Object getIdFromHit(Object hit) {
 		Object id;
 		if (hit instanceof Map) id = ((Map)hit).get("id");
 		else id = ((AThing)hit).getId();

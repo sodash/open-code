@@ -185,7 +185,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 *         first, and will be checked to avoid repeats. 
 	 *         
 	 *         Returns an empty list by default - override to specify
-	 *         some dependencies. null is also acceptable.
+	 *         some dependencies. null is also acceptable but not advisable.
 	 */
 	public Collection<? extends BuildTask> getDependencies() {
 		// What about build tasks from other projects - which aren't on the classpath?

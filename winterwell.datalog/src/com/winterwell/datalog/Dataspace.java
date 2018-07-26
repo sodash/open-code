@@ -30,7 +30,9 @@ public final class Dataspace extends AString {
 		assert ! this.name.startsWith("datalog.") : name;
 		assert ! this.name.equals("_list") : name;
 		// keep it safe
-		assert StrUtils.isWordlike(this.name) : name;
+		if ( ! StrUtils.isWordlike(this.name)) {
+			throw new IllegalArgumentException("Invalid dataspace: "+name);
+		}
 	}
 	
 }

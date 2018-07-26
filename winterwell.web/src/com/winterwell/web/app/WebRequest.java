@@ -852,9 +852,10 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	public final String getSlug() {
 		// NB getPathInfo() already returns URL decoded path
-		String pi = request.getPathInfo();
+		String pi = getRequestPath();
 		if (pi == null)
 			return null;
+		assert pi.startsWith("/") : "no / to start slug?! "+this;
 		boolean keepFileType = false;
 		// eg. /profile/ has no slug
 		if (pi.endsWith("/")) {
