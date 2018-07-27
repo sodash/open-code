@@ -210,10 +210,10 @@ public class Bob {
 			File buildFile = findBuildScript();
 			if (buildFile != null) {
 				argsLeft = Arrays.asList(buildFile.toString());
-			}						
+			}
 		}
 		
-		if (argsLeft.size() == 0 || "--help".equals(args[0])) {			
+		if (argsLeft.size() == 0 || Containers.contains("--help", args)) {			
 			System.err.println(StrUtils.LINEEND + "Bob the Builder"
 					+ StrUtils.LINEEND + "---------------"
 					+ StrUtils.LINEEND
