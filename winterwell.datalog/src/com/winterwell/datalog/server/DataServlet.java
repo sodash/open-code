@@ -52,6 +52,10 @@ import com.winterwell.web.fields.TimeField;
  */
 public class DataServlet implements IServlet {
 
+	/**
+	 * Number of results in aggregations
+	 */
+	private static final IntField numRows = new IntField("numRows");
 	static final SField DATASPACE = new SField("dataspace");
 	private static final String LOGTAG = "DataServlet";
 
@@ -82,7 +86,7 @@ public class DataServlet implements IServlet {
 		DataLogSecurity.check(state, dataspace, breakdown);
 
 		// num results
-		int numTerms = state.get(new IntField("termsSize"), 1000);		
+		int numTerms = state.get(numRows, 1000);		
 		// num examples
 		int size = state.get(new IntField("size"), 10);
 		// time window
