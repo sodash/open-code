@@ -24,7 +24,8 @@ public class BobSettings {
 
 	public static final Key<Boolean> VERBOSE = new Key<Boolean>("verbose");
 
-	@Option(tokens="-cp,-classpath", description="Classpath used for dynamically compiling build scripts. NB: This is not the classpath used for compile tasks which are part of a build script run.")
+	@Option(tokens="-cp,-classpath", description="Classpath used for dynamically compiling build scripts.")
+	// NB: This is not the classpath used for CompileTasks which are part of a build script run.
 	public List<String> classpath;
 	
 	@Option(tokens = "-ignore", description = "Ignore all exceptions")

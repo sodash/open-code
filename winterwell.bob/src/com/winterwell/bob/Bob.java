@@ -217,7 +217,9 @@ public class Bob {
 			System.err.println(StrUtils.LINEEND + "Bob the Builder"
 					+ StrUtils.LINEEND + "---------------"
 					+ StrUtils.LINEEND
-					+ "Usage: java -jar bob-all.jar [-cp CLASSPATH] [options] [TargetBuildTasks...]"
+					+ "Default usage (looks for a BuildX.java file in the builder directory):"+ StrUtils.LINEEND
+					+ "	java -jar bob-all.jar"+ StrUtils.LINEEND
+					+ "Usage: java -jar bob-all.jar [options] [TargetBuildTasks...]"
 					+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
 			System.exit(1);
 		}
