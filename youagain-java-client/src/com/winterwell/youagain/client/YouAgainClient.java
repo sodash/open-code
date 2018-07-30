@@ -73,7 +73,7 @@ public final class YouAgainClient {
 		ENDPOINT = eNDPOINT;
 	}
 	
-	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
+	private static final Key<List<AuthToken>> AUTHS = new Key("ya_auths");
 
 	private static final String LOGTAG = "youagain";
 	
@@ -122,14 +122,15 @@ public final class YouAgainClient {
 	 * This will also call state.setUser(). 
 	 * Caches the return so repeated calls are fast.
 	 * @param state
-	 * @return null if not logged in at all, otherwise list of AuthTokens.
+	 * @return List of AuthTokens. Never null.
 	 * WARNING: This can include anonymous temporary "nonce@temp" tokens!
+	 * The list is a fresh ArrayList which can be modified without side-effects.
 	 */
 	public List<AuthToken> getAuthTokens(WebRequest state) {
 		// check cache
 		List<AuthToken> tokens = state.get(AUTHS);
 		if (tokens!=null) {
-			return tokens;
+			return new ArrayList(tokens);
 		}
 		
 		List<String> jwt = getAllJWTTokens(state);
@@ -140,7 +141,9 @@ public final class YouAgainClient {
 			// verify it
 			basicToken = verifyNamePassword(np.first, np.second);
 		}
-		if (jwt.isEmpty() && basicToken==null) return null;
+		if (jwt.isEmpty() && basicToken==null) {
+			return new ArrayList();
+		}
 		if ( ! jwt.isEmpty()) {
 			// verify the tokens
 			tokens = verify(jwt, state);
@@ -156,7 +159,7 @@ public final class YouAgainClient {
 		state.put(AUTHS, tokens);
 		// set user?
 		XId uxid = getUserId2(state, tokens);		
-		return tokens;
+		return new ArrayList(tokens);
 	}
 	
 	private AuthToken verifyNamePassword(String email, String password) {
@@ -177,11 +180,11 @@ public final class YouAgainClient {
 	 * 
 	 * @param jwt
 	 * @param state Can be null. For sending messages back
-	 * @return verified auth tokens and unverified nonce@temp tokens
+	 * @return verified auth tokens and unverified nonce@temp tokens. Never null.
 	 */
 	public List<AuthToken> verify(List<String> jwt, WebRequest state) {
 		Log.d(LOGTAG, "verify: "+jwt);
-		List<AuthToken> list = new ArrayList();
+		final List<AuthToken> list = new ArrayList();
 		if (jwt.isEmpty()) return list;
 		for (String jt : jwt) {
 			try {
@@ -406,6 +409,13 @@ public final class YouAgainClient {
 
 	public void setDebug(boolean b) {
 		this.debug = b;
+	}
+
+	public void addAuthToken(WebRequest state, AuthToken authToken) {
+		List<AuthToken> auths = getAuthTokens(state);
+		auths.remove(authToken);
+		auths.add(authToken);
+		state.put(AUTHS, auths);
 	}
 
 }
