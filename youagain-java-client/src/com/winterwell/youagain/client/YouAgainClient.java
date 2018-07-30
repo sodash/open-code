@@ -356,14 +356,16 @@ public final class YouAgainClient {
 	 */
 	XId getUserId2(WebRequest state, List<AuthToken> auths) {
 		XId uxid = state.get(new XIdField("uxid"));
+		// ?? verify uxid matches an auth token??
 		if (uxid==null) {
 			// no user?
 			if (auths==null || auths.isEmpty()) {
 				return null;
 			}			
-			uxid = auths.get(0).xid;			
+			uxid = auths.get(0).xid;
 		} else {
-			if (auths==null) throw new WebEx.E401(state.getRequestUrl(), "No auth-tokens. Can't act as "+uxid);
+			if (auths==null) throw new WebEx.E401(state.getRequestUrl(), 
+					"No auth-tokens. Can't act as "+uxid);
 		}
 		assert uxid != null;
 		final XId fuxid = uxid;
