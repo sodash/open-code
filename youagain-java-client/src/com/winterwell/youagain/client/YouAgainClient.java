@@ -158,10 +158,32 @@ public final class YouAgainClient {
 		// stash them
 		state.put(AUTHS, tokens);
 		// set user?
-		XId uxid = getUserId2(state, tokens);		
+		getAuthTokens2_maybeSetUser(state, tokens);
+		// done
 		return new ArrayList(tokens);
 	}
 	
+	/**
+	 * Set user if tokens and not already set
+	 * @param state
+	 * @param tokens
+	 */
+	private void getAuthTokens2_maybeSetUser(WebRequest state, List<AuthToken> tokens) {
+		if (tokens.isEmpty() || state.getUser()!=null) {
+			return;
+		}
+		AuthToken user = tokens.get(0);
+		final XId uxid = state.get(new XIdField("uxid"));
+		if (uxid!=null) {
+			user = Containers.first(tokens, t -> t.getXId().equals(uxid));
+			if (user==null) {
+				Log.d(LOGTAG, "Unauthorised uxid "+uxid+" with "+tokens);
+				user = tokens.get(0);
+			}
+		}
+		state.setUser(user.getXId(), user);
+	}
+
 	private AuthToken verifyNamePassword(String email, String password) {
 		Utils.check4null(email, password);
 		FakeBrowser fb = new FakeBrowser();
@@ -349,12 +371,11 @@ public final class YouAgainClient {
 	}
 	
 	/**
-	 * also sets state.setUser()
 	 * @param state
 	 * @param auths
 	 * @return
 	 */
-	XId getUserId2(WebRequest state, List<AuthToken> auths) {
+	private XId getUserId2(WebRequest state, List<AuthToken> auths) {
 		XId uxid = state.get(new XIdField("uxid"));
 		// ?? verify uxid matches an auth token??
 		if (uxid==null) {
@@ -368,15 +389,11 @@ public final class YouAgainClient {
 					"No auth-tokens. Can't act as "+uxid);
 		}
 		assert uxid != null;
-		final XId fuxid = uxid;
 		// FIXME security check
-//		AuthToken auth = Containers.first(auths, a -> a.xid.equals(fuxid));
+//		AuthToken auth = Containers.first(auths, a -> a.xid.equals(uxid));
 //		if (auth==null) {
 //			throw new WebEx.E401(state.getRequestUrl(), "No auth-token for "+uxid);
 //		}
-		// set the user
-		Properties user = new Properties(new ArrayMap("xid", uxid));
-		state.setUser(uxid, user);
 		// done
 		return uxid;
 	}
