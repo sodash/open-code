@@ -24,7 +24,7 @@ import com.winterwell.web.LoginDetails;
  * @author daniel
  * @testedby XIdTest
  */
-public final class XId implements Serializable, IHasJson {
+public final class XId implements Serializable, IHasJson, CharSequence {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -362,6 +362,21 @@ public final class XId implements Serializable, IHasJson {
 	@Override
 	public Object toJson2() throws UnsupportedOperationException {
 		return toString();
+	}
+
+	@Override
+	public int length() {
+		return toString().length();
+	}
+
+	@Override
+	public char charAt(int index) {
+		return toString().charAt(index);
+	}
+
+	@Override
+	public CharSequence subSequence(int start, int end) {
+		return toString().subSequence(start, end);
 	}
 	
 }

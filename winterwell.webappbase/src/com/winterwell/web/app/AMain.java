@@ -110,7 +110,12 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		Dep.set(Gson.class, gson);
 	}
 
-	
+	/**
+	 * Convenience for {@link #init(String[])}, for use in unit tests.
+	 * 
+	 * This will initialise things like Gson and the database.
+	 * It won't start Jetty.
+	 */
 	public final void init() {
 		init(new String[0]);
 	}
