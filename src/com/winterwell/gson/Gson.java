@@ -159,9 +159,9 @@ public class Gson {
 	 * The format is W(Winterwell version)_G(original Google version).
 	 * An S on the Google-version indicates "snapshot"
 	 * 
-	 * TODO update from https://github.com/google/gson v2.6.2
+	 * TODO update from https://github.com/google/gson v2.8.5
 	 */
-	public static String VERSION = "W1.3_G2.3.1S";
+	public static String VERSION = "W1.4_G2.3.1S";
 	
 	static final boolean DEFAULT_JSON_NON_EXECUTABLE = false;
 
