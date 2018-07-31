@@ -1,6 +1,7 @@
 package com.winterwell.gson;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 
 import com.winterwell.gson.stream.JsonReader;
@@ -62,6 +63,56 @@ public static class TimeTypeAdapter implements JsonSerializer<Time>, JsonDeseria
 		}
 		Time t = TimeUtils.parseExperimental(s);
 		return t;
+	}
+}
+
+
+
+/**
+ * Treat any CharSequence class like a String
+ * Warning: This loses the type info! 
+ * Use-case: good for special "type-safe" String-like classes, e.g. Dataspace
+ * Experimental: This can handle flexible time inputs, like "tomorrow". 
+ * But ISO format yyyy-mm-dd is strongly recommended!
+ * @author daniel
+ */
+public static final class CharSequenceTypeAdapter implements JsonSerializer<CharSequence>, JsonDeserializer<CharSequence> {
+
+	private Class<? extends CharSequence> klass;
+	private Constructor<? extends CharSequence> scon;
+	
+	
+	public CharSequenceTypeAdapter(Class<? extends CharSequence> klass) {
+		this.klass = klass;
+		try {
+			scon = klass.getConstructor(String.class);			
+		} catch (NoSuchMethodException e) {
+			try {
+				scon = klass.getConstructor(CharSequence.class);
+			} catch (NoSuchMethodException e1) {
+				throw Utils.runtime(e);
+			}			
+		}
+		scon.setAccessible(true);
+	}
+
+	@Override
+	public CharSequence deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+			throws JsonParseException 
+	{
+		String s = null;
+		try {
+			s = json.getAsString();					
+			CharSequence ni = scon.newInstance(s);
+			return ni;
+		} catch(Exception ex) {
+			throw new JsonParseException(s, ex);
+		}
+	}
+
+	@Override
+	public JsonElement serialize(CharSequence src, Type typeOfSrc, JsonSerializationContext context) {
+		return new JsonPrimitive(src.toString());		
 	}
 }
 
