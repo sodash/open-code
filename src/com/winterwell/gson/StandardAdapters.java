@@ -135,7 +135,7 @@ public static class LenientLongAdapter extends TypeAdapter<Long>{
 	 */
 	public LenientLongAdapter(Long nullValue) {
 		this.nullValue = nullValue;
-		assert nullValue == 0 || nullValue == null : nullValue;
+		assert nullValue == null || nullValue == 0 : nullValue;
 	}
     
 	@Override

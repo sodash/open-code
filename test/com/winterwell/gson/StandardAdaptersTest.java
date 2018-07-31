@@ -27,6 +27,22 @@ public class StandardAdaptersTest {
 		assert now.equals(now2);
 	}
 	
+
+	@Test
+	public void testCharSequence() {
+		Gson gsonWith = new GsonBuilder()
+						.registerTypeAdapter(StringBuilder.class, new StandardAdapters.CharSequenceTypeAdapter(StringBuilder.class))
+						.create();
+				
+		String gson1 = Gson.toJSON(new StringBuilder("foo"));		
+		System.out.println(gson1);
+		
+		String gson2 = gsonWith.toJSON(new StringBuilder("foo"));		
+		System.out.println(gson2);
+		
+		StringBuilder n2 = gsonWith.fromJson(gson1, StringBuilder.class);
+	}
+	
 	@Test
 	public void testLenientLong() {
 		Gson gsonWith = new GsonBuilder()
