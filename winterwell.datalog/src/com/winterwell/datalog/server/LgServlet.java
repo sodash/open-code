@@ -143,7 +143,7 @@ public class LgServlet {
 	 * @param count
 	 * @param params can be null
 	 * @param stdTrackerParams
-	 * @return
+	 * @return event, or null if this was screened out (eg our own IPs)
 	 */
 	public static DataLogEvent doLog(WebRequest state, String dataspace, String gby, String tag, double count, 
 			Map params, boolean stdTrackerParams) 
