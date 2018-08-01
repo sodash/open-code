@@ -1,6 +1,7 @@
 package com.winterwell.datalog.server;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -128,8 +129,11 @@ public class LgServlet {
 		WebUtils2.sendText(logged!=null? "OK" : "not logged", resp);
 	}
 
+	/**
+	 * TODO refactor as Map key:ip value=user-type eg "bot"
+	 */
 	static List<Map> userTypeForIPorXId;
-	static Time userTypeForIPorXIdFetched;
+	static volatile Time userTypeForIPorXIdFetched;
 	
 	/**
 	 * 
@@ -154,9 +158,9 @@ public class LgServlet {
 		
 		// HACK remove Hetzner from the ip param 
 		// TODO make this a config setting?? Or even better, the servers report their IP
-		Object ip = params.get("ip");
+		Object ip = params.get("ip"); // NB ip can be null
 		if (ip instanceof String) ip = ((String) ip).split(",\\s*");
-		List ips = Containers.list(ip);
+		List ips = Containers.list(ip); // NB: ips is now never null
 		if (ips.contains("5.9.23.51")) {
 			ips = Containers.filter(ips, a -> ! "5.9.23.51".equals(a));
 			if (ips.size() == 1) {
@@ -206,6 +210,7 @@ public class LgServlet {
 	 * @return
 	 */
 	private static String getInvalidType(List ips) {
+		assert ips != null;
 		if (userTypeForIPorXId==null || userTypeForIPorXIdFetched==null || userTypeForIPorXIdFetched.isBefore(new Time().minus(10, TUnit.MINUTE))) {
 			//Needs to be set first -- will get caught in a loop otherwise as userTypeForIPorXId is still null
 			userTypeForIPorXIdFetched = new Time();			
@@ -222,15 +227,16 @@ public class LgServlet {
 				userTypeForIPorXId = hits;
 			}
 			catch(Exception ex) {
-				ex.printStackTrace();
+				Log.e("lg.getInvalidType", ex);
+				userTypeForIPorXId = new ArrayList(); // paranoia: keep logging fast. This will get checked again in 10 minutes
 			}
 		}
 		//At this point, can safely assume that we have a valid list of IPs
 		for (Object userIP : ips) {
-				for(Map botIP : userTypeForIPorXId) {
-					String badIP = (String) botIP.get("ip");
-					if (userIP.equals(badIP)) return (String) botIP.get("type");
-				}
+			for(Map botIP : userTypeForIPorXId) {
+				String badIP = (String) botIP.get("ip");
+				if (userIP.equals(badIP)) return (String) botIP.get("type");
+			}
 		}
 		return null;
 	}
