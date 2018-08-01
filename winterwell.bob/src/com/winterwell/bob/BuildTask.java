@@ -30,6 +30,7 @@ import com.winterwell.utils.time.TimeUtils;
 import com.winterwell.utils.web.XStreamUtils;
 
 import jobs.BuildUtils;
+import jobs.WWDependencyTask;
 
 /**
  * A task forming part or all of a build process. Subclass this to create build
@@ -87,7 +88,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	@Override
 	public Desc getDesc() {
 		if (this.desc!=null) return desc;
-		desc = new Desc("BuildTask", getClass());
+		desc = new Desc(getClass().getSimpleName(), BuildTask.class);
 		desc.setTag("bob");
 		try {
 			desc.setVersionStamp(this);
@@ -181,13 +182,15 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 
 	/**
 	 * @return The build tasks this task depends on. Dependencies will be run
-	 *         first. Returns an empty list by default - override to specify
-	 *         some dependencies. null is also acceptable.
+	 *         first, and will be checked to avoid repeats. 
+	 *         
+	 *         Returns an empty list by default - override to specify
+	 *         some dependencies. null is also acceptable but not advisable.
 	 */
 	public Collection<? extends BuildTask> getDependencies() {
-		// ?? What about build tasks from other projects - which aren't on the classpath??
-		// Should we have a WWDepTask, a bit like MavenDependencyTask, which downloads a jar??
-		return Collections.emptyList();
+		// What about build tasks from other projects - which aren't on the classpath?
+		// Hack: see WWDependencyTask, a bit like MavenDependencyTask, which downloads a jar
+		return new ArrayList();
 	}
 
 	private void handleException(Throwable e) {
@@ -271,7 +274,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	@Test
 	public final void run() throws RuntimeException {
 		// fix desc if it wasn't before
-		getDesc().getId();
+		String id = getDesc().getId();
 		// Add an output and error listener
 		report("Running " + toString() + " at "
 				+ TimeUtils.getTimeStamp() + "...", Level.FINE);
@@ -353,6 +356,8 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 
 
 	/**
+	 * Build the dependencies.
+	 * This includes a check to avoid repeat building of the same dependency. 
 	 * 
 	 * @return
 	 */

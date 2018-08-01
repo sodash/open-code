@@ -73,7 +73,7 @@ public final class YouAgainClient {
 		ENDPOINT = eNDPOINT;
 	}
 	
-	private static final Key<List<AuthToken>> AUTHS = new Key("auths");
+	private static final Key<List<AuthToken>> AUTHS = new Key("ya_auths");
 
 	private static final String LOGTAG = "youagain";
 	
@@ -122,14 +122,15 @@ public final class YouAgainClient {
 	 * This will also call state.setUser(). 
 	 * Caches the return so repeated calls are fast.
 	 * @param state
-	 * @return null if not logged in at all, otherwise list of AuthTokens.
+	 * @return List of AuthTokens. Never null.
 	 * WARNING: This can include anonymous temporary "nonce@temp" tokens!
+	 * The list is a fresh ArrayList which can be modified without side-effects.
 	 */
 	public List<AuthToken> getAuthTokens(WebRequest state) {
 		// check cache
 		List<AuthToken> tokens = state.get(AUTHS);
 		if (tokens!=null) {
-			return tokens;
+			return new ArrayList(tokens);
 		}
 		
 		List<String> jwt = getAllJWTTokens(state);
@@ -140,7 +141,9 @@ public final class YouAgainClient {
 			// verify it
 			basicToken = verifyNamePassword(np.first, np.second);
 		}
-		if (jwt.isEmpty() && basicToken==null) return null;
+		if (jwt.isEmpty() && basicToken==null) {
+			return new ArrayList();
+		}
 		if ( ! jwt.isEmpty()) {
 			// verify the tokens
 			tokens = verify(jwt, state);
@@ -155,10 +158,32 @@ public final class YouAgainClient {
 		// stash them
 		state.put(AUTHS, tokens);
 		// set user?
-		XId uxid = getUserId2(state, tokens);		
-		return tokens;
+		getAuthTokens2_maybeSetUser(state, tokens);
+		// done
+		return new ArrayList(tokens);
 	}
 	
+	/**
+	 * Set user if tokens and not already set
+	 * @param state
+	 * @param tokens
+	 */
+	private void getAuthTokens2_maybeSetUser(WebRequest state, List<AuthToken> tokens) {
+		if (tokens.isEmpty() || state.getUser()!=null) {
+			return;
+		}
+		AuthToken user = tokens.get(0);
+		final XId uxid = state.get(new XIdField("uxid"));
+		if (uxid!=null) {
+			user = Containers.first(tokens, t -> t.getXId().equals(uxid));
+			if (user==null) {
+				Log.d(LOGTAG, "Unauthorised uxid "+uxid+" with "+tokens);
+				user = tokens.get(0);
+			}
+		}
+		state.setUser(user.getXId(), user);
+	}
+
 	private AuthToken verifyNamePassword(String email, String password) {
 		Utils.check4null(email, password);
 		FakeBrowser fb = new FakeBrowser();
@@ -177,11 +202,11 @@ public final class YouAgainClient {
 	 * 
 	 * @param jwt
 	 * @param state Can be null. For sending messages back
-	 * @return verified auth tokens and unverified nonce@temp tokens
+	 * @return verified auth tokens and unverified nonce@temp tokens. Never null.
 	 */
 	public List<AuthToken> verify(List<String> jwt, WebRequest state) {
 		Log.d(LOGTAG, "verify: "+jwt);
-		List<AuthToken> list = new ArrayList();
+		final List<AuthToken> list = new ArrayList();
 		if (jwt.isEmpty()) return list;
 		for (String jt : jwt) {
 			try {
@@ -346,32 +371,29 @@ public final class YouAgainClient {
 	}
 	
 	/**
-	 * also sets state.setUser()
 	 * @param state
 	 * @param auths
 	 * @return
 	 */
-	XId getUserId2(WebRequest state, List<AuthToken> auths) {
+	private XId getUserId2(WebRequest state, List<AuthToken> auths) {
 		XId uxid = state.get(new XIdField("uxid"));
+		// ?? verify uxid matches an auth token??
 		if (uxid==null) {
 			// no user?
 			if (auths==null || auths.isEmpty()) {
 				return null;
 			}			
-			uxid = auths.get(0).xid;			
+			uxid = auths.get(0).xid;
 		} else {
-			if (auths==null) throw new WebEx.E401(state.getRequestUrl(), "No auth-tokens. Can't act as "+uxid);
+			if (auths==null) throw new WebEx.E401(state.getRequestUrl(), 
+					"No auth-tokens. Can't act as "+uxid);
 		}
 		assert uxid != null;
-		final XId fuxid = uxid;
 		// FIXME security check
-//		AuthToken auth = Containers.first(auths, a -> a.xid.equals(fuxid));
+//		AuthToken auth = Containers.first(auths, a -> a.xid.equals(uxid));
 //		if (auth==null) {
 //			throw new WebEx.E401(state.getRequestUrl(), "No auth-token for "+uxid);
 //		}
-		// set the user
-		Properties user = new Properties(new ArrayMap("xid", uxid));
-		state.setUser(uxid, user);
 		// done
 		return uxid;
 	}
@@ -406,6 +428,13 @@ public final class YouAgainClient {
 
 	public void setDebug(boolean b) {
 		this.debug = b;
+	}
+
+	public void addAuthToken(WebRequest state, AuthToken authToken) {
+		List<AuthToken> auths = getAuthTokens(state);
+		auths.remove(authToken);
+		auths.add(authToken);
+		state.put(AUTHS, auths);
 	}
 
 }

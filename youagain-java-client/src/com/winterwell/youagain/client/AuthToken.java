@@ -1,11 +1,17 @@
 package com.winterwell.youagain.client;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.Generated;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.winterwell.utils.IProperties;
+import com.winterwell.utils.Key;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Containers;
+import com.winterwell.web.data.IHasXId;
 import com.winterwell.web.data.XId;
 
 /**
@@ -14,7 +20,7 @@ import com.winterwell.web.data.XId;
  * A token identifying and authorising.
  * @author daniel
  */
-public class AuthToken {
+public class AuthToken implements IHasXId, IProperties {
 
 	@Override
 	public int hashCode() {
@@ -49,6 +55,12 @@ public class AuthToken {
 	
 	private String app;
 	
+
+	/**
+	 * Optional Display name - not user-name!
+	 */
+	public String name;
+	
 	/**
 	 * @return a JWT token
 	 */
@@ -82,6 +94,11 @@ public class AuthToken {
 	 */
 	public XId xid;
 	
+	/**
+	 * OPtional url for a profile image
+	 */
+	public String img;
+	
 	@Override
 	public String toString() {
 		return "AuthToken["+xid+"]";
@@ -105,6 +122,24 @@ public class AuthToken {
 	public AuthToken setXId(XId xid) {
 		this.xid = xid;
 		return this;
+	}
+
+	@Override
+	public <T> T get(Key<T> key) {
+		String k = key.name;;
+		return (T) Containers.objectAsMap(this).get(k);
+	}
+
+	@Override
+	public Collection<Key> getKeys() {
+		return Containers.apply(
+				"app img name token xid".split(" "),
+				k -> new Key(k));
+	}
+
+	@Override
+	public <T> T put(Key<T> key, T value) {
+		throw new UnsupportedOperationException("put "+key+" = "+value);
 	}
 	
 }

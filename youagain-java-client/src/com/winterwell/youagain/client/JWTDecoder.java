@@ -8,14 +8,17 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Base64.Decoder;
+import java.util.Map;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 
 /**
@@ -66,7 +69,7 @@ public class JWTDecoder {
 		
 		assert ! jwt.endsWith("temp") : jwt;
 		JWTVerifier verifier = JWT.require(algorithm)
-				.withIssuer(issuer)
+//				.withIssuer(issuer) // TODO reinstate
 				.build();
 		try {
 			DecodedJWT decoded = verifier.verify(jwt);
@@ -74,12 +77,27 @@ public class JWTDecoder {
 
 			// debugging
 			if ( ! Utils.equals(issuer, decoded.getIssuer())) {
-				Log.d(LOGTAG, "verify - issuer mismatch! expected: "+issuer+" got: "+decoded.getIssuer()+" from "+jwt+" "+ReflectionUtils.getSomeStack(12));
+				Log.w(LOGTAG, "verify - issuer mismatch! expected: "+issuer+" got: "+decoded.getIssuer()+" from "+jwt+" "+ReflectionUtils.getSomeStack(12));
 			}
-		} catch(Exception ex) {
-			throw new WrappedException("JWT verify failed for '"+jwt+"' for issuer "+issuer+" public key "+getPublicKey(), ex);
+		} catch(Throwable ex) {
+			Object token = "";
+			try {
+				DecodedJWT djwt = JWT.decode(jwt);
+				token = getMap(djwt);
+			} catch(Throwable ex2) {
+				// oh well
+			}
+			throw new WrappedException("JWT verify failed for "+token+" = '"+jwt+"' for issuer "+issuer
+					+" public key "+getPublicKey(), ex);
 		}
 	}
+
+	private Map getMap(DecodedJWT djwt) {
+		Map<String, Claim> map = djwt.getClaims();
+		Map<String, Object> map2 = Containers.applyToMap(map, (k,c) -> c.asString());
+		return map2;
+	}
+
 
 	private Algorithm algorithm() {
 		RSAPublicKey pubk = (RSAPublicKey) getPublicKey();

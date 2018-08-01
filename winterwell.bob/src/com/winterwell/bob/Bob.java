@@ -2,6 +2,7 @@ package com.winterwell.bob;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -160,6 +161,7 @@ public class Bob {
 
 	public static Time getLastRunDate(BuildTask buildTask) {
 		assert buildTask != null;
+		// relies on equals()
 		Time t = time4task.get(buildTask);
 		if (t != null)
 			return t;
@@ -203,19 +205,23 @@ public class Bob {
 		
 		List<String> argsLeft = cb.getRemainderArgs();
 		
-		if (argsLeft.size() == 0 || "--help".equals(args[0])) {			
+		if (argsLeft.size() == 0) {
 			// find a file?
-			File buildFile = args.length==0? findBuildScript() : null;
+			File buildFile = findBuildScript();
 			if (buildFile != null) {
-				args = new String[] { buildFile.toString() };
-			} else {			
-				System.err.println(StrUtils.LINEEND + "Bob the Builder"
-						+ StrUtils.LINEEND + "---------------"
-						+ StrUtils.LINEEND
-						+ "Usage: java -jar bob-all.jar [-cp CLASSPATH] [options] [TargetBuildTasks...]"
-						+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
-				System.exit(1);
+				argsLeft = Arrays.asList(buildFile.toString());
 			}
+		}
+		
+		if (argsLeft.size() == 0 || Containers.contains("--help", args)) {			
+			System.err.println(StrUtils.LINEEND + "Bob the Builder"
+					+ StrUtils.LINEEND + "---------------"
+					+ StrUtils.LINEEND
+					+ "Default usage (looks for a BuildX.java file in the builder directory):"+ StrUtils.LINEEND
+					+ "	java -jar bob-all.jar"+ StrUtils.LINEEND
+					+ "Usage: java -jar bob-all.jar [options] [TargetBuildTasks...]"
+					+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
+			System.exit(1);
 		}
 		
 		// Build each target

@@ -1,7 +1,11 @@
 package jobs;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -13,19 +17,24 @@ public class BuildUtils extends BuildWinterwellProject {
 		incSrc = true;				
 		setCompile(true);
 	}
+	
+	@Override
+	public Collection<? extends BuildTask> getDependencies() {
+		List<BuildTask> deps = new ArrayList(super.getDependencies());
+
+		// Maven
+		MavenDependencyTask mdt = new MavenDependencyTask();
+		mdt.setProjectDir(projectDir);
+		if (outDir!=null) {
+			mdt.setOutputDirectory(outDir);
+		}
+		deps.add(mdt);
+		
+		return deps;
+	}
 		
 	@Override
-	public void doTask() throws Exception {
-		// get the jars utils needs
-		try {
-			MavenDependencyTask mdt = new MavenDependencyTask();
-			mdt.setProjectDir(projectDir);
-			mdt.run();
-		} catch(Throwable ex) {
-			Log.e(LOGTAG, ex);
-			// oh well?!
-		}
-		
+	public void doTask() throws Exception {		
 		super.doTask();				
 	}
 

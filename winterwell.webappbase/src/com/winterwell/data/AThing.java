@@ -16,6 +16,11 @@ import lombok.Data;
 //@Data Lombok is nice, but not using it makes builds more robust
 public class AThing implements IInit {
 
+	/**
+	 * @deprecated TODO fill in from ES
+	 */
+	transient int _version;
+	
 	public String getName() {
 		return name;
 	}

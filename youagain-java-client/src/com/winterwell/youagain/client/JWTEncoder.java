@@ -160,5 +160,10 @@ public class JWTEncoder {
 		return kid;
 	}
 
+	@Override
+	public String toString() {
+		return "JWTEncoder[app=" + app + "]";
+	}
+
 
 }

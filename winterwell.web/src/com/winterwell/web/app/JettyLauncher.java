@@ -234,6 +234,8 @@ public class JettyLauncher {
 	/**
 	 * Add a servlet. Should be called after setup() and before run().
 	 * 
+	 * Best practice: use {@link #addMasterServlet()} instead, and add servlets to that!
+	 * 
 	 * @param path This should usually end with a /* to catch the slug bit, e.g. "/myservlet/*" will get "/myservlet/foo"
 	 * but "/myservlet" would not!
 	 * Annoyingly there is no way to do a general with/without slug, with/without type path!
@@ -435,4 +437,15 @@ public class JettyLauncher {
 		assert server == null;
 		this.webXmlFile = webXmlFile;
 	}
+
+	/**
+	 * Use a MasterServlet for routing, which helps avoid bugs re the servlet path
+	 * @return
+	 */
+	public MasterServlet addMasterServlet() {
+		MasterServlet ms = new MasterServlet();
+		addServlet("/*", ms);
+		return ms;
+	}
+	
 }

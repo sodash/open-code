@@ -24,7 +24,7 @@ import com.winterwell.web.LoginDetails;
  * @author daniel
  * @testedby XIdTest
  */
-public final class XId implements Serializable, IHasJson {
+public final class XId implements Serializable, IHasJson, CharSequence {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -316,7 +316,7 @@ public final class XId implements Serializable, IHasJson {
 
 	/**
 	 * Convenience for ensuring a List contains XId objects.
-	 * @param xids May be Strings or XIds (or a mix).
+	 * @param xids May be Strings or XIds or IHasXIds (or a mix).
 	 * Note: Strings are NOT run through canonicalisation -- they are assumed to be OK!
 	 * @return a copy of xids 
 	 */
@@ -325,29 +325,33 @@ public final class XId implements Serializable, IHasJson {
 	}
 	
 	/**
-	 * Convenience for ensuring a List contains XId objects.
+	 * Convenience for ensuring a List contains XId objects. Uses {@link #xid(Object, boolean)}
 	 * @param xids May be Strings or XIds (or a mix).
-	 * @return a copy of xids 
+	 * @return a copy of xids, can be modified 
 	 */
 	public static List<XId> xids(Collection xids, boolean canonicalise) {
-		ArrayList _xids = new ArrayList(xids.size());
+		final ArrayList _xids = new ArrayList(xids.size());
 		for (Object x : xids) {
 			if (x==null) continue;
-			XId xid;
-			if (x instanceof XId) xid = (XId) x;
-			else if (canonicalise) xid = new XId(x.toString());
-			else xid = new XId(x.toString(), false);
+			XId xid = xid(x, canonicalise);
 			_xids.add(xid);
 		}
 		return _xids;
 	}
 	/**
 	 * Flexible type coercion / constructor convenience.
-	 * @param xid Can be String or XId or null (returns null). Does NOT canonicalise
+	 * @param xid Can be String (actually any CharSequence) or XId or IHasXId or null (returns null). Does NOT canonicalise
 	 * */
 	public static XId xid(Object xid) {
+		return xid(xid, false);
+	}
+	
+	public static XId xid(Object xid, boolean canon) {
 		if (xid==null) return null;
-		return xid instanceof XId? (XId) xid : new XId((String)xid, false);
+		if (xid instanceof XId) return (XId) xid;		
+		if (xid instanceof CharSequence) new XId(xid.toString(), canon);
+		IHasXId hasxid = (IHasXId) xid;
+		return hasxid.getXId();
 	}
 	
 	@Override
@@ -358,6 +362,21 @@ public final class XId implements Serializable, IHasJson {
 	@Override
 	public Object toJson2() throws UnsupportedOperationException {
 		return toString();
+	}
+
+	@Override
+	public int length() {
+		return toString().length();
+	}
+
+	@Override
+	public char charAt(int index) {
+		return toString().charAt(index);
+	}
+
+	@Override
+	public CharSequence subSequence(int start, int end) {
+		return toString().subSequence(start, end);
 	}
 	
 }

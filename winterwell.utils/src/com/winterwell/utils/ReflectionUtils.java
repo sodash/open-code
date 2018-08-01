@@ -428,6 +428,27 @@ public class ReflectionUtils {
 			}
 		}
 	}
+	
+	public static void setPrivateStaticField(Object obj, String fieldName, Object value) {
+		Field f = ReflectionUtils.getField(obj.getClass(), fieldName);
+		if (f==null) {
+			throw Utils.runtime(new NoSuchFieldException(fieldName));
+		}	    
+		try {
+			f.setAccessible(true);
+			int m = f.getModifiers();
+			// coerce to non-final?
+			if ( ! Modifier.isStatic(m)) {
+				throw new IllegalArgumentException("Not static "+f);
+			}
+		    Field modifiersField = Field.class.getDeclaredField("modifiers");
+		    modifiersField.setAccessible(true);
+		    modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+			f.set(obj, value);
+		} catch(Exception iae) {
+			throw Utils.runtime(iae);		     
+		} 
+	}
 
 	/**
 	 * Set a field, which can be private. Throws exceptions if the field does

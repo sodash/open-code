@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -64,12 +65,13 @@ public class WebRequest implements IProperties, Closeable {
 	 * Uses path=/ Call {@link WebUtils2#addCookie(HttpServletResponse, String, Object, Dt, String)} for more options.
 	 * 
 	 * @param cookieDomain .mysite.com means cookies will work across mysite.com, abc.mysite.com and www.mysite.com 
+	 * @return 
 	 * @see WebUtils2#addCookie(HttpServletResponse, String, Object, Dt, String)
 	 */
-	public void setCookie(String name, String value, Dt timeTolive, String cookieDomain) {
+	public Cookie setCookie(String name, String value, Dt timeTolive, String cookieDomain) {
 		if (freshCookies==null) freshCookies = new ArrayMap();
 		freshCookies.put(name, value);
-		WebUtils2.addCookie(getResponse(), name, value, timeTolive, cookieDomain);
+		return WebUtils2.addCookie(getResponse(), name, value, timeTolive, cookieDomain);
 	}
 
 	/**
@@ -852,9 +854,10 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	public final String getSlug() {
 		// NB getPathInfo() already returns URL decoded path
-		String pi = request.getPathInfo();
+		String pi = getRequestPath();
 		if (pi == null)
 			return null;
+		assert pi.startsWith("/") : "no / to start slug?! "+this;
 		boolean keepFileType = false;
 		// eg. /profile/ has no slug
 		if (pi.endsWith("/")) {

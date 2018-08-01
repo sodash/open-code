@@ -106,7 +106,9 @@ public final class UploadServlet implements IServlet {
 		cargo.put("absolutePath", _asset.getAbsolutePath());
 		
 		String relpath = FileUtils.getRelativePath(_asset, webRoot);
-		String url = server +"/"+relpath;
+		// ugly code to avoid // inside the path whatever the path bits
+		if (relpath.startsWith("/")) relpath.substring(1);		
+		String url = server +(server.endsWith("/")? "" : "/")+relpath;
 		cargo.put("url", url);
 		
 

@@ -38,6 +38,10 @@ public class JSend implements IHasJson {
 	public JSend() {	
 	}
 	
+	/**
+	 * Send this response
+	 * @param request
+	 */
 	public void send(WebRequest request) {
 		WebUtils2.sendJson(request, toJSONString());
 	}
