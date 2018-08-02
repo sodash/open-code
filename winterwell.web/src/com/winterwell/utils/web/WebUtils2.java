@@ -192,8 +192,9 @@ public class WebUtils2 extends WebUtils {
 	 * @param timeTolive
 	 * @param cookieDomain
 	 *            e.g. ".soda.sh" Can be null for default behaviour
+	 * @return 
 	 */
-	public static void addCookie(HttpServletResponse response, String name,
+	public static Cookie addCookie(HttpServletResponse response, String name,
 			Object value, Dt timeTolive, String cookieDomain) {
 		String cname = urlEncode(name);
 		Cookie cookie = new Cookie(cname, value.toString());
@@ -206,6 +207,7 @@ public class WebUtils2 extends WebUtils {
 		// FIXME WHy is Jetty sometimes wrapping names in quotes? It seems to happen if the name uses a % encoding.		
 		response.addCookie(cookie);
 		Log.d("cookie", "add "+name+" = "+value);
+		return cookie;
 	}
 
 	/**
