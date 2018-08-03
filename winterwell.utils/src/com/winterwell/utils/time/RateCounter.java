@@ -198,10 +198,9 @@ public class RateCounter {
 	}
 
 	/**
-	 * Override the counter multiplying up if the we are within the first cycle?
+	 * Override the counter multiplying up if we are within the first cycle?
 	 * If true (the default) then the first cycle will not apply a fractional
-	 * boost. Dt = 1 day, counts = 1, time elapsed = 1 second true: 1 count per
-	 * day. false: 86400 counts per day.
+	 * boost.
 	 */
 	public void setFirstDtOverride(boolean override) {
 		this.overrideIfFirstCycle = override;
@@ -251,8 +250,7 @@ public class RateCounter {
 	}
 
 	/**
-	 * @deprecated For porting use.
-	 * @return
+	 * @return the rate
 	 */
 	public Rate rate() {
 		return new Rate(get(), getPeriod(), null);

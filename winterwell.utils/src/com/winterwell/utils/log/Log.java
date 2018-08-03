@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.winterwell.datalog.Rate;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.IFn;
@@ -19,8 +20,13 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Cache;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.RateCounter;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 /**
  * Yet another logging system. We use Android LogCat style commands, e.g.
@@ -128,7 +134,7 @@ public class Log {
 		}
 	}
 	
-	static LogConfig config;
+	static LogConfig config = new LogConfig();
 
 	private static IFilter<String> excludeFilter;
 
@@ -183,6 +189,9 @@ public class Log {
 				}
 			};
 		}
+		
+		// throttle cache??
+		
 		// all set (let's log that)
 		Log.i("log", "setConfig "+ReflectionUtils.getSomeStack(10));
 	}
@@ -293,6 +302,10 @@ public class Log {
 				error = Level.INFO;
 			}
 		}
+		// throttle?
+		if (throttle(tag)) {
+			return; // throttled!
+		}
 		// make a Report
 		Report report = new Report(tag, smsg, error, msgText, ex);
 		// Note: using an array for listeners avoids any concurrent-mod
@@ -310,6 +323,45 @@ public class Log {
 			escalate(new WeirdException("Escalating "+msgText));
 		}
 	}
+	
+	/**
+	 * 
+	 * @param tag
+	 * @return true to silently swallow this tag
+	 * This is to protect against log file bloat
+	 */
+	private static boolean throttle(String tag) {
+		if (config==null) return false;
+		if (config.throttleWindow==null || config.throttleAt==null) {
+			return false;
+		}
+		RateCounter rc = throttle.get(tag);
+		if (rc==null) {
+			rc = new RateCounter(config.throttleWindow);
+			rc.setFirstDtOverride(true);
+			throttle.put(tag, rc);
+			return false;
+		}
+		// shall we?
+		rc.plus(1);
+		if (config.throttleAt.isGreaterThan(rc.rate())) {
+			return false;
+		}
+		// first time? Or first time today?
+		Time tat = throttledAt.get(tag);
+		if (tat==null || tat.isBefore(new Time().minus(TUnit.DAY))) {
+			Log.i("throttle", "Throttle (skip) log reports for tag #"+tag+" which is running at "+rc);
+			throttledAt.put(tag, new Time());
+		}
+		return true;
+	}
+	
+
+	/**
+	 * Throttle frequent messages
+	 */
+	static final Cache<String, RateCounter> throttle = new Cache<>(1000);
+	static final Cache<String, Time> throttledAt = new Cache<>(100);
 
 	@Deprecated
 	public static void report(String tag, Object msg, Level error) {

@@ -177,7 +177,6 @@ public class LgServlet {
 		
 		// Add ip/user type
 		String userType = getInvalidType(ips);
-		Log.d(userType);
 		if (userType!=null) {
 			params.put("invalid", userType);
 		}
