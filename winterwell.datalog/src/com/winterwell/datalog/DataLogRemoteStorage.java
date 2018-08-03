@@ -146,10 +146,8 @@ public class DataLogRemoteStorage implements IDataLogStorage
 
 	@Override
 	public StatReq<IDataStream> getData(String tag, Time start, Time end, KInterpolate fn, Dt bucketSize) {
-		FakeBrowser fb = new FakeBrowser();
-		
-		fb.setAuthentication("daniel@local.com@email", "1234");
-		fb.setDebug(true);
+		FakeBrowser fb = fb();		
+		fb.setAuthentication("daniel@local.com@email", "1234");		
 		Map<String, String> vars = new ArrayMap(
 			"q", "tag:"+tag,
 			"breakdown", "time"
@@ -160,6 +158,14 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		Object jobj = JSON.parse(res);
 		throw new TodoException();
 	}
+
+	private FakeBrowser fb() {
+		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(true);
+		fb.setUserAgent(FakeBrowser.HONEST_USER_AGENT);
+		return fb;
+	}
+
 
 	@Override
 	public StatReq<Double> getTotal(String tag, Time start, Time end) {
@@ -195,8 +201,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	@Override
 	public Object saveEvent(Dataspace dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
 		// See LgServlet which reads these
-		FakeBrowser fb = new FakeBrowser();
-		fb.setDebug(true);
+		FakeBrowser fb = fb();
 		Map<String, String> vars = new ArrayMap(
 			event.toJson2()
 				);

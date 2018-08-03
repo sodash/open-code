@@ -124,7 +124,15 @@ public class FakeBrowser {
 
 	private static final String LOGTAG = "FakeBrowser";
 
-	
+	/**
+	 * ??what is this claiming to be??
+	 */
+	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36";
+
+	/**
+	 * Use this if you want to let servers know its FakeBrowser
+	 */
+	public static final String HONEST_USER_AGENT = "Java Winterwell";	
 
 	static {
 		try {
@@ -746,9 +754,7 @@ public class FakeBrowser {
 		
 	Map<String,Object> reqHeaders = new ArrayMap(
 			// pretend to be modernish Firefox
-			"User-Agent", 	//"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0"
-							// Chrome
-							"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36"
+			"User-Agent", DEFAULT_USER_AGENT
 			);
 
 	private Proxy proxy;
