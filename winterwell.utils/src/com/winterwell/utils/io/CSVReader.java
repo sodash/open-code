@@ -156,6 +156,10 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 		}
 	}
 
+	public CSVReader(File f) {
+		this(f, ',');
+	}
+
 	/**
 	 * @see java.io.Closeable#close()
 	 */

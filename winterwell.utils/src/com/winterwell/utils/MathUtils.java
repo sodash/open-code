@@ -577,6 +577,11 @@ public class MathUtils {
 	}
 
 	/**
+	 * test for valid number characters
+	 */
+	static final Pattern fastNumTest = Pattern.compile("[0-9\\.ex\\-]+");
+	
+	/**
 	 * 
 	 * @param value
 	 * @return true if value is (not null) and a Number or a number or a String like "1"
@@ -588,8 +593,11 @@ public class MathUtils {
 		Class<? extends Object> fClass = value.getClass();
 		if (ReflectionUtils.isa(fClass, Number.class)) return true;
 		if (value instanceof String) {
+			if ( ! fastNumTest.matcher((String)value).matches()) {
+				return false;
+			}
 			try {
-				// should we use a regex instead? \\d+(\\.\\d+)?
+				// should we use a regex instead? \\d+(\\.\\d+)?				
 				Double.valueOf((String)value);
 				return true;
 			} catch (Exception e) {

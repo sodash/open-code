@@ -42,13 +42,24 @@ public class MavenDependencyTask extends BuildTask {
 	public MavenDependencyTask() {
 	}
 
+	/**
+	 * Convenience for a single artifact dependency
+	 * @param artifactId e.g. "mystuff:artifact:1.2"
+	 */
+	public MavenDependencyTask(String artifactId) {
+		String[] bits = artifactId.split(":");
+		assert bits.length == 3;
+		addDependency(bits[0], bits[1], bits[2]);
+	}
+
 	File outDir;
 	File projectDir = FileUtils.getWorkingDirectory();
 
 	boolean incSrc;
 	
-	public void setIncSrc(boolean incSrc) {
+	public MavenDependencyTask setIncSrc(boolean incSrc) {
 		this.incSrc = incSrc;
+		return this;
 	}
 	
 	public MavenDependencyTask setOutputDirectory(File outDir) {
@@ -71,8 +82,9 @@ public class MavenDependencyTask extends BuildTask {
 	
 	private boolean keepJarVersioning;
 	private boolean forceUpdate;
-	public void setForceUpdate(boolean forceUpdate) {
+	public MavenDependencyTask setForceUpdate(boolean forceUpdate) {
 		this.forceUpdate = forceUpdate;
+		return this;
 	}
 	
 	/**
@@ -109,7 +121,12 @@ public class MavenDependencyTask extends BuildTask {
 		if (outDir==null) {
 			setOutputDirectory(new File(projectDir, "dependencies"));
 		}
-		outDir.mkdirs();		
+		boolean md = outDir.mkdirs();
+		if (md) {
+			// if we made the dir, we can take charge of it -- lets git ignore by default
+			File gi = new File(outDir, ".gitignore");
+			FileUtils.write(gi, "*.jar");
+		}
 		assert outDir.isDirectory() : this;
 		
 		if (dependencies.isEmpty()) {
