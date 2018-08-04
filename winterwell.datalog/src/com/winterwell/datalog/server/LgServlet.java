@@ -1,6 +1,7 @@
 package com.winterwell.datalog.server;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,6 +10,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogEvent;
@@ -19,7 +22,10 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.BrowserType;
 import com.winterwell.web.app.FileServlet;
@@ -123,6 +129,11 @@ public class LgServlet {
 		WebUtils2.sendText(logged!=null? "OK" : "not logged", resp);
 	}
 
+	/**
+	 * TODO refactor as Map key:ip value=user-type eg "bot"
+	 */
+	static List<Map> userTypeForIPorXId;
+	static volatile Time userTypeForIPorXIdFetched;
 	
 	/**
 	 * 
@@ -132,7 +143,7 @@ public class LgServlet {
 	 * @param count
 	 * @param params can be null
 	 * @param stdTrackerParams
-	 * @return
+	 * @return event, or null if this was screened out (eg our own IPs)
 	 */
 	public static DataLogEvent doLog(WebRequest state, String dataspace, String gby, String tag, double count, 
 			Map params, boolean stdTrackerParams) 
@@ -147,9 +158,9 @@ public class LgServlet {
 		
 		// HACK remove Hetzner from the ip param 
 		// TODO make this a config setting?? Or even better, the servers report their IP
-		Object ip = params.get("ip");
+		Object ip = params.get("ip"); // NB ip can be null
 		if (ip instanceof String) ip = ((String) ip).split(",\\s*");
-		List<Object> ips = Containers.list(ip);
+		List ips = Containers.list(ip); // NB: ips is now never null
 		if (ips.contains("5.9.23.51")) {
 			ips = Containers.filter(ips, a -> ! "5.9.23.51".equals(a));
 			if (ips.size() == 1) {
@@ -162,6 +173,12 @@ public class LgServlet {
 		// screen out our IPs?
 		if ( ! accept(dataspace, tag, params)) {
 			return null;
+		}
+		
+		// Add ip/user type
+		String userType = getInvalidType(ips);
+		if (userType!=null) {
+			params.put("invalid", userType);
 		}
 		
 		// write to log file
@@ -184,7 +201,46 @@ public class LgServlet {
 //		}
 		return event;
 	}
-		
+	
+	
+	/**
+	 * Is it a bot? works with Portal which holds the data
+	 * @param ips
+	 * @return
+	 */
+	private static String getInvalidType(List ips) {
+		assert ips != null;
+		if (userTypeForIPorXId==null || userTypeForIPorXIdFetched==null || userTypeForIPorXIdFetched.isBefore(new Time().minus(10, TUnit.MINUTE))) {
+			//Needs to be set first -- will get caught in a loop otherwise as userTypeForIPorXId is still null
+			userTypeForIPorXIdFetched = new Time();			
+			FakeBrowser fb = new FakeBrowser();
+			fb.setRequestMethod("GET");
+
+			try {
+				//Right now, just set to point at local. TODO read in correct endpoint from state
+				String json= fb.getPage("https://portal.good-loop.com/botip/_list.json");
+				Map response = (Map) JSON.parse(json);
+				Map esres = (Map) response.get("cargo");
+				List<Map> hits = Containers.asList(esres.get("hits"));
+				
+				userTypeForIPorXId = hits;
+			}
+			catch(Exception ex) {
+				Log.e("lg.getInvalidType", ex);
+				userTypeForIPorXId = new ArrayList(); // paranoia: keep logging fast. This will get checked again in 10 minutes
+			}
+		}
+		//At this point, can safely assume that we have a valid list of IPs
+		for (Object userIP : ips) {
+			for(Map botIP : userTypeForIPorXId) {
+				String badIP = (String) botIP.get("ip");
+				if (userIP.equals(badIP)) return (String) botIP.get("type");
+			}
+		}
+		return null;
+	}
+
+
 	static ua_parser.Parser parser;
 	
 

@@ -51,6 +51,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	 * @return
 	 */
 	public static boolean saveToRemoteServer(String server, DataLogEvent event) {
+		Utils.check4null(server, event);
 		DataLogRemoteStorage dlrs = new DataLogRemoteStorage();
 		DataLogConfig remote = new DataLogConfig();
 		// add https and endpoint
@@ -59,7 +60,17 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		
 		remote.logEndpoint = server;
 		dlrs.init(remote);
-		Object ok = dlrs.saveEvent(new Dataspace(event.dataspace), event, new Period(event.time));
+		
+		// DEBUG July 2018
+		String eds = event.dataspace; 
+		if (event.dataspace==null) {
+			Log.e("datalog", "null dataspace?! "+event);
+			eds = "gl"; // paranoia HACK
+		}		
+		
+		Dataspace ds = new Dataspace(eds);
+		// save
+		Object ok = dlrs.saveEvent(ds, event, new Period(event.time));
 		Log.d("datalog.remote", "Save to "+server+" "+event+" response: "+ok);
 		return true;
 	}
@@ -73,7 +84,8 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	public static void hackRemoteDataLog(DataLogEvent event) {
 		try {
 			KServerType st = AppUtils.getServerType(null);
-			String LG_SERVER = AppUtils.getServerUrl(st, "lg.good-loop.com").toString();
+			StringBuilder su = AppUtils.getServerUrl(st, "lg.good-loop.com");			
+			String LG_SERVER = su.toString();
 			DataLogRemoteStorage.saveToRemoteServer(LG_SERVER, event);
 		} catch(Throwable ex) {
 			Log.e("datalog.hack (swallowed)", ex);
@@ -134,10 +146,8 @@ public class DataLogRemoteStorage implements IDataLogStorage
 
 	@Override
 	public StatReq<IDataStream> getData(String tag, Time start, Time end, KInterpolate fn, Dt bucketSize) {
-		FakeBrowser fb = new FakeBrowser();
-		
-		fb.setAuthentication("daniel@local.com@email", "1234");
-		fb.setDebug(true);
+		FakeBrowser fb = fb();		
+		fb.setAuthentication("daniel@local.com@email", "1234");		
 		Map<String, String> vars = new ArrayMap(
 			"q", "tag:"+tag,
 			"breakdown", "time"
@@ -148,6 +158,14 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		Object jobj = JSON.parse(res);
 		throw new TodoException();
 	}
+
+	private FakeBrowser fb() {
+		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(true);
+		fb.setUserAgent(FakeBrowser.HONEST_USER_AGENT);
+		return fb;
+	}
+
 
 	@Override
 	public StatReq<Double> getTotal(String tag, Time start, Time end) {
@@ -183,8 +201,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	@Override
 	public Object saveEvent(Dataspace dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
 		// See LgServlet which reads these
-		FakeBrowser fb = new FakeBrowser();
-		fb.setDebug(true);
+		FakeBrowser fb = fb();
 		Map<String, String> vars = new ArrayMap(
 			event.toJson2()
 				);
