@@ -19,6 +19,11 @@ public class BuildWeb extends BuildWinterwellProject {
 		
 		// maven
 		MavenDependencyTask mdt = new MavenDependencyTask();
+		mdt.addDependency("org.eclipse.jetty", "jetty-server", "9.4.8.v20171121");
+		mdt.addDependency("org.eclipse.jetty","jetty-util","9.4.8.v20171121");
+		mdt.addDependency("org.eclipse.jetty","jetty-util-ajax","9.4.8.v20171121");
+		mdt.addDependency("org.eclipse.jetty", "jetty-servlet", "9.4.8.v20171121");
+		mdt.addDependency("javax.mail", "mail", "1.5.0-b01");
 		mdt.setProjectDir(projectDir);
 		if (outDir!=null) {
 			mdt.setOutputDirectory(outDir);

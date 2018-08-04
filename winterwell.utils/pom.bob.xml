@@ -1,30 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">	
+<project>	
 	<modelVersion>4.0.0</modelVersion>
-	
-	<!-- This is NOT a proper pom file! It is for Bob to use for fetching dependencies. -->
-		
-	<dependencies>	
-		
-		<!-- https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream -->
-		<dependency>
-		    <groupId>com.thoughtworks.xstream</groupId>
-		    <artifactId>xstream</artifactId>
-		    <version>1.4.10</version>
-		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/junit/junit -->
-		<dependency>
-		    <groupId>junit</groupId>
-		    <artifactId>junit</artifactId>
-		    <version>4.12</version>
-		    <scope>test</scope>
-		</dependency>
-						
-	</dependencies>
-	<groupId>com.example</groupId>
+<!-- Not a real pom! MavenDependencyTask pom for Bob -->	<groupId>com.example</groupId>
 	<artifactId>dummy</artifactId>
-	<version>1.0.0</version>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>dummy</name>
+	<dependencies>
+<dependency><groupId>com.thoughtworks.xstream</groupId><artifactId>xstream</artifactId><version>1.4.10</version></dependency>
+<dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>4.12</version></dependency>
+<dependency><groupId>com.jolbox</groupId><artifactId>bonecp</artifactId><version>0.8.0.RELEASE</version></dependency>	</dependencies>
 </project>

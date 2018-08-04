@@ -26,9 +26,10 @@
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-logging.jar"/>
 	<classpathentry kind="lib" path="/middleware/tagsoup/tagsoup.jar"/>
 	<classpathentry kind="lib" path="/middleware/dnsjava/dnsjava.jar" sourcepath="/middleware/dnsjava/dnsjava-2.1.3-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="/middleware/javamail/javax.mail.jar" sourcepath="/middleware/javamail/javamail-1.5.5-src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry kind="lib" path="/middleware/guava/guava.jar" sourcepath="/middleware/guava/src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/flexi-gson"/>
+	<classpathentry kind="lib" path="dependencies/activation.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

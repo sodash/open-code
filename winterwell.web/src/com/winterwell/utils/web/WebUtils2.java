@@ -1257,25 +1257,27 @@ public class WebUtils2 extends WebUtils {
 //			Log.d("CORS", "No request? "+state);
 			return;
 		}
-		{ // debug weird stuff
-			Collection<String> responseheaders = state.getResponse().getHeaderNames();
-			Collection<String> ach = state.getResponse().getHeaders(ALLOW_CREDENTIALS_HEADER);
-			assert ach==null || ach.size() < 2 : ach+" all-response-headers:"+responseheaders+" "+state;
-
-			List<String> headers = Containers.getList(state.getRequest().getHeaderNames());
-//			System.out.println(headers);
-			Cookie[] cookies = state.getRequest().getCookies();		
-			String ref = state.getReferer();
-			String caller = state.get("caller");
-//			Printer.out(ref);
-//			Printer.out(caller);
-		}
+//		{ // debug weird stuff
+//			Collection<String> responseheaders = state.getResponse().getHeaderNames();
+//			Collection<String> ach = state.getResponse().getHeaders(ALLOW_CREDENTIALS_HEADER);
+//			assert ach==null || ach.size() < 2 : ach+" all-response-headers:"+responseheaders+" "+state;
+//
+//			List<String> headers = Containers.getList(state.getRequest().getHeaderNames());
+////			System.out.println(headers);
+//			Cookie[] cookies = state.getRequest().getCookies();		
+//			String ref = state.getReferer();
+//			String caller = state.get("caller");
+////			Printer.out(ref);
+////			Printer.out(caller);
+//		}
 		
-		// DEBUG - how can we get true,true?? June 2018
-		Object already = state.get(new Key("CORS_set"));
-		state.put(new Key("CORS_set"), true);
+		// Avoid true,true, which upsets browsers
+		Key CORS_set = new Key("CORS_set");
+		Object already = state.get(CORS_set);
+		state.put(CORS_set, true);
 		if (Utils.yes(already)) {
-			Log.e("web", "potential header x2 bug - CORS set twice: "+ReflectionUtils.getSomeStack(8)+" "+state);
+			Log.d("web", "potential header x2 bug - CORS set twice: "+ReflectionUtils.getSomeStack(6)+" "+state);
+			return;
 		}
 		
 		// Note: wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header 
