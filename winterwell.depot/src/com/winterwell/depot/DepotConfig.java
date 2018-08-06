@@ -66,6 +66,9 @@ public class DepotConfig {
 	double writeBehindJitter = 0.1;
 	
 	@Option
+	Dt batch;
+	
+	@Option
 	File dir;
 
 	@Option
@@ -111,6 +114,7 @@ public class DepotConfig {
 		// init
 		s.init();
 		
+		// SlowStorage?
 		if (writeBehind!=null) {
 			SlowStorage wb = new SlowStorage(s, writeBehind, depot);
 			if (writeBehindJitter!=0) {
@@ -118,6 +122,13 @@ public class DepotConfig {
 					Log.e("DepotConfig", "Invalid jitter "+writeBehindJitter);
 				} else {
 					wb.setDelayJitter(writeBehindJitter);
+				}
+			}
+			if (batch!=null && batch.getMillisecs() != 0) {
+				if (batch.getMillisecs() < 0) {
+					Log.e("DepotConfig", "Invalid batch "+batch);
+				} else {
+					wb.setBatch(batch);
 				}
 			}
 			return wb;
