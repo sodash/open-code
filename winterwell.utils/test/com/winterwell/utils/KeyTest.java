@@ -16,12 +16,6 @@ public class KeyTest extends TestCase {
 		assert key1.equals(key2) == false;
 	}
 
-	public void testEqualsObject3() {
-		Key<String> key1 = new Key<String>("name");
-		int number = 2;
-		assert key1.equals(number) == false;
-	}
-
 	public void testEqualsObject4() {
 		Key<String> key1 = new Key<String>("name");
 		assert key1.equals(null) == false;

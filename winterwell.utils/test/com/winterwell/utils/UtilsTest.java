@@ -87,9 +87,9 @@ public class UtilsTest extends TestCase {
 		Long l = 1L;
 		Integer i = 1;
 		// Java says not the same
-		assert ! d.equals(i);
-		assert ! i.equals(d);
-		assert ! d.equals(l);
+		assert ! d.equals((Object) i);
+		assert ! i.equals((Object) d);
+		assert ! d.equals((Object) l);
 		// we say yes they are
 		assert Utils.equals(d, i);
 		assert Utils.equals(d, l);
