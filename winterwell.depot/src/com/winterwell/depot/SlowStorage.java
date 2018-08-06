@@ -4,16 +4,21 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.Actor;
 import com.winterwell.utils.threads.SlowActor;
 import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.RateCounter;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.TimeUtils;
 
@@ -62,6 +67,15 @@ implements IStore, Flushable, Closeable
 	}
 	
 	Dt delay;
+	
+	/**
+	 * In addition to delay, batch saves together. This is for efficiency with ElasticSearch.
+	 */
+	Dt batch;
+	
+	public void setBatch(Dt batch) {
+		this.batch = batch;
+	}
 
 	/**
 	 * marker for "yes it should be null"
@@ -71,6 +85,11 @@ implements IStore, Flushable, Closeable
 	private static final String LOGTAG = "SlowStorage";
 
 	private static final int MB = (int) Math.pow(2, 20); // 1k * 1k -- a big megabyte
+
+	/**
+	 * Dummy Desc to trigger batch save
+	 */
+	private static final Desc SAVE_BATCH = new Desc("SAVE_BATCH", String.class);
 	
 	final ConcurrentHashMap<Desc, Object> map = new ConcurrentHashMap();
 	
@@ -152,8 +171,61 @@ implements IStore, Flushable, Closeable
 		return base.getMetaData(desc);
 	}
 
+	HashSet<Desc> batched;
+	
 	@Override
 	protected void consume(Desc desc, Actor sender) {
+		// Too many errors? 
+		RateCounter ec = errorCount;
+		if (ec!=null && ec.get() > 10) {
+			// NB: Log throttle should stop thie error message going nuts 
+			Log.e(LOGTAG, "SlowStorage back off: "+errorCount+" consecutive save errors.");
+			// pause a bit
+			sendDelayed(desc, sender, delay);
+			return;
+		}
+		
+		try {
+			if (SAVE_BATCH.equals(desc)) {
+				consume2_saveBatch();
+				errorCount = null; // success - reset
+				return;
+			}
+			
+			// batch?
+			if (batch!=null) {
+				boolean freshBatch = batched.isEmpty();
+				batched.add(desc);
+				if (freshBatch) {
+					sendDelayed(SAVE_BATCH, this, batch);
+				}
+				return;			
+			}
+			
+			// normal save one at a time
+			consume2_saveOne(desc);
+			errorCount = null; // success - reset
+			
+		} catch(Exception ex) {			
+			// try again in a bit!
+			sendDelayed(desc, sender, delay);
+			// count and back off?
+			ec = errorCount;
+			if (ec == null) {
+				ec = new RateCounter(delay);
+				errorCount = ec; // NB: race condition paranoia - ec cannot be null
+			}
+			ec.plus(1);
+		}
+	}
+	
+	/**
+	 * Count failed saves. This is reset to null after any successful save. So it should always be low
+	 *  - unless the underlying storage is down.
+	 */
+	RateCounter errorCount;
+
+	private void consume2_saveOne(Desc desc) {
 		// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map.
 		// Remove any other requests for msg
 		for(Packet p : getQ().toArray(new Packet[0])) {
@@ -193,6 +265,57 @@ implements IStore, Flushable, Closeable
 		// Do nothing to the map if someone has just reset a fresh value.
 		map.remove(desc, v);
 	}
+
+	
+
+	private void consume2_saveBatch() {
+		List<Pair2<Desc,Object>> add = new ArrayList();
+		List<Desc> remove = new ArrayList();
+		
+		for(Desc desc : batched) {
+			// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map.
+			// Remove any other requests for msg
+			for(Packet p : getQ().toArray(new Packet[0])) {
+				if (desc.equals(p.msg)) {
+					getQ().remove(p);
+				}
+			}
+			// Save or remove?
+			Object v = map.get(desc); 
+			// NB: We only modify the map at the end, and only if it stays the same
+			if (v==null) {
+				Log.w(LOGTAG, "null?! Artifact already saved in race? "+desc);
+				// nothing to do
+			} else if (v==NULL) {
+				remove.add(desc);				
+			} else {
+				// merge? NB: dec.before is normally null
+				if (desc.getBefore() != null) {
+					Object latest = base.get(desc);
+					if (latest!=null) {
+						Object vMerge = depot.merger.doMerge(desc.getBefore(), v, latest);
+						v = vMerge;
+						// update the binding
+						desc.bind(vMerge);
+					}
+				}
+				
+				// Store it!
+				add.add(new Pair2<>(desc, v));				
+				
+				// take a new snapshot for further updates?
+				if (desc.getBefore() != null) {
+					desc.remarkForMerge();
+				}
+			}
+			// Modify the map if as expected. 
+			// Do nothing to the map if someone has just reset a fresh value.
+			map.remove(desc, v);
+		}
+		// save
+		base.storeBatch(add, remove);
+	}
+	
 
 	Depot depot;
 

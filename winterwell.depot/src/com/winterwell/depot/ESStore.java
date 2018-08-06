@@ -1,13 +1,16 @@
 package com.winterwell.depot;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.winterwell.depot.IHasVersion.IHasBefore;
+import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
+import com.winterwell.es.client.BulkRequestBuilder;
 import com.winterwell.es.client.DeleteRequestBuilder;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.GetRequestBuilder;
@@ -21,6 +24,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.XStreamUtils;
 
@@ -34,7 +38,10 @@ import com.winterwell.utils.web.XStreamUtils;
  */
 public class ESStore implements IStore {
 
-	private Cache<String, String> indexCache  = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
+//	/**
+//	 * TODO Used for flush
+//	 */
+//	private Cache<String, String> indexCache  = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
 
 	@Override
 	public void init() {
@@ -47,6 +54,36 @@ public class ESStore implements IStore {
 		}
 	}
 	
+	@Override
+	public void storeBatch(List<Pair2<Desc, Object>> add, List<Desc> remove) {
+		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		BulkRequestBuilder bulk = esc.prepareBulk();
+		// remove all
+		for (Desc desc : remove) {
+			ESPath path = pathForDesc(desc);
+			DeleteRequestBuilder rm = esc.prepareDelete(path.index(), path.type, path.id);
+			bulk.add(rm);
+		}
+		// add all
+		for (Pair2<Desc, Object> desc_artifact : add) {
+			ESPath path = pathForDesc(desc_artifact.first);
+			IndexRequestBuilder index = esc.prepareIndex(path);
+			ESStoreWrapper doc = new ESStoreWrapper(desc_artifact.second);
+			index.setBodyDoc(doc);
+//			indexCache.put(key, value);
+			bulk.add(index);
+		}
+		IESResponse resp = bulk.get().check();			
+	}
+
+	
+	private ESPath pathForDesc(Desc desc) {
+		String tag = Utils.or(desc.getTag(), "untagged");
+		String index = "depot_"+tag;
+		String type = "artifact";
+		return new ESPath(index, type, desc.getId());
+	}
+
 	@Override
 	public String getRaw(Desc desc) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
@@ -81,9 +118,8 @@ public class ESStore implements IStore {
 	@Override
 	public void remove(Desc desc) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		String index = "depot_"+Utils.or(desc.getTag(), "untagged");
-		String type = "artifact";
-		DeleteRequestBuilder del = esc.prepareDelete(index, type, desc.getId());
+		ESPath path = pathForDesc(desc);		
+		DeleteRequestBuilder del = esc.prepareDelete(path.index(), path.type, path.id);
 		IESResponse resp = del.get();
 		// bark on failure??
 		if (resp.getError()!=null) {
@@ -97,17 +133,13 @@ public class ESStore implements IStore {
 	}
 
 	@Override
-	public <X> void put(Desc<X> desc, X artifact) {
+	public <X> void put(Desc<X> desc, X artifact) {		
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		String tag = Utils.or(desc.getTag(), "untagged");
-		String index = "depot_"+tag;
-		String type = "artifact";
-//		FlexiGson gson = Dep.get(FlexiGson.class);
-//		String json = gson.toJson(artifact);		
-		IndexRequestBuilder put = esc.prepareIndex(index, type, desc.getId());;
+		ESPath path = pathForDesc(desc);		
+		IndexRequestBuilder put = esc.prepareIndex(path);;
 		put.setBodyDoc(new ESStoreWrapper(artifact));
 		IESResponse resp = put.get().check();	
-		indexCache.put(index, tag);
+//		indexCache.put(path.index(), tag);
 	}
 	
 	
@@ -115,11 +147,11 @@ public class ESStore implements IStore {
 	
 	@Override
 	public void flush() {
-		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		String indexList = StrUtils.join(indexCache.asMap().keySet(), ",");
+//		ESHttpClient esc = Dep.get(ESHttpClient.class);
+//		String indexList = StrUtils.join(indexCache.asMap().keySet(), ",");
 		// recent indices
 		// TODO call /indexList/_refresh
-		throw new TodoException();
+//		throw new TodoException();
 	}
 
 	@Override

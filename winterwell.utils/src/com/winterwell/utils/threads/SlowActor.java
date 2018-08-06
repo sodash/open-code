@@ -41,7 +41,11 @@ public class SlowActor<Msg> extends Actor<Msg> implements Flushable {
 	public 
 //	final NB: removed final to allow for mocks in testing. This should not really be over-ridden. 
 	void sendDelayed(Msg msg, Actor sender, Dt delay) {
-//		Log.d(getClass().getSimpleName(), "in " + delay + ": " + msg);
+		if (delay==null) {
+			// no delay!
+			send(msg, sender);
+			return;
+		}
 		sendDelayed(msg, sender, new Time().plus(delay));
 	}
 

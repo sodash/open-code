@@ -3,7 +3,10 @@ package com.winterwell.depot;
 import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
+
+import com.winterwell.utils.containers.Pair2;
 
 /**
  * This is similar to Map (but type-safe) and to IProperties (but with Desc instead of Key).
@@ -71,4 +74,19 @@ public interface IStore extends Flushable {
 	default void init() {
 		// do nothing by default
 	}
+
+	/**
+	 * Allows for efficient processing by e.g. ElasticSearch
+	 * @param add
+	 * @param remove
+	 */
+	default void storeBatch(List<Pair2<Desc, Object>> add, List<Desc> remove) {
+		for (Desc desc : remove) {
+			remove(desc);
+		}
+		for (Pair2<Desc, Object> desc_obj : add) {
+			put(desc_obj.first, desc_obj.second);
+		}
+	}
+	
 }
