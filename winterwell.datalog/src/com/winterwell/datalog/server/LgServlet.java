@@ -86,7 +86,7 @@ public class LgServlet {
 		Map<String, Object> ps = state.getParameterMap();
 		String ds = state.getRequired(DATASPACE);
 		// TODO security check the dataspace?
-		String tag = state.getRequired(TAG);
+		final String tag = state.getRequired(TAG).toLowerCase();
 		double count = state.get(new DoubleField("count"), 1.0);
 		// NB: dont IP/user track simple events, which are server-side
 		boolean stdTrackerParams = ! DataLogEvent.simple.equals(tag) && state.get(new BoolField("track"), true);
