@@ -551,7 +551,7 @@ public class WebUtils {
 	 * programs terminating until the browser closes!
 	 */
 	public static void display(URI uri) {
-		if (!GuiUtils.isInteractive())
+		if ( ! GuiUtils.isInteractive())
 			return;
 		try {
 			Desktop d = Desktop.getDesktop();

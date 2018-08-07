@@ -18,4 +18,9 @@ public class RateTest {
 		assert ! new Rate(1, TUnit.DAY).isGreaterThan(new Rate(1, TUnit.HOUR));
 	}
 
+	@Test
+	public void testStringCons() {
+		Rate r = new Rate("100/hour");
+		assert r.equals(new Rate(100, TUnit.HOUR)) : r;
+	}
 }

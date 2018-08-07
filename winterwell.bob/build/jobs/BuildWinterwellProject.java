@@ -248,7 +248,8 @@ public class BuildWinterwellProject extends BuildTask {
 	}
 
 	protected File getTestBinDir() {
-		return getBinDir();
+		// NB not all projects are set to use this (yet)
+		return new File(projectDir, "bin.test");
 	}
 
 }

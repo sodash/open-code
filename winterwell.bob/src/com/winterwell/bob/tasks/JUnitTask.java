@@ -14,6 +14,8 @@ import java.util.List;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.TodoException;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 
@@ -31,6 +33,8 @@ import junit.framework.TestSuite;
  *         Some modifications by Daniel Winterstein
  */
 final class HtmlTestReport implements TestListener {
+	private static final String LOGTAG = "JUnitTask";
+
 	/**
 	 * Method for creating a test suite from all tests found in the present
 	 * directory and its sub directories.
@@ -353,9 +357,9 @@ final class HtmlTestReport implements TestListener {
 			out = new PrintStream(new FileOutputStream(outputFile));
 		}
 		// Extract the test suite
-		System.out.println("Locating tests in " + classDirectory_);
+		Log.d(LOGTAG, "Locating tests in " + classDirectory_);
 		TestSuite suite = HtmlTestReport.build(classDirectory_);
-		System.out.println(suite.countTestCases() + " test cases found.");
+		Log.d(LOGTAG, suite.countTestCases() + " test cases found.");
 
 		// Print report header
 		printHeader();
@@ -537,14 +541,14 @@ public class JUnitTask extends BuildTask {
 	private final File outputFile;
 	private final File sourceDirectory;
 	private transient HtmlTestReport report;
-	private transient File classDirectory;
+//	private transient File classDirectory;
 
 	/**
 	 * Create a HTML report instance. Typical usage:
 	 * 
 	 * <pre>
-	 * File classDir = new File(&quot;/home/joe/dev/classes&quot;);
-	 * JUnitTask unitTest = new JUnitTask(null, classDir, new File(&quot;tests.html&quot;));
+	 * File classDir = new File("/home/joe/dev/classes");
+	 * JUnitTask unitTest = new JUnitTask(null, classDir, new File("tests.html"));
 	 * unitTest.run();
 	 * </pre>
 	 * 
@@ -567,19 +571,21 @@ public class JUnitTask extends BuildTask {
 
 	@Override
 	public void doTask() throws Exception {
-		// Build temp dir of classes
-		classDirectory = FileUtils.createTempDir();
-		for(File f : classpath) {
-			FileUtils.copy(f, classDirectory, true);
-		}
+//		// Build temp dir of classes ??why??
+//		classDirectory = FileUtils.createTempDir();
+//		for(File f : classpath) {
+//			FileUtils.copy(f, classDirectory, true);
+//		}
 		// Create a HTML report instance
+		if (classpath.size() != 1) throw new TodoException();
+		File classDirectory = Containers.first(classpath);
 		report = new HtmlTestReport(sourceDirectory, classDirectory);
 		report.setOutputFile(outputFile);
 		outputFile.getParentFile().mkdirs();
 		// Run the tests!
 		report.print();
 		// report
-		System.out.println("Tested " + classDirectory + ". " + getSuccessCount()
+		Log.d(LOGTAG, "Tested " + classDirectory + ". " + getSuccessCount()
 				+ " tests passed, " + getFailureCount() + " tests failed.");
 		// Exception?
 		if (exceptionOnTestFailure && report.getFailureCount() > 0) {
@@ -590,7 +596,7 @@ public class JUnitTask extends BuildTask {
 	}
 	
 	public void close() {
-		FileUtils.deleteDir(classDirectory);
+//		FileUtils.deleteDir(classDirectory);
 	}
 
 	/**

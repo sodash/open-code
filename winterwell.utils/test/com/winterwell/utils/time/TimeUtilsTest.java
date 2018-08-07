@@ -20,7 +20,7 @@ import com.winterwell.utils.containers.Pair;
 
 public class TimeUtilsTest {
 
-	@Test
+//	@Test
 	public void testScratch() {
 		SimpleDateFormat sdf = new SimpleDateFormat();
 		String out = sdf.format(new Time().getDate());
@@ -407,6 +407,11 @@ public class TimeUtilsTest {
 			Pair<Time> p = TimeUtils.parsePeriod("18 Nov 2009 to 23 Nov 2009", null);
 			assert p.first.equals(new Time(2009, 11, 18)) : p;
 			assert p.second.equals(new Time(2009, 11, 23)) : p;
+		}
+		{	// start/end of day
+			Pair<Time> p = TimeUtils.parsePeriod("18 Nov 2009", null);
+			assert p.first.equals(new Time(2009, 11, 18)) : p;
+			assert p.second.equals(new Time(2009, 11, 19)) : p;
 		}
 		if (false) { // this fails -- Java Date gets it wrong. But it is non-ISO format
 			Pair<Time> p = TimeUtils.parsePeriod("18/11/09 to 23/11/09", null);

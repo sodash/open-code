@@ -30,7 +30,10 @@ public class TimeField extends AField<ICallable<Time>> {
 	boolean preferEnd;
 	
 	/**
-	 * If true, then a month will be interpreted as the end of the month.
+	 * If true, then a month will be interpreted as the end of the month, 
+	 * 
+	 * TODO! day at the end of the day.
+	 * 
 	 * @param preferEnd
 	 * @return 
 	 */

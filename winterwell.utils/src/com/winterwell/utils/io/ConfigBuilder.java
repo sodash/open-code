@@ -2,6 +2,7 @@ package com.winterwell.utils.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.text.DateFormat;
@@ -60,6 +61,11 @@ import com.winterwell.utils.time.TimeUtils;
 public class ConfigBuilder {
 
 	private static final Map<Class,ISerialize> convertors = new HashMap();
+	
+	public static void addConvertor(Class klass, ISerialize fn) {
+		assert klass != null;
+		convertors.put(klass, fn);
+	}
 	
 	/**
 	 * 
@@ -195,9 +201,18 @@ public class ConfigBuilder {
 	}	
 	
 	private boolean checkField(Class<?> type) {
-		if (convertors.containsKey(type)) return true;
+		if (convertors.get(type) != null) return true;
 		for(Class k : recognisedTypes) {
 			if (ReflectionUtils.isa(type, k)) return true;
+		}
+		// does it have a String constructor?
+		try {
+			ISerialize fn = new SerializeViaConstructor(type);
+			addConvertor(type, fn);
+			Log.d(LOGTAG, "Add reflection based String convertor for "+type);
+			return true;
+		} catch (NoSuchMethodException | SecurityException e) {
+			// nope
 		}
 		// TODO is it a recursive thing?
 		return false;

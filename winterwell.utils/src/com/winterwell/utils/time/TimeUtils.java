@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Pair;
 
@@ -470,6 +471,12 @@ public class TimeUtils {
 		// standard?
 		try {
 			Time t = new Time(s);
+			
+			// HACK: was it a day without a time?
+			if (parsePeriod2_isWholeDay(s, t)) {
+				return new Period(t, getEndOfDay(t));
+			}
+			
 			return new Period(t);
 		} catch (Exception e) {
 			// oh well
@@ -636,6 +643,21 @@ public class TimeUtils {
 
 		// parse failed
 		throw new IllegalArgumentException(s);
+	}
+
+	private static boolean parsePeriod2_isWholeDay(String s, Time t) {
+		if ( ! t.equals(getStartOfDay(t))) {
+			return false;
+		}
+		if (MathUtils.isNumber(s)) return false;
+		// HACK: do we have an hour:minute part or other time marker?
+		if (s.contains(":") || s.contains("am") || s.contains("pm")) {
+			return false;
+		}
+		// HACK: ad hoc markers
+		if (s.contains("start")) return false;
+		// no time - so treat as whole day
+		return true;
 	}
 
 	/**

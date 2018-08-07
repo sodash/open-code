@@ -314,7 +314,11 @@ public class GuiUtils {
 		String envVar = System.getProperty("WINTERWELL_HEADLESS");
 		if (envVar == null)
 			return !GraphicsEnvironment.isHeadless();
-		return !envVar.toLowerCase().equals("true");
+		return Utils.yes(envVar);
+	}
+	
+	public static void setInteractive(boolean interactive) {
+		System.setProperty("WINTERWELL_HEADLESS", ""+interactive);
 	}
 
 	public static BufferedImage load(File imgFile) throws WrappedException {

@@ -84,6 +84,20 @@ implements Comparable<Rate>, IHasJson {
 		this.tag = tag;
 	}
 	
+	public Rate(String s) {
+		if ("auto".equals(s)) {
+			this.x = AUTO;
+			this.dt = TUnit.SECOND.dt;
+			this.tag = null;
+			return;
+		}
+		String[] bits = s.split("/");
+		this.x = Double.parseDouble(bits[0]);
+		this.dt = TimeUtils.parseDt(bits[1]);
+		assert dt != null : this;
+		this.tag = null;
+	}
+	
 	public Rate(double x, Dt dt) {
 		this(x,dt,null);
 	}

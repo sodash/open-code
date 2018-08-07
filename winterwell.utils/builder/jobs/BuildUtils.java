@@ -10,6 +10,13 @@ import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 
+/**
+ * Copy pasta from the primary copy which is in Bob's project. 
+ * 
+ * NB: This file can't be in utils Eclipse source files 'cos Bob isnt (that'd be a circular dependency)
+ * @author daniel
+ *
+ */
 public class BuildUtils extends BuildWinterwellProject {
 
 	public BuildUtils() {
@@ -38,7 +45,7 @@ public class BuildUtils extends BuildWinterwellProject {
 		
 	@Override
 	public void doTask() throws Exception {		
-		super.doTask();		
+		super.doTask();				
 	}
 
 }

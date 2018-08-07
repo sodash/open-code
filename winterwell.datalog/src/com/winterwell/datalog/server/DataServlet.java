@@ -92,7 +92,7 @@ public class DataServlet implements IServlet {
 		// time window
 		ICallable<Time> cstart = state.get(CommonFields.START);
 		Time start = cstart==null? new Time().minus(TUnit.MONTH) : cstart.call();
-		ICallable<Time> cend = state.get(new TimeField("end").setPreferEnd(true));
+		ICallable<Time> cend = state.get(CommonFields.END);
 		Time end = cend==null? new Time() : cend.call();
 		// query e.g. host:thetimes.com
 		String q = state.get("q");

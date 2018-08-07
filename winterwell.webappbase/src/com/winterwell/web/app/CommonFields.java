@@ -20,8 +20,8 @@ public class CommonFields {
 	 * Auto lower-case on the returned value
 	 */
 	public static final EmailField EMAIL = new EmailField("email");
-	public static final TimeField START = new TimeField("start");
-	public static final TimeField END = new TimeField("end");
+	public static final TimeField START = new TimeField("start").setPreferEnd(false);
+	public static final TimeField END = new TimeField("end").setPreferEnd(true);
 
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
 

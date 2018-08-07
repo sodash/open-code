@@ -24,6 +24,7 @@ import com.winterwell.utils.Proc;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ITree;
 import com.winterwell.utils.containers.Tree;
+import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.time.TUnit;
 
@@ -302,8 +303,7 @@ public class WebUtilsTest extends TestCase {
 //		String url = "http://local.soda.sh/reports";
 		File pdf = File.createTempFile("testreport", ".pdf");
 		WebUtils.renderUrlToPdf(url, pdf, true, "By SoDash", TUnit.MINUTE.dt);
-		Proc p = new Proc("gnome-open " + pdf.getAbsolutePath());
-		p.run();
+		openWindow(pdf);
 	}
 	
 	public void offtestRenderToPdf() {
@@ -311,24 +311,26 @@ public class WebUtilsTest extends TestCase {
 			String html = "<html><head></head><body><h1>PDF ROCKS</h1></body></html>";
 			File pdf = new File("test/pdftest1.pdf");
 			WebUtils.renderToPdf(html, pdf, false);
-			Proc p = new Proc("gnome-open " + pdf.getAbsolutePath());
-			p.run();
+			openWindow(pdf);
 		}
 		{
 			String html = "<html><head></head><body><h1>PDF ROCKS</h1></body></html>";
 			File pdf = new File("test/pdftest1.pdf");
 			WebUtils.renderToPdf(html, pdf, true);
-			Proc p = new Proc("gnome-open " + pdf.getAbsolutePath());
-			p.run();
+			openWindow(pdf);
 		}
 		{
 			String html = "<html><head></head><body>PDF <script>document.write(' + Javascript '); /*setTimeout(\"document.append('Rocks!');\",100);*/</script></body></html>";
 			File pdf = new File("test/pdftest2.pdf");
 			WebUtils.renderToPdf(html, pdf, false);
-			// "--window-status FLOT_DONE"); //"--javascript-delay 2000");
-			Proc p = new Proc("gnome-open " + pdf.getAbsolutePath());
-			p.run();
+			openWindow(pdf);
 		}
+	}
+
+	private void openWindow(File pdf) {
+		if ( ! GuiUtils.isInteractive()) return;
+		Proc p = new Proc("gnome-open " + pdf.getAbsolutePath());
+		p.run();		
 	}
 
 	public void testResolveUri_absolute1() {
