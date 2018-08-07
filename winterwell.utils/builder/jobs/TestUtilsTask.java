@@ -6,7 +6,7 @@ import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.utils.gui.GuiUtils;
 
-public class TestUtils extends BuildTask {
+public class TestUtilsTask extends BuildTask {
 
 	@Override
 	protected void doTask() throws Exception {

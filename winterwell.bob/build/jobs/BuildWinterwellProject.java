@@ -88,6 +88,10 @@ public class BuildWinterwellProject extends BuildTask {
 
 	protected String projectName;
 	
+	public String getProjectName() {
+		return projectName;
+	}
+	
 	public void setScpToWW(boolean scpToWW) {
 		this.scpToWW = scpToWW;
 	}
@@ -151,17 +155,16 @@ public class BuildWinterwellProject extends BuildTask {
 			jar.setManifestProperty(JarTask.MANIFEST_MAIN_CLASS, mainClass);
 		}
 		// Version
-		String gitiv = "";
+		String gitiv = "", by = "";
 		try {
 			gitiv = " git: "+GitTask.getLastCommitId(srcDir.getParentFile());
+			by = " by: "+WebUtils2.hostname();
 		} catch(Throwable ex) {
 			Log.w(LOGTAG, ex);
 		}
 		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
 				"version: "+(Utils.isBlank(version)? new Time().ddMMyyyy() : version)
-				+gitiv
-				+" by: "+WebUtils2.hostname()					
-				);
+				+gitiv+by);
 		// vendor
 		jar.setManifestProperty("Implementation-Vendor", "Winterwell");	
 //		// Git details? No this upsets IntelliJ

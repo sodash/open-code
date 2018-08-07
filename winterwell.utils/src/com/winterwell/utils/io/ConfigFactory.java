@@ -36,6 +36,11 @@ public class ConfigFactory {
 	
 	private boolean strict;
 	
+	@Override
+	public String toString() {
+		return "ConfigFactory [appName=" + appName + ", serverType=" + serverType + ", machine=" + machine + "]";
+	}
+
 	/**
 	 * If true, then duplicate config loading will cause an exception.
 	 * @param strict
