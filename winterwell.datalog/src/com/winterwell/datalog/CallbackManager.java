@@ -73,6 +73,7 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 	void consume2_doCallback(DataLogEvent msg, Callback callback) {
 		Log.d(LOGTAG, callback.url+" for "+msg);
 		FakeBrowser fb = new FakeBrowser();
+		fb.setUserAgent(FakeBrowser.HONEST_USER_AGENT);
 		fb.setDebug(true);
 		String json = Gson.toJSON(msg);
 		String ok = fb.post(callback.url, json);

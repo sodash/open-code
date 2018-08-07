@@ -132,7 +132,7 @@ public class FakeBrowser {
 	/**
 	 * Use this if you want to let servers know its FakeBrowser
 	 */
-	public static final String HONEST_USER_AGENT = "Java Winterwell";	
+	public static final String HONEST_USER_AGENT = "GoodLoopJavaBrowser";	
 
 	static {
 		try {

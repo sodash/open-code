@@ -73,6 +73,8 @@ public class LgServlet {
 	 */
 	public static final SField GBY = new SField("gby");
 	
+	static final BoolField track = new BoolField("track");
+	
 	/**
 	 * Log msg to fast.log file.  
 	 * @param req
@@ -80,7 +82,7 @@ public class LgServlet {
 	 * @throws IOException 
 	 */
 	public static void fastLog(WebRequest state) throws IOException {
-		HttpServletRequest req = state.getRequest();
+//		HttpServletRequest req = state.getRequest();
 		HttpServletResponse resp = state.getResponse();
 		String u = state.getRequestUrl();
 		Map<String, Object> ps = state.getParameterMap();
@@ -89,7 +91,7 @@ public class LgServlet {
 		final String tag = state.getRequired(TAG).toLowerCase();
 		double count = state.get(new DoubleField("count"), 1.0);
 		// NB: dont IP/user track simple events, which are server-side
-		boolean stdTrackerParams = ! DataLogEvent.simple.equals(tag) && state.get(new BoolField("track"), true);
+		boolean stdTrackerParams = ! DataLogEvent.simple.equals(tag) && state.get(track, true);
 		// Read the "extra" event parameters
 		Map params = (Map) state.get(PARAMS);		
 		if (params==null) {
@@ -244,16 +246,28 @@ public class LgServlet {
 	static ua_parser.Parser parser;
 	
 
+	/**
+	 * Add ua (user agent), user, ip.
+	 * Adds nothing if this is a call from one of our servers.
+	 * 
+	 * @param state
+	 * @param params Can be null
+	 * @param trckId
+	 * @return params, never null
+	 */
 	private static Map doLog2_addStdTrackerParams(WebRequest state, Map params, String trckId) {
 		// TODO allow the caller to explicitly set some of these if they want to
 		if (params==null) params = new ArrayMap();
+		// Browser info
+		String ua = state.getUserAgent();
+		if (FakeBrowser.HONEST_USER_AGENT.equals(ua)) {
+			return params; // dont add tracking params for our own server calls
+		}
+		params.putIfAbsent("ua", ua);
 		// Replace $user with tracking-id, and $
 		params.putIfAbsent("user", trckId);			
 		// ip: $ip
 		params.putIfAbsent("ip", state.getRemoteAddr());
-		// Browser info
-		String ua = state.getUserAgent();			
-		params.putIfAbsent("ua", ua);
 			
 		BrowserType bt = new BrowserType(ua);
 		boolean mobile = bt.isMobile();		
