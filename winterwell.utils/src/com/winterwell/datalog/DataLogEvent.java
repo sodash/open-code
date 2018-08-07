@@ -411,7 +411,18 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	public String getEventType0() {
 		assert eventType.length == 1 : this;
 		return eventType[0];
-	}	
+	}
+
+	/**
+	 * Best practice is to set props in the constructor and 
+	 * NOT to modify the event after construction. But you can if you must.
+	 * @param prop
+	 * @param value
+	 */
+	public void putProp(String prop, Object value) {
+		Utils.check4null(prop);
+		props.put(prop, value);
+	}
 
 	
 }
