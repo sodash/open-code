@@ -484,6 +484,12 @@ public class ESStorage implements IDataLogStorage {
 		return f;
 	}
 
+	@Override
+	public String toString() {
+		return "ESStorage [esConfig=" + esConfig + "]";
+	}
+
+
 	/**
 	 * All get stored as one type in ES 'cos multiple types is being deprecated as "kind of broken"
 	 */
