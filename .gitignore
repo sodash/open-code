@@ -1,3 +1,4 @@
+# Ignore
 *.class
 
 # Mobile Tools for Java (J2ME)
@@ -23,3 +24,6 @@ winterwell.bob/config/version.properties
 version.properties
 temp-iso
 test-output
+
+# Allow
+!winterwell.bob/bob-all.jar
