@@ -168,6 +168,7 @@ public class EclipseClasspath {
 	}
 	
 	IFn<String,File> projectFinder = new WinterwellProjectFinder();
+	private boolean includeProjectJars;
 
 	/**
 	 * @return The Eclipse projects referenced by this project.
@@ -200,7 +201,8 @@ public class EclipseClasspath {
 
 	/**
 	 * @return all the jar files needed? Never null.
-	 * This does NOT include jars from Eclipse user-libraries :(
+	 * 
+	 * This can get confused by jars from Eclipse user-libraries :(
 	 */
 	public Set<File> getCollectedLibs() {
 		Set<File> libs = new HashSet();
@@ -235,14 +237,19 @@ public class EclipseClasspath {
 			}
 			try {
 				EclipseClasspath pec = new EclipseClasspath(fp);
+				pec.setIncludeProjectJars(includeProjectJars);
 				pec.getCollectedLibs2(libs, projects);
 			} catch(Exception ex) {
 				Log.w("eclipse", ex);
 			}
 			// HACK add in the project jar?
-			File projectJar = new File(fp, p+".jar");
-			if (projectJar.isFile()) {
-				libs.add(projectJar);
+			if (includeProjectJars) {
+				File projectJar = new File(fp, p+".jar");
+				if (projectJar.isFile()) {
+					libs.add(projectJar);
+				} else {
+					Log.d(LOGTAG, "No project jar for "+p);
+				}
 			}
 		}
 	}
@@ -254,6 +261,15 @@ public class EclipseClasspath {
 		String xml = FileUtils.read(dotProject);
 		List<Node> tags = WebUtils.xpathQuery("//name", xml);
 		return tags.get(0).getTextContent();
+	}
+
+	/**
+	 * HACK method - if a referenced project has a jar named
+	 * (project)(version numbers?).jar
+	 * Then include that jar
+	 */
+	public void setIncludeProjectJars(boolean b) {
+		includeProjectJars = b;		
 	}
 
 }

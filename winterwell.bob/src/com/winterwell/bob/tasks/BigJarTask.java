@@ -9,6 +9,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import com.winterwell.utils.log.Log;
+
 /**
  * Combine lots of jars into one file.
  * @author daniel
@@ -56,7 +58,7 @@ public class BigJarTask extends JarTask {
 		
 		// Complete the ZIP file
 		out.close();
-		System.out.println("Created: "+jar);
+		Log.d(LOGTAG, "Created: "+jar+" from "+files);
 	}
 
 	/**

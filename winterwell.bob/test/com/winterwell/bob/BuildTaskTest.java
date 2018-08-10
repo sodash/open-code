@@ -1,7 +1,5 @@
 package com.winterwell.bob;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import com.winterwell.depot.Desc;

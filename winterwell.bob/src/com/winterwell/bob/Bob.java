@@ -1,7 +1,6 @@
 package com.winterwell.bob;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,17 +12,14 @@ import java.util.logging.Level;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
-import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.containers.Pair2;
-import com.winterwell.utils.io.ArgsParser;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
-import com.winterwell.utils.io.ConfigFactoryTest;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;

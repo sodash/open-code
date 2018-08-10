@@ -16,7 +16,6 @@ import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.containers.Containers;
-import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 
 import junit.framework.AssertionFailedError;

@@ -2,7 +2,6 @@ package com.winterwell.bob.tasks;
 
 import java.io.File;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Proc;

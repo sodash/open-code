@@ -1,18 +1,14 @@
 package com.winterwell.bob;
 
 import java.io.Closeable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 import org.junit.Test;
 
-import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasDesc;
 import com.winterwell.utils.Dep;
@@ -27,10 +23,6 @@ import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
-import com.winterwell.utils.web.XStreamUtils;
-
-import jobs.BuildUtils;
-import jobs.WWDependencyTask;
 
 /**
  * A task forming part or all of a build process. Subclass this to create build

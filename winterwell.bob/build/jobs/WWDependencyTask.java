@@ -2,8 +2,6 @@ package jobs;
 
 import java.io.File;
 
-import com.winterwell.bob.BuildTask;
-import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.FakeBrowser;

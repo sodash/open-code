@@ -7,12 +7,6 @@ import java.util.List;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.io.FileUtils;
 
-import jobs.BuildDepot;
-import jobs.BuildFlexiGson;
-import jobs.BuildMaths;
-import jobs.BuildUtils;
-import jobs.BuildWinterwellProject;
-
 public class BuildZonefoxTemp extends BuildTask {
 
 	@Override

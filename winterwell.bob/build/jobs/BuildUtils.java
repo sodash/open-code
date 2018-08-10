@@ -1,14 +1,11 @@
 package jobs;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.MavenDependencyTask;
-import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.log.Log;
 
 public class BuildUtils extends BuildWinterwellProject {
 

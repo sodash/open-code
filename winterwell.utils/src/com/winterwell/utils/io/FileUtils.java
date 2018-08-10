@@ -918,6 +918,8 @@ public class FileUtils {
 	}
 
 	/**
+	 * @deprecated Try to avoid this, as it bakes in Winterwell specific folder structure.
+	 * 
 	 * WINTERWELL_HOME if defined. This is the directory which contains code,
 	 * companies, business, etc.
 	 * It's /home/winterwell on servers.

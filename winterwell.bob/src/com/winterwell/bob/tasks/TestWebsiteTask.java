@@ -5,10 +5,8 @@ import java.util.List;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.web.WebUtils;
-import com.winterwell.web.FakeBrowser;
 
 /**
  * @deprecated

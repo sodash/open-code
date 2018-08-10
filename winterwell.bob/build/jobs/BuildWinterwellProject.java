@@ -1,12 +1,12 @@
 package jobs;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.tasks.BigJarTask;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
@@ -15,9 +15,9 @@ import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
-import com.winterwell.utils.FailureException;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -32,6 +32,47 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	protected String mainClass;
 
+
+
+	protected void doFatJar() {		
+		Collection<File> jars = new ArraySet();
+		// this projects jar!
+		jars.add(getJar());
+		// lib
+		File libs = new File(projectDir, "lib");
+		if (libs.isDirectory()) {
+			List<File> jars2 = FileUtils.find(libs, ".*\\.jar");
+			jars.addAll(jars2);
+		}		
+		// maven deps
+		File deps = new File(projectDir, "dependencies");
+		if (deps.isDirectory()) {
+			List<File> jars2 = FileUtils.find(deps, ".*\\.jar");
+			jars.addAll(jars2);
+		}	
+		// eclipse deps
+		EclipseClasspath ec = new EclipseClasspath(projectDir);
+		ec.setIncludeProjectJars(true);
+		List<String> projects = ec.getReferencedProjects();
+		Set<File> ecjars = ec.getCollectedLibs();
+		jars.addAll(ecjars);
+		// bundle
+		File fatjar = new File(projectName+"-all.jar");
+//		System.out.println(Printer.toString(jars,"\n\t"));
+		BigJarTask jt = new BigJarTask(fatjar, jars);
+		jt.setManifestProperty(JarTask.MANIFEST_TITLE, 
+				projectDir.getName()+" library (c) Winterwell. All rights reserved.");
+		if (mainClass!=null) {
+			jt.setManifestProperty(JarTask.MANIFEST_MAIN_CLASS, mainClass);
+		}
+		jt.run();
+		jt.close();
+		// done
+		report.put("fat-jar", jt.getJar().getAbsolutePath());
+
+	}
+
+	
 	/**
 	 * @return the jar file (after building!)
 	 */
@@ -85,8 +126,8 @@ public class BuildWinterwellProject extends BuildTask {
 	protected File jarFile;
 
 	private String version;
-
-	private boolean compile;
+	
+	private boolean compile = true;
 
 	private boolean scpToWW;
 
@@ -100,6 +141,11 @@ public class BuildWinterwellProject extends BuildTask {
 		this.scpToWW = scpToWW;
 	}
 	
+	/**
+	 * true by default. If false, dont run the compiler
+	 * @param compile
+	 * @return
+	 */
 	public BuildWinterwellProject setCompile(boolean compile) {
 		this.compile = compile;
 		return this;
@@ -232,8 +278,10 @@ public class BuildWinterwellProject extends BuildTask {
 			CompileTask compile = new CompileTask(srcDir, binDir);
 			// classpath
 			EclipseClasspath ec = new EclipseClasspath(projectDir);
+			ec.setIncludeProjectJars(true);
 			Set<File> libs = ec.getCollectedLibs();
-			compile.setClasspath(libs);			
+			compile.setClasspath(libs);		
+			
 			compile.run();
 			compile.close();
 		}

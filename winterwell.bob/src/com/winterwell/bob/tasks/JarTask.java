@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -19,7 +18,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -112,6 +110,10 @@ public class JarTask extends BuildTask {
 		setManifestProperty("Packaging-Date", new Time().toString());
 	}
 
+	public File getJar() {
+		return jar;
+	}
+	
 	/**
 	 * 
 	 * @param jar

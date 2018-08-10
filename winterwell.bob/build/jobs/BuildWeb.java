@@ -1,12 +1,10 @@
 package jobs;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.MavenDependencyTask;
-import com.winterwell.utils.io.FileUtils;
 
 public class BuildWeb extends BuildWinterwellProject {
 
@@ -38,7 +36,9 @@ public class BuildWeb extends BuildWinterwellProject {
 	 */
 	public BuildWeb() {
 		super("winterwell.web");
-		incSrc=true;	
+		
+		setCompile(true);
+		setIncSrc(true);
 		setScpToWW(false);
 	}
 	
