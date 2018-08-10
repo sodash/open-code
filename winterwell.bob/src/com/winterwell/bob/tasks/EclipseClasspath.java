@@ -11,6 +11,7 @@ import java.util.logging.Level;
 
 import org.w3c.dom.Node;
 
+import com.winterwell.utils.IFn;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
@@ -32,11 +33,10 @@ import com.winterwell.utils.web.WebUtils;
  */
 public class EclipseClasspath {
 
-	private File file;
 	/**
-	 * Usually, winterwell/code
+	 * the .classpath file
 	 */
-	private File workspaceDir = new File(FileUtils.getWinterwellDir(), "code");
+	private File file;
 	private File projectDir;
 
 	/**
@@ -52,15 +52,6 @@ public class EclipseClasspath {
 		if ( ! file.exists()) {
 			throw Utils.runtime(new FileNotFoundException(file.getAbsolutePath()));
 		}
-	}
-
-	/**
-	 * @param workspaceDir The directory which contains project directories.
-	 * i.e. the project "winterwell.funky" should be located at
-	 * workspaceDir/winterwell.funky
-	 */
-	public void setWorkspace(File workspaceDir) {
-		this.workspaceDir = workspaceDir;
 	}
 
 	/**
@@ -161,7 +152,8 @@ public class EclipseClasspath {
 	 * @return The list of jars in that library
 	 */
 	public Set<File> getUserLibrary(String name) {
-		File userLibraries = new File(workspaceDir, "middleware/userlibraries.userlibraries");
+		File mware = projectFinder.apply("middleware");
+		File userLibraries =  new File(mware, "userlibraries.userlibraries");
 		String xml = FileUtils.read(userLibraries);
 		HashSet<File> result = new HashSet<File>();
 		// TODO: I suppose we should error out if the library is not defined!
@@ -174,6 +166,8 @@ public class EclipseClasspath {
 		}
 		return result;
 	}
+	
+	IFn<String,File> projectFinder = new WinterwellProjectFinder();
 
 	/**
 	 * @return The Eclipse projects referenced by this project.
@@ -200,11 +194,7 @@ public class EclipseClasspath {
 	 */
 	private File getProjectDir(String projectName) {
 		assert ! Utils.isBlank(projectName);
-		File f = new File(workspaceDir, projectName);
-		// It's own repo?
-		if ( ! f.exists()) {
-			f = new File(FileUtils.getWinterwellDir(), projectName);
-		}
+		File f = projectFinder.apply(projectName);
 		return f;
 	}
 
@@ -235,8 +225,12 @@ public class EclipseClasspath {
 		for (String p : pros) {
 			if (projects.contains(p)) continue;			
 			// prefer top level projects
-			File fp = findProject(p);
-			if (fp==null) {				
+			File fp = null;
+			try {
+				fp = projectFinder.apply(p);
+				if (fp==null) throw new FileNotFoundException(); 
+			} catch(Exception ex) {
+				Log.i(LOGTAG, "Could not find project "+p+" for collecting libs");
 				continue;
 			}
 			try {
@@ -252,32 +246,10 @@ public class EclipseClasspath {
 			}
 		}
 	}
-
-	/**
-	 * HACK check WW folders
-	 * @param p
-	 * @return
-	 */
-	protected File findProject(String p) {
-		for(File workspaceDir : new File[] {
-				projectDir.getParentFile(), 
-				FileUtils.getWinterwellDir(),
-				new File(FileUtils.getWinterwellDir(), "open-code"),
-				new File(FileUtils.getWinterwellDir(), "code")
-				}) 
-		{
-			File fp = new File(workspaceDir, p);
-			if (fp.exists()) {
-				return fp;
-			}			
-		}		
-		Log.w(LOGTAG, "Could not locate project "+p);
-		return null;
-	}
 	
 	static final String LOGTAG = "EclipseClasspath";
 
-	private String getProjectName() {
+	public String getProjectName() {
 		File dotProject = new File(file.getParentFile(),".project");
 		String xml = FileUtils.read(dotProject);
 		List<Node> tags = WebUtils.xpathQuery("//name", xml);

@@ -230,5 +230,9 @@ public class ConfigFactory {
 	public List<ConfigBuilder> getHistory() {
 		return history;
 	}
+
+	public String getMachine() {
+		return machine;
+	}
 	
 }

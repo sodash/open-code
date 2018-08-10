@@ -1,6 +1,8 @@
 package jobs;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +14,8 @@ import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.SCPTask;
+import com.winterwell.bob.tasks.WinterwellProjectFinder;
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.FileUtils;
@@ -116,13 +120,19 @@ public class BuildWinterwellProject extends BuildTask {
 	 * @param projectName
 	 */
 	public BuildWinterwellProject(String projectName) {
-		this(FileUtils.or(
-			new File(FileUtils.getWinterwellDir(), "open-code/"+projectName),
-			new File(FileUtils.getWinterwellDir(), "code/"+projectName),
-			new File(FileUtils.getWinterwellDir(), projectName)
-		), projectName);
+		this(guessProjectDir(projectName), projectName);
 	}
 	
+	/**
+	 * TODO refactor with {@link EclipseClasspath} so they share code.
+	 * @param _projectName
+	 * @return
+	 */
+	private static File guessProjectDir(String _projectName) {
+		WinterwellProjectFinder wpg = new WinterwellProjectFinder();
+		return wpg.apply(_projectName);
+	}
+
 	public BuildWinterwellProject(File projectDir, String projectName) {
 		assert projectDir != null : projectName;
 		this.projectDir = projectDir;

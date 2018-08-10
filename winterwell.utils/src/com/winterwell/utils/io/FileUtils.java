@@ -922,7 +922,7 @@ public class FileUtils {
 	 * companies, business, etc.
 	 * It's /home/winterwell on servers.
 	 */
-	public static File getWinterwellDir() {
+	public static File getWinterwellDir() throws FailureException {
 		try {
 			String dd = System.getenv("WINTERWELL_HOME");
 			if (!Utils.isBlank(dd)) {
@@ -1695,6 +1695,13 @@ public class FileUtils {
 	 * @return
 	 */
 	public static File or (File... files) {
+		if (files==null) return null;
+		for (File file : files) {
+			if (file !=null && file.exists()) return file;
+		}
+		return null;
+	}
+	public static File or (List<File> files) {
 		if (files==null) return null;
 		for (File file : files) {
 			if (file !=null && file.exists()) return file;
