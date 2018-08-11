@@ -101,7 +101,7 @@ public class MasterHttpServlet extends HttpServlet {
 				new TestmeServlet().process(request);
 				return;
 			}
-			WebUtils2.sendError(500, "TODO", resp);
+			WebUtils2.sendError(500, "No servlet?! Did you mean to call /lg?", resp);
 		} catch(Throwable ex) {
 			WebEx wex = WebUtils2.runtime(ex);
 			if (wex.code >= 500) {
