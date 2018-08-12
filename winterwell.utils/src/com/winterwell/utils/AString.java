@@ -5,7 +5,7 @@ import java.io.Serializable;
 import com.winterwell.utils.web.IHasJson;
 
 /**
- * Wraps a String - to provide some type safety in interface methods.
+ * Wraps a String - to provide some type safety in interface methods, eg for ids.
  * 
  * Usage: Create a custom class that extends this. Voila - a "type safe" String.
  *  
@@ -21,10 +21,16 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 
 	/**
 	 * 
-	 * @param name String or an AString wrapper. Cannot be null
+	 * @param name String or an AString wrapper. Cannot be null.
+	 * If it is an ASTring, the class must match -- this provides type-safety
+	 * (e.g. a User-id cannot be turned into a Document-id)
 	 */
 	public AString(CharSequence name) {
-		this.name = name.toString();		
+		this.name = name.toString();
+		if (name instanceof AString && ! name.getClass().equals(getClass())) {
+			throw new IllegalArgumentException("Cannot change "+name.getClass().getSimpleName()
+					+" to "+getClass().getSimpleName()+": "+name);
+		}
 	}
 
 	@Override
