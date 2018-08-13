@@ -181,6 +181,25 @@ public class WebUtils2 extends WebUtils {
 			"<a[^>]+href=['\"]?(\\s*\\w+://[^'\" \t\r\n>]+)[^>]*>",
 			Pattern.DOTALL);
 
+	private static final ArrayMap Z_COMMON_MIMES = new ArrayMap(
+					// common ones
+					"js", MIME_TYPE_JAVASCRIPT,
+					"html", MIME_TYPE_HTML,
+					"png", "image/png",
+					"jpg", "image/jpeg",
+					"gif", "image/gif",
+					// Workaround for bug in MimeUtil re css
+					"css", "text/css",
+					// csv is text/csv c.f. http://tools.ietf.org/html/rfc4180
+					"csv", "text/csv",
+					// video? (NB: copy-pasta from JTwitter Twitter.java) 
+					"mov", "video/quicktime",
+					"avi",	"video/x-msvideo",
+					"wmv",	"video/x-ms-wmv",
+					"m4v",	"video/mp4",
+					"mp4",	"video/mp4"
+					);
+
 	/**
 	 * Convenience for creating cookies. Uses the "/" path
 	 * 
@@ -450,23 +469,12 @@ public class WebUtils2 extends WebUtils {
 	public static String getMimeType(String fileName) {
 		try {
 			String type = FileUtils.getType(fileName);
-			String mimetype = (String) new ArrayMap(
-					// Workaround for bug in MimeUtil re css
-					"css", "text/css",
-					// csv is text/csv c.f. http://tools.ietf.org/html/rfc4180
-					"csv", "text/csv",
-					// video? (NB: copy-pasta from JTwitter Twitter.java) 
-					"mov", "video/quicktime",
-					"avi",	"video/x-msvideo",
-					"wmv",	"video/x-ms-wmv",
-					"m4v",	"video/mp4",
-					"mp4",	"video/mp4"
-					).get(type);
+			String mimetype = (String) Z_COMMON_MIMES.get(type);
 			if (mimetype != null) return mimetype;
 			// Ugly library, but hopefully effective
 			return MimeUtil.getMimeType(fileName);
 		} catch(Throwable ex) { // get mimetype can fail on a missing jar
-			Log.e("FileServlet", ex);
+			Log.e("FileServlet", "getMimeType is using limited built-in type info: "+ex.toString());
 			return null;
 		}
 	}

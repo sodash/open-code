@@ -2,6 +2,7 @@ package com.winterwell.utils;
 
 import java.io.Serializable;
 
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.IHasJson;
 
 /**
@@ -33,16 +34,27 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 		}
 	}
 
+	/**
+	 * Only equals to its own class! 
+	 * 
+	 * Because we could not make String.equals(AString) return true, we opt for symmetric behaviour.
+	 * It will log a warning if compared against a String. 
+	 */
 	@Override
 	public final boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if ( ! (obj instanceof CharSequence)) return false;
+		// match or not?
+		if (name.equals(obj.toString())) {
 			return false;
-		AString other = (AString) obj;
-		return name.equals(other.name);
+		}
+		if (getClass().equals(obj.getClass())) return true;
+		// fail, but log a warning -- this could be a bug
+		Log.w(getClass().getName(), "Same String but != as classes mismatch: "+obj.getClass()+" string: "+name);
+		return false;
 	}
 
 	private static final long serialVersionUID = 1L;

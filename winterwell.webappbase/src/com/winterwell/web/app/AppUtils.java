@@ -1,6 +1,7 @@
 package com.winterwell.web.app;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,8 +41,10 @@ import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.es.fail.ESException;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
+import com.winterwell.utils.AString;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
@@ -520,7 +523,8 @@ public class AppUtils {
 		if (err != null) throw err;
 	}
 
-	private static void initESMappings2_putMapping(Map<Class, Map> mappingFromClass, ESHttpClient es, Class k,
+	private static void initESMappings2_putMapping(Map<Class, Map> mappingFromClass, ESHttpClient es, 
+			Class k,
 			ESPath path, String index) 
 	{
 		PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(
@@ -541,12 +545,27 @@ public class AppUtils {
 								// enable keyword based sorting
 								.field("raw", "keyword"));
 		// ID, either thing.org or sane version
-		dtype.property("@id", new ESType().keyword());
-		dtype.property("id", new ESType().keyword());
+		dtype.property("@id", ESType.keyword);
+		dtype.property("id", ESType.keyword);
 		// type
-		dtype.property("@type", new ESType().keyword());
+		dtype.property("@type", ESType.keyword);
+		// reflection based
+		List<Field> fields = ReflectionUtils.getAllFields(k);
+		for (Field field : fields) {
+			String fname = field.getName();
+			if (dtype.containsKey(fname) || dtype.containsKey(fname.toLowerCase())) {
+				continue;
+			}
+			Class<?> type = field.getType();
+			// IDs
+			if (type.equals(XId.class) || ReflectionUtils.isa(type, AString.class)) {
+				dtype.property(fname, ESType.keyword);
+				continue;
+			}
+			// ??anything else ES is liable to guess wrong??
+		}
 		
-		
+		// Call ES...
 		pm.setMapping(dtype);
 		IESResponse r2 = pm.get();
 		r2.check();
