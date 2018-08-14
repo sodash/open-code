@@ -63,6 +63,10 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		return config;
 	}
 	
+	/**
+	 * NB: this should return after starting up Jetty. i.e. it does not sit in a forever loop.
+	 * @param args
+	 */
 	public void doMain(String[] args) {
 		logFile = new LogFile(new File(appName+".log"))
 					.setLogRotation(TUnit.DAY.dt, 14);
@@ -74,6 +78,14 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		}
 		init(args);
 		launchJetty();
+		doMain2();
+	}
+
+	/**
+	 * Override to do other main stuff
+	 */
+	protected void doMain2() {
+		
 	}
 
 	/**

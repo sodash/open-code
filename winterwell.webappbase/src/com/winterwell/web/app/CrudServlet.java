@@ -387,7 +387,8 @@ public abstract class CrudServlet<T> implements IServlet {
 					mes.append(authToken.xid+" OR ");
 				}
 				if (mes.length()==0) {
-					mes.append("ANON OR" ); // fail - WTF? How come no logins?!
+					Log.w("crud", "No mes "+q+" "+state);
+					mes.append("ANON OR " ); // fail - WTF? How come no logins?!
 				}
 				StrUtils.pop(mes, 4);
 				q = q.replaceAll("\\bme\\b", mes.toString());
