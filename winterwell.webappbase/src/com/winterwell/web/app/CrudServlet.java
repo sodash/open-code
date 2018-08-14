@@ -378,6 +378,20 @@ public abstract class CrudServlet<T> implements IServlet {
 		String q = state.get("q");
 		ESQueryBuilder qb = null;
 		if ( q != null) {
+			// convert "me" to specific IDs
+			if (Pattern.compile("\\bme\\b").matcher(q).find()) {
+				YouAgainClient ya = Dep.get(YouAgainClient.class);
+				List<AuthToken> tokens = ya.getAuthTokens(state);
+				StringBuilder mes = new StringBuilder();
+				for (AuthToken authToken : tokens) {
+					mes.append(authToken.xid+" OR ");
+				}
+				if (mes.length()==0) {
+					mes.append("ANON OR" ); // fail - WTF? How come no logins?!
+				}
+				StrUtils.pop(mes, 4);
+				q = q.replaceAll("\\bme\\b", mes.toString());
+			}
 			// TODO match on all?
 			// HACK strip out unset
 			if (q.contains(":unset")) {
