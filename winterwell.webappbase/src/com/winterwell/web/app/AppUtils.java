@@ -21,6 +21,7 @@ import com.winterwell.data.PersonLite;
 import com.winterwell.depot.IInit;
 import com.winterwell.depot.merge.Diff;
 import com.winterwell.depot.merge.Merger;
+import com.winterwell.es.ESKeyword;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;
@@ -557,6 +558,12 @@ public class AppUtils {
 				continue;
 			}
 			Class<?> type = field.getType();
+			// annotation?
+			ESKeyword esk = field.getAnnotation(ESKeyword.class);
+			if (esk!=null) {
+				dtype.property(fname, ESType.keyword);
+				continue;
+			}
 			// IDs
 			if (type.equals(XId.class) || ReflectionUtils.isa(type, AString.class)) {
 				dtype.property(fname, ESType.keyword);
