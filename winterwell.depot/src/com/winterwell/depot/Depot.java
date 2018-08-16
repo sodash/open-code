@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
 import com.thoughtworks.xstream.XStreamException;
-import com.thoughtworks.xstream.converters.ConversionException;
 import com.winterwell.datalog.DataLog;
 import com.winterwell.depot.merge.Merger;
 import com.winterwell.utils.Printer;

@@ -1,7 +1,5 @@
 package com.winterwell.maths.stats.distributions.d1;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 import java.util.Map;
 

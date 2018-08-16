@@ -6,7 +6,6 @@ import java.util.Map;
 import com.winterwell.data.AThing;
 import com.winterwell.es.ESType;
 import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.Time;

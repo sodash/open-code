@@ -1,20 +1,15 @@
 package com.winterwell.web.app;
 
 import java.io.Closeable;
-import java.util.Date;
 
 import javax.mail.internet.InternetAddress;
 
-import com.sun.mail.imap.IMAPFolder;
-import com.winterwell.utils.Dep;
-import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.ConfigException;
 import com.winterwell.web.LoginDetails;
-import com.winterwell.web.data.XId;
 import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
 

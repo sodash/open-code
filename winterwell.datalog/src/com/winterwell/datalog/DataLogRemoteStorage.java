@@ -10,15 +10,9 @@ import java.util.regex.Pattern;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.DataLog.KInterpolate;
-import com.winterwell.datalog.server.DataServlet;
 import com.winterwell.datalog.server.LgServlet;
-import com.winterwell.datalog.DataLogConfig;
-import com.winterwell.datalog.DataLogEvent;
-import com.winterwell.datalog.MeanRate;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
-import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.IDataStream;
-import com.winterwell.utils.Dep;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;

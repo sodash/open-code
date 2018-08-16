@@ -6,7 +6,6 @@ package com.winterwell.datalog;
 import java.util.List;
 
 import com.winterwell.utils.Dep;
-import com.winterwell.utils.log.Log;
 import com.winterwell.web.ajax.AjaxMsg;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;

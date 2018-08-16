@@ -4,8 +4,6 @@ import com.winterwell.depot.IInit;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
 
-import lombok.Data;
-
 /**
  * Base class for things.
  * 

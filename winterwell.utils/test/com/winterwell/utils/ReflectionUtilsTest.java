@@ -1,7 +1,5 @@
 package com.winterwell.utils;
 
-import static org.junit.Assert.*;
-
 import java.math.BigInteger;
 
 import org.junit.Test;

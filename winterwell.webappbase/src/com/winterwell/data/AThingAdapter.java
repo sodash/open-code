@@ -1,9 +1,7 @@
 package com.winterwell.data;
 
 import java.lang.reflect.Type;
-import java.util.Map;
 
-import com.winterwell.gson.FlexiGson;
 import com.winterwell.gson.JsonDeserializationContext;
 import com.winterwell.gson.JsonDeserializer;
 import com.winterwell.gson.JsonElement;
@@ -11,7 +9,6 @@ import com.winterwell.gson.JsonObject;
 import com.winterwell.gson.JsonParseException;
 import com.winterwell.gson.JsonSerializationContext;
 import com.winterwell.gson.JsonSerializer;
-import com.winterwell.web.data.XId;
 
 /**
  * serialize: adds "@type"

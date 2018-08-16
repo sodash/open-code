@@ -1,15 +1,10 @@
 package com.winterwell.datalog;
 
-import static org.junit.Assert.*;
-
 import java.util.Map;
 
 import org.junit.Test;
 
-import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.XStreamUtils;
 
 public class DataLogEventTest {

@@ -1,11 +1,8 @@
 package com.winterwell.web.fields;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import com.winterwell.web.app.TestWebRequest;
-import com.winterwell.web.test.TestHttpServletRequest;
 
 public class AFieldTest {
 

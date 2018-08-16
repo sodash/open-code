@@ -1,7 +1,5 @@
 package com.winterwell.utils.web;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 public class WebUtils2Test {

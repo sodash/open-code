@@ -1,7 +1,6 @@
 package com.winterwell.web.ajax;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.util.ajax.JSON;

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
-import com.winterwell.datalog.server.DataServlet;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;

@@ -10,7 +10,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
+//import sun.misc.BASE64Decoder;
+import java.util.Base64.Decoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,8 +62,6 @@ import com.winterwell.web.fields.MissingFieldException;
 import com.winterwell.web.test.TestHttpServletRequest;
 
 import eu.medsea.util.MimeUtil;
-//import sun.misc.BASE64Decoder;
-import java.util.Base64.Decoder;
 
 
 /**

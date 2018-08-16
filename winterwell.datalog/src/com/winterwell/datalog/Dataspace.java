@@ -1,10 +1,7 @@
 package com.winterwell.datalog;
 
-import java.io.Serializable;
-
 import com.winterwell.utils.AString;
 import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.web.IHasJson;
 
 /**
  * A dataspace is a set of data sharing broad access rules

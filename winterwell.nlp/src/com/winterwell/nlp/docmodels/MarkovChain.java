@@ -5,15 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.winterwell.utils.MathUtils;
-
-import gnu.trove.list.array.TIntArrayList;
-import no.uib.cipr.matrix.MatrixEntry;
-import no.uib.cipr.matrix.Vector;
-import no.uib.cipr.matrix.Vector.Norm;
-import no.uib.cipr.matrix.VectorEntry;
-import no.uib.cipr.matrix.sparse.SparseVector;
-
 import com.winterwell.maths.datastorage.IIndex;
 import com.winterwell.maths.datastorage.IPruneListener;
 import com.winterwell.maths.datastorage.Index;
@@ -24,6 +15,14 @@ import com.winterwell.nlp.classifier.DocVectoriser;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.corpus.SimpleDocument;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
+import com.winterwell.utils.MathUtils;
+
+import gnu.trove.list.array.TIntArrayList;
+import no.uib.cipr.matrix.MatrixEntry;
+import no.uib.cipr.matrix.Vector;
+import no.uib.cipr.matrix.Vector.Norm;
+import no.uib.cipr.matrix.VectorEntry;
+import no.uib.cipr.matrix.sparse.SparseVector;
 
 /**
  * A non-hidden Markov model, which outputs the likelihood of such a sequence

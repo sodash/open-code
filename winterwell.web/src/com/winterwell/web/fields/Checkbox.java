@@ -5,7 +5,6 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebInputException;
 

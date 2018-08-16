@@ -4,31 +4,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.eclipse.jetty.util.ajax.JSON;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogImpl;
 import com.winterwell.datalog.DataLogSecurity;
 import com.winterwell.datalog.Dataspace;
 import com.winterwell.datalog.ESStorage;
-import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
-import com.winterwell.es.client.agg.Aggregation;
-import com.winterwell.es.client.agg.Aggregations;
-import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.nlp.query.SearchQuery.SearchFormatException;
-import com.winterwell.utils.Dep;
-import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
@@ -36,14 +21,12 @@ import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JsonResponse;
-import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.CommonFields;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
-import com.winterwell.web.fields.TimeField;
 
 /**
  * Serves up aggregations data

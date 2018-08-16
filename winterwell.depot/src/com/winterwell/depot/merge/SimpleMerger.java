@@ -1,9 +1,5 @@
 package com.winterwell.depot.merge;
 
-import java.util.Collection;
-
-import com.winterwell.utils.Utils;
-
 /**
  * The diff value wins if set. i.e. object + diff = diff.value.
  * 

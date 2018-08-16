@@ -1,14 +1,9 @@
 package com.winterwell.web.app;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.server.Server;
 
 /**
  * A very simple web-app using Jetty. Included here as an example.

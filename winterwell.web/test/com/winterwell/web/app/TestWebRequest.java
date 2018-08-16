@@ -1,17 +1,9 @@
 package com.winterwell.web.app;
 
-import static org.junit.Assert.*;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.junit.Test;
-
-import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.test.TestHttpServletRequest;
 import com.winterwell.web.test.TestHttpServletResponse;

@@ -2,7 +2,6 @@ package com.winterwell.utils.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.text.DateFormat;
@@ -19,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.imageio.metadata.IIOInvalidTreeException;
 
 import com.winterwell.depot.IInit;
 import com.winterwell.utils.Printer;

@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.winterwell.bob.BuildTask;
-import com.winterwell.es.BuildESJavaClient;
 import com.winterwell.utils.io.FileUtils;
-import com.winterwell.youagain.client.BuildYouAgainJavaClient;
 
 import jobs.BuildBob;
 import jobs.BuildFlexiGson;

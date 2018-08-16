@@ -2,7 +2,6 @@ package com.winterwell.datalog;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,10 +14,6 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -47,7 +42,6 @@ import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.gson.Gson;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
-import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.maths.timeseries.ListDataStream;
@@ -71,7 +65,6 @@ import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
-import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.XStreamUtils;
 import com.winterwell.web.app.AppUtils;
 

@@ -15,7 +15,6 @@ import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
-import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.io.FileUtils;

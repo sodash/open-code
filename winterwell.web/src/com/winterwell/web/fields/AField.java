@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,7 +26,6 @@ import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.IWidget;
 import com.winterwell.web.WebInputException;
-import com.winterwell.web.app.WebRequest;
 
 /**
  * Describes a form field. toString() returns the field's name.

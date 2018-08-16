@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
-import com.winterwell.maths.stats.distributions.d1.MeanVar1D;
 import com.winterwell.maths.timeseries.Datum;
 import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.utils.io.DBOptions;

@@ -1,9 +1,6 @@
 package com.winterwell.datalog;
 
 import java.io.Closeable;
-import java.lang.management.ManagementFactory;
-
-import com.sun.management.OperatingSystemMXBean;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

@@ -12,7 +12,6 @@ import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
-import com.winterwell.web.fields.SField;
 import com.winterwell.youagain.client.AuthToken;
 
 /**

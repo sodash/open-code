@@ -2,7 +2,6 @@ package com.winterwell.depot;
 
 import java.io.File;
 import java.io.Flushable;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 

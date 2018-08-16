@@ -5,9 +5,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.TodoException;
-
 /**
  * Describe part of a date or time, e.g. "11am", "Monday", or "21st June"
  * Created by daniel on 02/09/14.

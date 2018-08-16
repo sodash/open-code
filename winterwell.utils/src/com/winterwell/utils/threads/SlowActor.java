@@ -1,7 +1,6 @@
 package com.winterwell.utils.threads;
 
 import java.io.Flushable;
-import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;

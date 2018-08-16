@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.eclipse.jetty.util.ajax.JSON;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,9 +20,7 @@ import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.admin.DeleteIndexRequest;
 import com.winterwell.es.client.admin.GetAliasesRequest;
-import com.winterwell.es.client.admin.IndexSettingsRequest;
 import com.winterwell.es.client.admin.IndicesAdminClient;
-import com.winterwell.gson.Gson;
 import com.winterwell.maths.chart.LogGridInfo;
 import com.winterwell.maths.stats.distributions.d1.ExponentialDistribution1D;
 import com.winterwell.maths.stats.distributions.d1.HistogramData;

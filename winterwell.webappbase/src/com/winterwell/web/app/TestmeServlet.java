@@ -2,12 +2,10 @@ package com.winterwell.web.app;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.mail.internet.InternetAddress;
 
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.admin.IndicesAdminClient;
 import com.winterwell.es.client.admin.StatsRequest;
 import com.winterwell.es.client.admin.StatsResponse;
 import com.winterwell.utils.Dep;

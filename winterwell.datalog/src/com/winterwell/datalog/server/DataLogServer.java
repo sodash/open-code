@@ -6,7 +6,6 @@ import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.IDataLogAdmin;
 import com.winterwell.utils.Dep;
-import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
