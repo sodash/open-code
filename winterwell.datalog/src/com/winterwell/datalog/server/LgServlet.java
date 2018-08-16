@@ -93,7 +93,7 @@ public class LgServlet {
 		// NB: dont IP/user track simple events, which are server-side
 		boolean stdTrackerParams = ! DataLogEvent.simple.equals(tag) && state.get(track, true);
 		// Read the "extra" event parameters
-		Map params = (Map) state.get(PARAMS);		
+		Map<String,Object> params = (Map) state.get(PARAMS);		
 		if (params==null) {
 			// params from the url?
 			// e.g. 
@@ -102,7 +102,6 @@ public class LgServlet {
 			// &time={created_at}&app_id={app_id}&app_name={app_name}&store={store}&tracker_name={tracker_name}&tracker={tracker}
 			// &bid={dcp_bid}
 			// or use p.param for unambiguity
-			// TODO which would we prefer??
 			Map<String, String> smap = state.getMap();			
 			params = new HashMap();
 			for(Map.Entry<String, String> kv : smap.entrySet()) {
@@ -114,8 +113,12 @@ public class LgServlet {
 				params.put(k, v);
 			}
 		}
-		
+		// group by
 		String gby = state.get(GBY);
+		if (gby==null) {
+			// bleurgh - it should be a top-level parameter, but lets catch it here too
+			gby = (String) params.get(GBY.name);
+		}
 		// log it!
 		DataLogEvent logged = doLog(state, ds, gby, tag, count, params, stdTrackerParams);
 		
