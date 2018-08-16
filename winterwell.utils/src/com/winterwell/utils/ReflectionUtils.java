@@ -28,8 +28,6 @@ import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.time.Time;
 
-import sun.misc.SharedSecrets;
-
 /**
  * Reflection-related utility functions
  * 
@@ -777,7 +775,11 @@ public class ReflectionUtils {
 	}
 
 	public static List getEnumValues(Class type) {
-		return Arrays.asList(SharedSecrets.getJavaLangAccess().getEnumConstantsShared(type));
+//		Class<?> klass = Class.forName("sun.misc.SharedSecrets");
+//		Method getAccess = klass.getMethod("getJavaLangAccess");
+//		jla = getAccess.invoke(null);
+//		return Arrays.asList(SharedSecrets.getJavaLangAccess().getEnumConstantsShared(type));
+		return Arrays.asList("TODO enum values from "+type);
 	}
 
 	public static void shallowCopy(Object from, Object to) {

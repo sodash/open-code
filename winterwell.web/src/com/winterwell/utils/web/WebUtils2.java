@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,7 +61,9 @@ import com.winterwell.web.fields.MissingFieldException;
 import com.winterwell.web.test.TestHttpServletRequest;
 
 import eu.medsea.util.MimeUtil;
-import sun.misc.BASE64Decoder;
+//import sun.misc.BASE64Decoder;
+import java.util.Base64.Decoder;
+
 
 /**
  * {@link WebUtils}2 with more dependencies and more Winterwell-specific bits.
@@ -393,12 +396,12 @@ public class WebUtils2 extends WebUtils {
 		String basic = auth.substring(0, 6).toLowerCase();
 		if (!basic.equals("basic "))
 			return null;
-		BASE64Decoder decoder = new sun.misc.BASE64Decoder();
+		Decoder decoder = Base64.getDecoder();
 		byte[] decoded;
 		try {
-			decoded = decoder.decodeBuffer(auth.substring(6));
-		} catch (IOException e) {
-			throw new WrappedException(e);
+			decoded = decoder.decode(auth.substring(6));
+		} catch (Exception e) {
+			throw Utils.runtime(e);
 		}
 		String ds = new String(decoded);
 		int i = ds.indexOf(':');

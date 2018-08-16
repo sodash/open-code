@@ -70,7 +70,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.1";
+	public final static String VERSION_NUMBER = "0.9.2";
 
 	public static final String LOGTAG = "bob";
 
@@ -210,7 +210,7 @@ public class Bob {
 		}
 		
 		if (argsLeft.size() == 0 || Containers.contains("--help", args)) {			
-			System.err.println(StrUtils.LINEEND + "Bob the Builder"
+			System.err.println(StrUtils.LINEEND + "Bob the Builder   version: "+Bob.VERSION_NUMBER
 					+ StrUtils.LINEEND + "---------------"
 					+ StrUtils.LINEEND
 					+ "Default usage (looks for a BuildX.java file in the builder directory):"+ StrUtils.LINEEND
