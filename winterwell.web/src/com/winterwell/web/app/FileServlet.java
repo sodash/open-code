@@ -26,9 +26,14 @@ import com.winterwell.web.WebPage;
  * @author daniel
  * 
  */
-public class FileServlet extends HttpServlet {
+public class FileServlet extends HttpServlet implements IServlet {
 	private static final long serialVersionUID = 1L;
 	
+	@Override
+	public String toString() {
+		return "FileServlet[" + baseDir + "]";
+	}
+
 	/**
 	 * Serve a file up over HTTP, closing the connection afterwards.
 	 * @dependency mime-util.jar to sniff mime-types
@@ -77,6 +82,9 @@ public class FileServlet extends HttpServlet {
 	 */
 	File baseDir;
 
+	/**
+	 * @deprecated Better to set a dir!
+	 */
 	public FileServlet() {
 		super();
 	}
@@ -205,6 +213,11 @@ public class FileServlet extends HttpServlet {
 	public FileServlet setBaseDir(File baseDir) {
 		this.baseDir = baseDir;
 		return this;
+	}
+
+	@Override
+	public void process(WebRequest state) throws Exception {
+		doGet(state.getRequest(), state.getResponse());
 	}
 
 }

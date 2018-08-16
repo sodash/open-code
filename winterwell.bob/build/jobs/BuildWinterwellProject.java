@@ -32,6 +32,9 @@ public class BuildWinterwellProject extends BuildTask {
 	protected String mainClass;
 
 
+	protected boolean isCompile() {
+		return compile;
+	}
 
 	protected File doFatJar() {		
 		Collection<File> jars = new ArraySet();
@@ -136,8 +139,9 @@ public class BuildWinterwellProject extends BuildTask {
 		return projectName;
 	}
 	
-	public void setScpToWW(boolean scpToWW) {
+	public BuildWinterwellProject setScpToWW(boolean scpToWW) {
 		this.scpToWW = scpToWW;
+		return this;
 	}
 	
 	/**

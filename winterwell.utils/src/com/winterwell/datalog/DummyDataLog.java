@@ -27,124 +27,98 @@ class DummyDataLog implements IDataLog {
 
 	@Override
 	public IFuture<MeanRate> getMean(Time start, Time end, String... tagBits) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return new DummyFuture<MeanRate>(null);
+	}
+
+	private void warn() {
+		if (warnings > 3) return;
+		Log.w(LOGTAG, err);
+		warnings++;
 	}
 	
 	@Override
 	public String label(String label, String... tagBits) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return null;
 	}
 
 	@Override
 	public void count(DataLogEvent event) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 	}
 	
 	@Override
 	public void set(double x, Object... tagBits) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 	}
 
 	@Override
 	public IDataLogReq<Double> getTotal(Time start, Time end, String... tagBits) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return new DummyFuture<Double>(0.0);
 	}
 
 	@Override
 	public void mean(double x, Object... tag) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 	}
 
 	@Override
 	public Dt getPeriod() {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return null;
 	}
 
 	@Override
 	public MeanRate getMean(String... tag) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return null;
 	}
 
 	@Override
 	public Set<String> getLive() {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return null;
 	}
 
 	@Override
 	public IFuture<Iterable> getData(Pattern id, Time start, Time end) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return new DummyFuture<Iterable>(Collections.EMPTY_LIST);
 	}
 
 	@Override
 	public IFuture<Iterable> getData(Time start, Time end, KInterpolate ifn, Dt bucketSize, String... tagBits) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return new DummyFuture<Iterable>(Collections.EMPTY_LIST);
 	}
 
 	@Override
 	public Collection<String> getActiveLabels() {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return new ArrayList();
 	}
 
 	@Override
 	public Rate get(String... tag) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return Rate.ZERO(DataLog.tag(tag));
 	}
 
 	@Override
 	public void flush() {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 	}
 
 	@Override
 	public void count(double dx, Object... tags) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 	}
 
 	@Override
 	public void close() {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		// you *can* safely close this
 	}
 
 	@Override
@@ -176,26 +150,20 @@ class DummyDataLog implements IDataLog {
 
 	@Override
 	public DataLogConfig getConfig() {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return new DataLogConfig();
 	}
 
 	@Override
 	public IFuture<? extends Iterable> getMeanData(Time start, Time end,
 			KInterpolate fn, Dt bucketSize, String... tagBits) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 		return new DummyFuture<Iterable>(Collections.EMPTY_LIST);
 	}
 
 	@Override
 	public void setEventCount(DataLogEvent event) {
-		if (warnings < 3)
-			Log.w(LOGTAG, err);
-		warnings++;
+		warn();
 	}
 
 	@Override

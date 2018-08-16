@@ -269,8 +269,7 @@ public class JettyLauncher {
 		setup();
 		// Add a catch-all web server
 		if ( ! catchAllServletDefined) {
-			FileServlet fs = new FileServlet();
-			fs.setBaseDir(webRootDir);
+			FileServlet fs = new FileServlet(webRootDir);
 			String path = "/";
 			addServlet(path, fs);
 			Printer.out("	Adding " + fs.getClass().getName() + " at " + path);
@@ -435,12 +434,15 @@ public class JettyLauncher {
 	}
 
 	/**
-	 * Use a MasterServlet for routing, which helps avoid bugs re the servlet path
+	 * Use a MasterServlet for routing, which helps avoid bugs re the servlet path.
+	 * 
+	 * This will set a fallback {@link FileServlet}.
 	 * @return
 	 */
 	public MasterServlet addMasterServlet() {
 		MasterServlet ms = new MasterServlet();
 		addServlet("/*", ms);
+		ms.setFileServlet(new FileServlet(webRootDir));
 		return ms;
 	}
 	

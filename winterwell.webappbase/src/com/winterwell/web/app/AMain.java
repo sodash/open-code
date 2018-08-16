@@ -3,7 +3,10 @@ package com.winterwell.web.app;
 import java.io.File;
 
 import com.winterwell.datalog.DataLog;
+import com.winterwell.es.IESRouter;
 import com.winterwell.es.XIdTypeAdapter;
+import com.winterwell.es.client.ESConfig;
+import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.gson.Gson;
 import com.winterwell.gson.GsonBuilder;
 import com.winterwell.gson.KLoopPolicy;
@@ -36,7 +39,12 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	/**
 	 * aka app name
 	 */
+	@Deprecated // access via the non-static getAppName()
 	public static String appName;
+	
+	public String getAppName() {
+		return appName;
+	}
 	
 	public static LogFile logFile;
 
@@ -44,17 +52,20 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 
 	protected ConfigType config;
 
+	private Class<ConfigType> configType;
+
 	public static AMain main;
 
 	/**
 	 * @deprecated This will guess the appName from the folder -- better to sepcify it. 
 	 */
 	public AMain() {
-		this(FileUtils.getWorkingDirectory().getName().toLowerCase());
+		this(FileUtils.getWorkingDirectory().getName().toLowerCase(), null);
 	}
 	
-	public AMain(String projectName) {
+	public AMain(String projectName, Class<ConfigType> configType) {
 		this.appName = projectName;
+		this.configType = configType;
 	}
 
 	public ConfigType getConfig() {
@@ -66,7 +77,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * @param args
 	 */
 	public void doMain(String[] args) {
-		logFile = new LogFile(new File(appName+".log"))
+		logFile = new LogFile(new File(getAppName()+".log"))
 					.setLogRotation(TUnit.DAY.dt, 14);
 		try {
 			assert "foo".contains("bar");
@@ -94,7 +105,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		main = this;
 		init2a_configFactory();
 		config = init2_config(args);
-		init2(config);
+		init2(config);		
 	}
 	
 	private void init2a_configFactory() {
@@ -139,7 +150,8 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 
 	/**
 	 * called after config has been loaded.
-	 * This is the recommended method to override for custom init stuff
+	 * This is the recommended method to override for custom init stuff.
+	 * 
 	 * @param config
 	 */
 	protected void init2(ConfigType config) {
@@ -155,8 +167,20 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			// oh well, no emailer
 		}		
 		// TODO init3_gson();
+		// TODO init3_ES();
 	}
 
+	protected void init3_ES() {
+		ESConfig esc = ConfigFactory.get().getConfig(ESConfig.class); 
+		ESHttpClient esjc = new ESHttpClient(esc);
+		Dep.set(ESHttpClient.class, esjc);
+		assert config != null;
+		// Is the config the IESRouter?
+		if (config instanceof IESRouter) {
+			Dep.setIfAbsent(IESRouter.class, (IESRouter) config);
+		}
+	}
+	
 	protected Emailer init3_emailer() {
 		if (Dep.has(Emailer.class)) return Dep.get(Emailer.class);		
 		EmailConfig ec = AppUtils.getConfig(appName, EmailConfig.class, null);
@@ -176,7 +200,12 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * @param args
 	 * @return
 	 */
-	protected abstract ConfigType init2_config(String[] args);
+	protected ConfigType init2_config(String[] args) {
+		if (configType==null) {
+			return null;
+		}
+		return AppUtils.getConfig(getAppName(), configType, args);
+	}
 
 	private void launchJetty() {
 		Log.i("Go!");
@@ -210,9 +239,17 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 
 	/**
-	 * Adds /manifest
+	 * Adds /manifest and /testme
 	 *
 	 * Override! (but do call super) to set e.g. /* -> Master servlet
+	 * Recommended code:
+	 * 
+	 * <pre><code>
+		super.addJettyServlets(jl);
+		MasterServlet ms = jl.addMasterServlet();	
+		ms.add(MyServlet)
+		</code></pre>
+		
 	 * @param jl
 	 */
 	protected void addJettyServlets(JettyLauncher jl) {

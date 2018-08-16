@@ -25,6 +25,8 @@ public class MasterServlet extends HttpServlet {
 
 	private Map<String,Class> classForPrefix = new HashMap();
 
+	private FileServlet fileServlet;
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doGet(req, resp);
@@ -41,6 +43,7 @@ public class MasterServlet extends HttpServlet {
 	private IServlet newServlet(String servletName) throws Exception {
 		Class klass = classForPrefix.get(servletName);
 		if (klass==null) {
+			if (fileServlet!=null) return fileServlet;
 			throw new WebEx.E404(null, "No such servlet: "+servletName);
 		}
 		IServlet s = (IServlet) klass.newInstance();
@@ -49,6 +52,10 @@ public class MasterServlet extends HttpServlet {
 
 	protected String servletNameFromPath(String path) {
 		String[] pathBits = path.split("/");
+		if (pathBits.length==0) {
+			if (fileServlet!=null) return "FileServlet";
+			throw new WebEx.E400("No servlet?! This can mean a mis-configured server not serving index.html");
+		}
 		// NB: paths always start with a / so pathBits[0]=""
 		return FileUtils.getBasename(pathBits[1]);
 	}
@@ -83,6 +90,12 @@ public class MasterServlet extends HttpServlet {
 		this.debug = b;
 	}
 
+	/**
+	 * 
+	 * @param path e.g. "foo" or "/foo" or "/foo/*" 
+	 * 	Leading / and trailing /* are handled as equivalent
+	 * @param klass
+	 */
 	public void addServlet(String path, Class<? extends IServlet> klass) {
 		Utils.check4null(path, klass);
 		// / * is an annoyingly fiddly part of the standard J2EE -- lets make it irrelevant
@@ -104,5 +117,9 @@ public class MasterServlet extends HttpServlet {
 	@Override
 	public String toString() {
 		return "MasterServlet"+classForPrefix;
+	}
+
+	public void setFileServlet(FileServlet fileServlet) {
+		this.fileServlet = fileServlet;
 	}
 }

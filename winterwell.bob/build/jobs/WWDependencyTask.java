@@ -25,19 +25,29 @@ public class WWDependencyTask extends BuildWinterwellProject {
 	public void doTask() throws Exception {
 		// Do NOT run the super
 		// build?
-		BuildWinterwellProject builder = null;
 		if (builderClass!=null) {			
 			try {
 				Class<?> clazz = Class.forName(builderClass);
-				builder = (BuildWinterwellProject) clazz.newInstance();
+				BuildWinterwellProject builder = (BuildWinterwellProject) clazz.newInstance();
+				// copy settings: the ones that might get overridden by the caller.
+				// Don't copy all -- 'cos BuildX may have done some setup in its constructor.
+				builder.setCompile(isCompile());
+				builder.setErrorHandler(errorHandler);
+				builder.setIncSrc(incSrc);
+				builder.setMaxTime(maxTime);
+				builder.setScpToWW(scpToWW);
+				builder.setSkipDependencies(isSkipDependencies());
+				builder.setVerbosity(getVerbosity());
+				
+				// run!
+				builder.run();
+				jarFile = builder.getJar();
+				
+				// success :)
+				return;
 			} catch(Throwable ex) {
 				Log.w(LOGTAG, "Cannot run local BuildTask "+builderClass);
 			}			
-		}
-		if (builder!=null) {
-			builder.run();
-			jarFile = builder.getJar();
-			return;
 		}
 		
 		// download jar
@@ -53,5 +63,6 @@ public class WWDependencyTask extends BuildWinterwellProject {
 		FileUtils.move(jar, getJar());
 		Log.i(LOGTAG, "Downloaded jar "+getJar());
 	}
+
 
 }

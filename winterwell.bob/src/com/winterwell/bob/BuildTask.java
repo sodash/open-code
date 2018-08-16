@@ -111,9 +111,13 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	}
 
 
-	private IErrorHandler errorHandler;
+	protected IErrorHandler errorHandler;
 
 	private Level verbosity;
+	
+	public Level getVerbosity() {
+		return verbosity;
+	}
 	
 	/**
 	 * Allows per-task tweaking of loggin settings.
@@ -202,7 +206,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	}
 
 	
-	Dt maxTime;
+	protected Dt maxTime;
 
 	protected String LOGTAG = Bob.LOGTAG+"."+getClass().getSimpleName();
 
@@ -218,9 +222,15 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 * if true, the dependencies will NOT be run!
 	 * Use-case: for speed in debug runs.
 	 * @param skipDependencies
+	 * @return 
 	 */
-	public void setSkipDependencies(boolean skipDependencies) {
+	public BuildTask setSkipDependencies(boolean skipDependencies) {
 		this.skipDependencies = skipDependencies;
+		return this;
+	}
+	
+	public boolean isSkipDependencies() {
+		return skipDependencies;
 	}
 	
 	/**

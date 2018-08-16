@@ -315,12 +315,13 @@ public class DataLog {
 	 */
 	public static IDataLog init(DataLogConfig myConfig) {
 		if (dflt != null) {
-			try {
+			try {				
 				dflt.close();
 			} catch (Throwable e) {
 				// swallow
 				Log.e(LOGTAG, e);
 			}
+			dflt = null;
 		}
 		Dep.set(DataLogConfig.class, myConfig);
 		// default dataspace
