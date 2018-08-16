@@ -33,7 +33,7 @@ public class BuildWinterwellProject extends BuildTask {
 
 
 
-	protected void doFatJar() {		
+	protected File doFatJar() {		
 		Collection<File> jars = new ArraySet();
 		// this projects jar!
 		jars.add(getJar());
@@ -68,7 +68,7 @@ public class BuildWinterwellProject extends BuildTask {
 		jt.close();
 		// done
 		report.put("fat-jar", jt.getJar().getAbsolutePath());
-
+		return jt.getJar();
 	}
 
 	
@@ -128,7 +128,7 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	private boolean compile = true;
 
-	private boolean scpToWW;
+	protected boolean scpToWW;
 
 	protected String projectName;
 	

@@ -6,11 +6,16 @@ import java.util.Collection;
 
 import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
 import com.winterwell.utils.io.FileUtils;
 
 /**
- * Naturally Bob is built by Bob
+ * Naturally Bob is built by Bob.
+ * 
+ * You can get the latest version of Bob from:
+ * https://www.winterwell.com/software/downloads/bob-all.jar
+ * 
  * @author daniel
  *
  */
@@ -20,6 +25,7 @@ public class BuildBob extends BuildWinterwellProject {
 		super(new WinterwellProjectFinder().apply("winterwell.bob"), "bob");
 		incSrc = true;
 		setMainClass(Bob.class);
+		setScpToWW(true);
 	}
 
 	@Override
@@ -30,7 +36,19 @@ public class BuildBob extends BuildWinterwellProject {
 		File bobjar = getJar();
 		FileUtils.copy(bobjar, new File(projectDir, "winterwell.bob.jar"));
 		
-		doFatJar();
+		// bob-all.jar -- This is what you want to run Bob
+		File fatJar = doFatJar();
+
+		if (scpToWW) {
+			String remoteJar = "/home/winterwell/public-software/"+fatJar.getName();
+			SCPTask scp = new SCPTask(fatJar, "winterwell@winterwell.com",				
+					remoteJar);
+			// this is online at: https://www.winterwell.com/software/downloads
+			scp.setMkdirTask(false);
+			scp.run();
+//			scp.runInThread(); no, wait for it to finish
+			report.put("scp to remote", "winterwell.com:"+remoteJar);
+		}
 	}
 
 	@Override
