@@ -17,7 +17,6 @@
 package com.winterwell.gson.internal.bind;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.winterwell.gson.Gson;

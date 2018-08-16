@@ -51,7 +51,6 @@ import com.winterwell.gson.internal.bind.LateBinding;
 import com.winterwell.gson.internal.bind.MapTypeAdapterFactory;
 import com.winterwell.gson.internal.bind.ObjectTypeAdapter;
 import com.winterwell.gson.internal.bind.ReflectiveTypeAdapterFactory;
-import com.winterwell.gson.internal.bind.RuntimeTypeAdapterFactory;
 import com.winterwell.gson.internal.bind.SqlDateTypeAdapter;
 import com.winterwell.gson.internal.bind.TimeTypeAdapter;
 import com.winterwell.gson.internal.bind.TypeAdapters;

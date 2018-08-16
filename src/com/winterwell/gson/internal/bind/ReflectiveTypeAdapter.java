@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.winterwell.gson.Gson;
-import com.winterwell.gson.GsonBuilder;
 import com.winterwell.gson.JsonSyntaxException;
 import com.winterwell.gson.KLoopPolicy;
 import com.winterwell.gson.TypeAdapter;

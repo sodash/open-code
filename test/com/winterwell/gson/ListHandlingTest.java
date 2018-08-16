@@ -5,8 +5,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.winterwell.gson.Gson;
-
 public class ListHandlingTest {
 
 	@Test

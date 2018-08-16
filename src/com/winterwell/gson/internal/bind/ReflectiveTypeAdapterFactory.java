@@ -16,8 +16,6 @@
 
 package com.winterwell.gson.internal.bind;
 
-import static com.winterwell.gson.internal.bind.JsonAdapterAnnotationTypeAdapterFactory.getTypeAdapter;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -26,23 +24,16 @@ import java.util.Map;
 
 import com.winterwell.gson.FieldNamingStrategy;
 import com.winterwell.gson.Gson;
-import com.winterwell.gson.JsonSyntaxException;
-import com.winterwell.gson.KLoopPolicy;
 import com.winterwell.gson.TypeAdapter;
 import com.winterwell.gson.TypeAdapterFactory;
-import com.winterwell.gson.annotations.JsonAdapter;
 import com.winterwell.gson.annotations.SerializedName;
 import com.winterwell.gson.internal.$Gson$Types;
 import com.winterwell.gson.internal.ConstructorConstructor;
 import com.winterwell.gson.internal.Excluder;
 import com.winterwell.gson.internal.ObjectConstructor;
-import com.winterwell.gson.internal.Primitives;
 import com.winterwell.gson.reflect.TypeToken;
 import com.winterwell.gson.stream.JsonReader;
-import com.winterwell.gson.stream.JsonToken;
 import com.winterwell.gson.stream.JsonWriter;
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.ReflectionUtils;
 
 /**
  * Type adapter that reflects over the fields and methods of a class.

@@ -2,8 +2,6 @@ package com.winterwell.gson;
 
 import java.lang.reflect.Type;
 
-import com.winterwell.utils.web.IHasJson;
-
 /**
  * COnvert to JSON -- by just outputting the toString() string.
  * Use-case: for when you want to avoid creating objects.

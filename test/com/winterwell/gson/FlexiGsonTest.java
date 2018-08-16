@@ -1,15 +1,10 @@
 package com.winterwell.gson;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
-import com.winterwell.gson.Gson;
-import com.winterwell.gson.GsonBuilder;
-import com.winterwell.gson.RawJson;
 import com.winterwell.utils.containers.ArrayMap;
 
 public class FlexiGsonTest {

@@ -1,7 +1,5 @@
 package com.winterwell.gson;
 
-import static org.junit.Assert.*;
-
 import java.lang.reflect.Type;
 import java.util.Map;
 

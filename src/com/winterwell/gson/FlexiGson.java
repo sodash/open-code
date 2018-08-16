@@ -16,8 +16,6 @@
 
 package com.winterwell.gson;
 
-import java.util.Map;
-
 /**
  * Gson, with a classname that won't conflict with other jars 
  * @author Daniel Winterstein
