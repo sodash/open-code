@@ -29,6 +29,7 @@ import java.util.List;
 
 import com.winterwell.gson.internal.JsonReaderInternalAccess;
 import com.winterwell.gson.internal.bind.JsonTreeReader;
+import com.winterwell.gson.internal.bind.LBRow;
 import com.winterwell.gson.internal.bind.LateBinding;
 
 /**
@@ -1832,15 +1833,18 @@ public class JsonReader implements Closeable {
 	}
 
 	public void addLateBinding(Object obj, Field f, int index, LateBinding lb) {
-		lateBindings.add(new Object[]{obj, f, index, lb});
+		lateBindings.add(new LBRow(obj, f, index, lb));
 	}
 	
 	/**
 	 * [object, field, index, LB]
 	 */
-	List<Object[]> lateBindings = new ArrayList(0);
+	List<LBRow> lateBindings = new ArrayList(0);
 
-	public List<Object[]> getLateBindings() {
+	public List<LBRow> getLateBindings() {
 		return lateBindings;
 	}
+	
 }
+
+

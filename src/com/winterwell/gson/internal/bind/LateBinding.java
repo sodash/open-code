@@ -5,7 +5,7 @@ package com.winterwell.gson.internal.bind;
  * @author daniel
  *
  */
-public class LateBinding {
+public final class LateBinding {
 
 	public final String ref;
 

@@ -47,6 +47,7 @@ import com.winterwell.gson.internal.bind.EnumMapTypeAdapter;
 import com.winterwell.gson.internal.bind.JsonAdapterAnnotationTypeAdapterFactory;
 import com.winterwell.gson.internal.bind.JsonTreeReader;
 import com.winterwell.gson.internal.bind.JsonTreeWriter;
+import com.winterwell.gson.internal.bind.LBRow;
 import com.winterwell.gson.internal.bind.LateBinding;
 import com.winterwell.gson.internal.bind.MapTypeAdapterFactory;
 import com.winterwell.gson.internal.bind.ObjectTypeAdapter;
@@ -1064,11 +1065,11 @@ public class Gson {
 		T object = (T) fromJson(jsonReader, typeOfT);
 		
 		try {
-			for(Object[] lbs : jsonReader.getLateBindings()) {
-				Object obj = lbs[0];
-				Field f = (Field) lbs[1];
-				Integer i = (Integer) lbs[2];
-				LateBinding lb = (LateBinding) lbs[3];
+			for(LBRow lbs : jsonReader.getLateBindings()) {
+				Object obj = lbs.obj;
+				Field f = lbs.f;
+				int i = lbs.index;
+				LateBinding lb = lbs.lb;
 				Object value = jsonReader.getIdValue(lb.ref);
 				if (value==null) {
 					throw new JsonSyntaxException("Could not resolve ref: "+lb);
