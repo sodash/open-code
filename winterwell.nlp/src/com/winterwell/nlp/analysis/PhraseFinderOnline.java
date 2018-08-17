@@ -53,10 +53,7 @@ ITrainable.Unsupervised.Weighted<IDocument>, IPhraseFinder {
 	private boolean oncePerDocument = true;
 	private int overlapPenalty = 3;
 
-	private boolean includeNumbers;
-	
-	@Deprecated // TODO delete in 2016
-	private transient Set<String> stopwords;
+	private boolean includeNumbers;	
 	
 	final ITokenStream tokeniser;
 	Map<List<String>, String> words2raw;

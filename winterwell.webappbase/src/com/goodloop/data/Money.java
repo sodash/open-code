@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.winterwell.data.AThing;
 import com.winterwell.es.ESType;
+import com.winterwell.gson.StandardAdapters.LenientLongAdapter;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -57,6 +58,8 @@ implements Comparable<Money>, IHasJson {
 	/**
 	 * Support values down to 0.01p (a hundredth of a pence).
 	 * This is the canonical value of the Money object.
+	 * 
+	 * NB: You are advised to use {@link LenientLongAdapter} in Gson to avoid floating point errors.
 	 */
 	private long value100p;
 	

@@ -20,9 +20,7 @@ import com.winterwell.utils.containers.ArrayMap;
 
 /**
  * A simple common phrase finder.
- * 
- * TODO use a lossy online algorithm for streaming lots of data.
- * 
+ *  * 
  * @author daniel
  * @testedby {@link PhraseFinderTest}
  */
