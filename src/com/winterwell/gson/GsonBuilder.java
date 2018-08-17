@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.winterwell.gson.StandardAdapters.LenientLongAdapter;
 import com.winterwell.gson.internal.$Gson$Preconditions;
 import com.winterwell.gson.internal.Excluder;
 import com.winterwell.gson.internal.bind.TypeAdapters;
@@ -603,6 +604,8 @@ public class GsonBuilder {
 
 	/**
 	 * Allow comments in json. Comments are not valid in json -- though they are allowed in javascript, and often useful.
+	 * 
+	 * @see LenientLongAdapter which is something quite different
 	 * @see JsonReader#setLenient(boolean)
 	 * @param stripComments
 	 * @return this
