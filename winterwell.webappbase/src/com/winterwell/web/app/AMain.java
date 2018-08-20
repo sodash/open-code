@@ -152,6 +152,14 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * called after config has been loaded.
 	 * This is the recommended method to override for custom init stuff.
 	 * 
+	 * This base method does:
+	 *  - DataLog
+	 *  - Emailer, via {@link #init3_emailer()}
+	 *  
+	 *  NOT (YET):
+	 *  - TODO ES via {@link #init3_ES()}
+	 *  - TODO gson via {@link #init3_gson()}
+	 *  
 	 * @param config
 	 */
 	protected void init2(ConfigType config) {
@@ -159,6 +167,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		initFlag = true;		
 		// init DataLog
 		DataLog.getImplementation();
+		// emailer
 		try {
 			init3_emailer();			
 		} catch(Throwable ex) {
@@ -171,9 +180,11 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 
 	protected void init3_ES() {
-		ESConfig esc = ConfigFactory.get().getConfig(ESConfig.class); 
+		// config
+		ESConfig esc = ConfigFactory.get().getConfig(ESConfig.class);
+		// client
 		ESHttpClient esjc = new ESHttpClient(esc);
-		Dep.set(ESHttpClient.class, esjc);
+		Dep.setIfAbsent(ESHttpClient.class, esjc);
 		assert config != null;
 		// Is the config the IESRouter?
 		if (config instanceof IESRouter) {
