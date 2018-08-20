@@ -212,4 +212,8 @@ public class BrowserType {
 			Log.e("BrowserType", ex);
 		}
 	}
+
+	public void setOS(String family) {
+		this.os = family==null? null : family.toLowerCase();
+	}
 }

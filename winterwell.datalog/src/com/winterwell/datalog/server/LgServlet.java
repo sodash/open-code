@@ -35,6 +35,7 @@ import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
 
 import ua_parser.Client;
+import ua_parser.OS;
 import ua_parser.Parser;
 
 
@@ -305,9 +306,10 @@ public class LgServlet {
 		// browser
 		try {
 			ua_parser.Parser _parser = uaParser();
-			Client uac = _parser.parse(ua);
+			Client uac = _parser.parse(ua);			
 			bt.setBrowserMake(uac.userAgent.family);
-			bt.setVersion(uac.userAgent.major);			
+			bt.setVersion(uac.userAgent.major);
+			bt.setOS(uac.os.family);
 		} catch(Throwable ex) {
 			Log.w("lg", ex);
 		}
