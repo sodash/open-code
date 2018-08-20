@@ -26,6 +26,7 @@ public class BuildBob extends BuildWinterwellProject {
 		incSrc = true;
 		setMainClass(Bob.class);
 		setScpToWW(true);
+		makeFatJar = true;
 	}
 
 	@Override
@@ -37,17 +38,19 @@ public class BuildBob extends BuildWinterwellProject {
 		FileUtils.copy(bobjar, new File(projectDir, "winterwell.bob.jar"));
 		
 		// bob-all.jar -- This is what you want to run Bob
-		File fatJar = doFatJar();
+		if (makeFatJar) {
+			File fatJar = doFatJar();
 
-		if (scpToWW) {
-			String remoteJar = "/home/winterwell/public-software/"+fatJar.getName();
-			SCPTask scp = new SCPTask(fatJar, "winterwell@winterwell.com",				
-					remoteJar);
-			// this is online at: https://www.winterwell.com/software/downloads
-			scp.setMkdirTask(false);
-			scp.run();
-//			scp.runInThread(); no, wait for it to finish
-			report.put("scp to remote", "winterwell.com:"+remoteJar);
+			if (scpToWW) {
+				String remoteJar = "/home/winterwell/public-software/"+fatJar.getName();
+				SCPTask scp = new SCPTask(fatJar, "winterwell@winterwell.com",				
+						remoteJar);
+				// this is online at: https://www.winterwell.com/software/downloads
+				scp.setMkdirTask(false);
+				scp.run();
+		//			scp.runInThread(); no, wait for it to finish
+				report.put("scp to remote", "winterwell.com:"+remoteJar);
+			}
 		}
 	}
 

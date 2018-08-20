@@ -26,7 +26,6 @@ import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
-import com.winterwell.web.app.BuildWWAppBase;
 import com.winterwell.web.email.SimpleMessage;
 
 import jobs.BuildBob;
@@ -107,10 +106,10 @@ public class PublishProjectTask extends BuildTask {
 				new BuildBob(),
 				new BuildWeb(),
 				new BuildDataLog(),
-				new BuildDepot(),
-				new BuildWWAppBase(),
+				new BuildDepot(),				
 				
 				// these might not be on the classpath
+				new WWDependencyTask("winterwell.webappbase", "com.winterwell.web.app.BuildWWAppBase"),
 //				new BuildYouAgainJavaClient(),
 				new WWDependencyTask("youagain-java-client", "com.winterwell.youagain.client.BuildYouAgainJavaClient"),
 //				new BuildESJavaClient(),

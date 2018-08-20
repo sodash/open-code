@@ -29,6 +29,8 @@ import com.winterwell.utils.web.WebUtils2;
  */
 public class BuildWinterwellProject extends BuildTask {
 	
+	protected boolean makeFatJar;
+	
 	protected String mainClass;
 
 
@@ -314,6 +316,11 @@ public class BuildWinterwellProject extends BuildTask {
 	protected File getTestBinDir() {
 		// NB not all projects are set to use this (yet)
 		return new File(projectDir, "bin.test");
+	}
+
+	public BuildWinterwellProject setMakeFatJar(boolean b) {
+		makeFatJar = b;
+		return this;
 	}
 
 }
