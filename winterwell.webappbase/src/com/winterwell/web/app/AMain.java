@@ -179,6 +179,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		// TODO init3_ES();
 	}
 
+	/**
+	 * Init the ES client and router (NOT any schemas/mappings)
+	 */
 	protected void init3_ES() {
 		// config
 		ESConfig esc = ConfigFactory.get().getConfig(ESConfig.class);
