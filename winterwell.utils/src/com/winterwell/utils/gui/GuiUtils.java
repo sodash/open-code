@@ -19,10 +19,12 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -120,10 +122,27 @@ public class GuiUtils {
 	 * @param question
 	 * @return
 	 */
-	public static String askUser(String question) {
+	public static String askUser(String question) {		
 		return JOptionPane.showInputDialog(question);
 	}
 
+	/**
+	 * Mnenomic for {@link JOptionPane#showInputDialog(Object)}
+	 * 
+	 * @param question
+	 * @return
+	 */
+	public static <X> X askUserSelect(String title, String text, Collection<X> options) {		
+		int optionType = JOptionPane.OK_CANCEL_OPTION;
+		int messageType = JOptionPane.QUESTION_MESSAGE;
+		Icon icon = null; 
+		Object initialValue = null;
+		Component parentComponent = null;
+		Object[] aoptions = options.toArray();
+		int i = JOptionPane.showOptionDialog(parentComponent, text, title, optionType, messageType, icon, aoptions, initialValue);
+		return (X) aoptions[i].toString();
+	}
+	
 	// .showOptionDialog(null, options, question, 0, 0, null, options, options);
 	// JDialog dialog = new JDialog();
 	// dialog.setTitle(question);
