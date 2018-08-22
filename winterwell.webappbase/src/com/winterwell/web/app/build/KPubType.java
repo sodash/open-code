@@ -5,5 +5,6 @@ public enum KPubType {
 	production,
 	local,
 	boozer,
+	experiment,
 	winebar
 }
