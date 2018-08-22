@@ -383,6 +383,35 @@ public final class IMAPClient implements Closeable {
 			throw Utils.runtime(e);
 		}
 	}
+	
+	/**
+	 * See https://docs.oracle.com/javaee/6/api/javax/mail/Folder.html#getMessages(int,%20int)
+	 * @param j 
+	 * @param i 
+	 * @return a lazy-fetching array of all message objects in the current
+	 *         folder. May be empty, never null. These should be lightweight
+	 *         objects which retrieve their body only if necessary (eg. if
+	 *         passed into {@link SimpleMessage}).
+	 */
+	public Message[] getEmailIds(int start, int end) {
+		// Connect?
+		if (!isConnected()) {
+			connect();
+		}
+		// Open inbox?
+		if (folder == null || !folder.isOpen()) {
+			openFolder(null);
+		}
+		try {
+			// Get message headers
+			Message[] msgs = folder.getMessages(start,end);
+			assert msgs != null;
+			// Return them
+			return msgs;
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		}
+	}
 
 	/**
 	 * Warning: this pulls down the whole folder contents!

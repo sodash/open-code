@@ -3,6 +3,9 @@ package com.winterwell.web.app;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.log.Log;
+
 /**
  * What browser is this? Browser sniffing -- shouldn't be needed often, but it
  * does have some uses. Status: only recognises a handful of settings
@@ -13,6 +16,14 @@ import java.util.regex.Pattern;
  */
 public class BrowserType {
 
+	/**
+	 * 
+	 * @return lower-cased user-agent
+	 */
+	public String getUserAgent() {
+		return ua;
+	}
+	
 	public static final String OS_ANDROID = "android";
 
 	public static final String OS_BLACKBERRY = "blackberry";
@@ -171,7 +182,7 @@ public class BrowserType {
 	
 	/**
 	 * TODO What Browser software is it? e.g. IE vs chrome Status: only half-implemented!
-	 * @return
+	 * @return Never null (can be "other")
 	 */
 	public String getBrowserMake() {
 		Matcher m = MSIE.matcher(userAgent);
@@ -180,10 +191,29 @@ public class BrowserType {
 			version = Double.valueOf(m.group(1));
 		}		
 		// TODO safari, edge, firefox, chrome, opera
-		return make;
+		return make==null? "other" : make;
 	}
 	
 	public double getVersion() {
 		return version;
+	}
+
+	public void setBrowserMake(String family) {
+		this.make = family;
+	}
+	/**
+	 * 
+	 * @param version String or Number
+	 */
+	public void setVersion(Object version) {
+		try {
+			this.version = MathUtils.toNum(version);
+		} catch(Exception ex) {
+			Log.e("BrowserType", ex);
+		}
+	}
+
+	public void setOS(String family) {
+		this.os = family==null? null : family.toLowerCase();
 	}
 }

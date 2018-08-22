@@ -74,6 +74,7 @@ public class AppUtils {
 	private static final List<String> TEST_MACHINES = Arrays.asList(
 			"hugh", "mail.soda.sh"
 			);
+	@Deprecated
 	private static final List<String> PROD_MACHINES = Arrays.asList(
 			"heppner"
 			);

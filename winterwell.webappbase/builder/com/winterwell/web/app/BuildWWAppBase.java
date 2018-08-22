@@ -20,7 +20,7 @@ public class BuildWWAppBase extends BuildWinterwellProject {
 	public Collection<? extends BuildTask> getDependencies() {
 		return Arrays.asList(
 				new BuildUtils(),
-				new BuildBob(),
+				new BuildBob().setScpToWW(false).setMakeFatJar(false),
 				new BuildWeb(),
 				new BuildFlexiGson(),
 //				new BuildYouAgainJavaClient()
@@ -32,6 +32,8 @@ public class BuildWWAppBase extends BuildWinterwellProject {
 	
 	public BuildWWAppBase() {
 		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.webappbase"));
+		setIncSrc(true);
 	}
+	
 
 }

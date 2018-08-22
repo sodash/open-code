@@ -63,9 +63,11 @@ public class HttpServletWrapper extends HttpServlet {
 			WebRequest state = new WebRequest(req, resp);			
 			IServlet servlet = getServlet(state);
 			// log everything?
+			String sname = servlet.getClass().getSimpleName();
 			if (debug || debugAll) {
-				Log.d(servlet.getClass().getSimpleName(), state);
+				Log.d(sname, state);
 			}
+			Thread.currentThread().setName(sname);
 			servlet.process(state);
 		} catch (Throwable ex) {
 			doCatch(ex, resp);

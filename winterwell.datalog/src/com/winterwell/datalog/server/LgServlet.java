@@ -35,6 +35,7 @@ import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
 
 import ua_parser.Client;
+import ua_parser.OS;
 import ua_parser.Parser;
 
 
@@ -269,19 +270,11 @@ public class LgServlet {
 		// ip: $ip
 		params.putIfAbsent("ip", state.getRemoteAddr());
 			
-		BrowserType bt = new BrowserType(ua);
+		BrowserType bt = getBrowserInfo(ua);
 		boolean mobile = bt.isMobile();		
 		params.putIfAbsent("mbl", mobile);		
 		// browser
-		String browser;
-		try {
-			ua_parser.Parser _parser = uaParser();
-			Client uac = _parser.parse(ua);
-			browser = uac.userAgent.family+"_"+uac.userAgent.major;
-		} catch(Throwable ex) {
-			Log.d("lg", ex);
-			browser = bt.getBrowserMake()+"_"+bt.getVersion();
-		}
+		String browser = bt.getBrowserMake()+"_"+bt.getVersion();		
 		params.putIfAbsent("browser", browser);
 		// OS
 		String os = bt.getOS();
@@ -303,6 +296,27 @@ public class LgServlet {
 	}
 
 	
+	/**
+	 * Uses ua_parser if it can
+	 * @param ua
+	 * @return
+	 */
+	public static BrowserType getBrowserInfo(String ua) {
+		BrowserType bt = new BrowserType(ua);
+		// browser
+		try {
+			ua_parser.Parser _parser = uaParser();
+			Client uac = _parser.parse(ua);			
+			bt.setBrowserMake(uac.userAgent.family);
+			bt.setVersion(uac.userAgent.major);
+			bt.setOS(uac.os.family);
+		} catch(Throwable ex) {
+			Log.w("lg", ex);
+		}
+		return bt;
+	}
+
+
 	static Parser uaParser() throws IOException {
 		if (parser==null) {
 			parser = new Parser();
