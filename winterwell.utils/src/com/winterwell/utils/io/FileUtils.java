@@ -873,7 +873,6 @@ public class FileUtils {
 	 */
 	public static String getRelativePath(File f, File base) throws IllegalArgumentException
 	{
-
 		String fp = f.getAbsolutePath();
 		String bp = base.getAbsolutePath();
 		if ( ! fp.startsWith(bp)) {
@@ -1709,6 +1708,19 @@ public class FileUtils {
 			if (file !=null && file.exists()) return file;
 		}
 		return null;
+	}
+
+	/**
+	 * 
+	 * @param dir
+	 * @param f
+	 * @return true if f is in dir
+	 */
+	public static boolean contains(File dir, File f) {
+		String fp = f.getAbsolutePath();
+		String bp = dir.getAbsolutePath();
+		boolean yes = fp.startsWith(bp);
+		return yes;
 	}
 
 

@@ -1,6 +1,7 @@
 package com.winterwell.bob;
 
 import java.io.Closeable;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +18,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TimeOut;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.threads.TaskRunner;
@@ -73,6 +75,18 @@ import com.winterwell.utils.time.TimeUtils;
 public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 
 
+	@Deprecated // debug the weird
+	public void wtf() {
+		File base = new File(FileUtils.getWinterwellDir(), "wwappbase.js/base");
+		assert base.isDirectory() : getClass();
+		assert base.list().length > 0 : getClass();
+		File roles = new File(FileUtils.getWinterwellDir(), "wwappbase.js/base/Roles.js");
+		assert roles.isFile() : getClass();
+		assert roles.length() > 100 : getClass();
+		String rjs = FileUtils.read(roles);
+		assert rjs.contains("define") : getClass();
+	}	
+	
 	protected Map<String,Object> report = new ArrayMap();
 
 	private Desc desc;
@@ -275,6 +289,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 */
 	@Test
 	public final void run() throws RuntimeException {
+		wtf();
 		// fix desc if it wasn't before
 		String id = getDesc().getId();
 		// Add an output and error listener
@@ -293,7 +308,9 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			doDependencies();
 
 			// run
+			wtf();
 			doTask();
+			wtf();
 
 			// Done
 			reportIssues();
@@ -306,6 +323,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			handleException(e);
 			return;
 		} finally {
+			wtf();
 			if (timeOut!=null) timeOut.cancel();
 			// Adjust count
 			int bc = bob.adjustBobCount(-1);
@@ -398,6 +416,11 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		// skip if we're ignoring these
 		if (verbosity!=null && verbosity.intValue() > level.intValue()) return;
 		Log.report(LOGTAG, msg, level);
+	}
+	
+	public boolean isVerbose() {
+		return (verbosity!=null && verbosity.intValue() >= Level.FINEST.intValue())
+				|| Bob.getSingleton().getSettings().verbose;
 	}
 
 	/**

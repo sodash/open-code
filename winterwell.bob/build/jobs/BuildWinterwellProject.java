@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.BigJarTask;
@@ -198,7 +199,7 @@ public class BuildWinterwellProject extends BuildTask {
 
 	@Override
 	public void doTask() throws Exception {
-		File srcDir = getSrcDir();
+		File srcDir = getJavaSrcDir();
 		File binDir = getBinDir();
 		binDir.mkdir();
 		assert binDir.isDirectory() : binDir.getAbsoluteFile();
@@ -272,8 +273,18 @@ public class BuildWinterwellProject extends BuildTask {
 		return new File(projectDir, "bin");
 	}
 
-	protected File getSrcDir() {
-		return new File(projectDir, "src");
+	/**
+	 * 
+	 * @return the Java source directory
+	 */
+	protected File getJavaSrcDir() {
+		// flat /src or maven-style src/java?
+		File s = new File(projectDir, "src/java");
+		if (s.isDirectory()) {
+			return s;
+		}
+		s = new File(projectDir, "src");
+		return s;
 	}
 
 	protected void doTask2_compile(File srcDir, File binDir) {		
@@ -290,9 +301,12 @@ public class BuildWinterwellProject extends BuildTask {
 			compile.run();
 			compile.close();
 		}
+		// also copy any resources across??
 		CopyTask nonJava = new CopyTask(srcDir, binDir);
+		nonJava.setResolveSymLinks(true);
 		nonJava.setNegativeFilter(".*\\.java");
 		nonJava.setIncludeHiddenFiles(false);
+//		nonJava.setVerbosity(Level.ALL);
 		nonJava.run();
 	}
 	

@@ -66,6 +66,20 @@ public class CopyTask extends BuildTask {
 		srcDir = null;
 		this.destDir = destDir.getAbsoluteFile();
 	}
+	
+
+	boolean resolveSymlinks;
+	
+	/**
+	 * If true, symlinks get resolved - the output directory will contain a copy of the file (and not a symlink).
+	 * If false, symlinks are copied as symlinks.
+	 * 
+	 * TODO I think true would be a better default 
+	 */
+	public CopyTask setResolveSymLinks(boolean b) {
+		this.resolveSymlinks = b;
+		return this;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -74,7 +88,7 @@ public class CopyTask extends BuildTask {
 	 */
 	@Override
 	public void doTask() throws Exception {
-		boolean verbose = Bob.getSingleton().getSettings().verbose;
+		boolean verbose = isVerbose();
 		assert srcDir==null || this.srcDir.isDirectory() : this.srcDir;
 		if ( ! destDir.exists()) destDir.mkdirs();
 		assert destDir.isDirectory() : destDir;
@@ -99,7 +113,13 @@ public class CopyTask extends BuildTask {
 		
 		// Do it
 		Map copy2original = new HashMap();
+		List<File> symDirs = new ArrayList();
+		File prev = null;
 		for (final File in : files) {
+			// debug weird
+			wtf();
+			prev = in;
+			
 			assert in.exists() : in;
 			String path = srcDir==null? in.getName() : FileUtils.getRelativePath(in, srcDir);
 			File out = new File(destDir, path);
@@ -115,9 +135,22 @@ public class CopyTask extends BuildTask {
 			}
 			// sym link? Make a matching sym-link
 			if (FileUtils.isSymLink(in)) {
-				FileUtils.makeSymLink(in.getCanonicalFile(), out);
-				continue;
+				boolean symdir = in.isDirectory();
+				if ( ! resolveSymlinks) {
+					FileUtils.makeSymLink(in.getCanonicalFile(), out);
+					// TODO avoid copying files within a symlinked dir
+					if (symdir) symDirs.add(in);
+					continue;
+				} else {
+					// carry on??
+				}
 			}
+			// if we've sym-linked a directory, skip copying its sub-files
+			for (File symDir : symDirs) {
+				if (FileUtils.contains(symDir, in)) {
+					continue;
+				}
+			}			
 			// Don't copy directories - just create matching ones
 			if (in.isDirectory()) {
 				out.mkdir();

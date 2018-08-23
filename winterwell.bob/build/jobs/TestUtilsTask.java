@@ -15,7 +15,7 @@ public class TestUtilsTask extends BuildTask {
 		File outputFile = new File(projDir, "test-results/"+bu.getProjectName()+".html");
 		GuiUtils.setInteractive(false);
 		JUnitTask junit = new JUnitTask(
-				bu.getSrcDir(),
+				bu.getJavaSrcDir(),
 				bu.getTestBinDir(),
 				outputFile);		
 		junit.run();		
