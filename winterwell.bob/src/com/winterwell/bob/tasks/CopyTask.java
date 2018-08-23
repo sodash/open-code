@@ -117,7 +117,6 @@ public class CopyTask extends BuildTask {
 		File prev = null;
 		for (final File in : files) {
 			// debug weird
-			wtf();
 			prev = in;
 			
 			assert in.exists() : in;

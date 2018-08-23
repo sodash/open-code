@@ -74,19 +74,6 @@ import com.winterwell.utils.time.TimeUtils;
  */
 public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 
-
-	@Deprecated // debug the weird
-	public void wtf() {
-		File base = new File(FileUtils.getWinterwellDir(), "wwappbase.js/base");
-		assert base.isDirectory() : getClass();
-		assert base.list().length > 0 : getClass();
-		File roles = new File(FileUtils.getWinterwellDir(), "wwappbase.js/base/Roles.js");
-		assert roles.isFile() : getClass();
-		assert roles.length() > 100 : getClass();
-		String rjs = FileUtils.read(roles);
-		assert rjs.contains("define") : getClass();
-	}	
-	
 	protected Map<String,Object> report = new ArrayMap();
 
 	private Desc desc;
@@ -289,7 +276,6 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 */
 	@Test
 	public final void run() throws RuntimeException {
-		wtf();
 		// fix desc if it wasn't before
 		String id = getDesc().getId();
 		// Add an output and error listener
@@ -308,9 +294,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			doDependencies();
 
 			// run
-			wtf();
 			doTask();
-			wtf();
 
 			// Done
 			reportIssues();
@@ -323,7 +307,6 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			handleException(e);
 			return;
 		} finally {
-			wtf();
 			if (timeOut!=null) timeOut.cancel();
 			// Adjust count
 			int bc = bob.adjustBobCount(-1);
