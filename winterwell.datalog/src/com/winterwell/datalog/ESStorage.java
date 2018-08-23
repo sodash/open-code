@@ -443,13 +443,16 @@ public class ESStorage implements IDataLogStorage {
 		ESPath path = new ESPath(index, type, id);
 		Future<ESHttpResponse> f;
 		if (grpById) {
-			UpdateRequestBuilder saveReq = client.prepareUpdate(path);			
+			UpdateRequestBuilder saveReq = client.prepareUpdate(path);
+			// try x3 before failing
+			saveReq.setRetries(2);
 			// set doc
 			Map<String, Object> doc = event.toJson2();
 			PainlessScriptBuilder psb = PainlessScriptBuilder.fromJsonObject(doc);
 			saveReq.setScript(psb);
 			// upsert		
 			saveReq.setUpsert(doc);
+			saveReq.setDebug(true); 
 			f = saveReq.execute();
 		} else {
 			IndexRequestBuilder saveReq = client.prepareIndex(path);
