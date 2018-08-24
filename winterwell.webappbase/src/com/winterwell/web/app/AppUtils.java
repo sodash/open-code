@@ -735,8 +735,14 @@ public class AppUtils {
 	 */
 	public static StringBuilder getServerUrl(KServerType mtype, String domain) {
 		assert ! domain.startsWith("http") && ! domain.endsWith("/") : domain;
+		
+		// SoGive uses "app.sogive.org", "test.sogive.org", "local.sogive.org" for Historical Reasons
+		if ("app.sogive.org".equals(domain) && mtype != KServerType.PRODUCTION) {
+			domain = ".sogive.org";
+		}
+		
 		StringBuilder url = new StringBuilder();
-		url.append(mtype==KServerType.LOCAL? "http" : "https"); 		
+		url.append(mtype==KServerType.LOCAL? "http" : "https");
 		url.append("://"); url.append(mtype==KServerType.PRODUCTION? "" : mtype.toString().toLowerCase());
 		url.append(domain);
 		return url;
