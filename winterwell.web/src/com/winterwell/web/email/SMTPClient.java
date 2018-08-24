@@ -7,6 +7,7 @@ import java.util.logging.Level;
 
 import javax.mail.Address;
 import javax.mail.Authenticator;
+import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -239,7 +240,7 @@ public class SMTPClient implements Closeable {
 			email.setSentDate(new Date());
 		}
 		// make sure we're in the sent folder
-		IMAPFolder folder = imapClient.getOpenFolder();
+		Folder folder = imapClient.getOpenFolder();
 		if (folder == null || ! sentFolderName.equals(folder.getName())) {
 			imapClient.openFolder(sentFolderName);
 		}

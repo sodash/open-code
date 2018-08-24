@@ -3,6 +3,7 @@ package com.winterwell.web.email;
 import java.io.Closeable;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -15,14 +16,17 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.Store;
 import javax.mail.search.ComparisonTerm;
 import javax.mail.search.ReceivedDateTerm;
 import javax.mail.search.SearchTerm;
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 
-import com.sun.mail.imap.IMAPFolder;
-import com.sun.mail.imap.IMAPMessage;
-import com.sun.mail.imap.IMAPStore;
-import com.sun.mail.util.MailSSLSocketFactory;
+//import com.sun.mail.imap.IMAPFolder;
+//import com.sun.mail.imap.IMAPMessage;
+//import com.sun.mail.imap.IMAPStore;
+//import com.sun.mail.util.MailSSLSocketFactory;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
@@ -76,14 +80,14 @@ public final class IMAPClient implements Closeable {
 
 	private static final String LOGTAG = "imap";
 
-	private IMAPFolder folder;
+	private Folder folder;
 	private String host;
 	private String password;
 	private Integer port;
 	private int readWriteMode = Folder.READ_ONLY;
 	private Session session;
 
-	private IMAPStore store;
+	private Store store;
 
 	private String user;
 	/**
@@ -210,7 +214,7 @@ public final class IMAPClient implements Closeable {
 			}
 
 			// Get a Store object
-			store = (IMAPStore) session.getStore("imap");
+			store = session.getStore("imap");
 			// Connect
 			store.connect(host, user, password);
 			Log.e(LOGTAG, "...connected "+user);
@@ -249,12 +253,13 @@ public final class IMAPClient implements Closeable {
 	}
 
 	private void connect2_sslprops(Properties props) throws GeneralSecurityException {
-		Log.d(LOGTAG, "using SSL...");
-		java.security.Security
-				.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+		Log.d(LOGTAG, "using SSL...");		
+//		java.security.Security
+//				.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
 		
-		MailSSLSocketFactory socketFactory = new MailSSLSocketFactory();
-		socketFactory.setTrustAllHosts(true);
+//		MailSSLSocketFactory socketFactory = new MailSSLSocketFactory();
+//		SocketFactory socketFactory = SSLSocketFactory.getDefault();
+//		socketFactory.setTrustAllHosts(true);
 		
 //		// ??trust everyone?? (untested)
 //		if (user.equals("bot@soda.sh")) {
@@ -265,7 +270,7 @@ public final class IMAPClient implements Closeable {
 //			socketFactory.setTrustManagers(trustManagers);
 //		}
 		
-		props.put("mail.imap.socketFactory", socketFactory);
+//		props.put("mail.imap.socketFactory", socketFactory);
 				
 		props.setProperty("mail.imap.ssl.enable", "true");
 //		props.setProperty("mail.imap.socketFactory.class",
@@ -296,7 +301,7 @@ public final class IMAPClient implements Closeable {
 			}
 			// Close previous folder if any
 			closeFolder();
-			folder = (IMAPFolder) store.getFolder(folderName);
+			folder = store.getFolder(folderName);
 			if (folder.exists())
 				throw new IllegalArgumentException(folderName
 						+ " already exists");
@@ -311,26 +316,21 @@ public final class IMAPClient implements Closeable {
 		}
 	}
 
-	public void delete(IMAPMessage message) {
+	public void delete(Message message) {
+		// is this needed??
+		if (message instanceof SimpleMessage) {
+			message  = ((SimpleMessage) message).getOriginal();
+		}
 		assert folder != null;
 		assert readWriteMode == Folder.READ_WRITE;
 		try {
 			message.setFlag(Flag.DELETED, true);
 			// expunge immediately (could be inefficient for multiple deletes)
-			Message[] expunged = folder.expunge(new Message[] { message });
-			assert Containers.indexOf(message, expunged) != -1;
+//			Message[] expunged = folder.expunge(new Message[] { message });
+//			assert Containers.indexOf(message, expunged) != -1;
 		} catch (MessagingException e) {
 			throw new ExternalServiceException(e);
 		}
-	}
-
-	/**
-	 * 
-	 * @param message
-	 *            This must have been created from an IMAPMessage
-	 */
-	public void delete(SimpleMessage message) {
-		delete((IMAPMessage) message.getOriginal());
 	}
 
 	/**
@@ -421,11 +421,19 @@ public final class IMAPClient implements Closeable {
 	 */
 	public List<SimpleMessage> getEmails() {
 		Message[] msgs = getEmailHeaders();
-		List<SimpleMessage> mails = new ArrayList<SimpleMessage>(msgs.length);
-		for (Message msg : msgs) {
+		if (max>0 && msgs.length > max) {
+			Log.d(LOGTAG, "Cap at max "+max+" of "+msgs.length);
+			msgs = Arrays.copyOf(msgs, max);
+		}
+		return getEmails(msgs);
+	}
+	
+	public List<SimpleMessage> getEmails(Message[] headers) {
+		List<SimpleMessage> mails = new ArrayList<SimpleMessage>(headers.length);
+		for (Message msg : headers) {
 			mails.add(SimpleMessage.create(msg));
 			if (max>0 && mails.size() >= max) {
-				Log.d(LOGTAG, "Stop at max "+max+" of "+msgs.length);
+				Log.d(LOGTAG, "Stop at max "+max+" of "+headers.length);
 				break;
 			}
 		}
@@ -647,7 +655,7 @@ public final class IMAPClient implements Closeable {
 	/**
 	 * @return the currently open folder, or null if no folder is open.
 	 */
-	public IMAPFolder getOpenFolder() {
+	public Folder getOpenFolder() {
 		if (folder == null || !folder.isOpen())
 			return null;
 		return folder;
@@ -719,9 +727,9 @@ public final class IMAPClient implements Closeable {
 			Log.d(LOGTAG, "openFolder: get folder...");
 			if (folderName == null) {
 				// Search for Inbox
-				folder = (IMAPFolder) openFolder2_findInbox();
+				folder = openFolder2_findInbox();
 			} else {
-				folder = (IMAPFolder) store.getFolder(folderName);
+				folder = store.getFolder(folderName);
 			}
 			if (folder != null && folder.exists()) {
 				// open
@@ -766,12 +774,12 @@ public final class IMAPClient implements Closeable {
 	 * @throws MessagingException
 	 * @throws IllegalArgumentException
 	 */
-	private IMAPFolder openFolder2(String folderName, Folder[] folders)
+	private Folder openFolder2(String folderName, Folder[] folders)
 			throws MessagingException {
 		if (folders.length == 0)
 			return null;
 		if (folders.length == 1) {
-			folder = (IMAPFolder) folders[0];
+			folder = folders[0];
 			Log.d(LOGTAG, "openFolder2: open "+folder.getName()+"...");
 			folder.open(readWriteMode);
 			return folder;
@@ -829,5 +837,7 @@ public final class IMAPClient implements Closeable {
 	public void setMax(int perRunRequestLimit) {
 		this.max = perRunRequestLimit;
 	}
+
+	
 
 }

@@ -558,6 +558,19 @@ public final class Containers  {
 		return (List) Arrays.asList((Object[])array);
 	}
 
+	/**
+	 * Convert this ghost of Java past to a nice modern List
+	 * @param fossilList
+	 * @return rejuvenated copy of fossilList
+	 */
+	public static <X> List<X> asList(final Enumeration fossilList) {
+		ArrayList list2 = new ArrayList();
+		while(fossilList.hasMoreElements()) {
+			Object ne = fossilList.nextElement();
+			list2.add(ne);
+		}
+		return list2;
+	}
 	
 	@Deprecated
 	public static List<Object> asList(final Object[] objects) {

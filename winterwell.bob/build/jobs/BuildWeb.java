@@ -17,11 +17,17 @@ public class BuildWeb extends BuildWinterwellProject {
 		
 		// maven
 		MavenDependencyTask mdt = new MavenDependencyTask();
-		mdt.addDependency("org.eclipse.jetty", "jetty-server", "9.4.8.v20171121");
-		mdt.addDependency("org.eclipse.jetty","jetty-util","9.4.8.v20171121");
-		mdt.addDependency("org.eclipse.jetty","jetty-util-ajax","9.4.8.v20171121");
-		mdt.addDependency("org.eclipse.jetty", "jetty-servlet", "9.4.8.v20171121");
-		mdt.addDependency("javax.mail", "mail", "1.5.0-b01");
+		String jettyVersion = "9.4.12.RC2"; // see https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server
+		mdt.addDependency("org.eclipse.jetty", "jetty-server", jettyVersion);
+		mdt.addDependency("org.eclipse.jetty","jetty-util",jettyVersion);
+		mdt.addDependency("org.eclipse.jetty","jetty-util-ajax",jettyVersion);
+		mdt.addDependency("org.eclipse.jetty", "jetty-servlet",jettyVersion);
+		
+		mdt.addDependency("com.sun.mail", "javax.mail", "1.6.1"); //"1.5.0-b01");
+//		mdt.addDependency("javax.mail", "javax.mail-api", "1.6.1"); //"1.5.0-b01");
+//		mdt.addDependency("javax.mail", "imap", "1.4"); //"1.5.0-b01");
+		mdt.setIncSrc(true); // we like source code
+//		mdt.setForceUpdate(true);
 		mdt.setProjectDir(projectDir);
 		if (outDir!=null) {
 			mdt.setOutputDirectory(outDir);
