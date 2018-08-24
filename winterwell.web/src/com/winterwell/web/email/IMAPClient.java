@@ -106,6 +106,8 @@ public final class IMAPClient implements Closeable {
 	 */
 	private int max;
 
+	private boolean gmail;
+
 	/**
 	 * 
 	 * @param loginDetails
@@ -271,20 +273,20 @@ public final class IMAPClient implements Closeable {
 //		}
 		
 //		props.put("mail.imap.socketFactory", socketFactory);
-				
-		props.setProperty("mail.imap.ssl.enable", "true");
+		final String imap = gmail? "gimap" : "imap";
+		props.setProperty("mail."+imap+".ssl.enable", "true");
 //		props.setProperty("mail.imap.socketFactory.class",
 //				MailSSLSocketFactory.class.getCanonicalName()
 //				"javax.net.ssl.SSLSocketFactory"
 //				);
 		// fall back to normal IMAP connections on failure.
-		props.setProperty("mail.imap.socketFactory.fallback",
+		props.setProperty("mail."+imap+".socketFactory.fallback",
 				"true");
 		// use the simap port for imap/ssl connections.
 		// -- unless told otherwise
 		int _port = port==null || port<1? 993 : port; 
 		props.setProperty(
-				"mail.imap.socketFactory.port",
+				"mail."+imap+".socketFactory.port",
 				 String.valueOf(_port));
 
 	}
@@ -836,6 +838,11 @@ public final class IMAPClient implements Closeable {
 
 	public void setMax(int perRunRequestLimit) {
 		this.max = perRunRequestLimit;
+	}
+
+	public IMAPClient setGMail(boolean b) {
+		gmail = b;
+		return this;
 	}
 
 	

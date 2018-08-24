@@ -10,5 +10,6 @@
 <dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-util</artifactId><version>9.4.12.RC2</version></dependency>
 <dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-util-ajax</artifactId><version>9.4.12.RC2</version></dependency>
 <dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-servlet</artifactId><version>9.4.12.RC2</version></dependency>
-<dependency><groupId>com.sun.mail</groupId><artifactId>javax.mail</artifactId><version>1.6.1</version></dependency>	</dependencies>
+<dependency><groupId>com.sun.mail</groupId><artifactId>javax.mail</artifactId><version>1.6.1</version></dependency>
+<dependency><groupId>com.sun.mail</groupId><artifactId>gimap</artifactId><version>1.6.1</version></dependency>	</dependencies>
 </project>

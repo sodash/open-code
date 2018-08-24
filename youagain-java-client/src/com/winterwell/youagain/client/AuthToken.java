@@ -68,7 +68,8 @@ public class AuthToken implements IHasXId, IProperties {
 		if (token==null) {			
 			try {
 				// this shouldn't happen, but I guess its OK to make a fresh token
-				token = new JWTEncoder(app).encryptJWT(xid);
+				JWTEncoder enc = new JWTEncoder(app);
+				token = enc.encryptJWT(xid);
 			} catch (Exception e) {
 				throw Utils.runtime(e);
 			}

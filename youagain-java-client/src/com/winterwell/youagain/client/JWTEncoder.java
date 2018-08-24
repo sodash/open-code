@@ -35,6 +35,9 @@ import com.winterwell.web.data.XId;
 
 /**
  * This class will wrap low-level JWT stuff, and present it for YouAgain.
+ * 
+ * Not safe as a global 'cos deviceSignature is user specific.
+ * 
  * @author daniel
  * @testedby JWTTest
  */
@@ -49,7 +52,7 @@ public class JWTEncoder {
 		this.app = app;
 	}
 	
-	void setDeviceSignature(String deviceSignature) {
+	public void setDeviceSignature(String deviceSignature) {
 		this.deviceSignature = deviceSignature;
 	}
 	

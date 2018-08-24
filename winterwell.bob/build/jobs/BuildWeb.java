@@ -24,6 +24,7 @@ public class BuildWeb extends BuildWinterwellProject {
 		mdt.addDependency("org.eclipse.jetty", "jetty-servlet",jettyVersion);
 		
 		mdt.addDependency("com.sun.mail", "javax.mail", "1.6.1"); //"1.5.0-b01");
+		mdt.addDependency("com.sun.mail", "gimap", "1.6.1");
 //		mdt.addDependency("javax.mail", "javax.mail-api", "1.6.1"); //"1.5.0-b01");
 //		mdt.addDependency("javax.mail", "imap", "1.4"); //"1.5.0-b01");
 		mdt.setIncSrc(true); // we like source code

@@ -10,7 +10,10 @@ import com.winterwell.utils.log.Log;
  * What browser is this? Browser sniffing -- shouldn't be needed often, but it
  * does have some uses. Status: only recognises a handful of settings
  * 
- * Want to do more? See http://browscap.org/
+ * Want to do more? 
+ * See ua_parser as used in LgServlet
+ * 
+ * See http://browscap.org/
  * @author daniel
  * 
  */
@@ -36,6 +39,7 @@ public class BrowserType {
 
 	private static final String OS_MAC_DESKTOP = "applemac";
 	private static final String OS_WINDOWS = "windows";
+	private static final String OS_LINUX = "linux";
 	
 	/**
 	 * Internet Explorer
@@ -89,6 +93,9 @@ public class BrowserType {
 		}
 		if (userAgent.contains("CrOS")) {
 			return OS_CHROMEBOOK;
+		}
+		if (ua.contains("linux")) {
+			return OS_LINUX;
 		}
 		if (ua.contains("apple")) {
 			return OS_IOS; // This may be a bit loose -- looks like all webkit
@@ -181,16 +188,24 @@ public class BrowserType {
 	private static final Pattern MSIE = Pattern.compile("\\bMSIE (\\d+\\.\\d+)");
 	
 	/**
-	 * TODO What Browser software is it? e.g. IE vs chrome Status: only half-implemented!
+	 * What Browser software is it? e.g. IE vs chrome 
 	 * @return Never null (can be "other")
 	 */
 	public String getBrowserMake() {
+		// NB the order is important
 		Matcher m = MSIE.matcher(userAgent);
 		if (m.find()) {
 			make = MAKE_IE;
 			version = Double.valueOf(m.group(1));
-		}		
-		// TODO safari, edge, firefox, chrome, opera
+		} else if (userAgent.contains("Edge")) {
+			make = "edge";
+		} else if (userAgent.contains("Chrome")) {
+			make = "chrome";
+		} else if (userAgent.contains("Safari")) {
+			make = "safari"; 
+		} else if (userAgent.contains("Firefox")) {
+			make = "firefox";
+		}
 		return make==null? "other" : make;
 	}
 	
