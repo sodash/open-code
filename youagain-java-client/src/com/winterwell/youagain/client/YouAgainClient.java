@@ -292,7 +292,7 @@ public final class YouAgainClient {
 		// and parameters
 		Map<String, Object> pmap = state.getParameterMap();
 		for(String c : pmap.keySet()) {
-			if ( ! KEY.matcher(c).matches()) continue;		
+			if ( ! KEY.matcher(c).find()) continue;		
 			Object jwt = pmap.get(c);
 			// is it a list??
 			if (jwt instanceof String[]) {

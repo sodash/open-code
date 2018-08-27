@@ -80,6 +80,8 @@ abstract class CollectionMap<K, V, CV extends Collection<V>> extends HashMap<K, 
 	/**
 	 * Add value to the list stored for key, creating a new list if needed. You
 	 * can add multiple copies of the same value.
+	 * <p>
+	 * This adds to any previous setting. Unlike {@link #putOne(Object, Object)} which overwrites the previous setting.
 	 * 
 	 * @param key
 	 * @param value

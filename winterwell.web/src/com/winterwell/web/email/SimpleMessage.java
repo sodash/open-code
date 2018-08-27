@@ -36,6 +36,7 @@ import javax.mail.internet.MimeMultipart;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ListMap;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -54,6 +55,22 @@ import com.winterwell.web.ExternalServiceException;
  */
 public class SimpleMessage extends MimeMessage {
 
+	/**
+	 * @see #getHeaderMap()
+	 */
+	@Override
+	public final Enumeration getAllHeaderLines() throws MessagingException {
+		return super.getAllHeaderLines();
+	}
+	
+	/**
+	 * @see #getHeaderMap()
+	 */
+	@Override
+	public final Enumeration getAllHeaders() throws MessagingException {
+		return super.getAllHeaders();
+	}
+	
 	public Date getReceivedDate() throws MessagingException {
 		if (original!=null) {
 			Date rd = original.getReceivedDate();
@@ -916,12 +933,12 @@ public class SimpleMessage extends MimeMessage {
 	 * Copy out the headers into a map. Does not really support repeated headers (last value wins).
 	 * @return the headers for this message.
 	 */
-	public Map<String,String> getHeaderMap() {
+	public ListMap<String,String> getHeaderMap() {
 		Enumeration<Header> hs = headers.getAllHeaders();
-		HashMap map = new HashMap();
+		ListMap<String,String> map = new ListMap();
 		while(hs.hasMoreElements()) {
 			Header h = hs.nextElement();
-			map.put(h.getName(), h.getValue());
+			map.add(h.getName(), h.getValue());
 		}
 		return map;
 	}
