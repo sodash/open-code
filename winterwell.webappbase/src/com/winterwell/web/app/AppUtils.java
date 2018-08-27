@@ -610,9 +610,13 @@ public class AppUtils {
 		com.winterwell.es.client.query.BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
 		
 		if (start != null || end != null) {
+			if (start !=null && end !=null && ! end.isAfter(start)) {
+				if (end.equals(start)) {
+					throw new WebEx.E400("Empty date range - start = end = "+start+" Search: "+sq);
+				}
+				throw new WebEx.E400("Bad date range: start: "+start+" end: "+end+" Search: "+sq);
+			}
 			ESQueryBuilder timeFilter = ESQueryBuilders.dateRangeQuery("time", start, end);
-//			if (start!=null) timeFilter = timeFilter.from(start.toISOString()); //, true) ES versioning pain
-//			if (end!=null) timeFilter = timeFilter.to(end.toISOString()); //, true);
 			filter = filter.must(timeFilter);
 		}
 		

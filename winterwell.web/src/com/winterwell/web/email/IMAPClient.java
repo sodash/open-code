@@ -134,7 +134,7 @@ public final class IMAPClient implements Closeable {
 		}
 		// Assume remote search will work? We have seen bugs with it in the past.
 		setUseRemoteSearch(true);
-		Log.d("imap", XStreamUtils.serialiseToXml(loginDetails));
+		Log.d("imap", user+" password: "+(Utils.isBlank(password)?"yes":"no")+" server: "+host+":"+port);
 	}
 
 	public String getUser() {
