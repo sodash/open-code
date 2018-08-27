@@ -216,7 +216,8 @@ public final class IMAPClient implements Closeable {
 			}
 
 			// Get a Store object
-			store = session.getStore("imap");
+			final String imap = gmail? "gimap" : "imap";
+			store = session.getStore(imap);
 			// Connect
 			store.connect(host, user, password);
 			Log.e(LOGTAG, "...connected "+user);
