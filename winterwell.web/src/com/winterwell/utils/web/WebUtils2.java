@@ -155,7 +155,8 @@ public class WebUtils2 extends WebUtils {
 		return path;
 	}
 	
-	public static String extractParameterFromUrl(String parameter, String url){
+	public static String extractParameterFromUrl(String parameter, String url) {
+		if (url == null) return null;
 		Pattern p = Pattern.compile("(?<=" + parameter + "=).*?(?=&|$)");
 		Matcher m = p.matcher(url);	
 		if (m.find()){
