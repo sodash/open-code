@@ -44,6 +44,8 @@ public class CompileTask extends BuildTask {
 	
 	private List<String> classpath;
 	private List<File> srcFiles;
+	private String srcJavaVersion;
+	private String outputJavaVersion;
 
 	/**
 	 * Compile Java code.
@@ -56,20 +58,22 @@ public class CompileTask extends BuildTask {
 	public CompileTask(File srcDir, File outputDir) {
 		this.srcDir = srcDir;
 		this.outputDir = outputDir;
+		/*
+		 * Default to the version of Java that's running this code :)
+		 */
+		// NB: falls back to Java 9
+		String javaVersion = Utils.or(System.getProperty("java.specification.version"), "1.9");
+		setSrcJavaVersion(javaVersion);
+		setOutputJavaVersion(javaVersion);
 	}
 	
-	/**
-	 * Default to the version of Java that's running this code :)
-	 */
-	// NB: paranoid code falls back to Java 8
-	String javaVersion = Utils.or(System.getProperty("java.specification.version"), "1.8");
+	public void setOutputJavaVersion(String outputJavaVersion) {
+		this.outputJavaVersion = outputJavaVersion;
+	}
+	public void setSrcJavaVersion(String srcJavaVersion) {
+		this.srcJavaVersion = srcJavaVersion;
+	}
 	
-//	public static void main(String[] args) {
-//		// download ECJ
-//		// https://mvnrepository.com/artifact/org.eclipse.jdt.core.compiler/ecj
-//		new MavenDependencyTask().addDependency("org.eclipse.jdt.core.compiler", "ecj", "4.6.1").run();
-//	}
-
 	private void doJava6compile() throws IOException {
 		JavaCompiler jc = getJavaCompiler();
 		Log.d(LOGTAG, "compiler: "+jc.getClass());
@@ -82,8 +86,11 @@ public class CompileTask extends BuildTask {
 		// quiet
 		options.add("-nowarn");
 		// Java version: 8
-		options.add("-source"); options.add(javaVersion);
-		options.add("-target"); options.add(javaVersion);
+		options.add("-source"); options.add(srcJavaVersion);
+		options.add("-target"); options.add(outputJavaVersion);
+		
+		// ??Does lombok need anything??
+		
 		// What a lousy way to set the output dir
 		options.add("-d");
 		options.add(outputDir.getAbsolutePath());
@@ -224,23 +231,6 @@ public class CompileTask extends BuildTask {
 			}
 		}
 		return jFiles;
-	}
-
-	/**
-	 * Generate class files for specific VM version
-	 * <p> 
-	 * NOTE: If using version=1.5 with a Java 7 compiler -- you must 
-	 * also {@link #setSourceVersion(String)} to 1.5! 
-	 * @param version
-	 */
-	public void setTargetVersion(String version) {
-		options.add("-target");		
-		options.add(version);
-	}
-	
-	public void setSourceVersion(String version) {
-		options.add("-source");		
-		options.add(version);
 	}
 
 	public void setClasspath(Collection<File> classpath) {

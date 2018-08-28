@@ -297,7 +297,8 @@ public class BuildWinterwellProject extends BuildTask {
 			ec.setIncludeProjectJars(true);
 			Set<File> libs = ec.getCollectedLibs();
 			compile.setClasspath(libs);		
-			
+//			compile.setSrcJavaVersion("1.9");
+//			compile.setOutputJavaVersion("1.8");
 			compile.run();
 			compile.close();
 		}
