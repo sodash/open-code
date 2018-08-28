@@ -109,5 +109,9 @@ public class AjaxMsg extends AbstractMap2<String, Object> implements Serializabl
 		return jobj.put(key, value);
 		//throw new UnsupportedOperationException();
 	}
+	public static AjaxMsg warningAboutInput(String msg) {
+		AjaxMsg am = new AjaxMsg(KNoteType.warning, "warningAboutInput", msg);
+		return am;
+	}
 
 }
