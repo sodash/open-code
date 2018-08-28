@@ -8,7 +8,6 @@ import com.winterwell.maths.datastorage.IIndex;
 import com.winterwell.maths.datastorage.Index;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.IndexedDistribution;
-import com.winterwell.nlp.classifier.WordFreqDocModelTest;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.corpus.SimpleDocument;
 import com.winterwell.nlp.io.ITokenStream;
@@ -27,7 +26,7 @@ import com.winterwell.utils.log.KErrorPolicy;
  * 
  * @author daniel
  * 
- * @testedby {@link WordFreqDocModelTest}
+ * @testedby WordFreqDocModelTest
  */
 public final class WordFreqDocModel extends ADocModel implements
 		ITrainable.Unsupervised.Weighted<IDocument> {

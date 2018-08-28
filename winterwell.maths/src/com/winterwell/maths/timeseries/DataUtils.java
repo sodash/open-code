@@ -136,7 +136,7 @@ class CSVDataStream extends ADataStream {
  * 
  * NB: Probably no merge with {@link MatrixUtils}, which is extra-methods for matrices like getColumn().
  * 
- * @testedby {@link DataUtilsTest}
+ * @testedby DataUtilsTest
  * 
  * @author daniel
  * 
