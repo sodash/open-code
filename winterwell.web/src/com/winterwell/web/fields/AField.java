@@ -397,7 +397,7 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 		try {
 			return fromString(v);
 		} catch (Exception e) {
-			if (lenient) {
+			if (Utils.yes(lenient)) {
 				Log.w(getClass().getSimpleName()+"."+name, v+" -> "+e);
 				return null;
 			}
