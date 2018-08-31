@@ -659,6 +659,7 @@ public class ESStorage implements IDataLogStorage {
 		ESHttpClient esc = client(dataspace);
 		
 		SearchRequestBuilder search = esc.prepareSearch(index);
+		search.setDebug(true);
 //		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
 		// size controls
 		search.setSize(numExamples);
@@ -721,13 +722,6 @@ public class ESStorage implements IDataLogStorage {
 		// Set filter
 		search.setQuery(filter);
 		
-		// TODO unify the ES search above with the DataLog interface call below
-		// i.e. define a Java interface to match the above 
-//		String[] tagBits = null;
-//		DataLog.getData(start, end, null, TUnit.HOUR.dt, tagBits);
-//		DataLog.getData(start, end, sum/as-is, bucket, DataLogEvent filter, breakdown);
-		
-//		esc.debug = true;
 		SearchResponse sr = search.get();
 		return sr;
 	}
