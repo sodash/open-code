@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair;
 
 /**
@@ -523,7 +524,19 @@ public class TimeUtils {
 		}
 		
 		{ // TODO hour:minute
-
+			Pattern HOUR = Pattern.compile("(\\d\\d):(\\d\\d)|(\\d\\d?)am|(\\d\\d?)pm");
+			Matcher m = HOUR.matcher(s);
+			if (m.find()) {
+				String hourMin = m.group();
+				String g1 = m.group(1);
+				String g2 = m.group(2);
+				String g3 = m.group(3);
+				String g4 = m.group(4);
+				hour = Utils.or(g1,g3,g4); // TODO pm!
+				if (g4!=null) {
+					hour = String.valueOf((int)MathUtils.toNum(g4)+12);
+				}
+			}
 		}
 		
 		// put together a date
