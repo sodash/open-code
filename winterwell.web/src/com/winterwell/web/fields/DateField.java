@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.mail.internet.MailDateFormat;
+
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
@@ -45,7 +47,8 @@ public class DateField extends AField<Time> {
 		_formats.add(new SimpleDateFormat("dd/MM/yyyy HH:mm Z"));
 		try {
 			Class<?> mdf = Class.forName("javax.mail.internet.MailDateFormat");
-			_formats.add((SimpleDateFormat) mdf.newInstance());
+			Object mdfi = mdf.newInstance();
+			_formats.add((SimpleDateFormat) mdfi);
 		} catch (Exception ex) {
 			// oh well
 		}
@@ -65,6 +68,10 @@ public class DateField extends AField<Time> {
 		TimeZone zone = TimeZone.getTimeZone("GMT");
 		for (SimpleDateFormat df : _formats) {
 			df.setTimeZone(zone);
+			if (df instanceof MailDateFormat) {
+				continue; // MDF throws an exception if 2digityearstart is touched!
+			}
+			// 21st century
 			Date c = df.get2DigitYearStart();
 			df.set2DigitYearStart(new Time(2000,1,1).getDate());
 		}
