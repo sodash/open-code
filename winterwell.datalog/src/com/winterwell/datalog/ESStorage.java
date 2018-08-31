@@ -288,7 +288,7 @@ public class ESStorage implements IDataLogStorage {
 			// swap the write index over
 			IndicesAliasesRequest aliasSwap = _client.admin().indices().prepareAliases();
 			aliasSwap.setDebug(true);
-			aliasSwap.setRetries(2);
+			aliasSwap.setRetries(10); // really try again!
 			String writeIndex = writeIndexFromDataspace(dataspace);
 			aliasSwap.addAlias(baseIndex, writeIndex);			
 			// remove the write alias for the previous month
