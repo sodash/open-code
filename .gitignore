@@ -27,3 +27,4 @@ test-output
 
 # Allow
 !winterwell.bob/bob-all.jar
+bob-all.jar
