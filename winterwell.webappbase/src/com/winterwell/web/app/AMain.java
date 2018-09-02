@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.es.IESRouter;
+import com.winterwell.es.StdESRouter;
 import com.winterwell.es.XIdTypeAdapter;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
@@ -181,6 +182,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 
 	/**
 	 * Init the ES client and router (NOT any schemas/mappings)
+	 * 
+	 * Use {@link AppUtils#initESIndices(com.winterwell.data.KStatus[], Class[])}
+	 * {@link AppUtils#initESMappings(com.winterwell.data.KStatus[], Class[], java.util.Map)}
 	 */
 	protected void init3_ES() {
 		// config
@@ -192,6 +196,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		// Is the config the IESRouter?
 		if (config instanceof IESRouter) {
 			Dep.setIfAbsent(IESRouter.class, (IESRouter) config);
+		} else {
+			// nope - use a default
+			Dep.setIfAbsent(IESRouter.class, new StdESRouter());
 		}
 	}
 	

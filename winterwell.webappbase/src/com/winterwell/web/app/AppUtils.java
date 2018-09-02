@@ -430,7 +430,7 @@ public class AppUtils {
 	 * @param main
 	 * @param dbclasses
 	 */
-	public static void initESIndices(KStatus[] main, Class[] dbclasses) {
+	public static void initESIndices(KStatus[] main, Class... dbclasses) {
 		IESRouter esRouter = Dep.get(IESRouter.class);
 		ESHttpClient es = Dep.get(ESHttpClient.class);
 		ESException err = null;
