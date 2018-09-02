@@ -15,6 +15,17 @@ You'll also want to get a couple more repos:
 
 Import projects into Eclipse -- everything in open-code, plus elasticsearch-java-client and flexi-gson
 
+### Install and use Bob the Builder
+
+Download `bob-all.jar` from <https://www.winterwell.com/software/downloads/bob-all.jar>
+
+Run it in the different projects (winterwell.utils, winterwell.web, etc) to get the depenencies (which are downloaded from Maven central). Bob is run via:
+
+`java -jar (path to)bob-all.jar`
+
+
+### Older jars
+
 In Eclipse's Java Build Path editor, import a new User Library
 from the file `open-code/userlibraries.userlibraries`
 This will give you the library `elasticsearch`
