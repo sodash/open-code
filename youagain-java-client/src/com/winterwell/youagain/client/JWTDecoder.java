@@ -101,7 +101,7 @@ public class JWTDecoder {
 
 	private Algorithm algorithm() {
 		RSAPublicKey pubk = (RSAPublicKey) getPublicKey();
-		assert pubk != null : "JWTDecoder - no PublicKey";
+		assert pubk != null : "JWTDecoder - no PublicKey - setPublicKey first";
 		Algorithm alg = Algorithm.RSA256(pubk, null);
 		return alg;
 	}
