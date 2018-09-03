@@ -177,6 +177,7 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	/**
 	 * TODO refactor with {@link EclipseClasspath} so they share code.
+	 * @see WinterwellProjectFinder
 	 * @param _projectName
 	 * @return
 	 */
