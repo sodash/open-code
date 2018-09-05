@@ -125,7 +125,7 @@ public class FakeBrowser {
 	private static final String LOGTAG = "FakeBrowser";
 
 	/**
-	 * ??what is this claiming to be??
+	 * Chrome v50
 	 */
 	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36";
 
