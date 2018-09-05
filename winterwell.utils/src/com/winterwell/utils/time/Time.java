@@ -30,6 +30,9 @@ import com.winterwell.utils.log.Log;
  * <p>
  * Can be sorted - sorts as earliest Time first.
  * 
+ * Perfect date:
+ * https://i2.wp.com/www.metdaan.com/wp-content/uploads/2018/01/25-44.jpg?w=700&ssl=1
+ * 
  * @testedby {@link TimeTest}
  * @author daniel
  * 
