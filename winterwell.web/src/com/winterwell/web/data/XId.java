@@ -316,7 +316,7 @@ public final class XId implements Serializable, IHasJson, CharSequence {
 
 	/**
 	 * Convenience for ensuring a List contains XId objects.
-	 * @param xids May be Strings or XIds or IHasXIds (or a mix).
+	 * @param xids May be Strings or XIds or IHasXIds (or a mix). Must not be null.
 	 * Note: Strings are NOT run through canonicalisation -- they are assumed to be OK!
 	 * @return a copy of xids 
 	 */
