@@ -555,13 +555,20 @@ public class JUnitTask extends BuildTask {
 	 *            Root directory of source. If specified, it will be used to
 	 *            create a link to the source file of failing classes. May be
 	 *            null.
-	 * @param classDirectory
-	 *            Root directory of classes.
+	 * @param classDir
+	 *            Root directory of test classes.
+	 *            For *finding* tests. Tests are run in the current JVM with its classpath.
 	 */
 	public JUnitTask(File srcDir, File classDir, File outputFile) {
 		this(srcDir, Arrays.asList(classDir), outputFile);
 	}
 	
+	/**
+	 * 
+	 * @param srcDir
+	 * @param classPath For *finding* tests. Tests are run in the current JVM with its classpath.
+	 * @param outputFile
+	 */
 	public JUnitTask(File srcDir, Collection<File> classPath, File outputFile) {
 		sourceDirectory = srcDir;
 		classpath = classPath;

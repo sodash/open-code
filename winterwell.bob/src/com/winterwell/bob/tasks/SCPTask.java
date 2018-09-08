@@ -131,6 +131,9 @@ public class SCPTask extends ProcessTask {
 		addArg("-o StrictHostKeyChecking=no"); // This seems to cause bad JVM-hangs bugs (Ubuntu Linux 11.10, as seen by DBW, April 2012)
 		addArg("-o UserKnownHostsFile=/dev/null");
 		// Steven reported still being asked?! (Jan 2013)
+		
+		// Also no password prompt - just fail if one is needed
+		addArg("-o BatchMode=yes");
 	}
 
 	/**

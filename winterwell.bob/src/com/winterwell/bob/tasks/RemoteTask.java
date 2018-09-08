@@ -16,6 +16,8 @@ public class RemoteTask extends ProcessTask {
 	 */
 	public RemoteTask(String sshConnection, String command) {
 		super("ssh");
+		// no password prompt - just fail if one is needed
+		addArg("-o BatchMode=yes");
 		// Disable host key checks
 		addArg("-o StrictHostKeyChecking=no"); //TODO this crashes Eclipse! April 2012 DBW on Ubuntu
 		addArg("-o UserKnownHostsFile=/dev/null");
