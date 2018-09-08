@@ -1,5 +1,6 @@
 package com.winterwell.bob.tasks;
 
+import java.io.File;
 import java.util.List;
 
 import com.winterwell.bob.BuildTask;
@@ -11,6 +12,7 @@ import com.winterwell.utils.io.FileUtils;
  * TODO This task runs a separate Java process
  * 
  * FIXME It does not preserve the file settings
+ * Maybe send an xstream aml blob via a temp file??
  * 
  * @author daniel
  * @testedby ForkJVMTaskTest
@@ -27,6 +29,10 @@ public class ForkJVMTask extends BuildTask {
 	 * HACK
 	 */
 	String classpath = FileUtils.getWinterwellDir()+"/open-code/winterwell.bob/bob-all.jar";
+	/**
+	 * working dir for task
+	 */
+	private File dir;
 	
 	public void setClasspath(String classpath) {
 		this.classpath = classpath;
@@ -39,6 +45,7 @@ public class ForkJVMTask extends BuildTask {
 		System.out.println(command);
 		System.out.println("");
 		Proc proc = new Proc(command);
+		if (dir !=null) proc.setDirectory(dir);
 		
 		proc.start();
 		int ok = proc.waitFor();

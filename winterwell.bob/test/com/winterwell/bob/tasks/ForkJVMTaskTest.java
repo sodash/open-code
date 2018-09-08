@@ -13,6 +13,7 @@ public class ForkJVMTaskTest {
 	public void testDoTask() throws Exception {
 		BuildTask target = new TestTask();
 		ForkJVMTask fork = new ForkJVMTask(target);
+		fork.setClasspath("bob-all.jar:bin.test");
 		fork.doTask();
 	}
 
