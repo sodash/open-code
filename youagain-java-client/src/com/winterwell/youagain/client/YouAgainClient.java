@@ -17,6 +17,7 @@ import org.junit.runner.notification.RunListener.ThreadSafe;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -59,11 +60,13 @@ public final class YouAgainClient {
 		return new XId(WebUtils2.canonicalEmail(email), "email");
 	}
 
-	/**
-	 * ??add to AuthToken??
+	
+	/** 
 	 * @param txid
-	 * @return
+	 * @param appOwnerAuth email & password for an app-owner
+	 * @return oauth tokens for txid, if known
 	 */
+	// ??add to AuthToken??
 	public String[] getOAuthTokens(XId txid, LoginDetails appOwnerAuth) {
 		FakeBrowser fb = new FakeBrowser();
 		fb.setAuthentication(appOwnerAuth.loginName, appOwnerAuth.password);
@@ -73,6 +76,9 @@ public final class YouAgainClient {
 				"app", app,
 				"txid", txid));
 		JSend jsend = JSend.parse(response);
+		if ( ! jsend.isSuccess()) {
+			throw new FailureException(txid+" -> "+jsend.getMessage());
+		}
 		String authxml = (String) jsend.getData().map().get("auth");
 		Object tokens = XStreamUtils.serialiseFromXml(authxml);
 		return (String[]) tokens;
