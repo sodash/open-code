@@ -21,6 +21,7 @@ import com.winterwell.utils.IBuildStrings;
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
@@ -1093,6 +1094,9 @@ public class WebRequest implements IProperties, Closeable {
 		assert ! response.isCommitted();
 		
 		try {
+			// HACK FIXME delete - debug spew
+			Log.d("redirect", redirect+" from "+WebRequest.getCurrent()+" at "+ReflectionUtils.getSomeStack(10));
+						
 			response.sendRedirect(redirect);
 
 			assert !isOpen();

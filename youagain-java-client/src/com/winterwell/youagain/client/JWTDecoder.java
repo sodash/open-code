@@ -73,7 +73,7 @@ public class JWTDecoder {
 				.build();
 		try {
 			DecodedJWT decoded = verifier.verify(jwt);
-			Log.d(LOGTAG, "verified "+jwt+" -> "+decoded);
+			Log.d(LOGTAG, "verified "+jwt+" -> "+decoded.getSubject());
 
 			// debugging
 			if ( ! Utils.equals(issuer, decoded.getIssuer())) {
