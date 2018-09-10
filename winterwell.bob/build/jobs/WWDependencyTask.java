@@ -10,7 +10,7 @@ import com.winterwell.web.FakeBrowser;
  * Hack for BuildWWProject, which handles project-not-on-classpath
  * by downloading the jar 
  * @author daniel
- *
+ * @testedby {@link WWDependencyTaskTest}
  */
 public class WWDependencyTask extends BuildWinterwellProject {
 
@@ -51,8 +51,10 @@ public class WWDependencyTask extends BuildWinterwellProject {
 		}
 		
 		// download jar
+		String url = "https://www.winterwell.com/software/downloads/"+projectName+".jar";
+		Log.i(LOGTAG, "Downloading jar "+url);
 		FakeBrowser fb = new FakeBrowser();
-		File jar = fb.getFile("https://www.winterwell.com/software/downloads/"+projectName+".jar");
+		File jar = fb.getFile(url);
 //		String remoteJar = "/home/winterwell/public-software/"+projectName+".jar";
 //		SCPTask scp = new SCPTask("winterwell@winterwell.com", remoteJar, getJar());
 //		// this is online at: https://www.winterwell.com/software/downloads

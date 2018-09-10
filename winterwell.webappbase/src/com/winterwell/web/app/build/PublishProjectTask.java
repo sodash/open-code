@@ -109,10 +109,9 @@ public class PublishProjectTask extends BuildTask {
 				new BuildDepot(),				
 				
 				// these might not be on the classpath
+				new WWDependencyTask("jtwitter", "winterwell.jtwitter.BuildJTwitter"),
 				new WWDependencyTask("winterwell.webappbase", "com.winterwell.web.app.BuildWWAppBase"),
-//				new BuildYouAgainJavaClient(),
 				new WWDependencyTask("youagain-java-client", "com.winterwell.youagain.client.BuildYouAgainJavaClient"),
-//				new BuildESJavaClient(),
 				new WWDependencyTask("elasticsearch-java-client", "com.winterwell.es.BuildESJavaClient"),
 				new BuildFlexiGson()
 				));

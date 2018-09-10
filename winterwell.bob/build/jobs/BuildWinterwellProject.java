@@ -262,7 +262,7 @@ public class BuildWinterwellProject extends BuildTask {
 			SCPTask scp = new SCPTask(getJar(), "winterwell@winterwell.com",				
 					remoteJar);
 			// this is online at: https://www.winterwell.com/software/downloads
-			scp.setMkdirTask(false);
+			scp.setMkdirTask(false);			
 			scp.runInThread();
 			report.put("scp to remote", "winterwell.com:"+remoteJar);
 		}
