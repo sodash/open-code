@@ -30,7 +30,9 @@ import com.winterwell.utils.io.Option;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.utils.web.XStreamUtils;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.LoginDetails;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.AjaxMsg;
 import com.winterwell.web.ajax.AjaxMsg.KNoteType;
@@ -44,6 +46,7 @@ import com.winterwell.web.fields.XIdField;
  * 
  * This is a thread-safe and lightweight object.
  * 
+ * @testedyb {@link YouAgainClientTest}
  * @author daniel
  */
 public final class YouAgainClient {
@@ -56,6 +59,24 @@ public final class YouAgainClient {
 		return new XId(WebUtils2.canonicalEmail(email), "email");
 	}
 
+	/**
+	 * ??add to AuthToken??
+	 * @param txid
+	 * @return
+	 */
+	public String[] getOAuthTokens(XId txid, LoginDetails appOwnerAuth) {
+		FakeBrowser fb = new FakeBrowser();
+		fb.setAuthentication(appOwnerAuth.loginName, appOwnerAuth.password);
+		fb.setDebug(debug);
+		String ENDPOINT_AUTH = ENDPOINT.replace("youagain.json", "auth.json");
+		String response = fb.getPage(ENDPOINT_AUTH, new ArrayMap(
+				"app", app,
+				"txid", txid));
+		JSend jsend = JSend.parse(response);
+		String authxml = (String) jsend.getData().map().get("auth");
+		Object tokens = XStreamUtils.serialiseFromXml(authxml);
+		return (String[]) tokens;
+	}
 	
 	/**
 	 * For testing, this can be set via config/youagainclient.properties endpoint=

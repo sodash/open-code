@@ -15,7 +15,11 @@ public class CommonFields {
 	 */
 	public static final XIdField USER_XID = new XIdField("uxid");
 	public static final AField<XId> XID = new XIdField("xid");
-
+	/**
+	 * target xid
+	 */
+	public static final XIdField TXID = new XIdField("txid"); 
+	
 	/**
 	 * Auto lower-case on the returned value
 	 */
@@ -23,6 +27,6 @@ public class CommonFields {
 	public static final TimeField START = new TimeField("start").setPreferEnd(false);
 	public static final TimeField END = new TimeField("end").setPreferEnd(true);
 
-	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
+	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");	
 
 }

@@ -27,7 +27,7 @@ public final class XIdField extends AField<XId> {
 	public Class getValueClass() {
 		return XId.class;
 	}
-
+	
 	@Override
 	public XId fromString(String v) throws Exception {
 //		// HACK: special case! "me" or "su"

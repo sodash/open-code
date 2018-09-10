@@ -1072,7 +1072,7 @@ public class WebUtils2 extends WebUtils {
 		} catch(IOException ex) {
 			throw Utils.runtime(ex);
 		} finally {
-			FileUtils.close(out);
+			req.close();
 		}
 	}
 
