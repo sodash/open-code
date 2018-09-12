@@ -142,8 +142,13 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		return props.get(prop);
 	}
 	
+	/**
+	 * 
+	 * @return props (excluding count, dataspace, evt, id, time).
+	 * This cannot be modified.
+	 */
 	public Map<String, Object> getProps() {
-		return props;
+		return Collections.unmodifiableMap(props);
 	}
 	
 	/**

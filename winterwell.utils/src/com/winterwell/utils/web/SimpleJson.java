@@ -356,5 +356,17 @@ public class SimpleJson {
 		obj.put(key[key.length-1], value);
 	}
 
+	/**
+	 * Convenience to get a List value
+	 * @param jsonObj
+	 * @param fields
+	 * @return List or null
+	 */
+	public static List getList(Object jsonObj, Object... fields) {
+		Object v = get(jsonObj, fields);
+		if (v==null) return null;
+		return Containers.asList(v);
+	}
+
 
 }

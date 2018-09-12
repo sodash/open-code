@@ -120,6 +120,13 @@ public class AppUtils {
 		return get(path, klass, null);
 	}
 	
+	/**
+	 * 
+	 * @param path
+	 * @param klass
+	 * @param version
+	 * @return object or null for 404
+	 */
 	public static <X> X get(ESPath path, Class<X> klass, AtomicLong version) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 

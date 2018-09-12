@@ -225,7 +225,7 @@ public class SqlUtils {
 			}
 			return rsit;
 		} catch (Exception e) {
-			Log.report("db", Utils.getRootCause(e), Level.WARNING);
+			Log.w("db", select+" -> "+Utils.getRootCause(e));
 			throw Utils.runtime(e);
 		} finally {
 			if (autoClose)
