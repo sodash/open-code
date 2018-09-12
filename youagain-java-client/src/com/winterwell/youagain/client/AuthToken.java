@@ -82,7 +82,8 @@ public class AuthToken implements IHasXId, IProperties {
 	}
 	public AuthToken(Map jsonObj) {
 		this.token = (String) jsonObj.get("jwt");
-		this.xid = XId.xid(jsonObj.get("xid"));
+		Object _xid = jsonObj.get("xid");
+		this.xid = XId.xid(_xid);
 	}
 	/**
 	 * A token which can be verified with the YouAgain server.

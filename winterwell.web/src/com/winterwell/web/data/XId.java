@@ -349,7 +349,9 @@ public final class XId implements Serializable, IHasJson, CharSequence {
 	public static XId xid(Object xid, boolean canon) {
 		if (xid==null) return null;
 		if (xid instanceof XId) return (XId) xid;		
-		if (xid instanceof CharSequence) new XId(xid.toString(), canon);
+		if (xid instanceof CharSequence) {
+			return new XId(xid.toString(), canon);
+		}
 		IHasXId hasxid = (IHasXId) xid;
 		return hasxid.getXId();
 	}
