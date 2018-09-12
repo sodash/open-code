@@ -4,7 +4,13 @@ import static org.junit.Assert.assertEquals;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -136,6 +142,17 @@ public class TimeUtilsTest {
 			assert f.getDayOfMonth() == 2;
 			assert f.getYear() == 2017;
 		}		
+		{	// Java 8 fail
+			String t = "2018-01-01T00:00:00+0100";
+			ZonedDateTime zp = ZonedDateTime.parse(t);
+			long zes = zp.toEpochSecond();
+			Date.from(zp.toInstant());
+//			Instant ip = Instant.parse(date);
+//			TemporalAccessor j8 = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(date);
+//			Instant instant = Instant.from(j8);
+//			long es = instant.getEpochSecond();
+//			Date idate = Date.from(instant);
+		}
 	}
 	
 	@Test
