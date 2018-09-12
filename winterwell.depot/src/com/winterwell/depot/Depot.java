@@ -11,8 +11,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
+import com.google.common.cache.Cache;
 import com.thoughtworks.xstream.XStreamException;
 import com.winterwell.datalog.DataLog;
 import com.winterwell.depot.merge.Merger;
@@ -846,6 +848,20 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		assert desc.getBefore() != null : desc;
 		put2(desc, artifact, KOverwrite.MERGE);
 		
+	}
+
+	/**
+	 * Convenience for get-if-present, else make-store-and-return
+	 * @param desc
+	 * @param factory
+	 * @return
+	 */
+	public <Y> Y getWithFactory(Desc<Y> desc, Supplier<Y> factory) {
+		Y got = get(desc);
+		if (got!=null) return got;
+		got = factory.get();
+		put(desc, got);
+		return got;
 	}
 	
 }
