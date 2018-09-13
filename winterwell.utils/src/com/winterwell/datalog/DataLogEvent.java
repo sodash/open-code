@@ -234,7 +234,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	}
 
 	/**
-	 * Unique based on dataspace and (groupById OR eventType and properties). Does NOT include time though!
+	 * Unique based on dataspace and (groupById OR eventType and properties). 
+	 * Does NOT include time though! So its NOT guaranteed unique!
 	 * @param groupById Can be null 
 	 * @param dataLogEvent
 	 * @return ID -- if groupById is given, this is returned as-is (and time will not later be added).
