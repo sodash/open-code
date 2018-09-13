@@ -20,6 +20,7 @@ import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.GetRequestBuilder;
 import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
+import com.winterwell.es.client.KRefresh;
 import com.winterwell.es.client.ReindexRequest;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
@@ -201,17 +202,17 @@ public class AppUtils {
 	
 
 	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath) {
-		return doPublish(draft, draftPath, publishPath, false, false);
+		return doPublish(draft, draftPath, publishPath, KRefresh.FALSE, false);
 	}
 	
-	public static JThing doPublish(AThing item, boolean forceRefresh, boolean deleteDraft) {		
+	public static JThing doPublish(AThing item, KRefresh refresh, boolean deleteDraft) {		
 		IESRouter esr = Dep.get(IESRouter.class);
 		Class type = item.getClass();
 		String id = item.getId();		
 		ESPath draftPath = esr.getPath(type, id, KStatus.DRAFT);
 		ESPath publishPath = esr.getPath(type, id, KStatus.PUBLISHED);
 		JThing draft = new JThing(item);
-		return doPublish(draft, draftPath, publishPath, forceRefresh, deleteDraft);
+		return doPublish(draft, draftPath, publishPath, refresh, deleteDraft);
 	}
 	
 	/**
@@ -219,11 +220,12 @@ public class AppUtils {
 	 * @param draft
 	 * @param draftPath
 	 * @param publishPath
-	 * @param forceRefresh
+	 * @param forceRefresh true - use refresh=true to make the index update now
 	 * @param deleteDraft Normally we leave the draft, for future editing. But if the object is not editable once published - delete the draft.
 	 * @return
 	 */
-	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath, boolean forceRefresh, boolean deleteDraft) 
+	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath, 
+			KRefresh refresh, boolean deleteDraft) 
 	{
 		Log.d("doPublish", "to "+publishPath+"... deleteDraft "+deleteDraft);
 		// prefer being given the draft to avoid ES race conditions
@@ -242,7 +244,7 @@ public class AppUtils {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		UpdateRequestBuilder up = client.prepareUpdate(publishPath);
 		up.setDoc(draft.map());
-		if (forceRefresh) up.setRefresh("true");
+		up.setRefresh(refresh);		
 		up.setDocAsUpsert(true);
 		// NB: this doesn't return the merged item :(
 		IESResponse resp = up.get().check();
@@ -257,7 +259,7 @@ public class AppUtils {
 				UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
 				upd.setDoc(draft.map());
 				upd.setDocAsUpsert(true);
-				if (forceRefresh) upd.setRefresh("true");
+				upd.setRefresh(refresh);
 				IESResponse respd = upd.get().check();
 			}
 		}

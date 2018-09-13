@@ -21,6 +21,7 @@ import com.winterwell.es.IESRouter;
 import com.winterwell.es.client.DeleteRequestBuilder;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
+import com.winterwell.es.client.KRefresh;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.query.ESQueryBuilder;
@@ -183,6 +184,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			try {
 				ESPath path = esRouter.getPath(dataspace,type, id, s);
 				DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
+				del.setRefresh("wait_for");
 				IESResponse ok = del.get().check();
 			} catch(WebEx.E404 e404) {
 				// gone already				
@@ -310,9 +312,10 @@ public abstract class CrudServlet<T> implements IServlet {
 	public static final SField SORT = new SField("sort");
 
 	protected final JThing<T> doPublish(WebRequest state) {
-		return doPublish(state, false, false);
+		// wait 1 second??
+		return doPublish(state, KRefresh.WAIT_FOR, false);
 	}
-	protected JThing<T> doPublish(WebRequest state, boolean forceRefresh, boolean deleteDraft) {		
+	protected JThing<T> doPublish(WebRequest state, KRefresh forceRefresh, boolean deleteDraft) {		
 		String id = getId(state);
 		Log.d("crud", "doPublish "+id+" "+state+" deleteDraft: "+deleteDraft);
 		Utils.check4null(id); 
