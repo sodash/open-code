@@ -172,16 +172,11 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 */
 	public Time time = new Time();
 
+	/**
+	 * Set in the constructor, as it affects the ID (which is how the grouping happens)
+	 * transient as the ID is the eventual store of this.
+	 */
 	transient String groupById;
-	
-//	/**
-//	 * @deprecated Use the other constructor
-//	 * @param eventType
-//	 * @param properties
-//	 */
-//	public DataLogEvent(String eventType, Map<String,?> properties) {
-//		this(DataLog.getDataspace(), 1, eventType, properties);
-//	}
 	
 	public DataLogEvent(String tag, double count) {
 		this(DataLog.getDataspace(), count, simple, new ArrayMap("tag", tag));

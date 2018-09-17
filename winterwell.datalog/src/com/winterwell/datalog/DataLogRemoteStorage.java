@@ -194,8 +194,9 @@ public class DataLogRemoteStorage implements IDataLogStorage
 
 	@Override
 	public Object saveEvent(Dataspace dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
-		// See LgServlet which reads these
+		// See LgServlet which reads these		
 		FakeBrowser fb = fb();
+		fb.setRetryOnError(3);
 		Map<String, String> vars = new ArrayMap(
 			event.toJson2()
 				);

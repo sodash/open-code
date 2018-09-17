@@ -346,28 +346,40 @@ public class FakeBrowser {
 	 * @return
 	 */
 	String getPage2(String uri, Map<String, String> vars, int depth) {
-		try {
-			assert uri != null : "URI is null!";
-			assert timeOutMilliSecs > 0 : "problem with timeOutMilliSecs";
-			// Build URI with query params
-			uri = WebUtils.addQueryParameters(uri, vars);
-			if (debug) {
-				Log.d("get", uri);
+		// e.g. 2 retries = 3 tries in total
+		int tries = Math.max(retryOnError + 1, 1);		
+		Exception err = null;
+		for(int t=0; t<tries; t++) {
+			try {
+				assert uri != null : "URI is null!";
+				assert timeOutMilliSecs > 0 : "problem with timeOutMilliSecs";
+				// Build URI with query params
+				uri = WebUtils.addQueryParameters(uri, vars);
+				if (debug) {
+					Log.d("get", uri);
+				}
+				// Setup a connection
+				setupConnection(uri, timeOutMilliSecs);
+				location = uri;
+				// Open a connection and process response
+				String response = processResponse();
+				return response;
+			} catch (WebEx.Redirect e) {
+				return getPage3_redirect(uri, vars, depth, e);
+			} catch (Exception ex) {
+				// pause, unless that was our last try (in which case we'll exit the for loop and throw an exception)
+				if (t < tries-1) {					
+					Utils.sleep(t*t*100);
+				}
+				err = ex;
+			} finally {
+				disconnect();
 			}
-			// Setup a connection
-			setupConnection(uri, timeOutMilliSecs);
-			location = uri;
-			// Open a connection and process response
-			String response = processResponse();
-			return response;
-		} catch (WebEx.Redirect e) {
-			return getPage3_redirect(uri, vars, depth, e);
-		} catch (IOException ex) {
-			throw Utils.runtime(ex);
-		} finally {
-			disconnect();
 		}
+		// fail if here (out of tries)
+		throw Utils.runtime(err);
 	}
+	
 
 	private String getPage3_redirect(String uri, Map<String, String> vars, int depth, WebEx.Redirect e) 
 	{
@@ -774,6 +786,8 @@ public class FakeBrowser {
 	
 	Cooldown cooldown;
 
+	private int retryOnError;
+
 	/**
 	 * Create a connection and set it up (authentication, cookies) - but do not
 	 * open it
@@ -939,6 +953,10 @@ public class FakeBrowser {
 	public FakeBrowser setAuthenticationByJWT(String token) {		
 		setRequestHeader("Authorization", "Bearer "+token);
 		return this;
+	}
+
+	public void setRetryOnError(int retries) {
+		this.retryOnError = retries;
 	}
 
 	
