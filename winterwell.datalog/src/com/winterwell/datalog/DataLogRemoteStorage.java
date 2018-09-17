@@ -196,7 +196,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	public Object saveEvent(Dataspace dataspace, DataLogEvent event, Period periodIsNotUsedHere) {
 		// See LgServlet which reads these		
 		FakeBrowser fb = fb();
-		fb.setRetryOnError(3);
+		fb.setRetryOnError(5); // try a few times to get through. Can block for 2 seconds.
 		Map<String, String> vars = new ArrayMap(
 			event.toJson2()
 				);
