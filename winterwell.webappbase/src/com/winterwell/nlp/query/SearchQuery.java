@@ -151,6 +151,16 @@ public class SearchQuery implements Serializable, IHasJson {
 
 
 	/**
+	 * combine
+	 * @param base can be null
+	 * @param extra
+	 */
+	public SearchQuery(SearchQuery base, String extra) {
+		this(base==null? extra : base.getRaw()+" "+extra);
+		assert extra!=null;
+	}
+
+	/**
 	 * Disjunctive normal form, which is what we need for pulling data from
 	 * twitter.
 	 * @return a top-level OR containing only ANDs. 
@@ -724,8 +734,9 @@ public class SearchQuery implements Serializable, IHasJson {
 		return stack.get(stack.size() - 1);
 	}
 
-	public void setStrict(boolean b) {
+	public SearchQuery setStrict(boolean b) {
 		this.strict = b;
+		return this;
 	}
 	
 	public boolean isStrict() {

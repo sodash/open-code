@@ -29,7 +29,11 @@ import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
 
 /**
- * Serves up aggregations data
+ * Serves up aggregations data.
+ * 
+ * size: number of examples
+ * numRows: max terms in the breakdown
+ * 
  * @author daniel
  *
  */
@@ -39,7 +43,7 @@ public class DataServlet implements IServlet {
 	 * Number of results in aggregations
 	 */
 	private static final IntField numRows = new IntField("numRows");
-	static final SField DATASPACE = new SField("dataspace");
+	public static final SField DATASPACE = new SField("dataspace");
 	private static final String LOGTAG = "DataServlet";
 
 	@Override
@@ -73,9 +77,9 @@ public class DataServlet implements IServlet {
 		// num examples
 		int size = state.get(new IntField("size"), 10);
 		// time window
-		ICallable<Time> cstart = state.get(CommonFields.START);
+		ICallable<Time> cstart = state.get(DataLogFields.START);
 		Time start = cstart==null? new Time().minus(TUnit.MONTH) : cstart.call();
-		ICallable<Time> cend = state.get(CommonFields.END);
+		ICallable<Time> cend = state.get(DataLogFields.END);
 		Time end = cend==null? new Time() : cend.call();
 		// query e.g. host:thetimes.com
 		String q = state.get("q");

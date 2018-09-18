@@ -6,14 +6,24 @@ import java.util.Map;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
+import com.winterwell.datalog.server.DataLogFields;
+import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.Mutable.Ref;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Period;
+import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.SimpleJson;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.ajax.JSend;
+import com.winterwell.youagain.client.AuthToken;
 
 /**
  * Get data via the DataLog web service (i.e. call DataServlet)
@@ -22,37 +32,65 @@ import com.winterwell.web.FakeBrowser;
  */
 public class DataLogHttpClient {
 
-	String namespace;
+	Dataspace namespace;
 	
 	String ENDPOINT = "https://lg.good-loop.com/data";
+	
+	private List<AuthToken> auth;
+
+	private Map<String,Double> overview;
+
+	private List<Map> examples;
+
+	private Time start;
+
+	private Time end;
 	
 	@Override
 	public String toString() {
 		return "DataLogHttpClient [namespace=" + namespace + ", ENDPOINT=" + ENDPOINT + "]";
 	}
 
+	public DataLogHttpClient(Dataspace namespace) {
+		this(null, namespace);
+	}
+	
+	public void save(DataLogEvent event) {
+		String server = WebUtils2.getHost(ENDPOINT);
+		DataLogRemoteStorage.saveToRemoteServer(server, event);
+	}
 	/**
 	 * 
 	 * @param endpoint Can be null (uses the default {@link #ENDPOINT})
 	 * @param namespace
 	 */
-	public DataLogHttpClient(String endpoint, String namespace) {
+	public DataLogHttpClient(String endpoint, Dataspace namespace) {
 		if (endpoint!=null) {			
 			assert endpoint.contains("://") && endpoint.contains("/data") : endpoint;
 			ENDPOINT = endpoint;
 		}
 		this.namespace = namespace;
 		Utils.check4null(namespace);
-		assert ! namespace.contains(".") : "server / namespace mixup? "+namespace;
+		assert ! namespace.toString().contains(".") : "server / namespace mixup? "+namespace;
 	}
 	
-	public List<DataLogEvent> getEvents(String q, int maxResults) {
+	public List<DataLogEvent> getEvents(SearchQuery q, int maxResults) {
 		// Call DataServlet
 		FakeBrowser fb = new FakeBrowser();
-		// TODO auth!
-//		fb.setAuthenticationByJWT(token);
+		// auth!
+		if (auth!=null) {
+			AuthToken.setAuth(fb, auth);
+		}
 		
-		String json = fb.getPage(ENDPOINT, new ArrayMap("dataspace", namespace, "q", q, "size", maxResults));
+		Map<String, String> vars = new ArrayMap(
+				"dataspace", namespace, 
+				"q", q.getRaw(), 
+				"size", maxResults,
+				DataLogFields.START.name, start==null? null : start.toISOString(),
+				DataLogFields.END.name, end==null? null : end.toISOString()
+				);
+		// call
+		String json = fb.getPage(ENDPOINT, vars);
 		
 		Map jobj = (Map) JSON.parse(json);
 		
@@ -70,6 +108,73 @@ public class DataLogHttpClient {
 		}
 		
 		return des;
+	}
+
+	public DataLogHttpClient setAuth(List<AuthToken> auth) {
+		this.auth = auth;
+		return this;
+	}
+		
+
+	public Map<String, Double> getBreakdown(SearchQuery q, Breakdown breakdown) {
+		// Call DataServlet
+		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(true);
+		
+		// auth!
+		if (auth!=null) {
+			AuthToken.setAuth(fb, auth);
+		}
+		
+		String b = breakdown.toString();		
+		String json = fb.getPage(ENDPOINT, new ArrayMap(
+				"dataspace", namespace,				
+				"q", q.getRaw(), 
+				"breakdown", b,
+				DataLogFields.START.name, start==null? null : start.toISOString(),
+				DataLogFields.END.name, end==null? null : end.toISOString(),
+				"size", 5)); // size is num examples
+		
+		JSend jobj = JSend.parse(json);
+		if ( ! jobj.isSuccess()) {
+			throw new FailureException(jobj.getMessage());
+		}		
+		
+		List<Map> buckets = Containers.asList((Object)SimpleJson.get(jobj.getDataMap(), "by_"+breakdown.by, "buckets"));
+		Map<String, Double> byX = new ArrayMap();
+		// convert it		
+		for (Map bucket : buckets) {
+			String k = (String) bucket.get("key");
+			Object ov = SimpleJson.get(bucket, breakdown.field, breakdown.op);
+			double v = MathUtils.toNum(ov);
+			byX.put(k, v);
+		}
+		
+		// stash extra info in fields
+		overview = SimpleJson.get(jobj.getDataMap(), breakdown.field);
+		examples = Containers.asList((Object)SimpleJson.get(jobj.getDataMap(), "examples"));
+		
+		return byX;
+	}
+
+	/**
+	 * stached from the previoud {@link #getBreakdown(SearchQuery, Breakdown)} call
+	 * @return
+	 */
+	public List<DataLogEvent> getExamples() {
+		if (examples==null) return null;
+		List<DataLogEvent> des = new ArrayList();
+		// Convert into DataLogEvents
+		for (Map eg : examples) {
+			DataLogEvent de = DataLogEvent.fromESHit(namespace, (Map)eg.get("_source"));
+			des.add(de);
+		}
+		return des;
+	}
+
+	public void setPeriod(Time start, Time end) {
+		this.start = start; 
+		this.end = end;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.winterwell.datalog.DataLogConfig;
+import com.winterwell.datalog.Dataspace;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
@@ -77,9 +78,9 @@ public class TrackingPixelServlet implements IServlet {
 		String tag = DATALOG_EVENT_TYPE;
 		
 		// Default to dataspace "trk" but allow override
-		String dataspace = state.get(LgServlet.DATASPACE);
+		Dataspace dataspace = state.get(LgServlet.DATASPACE);
 		if (dataspace == null) {
-			dataspace = APP;
+			dataspace = new Dataspace(APP);
 		}
 		String gby = state.get(LgServlet.GBY);
 		// Count it

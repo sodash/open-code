@@ -2,6 +2,7 @@ package com.winterwell.youagain.client;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Generated;
@@ -9,8 +10,10 @@ import javax.annotation.Generated;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
+import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.data.IHasXId;
 import com.winterwell.web.data.XId;
 
@@ -142,6 +145,22 @@ public class AuthToken implements IHasXId, IProperties {
 	@Override
 	public <T> T put(Key<T> key, T value) {
 		throw new UnsupportedOperationException("put "+key+" = "+value);
+	}
+
+	/**
+	 * Set authentication for making requests to other YouAgain services
+	 * @param fb
+	 * @param auth
+	 */
+	public static void setAuth(FakeBrowser fb, List<AuthToken> auth) {
+		if (auth==null || auth.isEmpty()) return;
+		// see https://stackoverflow.com/questions/29282578/multiple-http-authorization-headers
+		StringBuilder tokens = new StringBuilder();		
+		for (AuthToken authToken : auth) {
+			tokens.append("Bearer "+authToken.getToken()+", ");
+		}
+		StrUtils.pop(tokens, 2);
+		fb.setRequestHeader("Authorization", tokens);
 	}
 	
 }

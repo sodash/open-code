@@ -530,10 +530,11 @@ public final class Containers  {
 	 *  -- eg output from a json parser -- this is your method.
 	 * Throws an IllegalArgumentException if 'array' is not an array or a List or Collection.
 	 * 
-	 * @param array array or List or Set
+	 * @param array array or List or Set or null (returns null)
 	 * @return List
 	 */
 	public static <X> List<X> asList(final Object array) {		
+		if (array==null) return null;
 		if (array instanceof List) return (List) array;
 		if (array instanceof Collection) return getList((Collection)array);
 		if ( ! array.getClass().isArray())

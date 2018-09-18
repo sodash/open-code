@@ -14,6 +14,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogEvent;
+import com.winterwell.datalog.Dataspace;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -29,6 +30,7 @@ import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.KServerType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.app.WebRequest.KResponseType;
+import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.BoolField;
 import com.winterwell.web.fields.DoubleField;
 import com.winterwell.web.fields.JsonField;
@@ -56,8 +58,8 @@ import ua_parser.Parser;
  */
 public class LgServlet {
 
-	static final SField TAG = new SField("t");
-	public static final SField DATASPACE = new SField("d");
+	static final SField TAG = DataLogFields.t;
+	static final AField<Dataspace> DATASPACE = DataLogFields.d;
 
 	public LgServlet() {		
 	}
@@ -84,7 +86,7 @@ public class LgServlet {
 		HttpServletResponse resp = state.getResponse();
 		String u = state.getRequestUrl();
 		Map<String, Object> ps = state.getParameterMap();
-		String ds = state.getRequired(DATASPACE);
+		Dataspace ds = state.getRequired(DATASPACE);
 		// TODO security check the dataspace?
 		final String tag = state.getRequired(TAG).toLowerCase();
 		double count = state.get(new DoubleField("count"), 1.0);
@@ -148,7 +150,7 @@ public class LgServlet {
 	 * @param stdTrackerParams
 	 * @return event, or null if this was screened out (eg our own IPs)
 	 */
-	public static DataLogEvent doLog(WebRequest state, String dataspace, String gby, String tag, double count, 
+	public static DataLogEvent doLog(WebRequest state, Dataspace dataspace, String gby, String tag, double count, 
 			Map params, boolean stdTrackerParams) 
 	{
 		assert dataspace != null;		
@@ -335,14 +337,15 @@ public class LgServlet {
 	 * @param params2
 	 * @return
 	 */
-	private static boolean accept(String dataspace, String tag, Map params) {
+	private static boolean accept(Dataspace dataspace, String tag, Map params) {
 		KServerType stype = AppUtils.getServerType(null);
 		// only screen our IPs out of production
 		if (stype != KServerType.PRODUCTION) 
 		{
 			return true;
 		}
-		if ( ! "gl".equals(dataspace)) return true;
+		// allow all non gl through??
+		if ( ! "gl".equals(dataspace.toString())) return true;
 		Object ip = params.get("ip");
 		List<String> ips = Containers.list(ip);		
 		if ( ! Collections.disjoint(OUR_IPS, ips)) {
@@ -366,7 +369,7 @@ public class LgServlet {
 
 	static List<String> OUR_IPS = Arrays.asList("62.30.12.102", "62.6.190.196", "82.37.169.72");
 	
-	private static void doLogToFile(String dataspace, String tag, double count, Map params, String trckId, WebRequest state) {
+	private static void doLogToFile(Dataspace dataspace, String tag, double count, Map params, String trckId, WebRequest state) {
 		String msg = params == null? "" : Printer.toString(params, ", ", ": ");
 		if (count != 1) msg += "\tcount:"+count;
 		msg += "\ttracker:"+trckId+"\tref:"+state.getReferer()+"\tip:"+state.getRemoteAddr();

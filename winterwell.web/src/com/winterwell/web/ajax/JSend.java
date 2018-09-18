@@ -30,6 +30,8 @@ code: Number // optional numeric code for errors
  * https://labs.omniti.com/labs/jsend
  * https://stackoverflow.com/questions/50873541/should-i-use-jsend-for-wrapping-json-ajax-responses-or-is-there-a-more-standard
  * 
+ * Note: requires Gson set in Dep, as JThing requires this
+ * 
  * @author daniel
  *
  */
@@ -73,6 +75,10 @@ public class JSend implements IHasJson {
 			check();
 		}
 		return data;
+	}
+	
+	public Map getDataMap() {
+		return data.map();
 	}
 
 	public JSend check() {

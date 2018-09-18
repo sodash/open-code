@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.DataLog.KInterpolate;
+import com.winterwell.datalog.server.DataLogFields;
+import com.winterwell.datalog.server.DataServlet;
 import com.winterwell.datalog.server.LgServlet;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.timeseries.IDataStream;
@@ -40,7 +42,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	/**
 	 * @deprecated This is inefficient
 	 * HACK a direct call to the remote server
-	 * @param server
+	 * @param server e.g. lg.good-loop.com NB: https or /lg are optional but can be provided
 	 * @param event
 	 * @return
 	 */
@@ -197,16 +199,17 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		// See LgServlet which reads these		
 		FakeBrowser fb = fb();
 		fb.setRetryOnError(5); // try a few times to get through. Can block for 2 seconds.
-		Map<String, String> vars = new ArrayMap(
-			event.toJson2()
-				);
-		vars.put("d", dataspace.name);		
-		vars.put(LgServlet.GBY.getName(), event.groupById); // group it?
-		vars.put("t", event.getEventType0()); // type
+		Map<String, Object> vars = new ArrayMap();
+		// core fields
+		vars.put(DataLogFields.d.name, 	dataspace.name);		
+		vars.put(LgServlet.GBY.name, 	event.groupById); // group it?
+		vars.put(DataLogFields.t.name, 	event.getEventType0()); // type
+		vars.put("count", event.count);
+		// props
 		String p = JSON.toString(event.getProps());
-		vars.put("p", p);				
+		vars.put("p", p);		
 		// TODO String r = referer		
-		String res = fb.getPage(logEndpoint, vars);
+		String res = fb.getPage(logEndpoint, (Map) vars);
 		Log.d("datalog.remote", "called "+fb.getLocation()+" return: "+res);
 		return res;
 	}

@@ -99,8 +99,8 @@ public class TimeCoverage implements Serializable {
 	 * @param from
 	 * @return a period (snapped to fit the grid) which is undone, or null if all done
 	 */
-	public Period getUndonePast(Time from) {
-		return getUndone2(from, false);
+	public Period getNextUndonePast(Time from) {
+		return getNextUndone2(from, false);
 	}
 	
 	/**
@@ -109,7 +109,7 @@ public class TimeCoverage implements Serializable {
 	 * @param fwd
 	 * @return Note: Can have from in the middle of it, if from falls within a bucket. ie. it can mix past & future a little.
 	 */
-	private Period getUndone2(final Time _from, boolean fwd) {
+	private Period getNextUndone2(final Time _from, boolean fwd) {
 		Time from = _from;
 		Dt dt = slicer.getDt();
 		while(slicer.contains(from)) {
@@ -133,8 +133,8 @@ public class TimeCoverage implements Serializable {
 	 * 	 * @return a period (snapped to fit the grid) which is undone, or null
 
 	 */
-	public Period getUndoneFuture(Time from) {
-		return getUndone2(from, true);
+	public Period getNextUndoneFuture(Time from) {
+		return getNextUndone2(from, true);
 	}
 
 	public Period getPeriod() {
@@ -149,5 +149,9 @@ public class TimeCoverage implements Serializable {
 				p+f,
 				n
 		};
+	}
+
+	public Period getNextUndone() {
+		return getNextUndoneFuture(getOrigin());
 	}
 }

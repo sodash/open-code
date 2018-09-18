@@ -70,9 +70,11 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 		return props;
 	}
 
+	@Deprecated
 	public String cssClass = "";
 
-	public String getCssClass() {
+	@Deprecated
+	public final String getCssClass() {
 		return cssClass;
 	}
 	
@@ -81,19 +83,34 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	 */
 	protected String id;
 
+	@Deprecated
 	protected String onChange;
 	protected boolean required;
+	
+	@Deprecated
 	private int size;
 
+	@Deprecated
 	protected String tooltip;
 
 	/**
+	 * @deprecated
+	 * 
 	 * This is the type attribute for the input tag - it is *not* the type of
 	 * the field!
 	 */
 	private String type;
 
 	private Boolean lenient;
+	
+	/**
+	 * If true, this will try to interpret badly formatted urls.
+	 * And bad inputs will return null rather than throw an error. 
+	 * @return false by default
+	 */
+	public boolean isLenient() {
+		return lenient!=null && lenient;
+	}
 	
 	/**
 	 * If true, this will try to interpret badly formatted urls.
@@ -156,7 +173,7 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	 *            can be null in which case nothing is added
 	 * @return url with value encoded as a GET parameter
 	 */
-	public StringBuilder addQueryParameter(CharSequence url, X value) {
+	public final StringBuilder addQueryParameter(CharSequence url, X value) {
 		if (value == null)
 			return StrUtils.sb(url);
 		StringBuilder sb = url instanceof StringBuilder ? (StringBuilder) url
@@ -304,6 +321,7 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	 * @throws MissingFieldException
 	 *             if the field is required and unset
 	 */
+	// NB: not final cos Checkbox
 	public String getStringValue(HttpServletRequest request)
 			throws MissingFieldException {
 		// UTF8 please... but there were bugs
@@ -413,7 +431,7 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	 * @param uri
 	 * @return value set in this uri, or null
 	 */
-	public X getValue(URI uri) {
+	public final X getValue(URI uri) {
 		return getValue(uri.toString());
 	}
 	
@@ -476,16 +494,17 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	}
 
 	/**
+	 * @deprecated
 	 * Javascript handler. Will be encoded using
 	 * {@link WebUtils#attributeEncode(String)} ad wrapped in quote marks.
 	 * 
 	 * @param onChange
 	 */
-	public void setOnChange(String onChange) {
+	public final void setOnChange(String onChange) {
 		this.onChange = onChange;
 	}
 
-	public AField<X> setRequired(boolean required) {
+	public final AField<X> setRequired(boolean required) {
 		this.required = required;
 		return this;
 	}
@@ -501,6 +520,7 @@ public class AField<X> extends Key<X> implements Serializable, IWidget,
 	}
 
 	/**
+	 * @deprecated
 	 * @param tooltip
 	 * @return this for convenient chaining in field initialisers
 	 */

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.winterwell.utils.IProperties;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Null;
 import com.winterwell.utils.Printer;
@@ -27,7 +28,9 @@ import com.winterwell.utils.web.SimpleJson;
  * For logging an event -- which can have arbitrary detail.
  * @author daniel
  */
-public final class DataLogEvent implements Serializable, IHasJson {
+public final class DataLogEvent implements Serializable, IHasJson
+//IProperties?? but keys would not include time, count, dataspace
+{
 	private static final long serialVersionUID = 1L;
 
 	public static final String EVENTTYPE = "evt";
@@ -172,6 +175,10 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	 */
 	public Time time = new Time();
 
+	public void setTime(Time time) {
+		this.time = time;
+	}
+	
 	/**
 	 * Set in the constructor, as it affects the ID (which is how the grouping happens)
 	 * transient as the ID is the eventual store of this.
@@ -194,6 +201,7 @@ public final class DataLogEvent implements Serializable, IHasJson {
 	}
 	
 	/**
+	 * The base constructor. If in doubt use this.
 	 * 
 	 * @param dataspace e.g. "default" (which becomes datalog.default in ES)
 	 * @param groupById This will be used to make the ID. can be null. Allows for grouping several events into one.
@@ -397,7 +405,8 @@ public final class DataLogEvent implements Serializable, IHasJson {
 		} else if (etype instanceof Collection) {
 			etypes = (String[]) ((Collection) etype).toArray(StrUtils.ARRAY);
 		} else {
-			etypes = (String[]) etype;
+			assert etype.getClass().isArray() : etype;
+			etypes = Containers.asList(etype).toArray(StrUtils.ARRAY);
 		}
 		return etypes;
 	}

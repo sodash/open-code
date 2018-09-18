@@ -670,7 +670,9 @@ public class ESStorage implements IDataLogStorage {
 		for(final String bd : breakdown) {
 			if (bd==null) {
 				Log.w("DataLog.ES", "null breakdown?! in "+breakdown);
+				continue;
 			}
+			// TODO new Breakdown
 			// tag & time
 			// e.g. tag/time {count:avg}
 			// TODO proper recursive handling
@@ -715,7 +717,7 @@ public class ESStorage implements IDataLogStorage {
 		
 		// add a total count as well
 		for(String k : allOutputs) {
-			com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
+			com.winterwell.es.client.agg.Aggregation myCount = new Breakdown(k).getAggregation();
 			search.addAggregation(myCount);	
 		}
 		

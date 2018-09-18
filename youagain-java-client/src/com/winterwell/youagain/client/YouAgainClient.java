@@ -300,10 +300,14 @@ public final class YouAgainClient {
 		String authHeader = state.getRequest().getHeader("Authorization");
 		if (authHeader!=null) {
 			authHeader = authHeader.trim();
-			if (authHeader.startsWith("Bearer")) {
-				String jwt = authHeader.substring("Bearer".length(), authHeader.length()).trim();
-				if (state.debug) Log.d(LOGTAG, "JWT from auth-header Bearer: "+jwt);
-				all.add(jwt);
+			// split on comma (c.f. https://stackoverflow.com/questions/29282578/multiple-http-authorization-headers)
+			String[] authHeaders = authHeader.split(", ");
+			for (String ah : authHeaders) {
+				if (ah.startsWith("Bearer")) {
+					String jwt = ah.substring("Bearer".length(), ah.length()).trim();
+					if (state.debug) Log.d(LOGTAG, "JWT from auth-header Bearer: "+jwt);
+					all.add(jwt);
+				}				
 			}
 		}		
 		// NB: This isnt standard, this is our naming rule 

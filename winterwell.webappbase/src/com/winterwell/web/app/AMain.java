@@ -53,7 +53,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 
 	protected ConfigType config;
 
-	private Class<ConfigType> configType;
+	protected Class<ConfigType> configType;
 
 	public static AMain main;
 

@@ -583,9 +583,7 @@ public class WebRequest implements IProperties, Closeable {
 
 	/**
 	 * Convenience wrapper around {@link #get(Key)}. Returns defaultValue if no
-	 * value has been set. FIXME defaultValue conflicts with
-	 * {@link #putDefault(Key, Object)}!! {@link #putDefault(Key, Object)} wins
-	 * :(
+	 * value has been set.
 	 */
 	public final <T> T get(Key<T> key, T defaultValue) {
 		if (defaultValue == null) {
