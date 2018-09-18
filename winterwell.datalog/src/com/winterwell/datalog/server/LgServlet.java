@@ -24,6 +24,7 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.BrowserType;
 import com.winterwell.web.app.FileServlet;
@@ -131,7 +132,8 @@ public class LgServlet {
 		if (DataLogServer.settings.CORS) {
 			WebUtils2.CORS(state, false);
 		}
-		WebUtils2.sendText(logged!=null? "OK" : "not logged", resp);
+		JsonResponse jr = new JsonResponse(state, logged);
+		WebUtils2.sendJson(jr, state);
 	}
 
 	/**
