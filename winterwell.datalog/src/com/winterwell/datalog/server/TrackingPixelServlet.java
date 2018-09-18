@@ -84,7 +84,7 @@ public class TrackingPixelServlet implements IServlet {
 		}
 		String gby = state.get(LgServlet.GBY);
 		// Count it
-		LgServlet.doLog(state, dataspace, gby, tag, 1, null, true);
+		LgServlet.doLog(state, dataspace, gby, tag, 1, null, null, true);
 
 		
 		// log it
