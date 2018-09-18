@@ -431,5 +431,9 @@ public final class DataLogEvent implements Serializable, IHasJson
 		props.put(prop, value);
 	}
 
+	public Time getTime() {
+		return time;
+	}
+
 	
 }

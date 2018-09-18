@@ -7,6 +7,10 @@ import org.junit.Test;
 
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 public class DataLogHttpClientTest {
 
@@ -39,4 +43,26 @@ public class DataLogHttpClientTest {
 		Map<String, Double> dontnForAdvert = dlc.getBreakdown(sqd, bd);	
 		System.out.println(dontnForAdvert);
 	}
+	
+
+	@Test
+	public void testSave() {
+		DataLogHttpClient dlc = new DataLogHttpClient(new Dataspace("test"));
+		dlc.ENDPOINT = "http://locallg.good-loop.com/data";
+		Map<String, ?> props = new ArrayMap(
+			"huh", 1,
+			"os", "Dummy OS"
+		);
+		String gby = "gby_testsave_1";
+		DataLogEvent event = new DataLogEvent(dlc.dataspace, gby, 1, new String[] {"testsave1"}, props);
+		event.setTime(new Time().minus(TUnit.WEEK));
+		Object ok = dlc.save(event);
+		System.out.println(ok);
+		Utils.sleep(1000);
+		dlc.setPeriod(new Time().minus(TUnit.MONTH), new Time().minus(TUnit.DAY));
+		List<DataLogEvent> events = dlc.getEvents(new SearchQuery("evt:testsave1"), 10);
+		System.out.println(events);
+		assert ! events.isEmpty();
+	}
+	
 }

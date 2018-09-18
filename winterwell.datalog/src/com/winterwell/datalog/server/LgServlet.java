@@ -20,6 +20,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
@@ -83,10 +84,8 @@ public class LgServlet {
 	 * @throws IOException 
 	 */
 	public static void fastLog(WebRequest state) throws IOException {
-//		HttpServletRequest req = state.getRequest();
-		HttpServletResponse resp = state.getResponse();
-		String u = state.getRequestUrl();
-		Map<String, Object> ps = state.getParameterMap();
+//		String u = state.getRequestUrl();
+//		Map<String, Object> ps = state.getParameterMap();
 		Dataspace ds = state.getRequired(DATASPACE);
 		// TODO security check the dataspace?
 		final String tag = state.getRequired(TAG).toLowerCase();
@@ -120,8 +119,10 @@ public class LgServlet {
 			// bleurgh - it should be a top-level parameter, but lets catch it here too
 			gby = (String) params.get(GBY.name);
 		}
+		ICallable<Time> ctime = state.get(DataLogFields.time);
+		Time time = ctime==null? null : ctime.call();
 		// log it!
-		DataLogEvent logged = doLog(state, ds, gby, tag, count, params, stdTrackerParams);
+		DataLogEvent logged = doLog(state, ds, gby, tag, count, time, params, stdTrackerParams);
 		
 		// Reply
 		// .gif?
@@ -148,12 +149,13 @@ public class LgServlet {
 	 * @param dataspace
 	 * @param tag
 	 * @param count
+	 * @param time Optional set the event time 
 	 * @param params can be null
 	 * @param stdTrackerParams
 	 * @return event, or null if this was screened out (eg our own IPs)
 	 */
 	public static DataLogEvent doLog(WebRequest state, Dataspace dataspace, String gby, String tag, double count, 
-			Map params, boolean stdTrackerParams) 
+			Time time, Map params, boolean stdTrackerParams) 
 	{
 		assert dataspace != null;		
 		assert tag != null : state;
@@ -179,6 +181,7 @@ public class LgServlet {
 		
 		// screen out our IPs?
 		if ( ! accept(dataspace, tag, params)) {
+			Log.d("lg", "not accepted "+tag+" "+params);
 			return null;
 		}
 		
@@ -195,17 +198,10 @@ public class LgServlet {
 		// ...which dataspaces?
 		// Multiple dataspaces: Dan A reports a significant cost to per-user dataspaces
 		// -- he estimated one server per 4k ES indexes. c.f. #5403
-		// Info should be stored to named dataspace + user + publisher + advertiser
-		// TODO upgrade DatalogEvent to have several dataspaces??
-//		ArraySet<String> dataspaces = new ArraySet(
-//			dataspace, params.get("user") // publisher, advertiser			
-//		);
-//		for(String ds : dataspaces) {
-//			if (ds==null) continue;
 		DataLogEvent event = new DataLogEvent(dataspace, gby, count, new String[] { tag}, params);
-//		event.time = state.get(time); FIXME
+		if (time != null) event.setTime(time);
 		DataLog.count(event);
-//		}
+
 		return event;
 	}
 	

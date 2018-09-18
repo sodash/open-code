@@ -4,6 +4,7 @@ import com.winterwell.datalog.Dataspace;
 import com.winterwell.web.app.CommonFields;
 import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.SField;
+import com.winterwell.web.fields.TimeField;
 
 public class DataLogFields extends CommonFields {
 
@@ -12,6 +13,7 @@ public class DataLogFields extends CommonFields {
 	 * tag
 	 */
 	public static SField t = new SField("t");
+	public static TimeField time = new TimeField("time");
 
 }
 

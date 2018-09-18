@@ -51,7 +51,9 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		DataLogRemoteStorage dlrs = new DataLogRemoteStorage();
 		DataLogConfig remote = new DataLogConfig();
 		// add https and endpoint
-		if ( ! server.startsWith("http")) server = "https://"+server;
+		if ( ! server.startsWith("http")) {
+			server = "https://"+server;
+		}
 		if ( ! server.endsWith("/lg")) server += "/lg";
 		
 		remote.logEndpoint = server;
@@ -205,6 +207,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		vars.put(LgServlet.GBY.name, 	event.groupById); // group it?
 		vars.put(DataLogFields.t.name, 	event.getEventType0()); // type
 		vars.put("count", event.count);
+		vars.put("time", event.getTime());
 		// props
 		String p = JSON.toString(event.getProps());
 		vars.put("p", p);		

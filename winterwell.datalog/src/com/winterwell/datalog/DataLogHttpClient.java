@@ -32,7 +32,7 @@ import com.winterwell.youagain.client.AuthToken;
  */
 public class DataLogHttpClient {
 
-	Dataspace namespace;
+	Dataspace dataspace;
 	
 	String ENDPOINT = "https://lg.good-loop.com/data";
 	
@@ -48,16 +48,18 @@ public class DataLogHttpClient {
 	
 	@Override
 	public String toString() {
-		return "DataLogHttpClient [namespace=" + namespace + ", ENDPOINT=" + ENDPOINT + "]";
+		return "DataLogHttpClient [namespace=" + dataspace + ", ENDPOINT=" + ENDPOINT + "]";
 	}
 
 	public DataLogHttpClient(Dataspace namespace) {
 		this(null, namespace);
 	}
 	
-	public void save(DataLogEvent event) {
+	public Object save(DataLogEvent event) {
 		String server = WebUtils2.getHost(ENDPOINT);
-		DataLogRemoteStorage.saveToRemoteServer(server, event);
+		// HACK: preserve (local testing) http protocol
+		if (ENDPOINT.startsWith("http://")) server = "http://"+server;
+		return DataLogRemoteStorage.saveToRemoteServer(server, event);
 	}
 	/**
 	 * 
@@ -69,7 +71,7 @@ public class DataLogHttpClient {
 			assert endpoint.contains("://") && endpoint.contains("/data") : endpoint;
 			ENDPOINT = endpoint;
 		}
-		this.namespace = namespace;
+		this.dataspace = namespace;
 		Utils.check4null(namespace);
 		assert ! namespace.toString().contains(".") : "server / namespace mixup? "+namespace;
 	}
@@ -77,14 +79,15 @@ public class DataLogHttpClient {
 	public List<DataLogEvent> getEvents(SearchQuery q, int maxResults) {
 		// Call DataServlet
 		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(true);
 		// auth!
 		if (auth!=null) {
 			AuthToken.setAuth(fb, auth);
 		}
 		
 		Map<String, String> vars = new ArrayMap(
-				"dataspace", namespace, 
-				"q", q.getRaw(), 
+				"dataspace", dataspace, 
+				"q", q==null? null : q.getRaw(), 
 				"size", maxResults,
 				DataLogFields.START.name, start==null? null : start.toISOString(),
 				DataLogFields.END.name, end==null? null : end.toISOString()
@@ -98,7 +101,7 @@ public class DataLogHttpClient {
 		List<DataLogEvent> des = new ArrayList();
 		// Convert into DataLogEvents
 		for (Map eg : egs) {
-			DataLogEvent de = DataLogEvent.fromESHit(namespace, (Map)eg.get("_source"));
+			DataLogEvent de = DataLogEvent.fromESHit(dataspace, (Map)eg.get("_source"));
 			des.add(de);
 		}
 		
@@ -128,7 +131,7 @@ public class DataLogHttpClient {
 		
 		String b = breakdown.toString();		
 		String json = fb.getPage(ENDPOINT, new ArrayMap(
-				"dataspace", namespace,				
+				"dataspace", dataspace,				
 				"q", q.getRaw(), 
 				"breakdown", b,
 				DataLogFields.START.name, start==null? null : start.toISOString(),
@@ -166,7 +169,7 @@ public class DataLogHttpClient {
 		List<DataLogEvent> des = new ArrayList();
 		// Convert into DataLogEvents
 		for (Map eg : examples) {
-			DataLogEvent de = DataLogEvent.fromESHit(namespace, (Map)eg.get("_source"));
+			DataLogEvent de = DataLogEvent.fromESHit(dataspace, (Map)eg.get("_source"));
 			des.add(de);
 		}
 		return des;

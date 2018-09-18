@@ -15,10 +15,11 @@ import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
 
 /**
- * TODO Like DateField, adding relative-time answers such as "last week"
+ * Like DateField, adding support for relative-time answers such as "last week"
+ * See {@link RelTime}
  * 
- * Enter dates (and times). TODO a (popup) javascript calendar widget. TODO
- * handle time zones configurably
+ * Enter dates (and times). 
+ * TODO handle time zones configurably
  * 
  * @author daniel
  * @testedby {@link TimeFieldTest}
