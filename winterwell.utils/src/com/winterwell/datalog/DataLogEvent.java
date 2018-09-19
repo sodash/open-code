@@ -56,6 +56,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"adid", String.class,
 			"idfa", String.class,
 			// common event-defining properties
+			"cause", String.class,
 			"tag", String.class, 
 			"action", String.class, 
 			"verb", String.class,
