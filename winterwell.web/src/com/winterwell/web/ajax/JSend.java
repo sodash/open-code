@@ -65,6 +65,11 @@ public class JSend implements IHasJson {
 		return status;
 	}
 
+	/**
+	 * NB: success is the default
+	 * @param status
+	 * @return
+	 */
 	public JSend setStatus(KAjaxStatus status) {
 		this.status = status;
 		return this;
@@ -121,7 +126,7 @@ public class JSend implements IHasJson {
 		return this;
 	}
 
-	KAjaxStatus status;
+	KAjaxStatus status = KAjaxStatus.success;
 
 	JThing data;
 	
@@ -135,7 +140,8 @@ public class JSend implements IHasJson {
 	@Override
 	public String toJSONString() {
 		// TODO for the case where data has a json String, we could be more efficient
-		return IHasJson.super.toJSONString();
+		String json = IHasJson.super.toJSONString();
+		return json;
 	}
 	
 	@Override

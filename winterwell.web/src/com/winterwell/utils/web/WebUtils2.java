@@ -1069,6 +1069,7 @@ public class WebUtils2 extends WebUtils {
 			// PrintWriter pw = response.getWriter();
 			out = FileUtils.getWriter(response.getOutputStream());
 			out.append(json);	
+			FileUtils.close(out);
 		} catch(IOException ex) {
 			throw Utils.runtime(ex);
 		} finally {

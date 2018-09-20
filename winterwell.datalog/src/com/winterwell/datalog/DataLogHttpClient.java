@@ -19,6 +19,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.time.TimeUtils;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
@@ -89,7 +90,7 @@ public class DataLogHttpClient {
 				"dataspace", dataspace, 
 				"q", q==null? null : q.getRaw(), 
 				"size", maxResults,
-				DataLogFields.START.name, start==null? null : start.toISOString(),
+				DataLogFields.START.name, startParam(),
 				DataLogFields.END.name, end==null? null : end.toISOString()
 				);
 		// call
@@ -113,6 +114,11 @@ public class DataLogHttpClient {
 		return des;
 	}
 
+	private String startParam() {
+		// /data sedaults to start=1 month ago
+		return start==null? TimeUtils.WELL_OLD.toISOString() : start.toISOString();
+	}	
+
 	public DataLogHttpClient setAuth(List<AuthToken> auth) {
 		this.auth = auth;
 		return this;
@@ -134,7 +140,7 @@ public class DataLogHttpClient {
 				"dataspace", dataspace,				
 				"q", q.getRaw(), 
 				"breakdown", b,
-				DataLogFields.START.name, start==null? null : start.toISOString(),
+				DataLogFields.START.name, startParam(),
 				DataLogFields.END.name, end==null? null : end.toISOString(),
 				"size", 5)); // size is num examples
 		
@@ -161,7 +167,7 @@ public class DataLogHttpClient {
 	}
 
 	/**
-	 * stached from the previoud {@link #getBreakdown(SearchQuery, Breakdown)} call
+	 * stached from the previous {@link #getBreakdown(SearchQuery, Breakdown)} call
 	 * @return
 	 */
 	public List<DataLogEvent> getExamples() {
@@ -175,9 +181,22 @@ public class DataLogHttpClient {
 		return des;
 	}
 
+	/**
+	 * 
+	 * @param start If null, defaults to well-old (i.e. all)
+	 * @param end If null, defaults to now
+	 */
 	public void setPeriod(Time start, Time end) {
 		this.start = start; 
 		this.end = end;
+	}
+
+	/**
+	 * stached from the previous {@link #getBreakdown(SearchQuery, Breakdown)}
+	 * @return
+	 */
+	public Map<String, Double> getOverview() {
+		return overview;
 	}
 
 }

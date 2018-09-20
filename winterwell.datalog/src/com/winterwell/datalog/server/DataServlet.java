@@ -61,9 +61,7 @@ public class DataServlet implements IServlet {
 				
 		Dataspace dataspace = new Dataspace(state.get(DATASPACE, "default"));				
 		// Uses "paths" of breakdown1/breakdown2/... {field1:operation, field2}
-		List<String> breakdown = state.get(
-				new ListField<String>("breakdown").setSplitPattern(",")
-				);
+		List<String> breakdown = state.get(DataLogFields.breakdown);
 		if (breakdown==null) {
 			Log.w(LOGTAG, "You want data but no breakdown?! "+state);
 			breakdown = new ArrayList();

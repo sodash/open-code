@@ -1004,8 +1004,13 @@ public final class Containers  {
 		return null;
 	}
 
-	public static <X> X first(Iterable<X> collection)
-			throws NoSuchElementException {
+	/**
+	 * @param collection
+	 * @return first element or null
+	 * @see #only(Iterable)
+	 */
+	public static <X> X first(Iterable<X> collection) {
+		if (collection==null) return null;
 		return get(collection, 0);
 	}
 
