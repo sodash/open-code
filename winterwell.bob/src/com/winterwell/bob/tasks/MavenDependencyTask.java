@@ -44,7 +44,8 @@ public class MavenDependencyTask extends BuildTask {
 
 	/**
 	 * Convenience for a single artifact dependency
-	 * @param artifactId e.g. "mystuff:artifact:1.2"
+	 * @param artifactId e.g. "mystuff:artifact:1.2" 
+	 * (which is Buildr format in Maven central mvnrepository.com)
 	 */
 	public MavenDependencyTask(String artifactId) {
 		String[] bits = artifactId.split(":");

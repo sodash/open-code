@@ -25,15 +25,28 @@ import com.winterwell.web.LoginDetails;
 import com.winterwell.web.data.XId;
 
 /**
- * TODO can we refactor some more common code here?
+ * Common main/init code. To use:
+ * 
+ * 1. Create subclass. You should probably override
+ * 	{@link #addJettyServlets(JettyLauncher)}
+ * and maybe
+ * {@link #doMain2()}
+ * 
+ * 2. Add a main method to the subclass:
+ * <pre><code>
+ * public static void main(String[] args) {
+		MyMain amain = new MyMain();
+		amain.doMain(args);
+	}
+ *  </code></pre>
+ * 
+ * That's it for basic use :)
  * 
  * @author daniel
  *
  * @param <ConfigType>
  */
 public abstract class AMain<ConfigType extends ISiteConfig> {
-
-//	public static final Time startTime = new Time();
 	
 	protected JettyLauncher jl;
 	
@@ -54,6 +67,12 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	protected ConfigType config;
 
 	protected Class<ConfigType> configType;
+
+	protected volatile boolean pleaseStop;
+
+	private Thread mainLoopThread;
+	
+	private volatile boolean readyFlag;
 
 	public static AMain main;
 
@@ -76,7 +95,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	/**
 	 * NB: this should return after starting up Jetty. i.e. it does not sit in a forever loop.
 	 * 
-	 * Normally leave this alone and override {@link #doMain2()}
+	 * Normally leave this alone and override {@link #doMain2()} and {@link #doMainLoop()}
 	 * 
 	 * @param args
 	 */
@@ -92,12 +111,37 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		init(args);
 		launchJetty();
 		doMain2();
+		// loop?
+		mainLoopThread = new Thread(getClass().getSimpleName()+".doMainLoop") {
+			@Override
+			public void run() {
+				doMainLoop();
+			}
+		};
+		mainLoopThread.start();
+		// ready
+		readyFlag = true;
+	}
+	
+	/**
+	 * @return true once {@link #doMain(String[])} has completed 
+	 */
+	public boolean isReady() {
+		return readyFlag;
 	}
 
 	/**
-	 * Override to do other main stuff
+	 * Override to do other main stuff.
+	 * This method must return. To implement an infinite loop -- use doMainLoop();
 	 */
 	protected void doMain2() {
+		
+	}
+	
+	/**
+	 * Overide to do a loop 
+	 */
+	protected void doMainLoop() {
 		
 	}
 
@@ -149,6 +193,11 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		if (jl!=null) {
 			jl.stop();
 			jl = null;
+		}
+		pleaseStop = true;
+		// break the loop, if we are in one
+		if (mainLoopThread!=null && mainLoopThread.isAlive()) {
+			mainLoopThread.interrupt();
 		}
 	}
 
