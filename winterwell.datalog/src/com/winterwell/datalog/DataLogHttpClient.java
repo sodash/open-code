@@ -33,7 +33,7 @@ import com.winterwell.youagain.client.AuthToken;
  */
 public class DataLogHttpClient {
 
-	Dataspace dataspace;
+	public final Dataspace dataspace;
 	
 	String ENDPOINT = "https://lg.good-loop.com/data";
 	

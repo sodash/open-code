@@ -75,6 +75,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	
 	/**
 	 * NB: this should return after starting up Jetty. i.e. it does not sit in a forever loop.
+	 * 
+	 * Normally leave this alone and override {@link #doMain2()}
+	 * 
 	 * @param args
 	 */
 	public void doMain(String[] args) {
