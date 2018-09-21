@@ -132,9 +132,11 @@ implements Comparable<Money>, IHasJson {
 	 * @param x
 	 * @return a new MA for this * x, or this if x=1
 	 */
-	public Money multiply(BigDecimal x) {
+	public Money multiply(Number x) {
 		if (x.doubleValue()==1) return this;
-		BigDecimal v2 = getValue().multiply(x);
+		// is this the best way to make a BigDecimal??
+		BigDecimal bdx = x instanceof BigDecimal? (BigDecimal) x : new BigDecimal(x.toString());
+		BigDecimal v2 = getValue().multiply(bdx);
 		return new Money(currency, v2);
 	}
 	
@@ -142,7 +144,7 @@ implements Comparable<Money>, IHasJson {
 	/**
 	 * 
 	 * @param x
-	 * @return a new MA for this - x, or this if x=0
+	 * @return a new Mony for this * x, or this if x=1
 	 */
 	public Money minus(Money x) {
 		if (x.isZero()) return this;
