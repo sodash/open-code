@@ -7,6 +7,33 @@ import org.junit.Test;
 public class SearchQueryTest {
 
 	@Test
+	public void testKeyNull() {
+		{
+			SearchQuery sq = new SearchQuery("alice foo:null");
+			List pt = sq.getParseTree();
+			System.out.println(pt);
+			assert pt.toString().equals("[and, alice]") : sq;
+			assert sq.matches("Hello alice :)");
+		}
+		{
+			SearchQuery sq = new SearchQuery("foo:null alice");
+			List pt = sq.getParseTree();
+			System.out.println(pt);
+			assert pt.toString().equals("[and, alice]") : sq;
+			assert sq.matches("Hello alice :)");
+		}
+
+		{
+			SearchQuery sq = new SearchQuery("name:null foo:null");
+			List pt = sq.getParseTree();
+			System.out.println(pt);
+			assert pt.toString().equals("[and]") : pt;
+			assert sq.matches("Hello alice :)");
+		}
+	}
+
+	
+	@Test
 	public void testQuotedKeyVal() {
 		SearchQuery sq = new SearchQuery("campaign:\"Villa Plus\"");
 		List pt = sq.getParseTree();

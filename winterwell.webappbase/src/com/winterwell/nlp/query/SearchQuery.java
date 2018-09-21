@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -463,6 +464,10 @@ public class SearchQuery implements Serializable, IHasJson {
 	
 	static Pattern kv = Pattern.compile("([a-z]+):(.+)");
 
+	/**
+	 * Modify output - Convert "k:v" into {k:v}. Filters nulls
+	 * @param output
+	 */
 	private void parse2_keyvalue(List output) {
 		for(int i=0; i<output.size(); i++) {
 			Object bit = output.get(i);
@@ -480,6 +485,11 @@ public class SearchQuery implements Serializable, IHasJson {
 				}
 				String k = m.group(1);
 				String v = m.group(2);
+				if ("null".equals(v) || "undefined".equals(v)) {
+					output.remove(i);
+					i--;
+					continue;
+				}
 				// ??Is list the right thing here?? Would Map be more clear??
 				// output.set(i, Arrays.asList(k, v));
 				output.set(i, Collections.singletonMap(k, v));
@@ -772,11 +782,12 @@ public class SearchQuery implements Serializable, IHasJson {
 	 * @param {*} propName 
 	 */
 	public String getProp(String propName) {
-		List prop = (List) Containers.first(this.getParseTree(), 
-				bit -> bit instanceof List && propName.equals( ((List)bit).get(0) )
+		List pt = this.getParseTree();
+		Map prop = (Map) Containers.first(pt, 
+				bit -> bit instanceof Map && ((Map)bit).containsKey(propName)
 				);
 		// What to return if prop:value is present but its complex??
-		return prop==null? null : (String) prop.get(1);
+		return prop==null? null : (String) prop.get(propName);
 	}
 
 }
