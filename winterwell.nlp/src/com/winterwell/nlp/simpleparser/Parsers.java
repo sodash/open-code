@@ -59,6 +59,15 @@ class Lit extends Parser<String> {
  */
 public class Parsers {
 
+	/**
+	 * Find by label, or null
+	 * @param name
+	 * @return
+	 */
+	public static Parser getParser(String name) {
+		return Parser.parsers.get(name);
+	}
+	
 	static final class Opt<PT> extends First<PT> {
 		public Opt(Parser p) {
 			super(new Parser[] { p, lit("").label(null) });
@@ -304,7 +313,7 @@ final class Ref<PT> extends Parser<PT> {
 		// if (p==null) { // if we want over-rides, then we have to do a lookup
 		// :(
 		p = lookup();
-		assert p != null : name;
+		if (p == null) throw new IllegalArgumentException("No parser named: "+name);
 		assert !(p instanceof Ref) : p;
 		assert p.getName().equals(name) : p + " where " + p.name + " != "
 				+ name;

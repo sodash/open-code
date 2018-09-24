@@ -23,6 +23,7 @@ public class ParseSearch {
 		// clear any ParseFail
 		ParseFail.setParseFail(null);
 		ParseState ps = new ParseState(parser, string);
+		// parse!
 		ParseResult r = parser.parse(ps);
 		if (r != null && r.unparsed().length() == 0)
 			return r;
