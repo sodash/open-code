@@ -639,7 +639,7 @@ public class FakeBrowser {
 			try {
 				String errorPage = FileUtils.read(es);
 				// ?? errorPage is sometimes a json blob - could we preserve it instead??
-				errorMessage += StrUtils.ellipsize(WebUtils.stripTags(errorPage), 280);
+				errorMessage += StrUtils.ellipsize(WebUtils.stripTags(errorPage), 500);
 			} catch(Exception ex) {
 				// ignore
 			}
