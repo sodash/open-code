@@ -28,6 +28,10 @@ public class DepotConfig {
 	public String getDefaultRemoteHost() {
 		return defaultRemoteHost;
 	}
+
+	// FIXME implement this switch in Depot
+	@Option(description="If set, uses in-memory merge instead of store-level merge. This is less efficient and may have worse race conditions, but it is more general purpose.")
+	boolean mergeInMemory;
 	
 	public DepotConfig() {
 		// default directory - the winterwell one if present, otherwise local depot

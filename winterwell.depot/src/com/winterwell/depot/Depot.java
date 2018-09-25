@@ -20,6 +20,7 @@ import com.winterwell.datalog.DataLog;
 import com.winterwell.depot.merge.Merger;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.gui.GuiUtils;
@@ -145,34 +146,22 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 				throw new IllegalArgumentException("Not a symlink: "+desc+" = "+artifact);
 			}
 			// put-if-absent?			
-			if (overwrite != KOverwrite.OVERWRITE) {
+			if (overwrite == KOverwrite.USE_EXISTING) {
 				try {
 					Y old = get(desc);
 					if (old!=null) {
-						if (old==artifact) {
-							// too noisy
-//							Log.d(TAG, "Going ahead with put() to save edits for "+desc+" = "+old);
-						} else if (overwrite==KOverwrite.USE_EXISTING) {							
-//							// TODO remove Bug hunting Apr 2014
-//							// Still triggering Jan 2015 :(
-							// But could this be legit due to sym-link Descs??
-							// NB: This WILL get triggered if safetySyncDescs() modified the desc
-							if (old instanceof IHasDesc) {
-								Desc oldDesc = ((IHasDesc) old).getDesc();
-								if ( ! oldDesc.equals(desc)) {
-									// TODO investigate again
-									Log.e(TAG, "(returning old) Put using existing with different desc?! "+oldDesc+" != "+desc+" old:"+old);
-								}
-							}							
-							return old;				
-						}
+						return old;				
 					}
 				} catch(Throwable ex) {
 					// oh well
 					Log.e(TAG, ex);
-				}
-				// merge... done later when the underlying system does a put
+				}				
 			}
+			
+			// Re. put with old==artifact - we go ahead with put() to save object edits
+			// Re. merge - this is done later when the underlying system does a put.
+			// Merge happens in SlowStorage -- because further edits could affect
+			// the object between now and then.
 			
 			// Paranoid Safety Check
 			if (overwrite==KOverwrite.OVERWRITE) {
