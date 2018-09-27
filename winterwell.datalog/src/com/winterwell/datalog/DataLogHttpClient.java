@@ -8,6 +8,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.server.DataLogFields;
 import com.winterwell.nlp.query.SearchQuery;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Mutable.Ref;
@@ -35,7 +36,7 @@ public class DataLogHttpClient {
 
 	public final Dataspace dataspace;
 	
-	String ENDPOINT = "https://lg.good-loop.com/data";
+	String ENDPOINT = Dep.get(DataLogConfig.class).getDataEndpoint;
 	
 	private List<AuthToken> auth;
 

@@ -97,7 +97,8 @@ public class DataLogConfig extends DBOptions implements IInit {
 	@Option(description="Used for logging to a remote server (provided storageClass has been set to use one)")
 	public String logEndpoint;
 
-	public String getDataEndpoint;
+	@Option
+	public String getDataEndpoint="https://lg.good-loop.com/data";
 
 	Map<String, Object> tagHandlers = new HashMap();
 

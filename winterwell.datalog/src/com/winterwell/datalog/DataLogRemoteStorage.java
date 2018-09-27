@@ -145,7 +145,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	@Override
 	public StatReq<IDataStream> getData(String tag, Time start, Time end, KInterpolate fn, Dt bucketSize) {
 		FakeBrowser fb = fb();		
-		fb.setAuthentication("daniel@local.com@email", "1234");		
+		fb.setAuthentication("daniel@local.com@email", "1234");		// FIXME remove this into options!
 		Map<String, String> vars = new ArrayMap(
 			"q", "tag:"+tag,
 			"breakdown", "time"

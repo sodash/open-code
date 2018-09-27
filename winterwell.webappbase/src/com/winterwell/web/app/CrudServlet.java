@@ -333,7 +333,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected String getId(WebRequest state) {
 		if (_id!=null) return _id;
 		// Beware if ID can have a / in it!
-		String sid = state.getSlugBits(1); // NB: slug-bit-0 is the servlet
+		String[] slugBits = state.getSlugBits();
+		
+		String sid = slugBits[slugBits.length - 1]; // NB: slug-bit-0 is the servlet
 		_id = getId2(state, sid);
 		return _id;
 	}
