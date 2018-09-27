@@ -3,6 +3,7 @@ package com.winterwell.web.app;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SessionIdManager;
@@ -20,10 +22,12 @@ import org.eclipse.jetty.server.session.DefaultSessionIdManager;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.ServletMapping;
 import org.eclipse.jetty.util.log.Logger;
 
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -444,6 +448,32 @@ public class JettyLauncher {
 		addServlet("/*", ms);
 		ms.setFileServlet(new FileServlet(webRootDir));
 		return ms;
+	}
+
+	/**
+	 * @deprecated A debug tool 
+	 * @return path -> servlet mapping info, assuming our standard (no filters or connectors) setup
+	 * @throws ServletException
+	 */
+	public Map<String,String> getServletMappings() throws ServletException {
+		Server server = getServer();
+		Handler[] handlers = server.getChildHandlers();
+		ArrayMap s4p = new ArrayMap();
+		for (Handler handler : handlers) {
+			if (handler instanceof org.eclipse.jetty.servlet.ServletHandler) {
+				ServletHandler sh = (ServletHandler) handler;
+//				ServletHolder[] servlets = sh.getServlets();				
+				ServletMapping[] sms = sh.getServletMappings();
+				for (ServletMapping servletMapping : sms) {
+					String path = Printer.toString(servletMapping.getPathSpecs());
+					ServletHolder sholder = sh.getServlet(servletMapping.getServletName());
+					s4p.put(path, sholder.getServlet().toString());
+				}
+			}
+		}
+//		Handler[] hs = server.getHandlers();		
+//		Connector[] conns = server.getConnectors();
+		return s4p;
 	}
 	
 }

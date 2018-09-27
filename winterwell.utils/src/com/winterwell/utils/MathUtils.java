@@ -541,6 +541,7 @@ public class MathUtils {
 	 */
 	public static <N extends Number> N cast(Class<N> klass, Number nv) {
 		if (nv==null) return null;
+		// no change :)
 		if (nv.getClass()==klass) return (N) nv;
 		// Ugly switch
 		if (klass==Integer.class || klass==int.class) return (N)(Number) nv.intValue();

@@ -28,6 +28,8 @@ public class HttpServletWrapper extends HttpServlet {
 	Supplier<IServlet> factory;
 
 	private boolean debug;
+
+	private Class<? extends IServlet> servletClass;
 	
 	public HttpServletWrapper setDebug(boolean debug) {
 		this.debug = debug;
@@ -50,10 +52,12 @@ public class HttpServletWrapper extends HttpServlet {
 				throw Utils.runtime(e);
 			}
 		});
+		servletClass = servlet;
 	}
 
 	@Override
 	public String toString() {
+		if (servletClass!=null) return "HttpServletWrapper[" + servletClass+ "]";
 		return "HttpServletWrapper[factory=" + factory + "]";
 	}
 

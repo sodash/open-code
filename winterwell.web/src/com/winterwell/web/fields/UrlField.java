@@ -25,7 +25,7 @@ public class UrlField extends AField<String> {
 			Matcher m = WebUtils2.URL_WEB_DOMAIN_REGEX.matcher(v);
 			if (m.matches()) {
 				String v2 = "http://"+v;
-				Log.d("sogrow", "edit newsUrls: Modified "+v+" to "+v2);
+				Log.d("UrlField", "edit "+name+": Modified "+v+" to "+v2);
 				v = v2;
 			} else {
 				throw new WebInputException(this, "Not a url or a web-domain: "+v);

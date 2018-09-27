@@ -138,6 +138,7 @@ public class DataLog {
 	private static IDataLog initDflt() {
 		try {
 			init();
+			assert dflt != null;
 			return dflt;
 		} catch (Throwable e) {
 			// Bad!

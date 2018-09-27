@@ -86,7 +86,7 @@ public class GitTask extends ProcessTask {
 	/**
 	 * 
 	 * @param dir
-	 * @return
+	 * @return {hash, author, time, subject, branch}
 	 * @throws IllegalArgumentException if dir is not a git-managed directory
 	 */
 	public static Map<String,Object> getLastCommitInfo(File dir) throws IllegalArgumentException {

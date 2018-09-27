@@ -444,6 +444,7 @@ public class ESStorage implements IDataLogStorage {
 		Future<ESHttpResponse> f;
 		if (grpById) {
 			UpdateRequestBuilder saveReq = client.prepareUpdate(path);
+			saveReq.setDebug(true); // Debugging Sep 2018 (this will be noisy)
 			// try x3 before failing
 			saveReq.setRetries(2);
 			// set doc

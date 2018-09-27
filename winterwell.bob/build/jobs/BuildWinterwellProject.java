@@ -3,6 +3,7 @@ package jobs;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -220,7 +221,13 @@ public class BuildWinterwellProject extends BuildTask {
 		// Version
 		String gitiv = "", by = "";
 		try {
-			gitiv = " git: "+GitTask.getLastCommitId(srcDir.getParentFile());
+			Map<String, Object> gitInfo = GitTask.getLastCommitInfo(srcDir.getParentFile());
+			Object branch = gitInfo.get("branch");
+			gitiv = " git: "+gitInfo.get("hash")
+				+" "+gitInfo.get("subject")
+				// non-master branch (master is not worth stating)
+				+ (branch!=null && ! "master".equals(branch)? " "+branch : "") 
+				;
 			by = " by: "+WebUtils2.hostname();
 		} catch(Throwable ex) {
 			Log.w(LOGTAG, ex);
