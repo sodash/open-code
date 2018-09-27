@@ -19,6 +19,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.containers.ArrayMap;
@@ -129,6 +133,12 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		Map<String,Object> manifests = getJarManifests();
 		cargo.put(("jarManifests"), manifests);
 		
+		try {
+			cargo.put("servlets", AMain.main.jl.getServletMappings());
+		} catch(Throwable ex) {
+			Log.w("manifest", ex);
+			// oh well
+		}
 		
 		JsonResponse output = new JsonResponse(state, cargo);
 		WebUtils2.sendJson(output, state);
