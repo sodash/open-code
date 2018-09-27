@@ -45,12 +45,22 @@ public class MavenDependencyTask extends BuildTask {
 	/**
 	 * Convenience for a single artifact dependency
 	 * @param artifactId e.g. "mystuff:artifact:1.2" 
-	 * (which is Buildr format in Maven central mvnrepository.com)
+	 * (which is Groovy / Buildr format in Maven central mvnrepository.com)
 	 */
 	public MavenDependencyTask(String artifactId) {
+		addDependency(artifactId);
+	}
+
+	/**
+	 * @param artifactId e.g. "mystuff:artifact:1.2" 
+	 * (which is Groovy / Buildr format in Maven central mvnrepository.com)
+	 * @return 
+	 */
+	public MavenDependencyTask addDependency(String artifactId) {
 		String[] bits = artifactId.split(":");
 		assert bits.length == 3;
 		addDependency(bits[0], bits[1], bits[2]);
+		return this;
 	}
 
 	File outDir;

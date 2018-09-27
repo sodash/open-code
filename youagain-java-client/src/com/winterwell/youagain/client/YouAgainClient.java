@@ -215,11 +215,11 @@ public final class YouAgainClient {
 		Utils.check4null(email, password);
 		FakeBrowser fb = new FakeBrowser();
 		fb.setDebug(debug);
+		fb.setAuthentication(email, password);
 		String response = fb.getPage(ENDPOINT, new ArrayMap(
 				"app", app, 
-				"action", "login", 
-				"person", email,
-				"password", password));		
+				"action", "login" 
+				));		
 		Map user = userFromResponse(response);
 		AuthToken at = new AuthToken(user);
 		return at;

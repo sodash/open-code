@@ -2,9 +2,12 @@ package com.winterwell.datalog;
 
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import com.winterwell.maths.timeseries.IDataStream;
+import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
@@ -52,13 +55,18 @@ public class DataLogRemoteStorageTest {
 		dc.storageClass = DataLogRemoteStorage.class;
 		dc.logEndpoint = "https://testlg.good-loop.com/lg";
 		dc.getDataEndpoint = "https://testlg.good-loop.com/data";
+		dc.logEndpoint = "http://locallg.good-loop.com/lg";
+		dc.getDataEndpoint = "http://locallg.good-loop.com/data";
 		DataLog.init(dc);
 		
-		DataLog.count(1, "testSaveEvent");
+		DataLog.count(1, "testsaveevent");
 		DataLog.flush();
-		
-		DataLogRemoteStorage storage = (DataLogRemoteStorage) DataLog.getImplementation().getStorage();
-		StatReq<IDataStream> data = storage.getData("testSaveEvent", new Time().minus(TUnit.MINUTE), new Time(), null, null);
+
+		DataLogHttpClient dlc = new DataLogHttpClient(dc.getDataEndpoint, new Dataspace(DataLog.getDataspace()));
+		SearchQuery q = new SearchQuery("evt:testsaveevent");
+		//		DataLogRemoteStorage storage = (DataLogRemoteStorage) DataLog.getImplementation().getStorage();
+//		StatReq<IDataStream> data = storage.getData("testSaveEvent", new Time().minus(TUnit.MINUTE), new Time(), null, null);
+		List<DataLogEvent> data = dlc.getEvents(q, 10);
 		System.out.println(data);
 	}
 

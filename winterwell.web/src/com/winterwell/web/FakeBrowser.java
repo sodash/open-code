@@ -420,6 +420,8 @@ public class FakeBrowser {
 	}
 
 	String requestMethod;
+
+	private String errorPage;
 	
 	/**
 	 * Fake a form POST.
@@ -510,18 +512,14 @@ public class FakeBrowser {
 	 * @throws IOException
 	 */
 	private String processResponse() throws IOException {
+		errorPage = null;
 		// Cookies
 		try {
 			updateCookies();
 		} catch(IllegalArgumentException ex) {
 			// First access of http headers -- can throw this due to a bug in Sun's connection handling
 			//   java.lang.IllegalArgumentException: protocol = http host = null
-//	        at sun.net.spi.DefaultProxySelector.select(DefaultProxySelector.java:164)
-//	        at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:871)
-//	        at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:801)
-//	        at sun.net.www.protocol.http.HttpURLConnection.followRedirect(HttpURLConnection.java:2030)
-//	        at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1334)
-//	        at sun.net.www.protocol.http.HttpURLConnection.getHeaderFields(HttpURLConnection.java:2236)
+	        // ... at sun.net.www.protocol.http.HttpURLConnection.getHeaderFields(HttpURLConnection.java:2236)
 			// Seen with http://green.blogs.nytimes.com/2010/01/28/brewer-invests-in-watershed-protection/@web
 			throw new IOException("Java bug fail: "+getLocation()+" "+ex);
 		} catch(NoSuchElementException ex) {
@@ -596,6 +594,11 @@ public class FakeBrowser {
 		// Copy into file
 		FileUtils.copy(inStream, downloadFile);
 	}
+	
+	@Override
+	public String toString() {
+		return "FakeBrowser[location="+getLocation()+"]";
+	}
 
 	/**
 	 * Check a response for error codes See
@@ -637,9 +640,9 @@ public class FakeBrowser {
 		InputStream es = connection.getErrorStream();
 		if (es != null) {
 			try {
-				String errorPage = FileUtils.read(es);
-				// ?? errorPage is sometimes a json blob - could we preserve it instead??
-				errorMessage += StrUtils.ellipsize(WebUtils.stripTags(errorPage), 500);
+				errorPage = FileUtils.read(es);				
+				// allow for quite a bit of error 'cos it can be vital for debugging
+				errorMessage += StrUtils.ellipsize(WebUtils.stripTags(errorPage), 1500);
 			} catch(Exception ex) {
 				// ignore
 			}
@@ -669,6 +672,15 @@ public class FakeBrowser {
 		throw new IOException(code + " (unrecognised error): " + errorMessage);
 	}
 
+	
+	/**
+	 * @return error-page from the last request, or null
+	 * The error-page is sometimes a json blob with useful debug info.
+	 */
+	public String getErrorPage() {
+		return errorPage;
+	}
+	
 	private void requestImages(URL base, String response) {
 		Matcher m = pSrc.matcher(response);
 		while (m.find()) {

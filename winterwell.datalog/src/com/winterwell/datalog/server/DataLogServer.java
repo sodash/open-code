@@ -10,6 +10,7 @@ import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
+import com.winterwell.web.app.AMain;
 import com.winterwell.web.app.JettyLauncher;
 import com.winterwell.web.app.ManifestServlet;
 import com.winterwell.youagain.client.YouAgainClient;
@@ -22,49 +23,41 @@ import com.winterwell.youagain.client.YouAgainClient;
  * @author daniel
  *
  */
-public class DataLogServer {
+public class DataLogServer extends AMain<DataLogConfig> {
 
-	private static JettyLauncher jl;
+	static DataLogConfig settings;
+
+	public DataLogServer() {
+		super("datalog", DataLogConfig.class);
+	}
 	
-	public static LogFile logFile;
-
-	public static DataLogConfig settings;
-
-	public static void main(String[] args) {						
-		init(args);
-		
-		Log.i("Go!");
-		assert jl==null;
-		jl = new JettyLauncher(new File("web"), settings.port);
-		jl.setup();
+	public static void main(String[] args) {	
+		DataLogServer dls = new DataLogServer();
+		dls.doMain(args);
+	}
+	
+	@Override
+	protected void addJettyServlets(JettyLauncher jl) {
 		jl.addServlet("/*", new MasterHttpServlet());
-		Log.i("web", "...Launching Jetty web server on port "+jl.getPort());
-		jl.run();
-
-		Log.i("Running...");
 	}
 
-	private static void init(String[] args) {
-		ConfigFactory cf = ConfigFactory.get();
-		settings = cf.getConfig(DataLogConfig.class);
-		assert settings != null;
-		Dep.set(DataLogConfig.class, settings);
-		// set the config
-		DataLog.init(settings);		
-		ManifestServlet.addConfig(settings);
-		
-		logFile = new LogFile(DataLogServer.settings.logFile)
+	@Override
+	protected void init2(DataLogConfig config) {
+		this.settings = config;
+		logFile = new LogFile(config.logFile)
 				// keep 6 weeks of log files so we can do 1 month reports
 				.setLogRotation(TUnit.DAY.dt, 6*7);
-
-		// app=datalog for login
-		YouAgainClient yac = new YouAgainClient("datalog");
-		Dep.set(YouAgainClient.class, yac);
-				
+		// set the config
+		DataLog.init(config);
+		// usual setup
+		super.init2(config);
+		init3_youAgain();
+		
 		// register the tracking event
 		IDataLogAdmin admin = DataLog.getAdmin();
 		admin.registerDataspace(DataLog.getDataspace());
 	}
+	
 
 
 }

@@ -799,6 +799,7 @@ public class WebUtils2 extends WebUtils {
 		if (email == null)
 			return false;
 		try {
+			// strip the name, if there is one
 			InternetAddress ia = new InternetAddress(email, true);
 			// InternetAddress allows foo@bar which we suspect is not actually
 			// going to work
@@ -807,7 +808,6 @@ public class WebUtils2 extends WebUtils {
 		} catch (AddressException e) {
 			return false;
 		}
-		// return pEmail.matcher(email).find();
 	}
 
 	/**

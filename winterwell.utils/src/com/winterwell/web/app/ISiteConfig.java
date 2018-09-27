@@ -1,13 +1,12 @@
 package com.winterwell.web.app;
 
 /**
- * Should this be a class instead?
+ * Used by webappbase. DataLogConfig implements this (hence why its here)
  * @author daniel
  *
  */
 public interface ISiteConfig {
 
 	int getPort();
-	
-	
+		
 }

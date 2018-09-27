@@ -145,19 +145,21 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		throw new TodoException();
 	}
 
+
+	@Deprecated // TODO! parse the output. Unify with DataLogHttpClient
 	@Override
 	public StatReq<IDataStream> getData(String tag, Time start, Time end, KInterpolate fn, Dt bucketSize) {
 		FakeBrowser fb = fb();		
-		fb.setAuthentication("daniel@local.com@email", "1234");		// FIXME remove this into options!
+//		fb.setAuthentication("daniel@local.com", "1234");		// FIXME remove this into options!
 		Map<String, String> vars = new ArrayMap(
-			"q", "tag:"+tag,
+			"q", "evt:"+tag,
 			"breakdown", "time"
 				);
 		vars.put("d", DataLog.getDataspace());
 		vars.put("t", DataLogEvent.simple); // type
 		String res = fb.getPage(getDataEndpoint, vars);
 		Object jobj = JSON.parse(res);
-		throw new TodoException();
+		throw new TodoException(jobj);
 	}
 
 	private FakeBrowser fb() {

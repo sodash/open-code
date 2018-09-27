@@ -23,6 +23,7 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.web.LoginDetails;
 import com.winterwell.web.data.XId;
+import com.winterwell.youagain.client.YouAgainClient;
 
 /**
  * Common main/init code. To use:
@@ -267,6 +268,13 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		Dep.set(Emailer.class, emailer);
 		return emailer;
 	}
+	
+	protected void init3_youAgain() {
+		// app=datalog for login
+		YouAgainClient yac = new YouAgainClient(getAppName());
+		Dep.set(YouAgainClient.class, yac);				
+	}
+
 	
 	/**
 	 * Suggestion: use AppUtils.getConfig()

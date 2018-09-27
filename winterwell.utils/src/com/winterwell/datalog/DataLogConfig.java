@@ -13,7 +13,9 @@ import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.IShift;
 import com.winterwell.utils.time.TUnit;
+import com.winterwell.web.app.ISiteConfig;
 
 /**
  * Why is this in utils? Because the interface references it.
@@ -40,7 +42,7 @@ server=localhost
  *         library. In particular, licenses for the com.winterwell.utils library do
  *         not apply to this file.
  */
-public class DataLogConfig extends DBOptions implements IInit { 
+public class DataLogConfig extends DBOptions implements IInit, ISiteConfig { 
 
 	public DataLogConfig() {
 		Log.d("DataLogConfig");
@@ -86,10 +88,8 @@ public class DataLogConfig extends DBOptions implements IInit {
 	@Option
 	public String COOKIE_DOMAIN = ".good-loop.com";
 
-
 	@Option
 	public File logFile = new File(FileUtils.getWorkingDirectory(), "lg.txt"); 
-
 
 	@Option(description="If true, Java will set CORS cross-domain access headers. Note that this can cause bugs if NGinx is also setting them.")
 	public boolean CORS = true;
@@ -137,6 +137,12 @@ public class DataLogConfig extends DBOptions implements IInit {
 	public Supplier getTagHandler(String topTag) {
 		Object th = tagHandlers.get(topTag);
 		return (Supplier) th;
+	}
+
+	
+	@Override
+	public int getPort() {
+		return port;
 	}
 
 }

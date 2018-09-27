@@ -654,7 +654,8 @@ public class ESStorage implements IDataLogStorage {
 			Time start, Time end, 
 			SearchQuery query, List<String> breakdown) 
 	{
-		com.winterwell.es.client.query.BoolQueryBuilder filter = AppUtils.makeESFilterFromSearchQuery(query, start, end);
+		com.winterwell.es.client.query.BoolQueryBuilder filter 
+			= AppUtils.makeESFilterFromSearchQuery(query, start, end);
 		
 		String index = readIndexFromDataspace(dataspace);
 		ESHttpClient esc = client(dataspace);
@@ -666,7 +667,7 @@ public class ESStorage implements IDataLogStorage {
 		search.setSize(numExamples);
 		
 		
-		// search parameters				
+		// breakdown				
 		Set<String> allOutputs = new ArraySet<>();
 		for(final String bd : breakdown) {
 			if (bd==null) {
@@ -682,7 +683,9 @@ public class ESStorage implements IDataLogStorage {
 			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
 					"by_"+StrUtils.join(b,'_'), b[0]);
 			byTag.setSize(numResults);
-			byTag.setMissing(ESQueryBuilders.UNSET);
+			if ( ! "time".equals(b[0])) { // HACK avoid "unset" -> parse exception
+				byTag.setMissing(ESQueryBuilders.UNSET);
+			}
 			Aggregation leaf = byTag;
 			if (b.length > 1) {
 				if (b[1].equals("time")) {
