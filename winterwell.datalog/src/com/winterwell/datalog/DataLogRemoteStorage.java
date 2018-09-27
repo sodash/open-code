@@ -48,6 +48,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	 */
 	public static boolean saveToRemoteServer(String server, DataLogEvent event) {
 		Utils.check4null(server, event);
+		// TODO via Dep
 		DataLogRemoteStorage dlrs = new DataLogRemoteStorage();
 		DataLogConfig remote = new DataLogConfig();
 		// add https and endpoint
@@ -81,9 +82,11 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	 */
 	public static void hackRemoteDataLog(DataLogEvent event) {
 		try {
+			// TODO replace with use of DatalogConfig
 			KServerType st = AppUtils.getServerType(null);
 			StringBuilder su = AppUtils.getServerUrl(st, "lg.good-loop.com");			
 			String LG_SERVER = su.toString();
+			
 			DataLogRemoteStorage.saveToRemoteServer(LG_SERVER, event);
 		} catch(Throwable ex) {
 			Log.e("datalog.hack (swallowed)", ex);
