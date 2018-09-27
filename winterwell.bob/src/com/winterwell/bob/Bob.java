@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
+import org.eclipse.jetty.util.ajax.JSON;
+
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.depot.Desc;
 import com.winterwell.utils.Dep;
@@ -170,8 +172,35 @@ public class Bob {
 	}
 
 	private static Map<Desc, Time> loadTaskHistory() {
-		// TODO Auto-generated method stub
-		return null;
+		// load from file
+		try {
+			File file = getHistoryFile();
+			if ( ! file.isFile()) {
+				return new HashMap();
+			}
+			String json = FileUtils.read(file);
+			Object jobj = JSON.parse(json);
+			return (Map<Desc, Time>) jobj;			
+		} catch(Throwable ex) {
+			Log.d(LOGTAG, ex);
+			return new HashMap();
+		}		
+	}
+
+	private static void saveTaskHistory() {
+		try {
+			File file = getHistoryFile();
+			String json = JSON.toString(time4task);
+			FileUtils.write(file, json);
+		} catch(Throwable ex) {
+			Log.d(LOGTAG, ex);
+		}		
+	}
+	
+	private static File getHistoryFile() {
+		BobSettings _settings = Bob.dflt==null? new BobSettings() : Bob.dflt.settings;
+		File file = new File(_settings.logDir, "time4task.json");
+		return file;
 	}
 
 	public static Bob getSingleton() {
@@ -263,6 +292,8 @@ public class Bob {
 
 	public static void setLastRunDate(BuildTask buildTask) {
 		time4task.put(buildTask.getDesc(), new Time());
+		// TODO save in a slow thread??
+		saveTaskHistory();
 	}
 
 	/**
