@@ -81,15 +81,16 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	@Override
 	public Desc getDesc() {
 		if (this.desc!=null) return desc;
-		desc = new Desc(getClass().getSimpleName(), BuildTask.class);
-		desc.setTag("bob");
+		Desc _desc = new Desc(getClass().getSimpleName(), BuildTask.class);
+		_desc.setTag("bob");
 		try {
-			desc.setVersionStamp(this);
+			_desc.setVersionStamp(this);
 		} catch(Throwable ex) {
 			Log.w(LOGTAG, "Reflection based versioning failed: "+ex+". Using unique versioning.");
-			desc.put("vuniq", Utils.getRandom().nextDouble());
+			_desc.put("vuniq", Utils.getRandom().nextDouble());
 		}
-		
+		// NB: dont set the desc field until its ready for thread safety
+		desc = _desc;
 		return desc;
 	}
 	

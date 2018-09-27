@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 import com.winterwell.bob.tasks.CompileTask;
+import com.winterwell.depot.Desc;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.ReflectionUtils;
@@ -66,7 +67,7 @@ public class Bob {
 
 	private static Bob dflt;
 
-	private static Map<Runnable, Time> time4task = new HashMap<>();
+	private static Map<Desc, Time> time4task = new HashMap<>();
 
 	private static volatile Time runStart;
 
@@ -157,20 +158,20 @@ public class Bob {
 
 	public static Time getLastRunDate(BuildTask buildTask) {
 		assert buildTask != null;
+		if (time4task==null) {
+			time4task = loadTaskHistory();
+		}
 		// relies on equals()
-		Time t = time4task.get(buildTask);
-		if (t != null)
+		Time t = time4task.get(buildTask.getDesc());
+		if (t != null) {
 			return t;
-//		// FIXME BU != BU :(
-//		for(BuildTask huh : time4task.keySet()) {
-//			assert ! huh.equals(buildTask);
-//		}
-		// // From file?
-		// File f = getFile(buildTask);
-		// if (f != null && f.exists()) {
-		// return f.lastModified();
-		// }
+		}
 		return TimeUtils.WELL_OLD;
+	}
+
+	private static Map<Desc, Time> loadTaskHistory() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public static Bob getSingleton() {
@@ -261,7 +262,7 @@ public class Bob {
 	}
 
 	public static void setLastRunDate(BuildTask buildTask) {
-		time4task.put(buildTask, new Time());
+		time4task.put(buildTask.getDesc(), new Time());
 	}
 
 	/**
