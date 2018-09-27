@@ -40,13 +40,18 @@ public class DataLogHttpClient {
 	
 	private List<AuthToken> auth;
 
-	private Map<String,Double> overview;
+	private transient Map<String,Double> overview;
 
 	private List<Map> examples;
 
 	private Time start;
 
 	private Time end;
+
+	/**
+	 * @deprecated for debug - the last url fetched
+	 */
+	private transient String lastCall;
 	
 	@Override
 	public String toString() {
@@ -145,6 +150,8 @@ public class DataLogHttpClient {
 				DataLogFields.END.name, end==null? null : end.toISOString(),
 				"size", 5)); // size is num examples
 		
+		lastCall = fb.getLocation();
+		
 		JSend jobj = JSend.parse(json);
 		if ( ! jobj.isSuccess()) {
 			throw new FailureException(jobj.getMessage());
@@ -198,6 +205,10 @@ public class DataLogHttpClient {
 	 */
 	public Map<String, Double> getOverview() {
 		return overview;
+	}
+
+	public String getLastCall() {
+		return lastCall;
 	}
 
 }
