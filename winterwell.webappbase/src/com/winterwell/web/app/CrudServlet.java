@@ -43,6 +43,7 @@ import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.WebRequest.KResponseType;
+import com.winterwell.web.data.IHasXId;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.SField;
 import com.winterwell.youagain.client.AuthToken;
@@ -326,6 +327,16 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (jthing==null) {
 			jthing = getThingFromDB(state);
 		}
+		// id must match
+		if (jthing.java() instanceof AThing) {
+			String thingId = ((AThing) jthing.java()).getId();
+			if (thingId==null || ACTION_NEW.equals(thingId)) {
+				jthing.put("id", id);
+			} else if ( ! thingId.equals(id)) {
+				throw new IllegalStateException("ID mismatch "+thingId+" vs "+id);
+			}
+		}
+		
 		JThing obj = AppUtils.doPublish(jthing, draftPath, publishPath, forceRefresh, deleteDraft);
 		return obj.setType(type);
 	}
