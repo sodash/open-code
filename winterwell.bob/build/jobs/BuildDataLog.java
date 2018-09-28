@@ -6,6 +6,9 @@ import java.util.Collection;
 
 import com.winterwell.bob.BuildTask;
 
+@Deprecated // Use the version in datalog for preference.
+// But this is kept so it can be used where we have a cyclic dependency:
+// DataLog <-> wwappbase 
 public class BuildDataLog extends BuildWinterwellProject {
 
 	public BuildDataLog() {
