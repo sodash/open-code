@@ -254,6 +254,7 @@ public class Bob {
 					+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
 			System.exit(1);
 		}
+		Log.d(LOGTAG, "Bob version: "+Bob.VERSION_NUMBER+" building "+argsLeft+"...");
 		
 		// Build each target
 		for (String clazzName : argsLeft) {
