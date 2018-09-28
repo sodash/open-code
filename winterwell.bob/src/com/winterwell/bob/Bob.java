@@ -69,11 +69,11 @@ public class Bob {
 
 	private static Bob dflt;
 
-	private static Map<Desc, Time> time4task = new HashMap<>();
+	private static Map<String, Time> time4task = new HashMap<>();
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.2";
+	public final static String VERSION_NUMBER = "0.9.3";
 
 	public static final String LOGTAG = "bob";
 
@@ -164,14 +164,14 @@ public class Bob {
 			time4task = loadTaskHistory();
 		}
 		// relies on equals()
-		Time t = time4task.get(buildTask.getDesc());
+		Time t = time4task.get(buildTask.getDesc().getId());
 		if (t != null) {
 			return t;
 		}
 		return TimeUtils.WELL_OLD;
 	}
 
-	private static Map<Desc, Time> loadTaskHistory() {
+	private static Map<String, Time> loadTaskHistory() {
 		// load from file
 		try {
 			File file = getHistoryFile();
@@ -180,7 +180,7 @@ public class Bob {
 			}
 			String json = FileUtils.read(file);
 			Object jobj = JSON.parse(json);
-			return (Map<Desc, Time>) jobj;			
+			return (Map) jobj;			
 		} catch(Throwable ex) {
 			Log.d(LOGTAG, ex);
 			return new HashMap();
@@ -291,7 +291,7 @@ public class Bob {
 	}
 
 	public static void setLastRunDate(BuildTask buildTask) {
-		time4task.put(buildTask.getDesc(), new Time());
+		time4task.put(buildTask.getDesc().getId(), new Time());
 		// TODO save in a slow thread??
 		saveTaskHistory();
 	}

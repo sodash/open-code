@@ -530,7 +530,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	@SuppressWarnings("unchecked")
 	public <T> T put(Key<T> _key, T value) {
 		checkUnset();
-		String key = _key.getName();
+		final String key = _key.getName();
 		assert key != null;		
 		Object old = properties.get(key);
 		if (Utils.equals(old, value)) {
@@ -876,7 +876,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 */
 	public void setVersionStamp(Object config) {
 		assert config != null : this;
-		assert ! properties.containsKey(CONFIG_KEY) : config;
+		assert ! properties.containsKey(CONFIG_KEY.name) : config;
 		String vrsn = XStreamUtils.serialiseToXml(config);
 		putHash(CONFIG_KEY, vrsn);
 	}

@@ -19,16 +19,25 @@ import com.winterwell.utils.io.FileUtils;
  */
 public class ForkJVMTask extends BuildTask {
 
-	BuildTask target;
+	/**
+	 * NB: String 'cos the class might not be on the classpath for this JVM
+	 */
+	final String target;
 	
-	public ForkJVMTask(BuildTask target) {
-		this.target = target;
+	public ForkJVMTask(Class<? extends BuildTask> target) {
+		this(target.getName());
 	}
 	
-	/**
-	 * HACK
-	 */
-	String classpath = FileUtils.getWinterwellDir()+"/open-code/winterwell.bob/bob-all.jar";
+	public ForkJVMTask(String target) {
+		this.target = target;
+
+		String classpath = System.getProperty("java.class.path");
+		String[] classpathEntries = classpath.split(File.pathSeparator);
+		setClasspath(classpath);
+	}
+	
+	String classpath;
+	
 	/**
 	 * working dir for task
 	 */
@@ -40,7 +49,7 @@ public class ForkJVMTask extends BuildTask {
 	
 	@Override
 	protected void doTask() throws Exception {
-		String command = "java -cp "+classpath+" com.winterwell.bob.Bob "+target.getClass().getName();
+		String command = "java -cp "+classpath+" com.winterwell.bob.Bob "+target;
 		System.out.println("");
 		System.out.println(command);
 		System.out.println("");

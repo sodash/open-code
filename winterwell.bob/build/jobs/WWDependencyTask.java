@@ -2,6 +2,7 @@ package jobs;
 
 import java.io.File;
 
+import com.winterwell.bob.tasks.ForkJVMTask;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.FakeBrowser;
@@ -9,6 +10,9 @@ import com.winterwell.web.FakeBrowser;
 /**
  * Hack for BuildWWProject, which handles project-not-on-classpath
  * by downloading the jar 
+ * 
+ * FIXME this won't download the dependencies though :(
+ * 
  * @author daniel
  * @testedby {@link WWDependencyTaskTest}
  */
@@ -24,6 +28,7 @@ public class WWDependencyTask extends BuildWinterwellProject {
 	@Override
 	public void doTask() throws Exception {
 		// Do NOT run the super
+		
 		// build?
 		if (builderClass!=null) {			
 			try {
@@ -64,6 +69,9 @@ public class WWDependencyTask extends BuildWinterwellProject {
 		getJar().getParentFile().mkdirs();
 		FileUtils.move(jar, getJar());
 		Log.i(LOGTAG, "Downloaded jar "+getJar());
+		
+		// run build for that project
+		ForkJVMTask forked = new ForkJVMTask(builderClass);
 	}
 
 

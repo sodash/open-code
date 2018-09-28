@@ -5,19 +5,6 @@ import junit.framework.TestCase;
 
 public class ArraySetTest extends TestCase {
 
-//	public void testSpliterator() {
-//		try {
-//			ArraySet<String> as = new ArraySet<>("a", "b");
-//			Spliterator<String> si = as.spliterator();
-//			System.out.println(si);
-//		} catch(Exception ex) {
-//			double jv = ReflectionUtils.getJavaVersion();
-//			assert jv < 1.8 : jv;
-//			// This is normal on Java 7
-//			System.out.println(jv+" "+ex);
-//		}
-//	}
-	
 	public void testContains() {
 		ArraySet<String> array = new ArraySet<String>();
 		array.add("a");
@@ -27,8 +14,6 @@ public class ArraySetTest extends TestCase {
 		assert array.contains("a");
 		assert array.contains("b");
 		assert !array.contains("c");
-
-		array.contains(12);
 	}
 
 	public void testAddT1() {

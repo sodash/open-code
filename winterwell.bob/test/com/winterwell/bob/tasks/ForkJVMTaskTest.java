@@ -11,8 +11,7 @@ public class ForkJVMTaskTest {
 
 	@Test
 	public void testDoTask() throws Exception {
-		BuildTask target = new TestTask();
-		ForkJVMTask fork = new ForkJVMTask(target);
+		ForkJVMTask fork = new ForkJVMTask(TestTask.class);
 		fork.setClasspath("bob-all.jar:bin.test");
 		fork.doTask();
 	}
