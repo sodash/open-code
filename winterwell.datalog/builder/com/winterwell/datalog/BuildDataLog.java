@@ -6,10 +6,13 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.winterwell.bob.BuildTask;
+import com.winterwell.web.app.BuildWWAppBase;
 
+import jobs.BuildMaths;
 import jobs.BuildUtils;
 import jobs.BuildWeb;
 import jobs.BuildWinterwellProject;
+import jobs.WWDependencyTask;
 
 public class BuildDataLog extends BuildWinterwellProject {
 
@@ -19,7 +22,12 @@ public class BuildDataLog extends BuildWinterwellProject {
 
 	@Override
 	public Collection<? extends BuildTask> getDependencies() {
-		return Arrays.asList(new BuildUtils(), new BuildWeb());
+		return Arrays.asList(
+				new BuildUtils(), 
+				new BuildWeb(),
+				new BuildMaths(),
+				new BuildWWAppBase()
+				);
 	}
 	
 	@Override

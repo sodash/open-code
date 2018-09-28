@@ -277,7 +277,9 @@ public class FileUtils {
 	 */
 	public static File copy(File in, File out, boolean overwrite)
 			throws WrappedException {
-		assert in.exists() : "File does not exist: " + in.getAbsolutePath();
+		if ( ! in.exists()) {
+			throw Utils.runtime(new FileNotFoundException(in.getAbsolutePath()));
+		}
 		assert !in.equals(out) : in + " = " + out + " can cause a delete!";
 		// recursively copy directories
 		if (in.isDirectory()) {

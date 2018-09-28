@@ -71,10 +71,15 @@ public class WWDependencyTask extends BuildWinterwellProject {
 		Log.i(LOGTAG, "Downloaded jar "+getJar());
 		
 		// run build for that project
-		if (builderClass!=null) {
-			ForkJVMTask forked = new ForkJVMTask(builderClass);
-			forked.getClasspath().add(jar);
-			forked.run();
+		if (builderClass!=null) {			
+			try {
+				ForkJVMTask forked = new ForkJVMTask(builderClass);
+				forked.getClasspath().add(jar);
+				forked.run();
+			} catch (Throwable ex) {
+				Log.w(LOGTAG, "Recursive build of "+builderClass+" failed: "+ex);
+				// NB: fork includes a finally: close block
+			}
 		}
 	}
 

@@ -173,7 +173,11 @@ public class PublishProjectTask extends BuildTask {
 			for (BuildTask buildTask : deps) {
 				if (buildTask instanceof BuildWinterwellProject) {
 					File jar = ((BuildWinterwellProject) buildTask).getJar();
-					FileUtils.copy(jar, localLib);
+					if (jar.isFile()) {
+						FileUtils.copy(jar, localLib);
+					} else {
+						Log.e(LOGTAG, "No jar?! "+jar.getAbsolutePath());
+					}
 				}
 			}			
 			

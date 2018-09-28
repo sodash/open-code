@@ -20,7 +20,7 @@ public class BuildWWAppBase extends BuildWinterwellProject {
 	public Collection<? extends BuildTask> getDependencies() {
 		return Arrays.asList(
 				new BuildUtils(),
-				new BuildBob().setScpToWW(false).setMakeFatJar(false),
+				new BuildBob().setMakeFatJar(false),
 				new BuildWeb(),
 				new BuildFlexiGson(),
 //				new BuildYouAgainJavaClient()

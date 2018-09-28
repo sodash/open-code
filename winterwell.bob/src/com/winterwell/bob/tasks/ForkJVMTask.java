@@ -52,7 +52,7 @@ public class ForkJVMTask extends BuildTask {
 	@Override
 	protected void doTask() throws Exception {
 		String command = "java -cp "+classpath+" com.winterwell.bob.Bob "+target;
-		Log.d(LOGTAG, "fork command: "+command);
+		Log.d(LOGTAG, "fork "+target+" Full command: "+command);
 		Proc proc = null;
 		try {
 			proc = new Proc(command);
