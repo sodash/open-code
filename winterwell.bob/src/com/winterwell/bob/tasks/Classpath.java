@@ -4,17 +4,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.org.apache.bcel.internal.generic.FSTORE;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArraySet;
+import com.winterwell.utils.containers.Containers;
 
 /**
- * Just a list of files (but its handy to give it a wrapper class)
+ * Just a list of files and globs (e.g. "mydir/*") -- but its handy to give it a wrapper class.
  * @author daniel
  *
  */
 public class Classpath {
 
-	List<File> files = new ArrayList();
+	List<String> files = new ArrayList();
 
 	public Classpath(String classpath) {
 		String[] classpathEntries = classpath.split(File.pathSeparator);
@@ -29,13 +31,14 @@ public class Classpath {
 	}
 
 	public void setFiles(List<File> files) {
-		this.files = files;
+		// null as []
+		if (files==null) files = new ArrayList();
+		this.files = Containers.apply(files, f -> stringForFile(f));
 	}
 	
-	public List<File> getFiles() {
-		return files;
-	}
-	
+	/**
+	 * Java classpath format: "file1:file2:file3"
+	 */
 	@Override
 	public String toString() {
 		return StrUtils.join(files, File.pathSeparator);
@@ -48,8 +51,7 @@ public class Classpath {
 	}
 
 	public Classpath add(File jarOrDir) {
-		files.add(jarOrDir);
-		return this;
+		return add(stringForFile(jarOrDir));
 	}
 
 	/**
@@ -58,9 +60,28 @@ public class Classpath {
 	 */
 	public void addAll(List<File> files2) {
 		for (File file : files2) {
-			if (files.contains(file)) continue;
-			files.add(file);	
+			String fs = stringForFile(file);
+			if (files.contains(fs)) continue;
+			files.add(fs);	
 		}		
+	}
+
+	private String stringForFile(File file) {
+		return file.toString();
+	}
+
+	public boolean isEmpty() {
+		return files.isEmpty();
+	}
+
+	public Classpath add(String jarOrDir) {
+		files.add(jarOrDir);
+		return this;
+	}
+
+	public List<File> getFiles() {
+		ArrayList<File> fs = Containers.apply(files, File::new);
+		return fs;
 	}
 	
 	

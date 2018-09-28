@@ -5,13 +5,6 @@ import java.math.BigInteger;
 import org.junit.Test;
 
 public class ReflectionUtilsTest {
-
-
-	@Test
-	public void testGetClassPath() {
-	// : separated
-		Printer.out(System.getProperty("java.class.path"));
-	}
 	
 	@Test
 	public void testSetPrivateField() {

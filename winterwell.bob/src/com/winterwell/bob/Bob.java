@@ -16,6 +16,7 @@ import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.depot.Desc;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -74,7 +75,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.4";
+	public final static String VERSION_NUMBER = "0.9.6";
 
 	public static final String LOGTAG = "bob";
 
@@ -271,6 +272,17 @@ public class Bob {
 				bob.maybeCarryOn(e);
 			}
 		}
+		
+		// all done
+		bob.close();
+		
+		// report
+		if (bob.lastScript instanceof BuildTask) {
+			Map success = ((BuildTask) bob.lastScript).getReport();
+			if (success!=null && ! success.isEmpty()) {
+				System.out.println(StrUtils.LINEEND+Printer.toString(success, StrUtils.LINEEND, ":\t"));
+			}
+		}
 	}
 
 	private static File findBuildScript() {
@@ -313,6 +325,8 @@ public class Bob {
 
 	private LogFile logfile;
 
+	private Runnable lastScript;
+
 	private Bob(BobSettings settings) {
 		this.settings = settings;
 	}
@@ -322,8 +336,9 @@ public class Bob {
 		return bobCount.addAndGet(dn);
 	}
 
-	public void build(Class clazz) throws Exception {
+	void build(Class clazz) throws Exception {
 		Runnable script = (Runnable) clazz.newInstance();
+		lastScript = script;
 		// Run it
 		script.run();
 		// Done
@@ -400,10 +415,15 @@ public class Bob {
 		this.settings = settings;
 	}
 
-	public void close() {
+	public void close() {		
 		// clean up ops
 		TaskRunner tr = Dep.get(TaskRunner.class);
+		Log.d(LOGTAG, "close... active-tasks: "+tr.getQueueSize());
 		tr.shutdown();
+		tr.awaitTermination();
+		Log.d(LOGTAG, "...closed");
+		
+		Log.i(LOGTAG, "----- BUILD COMPLETE -----");
 	}
 
 	public static Time getRunStart() {

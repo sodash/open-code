@@ -41,8 +41,9 @@ public class CopyRequiredClassesTaskTest {
 		File tempOut = FileUtils.createTempDir();
 		CopyRequiredClassesTask copyReqTask = new CopyRequiredClassesTask(FileUtils.getWorkingDirectory(), 
 				tempOut);
-		
-		File fu = new File(FileUtils.getWinterwellDir(), "code/winterwell.utils/src/winterwell/utils/io/FileUtils.java");
+
+		// HACK: guess a file
+		File fu = new File(FileUtils.getWinterwellDir(), "open-code/winterwell.utils/src/com/winterwell/utils/io/FileUtils.java");
 		assert fu.exists();
 		Tree deps = new Tree();
 		copyReqTask.doTask2_copyInClasses(fu, deps);

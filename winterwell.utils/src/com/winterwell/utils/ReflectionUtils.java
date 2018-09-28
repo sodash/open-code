@@ -29,7 +29,9 @@ import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.time.Time;
 
 /**
- * Reflection-related utility functions
+ * Reflection-related utility functions.
+ * 
+ * See also Bob's Classpath
  * 
  * @testedby {@link ReflectionUtilsTest}
  */

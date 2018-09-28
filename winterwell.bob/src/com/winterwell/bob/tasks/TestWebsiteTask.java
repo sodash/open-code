@@ -9,7 +9,8 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.web.WebUtils;
 
 /**
- * @deprecated
+ * @deprecated Use puppeteer!
+ * 
  * Status - fine in principle, but fails in chrome headless for our React pages :(
  * @author daniel
  *

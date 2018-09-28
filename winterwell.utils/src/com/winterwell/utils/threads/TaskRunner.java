@@ -39,9 +39,13 @@ import com.winterwell.utils.time.StopWatch;
  * 
  * @author daniel
  * @testedby {@link TaskRunnerTest}
+ * @see SafeExecutor
  */
 public class TaskRunner {
 
+	/**
+	 * Hint: Usually follow this with {@link #awaitTermination()}
+	 */
 	public void shutdown() {
 		Log.i("TaskRunner." + getName(), "shutdown");
 		exec.shutdown();
@@ -154,6 +158,19 @@ public class TaskRunner {
 		assert numThreads > 0;
 		exec = Executors.newFixedThreadPool(numThreads);
 	}
+	
+
+	/**
+	 * Convenience for {@link #awaitTermination(long, TimeUnit)} with a long timeout.
+	 */
+	public void awaitTermination() {
+		try {
+			exec.awaitTermination(10, TimeUnit.DAYS);
+		} catch (InterruptedException e) {
+			throw Utils.runtime(e);
+		}
+	}
+
 
 	/**
 	 * Clean up any references to task. Called by the task on success, failure

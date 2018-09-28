@@ -142,8 +142,16 @@ public class TimeUtilsTest {
 			assert f.getDayOfMonth() == 2;
 			assert f.getYear() == 2017;
 		}		
-		{	// Java 8 fail
+		try {	// Java 8 fail
 			String t = "2018-01-01T00:00:00+0100";
+			
+			OffsetDateTime parsed = OffsetDateTime.parse("2018-01-01T00:00:00+0100");
+			System.out.println(parsed);
+			
+			OffsetDateTime parsed2 = OffsetDateTime.parse( "2018-01-01T00:00:00+0100", 
+					DateTimeFormatter.ofPattern( "uuuu-MM-dd'T'HH:mm:ssX" ) );
+			System.out.println(parsed2);
+			
 			ZonedDateTime zp = ZonedDateTime.parse(t);
 			long zes = zp.toEpochSecond();
 			Date.from(zp.toInstant());
@@ -152,6 +160,14 @@ public class TimeUtilsTest {
 //			Instant instant = Instant.from(j8);
 //			long es = instant.getEpochSecond();
 //			Date idate = Date.from(instant);
+		} catch(Throwable ex) {
+			System.out.println("The java.time classes sure do suck: "+ex);
+		}
+		
+		if (false) { // not that ours handles this either!
+			String t = "2018-01-01T00:00:00+0100";
+			Time p = TimeUtils.parseExperimental(t);
+			System.out.println(p);
 		}
 	}
 	

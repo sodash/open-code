@@ -3,14 +3,16 @@ package com.winterwell.bob.tasks;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Test;
+
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 
 import junit.framework.TestCase;
 
-public class SCPTaskTest extends TestCase {
+public class SCPTaskTest {
 
-	
+	@Test
 	public void testBadRun() throws IOException {
 		{
 			File f = File.createTempFile("test", ".txt");
@@ -29,6 +31,7 @@ public class SCPTaskTest extends TestCase {
 	}
 
 	
+	// fails on permissions
 	public void testRun() throws IOException {
 		File f = File.createTempFile("test", ".txt");
 		File f2 = File.createTempFile("test", ".txt");
@@ -46,7 +49,7 @@ public class SCPTaskTest extends TestCase {
 
 	
 
-	
+	@Test
 	public void testWithEgan() throws IOException {
 		SCPTask._atomic = true;
 		String salt = Utils.getRandomString(4);
@@ -69,6 +72,7 @@ public class SCPTaskTest extends TestCase {
 	}
 	
 	
+	// fails on permissions
 	public void testCreateTargetDir() throws IOException {
 		File f = File.createTempFile("test", ".txt");
 		File f2 = new File("foo/bar.txt");

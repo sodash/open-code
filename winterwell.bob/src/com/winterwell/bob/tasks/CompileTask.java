@@ -42,7 +42,7 @@ public class CompileTask extends BuildTask {
 
 	private final File srcDir;
 	
-	private List<String> classpath;
+	private Classpath classpath;
 	private List<File> srcFiles;
 	private String srcJavaVersion;
 	private String outputJavaVersion;
@@ -170,7 +170,7 @@ public class CompileTask extends BuildTask {
 	private void addClasspathToOptions() {
 		if (classpath != null && ! classpath.isEmpty()) {
 			options.add("-classpath");
-			options.add(Printer.toString(classpath, ":"));
+			options.add(classpath.toString());
 		}
 	}
 
@@ -234,7 +234,7 @@ public class CompileTask extends BuildTask {
 	}
 
 	public void setClasspath(Collection<File> classpath) {
-		this.classpath = new ArrayList();
+		this.classpath = new Classpath();
 		for (File file : classpath) {
 			String path = file.getPath(); 
 			if (isJarDir(file)) {
@@ -269,7 +269,7 @@ public class CompileTask extends BuildTask {
 		return jars > (files.length/4) && jars > dirs;
 	}
 
-	public List<String> getClasspath() {
+	public Classpath getClasspath() {
 		return classpath;
 	}
 
@@ -278,7 +278,7 @@ public class CompileTask extends BuildTask {
 	}
 
 	public void setClasspath(Classpath cpfiles) {
-		setClasspath(cpfiles.getFiles());
+		this.classpath = cpfiles;
 	}
 
 }

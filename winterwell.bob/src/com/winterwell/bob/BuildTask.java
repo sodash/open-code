@@ -261,7 +261,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	}
 
 	/**
-	 * Call this to run the task!
+	 * Call this to run the task via junit!
 	 * This will first run the dependencies. 
 	 * Then check the last-run date (& possibly quit if the task has already run).
 	 * If not, it will call {@link #doTask()}
@@ -273,10 +273,27 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 * @param context
 	 * @throws RuntimeException
 	 *             Exceptions are wrapped with RuntimeException and rethrown,
-	 *             unless Bob ??.
+	 *             unless Bob is set to -ignore
 	 */
 	@Test
-	public final void run() throws RuntimeException {
+	public final void runViaJUnit() throws RuntimeException {
+		// run!
+		run();
+		
+		// also close
+		Bob.getSingleton().close();
+		
+		// report
+		Map success = getReport();
+		if (success!=null && ! success.isEmpty()) {
+			System.out.println(StrUtils.LINEEND+Printer.toString(success, StrUtils.LINEEND, ":\t"));
+		}
+	}
+	
+	/**
+	 * Call this to run the task within Bob. This does the work of run() without a TaskRunner shutdown.
+	 */
+	public final void run() {
 		// fix desc if it wasn't before
 		String id = getDesc().getId();
 		// Add an output and error listener
@@ -320,14 +337,6 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 				Log.e(LOGTAG, e);				
 			}
 			Log.report(LOGTAG, "...exiting " + toString(), Level.FINE);
-			if (bc == 0) {
-				bob.close();
-				Log.i(LOGTAG, "----- BUILD COMPLETE -----");
-				Map success = getReport();
-				if (success!=null && ! success.isEmpty()) {
-					System.out.println(StrUtils.LINEEND+Printer.toString(success, StrUtils.LINEEND, ":\t"));
-				}
-			}
 		}
 	}
 	
