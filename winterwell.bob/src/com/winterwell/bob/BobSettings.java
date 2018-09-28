@@ -24,9 +24,9 @@ public class BobSettings {
 
 	public static final Key<Boolean> VERBOSE = new Key<Boolean>("verbose");
 
-	@Option(tokens="-cp,-classpath", description="Classpath used for dynamically compiling build scripts.")
+	@Option(tokens="-cp,-classpath", description="Classpath used for dynamically compiling build scripts. Uses the file1:file2 format of Java")
 	// NB: This is not the classpath used for CompileTasks which are part of a build script run.
-	public List<String> classpath;
+	public String classpath;
 	
 	@Option(tokens = "-ignore", description = "Ignore all exceptions")
 	public boolean ignoreAllExceptions;
@@ -50,8 +50,4 @@ public class BobSettings {
 	@Option(tokens = "-v,-verbose")
 	public boolean verbose;
 
-	public List<File> getClasspathFiles() {
-		if (classpath==null) return null;
-		return Containers.apply(classpath, File::new);
-	}
 }

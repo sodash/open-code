@@ -12,7 +12,7 @@ public class ForkJVMTaskTest {
 	@Test
 	public void testDoTask() throws Exception {
 		ForkJVMTask fork = new ForkJVMTask(TestTask.class);
-		fork.setClasspath("bob-all.jar:bin.test");
+		fork.setClasspath(new Classpath("bob-all.jar:bin.test"));
 		fork.doTask();
 	}
 

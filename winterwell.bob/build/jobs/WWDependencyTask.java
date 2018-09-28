@@ -71,7 +71,11 @@ public class WWDependencyTask extends BuildWinterwellProject {
 		Log.i(LOGTAG, "Downloaded jar "+getJar());
 		
 		// run build for that project
-		ForkJVMTask forked = new ForkJVMTask(builderClass);
+		if (builderClass!=null) {
+			ForkJVMTask forked = new ForkJVMTask(builderClass);
+			forked.getClasspath().add(jar);
+			forked.run();
+		}
 	}
 
 

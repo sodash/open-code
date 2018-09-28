@@ -221,13 +221,21 @@ public class BuildWinterwellProject extends BuildTask {
 		// Version
 		String gitiv = "", by = "";
 		try {
-			Map<String, Object> gitInfo = GitTask.getLastCommitInfo(srcDir.getParentFile());
-			Object branch = gitInfo.get("branch");
-			gitiv = " git: "+gitInfo.get("hash")
-				+" "+gitInfo.get("subject")
-				// non-master branch (master is not worth stating)
-				+ (branch!=null && ! "master".equals(branch)? " "+branch : "") 
-				;
+			// go up until we're in git or fail
+			File repo = srcDir.getParentFile();
+			while(repo!=null) {
+				if (new File(repo, ".git").exists()) break;
+				repo = repo.getParentFile();
+			}
+			if (repo!=null) {
+				Map<String, Object> gitInfo = GitTask.getLastCommitInfo(repo);
+				Object branch = gitInfo.get("branch");
+				gitiv = " git: "+gitInfo.get("hash")
+					+" "+gitInfo.get("subject")
+					// non-master branch (master is not worth stating)
+					+ (branch!=null && ! "master".equals(branch)? " "+branch : "") 
+					;
+			}
 			by = " by: "+WebUtils2.hostname();
 		} catch(Throwable ex) {
 			Log.w(LOGTAG, ex);
@@ -264,15 +272,18 @@ public class BuildWinterwellProject extends BuildTask {
 //		report.put("jar-copy", libjar);
 		
 		// attempt to upload (but don't block)
-		if (scpToWW) {
-			String remoteJar = "/home/winterwell/public-software/"+getJar().getName();
-			SCPTask scp = new SCPTask(getJar(), "winterwell@winterwell.com",				
-					remoteJar);
-			// this is online at: https://www.winterwell.com/software/downloads
-			scp.setMkdirTask(false);			
-			scp.runInThread();
-			report.put("scp to remote", "winterwell.com:"+remoteJar);
-		}
+		doSCP();
+	}
+
+	private void doSCP() {
+		if ( ! scpToWW) return;			
+		String remoteJar = "/home/winterwell/public-software/"+getJar().getName();
+		SCPTask scp = new SCPTask(getJar(), "winterwell@winterwell.com",				
+				remoteJar);
+		// this is online at: https://www.winterwell.com/software/downloads
+		scp.setMkdirTask(false);			
+		scp.runInThread();
+		report.put("scp to remote", "winterwell.com:"+remoteJar);		
 	}
 	
 	

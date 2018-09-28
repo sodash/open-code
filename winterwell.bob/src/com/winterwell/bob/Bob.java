@@ -11,6 +11,7 @@ import java.util.logging.Level;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
+import com.winterwell.bob.tasks.Classpath;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.depot.Desc;
 import com.winterwell.utils.Dep;
@@ -73,7 +74,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.3";
+	public final static String VERSION_NUMBER = "0.9.4";
 
 	public static final String LOGTAG = "bob";
 
@@ -95,7 +96,8 @@ public class Bob {
 		} catch(ClassNotFoundException ex) {
 			Pair2<File, File> klass = compileClass(classOrFileName);
 			if (klass != null) {
-				List<File> cpfiles = getSingleton().getSettings().getClasspathFiles();
+				// classpath
+				List<File> cpfiles = getSingleton().getClasspath().getFiles();
 //				classpath = Utils.isEmpty(cp)? null : Containers.
 				// dynamically load a class from a file?
 				Class clazz = ReflectionUtils.loadClassFromFile(klass.first, klass.second, cpfiles);
@@ -120,24 +122,8 @@ public class Bob {
 		// classpath??
 //		Map<String, String> env = System.getenv();
 //		ClassLoader cl = ClassLoader.getSystemClassLoader();
-		BobSettings _settings = getSingleton().getSettings();
-		if (_settings.classpath!=null && ! _settings.classpath.isEmpty()) {
-			Collection<File> cpfiles = Containers.apply(_settings.classpath, File::new);
-			for (File file : cpfiles) {
-				if ( ! file.exists()) {
-					Log.w(LOGTAG, "Classpath file does not exist: "+file);
-				}
-			}
-			// add in the Bob files
-			String jcp = System.getProperty("java.class.path");
-			if (jcp != null) {
-				String[] jcps = jcp.split(":");
-				for (String j : jcps) {
-					cpfiles.add(new File(j));
-				}
-			}
-			cp.setClasspath(cpfiles);
-		}
+		Classpath claspath = Bob.getSingleton().getClasspath();
+		cp.setClasspath(claspath);		
 		cp.setSrcFiles(f);
 		cp.doTask();
 		File klass = new File(tempDir, cn.replace('.', '/')+".class");
@@ -145,6 +131,25 @@ public class Bob {
 			return new Pair<File>(tempDir, klass);
 		}
 		throw new FailureException("Bootstrap compile failed for "+classOrFileName+" = "+f);
+	}
+
+	private Classpath getClasspath() {
+		BobSettings _settings = getSingleton().getSettings();
+		Classpath cpfiles;
+		if (_settings.classpath!=null && ! _settings.classpath.isEmpty()) {
+			cpfiles = new Classpath(_settings.classpath);
+			for (File file : cpfiles.getFiles()) {
+				if ( ! file.exists()) {
+					Log.w(LOGTAG, "Classpath file does not exist: "+file);
+				}
+			}
+		} else {
+			cpfiles = new Classpath();
+		}
+		// add in the Bob files
+		Classpath bobcp = Classpath.getSystemClasspath();
+		cpfiles.addAll(bobcp.getFiles());
+		return cpfiles;
 	}
 
 	private static void classNotFoundMessage(Throwable e) {

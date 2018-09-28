@@ -277,4 +277,8 @@ public class CompileTask extends BuildTask {
 		this.srcFiles = Arrays.asList(files);
 	}
 
+	public void setClasspath(Classpath cpfiles) {
+		setClasspath(cpfiles.getFiles());
+	}
+
 }
