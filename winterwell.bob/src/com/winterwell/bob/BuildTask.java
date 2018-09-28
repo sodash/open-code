@@ -296,6 +296,10 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	public final void run() {
 		// fix desc if it wasn't before
 		String id = getDesc().getId();
+		if (skip()) {
+			return;
+		}
+		
 		// Add an output and error listener
 		report("Running " + toString() + " at "
 				+ TimeUtils.getTimeStamp() + "...", Level.FINE);
@@ -340,6 +344,39 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return trus if this should not be run eg for repeats
+	 */
+	public final boolean skip() {		
+		if (Bob.getSingleton().getSettings().skippingOff) {
+			return false;
+		}
+		// already done this run?
+		Time rs = Bob.getRunStart();
+		Time lastRun = Bob.getLastRunDate(this);
+		if (lastRun==null) return false;
+		if (lastRun.isAfterOrEqualTo(rs)) {
+			Log.i(LOGTAG, "Skip repeat this run dependency: "+this);
+			return true;
+		}
+		// what about recently?
+		boolean skip = skip(lastRun);
+		if (skip) Log.i(LOGTAG, "Skip recent dependency: "+this);
+		return skip;
+	}
+
+	/**
+	 * Override to have more lenient skipping, e.g. "skip if downloaded within a day"
+	 * @param lastRun
+	 * @return true to skip, false to run. If in doubt, return false.
+	 * Note: This will be ignored if -noskip / -clean is set true.
+	 */
+	protected boolean skip(Time lastRun) {
+		return false;
+	}
+
+
 	private void reportIssues() {
 		if (issues==null || issues.isEmpty()) return;
 		Log.w(LOGTAG, issues.size()+" issues: "
@@ -382,13 +419,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		// run
 		Collection<? extends BuildTask> deps = getDependencies();
 		if (deps!=null) {
-			Time rs = Bob.getRunStart();
 			for (BuildTask bs : deps) {
-				Time lastRun = Bob.getLastRunDate(bs);
-				if (lastRun.isAfterOrEqualTo(rs)) {
-					Log.i(LOGTAG, "Skip repeat dependency: "+bs);
-					continue; // skip it -- dont repeat run
-				}
 				bs.setDepth(depth+1);
 				bs.run();
 			}

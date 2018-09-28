@@ -40,7 +40,7 @@ public class BobSettings {
 	@Option(tokens = "-q,-quiet")
 	public boolean quiet;
 
-	@Option(tokens = "-noskip", description = "Switch off smart dependency skipping (if on, avoids repeatedly running sub-tasks)")
+	@Option(tokens = "-noskip,-clean", description = "Switch off smart dependency skipping (if on, avoids repeatedly running sub-tasks)")
 	public boolean skippingOff;
 
 	// @Option(tokens = "-p,-properties", description =

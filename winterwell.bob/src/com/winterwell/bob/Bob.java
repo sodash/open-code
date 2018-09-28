@@ -20,6 +20,7 @@ import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.containers.Pair2;
@@ -71,11 +72,11 @@ public class Bob {
 
 	private static Bob dflt;
 
-	private static Map<String, Time> time4task = new HashMap<>();
+	private static Map<String, Time> time4task;
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.6";
+	public final static String VERSION_NUMBER = "0.9.7";
 
 	public static final String LOGTAG = "bob";
 
@@ -185,8 +186,14 @@ public class Bob {
 				return new HashMap();
 			}
 			String json = FileUtils.read(file);
-			Object jobj = JSON.parse(json);
-			return (Map) jobj;			
+			Map jobj = (Map) JSON.parse(json);
+			ArrayMap<String,Time> t4t = new ArrayMap();
+			for(Object id : jobj.keySet()) {
+				Object v = jobj.get(id);
+				Time time = v instanceof Time? (Time) v : new Time(v.toString());
+				t4t.put(id.toString(), time);
+			}
+			return t4t;			
 		} catch(Throwable ex) {
 			Log.d(LOGTAG, ex);
 			return new HashMap();
@@ -309,6 +316,9 @@ public class Bob {
 	}
 
 	public static void setLastRunDate(BuildTask buildTask) {
+		if (time4task==null) {
+			time4task = loadTaskHistory();
+		}
 		time4task.put(buildTask.getDesc().getId(), new Time());
 		// TODO save in a slow thread??
 		saveTaskHistory();
