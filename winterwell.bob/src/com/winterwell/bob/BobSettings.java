@@ -17,6 +17,9 @@ import com.winterwell.utils.io.Option;
  */
 public class BobSettings {
 
+	@Option(tokens="-update", description="Download a fresh copy of Bob itself")
+	public boolean update;
+	
 	@Override
 	public String toString() {
 		return "BobSettings"+Printer.toString(Containers.objectAsMap(this));

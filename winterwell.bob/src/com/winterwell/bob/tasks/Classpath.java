@@ -45,6 +45,7 @@ public class Classpath {
 	}
 
 	public static Classpath getSystemClasspath() {
+		// see https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
 		String classpath = System.getProperty("java.class.path");		
 		Classpath cp = new Classpath(classpath);
 		return cp;

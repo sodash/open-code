@@ -32,6 +32,7 @@ import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
+import com.winterwell.web.FakeBrowser;
 
 /**
  * Bob the Builder, a Java based build utility.
@@ -76,7 +77,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.7";
+	public final static String VERSION_NUMBER = "0.9.8";
 
 	public static final String LOGTAG = "bob";
 
@@ -258,11 +259,28 @@ public class Bob {
 					+ StrUtils.LINEEND
 					+ "Default usage (looks for a BuildX.java file in the builder directory):"+ StrUtils.LINEEND
 					+ "	java -jar bob-all.jar"+ StrUtils.LINEEND
+					+ StrUtils.LINEEND
 					+ "Usage: java -jar bob-all.jar [options] [TargetBuildTasks...]"
 					+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
 			System.exit(1);
 		}
 		Log.d(LOGTAG, "Bob version: "+Bob.VERSION_NUMBER+" building "+argsLeft+"...");
+		
+		// update Bob itself?? TODO test
+		if (argsLeft.contains("--update")) {
+			FakeBrowser fb = new FakeBrowser();
+			File bobJar = fb.getFile("https://www.winterwell.com/software/downloads/bob-all.jar");
+			System.out.println("Bob jar downloaded to:");
+			System.out.println(bobJar);
+			// HACK
+			File wwbobjar = new File(FileUtils.getWinterwellDir(), "open-code/winterwell.bob/bob-all.jar");
+			if (wwbobjar.isFile()) {
+				FileUtils.move(wwbobjar, FileUtils.changeType(wwbobjar, ".jar.old"));
+				FileUtils.move(bobJar, wwbobjar);
+				System.out.println("Bob jar moved to:\n"+wwbobjar);
+			}
+			return;
+		}
 		
 		// Build each target
 		for (String clazzName : argsLeft) {

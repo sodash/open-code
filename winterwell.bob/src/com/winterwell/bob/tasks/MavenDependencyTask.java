@@ -203,7 +203,8 @@ public class MavenDependencyTask extends BuildTask {
 			
 			// did it work??		
 			if ( ! proc.getOutput().contains("BUILD SUCCESS")) {
-				throw new FailureException(proc.getError());
+				String error = proc.getError();
+				throw new FailureException(error);
 			}		
 //			FileUtils.delete(pom);
 		} finally {
