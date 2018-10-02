@@ -18,8 +18,7 @@ class LogConfig {
 	List<String> ignoretags;
 	
 	@Option
-	List<String> verbosetags;
-	
+	List<String> verbosetags; 
 	
 	@Option(description="reports to filter out.")
 	List<String> exclude;

@@ -21,6 +21,7 @@ import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Cache;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.time.RateCounter;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
@@ -119,9 +120,7 @@ public class Log {
 
 		// config
 		try {
-			config = new ConfigBuilder(new LogConfig())
-					.set(new File("config/log.properties"))
-					.get();
+			config = ConfigFactory.get().getConfig(LogConfig.class);
 			setConfig(config);
 		} catch(Throwable ex) {
 			// How can we report this bad config issue? Only to std-error :(
