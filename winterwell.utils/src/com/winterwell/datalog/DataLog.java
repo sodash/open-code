@@ -411,7 +411,7 @@ public class DataLog {
 	 * @return tagBits
 	 */
 	static String[] check(String... tagBits) {		
-		assert tagBits != null;
+		assert tagBits != null : "DataLog - null tagBits";
 		assert tagBits.length != 0;
 		assert ! (tagBits.length==1 && tagBits[0] == null);
 		for(int i=0; i<tagBits.length; i++) {
