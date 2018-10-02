@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
@@ -150,8 +151,13 @@ public class ConfigFactory {
 		};		
 		List<File> files = new ArrayList();
 		// WW logins
-		files.add(new File(FileUtils.getWinterwellDir(), "logins/logins."+appName+".properties"));
-		files.add(new File(FileUtils.getWinterwellDir(), "logins/"+thingy+".properties"));		
+		try {
+			files.add(new File(FileUtils.getWinterwellDir(), "logins/logins."+appName+".properties"));
+			files.add(new File(FileUtils.getWinterwellDir(), "logins/"+thingy+".properties"));
+		} catch(FailureException fex) {			
+			// oh well - no WW home - log and carry on
+			Log.w(LOGTAG, fex.toString());
+		}
 		// the normal set of options
 		for(Object option : options) {
 			if (option==null) continue;		
