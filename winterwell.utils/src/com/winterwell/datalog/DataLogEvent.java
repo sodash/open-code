@@ -106,6 +106,18 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"price", Double.class,
 			/** Use a distinct param for donation amount, so theres no clashes when grouping events together */
 			"dntn", Double.class,
+			/**
+			 * revenue model
+			 */
+			"rev", String.class, 
+			/**
+			 * rev-share for publishers
+			 */
+			"revpub", Double.class,
+			/**
+			 * rev-share for agencies
+			 */
+			"revagent", Double.class,
 			"currency", String.class, // deprecated
 			"curr", String.class,
 			"w", Integer.class, // width
