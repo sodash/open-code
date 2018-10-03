@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.eclipse.jetty.util.ajax.JSON;
+
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
@@ -27,6 +29,7 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
+import com.winterwell.es.client.admin.GetAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
@@ -37,6 +40,7 @@ import com.winterwell.utils.AString;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.log.Log;
@@ -510,12 +514,34 @@ public class AppUtils {
 					// After this, the sysadmin should (probably) remove the link old-base -> alias, 
 					// and put in a new-base -> alias link
 					
+					// To see mappings:
+					Log.i("ES.init", "To see mappings:\n"
+							+" curl http://localhost:9200/_cat/aliases/"+k.getSimpleName().toLowerCase()+"*\n"
+							+" curl http://localhost:9200/_cat/indices/"+k.getSimpleName().toLowerCase()+"*\n"
+							);
+					
+					// https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
+					String alias = path.index();					
+					String OLD = "OLD";
+					try {
+						List<String> oldIndexes = es.admin().indices().getAliasesResponse(alias);
+						OLD = "'"+oldIndexes.get(0)+"'";
+					} catch(Exception aex) {
+						// oh well
+					}
+					String switchjson = ("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
+							.replace('\'', '"');
+					Log.i("ES.init", "To switch old -> new:\n"
+							+"curl http://localhost:9200/_aliases -d '"+switchjson+"'");
+					
 					err = ex;
 					Log.e("init", ex.toString());
 				}
 			}
 		}
-		if (err != null) throw err;
+		if (err != null) {			
+			throw err;
+		}
 	}
 
 	private static void initESMappings2_putMapping(Map<Class, Map> mappingFromClass, ESHttpClient es, 
