@@ -2,6 +2,7 @@ package com.winterwell.web.app;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -544,6 +545,16 @@ public class AppUtils {
 		// type
 		dtype.property("@type", ESType.keyword);
 		// reflection based
+		initESMappings3_putMapping_byAnnotation(k, dtype);
+		
+		// Call ES...
+		pm.setMapping(dtype);
+		IESResponse r2 = pm.get();
+		r2.check();
+	}
+
+
+	private static void initESMappings3_putMapping_byAnnotation(Class k, ESType dtype) {
 		List<Field> fields = ReflectionUtils.getAllFields(k);
 		for (Field field : fields) {
 			String fname = field.getName();
@@ -557,18 +568,31 @@ public class AppUtils {
 				dtype.property(fname, ESType.keyword);
 				continue;
 			}
+			// enum = keyword
+			if (type.isEnum()) {
+				dtype.property(fname, ESType.keyword);
+				continue;
+			}
 			// IDs
 			if (type.equals(XId.class) || ReflectionUtils.isa(type, AString.class)) {
 				dtype.property(fname, ESType.keyword);
 				continue;
 			}
 			// ??anything else ES is liable to guess wrong??
+			
+			// TODO recurse
+			if (type != Object.class && ! type.isPrimitive() && ! type.isArray() 
+					&& ! ReflectionUtils.isa(type, Collection.class)
+					&& ! ReflectionUtils.isa(type, Map.class)) 
+			{
+				ESType ftype = new ESType();
+				assert ftype.isEmpty();
+				initESMappings3_putMapping_byAnnotation(type, ftype);
+				if ( ! ftype.isEmpty()) {
+					dtype.property(fname, ftype);
+				}
+			}
 		}
-		
-		// Call ES...
-		pm.setMapping(dtype);
-		IESResponse r2 = pm.get();
-		r2.check();
 	}
 
 	/**
