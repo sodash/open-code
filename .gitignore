@@ -29,3 +29,5 @@ test-output
 !winterwell.bob/bob-all.jar
 bob-all.jar
 winterwell.datalog/dependencies
+*/dependencies
+*/boblog
