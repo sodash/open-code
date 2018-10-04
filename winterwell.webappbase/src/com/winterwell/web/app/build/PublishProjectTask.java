@@ -48,7 +48,7 @@ public class PublishProjectTask extends BuildTask {
 	 */
 	protected KPubType typeOfPublish = null;
 	
-	// preClean can be set to 'clean' in order to sanitize a target before the files are synced to it
+	// preClean is no longer supported
 	protected String preClean =
 			"";
 //			"clean";
