@@ -23,14 +23,11 @@ Run it in the different projects (winterwell.utils, winterwell.web, etc) to get 
 
 `java -jar (path to)bob-all.jar`
 
+For example (if you downloaded bob-all.jar to Downloads):
 
-### Older jars
+```
+cd open-code/winterwell.utils
+java -jar ~/Downloads/bob-all.jar 
+```
 
-In Eclipse's Java Build Path editor, import a new User Library
-from the file `open-code/userlibraries.userlibraries`
-This will give you the library `elasticsearch`
-
-You will also need lots of jars in the `middleware` project
- -- get these by copy from Daniel, Miles or Carson.
-
-This step is probably not needed (the code will usually find itself): Set the env variable WINTERWELL_HOME to point to the folder above open-code.
+Which would build winterwell.utils.jar
