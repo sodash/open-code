@@ -50,6 +50,9 @@ public class LogFile implements ILogListener, Closeable {
 	
 	IFilter<Report> filter;
 
+	/**
+	 * See {@link LogConfig#fileMaxSize}
+	 */
 	private long fileMaxSize;
 	
 	public LogFile setFilter(IFilter<Report> filter) {
