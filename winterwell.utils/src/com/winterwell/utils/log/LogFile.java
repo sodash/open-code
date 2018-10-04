@@ -2,11 +2,14 @@ package com.winterwell.utils.log;
 
 import java.io.Closeable;
 import java.io.File;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Time;
@@ -46,6 +49,8 @@ public class LogFile implements ILogListener, Closeable {
 	}
 	
 	IFilter<Report> filter;
+
+	private long fileMaxSize;
 	
 	public LogFile setFilter(IFilter<Report> filter) {
 		this.filter = filter;
@@ -64,7 +69,20 @@ public class LogFile implements ILogListener, Closeable {
 			file.getParentFile().mkdirs();
 		}
 		Log.addListener(this);
+		// settings form config?
+		LogConfig lc = Dep.has(LogConfig.class)? Dep.get(LogConfig.class) : new LogConfig();
+		if (lc.fileHistory!=null && lc.fileInterval!=null) {
+			setLogRotation(lc.fileInterval, lc.fileHistory);
+		}
+		if (lc.fileMaxSize!=null) {
+			setFileMaxSize(ConfigBuilder.bytesFromString(lc.fileMaxSize));
+		}
 	}
+
+	private void setFileMaxSize(long maxSize) {
+		fileMaxSize = maxSize;
+	}
+
 
 	/**
 	 * Delete all log entries from the file. The file will still exist but it
@@ -100,6 +118,12 @@ public class LogFile implements ILogListener, Closeable {
 				}
 			}
 		}
+		String line = listen2_lineFromReport(report);
+		listen2(line, report.getTime());
+	}
+
+
+	private String listen2_lineFromReport(Report report) {
 //		String lines = report.toString();
 		// Use Java SimpleFormatter to make LogStash happy out of the box
 		LogRecord lr = new LogRecord(report.level, report.tag+" "+report.getMessage()
@@ -112,12 +136,14 @@ public class LogFile implements ILogListener, Closeable {
 		String lines = sf.format(lr);
 		// a single line for each report to make it easier to grep
 		String line = lines.replaceAll("[\r\n]", " ") + "\n";
-		listen2(line, report.getTime());
+		return line;
 	}
 	
 	static final String serverName = WebUtils.hostname();
 	
 	SimpleFormatter sf = new SimpleFormatter();
+
+	private transient boolean criedForHelp;
 	
 	/**
 	 * Low-level faster writing. 
@@ -125,12 +151,27 @@ public class LogFile implements ILogListener, Closeable {
 	 * @param time
 	 */
 	public synchronized void listen2(String line, Time time) {
+		// too big?!
+		if (fileMaxSize > 0 && file.length() > fileMaxSize) {
+			// one final log message
+			if ( ! criedForHelp) {
+				// ??minor: possibly refactor Log so this can use guaranteed the same Report construction
+				String tooBigLine = "Log file too big: "+file.length()+" > "+fileMaxSize+". Logging skipped!";
+				Report report = new Report("log", tooBigLine, Level.SEVERE, line, null);
+				String cry = listen2_lineFromReport(report);
+				FileUtils.append(cry, file);
+				criedForHelp = true;
+			}
+			// done
+			return;
+		}
 		// Rotate the logs?
 		if (nextRotation != null && nextRotation.isBefore(time)) {
 			rotateLogFiles();
 		}
 		// append to file (flushes immediately)
-		FileUtils.append(line, file);		
+		FileUtils.append(line, file);
+		criedForHelp = false;
 	}
 
 	/**

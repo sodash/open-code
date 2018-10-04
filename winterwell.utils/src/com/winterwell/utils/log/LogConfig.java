@@ -31,4 +31,13 @@ class LogConfig {
 	
 	@Option(description="How much is too much? Can be null for unlimited")
 	Rate throttleAt = new Rate(1000, TUnit.MINUTE);
+	
+	@Option(description="How big can an individual log file get? e.g. 1gb or 100mb. Setting this does have a minor performance hit. The first overflow report will generate a 'file too big' log message.")
+	String fileMaxSize;
+	
+	@Option
+	Dt fileInterval;
+	
+	@Option
+	Integer fileHistory;
 }

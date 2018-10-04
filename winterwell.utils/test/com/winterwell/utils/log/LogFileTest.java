@@ -1,9 +1,12 @@
 package com.winterwell.utils.log;
 
 import java.io.File;
+import java.util.Arrays;
 
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.time.TUnit;
 
@@ -25,6 +28,28 @@ public class LogFileTest extends TestCase {
 		lf.close();
 	}
 
+	
+	public void testLogFileSizeViaConfig() {
+		ConfigBuilder cb = new ConfigBuilder(new LogConfig());
+		cb.setFromMain("-fileMaxSize 1k".split(" "));
+		LogConfig lc = cb.get();
+		Dep.set(LogConfig.class, lc);
+		
+		File f = new File("test-output/test1.txt");
+		FileUtils.delete(f);
+		LogFile lf = new LogFile(f);
+		for (int i=0; i<100; i++) {
+			Log.i("Hello "+i);
+		}
+
+		String log = FileUtils.read(f);
+		Printer.out(log);		
+		lf.close();
+		assert log.contains("Hello 1");
+		assert log.contains("file too big");
+	}
+
+	
 	public void testLogError() {
 		File f = new File("test-output/test-error.txt");
 		FileUtils.delete(f);

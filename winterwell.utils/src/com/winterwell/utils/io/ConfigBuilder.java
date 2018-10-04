@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.winterwell.depot.IInit;
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
@@ -656,6 +657,28 @@ public class ConfigBuilder {
 
 	public List<File> getFileSources() {
 		return Containers.filterByClass(getSources(), File.class);
+	}
+
+	public static long bytesFromString(String fileSize) {
+		fileSize = fileSize.toLowerCase().trim();
+		if (fileSize.endsWith("b")) fileSize = fileSize.substring(0, fileSize.length() -1);
+		long mult = 1;
+		String n = fileSize;
+		if (fileSize.endsWith("g")) {
+			mult = 1000000000;
+			n = fileSize.substring(0, fileSize.length()-1);
+		}
+		if (fileSize.endsWith("m")) {
+			// see https://en.wikipedia.org/wiki/Megabyte
+			mult = 1000000;
+			n = fileSize.substring(0, fileSize.length()-1);
+		}
+		if (fileSize.endsWith("k")) {
+			mult = 1024;
+			n = fileSize.substring(0, fileSize.length()-1);
+		}
+		return (long) (MathUtils.toNum(n)*mult);
+//		??MathUtils.getNumber(_num)
 	}
 	
 
