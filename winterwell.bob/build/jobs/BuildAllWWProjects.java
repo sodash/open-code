@@ -23,7 +23,8 @@ public class BuildAllWWProjects extends BuildTask {
 	
 	@Override
 	protected void doTask() throws Exception {
-		List<BuildWinterwellProject> projects = Arrays.asList(new BuildUtils(),
+		List<BuildWinterwellProject> projects = Arrays.asList(
+				new BuildUtils(),
 				new BuildWeb(),
 				new BuildMaths(),
 				new BuildNLP(),
