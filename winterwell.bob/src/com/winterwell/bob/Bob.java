@@ -1,6 +1,8 @@
 package com.winterwell.bob;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -77,7 +79,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.8";
+	public final static String VERSION_NUMBER = "0.9.9";
 
 	public static final String LOGTAG = "bob";
 
@@ -85,6 +87,19 @@ public class Bob {
 	 * @throws Exception 
 	 */
 	static Class getClass(String classOrFileName) throws Exception {
+		try {
+			return getClass2(classOrFileName);
+		} catch(Exception ex) {
+			// partial name? try a find
+			File buildFile = findBuildScript(classOrFileName);
+			if (buildFile!=null && ! buildFile.toString().equals(classOrFileName)) {
+				return getClass2(buildFile.toString());
+			}
+			throw ex;
+		}
+	}
+	
+	static Class getClass2(String classOrFileName) throws Exception {
 		String className = classOrFileName;
 		// Strip endings if they were used
 		if (classOrFileName.endsWith(".java")) {
@@ -110,11 +125,20 @@ public class Bob {
 		}
 	}
 
+	/**
+	 * 
+	 * @param classOrFileName
+	 * @return (temp-output-dir, class-file)
+	 * @throws Exception
+	 */
 	private static Pair<File> compileClass(String classOrFileName) throws Exception {
 		// TODO can we compile it here and now?? But how would we load it?
 		String fileName = classOrFileName;
 		if ( ! classOrFileName.endsWith(".java")) fileName = classOrFileName+".java";
 		File f = new File(fileName);
+		if ( ! f.isFile()) {
+			throw new FileNotFoundException(classOrFileName);
+		}
 		// sniff package
 		String src = FileUtils.read(f);
 		String[] fnd = StrUtils.find("package (.+);", src);
@@ -247,13 +271,13 @@ public class Bob {
 		
 		if (argsLeft.size() == 0) {
 			// find a file?
-			File buildFile = findBuildScript();
+			File buildFile = findBuildScript(null);
 			if (buildFile != null) {
 				argsLeft = Arrays.asList(buildFile.toString());
 			}
 		}
 		
-		if (argsLeft.size() == 0 || Containers.contains("--help", args)) {			
+		if (argsLeft.size() == 0 || Containers.contains("--help", args)) {
 			System.err.println(StrUtils.LINEEND + "Bob the Builder   version: "+Bob.VERSION_NUMBER
 					+ StrUtils.LINEEND + "---------------"
 					+ StrUtils.LINEEND
@@ -310,19 +334,24 @@ public class Bob {
 		}
 	}
 
-	private static File findBuildScript() {
+	private static File findBuildScript(String optionalName) {
 		File baseDir = FileUtils.getWorkingDirectory();
 		File bdir = new File(baseDir, "builder");
 		if ( ! bdir.isDirectory()) {
 			return null;
 		}
-		List<File> files = FileUtils.find(bdir, ".*Build.*\\.java");
+		String namePattern = ".*Build.*\\.java";
+		if (optionalName!=null) {
+			namePattern = ".*"+optionalName+"\\.java";
+		}
+		List<File> files = FileUtils.find(bdir, namePattern);
 		if (files.isEmpty()) return null;
 		if (files.size()==1) {
 			Log.w(LOGTAG, "Auto-build: found file "+files.get(0));
 			return files.get(0);
 		}
-		Log.w(LOGTAG, "Auto-build: could not pick between files "+files);
+		Log.w(LOGTAG, "Auto-build: could not pick between "+files.size()+" tasks in "+bdir);
+		Log.w(LOGTAG, Containers.apply(files, FileUtils::getBasename));
 		return null;
 	}
 
