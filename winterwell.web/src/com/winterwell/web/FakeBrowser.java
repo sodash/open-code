@@ -410,6 +410,10 @@ public class FakeBrowser {
 	public List<String> getResponseHeaders(String header) {
 		return headers.get(header);
 	}
+	
+	public Map<String, List<String>> getResponseHeaders() {
+		return headers;
+	}
 
 	/**
 	 * @return
