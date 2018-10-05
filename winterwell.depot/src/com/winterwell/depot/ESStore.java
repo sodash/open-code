@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jetty.util.ConcurrentHashSet;
+
 import com.winterwell.depot.IHasVersion.IHasBefore;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
@@ -95,20 +97,28 @@ public class ESStore implements IStore {
 		return essw.raw;
 	}
 
+	final Set<String> knownIndexes = new ConcurrentHashSet<>();
+	
 	private void initIndex(String index, String type) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		// make index
 		String bindex = index+"_"+esc.getConfig().getIndexAliasVersion();
+		if (knownIndexes.contains(bindex)) {
+			// already done
+			return;
+		}
 		CreateIndexRequest pc = esc.admin().indices().prepareCreate(bindex);
 		pc.setAlias(index);
 		pc.get(); // this will fail if it already exists - oh well
 		// mapping
 		PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(index, type);
+		// ES5+ types
 		ESType mapping = new ESType()
 				.property("raw", new ESType().text().noIndex());
 		// TODO disable _all and other performance boosts
 		pm.setMapping(mapping);
 		IESResponse resp = pm.get().check();
+		knownIndexes.add(bindex);
 	}
 
 	@Override

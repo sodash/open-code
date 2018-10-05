@@ -16,6 +16,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.Warning;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.IFuture;
 import com.winterwell.utils.time.Dt;
@@ -217,6 +218,7 @@ public class DataLog {
 	 * @return The rate right now.
 	 */
 	public static Rate get(String... tagBits) {
+		assert dflt!=null : "this should be impossible"; // debugging ZF issue
 		tagBits = check(tagBits);
 		return dflt.get(tagBits);
 	}
@@ -315,22 +317,16 @@ public class DataLog {
 	 * @return 
 	 */
 	public static IDataLog init(DataLogConfig myConfig) {
-		if (dflt != null) {
-			try {				
-				dflt.close();
-			} catch (Throwable e) {
-				// swallow
-				Log.e(LOGTAG, e);
-			}
-			dflt = null;
-		}
-		Dep.set(DataLogConfig.class, myConfig);
-		// default dataspace
-		if ( ! Utils.isBlank(myConfig.namespace)) {
-			DEFAULT_DATASPACE = myConfig.namespace;
-		}
-		// make it
 		try {
+			FileUtils.close(dflt);			
+			// never null 
+			dflt = new DummyDataLog(new IllegalStateException("DataLog is being initialised to "+myConfig));
+			Dep.set(DataLogConfig.class, myConfig);
+			// default dataspace
+			if ( ! Utils.isBlank(myConfig.namespace)) {
+				DEFAULT_DATASPACE = myConfig.namespace;
+			}
+			// make it
 			Class<?> klass = Class.forName(CLASS_DATALOGIMPL);
 			Constructor<?> cons = klass.getConstructor(DataLogConfig.class);
 			dflt = (IDataLog) cons.newInstance(myConfig);
@@ -338,7 +334,7 @@ public class DataLog {
 			dflt.init();
 			return dflt;
 		} catch (Throwable ex) {
-			ex.printStackTrace();
+			dflt = new DummyDataLog(new IllegalStateException("DataLog init fail! "+ex+" from "+myConfig));
 			Log.e(LOGTAG, "Error creating "+CLASS_DATALOGIMPL+" with config "+XStreamUtils.serialiseToXml(myConfig));
 			Log.e(LOGTAG, Utils.getRootCause(ex));
 			throw Utils.runtime(ex);
