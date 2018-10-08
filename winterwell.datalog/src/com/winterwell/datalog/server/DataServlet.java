@@ -79,6 +79,10 @@ public class DataServlet implements IServlet {
 		Time start = cstart==null? new Time().minus(TUnit.MONTH) : cstart.call();
 		ICallable<Time> cend = state.get(DataLogFields.END);
 		Time end = cend==null? new Time() : cend.call();
+		
+		// TODO distribution data??
+//		ess.getMean(start, end, tag);
+		
 		// query e.g. host:thetimes.com
 		String q = state.get("q");
 		SearchQuery filter = makeQueryFilter(q, start, end);
