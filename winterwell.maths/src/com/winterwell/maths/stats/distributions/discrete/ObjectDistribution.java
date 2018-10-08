@@ -409,6 +409,7 @@ public class ObjectDistribution<X> extends AFiniteDistribution<X> implements
 		}
 		// NB: This method does not modify pseudocount.
 		// if the pseudo-count is high, you'll never get probabilities out
+		// For normalised distributions -- pseudoCount should be low - e.g. 1/size()
 		assert pseudoCount < 1.0 / size() : "pseudocount too high: "+pseudoCount;
 
 		normalised = true;

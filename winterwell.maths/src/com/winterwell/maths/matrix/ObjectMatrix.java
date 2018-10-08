@@ -80,7 +80,8 @@ public class ObjectMatrix<Row, Col> implements Serializable, IHasJson {
 	}
 
 	public double get(Row row, Col col) {
-		Double d = backing.get(new Pair2<Row, Col>(row, col));
+		Pair2<Row, Col> k = new Pair2<Row, Col>(row, col);
+		Double d = backing.get(k);
 		return d == null ? 0 : d;
 	}
 
