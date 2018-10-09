@@ -219,7 +219,7 @@ final class FtrPrevWord implements IFeature {
 
 	public FtrPrevWord(int n) {
 		this.n = n;
-		assert n > 0;
+		assert n > 0 : n;
 	}
 
 	@Override

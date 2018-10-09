@@ -766,7 +766,7 @@ public class WebRequest implements IProperties, Closeable {
 	public <X> X getRequired(AField<X> field) throws MissingFieldException {
 		X x = get(field);
 		if (x == null)
-			throw new MissingFieldException(field);
+			throw new MissingFieldException(field, "from "+this);
 		return x;
 	}
 

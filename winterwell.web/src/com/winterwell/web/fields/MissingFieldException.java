@@ -20,6 +20,12 @@ public class MissingFieldException extends WebInputException {
 		this.fields = fields;
 	}
 
+	public MissingFieldException(AField field, String msg) {
+		super("Missing " + field+" "+msg);
+		assert field != null;
+		this.fields = Collections.singletonList(field);
+	}
+
 	public List<AField> getFields() {
 		return fields;
 	}
