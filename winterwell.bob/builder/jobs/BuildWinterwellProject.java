@@ -19,6 +19,7 @@ import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.io.FileUtils;
@@ -234,9 +235,9 @@ public class BuildWinterwellProject extends BuildTask {
 		// compile
 		doTask2_compile(srcDir, binDir);
 		
-		// Jar		
-		FileUtils.delete(getJar());
-		JarTask jar = new JarTask(getJar(), getBinDir());
+		// Jar	
+		File tempJar = File.createTempFile("temp", ".jar");
+		JarTask jar = new JarTask(tempJar, getBinDir());
 		jar.setAppend(false);
 		jar.setManifestProperty(JarTask.MANIFEST_TITLE, 
 				projectDir.getName()+" library (c) Winterwell. All rights reserved.");
@@ -276,6 +277,9 @@ public class BuildWinterwellProject extends BuildTask {
 			jar.setManifestProperty("branch", branch);
 		}
 		jar.run();
+		if ( ! tempJar.isFile()) throw new FailureException("make jar failed?! "+this+" "+getJar());
+		// replace the old jar
+		FileUtils.move(tempJar, getJar());
 		report.put("jar", getJar().getAbsolutePath());
 		
 		// source code?
