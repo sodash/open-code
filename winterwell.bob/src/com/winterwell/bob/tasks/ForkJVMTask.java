@@ -36,6 +36,11 @@ public class ForkJVMTask extends BuildTask {
 	
 	Classpath classpath = Classpath.getSystemClasspath();
 	
+	public ForkJVMTask setDir(File dir) {
+		this.dir = dir;
+		return this;
+	}
+	
 	/**
 	 * working dir for task
 	 */

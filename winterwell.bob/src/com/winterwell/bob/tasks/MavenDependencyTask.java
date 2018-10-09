@@ -35,22 +35,13 @@ import com.winterwell.utils.time.Time;
 public class MavenDependencyTask extends BuildTask {
 
 	private String mavenArtifactSpec;
-
-	@Override
-	protected boolean skip(Time lastRun) {
-		// dont repeat download within a day
-		Dt dt = lastRun.dt(new Time());
-		if (dt.isShorterThan(TUnit.DAY.dt)) {
-			return true;
-		}
-		return false;
-	}
 	
 	/**
 	 * 
 	 * @param mavenArtifactSpec "groupId:artifactId:version"
 	 */
 	public MavenDependencyTask() {
+		setSkipGap(TUnit.DAY.dt); // dont repeat download within a day
 	}
 
 	/**

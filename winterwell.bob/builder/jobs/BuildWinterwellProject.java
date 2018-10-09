@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.BigJarTask;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
+import com.winterwell.bob.tasks.ForkJVMTask;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
@@ -21,6 +23,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 
@@ -35,6 +38,28 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	protected String mainClass;
 
+	@Override
+	public Collection<? extends BuildTask> getDependencies() {
+		ArraySet deps = new ArraySet();
+		// what projects does Eclipse specify?
+		EclipseClasspath ec = new EclipseClasspath(projectDir);
+		List<String> projects = ec.getReferencedProjects();
+		for (String pname : projects) {			
+			WinterwellProjectFinder pf = new WinterwellProjectFinder();
+			File pdir = pf.apply(pname);
+			if (pdir!=null && pdir.isDirectory()) {
+				File bfile = Bob.findBuildScript2(pdir, null);
+				if (bfile != null) {
+					ForkJVMTask fork = new ForkJVMTask(bfile.toString());
+					fork.setDir(pdir);
+					fork.setErrorHandler(IGNORE_EXCEPTIONS);
+					fork.setSkipGap(TUnit.DAY.dt);
+					deps.add(fork);
+				}
+			}
+		}
+		return deps;
+	}
 
 	protected boolean isCompile() {
 		return compile;

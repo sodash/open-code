@@ -79,7 +79,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.9";
+	public final static String VERSION_NUMBER = "0.9.10";
 
 	public static final String LOGTAG = "bob";
 
@@ -107,11 +107,21 @@ public class Bob {
 		}
 		if (classOrFileName.endsWith(".class")) {
 			className = classOrFileName.substring(0, classOrFileName.length() - 6);
-		}
+		}		
 		try {
 			Class<?> clazz = Class.forName(className);
 			return clazz;
 		} catch(ClassNotFoundException ex) {
+			// is it a directory?
+			File dir = new File(classOrFileName);
+			if (dir.isDirectory()) {
+				File found = findBuildScript2(dir, null);
+				if (found!=null) {
+					Log.d(LOGTAG, "located build-script "+found+" in directory "+dir);
+					classOrFileName = found.toString();
+				}
+			}
+			
 			Pair2<File, File> klass = compileClass(classOrFileName);
 			if (klass != null) {
 				// classpath
@@ -136,6 +146,9 @@ public class Bob {
 		String fileName = classOrFileName;
 		if ( ! classOrFileName.endsWith(".java")) fileName = classOrFileName+".java";
 		File f = new File(fileName);
+		if ( f.isDirectory()) {
+			throw new IllegalArgumentException(f+" from "+classOrFileName+" should have been handled via find-build-script");
+		}
 		if ( ! f.isFile()) {
 			throw new FileNotFoundException(classOrFileName);
 		}
@@ -336,7 +349,17 @@ public class Bob {
 
 	private static File findBuildScript(String optionalName) {
 		File baseDir = FileUtils.getWorkingDirectory();
-		File bdir = new File(baseDir, "builder");
+		return findBuildScript2(baseDir, optionalName);
+	}
+	
+	/**
+	 * ??how best to expose this method
+	 * @param projectDir
+	 * @param optionalName
+	 * @return
+	 */
+	public static File findBuildScript2(File projectDir, String optionalName) {
+		File bdir = new File(projectDir, "builder");
 		if ( ! bdir.isDirectory()) {
 			return null;
 		}

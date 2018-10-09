@@ -346,7 +346,8 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	
 	/**
 	 * 
-	 * @return trus if this should not be run eg for repeats
+	 * @return true if this should not be run eg for repeats
+	 * @see #skip(Time) which can be over-ridden
 	 */
 	public final boolean skip() {		
 		if (Bob.getSingleton().getSettings().skippingOff) {
@@ -357,22 +358,37 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		Time lastRun = Bob.getLastRunDate(this);
 		if (lastRun==null) return false;
 		if (lastRun.isAfterOrEqualTo(rs)) {
-			Log.i(LOGTAG, "Skip repeat this run dependency: "+this);
+			Log.i(LOGTAG, "Skip repeat this run dependency: "+getClass().getSimpleName()+" "+getDesc().getId());
 			return true;
 		}
 		// what about recently?
 		boolean skip = skip(lastRun);
-		if (skip) Log.i(LOGTAG, "Skip recent dependency: "+this);
+		if (skip) Log.i(LOGTAG, "Skip recent dependency: "+getClass().getSimpleName()+" "+getDesc().getId());
 		return skip;
 	}
 
+	Dt skipGap;
+	
+	public BuildTask setSkipGap(Dt skipGap) {
+		this.skipGap = skipGap;
+		return this;
+	}
+	
 	/**
 	 * Override to have more lenient skipping, e.g. "skip if downloaded within a day"
 	 * @param lastRun
 	 * @return true to skip, false to run. If in doubt, return false.
 	 * Note: This will be ignored if -noskip / -clean is set true.
+	 * @see #setSkipGap(Dt)
 	 */
-	protected boolean skip(Time lastRun) {
+	protected final boolean skip(Time lastRun) {
+		if (skipGap!=null && lastRun!=null) {
+			Dt gap = lastRun.dt(new Time());
+			if (gap.isShorterThan(skipGap)) {
+				Log.d(LOGTAG, "skip "+this+" - last run "+gap+" < "+skipGap);
+				return true;
+			}
+		}
 		return false;
 	}
 

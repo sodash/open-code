@@ -27,6 +27,9 @@ public class BuildBob extends BuildWinterwellProject {
 		setMainClass(Bob.class);
 		setScpToWW(true);
 		makeFatJar = true;
+		
+		// Manually set the version
+		String v = Bob.VERSION_NUMBER;
 	}
 
 	@Override

@@ -211,6 +211,11 @@ public class EclipseClasspath {
 		return libs;
 	}
 
+	/**
+	 * 
+	 * @param libs
+	 * @param projects Avoid repeats
+	 */
 	private void getCollectedLibs2(Set<File> libs, Set<String> projects)
 	{
 		List<File> libs2 = getReferencedLibraries();
