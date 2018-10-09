@@ -148,7 +148,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (state.actionIs("save") || state.actionIs(ACTION_NEW)) {
 			doSave(state);
 		}
-		if (state.actionIs("discard-edits")) {
+		if (state.actionIs("discard-edits") || state.actionIs("discardEdits")) {
 			jthing = doDiscardEdits(state);
 		}
 		if (state.actionIs("delete")) {
@@ -206,11 +206,6 @@ public abstract class CrudServlet<T> implements IServlet {
 		T obj = AppUtils.get(path, type);		
 		if (obj!=null) {
 			JThing thing = new JThing().setType(type).setJava(obj);
-			// HACK force status?
-			if (status==KStatus.DRAFT && AppUtils.getStatus(thing) == KStatus.PUBLISHED) {
-				thing = AppUtils.setStatus(thing, status);
-			}
-			// success
 			return thing;
 		}
 		
@@ -222,12 +217,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			WebRequest state2 = new WebRequest(state.request, state.response);
 			state2.put(AppUtils.STATUS, KStatus.PUBLISHED);
 			JThing<T> pubThing = getThingFromDB(state2);
-			if (pubThing != null) {
-				// NB: this won't exist in the draft DB yet (so that merely viewing an item in an editor doesn't make a draft)
-				// -- but if it is edited, then save-edits should make a draft
-				JThing<T> draftThing = AppUtils.setStatus(pubThing, KStatus.DRAFT);
-				return draftThing;
-			}
+			return pubThing;
 		}
 		return null;
 	}
