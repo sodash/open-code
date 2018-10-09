@@ -1,15 +1,18 @@
 package com.winterwell.web.app;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
+import com.google.common.util.concurrent.ListeningExecutorService;
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
@@ -504,9 +507,11 @@ public class AppUtils {
 					}
 					// setup the right mapping
 					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
-					// attempt a simple reindex
+					// attempt a simple reindex?
+					// No - cos a gap would open between the data in the two versions. We have to reindex and switch as instantaneously as we can.
 					ReindexRequest rr = new ReindexRequest(es, path.index(), index);
-					rr.execute(); // could be slow, so don't wait
+					Log.i("ES.init", "To reindex:\n"+
+							"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
 					// and shout fail!
 					//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
 					// c.f. https://issues.soda.sh/stream?tag=35538&as=su
@@ -539,7 +544,9 @@ public class AppUtils {
 				}
 			}
 		}
-		if (err != null) {			
+		if (err != null) {	
+			// wait for ES to at least submit reindex ops
+			es.flush();
 			throw err;
 		}
 	}
@@ -571,7 +578,7 @@ public class AppUtils {
 		// type
 		dtype.property("@type", ESType.keyword);
 		// reflection based
-		initESMappings3_putMapping_byAnnotation(k, dtype);
+		initESMappings3_putMapping_byAnnotation(k, dtype, new ArrayList());
 		
 		// Call ES...
 		pm.setMapping(dtype);
@@ -580,7 +587,7 @@ public class AppUtils {
 	}
 
 
-	private static void initESMappings3_putMapping_byAnnotation(Class k, ESType dtype) {
+	private static void initESMappings3_putMapping_byAnnotation(Class k, ESType dtype, Collection<Class> seenAlready) {
 		List<Field> fields = ReflectionUtils.getAllFields(k);
 		for (Field field : fields) {
 			String fname = field.getName();
@@ -606,14 +613,17 @@ public class AppUtils {
 			}
 			// ??anything else ES is liable to guess wrong??
 			
-			// TODO recurse
+			// Recurse (but not into everything)
 			if (type != Object.class && ! type.isPrimitive() && ! type.isArray() 
 					&& ! ReflectionUtils.isa(type, Collection.class)
 					&& ! ReflectionUtils.isa(type, Map.class)) 
 			{
+				if (seenAlready.contains(type)) continue;
 				ESType ftype = new ESType();
 				assert ftype.isEmpty();
-				initESMappings3_putMapping_byAnnotation(type, ftype);
+				ArrayList<Class> seenAlready2 = new ArrayList(seenAlready);
+				seenAlready2.add(type);
+				initESMappings3_putMapping_byAnnotation(type, ftype, seenAlready2);
 				if ( ! ftype.isEmpty()) {
 					dtype.property(fname, ftype);
 				}
