@@ -25,7 +25,7 @@ public class BuildBob extends BuildWinterwellProject {
 		super(new WinterwellProjectFinder().apply("winterwell.bob"), "bob");
 		incSrc = true;
 		setMainClass(Bob.class);
-		setScpToWW(true);
+//		setScpToWW(true);
 		makeFatJar = true;
 		
 		// Manually set the version
