@@ -509,7 +509,7 @@ public class AppUtils {
 					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
 					// attempt a simple reindex?
 					// No - cos a gap would open between the data in the two versions. We have to reindex and switch as instantaneously as we can.
-					ReindexRequest rr = new ReindexRequest(es, path.index(), index);
+//					ReindexRequest rr = new ReindexRequest(es, path.index(), index);
 					Log.i("ES.init", "To reindex:\n"+
 							"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
 					// and shout fail!
@@ -545,8 +545,8 @@ public class AppUtils {
 			}
 		}
 		if (err != null) {	
-			// wait for ES to at least submit reindex ops
-			es.flush();
+			// ??IF we add auto reindex, then wait for ES
+//			es.flush();
 			throw err;
 		}
 	}
