@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
@@ -22,7 +24,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import com.sun.management.OperatingSystemMXBean;
+
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;
@@ -312,6 +314,7 @@ public class ReflectionUtils {
 	 */
 	static Method getMethod(Class<?> clazz, String methodName) {
 //		clazz.getMethod(name, parameterTypes)
+		// ??why not use class.getMethod or getDeclaredMethod?? they prob have hierarchy privacy issues
 		// ignore the parameter types - but iterate over all methods :(
 		for (Method m : clazz.getMethods()) {
 			if (m.getName().equals(methodName))
@@ -870,13 +873,20 @@ public class ReflectionUtils {
 	public static double getSystemCPU() {
 		try {
 			// see https://stackoverflow.com/questions/47177/how-do-i-monitor-the-computers-cpu-memory-and-disk-usage-in-java
-			OperatingSystemMXBean operatingSystemMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-			double cpuLoad = operatingSystemMXBean.getSystemCpuLoad();		
+			// NB: the sun version is not in OpenJDK :( import com.sun.management.OperatingSystemMXBean;
+			OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+			double cpuLoad = call(operatingSystemMXBean, "getSystemCpuLoad");		
 			return cpuLoad;
 		} catch(Throwable ex) {
 			return -1;
 		}
 	}
+	
+	public static <X> X call(Object object, String methodName, Object... args) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Method m = getMethod(object.getClass(), methodName);
+		return (X) m.invoke(object, args);
+	}
+
 	/**
 	 * 
 	 * @return JVM cpu use, or -1 if unknown
@@ -884,8 +894,8 @@ public class ReflectionUtils {
 	public static double getJavaCPU() {
 		try {
 			// see https://stackoverflow.com/questions/47177/how-do-i-monitor-the-computers-cpu-memory-and-disk-usage-in-java
-			OperatingSystemMXBean operatingSystemMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-			double cpuLoad = operatingSystemMXBean.getProcessCpuLoad();		
+			OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+			double cpuLoad = call(operatingSystemMXBean, "getProcessCpuLoad");		
 			return cpuLoad;
 		} catch(Throwable ex) {
 			return -1;
