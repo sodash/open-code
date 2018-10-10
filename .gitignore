@@ -31,3 +31,4 @@ bob-all.jar
 winterwell.datalog/dependencies
 */dependencies
 */boblog
+!junit-4.12.jar
