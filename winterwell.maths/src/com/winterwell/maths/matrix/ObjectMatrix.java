@@ -243,4 +243,8 @@ public class ObjectMatrix<Row, Col> implements Serializable, IHasJson {
 		return map;
 	}
 
+	public int size() {
+		return backing.size();
+	}
+
 }

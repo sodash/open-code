@@ -141,7 +141,21 @@ public class Actor<Msg> {
 				lastEx = new Pair2<Msg, Throwable>(msg==null? null : msg.msg, e);
 			}
 		}
+		// shutdown
+		assert pleaseStop;
+		try {
+			shutdown();
+		} catch (Exception e) {
+			Log.e(getName(), e);
+			lastEx = new Pair2<Msg, Throwable>(null, e);
+		}
+	}
 
+	/**
+	 * Override to do any clean up
+	 */
+	protected void shutdown() throws Exception {
+		
 	}
 
 	private void loop2_batch() {

@@ -31,6 +31,10 @@ public class WordMarkovChain<Token> extends ACondDistribution<Token, Cntxt>
 		m.plus(prev, word, weight);
 	}	
 	
+	public int getNumStates() {
+		return m.size();
+	}
+	
 	@Override
 	public ObjectDistribution<Token> getMarginal(Cntxt context) {
 		Map<Token, Double> col = m.getRow(context);
