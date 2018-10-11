@@ -318,9 +318,6 @@ public class Proc implements Closeable {
 	 * Wait for the process to finish. If the thread is interrupted, this will
 	 * destroy the process to ensure system resources are freed.
 	 *
-	 * FIXME: encountered bug in {@link Utils#getSVNRevision(File)} where this
-	 * appears to return too quickly
-	 *
 	 * @return Exit code from the process, usually 0 for fine, other for error.
 	 * @throws RuntimeException
 	 *             if interrupted

@@ -440,11 +440,6 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 				bs.run();
 			}
 		}
-//		// Do we need to run?
-//		if (depLrd < getLastRunDate() && ! triggered()) {
-//			Log.d(LOGTAG, "no need to run? " + getClass().getName()+" dependencies up to date");
-//			return false;
-//		}
 		return true;
 	}
 

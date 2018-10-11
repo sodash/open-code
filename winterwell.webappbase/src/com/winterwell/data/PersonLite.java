@@ -27,12 +27,22 @@ public class PersonLite extends AThing {
 		setInfo(jobj);
 	}
 
+	
+	
+	/**
+	 * NB: id= xid is already set from "xid" or "id" in the constructor.
+	 * 
+	 * @param jobj
+	 * @return
+	 */
 	public PersonLite setInfo(Map<String, Object> jobj) {
 		// NB: don't overwrite existing data with null
 		if (jobj.containsKey("img")) img = (String) jobj.get("img");
 		if (jobj.containsKey("description")) description = (String) jobj.get("description");
 		if (jobj.containsKey("name")) name = (String) jobj.get("name");
-		if (jobj.containsKey("username")) username = (String) jobj.get("username");
+		if (jobj.containsKey("username")) {
+			username = (String) jobj.get("username");
+		}
 		if (jobj.containsKey("url")) url = (String) jobj.get("url");
 		return this;
 	}
@@ -44,10 +54,11 @@ public class PersonLite extends AThing {
 	public String description;
 
 	/**
-	 * Convenience for {@link #getId()} with new XId(id, false)
+	 * Convenience for {@link #getId()} with new XId(id, false).
 	 * @return
 	 */
 	public XId getXId() {
 		return new XId(getId(), false);
 	}
+	
 }
