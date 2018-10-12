@@ -114,6 +114,11 @@ public class FileUtils {
 	 * http://www.rgagnon.com/javadetails/java-handle-utf8-file-with-bom.html
 	 */
 	private static final char UTF8_BOM = '\uFEFF';
+	/**
+	 * e.g. "png"
+	 * lowercase
+	 */
+	public static final List<String> IMAGE_TYPES = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp", "tiff", "svg");
 
 	/**
 	 * Append a string to a file. Creates the file if necessary (the parent
@@ -1115,7 +1120,7 @@ public class FileUtils {
 	 */
 	public static boolean isImage(File file) {
 		String ftype = getType(file);
-		return Arrays.asList("png", "jpg", "jpeg", "gif", "bmp", "tiff", "svg").contains(ftype);
+		return IMAGE_TYPES.contains(ftype);
 	}
 	
 	/**

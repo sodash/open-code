@@ -150,6 +150,8 @@ public class WebRequest implements IProperties, Closeable {
 	/**
 	 * What type of response to send back. E.g. a full web page or a JSON
 	 * snippet.
+	 * 
+	 * HACK: This basically special-cases some special mime-types.
 	 */
 	public enum KResponseType {
 		// /** A JavaScript library - loaded via a script tag to get round
@@ -209,6 +211,10 @@ public class WebRequest implements IProperties, Closeable {
 			this.mimeType = mimeType;
 		}
 		
+		/**
+		 * String values of the response type values.
+		 * Use-case like valueOf, but without an exception if it isnt on the list.
+		 */
 		public static final List<String> strings = Containers.apply(Arrays.asList(KResponseType.values()), StrUtils.STR);		
 	}
 
@@ -458,10 +464,15 @@ public class WebRequest implements IProperties, Closeable {
 		String pi = request.getRequestURI();
 		if (pi != null) {
 			String type = FileUtils.getType(pi);
-			if ( ! type.equals("")) {
-				// a bit convoluted, but it avoids catching an exception as a regular thing
+			if ( ! type.isEmpty()) {
+				// a bit convoluted, but it avoids catching an exception as a regular thing				
 				int i = KResponseType.strings.indexOf(type);
+				// e.g. .json or .html
 				if (i!=-1) return KResponseType.values()[i];
+				// a known type?
+				if (FileUtils.IMAGE_TYPES.contains(type)) {
+					return KResponseType.image;
+				}
 			}
 		}
 		// fall back to content-type header
