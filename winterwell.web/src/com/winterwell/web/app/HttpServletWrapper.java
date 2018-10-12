@@ -91,7 +91,7 @@ public class HttpServletWrapper extends HttpServlet {
 		} else {
 			Log.w(wex.getClass().getSimpleName(), ex);
 		}
-		WebUtils2.sendError(wex.code, wex.getMessage()+" \n\n"+Printer.toString(ex, true), resp);
+		WebUtils2.sendError(wex.code, wex.getMessage()+" \n\n<details>"+Printer.toString(ex, true)+"</details>", resp);
 	}
 
 	@Override
