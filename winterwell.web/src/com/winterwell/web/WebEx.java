@@ -40,6 +40,25 @@ public class WebEx extends RuntimeException {
 			super(code, msg, e);
 		}		
 	}
+
+	/**
+	 * Request Header Fields Too Large -- WHat is this caused by??
+	 */
+	public static class E431 extends E40X {
+		private static final long serialVersionUID = 1L;
+
+		public E431(String url) {
+			super(431, url);
+		}
+
+		public E431(String url, String msg) {
+			super(431, StrUtils.joinWithSkip(" ", msg, url));
+		}
+		
+		public E431(String msg, Throwable e) {
+			super(431, msg, e);
+		}		
+	}
 	
 	/**
 	 * Wrap an exception to indicate the causing input web parameter

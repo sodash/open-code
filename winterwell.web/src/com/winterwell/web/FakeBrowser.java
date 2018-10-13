@@ -422,6 +422,8 @@ public class FakeBrowser {
 	String requestMethod;
 
 	private String errorPage;
+
+	private transient Map<String, String> debugVars;
 	
 	/**
 	 * Fake a form POST.
@@ -434,6 +436,7 @@ public class FakeBrowser {
 	 * @return The response from the server.
 	 */
 	public String post(String uri, Map<String, String> vars) {
+		this.debugVars = vars;
 		String encodedData = WebUtils.urlEncode(vars);
 		return post(uri, MIME_TYPE_URLENCODED_FORM, encodedData);
 	}
@@ -662,6 +665,10 @@ public class FakeBrowser {
 			if (code==410) {
 				throw new WebEx.E410(url, errorMessage);
 			}			
+			if (code==431) {
+				// Request Header Fields Too Large?? What is this caused by??
+				throw new WebEx.E431(StrUtils.joinWithSkip(" ", errorMessage, url, debugVars));
+			}
 			throw new WebEx.E40X(code, errorMessage+" "+url);
 		}
 		// Server error
