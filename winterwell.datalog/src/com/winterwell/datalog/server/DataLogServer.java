@@ -1,6 +1,7 @@
 package com.winterwell.datalog.server;
 
 import java.io.File;
+import java.util.Arrays;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogConfig;
@@ -11,7 +12,9 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.app.AMain;
+import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.JettyLauncher;
+import com.winterwell.web.app.KServerType;
 import com.winterwell.web.app.ManifestServlet;
 import com.winterwell.youagain.client.YouAgainClient;
 
@@ -44,6 +47,22 @@ public class DataLogServer extends AMain<DataLogConfig> {
 	@Override
 	protected void init2(DataLogConfig config) {
 		this.settings = config;
+		// set skipped IPs if unset
+		if (config.ourSkippedIPs == null) {
+			// test / local / prod??
+			if (AppUtils.getServerType() == KServerType.LOCAL || AppUtils.getServerType() == KServerType.TEST) {
+				Log.d("init", "No ourSkippedIPS 'cos "+AppUtils.getServerType());
+			} else {
+				// HACK - don't log GL office activty
+				config.ourSkippedIPs = Arrays.asList(
+						"62.30.12.102", // ??which office
+						"62.6.190.196", // ??which office 
+						"82.37.169.72" // ??which office
+						);
+				Log.d("init", "Set ourSkippedIPS from null to "+config.ourSkippedIPs+" (GL office)");
+			}			
+		}
+		
 		logFile = new LogFile(config.logFile)
 				// keep 6 weeks of log files so we can do 1 month reports
 				.setLogRotation(TUnit.DAY.dt, 6*7);

@@ -145,4 +145,11 @@ public class DataLogConfig extends DBOptions implements IInit, ISiteConfig {
 		return port;
 	}
 
+	/**
+	 * If null, this is set by DataLogServer 'cos this (utils based) config class
+	 * doesn't have local/test/production knowledge.
+	 */
+	@Option
+	public List<String> ourSkippedIPs;
+	
 }

@@ -13,8 +13,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.DataLog;
+import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.datalog.Dataspace;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -352,7 +354,8 @@ public class LgServlet {
 		}
 		if ("good-loop.com".equals(params.get("host"))) {
 			String url = (String) params.get("url");
-			// do track the marketing site, esp live demo, but otherwise no GL sites 
+			// Do track the marketing site, esp live demo and landing-page ad-player
+			// but otherwise no GL sites 
 			if (url!=null) {
 				if (url.contains("live-demo")) return true;
 				if (url.contains("//www.good-loop.com")) return true;
@@ -365,7 +368,7 @@ public class LgServlet {
 		return true;
 	}
 
-	static List<String> OUR_IPS = Arrays.asList("62.30.12.102", "62.6.190.196", "82.37.169.72");
+	static List<String> OUR_IPS = Dep.get(DataLogConfig.class).ourSkippedIPs;
 	
 	private static void doLogToFile(Dataspace dataspace, String tag, double count, Map params, String trckId, WebRequest state) {
 		String msg = params == null? "" : Printer.toString(params, ", ", ": ");

@@ -376,13 +376,22 @@ public class AppUtils {
 			Log.d("AppUtils", "Using WebRequest serverType "+st+" from url "+url);
 			return st;
 		}
+		return getServerType();
+	}
+	
+	
+	/**
+	 * local / test / production
+	 */
+	public static KServerType getServerType() {
 		// cache the answer
 		if (_serverType==null) {
 			_serverType = getServerType2();
 			Log.d("AppUtils", "Using serverType "+_serverType);
 		}
-		return _serverType;
-	}		
+		return _serverType;		
+	}
+	
 	
 	private static KServerType _serverType;
 	private static String _hostname;
