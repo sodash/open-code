@@ -32,3 +32,4 @@ winterwell.datalog/dependencies
 */dependencies
 */boblog
 !junit-4.12.jar
+winterwell.bob/test-out
