@@ -21,7 +21,7 @@ public class JUnitTaskTest {
 		Collection<File> classPath = Arrays.asList(new File("bin.test"));
 		File outputFile = new File("bin.test/JunitTaskTest.html");
 		JUnitTask jut = new JUnitTask(srcDir, classPath, outputFile);
-		
+//		jut.setExceptionOnTestFailure(true);
 		jut.doTask();
 		
 //		GuiUtils.setInteractive(interactive);
