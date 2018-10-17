@@ -24,7 +24,7 @@ import com.winterwell.web.LoginDetails;
  * @author daniel
  * @testedby XIdTest
  */
-public final class XId implements Serializable, IHasJson, CharSequence {
+public final class XId implements Serializable, IHasJson, CharSequence, Comparable<XId> {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -380,5 +380,12 @@ public final class XId implements Serializable, IHasJson, CharSequence {
 	public CharSequence subSequence(int start, int end) {
 		return toString().subSequence(start, end);
 	}
+
+	@Override
+	public int compareTo(XId o) {
+		return toString().compareTo(o.toString());
+	}
+
+
 	
 }
