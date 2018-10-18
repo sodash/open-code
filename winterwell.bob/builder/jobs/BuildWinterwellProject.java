@@ -305,14 +305,27 @@ public class BuildWinterwellProject extends BuildTask {
 	}
 
 	private void doSCP() {
-		if ( ! scpToWW) return;			
-		String remoteJar = "/home/winterwell/public-software/"+getJar().getName();
-		SCPTask scp = new SCPTask(getJar(), "winterwell@winterwell.com",				
-				remoteJar);
-		// this is online at: https://www.winterwell.com/software/downloads
-		scp.setMkdirTask(false);			
-		scp.runInThread();
-		report.put("scp to remote", "winterwell.com:"+remoteJar);		
+		if ( ! scpToWW) return;
+		{
+			String remoteJar = "/home/winterwell/public-software/"+getJar().getName();
+			SCPTask scp = new SCPTask(getJar(), "winterwell@winterwell.com",				
+					remoteJar);
+			// this is online at: https://www.winterwell.com/software/downloads
+			scp.setMkdirTask(false);			
+			scp.runInThread();
+			report.put("scp to remote", "winterwell.com:"+remoteJar);
+		}
+		// also scp maven file?
+		// Hm -- transitive dependencies??
+		// Maybe the best solution is for WWDepProject to try and checkout from git??
+//		{
+//			String remoteJar = "/home/winterwell/public-software/pom.bob."+getProjectName()+".xml";
+//			SCPTask scp = new SCPTask(pom, "winterwell@winterwell.com",	remoteJar);
+//			// this is online at: https://www.winterwell.com/software/downloads
+//			scp.setMkdirTask(false);
+//			scp.runInThread();
+//			report.put("scp pom to remote", "winterwell.com:"+remoteJar);
+//		}
 	}
 	
 	
