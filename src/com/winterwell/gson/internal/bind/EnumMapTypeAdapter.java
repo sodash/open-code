@@ -73,11 +73,8 @@ public class EnumMapTypeAdapter extends TypeAdapter<EnumMap> {
     		String name = in.nextName();
     		// Is it the enum prop?
     		if (eProp.equals(name)) {
-    			try {
-    				e = Class.forName(in.nextString());
-    			} catch (ClassNotFoundException e1) {
-    				throw new IOException(e1);
-    			}
+    			String _class = in.nextString();
+				e = gson.getClass(_class);
     			continue;
     		}
     		if (gson.getClassProperty().equals(name)) {

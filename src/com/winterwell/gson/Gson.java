@@ -60,6 +60,7 @@ import com.winterwell.gson.stream.JsonReader;
 import com.winterwell.gson.stream.JsonToken;
 import com.winterwell.gson.stream.JsonWriter;
 import com.winterwell.gson.stream.MalformedJsonException;
+import com.winterwell.utils.log.KErrorPolicy;
 
 /**
  * This is the main class for using Gson. Gson is typically used by first
@@ -222,6 +223,11 @@ public class Gson {
 	 * @since September 2014, added by Daniel
 	 */
 	private static KLoopPolicy loopPolicy;
+	
+	/**
+	 * How do we handle "@class" failures?
+	 */
+	private KErrorPolicy classErrorPolicy = KErrorPolicy.THROW_EXCEPTION;
 
 
 	/**
@@ -1340,6 +1346,25 @@ public class Gson {
 	// Note: named with capitals to avoid conflict with toJson()
 	public static Map fromJSON(String json) {
 		return SAFE_GSON.fromJson(json, Map.class);
+	}
+
+
+	/**
+	 * Can return null on error!
+	 * @param _class
+	 * @return
+	 */
+	public Class getClass(String _class) {
+		// user defined type mapping?
+		// See GsonBuilder.setClassMapping() 
+		Class typeOfT = classForClass.get(_class);		
+		if (typeOfT!=null) return typeOfT;
+		try {
+			typeOfT = Class.forName(_class);
+			return typeOfT;
+		} catch (ClassNotFoundException e) {
+			return KErrorPolicy.process(classErrorPolicy, e);
+		}		
 	}
 }
 

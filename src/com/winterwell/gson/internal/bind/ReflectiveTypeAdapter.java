@@ -22,6 +22,7 @@ import com.winterwell.gson.stream.JsonToken;
 import com.winterwell.gson.stream.JsonWriter;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.log.Log;
 
 /**
  * Uses "@class" property to instantiate sub-classes.
@@ -212,7 +213,12 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 		String _class = (String) map.get(classProperty);
 		if (_class == null)
 			return map;
-		Class<?> typeOfT = Class.forName(_class);
+		// get the Java class		
+		Class typeOfT = gson.getClass(_class);		
+		if (typeOfT==null) {
+			return map; // class error
+		}
+		
 		ObjectConstructor<?> con = conCon.get(TypeToken.get(typeOfT));
 		Object obj = con.construct();
 		// fill in the fields from map
@@ -352,7 +358,7 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 	}
 
 	/**
-	 * Check the reader for a _class property
+	 * Check the reader for a "@class" property
 	 * 
 	 * @param in
 	 * @return the TypeAdaptor to use, or null to carry on with the default
@@ -389,12 +395,8 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 		if (constructor.getType().getCanonicalName().equals(klass)) {
 			// no change needed (as you were -- use constructor)
 			return null;
-		}
-		// user defined type mapping?
-		// See GsonBuilder.setClassMapping() 		
-		Class typeOfT = gson.classForClass.get(klass);
-		// get the Java class
-		if (typeOfT==null) typeOfT = Class.forName(klass);
+		}		
+		Class typeOfT = gson.getClass(klass);
 		TypeToken tt = TypeToken.get(typeOfT);
 		TypeAdapter _typeAdapter = gson.getAdapter(tt);
 		return _typeAdapter;
