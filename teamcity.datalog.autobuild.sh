@@ -11,8 +11,8 @@
 
 
 #DIRECTORY MAPS
-OPEN_CODE='/home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11'
-ES_JAVA_CLIENT='/home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e'
+OPEN_CODE='/home/winterwell/open-code'
+ES_JAVA_CLIENT='/home/winterwell/elasticsearch-java-client'
 WWAPPBASE_DIR='/home/winterwell/TeamCity/buildAgent/work/9307b27f248c307'
 
 
@@ -44,7 +44,7 @@ wget -cO - 'https://www.winterwell.com/software/downloads/bob-all.jar' >> $OPEN_
 ### HalfStep: Pull on Flexi-Gson
 #########################
 printf "\nPulling on Flexi-Gson repo\n"
-cd /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115
+cd /home/winterwell/flexi-gson
 git gc --prune=now
 git pull origin master
 git reset --hard FETCH_HEAD
@@ -53,7 +53,7 @@ git reset --hard FETCH_HEAD
 ### QuarterStep: Build Flexi-Gson
 ##########################
 printf "\nBuilding flexi-gson.jar\n"
-cd /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115
+cd /home/winterwell/flexi-gson
 java -jar $OPEN_CODE/winterwell.bob/bob-all.jar jobs.BuildFlexiGson
 
 
