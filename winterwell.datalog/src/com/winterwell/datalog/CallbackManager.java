@@ -45,6 +45,7 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 
 	@Override
 	protected void consume(DataLogEvent msg, Actor sender) throws Exception {
+		assert msg != null;
 		if (DataLog.getImplementation().getConfig().noCallbacks) {
 			Log.d(LOGTAG, "config: no callbacks");
 			return;
@@ -71,11 +72,11 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 	}
 
 	void consume2_doCallback(DataLogEvent msg, Callback callback) {
-		Log.d(LOGTAG, callback.url+" for "+msg);
+		String json = Gson.toJSON(msg);
+		Log.d(LOGTAG, callback.url+" for "+msg+" Posting "+json);
 		FakeBrowser fb = new FakeBrowser();
 		fb.setUserAgent(FakeBrowser.HONEST_USER_AGENT);
-		fb.setDebug(true);
-		String json = Gson.toJSON(msg);
+		fb.setDebug(true);		
 		String ok = fb.post(callback.url, json);
 	}
 

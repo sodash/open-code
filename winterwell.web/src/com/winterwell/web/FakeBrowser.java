@@ -484,6 +484,7 @@ public class FakeBrowser {
 			String postBody = WebUtils2.urlDecode(encodedPostBody);
 			String curl = StrUtils.compactWhitespace("curl -XPOST -d '"+postBody+"'"+sheaders+" '"+uri+"'");
 			Log.d(LOGTAG, curl);
+			if (debugVars==null) debugVars = new ArrayMap("encodedBody", encodedPostBody);
 		}
 		try {
 			connection = setupConnection(uri, DEFAULT_TIMEOUT);
