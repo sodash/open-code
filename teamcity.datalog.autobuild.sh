@@ -43,10 +43,18 @@ wget -cO - 'https://www.winterwell.com/software/downloads/bob-all.jar' >> $OPEN_
 #########################
 ### HalfStep: Pull on Flexi-Gson
 #########################
+printf "\nPulling on Flexi-Gson repo\n"
 cd /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115
 git gc --prune=now
 git pull origin master
 git reset --hard FETCH_HEAD
+
+##########################
+### QuarterStep: Build Flexi-Gson
+##########################
+printf "\nBuilding flexi-gson.jar\n"
+cd /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115
+java -jar $OPEN_CODE/winterwell.bob/bob-all.jar jobs.BuildFlexiGson
 
 
 
