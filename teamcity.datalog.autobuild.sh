@@ -9,11 +9,23 @@
 #->winterwell.webappbase.jar needs freshly compiled elasticsearch-java-client.jar AND youagain-java-client.jar created first.
 
 
-
 #DIRECTORY MAPS
 OPEN_CODE='/home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11'
 ES_JAVA_CLIENT='/home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e'
 WWAPPBASE_DIR='/home/winterwell/TeamCity/buildAgent/work/9307b27f248c307'
+
+
+#########################
+### Preamble: Ensure that there are symlinks for given projects
+### Bob looks for the projects based on the relationship of the "winterwell" directory
+#########################
+rm -rf /home/winterwell/elasticsearch-java-client
+rm -rf /home/winterwell/open-code
+
+ln -s /home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e /home/winterwell/elasticsearch-java-client
+ln -s /home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11 /home/winterwell/open-code
+
+
 
 ########################
 ### Step 00: Get existing bob-all.jar
@@ -28,9 +40,8 @@ wget -cO - 'https://www.winterwell.com/software/downloads/bob-all.jar' >> $OPEN_
 ### Step 01: Build a new bob-all.jar
 #######################
 printf "\nBuilding a new bob-all.jar\n"
-cd winterwell.bob
+cd $OPEN_CODE/winterwell.bob
 java -jar bob-all.jar jobs.BuildBob
-cd ../
 
 
 ########################
