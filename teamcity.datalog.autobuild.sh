@@ -15,8 +15,14 @@ OPEN_CODE='/home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11'
 ES_JAVA_CLIENT='/home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e'
 WWAPPBASE_DIR='/home/winterwell/TeamCity/buildAgent/work/9307b27f248c307'
 
+########################
+### Step 00: Get existing bob-all.jar
+########################
+if [[ -f $OPEN_CODE/winterwell.bob/bob-all.jar ]]; then
+    rm $OPEN_CODE/winterwell.bob/bob-all.jar
+fi
 
-
+wget -cO - 'https://www.winterwell.com/software/downloads/bob-all.jar' >> $OPEN_CODE/winterwell.bob/bob-all.jar
 
 #######################
 ### Step 01: Build a new bob-all.jar
