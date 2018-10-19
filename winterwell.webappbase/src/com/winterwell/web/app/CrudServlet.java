@@ -500,7 +500,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param state
 	 * @return
 	 */
-	protected List cleanse(List hits2, WebRequest state) {
+	protected List<Map> cleanse(List<Map> hits2, WebRequest state) {
 		return hits2;
 	}
 
