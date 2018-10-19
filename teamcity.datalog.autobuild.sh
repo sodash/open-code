@@ -2,6 +2,7 @@
 
 #TeamCity Build $PROJECT script.
 
+
 #GLOBAL RULES
 #No matter which sub-directory has been altered, they are all inter-dependent for any and all good-loop/winterwell projects
 #No matter which project, the build order must start with a new bob-all.jar creation
