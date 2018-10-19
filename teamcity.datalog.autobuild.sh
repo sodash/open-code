@@ -21,9 +21,11 @@ WWAPPBASE_DIR='/home/winterwell/TeamCity/buildAgent/work/9307b27f248c307'
 #########################
 rm -rf /home/winterwell/elasticsearch-java-client
 rm -rf /home/winterwell/open-code
+rm -rf /home/winterwell/flexi-gson
 
 ln -s /home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e /home/winterwell/elasticsearch-java-client
 ln -s /home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11 /home/winterwell/open-code
+ln -s /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115 /home/winterwell/flexi-gson
 
 
 
@@ -35,6 +37,17 @@ if [[ -f $OPEN_CODE/winterwell.bob/bob-all.jar ]]; then
 fi
 
 wget -cO - 'https://www.winterwell.com/software/downloads/bob-all.jar' >> $OPEN_CODE/winterwell.bob/bob-all.jar
+
+
+#########################
+### HalfStep: Pull on Flexi-Gson
+#########################
+cd /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115
+git gc --prune=now
+git pull origin master
+git reset --hard FETCH_HEAD
+
+
 
 #######################
 ### Step 01: Build a new bob-all.jar
@@ -67,8 +80,8 @@ java -cp $OPEN_CODE/junit-4.12.jar:$OPEN_CODE/winterwell.bob/bob-all.jar:$ES_JAV
 ###########################
 printf "\nSetting the 'KPubType' to a 'local' string, so that this is a localhost publish of the jars\n"
 cd $OPEN_CODE/winterwell.datalog
-sed -i -e 's/typeOfPublish = KPubType.test;/typeOfPublish = KPubType.local;/g' winterwell.datalog/builder/com/winterwell/datalog/PublishDataServer.java
-sed -i -e 's/typeOfPublish = KPubType.production;/typeOfPublish = KPubType.local;/g' winterwell.datalog/builder/com/winterwell/datalog/PublishDataServer.java
+sed -i -e 's/typeOfPublish = KPubType.test;/typeOfPublish = KPubType.local;/g' builder/com/winterwell/datalog/PublishDataServer.java
+sed -i -e 's/typeOfPublish = KPubType.production;/typeOfPublish = KPubType.local;/g' builder/com/winterwell/datalog/PublishDataServer.java
 
 ############################
 ## Step 04: Update the wwappbase.js repo
