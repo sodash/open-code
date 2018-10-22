@@ -748,6 +748,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 * Exposes the {@link IDescCache}
 	 */
 	public static IDescCache getDescCache() {
+		assert descCache != null : "Depot not initialised";
 		return descCache;
 	}
 
