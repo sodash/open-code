@@ -4,10 +4,10 @@
 
 #######TODO : Read latest build log on TC and (probably) see that building the elasticsearch-java-client just fails outright.
 ########CURRENT THEORY TO TEST:
-# I believe that bob is genuinely confused about the directory structure that it is being asked to build in.
-# Therefore, to fully test this theory, I will rsync the Teamcity 'work/$PROJECT' directories, to /home/winterwell/$PROJECT so
-# that bob can run in a more normal directory structure.   This essentially turns TeamCity into a "Git-Trigger -> Build Now" system.
-# Which makes this 1 degree off of a traditional TeamCity Setup.
+# I have confirmed that the bob-all.jar that I can build on my local computer, and the bob-all.jar that gets built on sandrock
+# are not the same.  My bob-all.jar can create an elasticsearch-java-client.jar on both my local setup, and (when SCP'ed) on sandrock.
+#  So, something is wrong with the way that bob-all.jar is being compiled on sandrock.
+####Current trial:  might need a winterwell.utils.jar to kick-start a good bob build of bob-all.jar
 
 #GLOBAL RULES
 #No matter which sub-directory has been altered, they are all inter-dependent for any and all good-loop/winterwell projects
@@ -91,9 +91,10 @@ java -jar $OPEN_CODE/winterwell.bob/bob-all.jar jobs.BuildFlexiGson
 #######################
 ### Step 01: Build a new bob-all.jar
 #######################
-printf "\nBuilding a new bob-all.jar\n"
-cd $OPEN_CODE/winterwell.bob
-java -jar bob-all.jar jobs.BuildBob
+########COMMENTING OUT FOR A TEST.
+# printf "\nBuilding a new bob-all.jar\n"
+# cd $OPEN_CODE/winterwell.bob
+# java -jar bob-all.jar jobs.BuildBob
 
 
 ########################
