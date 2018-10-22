@@ -54,10 +54,10 @@ rm -rf /home/winterwell/flexi-gson/*
 rm -rf /home/winterwell/open-code/*
 rm -rf /home/winterwell/wwappbase.js/*
 ## NOW do the rsync
-rsync -r /home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e/* /home/winterwell/elasticsearch-java-client/
-rsync -r /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115/* /home/winterwell/flexi-gson/
-rsync -r /home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11/* /home/winterwell/open-code/
-rsync -r /home/winterwell/TeamCity/buildAgent/work/9307b27f248c307/* /home/winterwell/wwappbase.js/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e/* /home/winterwell/elasticsearch-java-client/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115/* /home/winterwell/flexi-gson/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11/* /home/winterwell/open-code/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/9307b27f248c307/* /home/winterwell/wwappbase.js/
 
 
 
