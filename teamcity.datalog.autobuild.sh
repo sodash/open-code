@@ -49,22 +49,22 @@ git reset --hard FETCH_HEAD
 
 #RSYNC the projects on the disk to mimic a semi-traditional devbox directory structure.
 ## SUBTASK: Clean out the existing contents of the /home/winterwell/$PROJECT structure.
-rm -rf /home/winterwell/elasticsearch-java-client/*
-rm -rf /home/winterwell/flexi-gson/*
-rm -rf /home/winterwell/open-code/*
-rm -rf /home/winterwell/wwappbase.js/*
+rm -rf /home/winterwell/winterwell/elasticsearch-java-client/*
+rm -rf /home/winterwell/winterwell/flexi-gson/*
+rm -rf /home/winterwell/winterwell/open-code/*
+rm -rf /home/winterwell/winterwell/wwappbase.js/*
 ## NOW do the rsync
-rsync -ravz /home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e/.[^.]* /home/winterwell/elasticsearch-java-client/
-rsync -ravz /home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e/* /home/winterwell/elasticsearch-java-client/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e/.[^.]* /home/winterwell/winterwell/elasticsearch-java-client/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/ff7665b6f2ca318e/* /home/winterwell/winterwell/elasticsearch-java-client/
 
-rsync -ravz /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115/.[^.]* /home/winterwell/flexi-gson/
-rsync -ravz /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115/* /home/winterwell/flexi-gson/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115/.[^.]* /home/winterwell/winterwell/flexi-gson/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/80e533dc8a610115/* /home/winterwell/winterwell/flexi-gson/
 
-rsync -ravz /home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11/.[^.]* /home/winterwell/open-code/
-rsync -ravz /home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11/* /home/winterwell/open-code/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11/.[^.]* /home/winterwell/winterwell/open-code/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/c7a16811424bee11/* /home/winterwell/winterwell/open-code/
 
-rsync -ravz /home/winterwell/TeamCity/buildAgent/work/9307b27f248c307/.[^.]* /home/winterwell/wwappbase.js/
-rsync -ravz /home/winterwell/TeamCity/buildAgent/work/9307b27f248c307/* /home/winterwell/wwappbase.js/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/9307b27f248c307/.[^.]* /home/winterwell/winterwell/wwappbase.js/
+rsync -ravz /home/winterwell/TeamCity/buildAgent/work/9307b27f248c307/* /home/winterwellwinterwell//wwappbase.js/
 
 
 
@@ -100,6 +100,9 @@ java -jar $OPEN_CODE/winterwell.bob/bob-all.jar jobs.BuildFlexiGson
 ########################
 ### Step 02: Build a new winterwell.webappbase.jar
 ########################
+printf "\nGetting an existing winterwell.webappbase.jar in order to build a new one\n"
+cd $OPEN_CODE/winterwell.webappbase/
+wget https://www.winterwell.com/software/downloads/winterwell.webappbase.jar
 printf "\nBuilding a new winterwell.webappbase.jar\n"
 printf "\n\tSub-Task: Building a new elasticsearch-java-client.jar\n"
 cd $ES_JAVA_CLIENT
