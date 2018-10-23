@@ -87,8 +87,8 @@ public interface ITrainable<DataType> {
 		 * @param x
 		 *            example datum to learn from
 		 * @param tag
-		 *            never null
-		 *            
+		 *            "y" the target variable, never null
+		 * @see #train1(Object, Object, double)            
 		 */
 		default void train1(DataType x, Tag tag) {
 			train1(x, tag, 1);

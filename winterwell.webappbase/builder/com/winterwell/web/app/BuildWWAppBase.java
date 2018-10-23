@@ -7,12 +7,12 @@ import java.util.Collection;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.io.FileUtils;
 
-import jobs.BuildBob;
-import jobs.BuildFlexiGson;
-import jobs.BuildUtils;
-import jobs.BuildWeb;
-import jobs.BuildWinterwellProject;
-import jobs.WWDependencyTask;
+import com.winterwell.bob.wwjobs.BuildBob;
+import com.winterwell.bob.wwjobs.BuildFlexiGson;
+import com.winterwell.bob.wwjobs.BuildUtils;
+import com.winterwell.bob.wwjobs.BuildWeb;
+import com.winterwell.bob.wwjobs.BuildWinterwellProject;
+import com.winterwell.bob.wwjobs.WWDependencyTask;
 
 public class BuildWWAppBase extends BuildWinterwellProject {
 

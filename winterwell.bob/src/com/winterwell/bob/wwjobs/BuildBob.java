@@ -1,4 +1,4 @@
-package jobs;
+package com.winterwell.bob.wwjobs;
 
 import java.io.File;
 import java.util.Arrays;
@@ -8,9 +8,6 @@ import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
-import com.winterwell.bob.wwjobs.BuildUtils;
-import com.winterwell.bob.wwjobs.BuildWeb;
-import com.winterwell.bob.wwjobs.BuildWinterwellProject;
 import com.winterwell.utils.io.FileUtils;
 
 /**

@@ -28,15 +28,15 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.web.email.SimpleMessage;
 
-import jobs.BuildBob;
-import jobs.BuildDataLog;
-import jobs.BuildDepot;
-import jobs.BuildFlexiGson;
-import jobs.BuildMaths;
-import jobs.BuildUtils;
-import jobs.BuildWeb;
-import jobs.BuildWinterwellProject;
-import jobs.WWDependencyTask;
+import com.winterwell.bob.wwjobs.BuildBob;
+import com.winterwell.bob.wwjobs.BuildDataLog;
+import com.winterwell.bob.wwjobs.BuildDepot;
+import com.winterwell.bob.wwjobs.BuildFlexiGson;
+import com.winterwell.bob.wwjobs.BuildMaths;
+import com.winterwell.bob.wwjobs.BuildUtils;
+import com.winterwell.bob.wwjobs.BuildWeb;
+import com.winterwell.bob.wwjobs.BuildWinterwellProject;
+import com.winterwell.bob.wwjobs.WWDependencyTask;
 
 
 /**

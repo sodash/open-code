@@ -1,4 +1,4 @@
-package jobs;
+package com.winterwell.bob.wwjobs;
 
 import java.util.ArrayList;
 import java.util.Collection;

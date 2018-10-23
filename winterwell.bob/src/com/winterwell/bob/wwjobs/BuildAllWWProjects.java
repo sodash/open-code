@@ -1,16 +1,10 @@
-package jobs;
+package com.winterwell.bob.wwjobs;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import com.winterwell.bob.BuildTask;
-import com.winterwell.bob.wwjobs.BuildDepot;
-import com.winterwell.bob.wwjobs.BuildMaths;
-import com.winterwell.bob.wwjobs.BuildNLP;
-import com.winterwell.bob.wwjobs.BuildUtils;
-import com.winterwell.bob.wwjobs.BuildWeb;
-import com.winterwell.bob.wwjobs.BuildWinterwellProject;
 
 /**
  * Well, not all. But all the basics.

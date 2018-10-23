@@ -8,11 +8,11 @@ import java.util.Collection;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.web.app.BuildWWAppBase;
 
-import jobs.BuildMaths;
-import jobs.BuildUtils;
-import jobs.BuildWeb;
-import jobs.BuildWinterwellProject;
-import jobs.WWDependencyTask;
+import com.winterwell.bob.wwjobs.BuildMaths;
+import com.winterwell.bob.wwjobs.BuildUtils;
+import com.winterwell.bob.wwjobs.BuildWeb;
+import com.winterwell.bob.wwjobs.BuildWinterwellProject;
+import com.winterwell.bob.wwjobs.WWDependencyTask;
 
 public class BuildDataLog extends BuildWinterwellProject {
 

@@ -1,0 +1,149 @@
+<?xml-stylesheet href="/shared/bsp/xsl/rss/nolsol.xsl" type="text/xsl" title="XSL_formatting"?>
+<rss
+  version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>BBC News | Most Popular Stories | UK Edition</title>
+    <link>http://news.bbc.co.uk/go/rss/-/1/shared/bsp/hi/live_stats/html/map.stm</link>
+    <description>The most read stories on the BBC News website right now.</description>
+    <language>en-gb</language>
+    <lastBuildDate>Thu, 22 Jun 2017 13:00:26 GMT</lastBuildDate>
+    <copyright>Copyright: (C) British Broadcasting Corporation, see http://news.bbc.co.uk/1/hi/help/rss/4498287.stm for terms and conditions of reuse</copyright>
+    <docs>http://www.bbc.co.uk/syndication/</docs>
+    <ttl>5</ttl>
+    <image>
+      <title>BBC News</title>
+      <url>http://news.bbc.co.uk/nol/shared/img/bbc_news_120x60.gif</url>
+      <link>http://news.bbc.co.uk/go/rss/-/1/shared/bsp/hi/live_stats/html/map.stm</link>
+    </image>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/uk-england-devon-40364632</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/uk-england-devon-40364632</guid>
+      <pubDate />
+      <category>Devon</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/uk-40366646</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/uk-40366646</guid>
+      <pubDate />
+      <category>UK</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/uk-england-birmingham-40366976</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/uk-england-birmingham-40366976</guid>
+      <pubDate />
+      <category>Birmingham and Black Country</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/business-40367686</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/business-40367686</guid>
+      <pubDate />
+      <category>Business</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/technology-40366816</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/technology-40366816</guid>
+      <pubDate />
+      <category>Technology</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/uk-40363063</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/uk-40363063</guid>
+      <pubDate />
+      <category>UK</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>Church 'colluded' with sex abuse bishop </title>
+      <description>Former bishop Peter Ball was jailed for sex offences against 18 teenagers and young men.</description>
+      <link>http://www.bbc.co.uk/news/uk-england-40368573</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/uk-england-40368573</guid>
+      <pubDate />
+      <category>England</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.ukhttp://c.files.bbci.co.uk/31AF/production/_96591721_breaking_image_large-3.png" />
+    </item>
+    <item>
+      <title>UK rail ticket machines hit by IT glitch</title>
+      <description>Rail ticket machines across the UK fell out of service during the morning commute.</description>
+      <link>http://www.bbc.co.uk/news/technology-40367628</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/technology-40367628</guid>
+      <pubDate />
+      <category>Technology</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.ukhttp://c.files.bbci.co.uk/113DB/production/_96591607_mediaitem96591601.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/uk-england-birmingham-40364821</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/uk-england-birmingham-40364821</guid>
+      <pubDate />
+      <category>Birmingham and Black Country</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+    <item>
+      <title>BBC News</title>
+      <description>Summary unavailable</description>
+      <link>http://www.bbc.co.uk/news/world-europe-40362094</link>
+      <guid
+        isPermaLink="false">http://www.bbc.co.uk/news/world-europe-40362094</guid>
+      <pubDate />
+      <category>Europe</category>
+      <media:thumbnail
+        width="66"
+        height="49"
+        url="http://news.bbc.co.uk/nol/shared/img/news_genblank.jpg" />
+    </item>
+  </channel>
+</rss>

@@ -1,4 +1,4 @@
-package jobs;
+package com.winterwell.bob.wwjobs;
 
 import java.io.File;
 import java.util.Arrays;

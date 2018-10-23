@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import com.winterwell.depot.Desc;
 
-import jobs.BuildUtils;
+import com.winterwell.bob.wwjobs.BuildUtils;
 
 public class BuildTaskTest {
 
