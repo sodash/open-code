@@ -1301,6 +1301,7 @@ public class WebUtils2 extends WebUtils {
 		if (origin==null || origin.equals("null")) {
 			if ( ! wc) originOut= "*"; //URI(state.getRequestUrl()).getHost();
 		}
+		// is getResponse an error??
 		if (forceSet && Utils.isBlank(state.getResponse().getHeader("Access-Control-Allow-Origin"))) {
 			if ( ! wc) originOut = "*"; // Do we need this??
 		}
@@ -1316,9 +1317,9 @@ public class WebUtils2 extends WebUtils {
 //						));
 //			}
 //			Log.d("cors", "set Access-Control-Allow-Credentials: true from "+ReflectionUtils.getSomeStack(8));			
-			state.getResponse().setHeader(ALLOW_CREDENTIALS_HEADER, "true");
+			state.setHeader(ALLOW_CREDENTIALS_HEADER, "true");
 		}
-		state.getResponse().setHeader("Access-Control-Allow-Origin", originOut);
+		state.setHeader("Access-Control-Allow-Origin", originOut);
 		// debug - no light :(
 //		Collection<String> responseheaders2 = state.getResponse().getHeaderNames();
 //		Collection<String> ach = state.getResponse().getHeaders(ALLOW_CREDENTIALS_HEADER);

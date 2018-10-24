@@ -47,13 +47,7 @@ public class TrackingPixelServlet implements IServlet {
 		// Do not track?
 		boolean dnt = state.isDoNotTrack();
 		if (dnt) {
-			// If this user has opted-in, we can ignore DNT TODO a way for them to set that
-			String tkc = state.getCookie("tkc"); // tracking consent?
-			if (tkc==null || tkc.equals("0")) {
-				return null;	
-			}
-			// https://www.w3.org/TR/tracking-dnt/#tracking-status-value
-			state.getResponse().setHeader("Tk", "C");
+			return null;			
 		}
 		uid = Utils.getRandomString(20)+"@trk";
 		DataLogConfig dls = Dep.get(DataLogConfig.class);

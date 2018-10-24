@@ -1235,12 +1235,32 @@ public class WebRequest implements IProperties, Closeable {
 	}
 
 	/**
-	 * @return true if the do-not-track header is on. I.e. true means don't track
+	 * @return true if the do-not-track header "DNT" is on (= "1"). 
+	 * I.e. true means don't track!
+	 * Plus: also checks for a DNT cookie first, 
+	 * as an easy way to implement yes/no-cookies on a per server basis.
+	 * And will set the Tk header if appropriate.
 	 */
 	public boolean isDoNotTrack() {
-		String dnt = getRequest().getHeader("DNT");
-		if (dnt==null) return false;
-		if ("1".equals(dnt.trim())) return true;
+		// cookie first, so site settings can override
+		String dntc = getCookie("DNT"); // allow GL tracking everywhere?
+//		if (dntc==null) dntc = getCookie("DNT-"+WebUtils.getDomain(getReferer()));
+		if (dntc != null) {
+			if ("0".equals(dntc.trim())) {
+				// https://www.w3.org/TR/tracking-dnt/#tracking-status-value
+				setHeader("Tk", "C");
+				return false;
+			}
+			// site specific DNT
+			return true;
+		}
+		String dnth = getRequest().getHeader("DNT");
+		if (dnth==null) return false;
+		if ("1".equals(dnth.trim())) {
+			// DNT!
+			return true;
+		}
+		// assume OK to track
 		return false;
 	}
 
@@ -1289,5 +1309,18 @@ public class WebRequest implements IProperties, Closeable {
 	}
 	public boolean isGET() {
 		return is("GET");
+	}
+
+    /**
+    *
+    * Sets a response header with the given name and value.
+    * If the header had already been set, the new value overwrites the
+    * previous one.  The <code>containsHeader</code> method can be
+    * used to test for the presence of a header before setting its
+    * value.
+    */
+	public void setHeader(String header, String value) {
+//		?? encoding
+		getResponse().setHeader(header, value);
 	}
 }
