@@ -67,7 +67,7 @@ public class ForkJVMTask extends BuildTask {
 			int ok = proc.waitFor();
 			
 			if (ok != 0) {
-				throw new FailureException(command+" -> "+proc.getError());
+				throw new FailureException(command+"\n -> "+proc.getError());
 			}
 			Log.d(LOGTAG, "fork error: "+proc.getError());
 			Log.d(LOGTAG, "fork output: "+proc.getOutput());
