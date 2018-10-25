@@ -9,7 +9,8 @@ import com.winterwell.utils.StrUtils;
  *  
  * In DataLog, it is typically *your* app.
  * 
- * In Profiler, it is typically the website/app from which the data comes.
+ * In Profiler, it is typically the website/app from which the data comes,
+ * and matches with the data-controller
  * 
  * Just a String wrapper for some type safety.
  * @author daniel
