@@ -39,6 +39,11 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	protected String mainClass;
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Uses Eclipse .classpath file to find projects
+	 */
 	@Override
 	public Collection<? extends BuildTask> getDependencies() {
 		ArraySet deps = new ArraySet();
@@ -47,19 +52,30 @@ public class BuildWinterwellProject extends BuildTask {
 		List<String> projects = ec.getReferencedProjects();
 		for (String pname : projects) {			
 			WinterwellProjectFinder pf = new WinterwellProjectFinder();
-			File pdir = pf.apply(pname);
-			if (pdir!=null && pdir.isDirectory()) {
-				File bfile = Bob.findBuildScript2(pdir, null);
-				if (bfile != null) {
-					ForkJVMTask fork = new ForkJVMTask(bfile.toString());
-					fork.setDir(pdir);
-					fork.setErrorHandler(IGNORE_EXCEPTIONS);
-					fork.setSkipGap(TUnit.DAY.dt);
-					deps.add(fork);
-				}
-			}
+			getDependency2_project(deps, pname, pf);
 		}
 		return deps;
+	}
+
+	private void getDependency2_project(ArraySet deps, String pname, WinterwellProjectFinder pf) {
+		File pdir = pf.apply(pname);
+		if (pdir!=null && pdir.isDirectory()) {
+			File bfile = Bob.findBuildScript2(pdir, null);
+			if (bfile != null) {					
+				// Use a forked Bob to pull in dependencies??
+				// or a WW task??
+				String builderClass = FileUtils.getRelativePath(bfile, pdir);
+				builderClass = builderClass.replace('/', '.').substring(0, builderClass.length()-5);
+				WWDependencyTask wwdt = new WWDependencyTask(pname, builderClass);
+				deps.add(wwdt);
+				
+//				ForkJVMTask fork = new ForkJVMTask(bfile.toString());
+//				fork.setDir(pdir);
+//				fork.setErrorHandler(IGNORE_EXCEPTIONS);
+//				fork.setSkipGap(TUnit.DAY.dt);
+//				deps.add(fork);
+			}
+		}
 	}
 
 	protected boolean isCompile() {
