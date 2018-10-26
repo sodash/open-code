@@ -33,4 +33,11 @@ public class PaymentException extends WebEx.E40X {
 			super(string);
 		}
 	}
+	
+	public static class NoBudgetException extends PaymentException {
+		private static final long serialVersionUID = 1L;
+		public NoBudgetException(String string) {
+			super(string);
+		}
+	}
 }
