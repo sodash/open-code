@@ -27,7 +27,7 @@ public final class Dataspace extends AString {
 		super(name);
 		assert ! this.name.startsWith("datalog.") : name;
 		assert ! this.name.equals("_list") : name;
-		// keep it safe
+		// keep it safe. This will also spot if an XId was passed in the wrong place
 		if ( ! StrUtils.isWordlike(this.name)) {
 			throw new IllegalArgumentException("Invalid dataspace: "+name);
 		}
