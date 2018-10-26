@@ -150,7 +150,7 @@ public class Bob {
 			throw new IllegalArgumentException(f+" from "+classOrFileName+" should have been handled via find-build-script");
 		}
 		if ( ! f.isFile()) {
-			throw new FileNotFoundException(classOrFileName);
+			throw new FileNotFoundException(f+" from "+classOrFileName);
 		}
 		// sniff package
 		String src = FileUtils.read(f);
