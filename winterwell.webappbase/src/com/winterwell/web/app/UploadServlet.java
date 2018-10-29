@@ -16,6 +16,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -49,9 +50,17 @@ public final class UploadServlet implements IServlet {
 	/**
 	 * 10mb
 	 */
-	private static final long MAX_UPLOAD = 10 * 1024L * 1024L;
+	long MAX_UPLOAD = 10 * 1024L * 1024L;
 	public static final String ACTION_UPLOAD = "upload";
 
+	/**
+	 * NB see ConfigBuilder.bytesFromString()
+	 * @param mAX_UPLOAD
+	 */
+	public void setMaxUpload(long maxBytes) {
+		this.MAX_UPLOAD = maxBytes;
+	}
+	
 	public static final FileUploadField UPLOAD = new FileUploadField("upload");
 	
 	File webRoot = new File("web"); // = Dep.get(ISiteConfig.class).getWebRootDir();
