@@ -3,7 +3,11 @@ package com.winterwell.nlp.query;
 import java.util.List;
 
 import org.junit.Test;
-
+/**
+ * NB in webappbase project cos so is searchquery
+ * @author mark
+ *
+ */
 public class SearchQueryTest {
 
 	@Test
@@ -91,5 +95,21 @@ public class SearchQueryTest {
 		String host = sq.getProp("host");
 		assert host.equals("localpub.com") : sq;
 	}
+	
+	@Test
+	public void testCombineWithAND() {
+		String baseq = "user:ww@trk OR user:mark@winterwell.com@email";
+		String extraq = "evt:spend OR evt:spendadjust OR evt:donation";
+		SearchQuery base = new SearchQuery(baseq);
+		SearchQuery extra = new SearchQuery(base, extraq);
+		assert extra.getRaw().equals("(user:ww@trk OR user:mark@winterwell.com@email) AND (evt:spend OR evt:spendadjust OR evt:donation)");
+	}
+	
+//	@Test
+//	public void testBrackets() {
+//		String baseq = "user:wwvyfncgobrxvwqablhe@trk";
+//		SearchQuery sq = new SearchQuery("blah");
+//		sq.bracket()
+//	}
 
 }
