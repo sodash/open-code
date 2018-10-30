@@ -31,7 +31,7 @@ import com.winterwell.utils.web.SimpleJson;
  * TODO should we add substring searching? E.g. *?
  * 
  * @author daniel, Alex
- * @testedby {@link SearchSpecTest}
+ * @testedby {@link SearchQueryTest}
  */
 public class SearchQuery implements Serializable, IHasJson {
 
@@ -152,13 +152,25 @@ public class SearchQuery implements Serializable, IHasJson {
 
 
 	/**
-	 * combine
+	 * @deprecated Let's refactor this to be more explicitly AND
+	 * combine with AND
 	 * @param base can be null
 	 * @param extra
 	 */
 	public SearchQuery(SearchQuery base, String extra) {
-		this(base==null? extra : base.getRaw()+" "+extra);
+		// e.g. base: foo OR bar, extra: wibble -> (foo or bar) and (wibble)
+		this(base==null? extra : bracket(base.getRaw())+" AND "+bracket(extra));
 		assert extra!=null;
+	}
+
+	/**
+	 * Add ()s if not already there
+	 * @param s
+	 * @return
+	 */
+	private static String bracket(String s) {
+		if (s.startsWith("(")) return s;
+		return "("+s+")";
 	}
 
 	/**
