@@ -34,6 +34,7 @@ import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.GetAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.es.fail.ESException;
@@ -702,9 +703,10 @@ public class AppUtils {
 		// TODO this is just a crude 1-level thing
 		List ptree = sq.getParseTree();
 		try {
-			com.winterwell.es.client.query.BoolQueryBuilder q = parseTreeToQuery(ptree);
-			if ( ! q.isEmpty()) {
-				filter = filter.must(q);
+			ESQueryBuilder q = parseTreeToQuery(ptree);
+			if (q instanceof BoolQueryBuilder && ! ((BoolQueryBuilder) q).isEmpty()) {
+				if (filter.isEmpty()) filter = (BoolQueryBuilder) q;
+				else filter = filter.must(q);
 			}
 		} catch (Throwable e) {
 			// Put full query info on an assertion failure
@@ -715,7 +717,7 @@ public class AppUtils {
 	}
 	
 	
-	private static com.winterwell.es.client.query.BoolQueryBuilder parseTreeToQuery(Object rawClause) {
+	private static ESQueryBuilder parseTreeToQuery(Object rawClause) {
 		if ( ! (rawClause instanceof List) && ! (rawClause instanceof Map)) {
 			throw new IllegalArgumentException("clause is not list or map: " + rawClause);
 		}		
@@ -730,11 +732,15 @@ public class AppUtils {
 				String val = (String) clause.get(prop);
 				if (ESQueryBuilders.UNSET.equals(val)) {
 					ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
-					return filter.mustNot(setFilter);
+					filter = filter.mustNot(setFilter);
 				} else {
 					// normal key=value case
 					ESQueryBuilder kvFilter = ESQueryBuilders.termQuery(prop, val);
-					return filter.must(kvFilter);
+					// just one?
+					if (clause.size() == 1) {
+						return kvFilter; // no extra wrapping
+					}
+					filter = filter.must(kvFilter);
 				}	
 			}
 		}			
@@ -764,7 +770,7 @@ public class AppUtils {
 			
 			if (SearchQuery.KEYWORD_AND.equals((String) maybeOperator)) {
 				for (Object term : clause.subList(1, clause.size())) {
-					com.winterwell.es.client.query.BoolQueryBuilder andTerm = parseTreeToQuery(term);
+					ESQueryBuilder andTerm = parseTreeToQuery(term);
 					filter = filter.must(andTerm);
 				}
 				return filter;

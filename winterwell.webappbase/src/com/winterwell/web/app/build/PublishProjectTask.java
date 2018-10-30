@@ -57,6 +57,9 @@ public class PublishProjectTask extends BuildTask {
 	protected String remoteWebAppDir;
 	protected File localWebAppDir;
 	protected File jarFile;
+	/**
+	 * wwappbase.js/project-publisher.sh + projectname
+	 */
 	protected String bashScript;
 	protected File localLib;
 

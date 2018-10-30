@@ -136,15 +136,18 @@ public class Bob {
 	}
 
 	/**
-	 * 
+	 * From a .java file or fully-qualified classname,
+	 * compile it to a .class file 
 	 * @param classOrFileName
 	 * @return (temp-output-dir, class-file)
 	 * @throws Exception
 	 */
 	private static Pair<File> compileClass(String classOrFileName) throws Exception {
 		// TODO can we compile it here and now?? But how would we load it?
+		// 1. Look for the .java file
 		String fileName = classOrFileName;
 		if ( ! classOrFileName.endsWith(".java")) fileName = classOrFileName+".java";
+		fileName = fileName.replace('.', '/');
 		File f = new File(fileName);
 		if ( f.isDirectory()) {
 			throw new IllegalArgumentException(f+" from "+classOrFileName+" should have been handled via find-build-script");
@@ -155,18 +158,19 @@ public class Bob {
 		// sniff package
 		String src = FileUtils.read(f);
 		String[] fnd = StrUtils.find("package (.+);", src);
-		String cn = (fnd==null? "" : fnd[1]+".") + new File(FileUtils.getBasename(f)).getName();
+		// full classname
+		String className = (fnd==null? "" : fnd[1]+".") + new File(FileUtils.getBasename(f)).getName();
 		
 		File tempDir = FileUtils.createTempDir();
 		CompileTask cp = new CompileTask(null, tempDir);
-		// classpath??
-//		Map<String, String> env = System.getenv();
-//		ClassLoader cl = ClassLoader.getSystemClassLoader();
+		// classpath
 		Classpath claspath = Bob.getSingleton().getClasspath();
-		cp.setClasspath(claspath);		
+		cp.setClasspath(claspath);
+		// our .java file to compile
 		cp.setSrcFiles(f);
+		// ...compile
 		cp.doTask();
-		File klass = new File(tempDir, cn.replace('.', '/')+".class");
+		File klass = new File(tempDir, className.replace('.', '/')+".class");
 		if (klass.isFile()) {
 			return new Pair<File>(tempDir, klass);
 		}
