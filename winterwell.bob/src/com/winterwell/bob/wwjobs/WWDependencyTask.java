@@ -74,6 +74,7 @@ public class WWDependencyTask extends BuildWinterwellProject {
 		if (builderClass!=null) {			
 			try {
 				ForkJVMTask forked = new ForkJVMTask(builderClass);
+				forked.setDir(projectDir);
 				forked.getClasspath().add(jar);
 				forked.run();
 			} catch (Throwable ex) {

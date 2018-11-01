@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.SessionTrackingMode;
@@ -467,7 +468,8 @@ public class JettyLauncher {
 				for (ServletMapping servletMapping : sms) {
 					String path = Printer.toString(servletMapping.getPathSpecs());
 					ServletHolder sholder = sh.getServlet(servletMapping.getServletName());
-					s4p.put(path, sholder.getServlet().toString());
+					Servlet s = sholder.getServlet();
+					s4p.put(path, s.toString());
 				}
 			}
 		}

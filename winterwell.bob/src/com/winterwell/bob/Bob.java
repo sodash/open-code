@@ -145,15 +145,21 @@ public class Bob {
 	private static Pair<File> compileClass(String classOrFileName) throws Exception {
 		// TODO can we compile it here and now?? But how would we load it?
 		// 1. Look for the .java file
-		String fileName = classOrFileName;
-		if ( ! classOrFileName.endsWith(".java")) fileName = classOrFileName+".java";
+		String fileName = classOrFileName;		
 		fileName = fileName.replace('.', '/');
+		// .java ending
+		if (fileName.endsWith("/java")) {
+			fileName = fileName.substring(0, fileName.length()-5)+".java";
+		}
+		if ( ! fileName.endsWith(".java")) {
+			fileName = fileName+".java";
+		}
 		File f = new File(fileName);
 		if ( f.isDirectory()) {
 			throw new IllegalArgumentException(f+" from "+classOrFileName+" should have been handled via find-build-script");
 		}
 		if ( ! f.isFile()) {
-			throw new FileNotFoundException(f+" from "+classOrFileName);
+			throw new FileNotFoundException(f+" = "+f.getAbsolutePath()+" from "+classOrFileName);
 		}
 		// sniff package
 		String src = FileUtils.read(f);
@@ -213,7 +219,8 @@ public class Bob {
 			time4task = loadTaskHistory();
 		}
 		// relies on equals()
-		Time t = time4task.get(buildTask.getDesc().getId());
+		String id = buildTask.getDesc().getId();
+		Time t = time4task.get(id);
 		if (t != null) {
 			return t;
 		}
@@ -393,7 +400,9 @@ public class Bob {
 		if (time4task==null) {
 			time4task = loadTaskHistory();
 		}
-		time4task.put(buildTask.getDesc().getId(), new Time());
+		String id = buildTask.getDesc().getId();
+		time4task.put(id, new Time());
+		assert buildTask.skip() : buildTask;
 		// TODO save in a slow thread??
 		saveTaskHistory();
 	}

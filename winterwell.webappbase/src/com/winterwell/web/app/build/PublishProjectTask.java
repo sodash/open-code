@@ -56,7 +56,7 @@ public class PublishProjectTask extends BuildTask {
 	protected String remoteUser = "winterwell";
 	protected String remoteWebAppDir;
 	protected File localWebAppDir;
-	protected File jarFile;
+//	protected File jarFile;
 	/**
 	 * wwappbase.js/project-publisher.sh + projectname
 	 */
@@ -97,12 +97,13 @@ public class PublishProjectTask extends BuildTask {
 		this.localWebAppDir = localWebAppDir;
 		logfile = new LogFile();
 		localLib = new File(localWebAppDir,"tmp-lib");
-		jarFile = new File(localLib, projectName+".jar");
+//		jarFile = new File(localLib, projectName+".jar");
 		bashScript = new File(FileUtils.getWinterwellDir(), "wwappbase.js/project-publisher.sh")+" "+projectName;
 	}
 
 	@Override
 	public List<BuildTask> getDependencies() {
+		// All the WW libs
 		List<BuildTask> deps = new ArrayList(Arrays.asList(
 				new BuildUtils(),
 				new BuildMaths(),
@@ -124,6 +125,17 @@ public class PublishProjectTask extends BuildTask {
 				// don't scp??
 				((BuildWinterwellProject) buildTask).setScpToWW(false);
 			}
+		}
+		
+		// the builder for this project
+		String pubTaskName = getClass().getName();
+		String buildTaskName = pubTaskName.replace("Publish", "Build");
+		try {
+			Class btc = Class.forName(buildTaskName);
+			BuildTask bt = (BuildTask) btc.newInstance();
+			deps.add(bt);
+		} catch(Throwable ohwell) {
+			Log.d(LOGTAG, "No build task for "+buildTaskName+": "+ohwell);
 		}
 		return deps;
 	}
@@ -156,41 +168,7 @@ public class PublishProjectTask extends BuildTask {
 		mvpt.run();
 			
 		// Find jars and move them into tmp-lib
-		{
-			EclipseClasspath ec = new EclipseClasspath(localWebAppDir);
-			Set<File> jars = ec.getCollectedLibs();
-			// Create local lib dir			
-			localLib.mkdirs();
-			assert localLib.isDirectory();
-			// Ensure desired jars are present
-			for (File jar : jars) {
-				File localJar = new File(localLib, jar.getName());
-				if (localJar.isFile() && localJar.lastModified() >= jar.lastModified()) {
-					continue;
-				}
-				FileUtils.copy(jar, localJar);
-			}
-	//		// Remove unwanted jars -- no too dangerous
-			// WW jars
-			Collection<? extends BuildTask> deps = getDependencies();
-			for (BuildTask buildTask : deps) {
-				if (buildTask instanceof BuildWinterwellProject) {
-					File jar = ((BuildWinterwellProject) buildTask).getJar();
-					if (jar.isFile()) {
-						FileUtils.copy(jar, localLib);
-					} else {
-						Log.e(LOGTAG, "No jar?! "+jar.getAbsolutePath());
-					}
-				}
-			}			
-			
-			// This jar
-			if (jarFile!=null) {
-				JarTask jarTask = new JarTask(jarFile, new File(localWebAppDir, "bin"));
-				jarTask.run();
-				jarTask.close();
-			}
-		}
+		collectJars();
 		
 		if (noPublishJustBuild) {
 			return;
@@ -210,6 +188,42 @@ public class PublishProjectTask extends BuildTask {
 		pubas.close();
 		Log.d(pubas.getCommand(), pubas.getOutput());
 		
+	}
+
+	/**
+	 * Find jars and move them into tmp-lib
+	 */
+	void collectJars() {
+		EclipseClasspath ec = new EclipseClasspath(localWebAppDir);
+		Set<File> jars = ec.getCollectedLibs();
+		// Create local lib dir			
+		localLib.mkdirs();
+		assert localLib.isDirectory();
+		// Ensure desired jars are present
+		for (File jar : jars) {
+			File localJar = new File(localLib, jar.getName());
+			if (localJar.isFile() && localJar.lastModified() >= jar.lastModified()) {
+				continue;
+			}
+			FileUtils.copy(jar, localJar);
+		}
+		
+		// Remove unwanted jars? -- no too dangerous
+		
+		// WW jars
+		Collection<? extends BuildTask> deps = getDependencies();
+		for (BuildTask buildTask : deps) {
+			if (buildTask instanceof BuildWinterwellProject) {
+				File jar = ((BuildWinterwellProject) buildTask).getJar();
+				if (jar.isFile()) {
+					FileUtils.copy(jar, localLib);
+				} else {
+					Log.e(LOGTAG, "No jar?! "+jar.getAbsolutePath());
+				}
+			}
+		}			
+		
+		// This jar -- done by BuildX, in deps above
 	}
 	
 	protected void doSendEmail(String tos) {

@@ -179,7 +179,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	protected abstract void doTask() throws Exception;
 
 	/**
-	 * @return The build tasks this task depends on. Dependencies will be run
+	 * @return The build tasks this task depends on. Dependencies are run
 	 *         first, and will be checked to avoid repeats. 
 	 *         
 	 *         Returns an empty list by default - override to specify
@@ -356,15 +356,20 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		// already done this run?
 		Time rs = Bob.getRunStart();
 		Time lastRun = Bob.getLastRunDate(this);
-		if (lastRun==null) return false;
+		if (lastRun==null) {
+			return false; // first time
+		}
 		if (lastRun.isAfterOrEqualTo(rs)) {
 			Log.i(LOGTAG, "Skip repeat this run dependency: "+getClass().getSimpleName()+" "+getDesc().getId());
 			return true;
 		}
 		// what about recently?
 		boolean skip = skip(lastRun);
-		if (skip) Log.i(LOGTAG, "Skip recent dependency: "+getClass().getSimpleName()+" "+getDesc().getId());
-		return skip;
+		if (skip) {
+			Log.i(LOGTAG, "Skip recent dependency: "+getClass().getSimpleName()+" "+getDesc().getId());
+			return true;
+		}
+		return false;
 	}
 
 	Dt skipGap;

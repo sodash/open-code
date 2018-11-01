@@ -108,11 +108,8 @@ public class BuildWinterwellProject extends BuildTask {
 		File fatjar = new File(projectName+"-all.jar");
 //		System.out.println(Printer.toString(jars,"\n\t"));
 		BigJarTask jt = new BigJarTask(fatjar, jars);
-		jt.setManifestProperty(JarTask.MANIFEST_TITLE, 
-				projectDir.getName()+" library (c) Winterwell. All rights reserved.");
-		if (mainClass!=null) {
-			jt.setManifestProperty(JarTask.MANIFEST_MAIN_CLASS, mainClass);
-		}
+		setJarManifest(jt, projectDir, 
+				projectDir.getName()+" fat-jar (c) Winterwell. All rights reserved.");
 		jt.run();
 		jt.close();
 		// done
@@ -167,8 +164,6 @@ public class BuildWinterwellProject extends BuildTask {
 		this.mainClass = mainClass;
 	}
 	
-	protected boolean incGitInManifest;
-
 	public final File projectDir;
 	protected boolean incSrc;
 	protected File jarFile;
@@ -255,43 +250,7 @@ public class BuildWinterwellProject extends BuildTask {
 		File tempJar = File.createTempFile("temp", ".jar");
 		JarTask jar = new JarTask(tempJar, getBinDir());
 		jar.setAppend(false);
-		jar.setManifestProperty(JarTask.MANIFEST_TITLE, 
-				projectDir.getName()+" library (c) Winterwell. All rights reserved.");
-		if (mainClass!=null) {
-			jar.setManifestProperty(JarTask.MANIFEST_MAIN_CLASS, mainClass);
-		}
-		// Version
-		String gitiv = "", by = "";
-		try {
-			// go up until we're in git or fail
-			File repo = srcDir.getParentFile();
-			while(repo!=null) {
-				if (new File(repo, ".git").exists()) break;
-				repo = repo.getParentFile();
-			}
-			if (repo!=null) {
-				Map<String, Object> gitInfo = GitTask.getLastCommitInfo(repo);
-				Object branch = gitInfo.get("branch");
-				gitiv = " git: "+gitInfo.get("hash")
-					+" "+gitInfo.get("subject")
-					// non-master branch (master is not worth stating)
-					+ (branch!=null && ! "master".equals(branch)? " "+branch : "") 
-					;
-			}
-			by = " by: "+WebUtils2.hostname();
-		} catch(Throwable ex) {
-			Log.w(LOGTAG, ex);
-		}
-		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
-				"version: "+(Utils.isBlank(version)? new Time().ddMMyyyy() : version)
-				+gitiv+by);
-		// vendor
-		jar.setManifestProperty("Implementation-Vendor", "Winterwell");	
-//		// Git details? No this upsets IntelliJ
-		if (incGitInManifest) {
-			String branch = GitTask.getGitBranch(srcDir.getParentFile());
-			jar.setManifestProperty("branch", branch);
-		}
+		setJarManifest(jar, srcDir, projectDir.getName()+" library (c) Winterwell. All rights reserved.");
 		jar.run();
 		if ( ! tempJar.isFile()) throw new FailureException("make jar failed?! "+this+" "+getJar());
 		// replace the old jar
@@ -318,6 +277,42 @@ public class BuildWinterwellProject extends BuildTask {
 		
 		// attempt to upload (but don't block)
 		doSCP();
+	}
+
+	private void setJarManifest(JarTask jar, File projectDir, String title) {
+		jar.setManifestProperty(JarTask.MANIFEST_TITLE, title);
+		if (mainClass!=null) {
+			jar.setManifestProperty(JarTask.MANIFEST_MAIN_CLASS, mainClass);
+		}
+		// Version
+		String gitiv = "", by = "";
+		try {
+			// go up until we're in git or fail
+			File repo = projectDir;
+			while(repo!=null) {
+				if (new File(repo, ".git").exists()) break;
+				repo = repo.getParentFile();
+			}
+			if (repo!=null) {
+				Map<String, Object> gitInfo = GitTask.getLastCommitInfo(repo);
+				Object branch = gitInfo.get("branch");
+				gitiv = " git: "+gitInfo.get("hash")
+					+" "+gitInfo.get("subject")
+					// non-master branch (master is not worth stating)
+					+ (branch!=null && ! "master".equals(branch)? " "+branch : "") 
+					;
+			}
+			// Git details as their own property e.g. "branch"? No this upsets IntelliJ
+			// So we pack them into version.
+			by = " by: "+WebUtils2.hostname();
+		} catch(Throwable ex) {
+			Log.w(LOGTAG, ex);
+		}
+		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
+				"version: "+(Utils.isBlank(version)? new Time().ddMMyyyy() : version)
+				+gitiv+by);
+		// vendor
+		jar.setManifestProperty("Implementation-Vendor", "Winterwell");	
 	}
 
 	private void doSCP() {
