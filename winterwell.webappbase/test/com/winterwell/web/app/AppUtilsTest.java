@@ -13,7 +13,19 @@ import com.winterwell.nlp.query.SearchQuery;
 public class AppUtilsTest {
 
 	@Test
-	public void testMakeESFilterFromSearchQuery() {
+	public void testMakeESFilterFromSearchQuery() {		
+		{
+			String q = "(cid:nestle-cocoa-plan-vegetable-growing-kit OR cid:tchc OR cid:unset) AND (evt:spend OR evt:spendadjust OR evt:donation)";
+			SearchQuery sq = new SearchQuery(q);
+			List ptre = sq.getParseTree();
+			BoolQueryBuilder esf = AppUtils.makeESFilterFromSearchQuery(sq, null, null);
+			Map esmap = (Map) esf.getUnderlyingMap().get("bool");
+			System.out.println(esmap);
+			System.out.println(esf);
+			// top level must be must
+			assert esmap.containsKey("must") : esmap;
+			assert ! esmap.containsKey("should") : esmap;
+		}
 		{
 			String q = "(user:wwvyfncgobrxvwqablhe@trk OR user:mark@winterwell.com@email) AND (evt:spend OR evt:spendadjust OR evt:donation)";
 			SearchQuery sq = new SearchQuery(q);

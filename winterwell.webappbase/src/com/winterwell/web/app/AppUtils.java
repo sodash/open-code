@@ -730,6 +730,7 @@ public class AppUtils {
 			// We expect only one pair per clause, but no reason not to tolerate multiples.
 			for (String prop : clause.keySet()) {
 				String val = (String) clause.get(prop);
+				// handle special "unset" value
 				if (ESQueryBuilders.UNSET.equals(val)) {
 					ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
 					filter = filter.mustNot(setFilter);
@@ -743,6 +744,8 @@ public class AppUtils {
 					filter = filter.must(kvFilter);
 				}	
 			}
+			// return must/musnt key(s)=value(s)
+			return filter;
 		}			
 		
 		List clause = (List) rawClause;
