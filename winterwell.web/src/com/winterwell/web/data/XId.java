@@ -318,9 +318,9 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	 * Convenience for ensuring a List contains XId objects.
 	 * @param xids May be Strings or XIds or IHasXIds (or a mix). Must not be null.
 	 * Note: Strings are NOT run through canonicalisation -- they are assumed to be OK!
-	 * @return a copy of xids 
+	 * @return a copy of xids, can be modified 
 	 */
-	public static List<XId> xids(Collection xids) {
+	public static ArrayList<XId> xids(Collection xids) {
 		return xids(xids, false);
 	}
 	
@@ -329,7 +329,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	 * @param xids May be Strings or XIds (or a mix).
 	 * @return a copy of xids, can be modified 
 	 */
-	public static List<XId> xids(Collection xids, boolean canonicalise) {
+	public static ArrayList<XId> xids(Collection xids, boolean canonicalise) {
 		final ArrayList _xids = new ArrayList(xids.size());
 		for (Object x : xids) {
 			if (x==null) continue;
