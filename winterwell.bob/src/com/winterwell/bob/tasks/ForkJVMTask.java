@@ -33,6 +33,7 @@ public class ForkJVMTask extends BuildTask {
 	
 	public ForkJVMTask(String target) {
 		this.target = target;
+		// odds are, you don't need to repeat these every time
 		setSkipGap(TUnit.HOUR.dt);
 	}
 	
