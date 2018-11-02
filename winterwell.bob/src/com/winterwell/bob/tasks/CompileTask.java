@@ -21,6 +21,7 @@ import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Proc;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.io.FileUtils;
@@ -97,7 +98,7 @@ public class CompileTask extends BuildTask {
 		// classpath
 		addClasspathToOptions();
 		// Run it!
-		Log.d(LOGTAG, "javac options "+options);		
+		Log.d(LOGTAG, "javac "+StrUtils.join(options, " ")+" "+StrUtils.join(javaFiles, " "));		
 		CompilationTask ctask = jc.getTask(null, sjfm, diagnostics, options, null, fileObjects);
 		Boolean ok = ctask.call();
 		sjfm.close();
@@ -114,7 +115,7 @@ public class CompileTask extends BuildTask {
 		Log.d(LOGTAG, diags);
 		// OK?
 		if ( ! ok) {
-			throw new FailureException("Compile task failed :( " + diags);
+			throw new FailureException("Compile task failed :( " + diags+" from javac "+options);
 		}
 	}
 

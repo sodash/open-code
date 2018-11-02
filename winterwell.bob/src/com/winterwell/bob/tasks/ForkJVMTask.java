@@ -9,9 +9,10 @@ import com.winterwell.utils.Proc;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.TUnit;
 
 /**
- * TODO This task runs a separate Java process
+ * This task runs a separate Java process
  * 
  * FIXME It does not preserve the file settings
  * Maybe send an xstream aml blob via a temp file??
@@ -20,7 +21,7 @@ import com.winterwell.utils.log.Log;
  * @testedby ForkJVMTaskTest
  */
 public class ForkJVMTask extends BuildTask {
-
+	
 	/**
 	 * NB: String 'cos the class might not be on the classpath for this JVM
 	 */
@@ -32,6 +33,7 @@ public class ForkJVMTask extends BuildTask {
 	
 	public ForkJVMTask(String target) {
 		this.target = target;
+		setSkipGap(TUnit.HOUR.dt);
 	}
 	
 	Classpath classpath = Classpath.getSystemClasspath();

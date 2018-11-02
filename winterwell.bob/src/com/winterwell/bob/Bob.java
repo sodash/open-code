@@ -144,23 +144,28 @@ public class Bob {
 	 */
 	private static Pair<File> compileClass(String classOrFileName) throws Exception {
 		// TODO can we compile it here and now?? But how would we load it?
-		// 1. Look for the .java file
-		String fileName = classOrFileName;		
-		fileName = fileName.replace('.', '/');
-		// .java ending
-		if (fileName.endsWith("/java")) {
-			fileName = fileName.substring(0, fileName.length()-5)+".java";
-		}
-		if ( ! fileName.endsWith(".java")) {
-			fileName = fileName+".java";
-		}
+		// 1. Look for the .java file		
+		String fileName = classOrFileName;
 		File f = new File(fileName);
-		if ( f.isDirectory()) {
-			throw new IllegalArgumentException(f+" from "+classOrFileName+" should have been handled via find-build-script");
-		}
 		if ( ! f.isFile()) {
-			throw new FileNotFoundException(f+" = "+f.getAbsolutePath()+" from "+classOrFileName);
+			// classname? turn into a file
+			fileName = fileName.replace('.', '/');
+			// .java ending
+			if (fileName.endsWith("/java")) {
+				fileName = fileName.substring(0, fileName.length()-5)+".java";
+			}
+			if ( ! fileName.endsWith(".java")) {
+				fileName = fileName+".java";
+			}
+			f = new File(fileName);
+			if ( f.isDirectory()) {
+				throw new IllegalArgumentException(f+" from "+classOrFileName+" should have been handled via find-build-script");
+			}
+			if ( ! f.isFile()) {
+				throw new FileNotFoundException(f+" = "+f.getAbsolutePath()+" from "+classOrFileName);
+			}
 		}
+		
 		// sniff package
 		String src = FileUtils.read(f);
 		String[] fnd = StrUtils.find("package (.+);", src);

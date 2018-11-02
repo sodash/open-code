@@ -22,7 +22,7 @@ public class BuildZonefoxTemp extends BuildTask {
 //				new BuildBob(),
 //				new BuildFlexiGson(),
 //				new BuildUtils(),
-//				new BuildESJavaClient(),
+				new WWDependencyTask("elasticsearch-java-client", "BuildESJavaClient"),
 				null
 				);
 		for (BuildWinterwellProject buildWinterwellProject : projects) {
