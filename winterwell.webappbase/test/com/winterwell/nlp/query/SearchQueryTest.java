@@ -11,6 +11,13 @@ import org.junit.Test;
 public class SearchQueryTest {
 
 	@Test
+	public void testBOASBugNov2018() {
+		String q = "evt:donation vert:Q7X1VA5c bid:unset";
+		SearchQuery sq = new SearchQuery(q);
+		System.out.println(sq);
+	}
+	
+	@Test
 	public void testKeyNull() {
 		{
 			SearchQuery sq = new SearchQuery("alice foo:null");
