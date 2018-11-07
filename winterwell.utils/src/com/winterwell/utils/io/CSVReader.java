@@ -91,7 +91,6 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 
 	private File file;
 	private CSVSpec spec;
-	private boolean skipFirstRow;
 
 	/**
 	 * @return the file we're looking at. Can be null if this was created using

@@ -12,7 +12,8 @@ public class CSVSpec {
 	public static final char UNSET = 0;
 	public char delimiter;
 	public char quote;
-
+	public Boolean headerRow;
+	
 	/**
 	 * Defaults!
 	 */
@@ -47,6 +48,10 @@ public class CSVSpec {
 	}
 	public CSVReader buildReader(File f) {
 		return new CSVReader(f, this);
+	}
+	public CSVSpec setHeaderRow(boolean b) {
+		this.headerRow = b;
+		return this;
 	}
 
 }

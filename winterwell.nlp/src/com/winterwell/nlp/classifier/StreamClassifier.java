@@ -1,5 +1,6 @@
 package com.winterwell.nlp.classifier;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -11,10 +12,12 @@ import com.winterwell.maths.stats.distributions.cond.ExplnOfDist;
 import com.winterwell.maths.stats.distributions.cond.ICondDistribution;
 import com.winterwell.maths.stats.distributions.cond.IHasSignature;
 import com.winterwell.maths.stats.distributions.cond.ISitnStream;
+import com.winterwell.maths.stats.distributions.cond.ListSitnStream;
 import com.winterwell.maths.stats.distributions.cond.Sitn;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.nlp.corpus.IDocument;
+import com.winterwell.nlp.io.SitnStream;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.Containers;
@@ -47,6 +50,11 @@ public class StreamClassifier<Tok> implements ITextClassifier<String>, IStreamCl
 	public StreamClassifier<Tok> setPrior(IFiniteDistribution<String> prior) {
 		this.prior = prior;
 		return this;
+	}
+	
+	public StreamClassifier(Map<String, ? extends ICondDistribution<Tok, Cntxt>> models) 
+	{
+		this(new ListSitnStream(new ArrayList()), models);
 	}
 	
 	/**

@@ -52,4 +52,8 @@ public interface IFiniteDistribution<X> extends IDiscreteDistribution<X>,
 	 */
 	double getTotalWeight();
 
+	default boolean contains(X item) {
+		return prob(item) > 0;
+	}
+
 }

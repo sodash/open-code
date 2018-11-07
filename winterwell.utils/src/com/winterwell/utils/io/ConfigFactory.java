@@ -28,6 +28,9 @@ public class ConfigFactory {
 	private static final String LOGTAG = ConfigBuilder.LOGTAG;
 	private String[] args;
 	private String appName;
+	/**
+	 * null unless set! See {@link #setServerType(String)}
+	 */
 	String serverType;
 	private String machine = WebUtils.hostname();
 	private boolean debug = true;
@@ -143,7 +146,7 @@ public class ConfigFactory {
 		Object[] options = new Object[] {
 				thingy,
 				appName,
-				// live, local, test?
+				// live, local, test? This is null unless set!
 				serverType,
 				// or in a logins file (which should not be in the git repo!), for passwords?
 				"logins", 
@@ -206,7 +209,7 @@ public class ConfigFactory {
 			cb.setFromSystemProperties(null);
 			// check several config files
 			List<File> propsPath = getPropFileOptions(configClass);
-			for(File pp : propsPath) {
+			for(File pp : propsPath) {				
 				cb.set(pp);
 			}
 			// args

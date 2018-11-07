@@ -27,7 +27,6 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.containers.Properties;
 import com.winterwell.utils.io.ConfigFactory;
-import com.winterwell.utils.io.Option;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
@@ -71,8 +70,8 @@ public final class YouAgainClient {
 		FakeBrowser fb = new FakeBrowser();
 		fb.setAuthentication(appOwnerAuth.loginName, appOwnerAuth.password);
 		fb.setDebug(debug);
-		String ENDPOINT_AUTH = ENDPOINT.replace("youagain.json", "auth.json");
-		String response = fb.getPage(ENDPOINT_AUTH, new ArrayMap(
+		String endpoint_AUTH = yac.endpoint.replace("youagain.json", "auth.json");
+		String response = fb.getPage(endpoint_AUTH, new ArrayMap(
 				"app", app,
 				"txid", txid));
 		JSend jsend = JSend.parse(response);
@@ -84,22 +83,24 @@ public final class YouAgainClient {
 		return (String[]) tokens;
 	}
 	
-	/**
-	 * For testing, this can be set via config/youagainclient.properties endpoint=
-	 * Or by calling {@link #setENDPOINT(String)}
-	 */
-	static String ENDPOINT = 
-				"https://youagain.good-loop.com/youagain.json";
-//				"http://localyouagain.good-loop.com/youagain.json";
+//	/**
+//	 * TODO refactor to exclusively use {@link YouAgainClientConfig#yac.endpoint}
+//	 * 
+//	 * For testing, this can be set via config/youagainclient.properties yac.endpoint=
+//	 * Or by calling {@link #setyac.endpoint(String)}
+//	 */
+//	static String yac.endpoint = 
+//				"https://youagain.good-loop.com/youagain.json";
+////				"http://localyouagain.good-loop.com/youagain.json";
 
-	/**
-	 * @deprecated for testing only
-	 * @param eNDPOINT
-	 */
-	public static void setENDPOINT(String eNDPOINT) {
-		ENDPOINT = eNDPOINT;
-	}
-	
+//	/**
+//	 * @deprecated for testing only
+//	 * @param yac.endpoint
+//	 */
+//	public static void setyac.endpoint(String yac.endpoint) {
+//		yac.endpoint = yac.endpoint;
+//	}
+//	
 	private static final Key<List<AuthToken>> AUTHS = new Key("ya_auths");
 
 	private static final String LOGTAG = "youagain";
@@ -112,7 +113,9 @@ public final class YouAgainClient {
 	final String app;
 
 	private boolean debug;
-	private static boolean initFlag;
+
+	YouAgainClientConfig yac;
+	private boolean initFlag;
 	
 	public YouAgainClient(String app) {
 		assert ! Utils.isBlank(app);
@@ -122,17 +125,15 @@ public final class YouAgainClient {
 	}	
 	
 	/**
-	 * Allows for config to override the endpoint used
+	 * Allows for config to override the yac.endpoint used
 	 */
 	private void init() {
 		if (initFlag) return;		
 		initFlag = true;
 		try {			
 			ConfigFactory cf = ConfigFactory.get();
-			YouAgainClientConfig yac = cf.getConfig(YouAgainClientConfig.class);
-			if ( ! Utils.isBlank(yac.endpoint)) {
-				this.ENDPOINT = yac.endpoint;
-			}
+			yac = cf.getConfig(YouAgainClientConfig.class);
+			assert ! Utils.isBlank(yac.endpoint) : yac;
 		} catch(Throwable ex) {
 			Log.e(LOGTAG, ex); // swallow
 		}
@@ -216,7 +217,7 @@ public final class YouAgainClient {
 		FakeBrowser fb = new FakeBrowser();
 		fb.setDebug(debug);
 		fb.setAuthentication(email, password);
-		String response = fb.getPage(ENDPOINT, new ArrayMap(
+		String response = fb.getPage(yac.endpoint, new ArrayMap(
 				"app", app, 
 				"action", "login" 
 				));		
@@ -278,11 +279,11 @@ public final class YouAgainClient {
 		if (dec!=null) return dec;		
 		dec = new JWTDecoder(app);
 		if (yaPubKey==null) {
-			String publickeyEndpoint = ENDPOINT.replace("youagain.json", "publickey");
+			String publickeyendpoint = yac.endpoint.replace("youagain.json", "publickey");
 			// load from the server, so we could change keys
-			String skey = new FakeBrowser().getPage(publickeyEndpoint);
+			String skey = new FakeBrowser().getPage(publickeyendpoint);
 			yaPubKey = JWTDecoder.keyFromString(skey);
-			Log.d(LOGTAG, "GOT key "+yaPubKey+" from "+publickeyEndpoint);	
+			Log.d(LOGTAG, "GOT key "+yaPubKey+" from "+publickeyendpoint);	
 		}
 		dec.setPublicKey(yaPubKey);
 		return dec;
@@ -360,7 +361,7 @@ public final class YouAgainClient {
 	public AuthToken login(String usernameUsuallyAnEmail, String password) throws LoginFailedException {
 		Utils.check4null(usernameUsuallyAnEmail, password);
 		FakeBrowser fb = new FakeBrowser();
-		String response = fb.getPage(ENDPOINT, new ArrayMap(
+		String response = fb.getPage(yac.endpoint, new ArrayMap(
 				"app", app, 
 				"action", "login",
 				"person", usernameUsuallyAnEmail,
@@ -371,9 +372,10 @@ public final class YouAgainClient {
 	}
 
 	public AuthToken register(String usernameUsuallyAnEmail, String password) {
+		assert yac != null;
 		Utils.check4null(usernameUsuallyAnEmail, password);
 		FakeBrowser fb = new FakeBrowser();
-		String response = fb.getPage(ENDPOINT, new ArrayMap(
+		String response = fb.getPage(yac.endpoint, new ArrayMap(
 				"app", app, 
 				"action", "signup",
 				"person", usernameUsuallyAnEmail,
@@ -433,7 +435,7 @@ public final class YouAgainClient {
 	public List<String> getSharedWith(String authToken) {
 		FakeBrowser fb = new FakeBrowser();
 		fb.setAuthenticationByJWT(authToken);
-		String response = fb.getPage(ENDPOINT, new ArrayMap(
+		String response = fb.getPage(yac.endpoint, new ArrayMap(
 				"app", app, 
 				"action", "shared-with"));
 		
@@ -448,7 +450,7 @@ public final class YouAgainClient {
 	public boolean share(String authToken, String targetUser, String item) {
 		FakeBrowser fb = new FakeBrowser();
 		fb.setAuthenticationByJWT(authToken);
-		String response = fb.getPage(ENDPOINT, new ArrayMap(
+		String response = fb.getPage(yac.endpoint, new ArrayMap(
 				"app", app,
 				"shareWith", targetUser,
 				"entity", item,
@@ -468,10 +470,4 @@ public final class YouAgainClient {
 		state.put(AUTHS, auths);
 	}
 
-}
-
-
-class YouAgainClientConfig {
-	@Option
-	String endpoint;
 }

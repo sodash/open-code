@@ -385,6 +385,10 @@ public class ConfigBuilder {
 			File absFile = propertiesFile.getAbsoluteFile();
 			Properties props = new Properties();
 			props.load(FileUtils.getReader(absFile));
+			if (props.isEmpty()) {
+				Log.d(LOGTAG, config.getClass().getSimpleName()+": No props in properties file: "+propertiesFile+" = "+propertiesFile.getAbsolutePath());
+				return this;
+			}
 			return set(props);
 		} catch (IOException e) {
 			throw new WrappedException(e);

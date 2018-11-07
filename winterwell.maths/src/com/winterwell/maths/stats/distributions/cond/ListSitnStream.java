@@ -37,6 +37,7 @@ public class ListSitnStream<X> implements ISitnStream<X> {
 		return null;
 	}
 
+	@Deprecated // not supported for this class
 	@Override
 	public ISitnStream<X> factory(Object sourceSpecifier) {
 		throw new UnsupportedOperationException();

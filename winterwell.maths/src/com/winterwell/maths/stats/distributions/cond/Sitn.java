@@ -23,8 +23,8 @@ public final class Sitn<X> {
 	/**
 	 * 
 	 * @param outcome
-	 *            Can be null
-	 * @param bits
+	 *            Cannot be null
+	 * @param context Cannot be null
 	 */
 	public Sitn(X outcome, Cntxt context) {
 		assert context != null;

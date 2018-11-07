@@ -1,8 +1,12 @@
 package com.winterwell.maths.stats.distributions.cond;
 
+import java.util.List;
+
 import com.winterwell.maths.ITrainable;
 import com.winterwell.maths.stats.distributions.IDistributionBase;
 import com.winterwell.maths.stats.distributions.discrete.IDiscreteDistribution;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.containers.Containers;
 
 /**
  * Wrap an {@link IDiscreteDistribution} to make it into an
@@ -18,6 +22,8 @@ import com.winterwell.maths.stats.distributions.discrete.IDiscreteDistribution;
 public final class UnConditional<X> implements
 		ICondDistribution.WithExplanation<X, Cntxt>, ITrainable.Supervised<Cntxt, X> {
 
+	private static final Cntxt BLANK_CONTEXT = new Cntxt(new String[0]);
+	
 	public final IDiscreteDistribution<X> dist;
 
 	public UnConditional(IDiscreteDistribution<X> dist) {
@@ -74,6 +80,17 @@ public final class UnConditional<X> implements
 	@Override
 	public double probWithExplanation(X outcome, Cntxt context, ExplnOfDist explain) {
 		return prob(outcome, context);
+	}
+
+	/**
+	 * 
+	 * @param values
+	 * @return values wrapped in Sitn with blank context
+	 */
+	public static <T> List<Sitn<T>> sitns(List<T> values) {
+		return Containers.apply(values, 
+					s -> new Sitn<T>(s, BLANK_CONTEXT)
+				);
 	}
 
 }

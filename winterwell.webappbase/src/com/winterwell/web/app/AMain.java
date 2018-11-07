@@ -101,6 +101,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * @param args
 	 */
 	public void doMain(String[] args) {
+		// logfile before log config??! Is that right?
 		logFile = new LogFile(new File(getAppName()+".log"))
 					.setLogRotation(TUnit.DAY.dt, 14);
 		try {

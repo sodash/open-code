@@ -992,11 +992,11 @@ public final class Containers  {
 	 * 
 	 * @return the first element, if there is one, or null.
 	 */
-	public static <X> X first(Collection<X> collection, IFilter<X> filter) {
-		if (collection == null || collection.isEmpty())
-			return null;
-		if (filter == null)
-			return collection.iterator().next();
+	public static <X> X first(Iterable<X> collection, IFilter<X> filter) {
+		if (collection == null) return null;
+		if (filter == null) {
+			return first(collection);
+		}
 		for (X x : collection) {
 			if (filter.accept(x))
 				return x;
