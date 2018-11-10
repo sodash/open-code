@@ -1,5 +1,6 @@
 package com.winterwell.utils.log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.datalog.Rate;
@@ -12,10 +13,17 @@ import com.winterwell.utils.time.TUnit;
  * @author daniel
  *
  */
-class LogConfig {
+public class LogConfig {
 
 	@Option
 	List<String> ignoretags;
+	
+	public LogConfig addIgnoreTag(String tag) {
+		assert tag != null;
+		if (ignoretags==null) ignoretags = new ArrayList();
+		ignoretags.add(tag);
+		return this;
+	}
 	
 	@Option
 	List<String> verbosetags; 

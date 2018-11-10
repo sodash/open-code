@@ -40,6 +40,9 @@ import com.winterwell.utils.log.Log;
  */
 public class TestHttpServletRequest implements HttpServletRequest {
 
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
 	private String contentType;
 	private Map<String, String> parameters;
 	private HttpSession session;

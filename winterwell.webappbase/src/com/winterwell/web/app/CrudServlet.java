@@ -310,24 +310,37 @@ public abstract class CrudServlet<T> implements IServlet {
 		String id = getId(state);
 		Log.d("crud", "doPublish "+id+" "+state+" deleteDraft: "+deleteDraft);
 		Utils.check4null(id); 
-		ESPath draftPath = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
-		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
 		// load (if not loaded)
 		getThing(state);
 		if (jthing==null) {
 			jthing = getThingFromDB(state);
 		}
+		return doPublish2(dataspace, jthing, forceRefresh, deleteDraft, id);
+	}
+
+
+
+	/**
+	 * @param _jthing 
+	 * @param forceRefresh
+	 * @param deleteDraft
+	 * @param id
+	 * @return
+	 */
+	protected JThing<T> doPublish2(CharSequence dataspace, JThing<T> _jthing, KRefresh forceRefresh, boolean deleteDraft, String id) {
+		ESPath draftPath = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
+		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
 		// id must match
-		if (jthing.java() instanceof AThing) {
-			String thingId = ((AThing) jthing.java()).getId();
+		if (_jthing.java() instanceof AThing) {
+			String thingId = ((AThing) _jthing.java()).getId();
 			if (thingId==null || ACTION_NEW.equals(thingId)) {
-				jthing.put("id", id);
+				_jthing.put("id", id);
 			} else if ( ! thingId.equals(id)) {
 				throw new IllegalStateException("ID mismatch "+thingId+" vs "+id);
 			}
 		}
 		
-		JThing obj = AppUtils.doPublish(jthing, draftPath, publishPath, forceRefresh, deleteDraft);
+		JThing obj = AppUtils.doPublish(_jthing, draftPath, publishPath, forceRefresh, deleteDraft);
 		return obj.setType(type);
 	}
 
