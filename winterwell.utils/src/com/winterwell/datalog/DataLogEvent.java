@@ -138,7 +138,8 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"env", String.class, // environment -- possibly this should be StringBuilder for word handling?? but does bby then break??
 			"os", String.class,
 			// no-index (object)
-			"xtra", Null.class // FIXME this was causing bugs :(
+			"xtra", Null.class, // FIXME this was causing bugs :(
+			"socialShareId", String.class // unique ID to identify where ad has been requested via link shared on social media
 			));
 
 	public static final String simple = "simple";

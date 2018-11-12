@@ -368,6 +368,7 @@ public class LgServlet {
 		return true;
 	}
 
+	static DataLogConfig DataLogConfig = Dep.get(DataLogConfig.class);
 	static List<String> OUR_IPS = Dep.get(DataLogConfig.class).ourSkippedIPs;
 	
 	private static void doLogToFile(Dataspace dataspace, String tag, double count, Map params, String trckId, WebRequest state) {
