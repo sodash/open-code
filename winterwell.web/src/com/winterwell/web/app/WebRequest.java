@@ -866,7 +866,7 @@ public class WebRequest implements IProperties, Closeable {
 		String pi = getRequestPath();
 		if (pi == null)
 			return null;
-		assert pi.startsWith("/") : "no / to start slug?! "+this;
+		assert pi.startsWith("/") : "no / to start slug?! "+pi+" "+this;
 		boolean keepFileType = false;
 		// eg. /profile/ has no slug
 		if (pi.endsWith("/")) {
