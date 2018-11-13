@@ -137,6 +137,18 @@ public class LgServlet {
 		}
 		JsonResponse jr = new JsonResponse(state, logged);
 		WebUtils2.sendJson(jr, state);
+		// also fire a callback?
+		String cb = state.get(JsonResponse.CALLBACK);
+		if (cb!=null) {
+			try {
+				FakeBrowser fb = new FakeBrowser();
+				fb.setTimeOut(1000); // don't wait around - just call and go
+				fb.getPage(cb);
+			} catch(Exception ex) {
+				// oh well
+				Log.d("log.callback", cb+" from "+state+"-> "+ex);
+			}
+		}
 	}
 
 	/**
