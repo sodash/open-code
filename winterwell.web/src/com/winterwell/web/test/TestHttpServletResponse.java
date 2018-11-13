@@ -199,8 +199,8 @@ public class TestHttpServletResponse implements HttpServletResponse {
 		return sb.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * The output can be seen via {@link #getOutputBufferContents()}
 	 * 
 	 * @see javax.servlet.ServletResponse#getOutputStream()
 	 */

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.servlet.ServletConfig;
@@ -188,7 +190,9 @@ public class FileServlet extends HttpServlet implements IServlet {
 //		WebPage page = new WebPage();
 		page.append("<h1>"+file+"</h1>\n");
 		HtmlTable table = new HtmlTable(Arrays.asList("Filename"));
-		for (File f : file.listFiles()) {
+		List<File> files = Arrays.asList(file.listFiles());
+		Collections.sort(files);
+		for (File f : files) {
 			String path = FileUtils.getRelativePath(f, baseDir);
 			table.addRow("<a href='/"+path+"'>" + f.getName() + "</a>");
 		}
