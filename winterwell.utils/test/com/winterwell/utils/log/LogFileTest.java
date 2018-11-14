@@ -1,7 +1,6 @@
 package com.winterwell.utils.log;
 
 import java.io.File;
-import java.util.Arrays;
 
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;

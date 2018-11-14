@@ -1,6 +1,5 @@
 package com.winterwell.utils.log;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Cache;
 import com.winterwell.utils.containers.Containers;
-import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.time.RateCounter;
 import com.winterwell.utils.time.TUnit;

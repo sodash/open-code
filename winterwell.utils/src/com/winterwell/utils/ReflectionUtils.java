@@ -24,7 +24,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;

@@ -1,7 +1,6 @@
 package com.winterwell.utils.time;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,12 +9,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.winterwell.utils.MathUtils;
-import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair;
 
 /**
