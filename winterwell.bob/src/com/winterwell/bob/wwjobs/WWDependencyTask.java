@@ -2,9 +2,12 @@ package com.winterwell.bob.wwjobs;
 
 import java.io.File;
 
+import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.ForkJVMTask;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.FakeBrowser;
 
 /**
@@ -23,6 +26,8 @@ public class WWDependencyTask extends BuildWinterwellProject {
 	public WWDependencyTask(String projectName, String builderClass) {
 		super(projectName);
 		this.builderClass = builderClass;
+		// dependencies shouldnt need rebuilding all the time
+		setSkipGap(TUnit.DAY.dt);
 	}
 
 	@Override
@@ -83,6 +88,5 @@ public class WWDependencyTask extends BuildWinterwellProject {
 			}
 		}
 	}
-
 
 }
