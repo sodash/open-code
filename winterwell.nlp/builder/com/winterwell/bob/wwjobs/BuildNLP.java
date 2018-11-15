@@ -12,11 +12,10 @@ import com.winterwell.utils.IFilter;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.io.FileUtils;
 
-@Deprecated // use the version in ww.nlp/builder
 public class BuildNLP extends BuildWinterwellProject {
 
 	public BuildNLP() {
-		super(new File(FileUtils.getWinterwellDir(), "code/winterwell.nlp"));
+		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.nlp"), "winterwell.nlp");
 		incSrc = false;
 	}
 

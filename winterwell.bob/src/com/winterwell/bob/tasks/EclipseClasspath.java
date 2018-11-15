@@ -33,6 +33,11 @@ import com.winterwell.utils.web.WebUtils;
  */
 public class EclipseClasspath {
 
+	@Override
+	public String toString() {
+		return "EclipseClasspath[projectDir=" + projectDir + "]";
+	}
+
 	/**
 	 * the .classpath file
 	 */

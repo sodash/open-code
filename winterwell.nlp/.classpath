@@ -4,6 +4,7 @@
 	<classpathentry kind="src" output="bin.test.demo" path="test.demo"/>
 	<classpathentry kind="src" path="test.utils"/>
 	<classpathentry kind="src" output="bin.test" path="test"/>
+	<classpathentry kind="src" path="builder"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry kind="lib" path="/middleware/jwnl/jwnl.jar" sourcepath="/middleware/jwnl/src.zip"/>
@@ -24,5 +25,6 @@
 	<classpathentry kind="lib" path="/middleware/opennlp/opennlp-tools.jar" sourcepath="/middleware/opennlp/opennlp-tools-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/middleware/stemmer/stemmer.jar" sourcepath="/middleware/stemmer/src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.maths"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.bob"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -23,6 +23,11 @@ public class WWDependencyTask extends BuildWinterwellProject {
 
 	private String builderClass;
 
+	/**
+	 * 
+	 * @param projectName
+	 * @param builderClass fully-qualified class name. Can be null
+	 */
 	public WWDependencyTask(String projectName, String builderClass) {
 		super(projectName);
 		this.builderClass = builderClass;

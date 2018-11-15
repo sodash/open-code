@@ -75,6 +75,17 @@ public class BuildWinterwellProject extends BuildTask {
 //				fork.setErrorHandler(IGNORE_EXCEPTIONS);
 //				fork.setSkipGap(TUnit.DAY.dt);
 //				deps.add(fork);
+			} else {
+				// HACK look in wwjobs
+				try {
+					String pname2 = pname.replace("winterwell.", "");
+					String cname = BuildUtils.class.getPackage().getName()+".Build"+StrUtils.toTitleCase(pname2);
+					Class<?> bt = Class.forName(cname);
+					deps.add(bt.newInstance());
+				} catch(Throwable ex) {
+					// oh well
+					Log.d("BuildWinterwellProject", "skip dep for project "+pname);
+				}
 			}
 		}
 	}
@@ -411,4 +422,11 @@ public class BuildWinterwellProject extends BuildTask {
 		return this;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+"[projectName=" + projectName + "]";
+	}
+
+	
+	
 }
