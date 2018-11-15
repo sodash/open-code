@@ -33,6 +33,7 @@ public class BuildBob extends BuildWinterwellProject {
 		
 		// Manually set the version
 		String v = Bob.VERSION_NUMBER;
+		setVersion(v);
 	}
 
 	@Override

@@ -310,7 +310,7 @@ public class BuildWinterwellProject extends BuildTask {
 			Log.w(LOGTAG, ex);
 		}
 		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
-				"version: "+StrUtils.joinWithSkip(version, new Time().ddMMyyyy())
+				"version: "+StrUtils.joinWithSkip(" ", version, new Time().ddMMyyyy())
 				+gitiv+by);
 		// vendor
 		jar.setManifestProperty("Implementation-Vendor", "Winterwell");	
