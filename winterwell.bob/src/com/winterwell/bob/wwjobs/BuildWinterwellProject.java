@@ -20,6 +20,7 @@ import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.io.FileUtils;
@@ -309,7 +310,7 @@ public class BuildWinterwellProject extends BuildTask {
 			Log.w(LOGTAG, ex);
 		}
 		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
-				"version: "+(Utils.isBlank(version)? new Time().ddMMyyyy() : version)
+				"version: "+StrUtils.joinWithSkip(version, new Time().ddMMyyyy())
 				+gitiv+by);
 		// vendor
 		jar.setManifestProperty("Implementation-Vendor", "Winterwell");	
