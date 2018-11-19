@@ -175,6 +175,10 @@ public class EclipseClasspath {
 	IFn<String,File> projectFinder = new WinterwellProjectFinder();
 	private boolean includeProjectJars;
 
+	public IFn<String, File> getProjectFinder() {
+		return projectFinder;
+	}
+	
 	/**
 	 * @return The Eclipse projects referenced by this project.
 	 */

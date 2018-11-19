@@ -20,6 +20,7 @@ import com.winterwell.bob.tasks.MakeVersionPropertiesTask;
 import com.winterwell.bob.tasks.ProcessTask;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.IFn;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.gui.GuiUtils;
@@ -61,6 +62,9 @@ public class PublishProjectTask extends BuildTask {
 	 * wwappbase.js/project-publisher.sh + projectname
 	 */
 	protected String bashScript;
+	/**
+	 * tmp-lib
+	 */
 	protected File localLib;
 
 	/**
@@ -102,7 +106,21 @@ public class PublishProjectTask extends BuildTask {
 	}
 
 	@Override
-	public List<BuildTask> getDependencies() {
+	public List<BuildTask> getDependencies() {		
+		// the builder for this project?
+		String pubTaskName = getClass().getName();
+		String buildTaskName = pubTaskName.replace("Publish", "Build");
+		try {
+			Class btc = Class.forName(buildTaskName);
+			BuildTask bt = (BuildTask) btc.newInstance();
+			ArrayList deps = new ArrayList();
+			deps.add(bt);
+			return deps;
+		} catch(Throwable ohwell) {
+			Log.d(LOGTAG, "No build task for "+buildTaskName+": "+ohwell);
+		}
+		
+		// no builder found -- list std ww projects
 		// All the WW libs
 		List<BuildTask> deps = new ArrayList(Arrays.asList(
 				new BuildUtils(),
@@ -127,16 +145,6 @@ public class PublishProjectTask extends BuildTask {
 			}
 		}
 		
-		// the builder for this project
-		String pubTaskName = getClass().getName();
-		String buildTaskName = pubTaskName.replace("Publish", "Build");
-		try {
-			Class btc = Class.forName(buildTaskName);
-			BuildTask bt = (BuildTask) btc.newInstance();
-			deps.add(bt);
-		} catch(Throwable ohwell) {
-			Log.d(LOGTAG, "No build task for "+buildTaskName+": "+ohwell);
-		}
 		return deps;
 	}
 
@@ -201,7 +209,7 @@ public class PublishProjectTask extends BuildTask {
 		assert localLib.isDirectory();
 		// Ensure desired jars are present
 		for (File jar : jars) {
-			File localJar = new File(localLib, jar.getName());
+			File localJar = new File(localLib, jar.getName()).getAbsoluteFile();
 			if (localJar.isFile() && localJar.lastModified() >= jar.lastModified()) {
 				continue;
 			}
@@ -210,18 +218,21 @@ public class PublishProjectTask extends BuildTask {
 		
 		// Remove unwanted jars? -- no too dangerous
 		
-		// WW jars
-		Collection<? extends BuildTask> deps = getDependencies();
-		for (BuildTask buildTask : deps) {
-			if (buildTask instanceof BuildWinterwellProject) {
-				File jar = ((BuildWinterwellProject) buildTask).getJar();
+		// WW jars - by project
+		List<String> projects = ec.getReferencedProjects();
+		IFn<String, File> epf = ec.getProjectFinder();
+		for (String project : projects) {
+			File pdir = epf.apply(project);
+			if (pdir != null && pdir.isDirectory()) {
+				BuildWinterwellProject bwp = new BuildWinterwellProject(pdir, project);
+				File jar = bwp.getJar();
 				if (jar.isFile()) {
 					FileUtils.copy(jar, localLib);
-				} else {
-					Log.e(LOGTAG, "No jar?! "+jar.getAbsolutePath());
 				}
+			} else {
+				Log.d(LOGTAG, "Could not find Eclipse project "+project);
 			}
-		}			
+		}
 		
 		// This jar -- done by BuildX, in deps above
 	}
