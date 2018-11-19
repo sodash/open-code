@@ -60,34 +60,36 @@ public class BuildWinterwellProject extends BuildTask {
 
 	private void getDependency2_project(ArraySet deps, String pname, WinterwellProjectFinder pf) {
 		File pdir = pf.apply(pname);
-		if (pdir!=null && pdir.isDirectory()) {
-			File bfile = Bob.findBuildScript2(pdir, null);
-			if (bfile != null) {					
-				// Use a forked Bob to pull in dependencies??
-				// or a WW task??
-				String builderClass = FileUtils.getRelativePath(bfile, pdir);
-				builderClass = builderClass.replace('/', '.').substring(0, builderClass.length()-5);
-				WWDependencyTask wwdt = new WWDependencyTask(pname, builderClass);
-				deps.add(wwdt);
-				
-//				ForkJVMTask fork = new ForkJVMTask(bfile.toString());
-//				fork.setDir(pdir);
-//				fork.setErrorHandler(IGNORE_EXCEPTIONS);
-//				fork.setSkipGap(TUnit.DAY.dt);
-//				deps.add(fork);
-			} else {
-				// HACK look in wwjobs
-				try {
-					String pname2 = pname.replace("winterwell.", "");
-					String cname = BuildUtils.class.getPackage().getName()+".Build"+StrUtils.toTitleCase(pname2);
-					Class<?> bt = Class.forName(cname);
-					deps.add(bt.newInstance());
-				} catch(Throwable ex) {
-					// oh well
-					Log.d("BuildWinterwellProject", "skip dep for project "+pname);
-				}
-			}
+		if (pdir==null || ! pdir.isDirectory()) {
+			return;
 		}
+		File bfile = Bob.findBuildScript2(pdir, null);
+		if (bfile != null) {					
+			// Use a forked Bob to pull in dependencies??
+			// or a WW task??
+			String builderClass = FileUtils.getRelativePath(bfile, pdir);
+			// HACK: pop the first folder?? usually builder/
+			int slashi = builderClass.indexOf('/');
+			if (slashi > 0) {
+				builderClass = builderClass.substring(slashi+1, builderClass.length());	
+			}			
+			// make file path into package name
+			builderClass = builderClass.replace('/', '.').substring(0, builderClass.length()-5);
+			// make a WWDep task
+			WWDependencyTask wwdt = new WWDependencyTask(pname, builderClass);
+			deps.add(wwdt);			
+		} else {
+			// HACK look in wwjobs
+			try {
+				String pname2 = pname.replace("winterwell.", "");
+				String cname = BuildUtils.class.getPackage().getName()+".Build"+StrUtils.toTitleCase(pname2);
+				Class<?> bt = Class.forName(cname);
+				deps.add(bt.newInstance());
+			} catch(Throwable ex) {
+				// oh well
+				Log.d("BuildWinterwellProject", "skip dep for project "+pname);
+			}
+		}		
 	}
 
 	protected boolean isCompile() {

@@ -21,6 +21,7 @@ import com.winterwell.bob.tasks.ProcessTask;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.IFn;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.gui.GuiUtils;
@@ -77,6 +78,8 @@ public class PublishProjectTask extends BuildTask {
 	private LogFile logfile = new LogFile();
 
 	private boolean noPublishJustBuild;
+
+	private BuildTask buildProjectTask;
 			
 	public PublishProjectTask setNoPublishJustBuild(boolean noPublishJustBuild) {
 		this.noPublishJustBuild = noPublishJustBuild;
@@ -111,9 +114,9 @@ public class PublishProjectTask extends BuildTask {
 		String buildTaskName = pubTaskName.replace("Publish", "Build");
 		try {
 			Class btc = Class.forName(buildTaskName);
-			BuildTask bt = (BuildTask) btc.newInstance();
+			buildProjectTask = (BuildTask) btc.newInstance();
 			ArrayList deps = new ArrayList();
-			deps.add(bt);
+			deps.add(buildProjectTask);
 			return deps;
 		} catch(Throwable ohwell) {
 			Log.d(LOGTAG, "No build task for "+buildTaskName+": "+ohwell);
@@ -233,7 +236,13 @@ public class PublishProjectTask extends BuildTask {
 			}
 		}
 		
-		// This jar -- done by BuildX, in deps above
+		// This jar
+		if (buildProjectTask instanceof BuildWinterwellProject) {
+			File jar = ((BuildWinterwellProject) buildProjectTask).getJar();
+			FileUtils.copy(jar, localLib);
+		}
+		
+		System.out.println("Jars: "+Printer.toString(Arrays.asList(localLib.list()), "\n"));
 	}
 	
 	protected void doSendEmail(String tos) {
