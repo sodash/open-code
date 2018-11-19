@@ -74,7 +74,7 @@ public class PublishProjectTask extends BuildTask {
 
 	protected boolean compile;
 
-	private LogFile logfile;
+	private LogFile logfile = new LogFile();
 
 	private boolean noPublishJustBuild;
 			
@@ -99,7 +99,6 @@ public class PublishProjectTask extends BuildTask {
 		this.remoteWebAppDir = remoteWebAppDir;
 		// local
 		this.localWebAppDir = localWebAppDir;
-		logfile = new LogFile();
 		localLib = new File(localWebAppDir,"tmp-lib");
 //		jarFile = new File(localLib, projectName+".jar");
 		bashScript = new File(FileUtils.getWinterwellDir(), "wwappbase.js/project-publisher.sh")+" "+projectName;
@@ -120,7 +119,7 @@ public class PublishProjectTask extends BuildTask {
 			Log.d(LOGTAG, "No build task for "+buildTaskName+": "+ohwell);
 		}
 		
-		// no builder found -- list std ww projects
+		// no builder found :( -- list std ww projects
 		// All the WW libs
 		List<BuildTask> deps = new ArrayList(Arrays.asList(
 				new BuildUtils(),
