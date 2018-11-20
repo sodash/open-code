@@ -79,7 +79,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.11";
+	public final static String VERSION_NUMBER = "0.9.12";
 
 	public static final String LOGTAG = "bob";
 
