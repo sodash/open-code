@@ -281,7 +281,9 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		run();
 		
 		// also close
-		Bob.getSingleton().close();
+		Bob _bob = Bob.getSingleton();
+		_bob.built.add(getClass());
+		_bob.close();
 		
 		// report
 		Map success = getReport();

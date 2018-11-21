@@ -3,6 +3,7 @@ package com.winterwell.bob;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -79,7 +80,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.12";
+	public final static String VERSION_NUMBER = "0.9.13";
 
 	public static final String LOGTAG = "bob";
 
@@ -340,13 +341,14 @@ public class Bob {
 			try {
 				Class clazz = getClass(clazzName);
 				bob.build(clazz);
+				bob.built.add(clazz);
 			} catch (ClassNotFoundException e) {
 				classNotFoundMessage(e);
 				bob.maybeCarryOn(e);
 			} catch (NoClassDefFoundError e) {
 				classNotFoundMessage(e);
 				bob.maybeCarryOn(e);
-			} catch (Exception e) {		
+			} catch (Exception e) {
 				bob.maybeCarryOn(e);
 			}
 		}
@@ -521,8 +523,10 @@ public class Bob {
 		tr.awaitTermination();
 		Log.d(LOGTAG, "...closed");
 		
-		Log.i(LOGTAG, "----- BUILD COMPLETE -----");
+		Log.i(LOGTAG, "----- BUILD COMPLETE: "+built+" -----");
 	}
+	
+	List<Class> built = new ArrayList();
 
 	public static Time getRunStart() {
 		if (runStart==null) runStart = new Time();
