@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import org.junit.Test;
@@ -79,12 +80,9 @@ public class ContainersTest {
 				"d", null,
 				"e", "EEE"
 				);
-		StringBuilder sb = new StringBuilder();
-		BiPredicate<List<String>, Object> fn = (p, v) -> {
-			if (v instanceof String || v instanceof Number) {
-				sb.append(Printer.str(p)+" = "+v+"\n");
-			}
-			return true;
+		StringBuilder sb = new StringBuilder();		
+		BiFunction<List<String>, Object, Object> fn = () -> {
+			
 		};
 		Containers.applyToJsonObject(obj, fn);
 		System.out.println(sb.toString());
