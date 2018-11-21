@@ -292,10 +292,6 @@ public class Bob {
 		cf.setArgs(args);
 		ConfigBuilder cb = cf.getConfigBuilder(BobSettings.class);
 		BobSettings _settings = cb.get();
-		// Make Bob
-		Bob bob = new Bob(_settings);
-		dflt = bob;
-		bob.init();
 		
 		List<String> argsLeft = cb.getRemainderArgs();
 		
@@ -315,13 +311,19 @@ public class Bob {
 					+ "	java -jar bob-all.jar"+ StrUtils.LINEEND
 					+ StrUtils.LINEEND
 					+ "Usage: java -jar bob-all.jar [options] [TargetBuildTasks...]"
-					+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
+					+ StrUtils.LINEEND + cb.getOptionsMessage());
 			System.exit(1);
 		}
 		Log.d(LOGTAG, "Bob version: "+Bob.VERSION_NUMBER+" building "+argsLeft+"...");
+
+
+		// Make Bob
+		Bob bob = new Bob(_settings);
+		dflt = bob;
+		bob.init();
 		
-		// update Bob itself?? TODO test
-		if (argsLeft.contains("--update")) {
+		// update Bob itself?
+		if (bob.settings.update) {
 			FakeBrowser fb = new FakeBrowser();
 			File bobJar = fb.getFile("https://www.winterwell.com/software/downloads/bob-all.jar");
 			System.out.println("Bob jar downloaded to:");
@@ -333,6 +335,7 @@ public class Bob {
 				FileUtils.move(bobJar, wwbobjar);
 				System.out.println("Bob jar moved to:\n"+wwbobjar);
 			}
+			// exit
 			return;
 		}
 		

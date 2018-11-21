@@ -24,6 +24,7 @@ import com.winterwell.utils.Proc;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 
@@ -82,7 +83,6 @@ public class CompileTask extends BuildTask {
 		// NullPointerException
 		StandardJavaFileManager sjfm = jc.getStandardFileManager(null, null,
 				null);
-		Iterable fileObjects = sjfm.getJavaFileObjectsFromFiles(javaFiles);
 		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 		// quiet
 		options.add("-nowarn");
@@ -98,7 +98,11 @@ public class CompileTask extends BuildTask {
 		// classpath
 		addClasspathToOptions();
 		// Run it!
-		Log.d(LOGTAG, "javac "+StrUtils.join(options, " ")+" "+StrUtils.join(javaFiles, " "));		
+		Log.d(LOGTAG, "javac "+StrUtils.join(options, " ")+" "
+				+Containers.first(javaFiles)+"   ("+javaFiles.size()+" java files)"
+//				+StrUtils.join(javaFiles, " ") This can be a big list!
+				);		
+		Iterable fileObjects = sjfm.getJavaFileObjectsFromFiles(javaFiles);
 		CompilationTask ctask = jc.getTask(null, sjfm, diagnostics, options, null, fileObjects);
 		Boolean ok = ctask.call();
 		sjfm.close();
