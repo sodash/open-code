@@ -81,7 +81,6 @@ public class ContainersTest {
 				"d", null,
 				"e", "EEE"
 				);
-<<<<<<< HEAD
 		String sobj = Printer.toString(obj, ", ", ":");
 		StringBuilder sb = new StringBuilder();		
 		BiFunction<Object, List<String>, Object> fn = (v,p) -> {
@@ -93,11 +92,6 @@ public class ContainersTest {
 				return ((Number) v).doubleValue() + 100;
 			}
 			return v;
-=======
-		StringBuilder sb = new StringBuilder();		
-		BiFunction<List<String>, Object, Object> fn = () -> {
-			
->>>>>>> cfe9ebc8a0d436ed87c6d5455a05660ecf170298
 		};
 		Map<String, Object> obj2 = Containers.applyToJsonObject(obj, fn);
 		String sobj2 = Printer.toString(obj2, ", ", ":");		
