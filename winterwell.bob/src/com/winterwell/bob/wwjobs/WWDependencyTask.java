@@ -56,7 +56,7 @@ public class WWDependencyTask extends BuildWinterwellProject {
 				
 				// run!
 				builder.run();
-				jarFile = builder.getJar();
+				setJar(builder.getJar());
 				
 				// success :)
 				return;

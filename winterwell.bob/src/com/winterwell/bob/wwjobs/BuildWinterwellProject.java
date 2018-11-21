@@ -180,7 +180,7 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	public final File projectDir;
 	protected boolean incSrc;
-	protected File jarFile;
+	private File jarFile;
 
 	private String version;
 	

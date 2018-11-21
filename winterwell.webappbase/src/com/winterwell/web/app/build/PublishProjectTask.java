@@ -205,6 +205,7 @@ public class PublishProjectTask extends BuildTask {
 	 */
 	void collectJars() {
 		EclipseClasspath ec = new EclipseClasspath(localWebAppDir);
+		ec.setIncludeProjectJars(true);
 		Set<File> jars = ec.getCollectedLibs();
 		// Create local lib dir			
 		localLib.mkdirs();
@@ -220,21 +221,22 @@ public class PublishProjectTask extends BuildTask {
 		
 		// Remove unwanted jars? -- no too dangerous
 		
-		// WW jars - by project
-		List<String> projects = ec.getReferencedProjects();
-		IFn<String, File> epf = ec.getProjectFinder();
-		for (String project : projects) {
-			File pdir = epf.apply(project);
-			if (pdir != null && pdir.isDirectory()) {
-				BuildWinterwellProject bwp = new BuildWinterwellProject(pdir, project);
-				File jar = bwp.getJar();
-				if (jar.isFile()) {
-					FileUtils.copy(jar, localLib);
-				}
-			} else {
-				Log.d(LOGTAG, "Could not find Eclipse project "+project);
-			}
-		}
+//		// WW jars - by project -- almost no need (done by EC above) 
+//		// ??unless the build script uses a non-standard name.
+//		List<String> projects = ec.getReferencedProjects();
+//		IFn<String, File> epf = ec.getProjectFinder();
+//		for (String project : projects) {
+//			File pdir = epf.apply(project);
+//			if (pdir != null && pdir.isDirectory()) {
+//				BuildWinterwellProject bwp = new BuildWinterwellProject(pdir, project);
+//				File jar = bwp.getJar();
+//				if (jar.isFile()) {
+//					FileUtils.copy(jar, localLib);
+//				}
+//			} else {
+//				Log.d(LOGTAG, "Could not find Eclipse project "+project);
+//			}
+//		}
 		
 		// This jar
 		if (buildProjectTask instanceof BuildWinterwellProject) {

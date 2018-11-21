@@ -264,6 +264,8 @@ public class EclipseClasspath {
 				} else {
 					Log.d(LOGTAG, "No project jar for "+p);
 				}
+			} else {
+				Log.d(LOGTAG, "Dont include project jar for "+p);
 			}
 		}
 	}
