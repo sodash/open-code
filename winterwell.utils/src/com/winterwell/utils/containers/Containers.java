@@ -378,19 +378,19 @@ public final class Containers  {
 	 * @param fn Apply this to each node (leaf and branch). If it returns null, remove the node
 	 */
 	public static Map<String, Object> applyToJsonObject(
-			Map<String, Object> jsonObject, BiFunction<List<String>, Object, Object> fn4PathValue) {
+			Map<String, Object> jsonObject, BiFunction<Object, List<String>, Object> fn4valuePath) {
 		List<String> path = new ArrayList<>();
-		return applyToJsonObject2_map(path, jsonObject, fn4PathValue);
+		return applyToJsonObject2_map(path, jsonObject, fn4valuePath);
 	}
 	
 	public static List applyToJsonObject(
-			List jsonArray, BiFunction<List<String>, Object, Object> fn4PathValue) {
+			List jsonArray, BiFunction<Object, List<String>, Object> fn4PathValue) {
 		List<String> path = new ArrayList<>();
 		return applyToJsonObject2_list(path, jsonArray, fn4PathValue);
 	}
 
 	static Map<String, Object> applyToJsonObject2_map(
-			List<String> path, Map<String, Object> jsonObject, BiFunction<List<String>, Object, Object> fn4PathValue) 
+			List<String> path, Map<String, Object> jsonObject, BiFunction<Object, List<String>, Object> fn4valuePath) 
 	{
 		final ArrayMap<String,Object> copyMap = new ArrayMap();
 		for (Entry<String, Object> e : jsonObject.entrySet()) {
@@ -401,7 +401,8 @@ public final class Containers  {
 			if (Containers.isArray(inputv)) {
 				inputv = Containers.asList(inputv);
 			}
-			Object outputv = fn4PathValue.apply(path, inputv);
+			// apply!
+			Object outputv = fn4valuePath.apply(inputv,path);
 			if (outputv==null) {
 				// prune
 				path.remove(path.size()-1);
@@ -413,9 +414,9 @@ public final class Containers  {
 			}
 			// recurse?
 			if (outputv instanceof Map) {
-				outputv = applyToJsonObject2_map(path, (Map)outputv, fn4PathValue);
+				outputv = applyToJsonObject2_map(path, (Map)outputv, fn4valuePath);
 			} else if (outputv instanceof List) {
-				outputv = applyToJsonObject2_list(path, (List)outputv, fn4PathValue);
+				outputv = applyToJsonObject2_list(path, (List)outputv, fn4valuePath);
 			} else {
 				// no recurse
 			}
@@ -438,7 +439,7 @@ public final class Containers  {
 
 
 	static List applyToJsonObject2_list(
-			List<String> path, List jsonArray, BiFunction<List<String>, Object, Object> fn4PathValue) 
+			List<String> path, List jsonArray, BiFunction<Object, List<String>, Object> fn4valuePath) 
 	{
 		final List copyList = new ArrayList();
 		for(int i=0, n=jsonArray.size(); i<n; i++) {
@@ -448,7 +449,7 @@ public final class Containers  {
 				inputv = Containers.asList(inputv);
 			}
 			path.add(Integer.toString(i));	
-			Object outputv = fn4PathValue.apply(path, inputv);
+			Object outputv = fn4valuePath.apply(inputv, path);
 			if (outputv==null) {
 				path.remove(path.size()-1);
 				continue;
@@ -458,9 +459,9 @@ public final class Containers  {
 				outputv = Containers.asList(outputv);
 			}
 			if (outputv instanceof Map) {
-				outputv = applyToJsonObject2_map(path, (Map)outputv, fn4PathValue);
+				outputv = applyToJsonObject2_map(path, (Map)outputv, fn4valuePath);
 			} else if (outputv instanceof List) {
-				outputv = applyToJsonObject2_list(path, (List)outputv, fn4PathValue);
+				outputv = applyToJsonObject2_list(path, (List)outputv, fn4valuePath);
 			} else {
 				// no recurse
 			}

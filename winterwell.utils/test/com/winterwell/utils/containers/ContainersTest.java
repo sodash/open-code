@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import org.junit.Test;
@@ -21,6 +22,7 @@ import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers.Changes;
 import com.winterwell.utils.threads.SafeExecutor;
+import com.winterwell.utils.web.SimpleJson;
 
 import junit.framework.Assert;
 
@@ -79,17 +81,29 @@ public class ContainersTest {
 				"d", null,
 				"e", "EEE"
 				);
-		StringBuilder sb = new StringBuilder();
-		BiPredicate<List<String>, Object> fn = (p, v) -> {
-			if (v instanceof String || v instanceof Number) {
-				sb.append(Printer.str(p)+" = "+v+"\n");
+		String sobj = Printer.toString(obj, ", ", ":");
+		StringBuilder sb = new StringBuilder();		
+		BiFunction<Object, List<String>, Object> fn = (v,p) -> {
+			sb.append(p+"="+v+"\n\n");
+			if (v instanceof String) {
+				return v+"-yourmum";
 			}
-			return true;
+			if (v instanceof Number) {
+				return ((Number) v).doubleValue() + 100;
+			}
+			return v;
 		};
-		Containers.applyToJsonObject(obj, fn);
-		System.out.println(sb.toString());
-		assert StrUtils.compactWhitespace(sb.toString()).equals(
-				"a = 1 b = bee c, c1 = 2.1 c, c2, 0, c-deep = 17 c, c2, 1 = 18 e = EEE");
+		Map<String, Object> obj2 = Containers.applyToJsonObject(obj, fn);
+		String sobj2 = Printer.toString(obj2, ", ", ":");		
+//		System.out.println(sobj2);
+		assert sobj2.contains("EEE-yourmum");
+		assert SimpleJson.get(obj2, "c", "c2", 0, "c-deep").equals(117.0) : SimpleJson.get(obj2, "c", "c2", 0, "c-deep");
+		
+//		System.out.println(sb.toString());
+		
+		String sobjafter = Printer.toString(obj, ", ", ":");
+		assert sobj.equals(sobjafter); // no side effects
+		
 	}
 	
 	
