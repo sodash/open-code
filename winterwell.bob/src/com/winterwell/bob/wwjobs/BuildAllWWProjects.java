@@ -29,7 +29,7 @@ public class BuildAllWWProjects extends BuildTask {
 				new BuildMaths(),
 				new BuildNLP(),
 				new BuildDepot(),
-				new BuildBob()
+				new WWDependencyTask("winterwell.bob", "jobs.BuildBob")
 				);
 		for (BuildWinterwellProject bwp : projects) {
 			bwp.setScpToWW(true);

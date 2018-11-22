@@ -17,7 +17,9 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import com.winterwell.bob.Bob;
+import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Proc;
@@ -98,10 +100,25 @@ public class CompileTask extends BuildTask {
 		// classpath
 		addClasspathToOptions();
 		// Run it!
-		Log.d(LOGTAG, "javac "+StrUtils.join(options, " ")+" "
+		Log.d(LOGTAG, "javac " //+StrUtils.join(options, " ")+" "
 				+Containers.first(javaFiles)+"   ("+javaFiles.size()+" java files)"
-//				+StrUtils.join(javaFiles, " ") This can be a big list!
-				);		
+//				+StrUtils.join(javaFiles, " ") // This can be a big list! But its the only way to make a valid javac command
+				);
+		// save a linux command
+		try {			
+			BobSettings bs = Dep.has(BobSettings.class)? Dep.get(BobSettings.class) : new BobSettings();
+			String sname = FileUtils.safeFilename(Utils.or(srcDir, srcFiles, "weird").toString(), false);
+			File cmdfile = new File(bs.logDir, "CompileTask."+sname+".sh");
+			FileUtils.write(cmdfile, 
+					"# "+StrUtils.compactWhitespace(getDesc().getId())+"\n"+
+					"javac "+StrUtils.join(options, " ")+" "+StrUtils.join(javaFiles, " ")
+					);
+			Log.d(LOGTAG, "javac compile command saved to: "+cmdfile.getAbsolutePath());
+		} catch(Throwable ex) {
+			// oh well
+			Log.i(LOGTAG, ex);
+		}
+		
 		Iterable fileObjects = sjfm.getJavaFileObjectsFromFiles(javaFiles);
 		CompilationTask ctask = jc.getTask(null, sjfm, diagnostics, options, null, fileObjects);
 		Boolean ok = ctask.call();

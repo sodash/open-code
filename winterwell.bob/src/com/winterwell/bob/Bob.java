@@ -80,7 +80,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.13";
+	public final static String VERSION_NUMBER = "0.9.15";
 
 	public static final String LOGTAG = "bob";
 
@@ -314,6 +314,7 @@ public class Bob {
 					+ StrUtils.LINEEND + cb.getOptionsMessage());
 			System.exit(1);
 		}
+		System.out.println(StrUtils.LINEEND + "Bob the Builder   version: "+Bob.VERSION_NUMBER);
 		Log.d(LOGTAG, "Bob version: "+Bob.VERSION_NUMBER+" building "+argsLeft+"...");
 
 

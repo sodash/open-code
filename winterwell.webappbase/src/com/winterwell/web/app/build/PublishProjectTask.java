@@ -30,7 +30,6 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.web.email.SimpleMessage;
 
-import com.winterwell.bob.wwjobs.BuildBob;
 import com.winterwell.bob.wwjobs.BuildDataLog;
 import com.winterwell.bob.wwjobs.BuildDepot;
 import com.winterwell.bob.wwjobs.BuildFlexiGson;
@@ -115,6 +114,12 @@ public class PublishProjectTask extends BuildTask {
 		try {
 			Class btc = Class.forName(buildTaskName);
 			buildProjectTask = (BuildTask) btc.newInstance();
+			
+			// FIXME nobble the compile
+			// Weird bug: BuildSoGiveApp would run from command line bob, but fail from Eclipse junit
+			// ?! Nov 2018
+			((BuildWinterwellProject) buildProjectTask).setCompile(false);
+			
 			ArrayList deps = new ArrayList();
 			deps.add(buildProjectTask);
 			return deps;
@@ -127,7 +132,7 @@ public class PublishProjectTask extends BuildTask {
 		List<BuildTask> deps = new ArrayList(Arrays.asList(
 				new BuildUtils(),
 				new BuildMaths(),
-				new BuildBob(),
+				new WWDependencyTask("winterwell.bob", "jobs.BuildBob"),
 				new BuildWeb(),
 				new BuildDataLog(),
 				new BuildDepot(),				

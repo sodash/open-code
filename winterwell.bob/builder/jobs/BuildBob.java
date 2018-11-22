@@ -28,8 +28,10 @@ public class BuildBob extends BuildWinterwellProject {
 		super(new WinterwellProjectFinder().apply("winterwell.bob"), "bob");
 		incSrc = true;
 		setMainClass(Bob.class);
-//		setScpToWW(true);
-		makeFatJar = true;
+		
+		// uncomment if releasing Bob
+		setScpToWW(true);
+		setMakeFatJar(true);
 		
 		// Manually set the version
 		String v = Bob.VERSION_NUMBER;
@@ -40,25 +42,12 @@ public class BuildBob extends BuildWinterwellProject {
 	public void doTask() throws Exception { 
 		super.doTask();
 		
+		// needed??
 		// also make "winterwell.bob.jar" for other builds to find (e.g. BuildJerbil)
 		File bobjar = getJar();
 		FileUtils.copy(bobjar, new File(projectDir, "winterwell.bob.jar"));
 		
-		// bob-all.jar -- This is what you want to run Bob
-		if (makeFatJar) {
-			File fatJar = doFatJar();
-
-			if (scpToWW) {
-				String remoteJar = "/home/winterwell/public-software/"+fatJar.getName();
-				SCPTask scp = new SCPTask(fatJar, "winterwell@winterwell.com",				
-						remoteJar);
-				// this is online at: https://www.winterwell.com/software/downloads
-				scp.setMkdirTask(false);
-				scp.run();
-		//			scp.runInThread(); no, wait for it to finish
-				report.put("scp to remote", "winterwell.com:"+remoteJar);
-			}
-		}
+		// bob-all.jar is what you want to run Bob
 	}
 
 	@Override
