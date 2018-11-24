@@ -8,6 +8,20 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.data.XId;
 
 public class WebEx extends RuntimeException {
+	
+	/**
+	 * e.g. a version conflict in elastic-search
+	 * @author daniel
+	 *
+	 */
+	public static class E409Conflict extends E40X {
+		public E409Conflict(String url, String msg) {
+			super(409, url, msg);
+		}
+		private static final long serialVersionUID = 1L;
+	}
+
+
 	private static final long serialVersionUID = 1L;
 	/** HTTP code, e.g. 404 for file not found */
 	public final int code;
