@@ -13,6 +13,7 @@ import java.util.Set;
 
 import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.IErrorHandler;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
@@ -26,6 +27,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.web.email.SimpleMessage;
@@ -79,6 +81,10 @@ public class PublishProjectTask extends BuildTask {
 	private boolean noPublishJustBuild;
 
 	private BuildTask buildProjectTask;
+	
+	public void setBuildProjectTask(BuildTask buildProjectTask) {
+		this.buildProjectTask = buildProjectTask;
+	}
 			
 	public PublishProjectTask setNoPublishJustBuild(boolean noPublishJustBuild) {
 		this.noPublishJustBuild = noPublishJustBuild;
@@ -109,22 +115,29 @@ public class PublishProjectTask extends BuildTask {
 	@Override
 	public List<BuildTask> getDependencies() {		
 		// the builder for this project?
-		String pubTaskName = getClass().getName();
-		String buildTaskName = pubTaskName.replace("Publish", "Build");
-		try {
-			Class btc = Class.forName(buildTaskName);
-			buildProjectTask = (BuildTask) btc.newInstance();
+		if (buildProjectTask==null) {
+			// guess the name is s/PublishX/BuildX/
+			String pubTaskName = getClass().getName();
+			String buildTaskName = pubTaskName.replace("Publish", "Build");
+			try {
+				Class btc = Class.forName(buildTaskName);
+				buildProjectTask = (BuildTask) btc.newInstance();				
+			} catch(Throwable ohwell) {
+				Log.d(LOGTAG, "No build task for "+buildTaskName+": "+ohwell);
+			}
+		}
+		if (buildProjectTask != null) {
 			
 			// FIXME nobble the compile
 			// Weird bug: BuildSoGiveApp would run from command line bob, but fail from Eclipse junit
 			// ?! Nov 2018
-			((BuildWinterwellProject) buildProjectTask).setCompile(false);
+//			((BuildWinterwellProject) buildProjectTask).setCompile(false);
 			
+//			((BuildWinterwellProject) buildProjectTask).setErrorHandler(IErrorHandler.forPolicy(KErrorPolicy.REPORT));
+
 			ArrayList deps = new ArrayList();
 			deps.add(buildProjectTask);
 			return deps;
-		} catch(Throwable ohwell) {
-			Log.d(LOGTAG, "No build task for "+buildTaskName+": "+ohwell);
 		}
 		
 		// no builder found :( -- list std ww projects

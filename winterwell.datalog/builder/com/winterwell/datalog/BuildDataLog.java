@@ -20,15 +20,15 @@ public class BuildDataLog extends BuildWinterwellProject {
 		super("winterwell.datalog");
 	}	
 
-	@Override
-	public Collection<? extends BuildTask> getDependencies() {
-		return Arrays.asList(
-				new BuildUtils(), 
-				new BuildWeb(),
-				new BuildMaths(),
-				new BuildWWAppBase()
-				);
-	}
+//	@Override
+//	public Collection<? extends BuildTask> getDependencies() {
+//		return Arrays.asList(
+//				new BuildUtils(), 
+//				new BuildWeb(),
+//				new BuildMaths(),
+//				new BuildWWAppBase()
+//				);
+//	}
 	
 	@Override
 	public void doTask() throws Exception {	
