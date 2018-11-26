@@ -3,6 +3,7 @@ package com.winterwell.bob;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -79,7 +80,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.12";
+	public final static String VERSION_NUMBER = "0.9.15";
 
 	public static final String LOGTAG = "bob";
 
@@ -291,10 +292,6 @@ public class Bob {
 		cf.setArgs(args);
 		ConfigBuilder cb = cf.getConfigBuilder(BobSettings.class);
 		BobSettings _settings = cb.get();
-		// Make Bob
-		Bob bob = new Bob(_settings);
-		dflt = bob;
-		bob.init();
 		
 		List<String> argsLeft = cb.getRemainderArgs();
 		
@@ -314,13 +311,20 @@ public class Bob {
 					+ "	java -jar bob-all.jar"+ StrUtils.LINEEND
 					+ StrUtils.LINEEND
 					+ "Usage: java -jar bob-all.jar [options] [TargetBuildTasks...]"
-					+ StrUtils.LINEEND + new com.winterwell.utils.io.ArgsParser(bob.settings).getOptionsMessage());
+					+ StrUtils.LINEEND + cb.getOptionsMessage());
 			System.exit(1);
 		}
+		System.out.println(StrUtils.LINEEND + "Bob the Builder   version: "+Bob.VERSION_NUMBER);
 		Log.d(LOGTAG, "Bob version: "+Bob.VERSION_NUMBER+" building "+argsLeft+"...");
+
+
+		// Make Bob
+		Bob bob = new Bob(_settings);
+		dflt = bob;
+		bob.init();
 		
-		// update Bob itself?? TODO test
-		if (argsLeft.contains("--update")) {
+		// update Bob itself?
+		if (bob.settings.update) {
 			FakeBrowser fb = new FakeBrowser();
 			File bobJar = fb.getFile("https://www.winterwell.com/software/downloads/bob-all.jar");
 			System.out.println("Bob jar downloaded to:");
@@ -332,6 +336,7 @@ public class Bob {
 				FileUtils.move(bobJar, wwbobjar);
 				System.out.println("Bob jar moved to:\n"+wwbobjar);
 			}
+			// exit
 			return;
 		}
 		
@@ -340,13 +345,14 @@ public class Bob {
 			try {
 				Class clazz = getClass(clazzName);
 				bob.build(clazz);
+				bob.built.add(clazz);
 			} catch (ClassNotFoundException e) {
 				classNotFoundMessage(e);
 				bob.maybeCarryOn(e);
 			} catch (NoClassDefFoundError e) {
 				classNotFoundMessage(e);
 				bob.maybeCarryOn(e);
-			} catch (Exception e) {		
+			} catch (Exception e) {
 				bob.maybeCarryOn(e);
 			}
 		}
@@ -521,8 +527,10 @@ public class Bob {
 		tr.awaitTermination();
 		Log.d(LOGTAG, "...closed");
 		
-		Log.i(LOGTAG, "----- BUILD COMPLETE -----");
+		Log.i(LOGTAG, "----- BUILD COMPLETE: "+built+" -----");
 	}
+	
+	List<Class> built = new ArrayList();
 
 	public static Time getRunStart() {
 		if (runStart==null) runStart = new Time();

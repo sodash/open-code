@@ -20,6 +20,10 @@ public class BobSettings {
 	@Option(tokens="-update", description="Download a fresh copy of Bob itself")
 	public boolean update;
 	
+
+	@Option(description="TODO sniff the script .java file for Bob settings in javadoc, e.g. @Bob -classpath lib/foo.jar")
+	public boolean sniff = true;
+	
 	@Override
 	public String toString() {
 		return "BobSettings"+Printer.toString(Containers.objectAsMap(this));

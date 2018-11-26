@@ -13,6 +13,7 @@ import java.util.Set;
 
 import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.IErrorHandler;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
@@ -26,11 +27,11 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.web.email.SimpleMessage;
 
-import com.winterwell.bob.wwjobs.BuildBob;
 import com.winterwell.bob.wwjobs.BuildDataLog;
 import com.winterwell.bob.wwjobs.BuildDepot;
 import com.winterwell.bob.wwjobs.BuildFlexiGson;
@@ -80,6 +81,10 @@ public class PublishProjectTask extends BuildTask {
 	private boolean noPublishJustBuild;
 
 	private BuildTask buildProjectTask;
+	
+	public void setBuildProjectTask(BuildTask buildProjectTask) {
+		this.buildProjectTask = buildProjectTask;
+	}
 			
 	public PublishProjectTask setNoPublishJustBuild(boolean noPublishJustBuild) {
 		this.noPublishJustBuild = noPublishJustBuild;
@@ -110,16 +115,29 @@ public class PublishProjectTask extends BuildTask {
 	@Override
 	public List<BuildTask> getDependencies() {		
 		// the builder for this project?
-		String pubTaskName = getClass().getName();
-		String buildTaskName = pubTaskName.replace("Publish", "Build");
-		try {
-			Class btc = Class.forName(buildTaskName);
-			buildProjectTask = (BuildTask) btc.newInstance();
+		if (buildProjectTask==null) {
+			// guess the name is s/PublishX/BuildX/
+			String pubTaskName = getClass().getName();
+			String buildTaskName = pubTaskName.replace("Publish", "Build");
+			try {
+				Class btc = Class.forName(buildTaskName);
+				buildProjectTask = (BuildTask) btc.newInstance();				
+			} catch(Throwable ohwell) {
+				Log.d(LOGTAG, "No build task for "+buildTaskName+": "+ohwell);
+			}
+		}
+		if (buildProjectTask != null) {
+			
+			// FIXME nobble the compile
+			// Weird bug: BuildSoGiveApp would run from command line bob, but fail from Eclipse junit
+			// ?! Nov 2018
+//			((BuildWinterwellProject) buildProjectTask).setCompile(false);
+			
+//			((BuildWinterwellProject) buildProjectTask).setErrorHandler(IErrorHandler.forPolicy(KErrorPolicy.REPORT));
+
 			ArrayList deps = new ArrayList();
 			deps.add(buildProjectTask);
 			return deps;
-		} catch(Throwable ohwell) {
-			Log.d(LOGTAG, "No build task for "+buildTaskName+": "+ohwell);
 		}
 		
 		// no builder found :( -- list std ww projects
@@ -127,7 +145,7 @@ public class PublishProjectTask extends BuildTask {
 		List<BuildTask> deps = new ArrayList(Arrays.asList(
 				new BuildUtils(),
 				new BuildMaths(),
-				new BuildBob(),
+				new WWDependencyTask("winterwell.bob", "jobs.BuildBob"),
 				new BuildWeb(),
 				new BuildDataLog(),
 				new BuildDepot(),				
@@ -205,6 +223,7 @@ public class PublishProjectTask extends BuildTask {
 	 */
 	void collectJars() {
 		EclipseClasspath ec = new EclipseClasspath(localWebAppDir);
+		ec.setIncludeProjectJars(true);
 		Set<File> jars = ec.getCollectedLibs();
 		// Create local lib dir			
 		localLib.mkdirs();
@@ -220,21 +239,22 @@ public class PublishProjectTask extends BuildTask {
 		
 		// Remove unwanted jars? -- no too dangerous
 		
-		// WW jars - by project
-		List<String> projects = ec.getReferencedProjects();
-		IFn<String, File> epf = ec.getProjectFinder();
-		for (String project : projects) {
-			File pdir = epf.apply(project);
-			if (pdir != null && pdir.isDirectory()) {
-				BuildWinterwellProject bwp = new BuildWinterwellProject(pdir, project);
-				File jar = bwp.getJar();
-				if (jar.isFile()) {
-					FileUtils.copy(jar, localLib);
-				}
-			} else {
-				Log.d(LOGTAG, "Could not find Eclipse project "+project);
-			}
-		}
+//		// WW jars - by project -- almost no need (done by EC above) 
+//		// ??unless the build script uses a non-standard name.
+//		List<String> projects = ec.getReferencedProjects();
+//		IFn<String, File> epf = ec.getProjectFinder();
+//		for (String project : projects) {
+//			File pdir = epf.apply(project);
+//			if (pdir != null && pdir.isDirectory()) {
+//				BuildWinterwellProject bwp = new BuildWinterwellProject(pdir, project);
+//				File jar = bwp.getJar();
+//				if (jar.isFile()) {
+//					FileUtils.copy(jar, localLib);
+//				}
+//			} else {
+//				Log.d(LOGTAG, "Could not find Eclipse project "+project);
+//			}
+//		}
 		
 		// This jar
 		if (buildProjectTask instanceof BuildWinterwellProject) {

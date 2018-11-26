@@ -40,6 +40,8 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	protected String mainClass;
 
+	private File fatJar;
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -128,6 +130,7 @@ public class BuildWinterwellProject extends BuildTask {
 		jt.close();
 		// done
 		report.put("fat-jar", jt.getJar().getAbsolutePath());
+		this.fatJar = jt.getJar();
 		return jt.getJar();
 	}
 
@@ -180,7 +183,7 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	public final File projectDir;
 	protected boolean incSrc;
-	protected File jarFile;
+	private File jarFile;
 
 	private String version;
 	
@@ -277,6 +280,12 @@ public class BuildWinterwellProject extends BuildTask {
 			jar2.setAppend(true);
 			jar2.run();			
 		}
+		
+		// fat jar?
+		if (makeFatJar) {
+			doFatJar();
+		}
+		
 		// Test
 		// JUnitTask junit = new JUnitTask(srcDir, binDir, new File(projectDir,
 		// "unit-tests.html"));
@@ -340,6 +349,15 @@ public class BuildWinterwellProject extends BuildTask {
 			scp.runInThread();
 			report.put("scp to remote", "winterwell.com:"+remoteJar);
 		}
+		if (makeFatJar && getFatJar()!=null) {
+			String remoteJar = "/home/winterwell/public-software/"+getFatJar().getName();
+			SCPTask scp = new SCPTask(getFatJar(), "winterwell@winterwell.com",				
+					remoteJar);
+			// this is online at: https://www.winterwell.com/software/downloads
+			scp.setMkdirTask(false);			
+			scp.runInThread();
+			report.put("scp to remote", "winterwell.com:"+remoteJar);
+		}
 		// also scp maven file?
 		// Hm -- transitive dependencies??
 		// Maybe the best solution is for WWDepProject to try and checkout from git??
@@ -351,6 +369,10 @@ public class BuildWinterwellProject extends BuildTask {
 //			scp.runInThread();
 //			report.put("scp pom to remote", "winterwell.com:"+remoteJar);
 //		}
+	}
+	
+	public File getFatJar() {
+		return fatJar;
 	}
 	
 	
@@ -375,6 +397,7 @@ public class BuildWinterwellProject extends BuildTask {
 
 	protected void doTask2_compile(File srcDir, File binDir) {		
 		// FIXME Compile seeing errors in Windows re XStream dependency!
+		// FIXME Compile seeing errors on Linux when run from JUnit but not when bob is run from the command line ?! Nov 2018
 		if (compile) {
 			assert projectDir != null : this;
 			CompileTask compile = new CompileTask(srcDir, binDir);

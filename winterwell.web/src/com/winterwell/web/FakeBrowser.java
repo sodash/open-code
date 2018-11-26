@@ -667,6 +667,9 @@ public class FakeBrowser {
 			if (code==401) {
 				throw new WebEx.E401(url, errorMessage);
 			}	
+			if (code==409) {
+				throw new WebEx.E409Conflict(url, errorMessage);
+			}
 			if (code==410) {
 				throw new WebEx.E410(url, errorMessage);
 			}			

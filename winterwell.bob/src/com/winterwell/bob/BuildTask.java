@@ -135,7 +135,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 */
 	public static IErrorHandler IGNORE_EXCEPTIONS = new IErrorHandler() {		
 		@Override
-		public void handle(Throwable ex) throws Exception {
+		public void handle(Throwable ex) {
 			System.err.println(ex);
 		}
 	};
@@ -281,7 +281,9 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		run();
 		
 		// also close
-		Bob.getSingleton().close();
+		Bob _bob = Bob.getSingleton();
+		_bob.built.add(getClass());
+		_bob.close();
 		
 		// report
 		Map success = getReport();
