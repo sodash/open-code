@@ -283,6 +283,13 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 		return sum;
 	}
 
+	@Override
+	public boolean containsKey(Object key) {
+		// override the base method 'cos keySet() is slow, so keySet().contains is a bad idea.
+		// NB: null values are not allowed - see put()
+		return map.get(key) != null;
+	}
+	
 	/**
 	 * WARNING: Edits will not write-through. <br>
 	 * WARNING: This copies the keys when it is called.
@@ -372,6 +379,64 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 		}
 	}
 
+	/**
+	 * order entries by count
+	 */
+	public void order(int idealSize) {
+		if (size() <= idealSize) return;
+		Log.v("map", "prune!");
+		// Copy out of the backing map
+		List<HLEntry> entries = Arrays.asList(map.values().toArray(new HLEntry[0]));
+		if (entries.size() <= idealSize) return; // race condition
+		// sort by score
+		// NB: HLEntry score could mutate under us, which could cause
+		// > java.lang.IllegalArgumentException: Comparison method violates its general contract!
+		boolean sorted = false;
+		for(int i=0; i<5; i++) {
+			try {
+				Collections.sort(entries);
+				sorted = true;
+				break;
+			} catch(IllegalArgumentException ex) {
+				// try again...
+				Log.d("HalfLifeMap", "Rare concurrency issue: "+ex);
+			}
+		}
+		if ( ! sorted) {
+			// failed x5?! Copy them out instead
+			entries = entries.stream().map(hle -> hle.clone()).collect(Collectors.toList());
+			Collections.sort(entries);
+		}
+		// What to prune?
+		List<HLEntry> toPrune = entries.subList(0, entries.size() - idealSize);
+		// prune
+		boolean track = ! Double.isNaN(prunedValue);
+		for (HLEntry e : toPrune) {
+			// actually prune
+			HLEntry<K, V> v = map.remove(e.key);			
+			// track what we forget
+			if (track && v != null && v.getValue()!=null) {
+				double pv = ((Number)v.getValue()).doubleValue();
+				// At overflow, just sit on max-value
+				// TODO do we want thread safety here?
+				prunedValue = Math.min(Double.MAX_VALUE, prunedValue + pv);
+				assert ! Double.isNaN(prunedValue);
+			}
+		}
+		
+		// ...track this anyway
+		pruned += toPrune.size();			
+	
+		// emit an event
+		if (listeners == null)
+			return;		
+		for (int i = 0; i < listeners.size(); i++) {
+			IPruneListener pl = listeners.get(i);
+			pl.pruneEvent(toPrune);
+		}
+	}
+
+	
 	@Override
 	public int getPrunedCount() {
 		return pruned;
@@ -387,6 +452,7 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 	 * 
 	 * This may trigger a prune event.
 	 * put(k,v) boosts k's decay count by 1.
+	 * Null values are NOT allowed
 	 */
 	@Override
 	public V put(K key, V val) {
