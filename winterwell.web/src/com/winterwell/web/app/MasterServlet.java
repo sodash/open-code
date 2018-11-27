@@ -16,7 +16,16 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 
 /**
-*
+* Example use in an AMain subclass:
+* <code><pre>
+* 
+* 	protected void addJettyServlets(JettyLauncher jl) {
+		super.addJettyServlets(jl);
+		MasterServlet ms = jl.addMasterServlet();	
+		ms.addServlet("/foo", FooServlet.class);
+	}
+	
+* </pre></code>
 */
 public class MasterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
