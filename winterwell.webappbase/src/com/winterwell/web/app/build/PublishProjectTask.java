@@ -131,7 +131,7 @@ public class PublishProjectTask extends BuildTask {
 			// FIXME nobble the compile
 			// Weird bug: BuildSoGiveApp would run from command line bob, but fail from Eclipse junit
 			// ?! Nov 2018
-//			((BuildWinterwellProject) buildProjectTask).setCompile(false);
+			((BuildWinterwellProject) buildProjectTask).setCompile(false);
 			
 //			((BuildWinterwellProject) buildProjectTask).setErrorHandler(IErrorHandler.forPolicy(KErrorPolicy.REPORT));
 
