@@ -33,6 +33,7 @@ import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.GetAliasesRequest;
+import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
@@ -520,8 +521,18 @@ public class AppUtils {
 					// attempt a simple reindex?
 					// No - cos a gap would open between the data in the two versions. We have to reindex and switch as instantaneously as we can.
 //					ReindexRequest rr = new ReindexRequest(es, path.index(), index);
-					Log.i("ES.init", "To reindex:\n"+
-							"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
+					if (AppUtils.getServerType() == KServerType.LOCAL) {
+						Log.i("ES.init", "LOCAL - So try to reindex:\n"+
+								"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
+						ReindexRequest rr = new ReindexRequest(es, path.index(), index);
+						rr.setDebug(true);
+						IESResponse resp = rr.get();
+						System.out.println(resp);
+					} else {
+						// dont auto reindex test or live
+						Log.i("ES.init", "To reindex:\n"+
+								"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
+					}
 					// and shout fail!
 					//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
 					// c.f. https://issues.soda.sh/stream?tag=35538&as=su
@@ -535,6 +546,7 @@ public class AppUtils {
 							+" curl http://localhost:9200/_cat/indices/"+k.getSimpleName().toLowerCase()+"*\n"
 							);
 					
+					// Switch Info
 					// https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
 					String alias = path.index();					
 					String OLD = "OLD";
@@ -544,11 +556,22 @@ public class AppUtils {
 					} catch(Exception aex) {
 						// oh well
 					}
+
 					String switchjson = ("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
 							.replace('\'', '"');
 					Log.i("ES.init", "To switch old -> new:\n"
 							+"curl http://localhost:9200/_aliases -d '"+switchjson+"'");
-					
+					// do it if local
+					if (AppUtils.getServerType() == KServerType.LOCAL) {
+						IndicesAliasesRequest ar = es.admin().indices().prepareAliases();
+						ar.addAlias(index, alias);
+						// NB: the index has had ''s added to it
+						ar.removeAlias(OLD.substring(1, OLD.length()-1), alias);
+						ar.setDebug(true);
+						IESResponse resp = ar.get();
+						System.out.println(resp);
+					}
+					// record fail - but loop over the rest so we catch all the errors in one loop
 					err = ex;
 					Log.e("init", ex.toString());
 				}
