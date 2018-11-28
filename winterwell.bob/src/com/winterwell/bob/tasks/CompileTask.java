@@ -29,6 +29,8 @@ import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.SimpleJson;
+import com.winterwell.utils.web.XStreamUtils;
 
 /**
  * Compile Java code. ??Ignores non-Java files! You may wish to use a
@@ -112,6 +114,8 @@ public class CompileTask extends BuildTask {
 			FileUtils.write(cmdfile, 
 					"# "+StrUtils.compactWhitespace(getDesc().getId())+"\n"+
 					"javac "+StrUtils.join(options, " ")+" "+StrUtils.join(javaFiles, " ")
+					+"\n\n\n"
+					+XStreamUtils.serialiseToXml(this) // for debug - what are the diffs??
 					);
 			Log.d(LOGTAG, "javac compile command saved to: "+cmdfile.getAbsolutePath());
 		} catch(Throwable ex) {

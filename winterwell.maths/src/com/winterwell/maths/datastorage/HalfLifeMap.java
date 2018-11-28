@@ -41,15 +41,18 @@ import com.winterwell.utils.log.Log;
  * 1. Value-based eviction (i.e. keep the most important/used items) would not allow new items to be learned.<br>
  * 2. A most-recent-update (MRU) cache which would ruthlessly evict older items.
  * 
- * <p>
+ * <p><i>
+ * 	Warning: This class gets used in critical bottlenecks - be careful if editing the code to consider performance.
+ * </i></p>
  * 
+ * <p> 
  * TODO would it be better to use an inflationary unit, instead of decaying counts?
  * So "1" goes up over time, effectively devaluing old counts. 
  * However - profiling by Carson suggests that devalue() isn't a likely bottleneck. 
  * TODO are the synchonized blocks needed?
  * @author daniel
  */
-@BinaryXML // Tell out XStream converter to do this as a binary blob.
+@BinaryXML // Tell our XStream converter to do this as a binary blob.
 public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 		Serializable, Cloneable, IForget<K, V> 
 //ConcurrentMap<K, V> ??
@@ -283,6 +286,13 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 		return sum;
 	}
 
+	@Override
+	public boolean containsKey(Object key) {
+		// override the base method 'cos keySet() is slow, so keySet().contains is a bad idea.
+		// NB: null values are not allowed - see put()
+		return map.get(key) != null;
+	}
+	
 	/**
 	 * WARNING: Edits will not write-through. <br>
 	 * WARNING: This copies the keys when it is called.
@@ -387,6 +397,7 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 	 * 
 	 * This may trigger a prune event.
 	 * put(k,v) boosts k's decay count by 1.
+	 * Null values are NOT allowed
 	 */
 	@Override
 	public V put(K key, V val) {

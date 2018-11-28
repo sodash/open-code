@@ -135,7 +135,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 */
 	public static IErrorHandler IGNORE_EXCEPTIONS = new IErrorHandler() {		
 		@Override
-		public void handle(Throwable ex) throws Exception {
+		public void handle(Throwable ex) {
 			System.err.println(ex);
 		}
 	};
