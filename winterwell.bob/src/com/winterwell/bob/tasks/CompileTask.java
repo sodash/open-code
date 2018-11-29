@@ -109,7 +109,13 @@ public class CompileTask extends BuildTask {
 		// save a linux command
 		try {			
 			BobSettings bs = Dep.has(BobSettings.class)? Dep.get(BobSettings.class) : new BobSettings();
-			String sname = FileUtils.safeFilename(Utils.or(srcDir, srcFiles, "weird").toString(), false);
+			// HACK - to pick a nice name for the debug file
+			File projectDir = srcDir;			
+			List<String> notThese = Arrays.asList("src", "test", "source", "java", "build", "builder", "main");
+			while (projectDir!=null && notThese.contains(projectDir.getName())) projectDir = projectDir.getParentFile();			
+			String sname = FileUtils.safeFilename(Utils.or(projectDir!=null? projectDir.getName() : null, 
+					srcDir, srcFiles, "weird").toString(), 
+					false);
 			File cmdfile = new File(bs.logDir, "CompileTask."+sname+".sh");
 			FileUtils.write(cmdfile, 
 					"# "+StrUtils.compactWhitespace(getDesc().getId())+"\n"+
