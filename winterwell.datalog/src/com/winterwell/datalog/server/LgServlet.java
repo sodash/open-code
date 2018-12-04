@@ -348,7 +348,7 @@ public class LgServlet {
 		if ( ! "gl".equals(dataspace.toString())) return true;
 		Object ip = params.get("ip");
 		List<String> ips = Containers.list(ip);		
-		if ( ! Collections.disjoint(OUR_IPS, ips)) {
+		if (OUR_IPS != null && ! Collections.disjoint(OUR_IPS, ips)) {
 			Log.d("lg", "skip ip "+ip+" event: "+tag+params);
 			return false;
 		}
@@ -368,7 +368,10 @@ public class LgServlet {
 		return true;
 	}
 
-	static List<String> OUR_IPS = Dep.get(DataLogConfig.class).ourSkippedIPs;
+	/**
+	 * Rarely null.
+	 */
+	static final List<String> OUR_IPS = Dep.get(DataLogConfig.class).ourSkippedIPs;
 	
 	private static void doLogToFile(Dataspace dataspace, String tag, double count, Map params, String trckId, WebRequest state) {
 		String msg = params == null? "" : Printer.toString(params, ", ", ": ");
