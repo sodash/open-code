@@ -16,7 +16,6 @@ import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.IErrorHandler;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
-import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.MakeVersionPropertiesTask;
 import com.winterwell.bob.tasks.ProcessTask;
 import com.winterwell.utils.Environment;
