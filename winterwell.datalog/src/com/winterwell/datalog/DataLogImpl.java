@@ -668,7 +668,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 		// a-z params
 		event.keySet().stream().sorted().forEach(k -> {
 			// exclude the non-params
-			if (DataLogEvent.EVENTTYPE.equals(k)) return;
+			if (DataLogEvent.EVT.equals(k)) return;
 			if ("count".equals(k)) return;
 			if ("dataspace".equals(k)) return;
 			if ("time".equals(k)) return;			

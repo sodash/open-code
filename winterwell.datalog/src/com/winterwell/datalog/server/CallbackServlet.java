@@ -29,7 +29,7 @@ public class CallbackServlet extends CrudServlet<Callback> implements IServlet {
 		Utils.check4null(id, state);
 		String dataspace = state.getRequired(DataServlet.DATASPACE);
 		String url = state.getRequired(new UrlField("callback"));
-		String eventType = state.get(DataLogEvent.EVENTTYPE);
+		String eventType = state.get(DataLogEvent.EVT);
 		Callback cb = new Callback(dataspace, eventType, url); 
 		// OK				
 		return new JThing().setJava(cb);
