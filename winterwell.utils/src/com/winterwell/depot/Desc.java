@@ -529,12 +529,18 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T put(Key<T> _key, T value) {
+		return (T) put(_key.name, value);
+	}
+
+	/**
+	 * Equivalent to {@link #put(Key, Object)}
+	 */
+	public Object put(String key, Object value) {
 		checkUnset();
-		final String key = _key.getName();
 		assert key != null;		
 		Object old = properties.get(key);
 		if (Utils.equals(old, value)) {
-			return (T) old; // no-op
+			return old; // no-op
 		}				
 		assert old==null : "Cannot overrite "+key+"="+Printer.toString(old)+" w "+Printer.toString(value)+" in "+this;
 		// An arbitrary limit on key-name length
@@ -542,17 +548,10 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 			throw new IllegalArgumentException(key);
 		}
 		if (value == null)
-			return (T) properties.remove(key);
+			return properties.remove(key);
 		// is it an allowed class?
 		put2_checkValue(key, value);
-		return (T) properties.put(key, value);
-	}
-
-	/**
-	 * Convenience method for {@link #put(Key, Object)}
-	 */
-	public void put(String key, Object value) {
-		put(new Key(key), value);
+		return properties.put(key, value);
 	}
 	
 	/**
