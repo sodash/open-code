@@ -57,6 +57,7 @@ import com.winterwell.web.app.BrowserType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.email.SimpleMessage;
 import com.winterwell.web.fields.AField;
+import com.winterwell.web.fields.BoolField;
 import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.MissingFieldException;
 import com.winterwell.web.test.TestHttpServletRequest;
@@ -1244,6 +1245,8 @@ public class WebUtils2 extends WebUtils {
 		return url;
 	}
 
+	static final BoolField CORS_set = new BoolField("CORS_set");
+	
 	/**
 	 * Unravel long urls, e.g. from bitly to original. Convenience for {@link #getLongUrl(String, int)}
 	 * with assumed-resolved length=40
@@ -1265,26 +1268,11 @@ public class WebUtils2 extends WebUtils {
 	 * Due to security restrictions this does NOT work for withCredentials (ie with cookies) requests!
 	 */
 	public static void CORS(WebRequest state, boolean forceSet) {
-		if (state.getRequest()==null) {
-//			Log.d("CORS", "No request? "+state);
+		if (state.getRequest()==null) { // huh?
 			return;
 		}
-//		{ // debug weird stuff
-//			Collection<String> responseheaders = state.getResponse().getHeaderNames();
-//			Collection<String> ach = state.getResponse().getHeaders(ALLOW_CREDENTIALS_HEADER);
-//			assert ach==null || ach.size() < 2 : ach+" all-response-headers:"+responseheaders+" "+state;
-//
-//			List<String> headers = Containers.getList(state.getRequest().getHeaderNames());
-////			System.out.println(headers);
-//			Cookie[] cookies = state.getRequest().getCookies();		
-//			String ref = state.getReferer();
-//			String caller = state.get("caller");
-////			Printer.out(ref);
-////			Printer.out(caller);
-//		}
 		
-		// Avoid true,true, which upsets browsers
-		Key CORS_set = new Key("CORS_set");
+		// Avoid true,true, which upsets browsers		
 		Object already = state.get(CORS_set);
 		state.put(CORS_set, true);
 		if (Utils.yes(already)) {
@@ -1307,23 +1295,10 @@ public class WebUtils2 extends WebUtils {
 		}
 		// see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i		
 		if ( ! "*".equals(originOut)) {
-//			// Bug seen in good-loop -- It's a mystery! This logging did not shed any light :(
-//			if (state.getResponse().getHeader("Access-Control-Allow-Credentials") != null) {
-//				Log.escalate(new WeirdException(
-//						"2x?! Access-Control-Allow-Credentials: "
-//						+state.getResponse().getHeader("Access-Control-Allow-Credentials")
-//						+" header-names:"+
-//						state.getResponse().getHeaderNames()
-//						));
-//			}
 //			Log.d("cors", "set Access-Control-Allow-Credentials: true from "+ReflectionUtils.getSomeStack(8));			
 			state.setHeader(ALLOW_CREDENTIALS_HEADER, "true");
 		}
 		state.setHeader("Access-Control-Allow-Origin", originOut);
-		// debug - no light :(
-//		Collection<String> responseheaders2 = state.getResponse().getHeaderNames();
-//		Collection<String> ach = state.getResponse().getHeaders(ALLOW_CREDENTIALS_HEADER);
-//		assert ach==null || ach.size() < 2 : ach+" all-response-headers:"+responseheaders2+" "+state;
 	}
 
 	/**

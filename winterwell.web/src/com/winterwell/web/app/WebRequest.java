@@ -582,7 +582,7 @@ public class WebRequest implements IProperties, Closeable {
 			String vs = getRequest().getParameter(key.getName());
 			if (vs != null) {
 				IllegalArgumentException ex = new IllegalArgumentException(key
-						+ " should be an AField!");
+						+ " should be an AField! But chill we handled it.");
 				Log.report(ex);
 				return (T) vs;
 			}
