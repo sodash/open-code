@@ -1,7 +1,9 @@
 package com.winterwell.web.test;
 
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
@@ -13,7 +15,7 @@ import com.winterwell.utils.log.Log;
 
 public class TestHttpSession implements HttpSession {
 
-	Map<String, Object> attributes = new ArrayMap<String, Object>();
+	final Map<String, Object> attributes = new ArrayMap<String, Object>();
 
 	@Override
 	public Object getAttribute(String arg0) {
@@ -21,10 +23,20 @@ public class TestHttpSession implements HttpSession {
 	}
 
 	@Override
-	public Enumeration getAttributeNames() {
-		Log.report("Not implemented: " + ReflectionUtils.getCaller()); // TODOAuto-generated
-																// method stub
-		return null;
+	public Enumeration<String> getAttributeNames() {
+		Set<String> anames = attributes.keySet();
+		Iterator<String> anit = anames.iterator();
+		return new Enumeration<String>() {
+			@Override
+			public boolean hasMoreElements() {
+				return anit.hasNext();
+			}
+
+			@Override
+			public String nextElement() {
+				return anit.next();
+			}
+		};
 	}
 
 	@Override
@@ -106,9 +118,7 @@ public class TestHttpSession implements HttpSession {
 
 	@Override
 	public void removeAttribute(String arg0) {
-		Log.report("Not implemented: " + ReflectionUtils.getCaller()); // TODOAuto-generated
-																// method stub
-
+		attributes.remove(arg0);
 	}
 
 	@Override
