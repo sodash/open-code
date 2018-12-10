@@ -79,6 +79,13 @@ final class ReflectiveTypeAdapter<T> extends TypeAdapter<T> {
 			return read2_justAMap(in, peek);
 		}
 		
+		// special case - String constructors
+		if (peek == JsonToken.STRING) {
+			String s = in.nextString();
+			T instance = constructor.construct(s);
+			return instance;
+		}
+		
 		try {
 			// Make the Thing
 			T instance = constructor.construct();

@@ -16,6 +16,8 @@
 
 package com.winterwell.gson.internal;
 
+import java.lang.reflect.Constructor;
+
 /**
  * Defines a generic object construction factory. The purpose of this class is
  * to construct a default instance of a class that can be used for object
@@ -27,7 +29,7 @@ package com.winterwell.gson.internal;
  */
 public interface ObjectConstructor<T> {
 
-  /**
+/**
    * Returns a new instance.
    */
   public T construct();
@@ -36,4 +38,9 @@ public interface ObjectConstructor<T> {
    * @return What does this ObjectConstructor output?
    */
   public Class getType();
+  
+  default T construct(String string) {
+	  throw new UnsupportedOperationException("No string constructor for "+getType()+". Input was: "+string);	  
+  }
+  
 }
