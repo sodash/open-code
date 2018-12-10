@@ -28,6 +28,10 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 	
 	Results results;
 	
+	public Results getResults() {
+		return results;
+	}
+	
 	transient Data testData;	
 	Desc<Data> testDataDesc;
 	
@@ -37,7 +41,7 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 	private String tag = "experiment";
 
 	@Override
-	public Desc getDesc() {		
+	public Desc<Experiment<Data, Model, Results>> getDesc() {		
 		Desc temp = new Desc(modelDesc.getName()+"-"+testDataDesc.getName(), Experiment.class);
 		temp.setTag(tag);
 		temp.addDependency("model", modelDesc);

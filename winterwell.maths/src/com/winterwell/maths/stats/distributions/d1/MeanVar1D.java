@@ -167,7 +167,7 @@ public class MeanVar1D extends ADistribution1D implements
 	 * @return new average
 	 */
 	final double train2_updateMean(double d, double average, double weight) {
-		assert MathUtils.isFinite(d);
+		assert MathUtils.isFinite(d) : d;
 		double a = ((1 - lossFactor) * count) / (count + weight);
 		assert MathUtils.isFinite(a) : a + " " + lossFactor + " " + count;
 		double a1 = 1 - a;
