@@ -42,7 +42,7 @@ public class PersonLite extends AThing {
 		if (jobj.containsKey("name")) name = (String) jobj.get("name");
 		if (jobj.containsKey("username")) {
 			username = (String) jobj.get("username");
-		}
+		}		
 		if (jobj.containsKey("url")) url = (String) jobj.get("url");
 		return this;
 	}
