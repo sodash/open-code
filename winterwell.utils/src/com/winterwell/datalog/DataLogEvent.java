@@ -94,6 +94,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"xid", String.class,
 			"oxid", String.class,
 			"txid", String.class,
+			"email", String.class,
 			"uxid", String.class,
 			"su",String.class,
 			"gby", String.class, // group-by ID -- for collating events together into one summary event
@@ -142,7 +143,8 @@ public final class DataLogEvent implements Serializable, IHasJson
 			// no-index (object)
 			"xtra", Null.class, // FIXME this was causing bugs :(
 			"socialShareId", String.class // unique ID to identify where ad has been requested via link shared on social media
-			));
+			// mailing list / CRM??
+		));
 
 	public static final String simple = "simple";
 	

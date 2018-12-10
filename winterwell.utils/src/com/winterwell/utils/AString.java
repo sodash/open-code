@@ -23,7 +23,7 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 	/**
 	 * 
 	 * @param name String or an AString wrapper. Cannot be null.
-	 * If it is an ASTring, the class must match -- this provides type-safety
+	 * If it is an AString, the class must match -- this provides type-safety
 	 * (e.g. a User-id cannot be turned into a Document-id)
 	 */
 	public AString(CharSequence name) {
@@ -38,7 +38,9 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 	 * Only equals to its own class! 
 	 * 
 	 * Because we could not make String.equals(AString) return true, we opt for symmetric behaviour.
-	 * It will log a warning if compared against a String. 
+	 * It will log a warning if compared against a String.
+	 * 
+	 *  @see #equiv(CharSequence)
 	 */
 	@Override
 	public final boolean equals(Object obj) {
@@ -55,6 +57,16 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 		// fail, but log a warning -- this could be a bug
 		Log.w(getClass().getName(), "Same String but != as classes mismatch: "+obj.getClass()+" string: "+name);
 		return false;
+	}
+	
+
+	/**
+	 * @param b
+	 * @return true if this and b have equals string values. Like equals() but ignores class.
+	 */
+	public boolean equiv(CharSequence b) {
+		if (b==null) return false;
+		return toString().equals(b.toString());
 	}
 
 	private static final long serialVersionUID = 1L;
