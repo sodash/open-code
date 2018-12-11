@@ -169,7 +169,7 @@ public interface ITrainable<DataType> {
 	void finishTraining();
 
 	/**
-	 * Is the {@link ITrainable} ready to be trained?
+	 * Is the {@link ITrainable} ready to be used?
 	 * 
 	 * @return
 	 */
