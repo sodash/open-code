@@ -18,7 +18,8 @@ import com.winterwell.utils.containers.Pair2;
 public interface IStore extends Flushable {
 
 	/**
-	 * Use-case: Damage limitation only. For handling damaged artifacts, which can't be de-seraliased.
+	 * @deprecated 
+	 * Use-case: Damage limitation only. For handling damaged artifacts, which can't be de-serialised.
 	 * @param desc
 	 * @return The raw serialised gunk, or null.
 	 */

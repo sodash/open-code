@@ -143,7 +143,13 @@ public class ESStore implements IStore {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		ESPath path = pathForDesc(desc);		
 		IndexRequestBuilder put = esc.prepareIndex(path);;
-		put.setBodyDoc(new ESStoreWrapper(artifact));
+		// ?? ESStoreWrapper uses XStream's xml encoding
+		// ?? Sometimes, json would be better -- is there an elegant way to switch between the two?
+		// ?? Would json be better here always? 
+		// NB: our XStream does have some special-case handling for large blobs of data.
+		// -- though that could be added to Gson too. See XStreamBinaryConverter
+		ESStoreWrapper doc = new ESStoreWrapper(artifact);
+		put.setBodyDoc(doc);
 		IESResponse resp = put.get().check();	
 //		indexCache.put(path.index(), tag);
 	}
