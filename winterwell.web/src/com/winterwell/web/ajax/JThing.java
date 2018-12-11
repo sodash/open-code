@@ -67,16 +67,24 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 
 	public String string() {
 		if (json==null && map!=null) {
-			Gson gson = Dep.get(Gson.class);
+			Gson gson = gson();
 			json = gson.toJson(map);
 		}
 		if (json==null && java!=null) {
-			Gson gson = Dep.get(Gson.class);
+			Gson gson = gson();
 			json = gson.toJson(java);
 		}
 		return json;
 	}
 	
+	private Gson gson() {
+		if (Dep.has(Gson.class)) {
+			return Dep.get(Gson.class);
+		}
+		// a default
+		return new Gson();
+	}
+
 	/**
 	 * @return An unmodifiable map view.
 	 * @see #put(String, Object)
@@ -114,7 +122,7 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 		String sjson = string();
 		if (sjson != null) {
 			assert type != null : "Call setType() first "+this;
-			Gson gson = Dep.get(Gson.class);			
+			Gson gson = gson();			
 			T pojo = gson.fromJson(sjson, type);
 			if (pojo instanceof IInit) {
 				((IInit) pojo).init();				

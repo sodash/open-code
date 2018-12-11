@@ -294,7 +294,8 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		assert jl==null;
 		jl = new JettyLauncher(getWebRootDir(), getPort());
 		jl.setup();		
-		
+		// no sessions!
+		WebRequest.setStateless(true);
 		addJettyServlets(jl);
 				
 		Log.i("web", "...Launching Jetty web server on port "+jl.getPort());

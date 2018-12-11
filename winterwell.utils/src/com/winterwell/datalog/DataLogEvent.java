@@ -32,7 +32,10 @@ public final class DataLogEvent implements Serializable, IHasJson
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String EVENTTYPE = "evt";
+	/**
+	 * event-type -- can be an array to combine several events from a single session.
+	 */
+	public static final String EVT = "evt";
 
 	/**
 	 * these get special treatment - as direct properties not key/value props.
@@ -91,6 +94,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"xid", String.class,
 			"oxid", String.class,
 			"txid", String.class,
+			"email", String.class,
 			"uxid", String.class,
 			"su",String.class,
 			"gby", String.class, // group-by ID -- for collating events together into one summary event
@@ -139,7 +143,8 @@ public final class DataLogEvent implements Serializable, IHasJson
 			// no-index (object)
 			"xtra", Null.class, // FIXME this was causing bugs :(
 			"socialShareId", String.class // unique ID to identify where ad has been requested via link shared on social media
-			));
+			// mailing list / CRM??
+		));
 
 	public static final String simple = "simple";
 	
@@ -148,7 +153,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 	 * Note: this is NOT the same as tag, because we want to limit to a sane number of these.
 	 * e.g. type=simple, tag=any old string
 	 */
-	private final String[] eventType;
+	private final String[] evt;
 	/**
 	 * never null
 	 */
@@ -227,7 +232,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 		assert ! dataspace.isEmpty() && ! dataspace.contains("/") : dataspace;
 //		assert dataspace.equals(StrUtils.toCanonical(dataspace)) : dataspace +" v "+StrUtils.toCanonical(dataspace); 
 		this.count = count;
-		this.eventType = eventType;
+		this.evt = eventType;
 		this.props = properties == null? Collections.EMPTY_MAP : (Map) properties;
 		this.groupById = Utils.isBlank(groupById)? null : groupById;
 		this.id = makeId(groupById);
@@ -303,7 +308,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 	public Map<String,Object> toJson2() {
 		Map map = new ArrayMap();		
 //		map.put("dataspace", dataspace); This is given by the index
-		map.put(EVENTTYPE, getEventType());
+		map.put(EVT, getEventType());
 		map.put("time", time.toISOString()); //getTime()); // This is for ES -- which works with epoch millisecs
 		map.put("count", count);
 		if (props.isEmpty()) return map;
@@ -375,7 +380,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 		double cnt = MathUtils.toNum(hit.get("count"));
 		Map<String, Object> properties = new ArrayMap();
 		// common props
-		List<String> NOT_COMMON = Arrays.asList(EVENTTYPE, "time","count", "dataspace", "id", "props");
+		List<String> NOT_COMMON = Arrays.asList(EVT, "time","count", "dataspace", "id", "props");
 		for(Entry<String, ?> pv : hit.entrySet()) {
 			if (NOT_COMMON.contains(pv.getKey())) {
 				continue;
@@ -410,7 +415,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 	 * @return
 	 */
 	static String[] getEventTypeFromMap(Map<String, ?> hit) {
-		Object etype = hit.get(EVENTTYPE);
+		Object etype = hit.get(EVT);
 		if (etype==null) throw new IllegalArgumentException("Not a DataLogEVent "+hit);
 		String[] etypes;
 		if (etype instanceof String) {
@@ -425,12 +430,12 @@ public final class DataLogEvent implements Serializable, IHasJson
 	}
 
 	public String[] getEventType() {
-		return eventType;
+		return evt;
 	}
 
 	public String getEventType0() {
-		assert eventType.length == 1 : this;
-		return eventType[0];
+		assert evt.length == 1 : this;
+		return evt[0];
 	}
 
 	/**

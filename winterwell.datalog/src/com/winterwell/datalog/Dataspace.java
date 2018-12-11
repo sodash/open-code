@@ -32,5 +32,6 @@ public final class Dataspace extends AString {
 			throw new IllegalArgumentException("Invalid dataspace: "+name);
 		}
 	}
+
 	
 }

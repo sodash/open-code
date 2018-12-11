@@ -338,7 +338,7 @@ public class ESStorage implements IDataLogStorage {
 				.property("v", new ESType().text().norms(false))
 				.property("n", new ESType().DOUBLE());
 		ESType simpleEvent = new ESType()
-				.property(DataLogEvent.EVENTTYPE, keywordy.copy()) // ?? should we set fielddata=true??
+				.property(DataLogEvent.EVT, keywordy.copy()) // ?? should we set fielddata=true??
 				.property("time", new ESType().date())
 				.property("count", new ESType().DOUBLE())
 				.property("props", props);		

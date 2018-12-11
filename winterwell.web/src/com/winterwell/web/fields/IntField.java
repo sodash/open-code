@@ -19,6 +19,7 @@ public final class IntField extends AField<Integer> {
 	private static final long serialVersionUID = 1L;
 
 	private int max;
+	private int min;
 
 	private Boolean rounding;
 

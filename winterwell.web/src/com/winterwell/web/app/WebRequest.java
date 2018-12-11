@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.sun.xml.internal.ws.api.message.Messages;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.IBuildStrings;
 import com.winterwell.utils.IProperties;
@@ -405,6 +406,8 @@ public class WebRequest implements IProperties, Closeable {
 	 */
 	public final void addMessage(AjaxMsg message) {
 		assert message!=null;
+		// log all messages
+		Log.i("AjaxMsg", message.getText()+"\tid:"+message.getId()+"\tstate:"+this);		
 		// Allow messages to travel across requests  within a session
 		HttpSession session = getSession();
 		List<AjaxMsg> msgs = WebUtils2.getAttribute(session, KEY_MESSAGES);
@@ -412,12 +415,29 @@ public class WebRequest implements IProperties, Closeable {
 			msgs = new ArrayList<AjaxMsg>(4);
 		}
 		msgs.add(message);
-		WebUtils2.setAttribute(session, KEY_MESSAGES, msgs);
-		// log all messages
-		Log.i("AjaxMsg", message.getText()+"\tid:"+message.getId()+"\tstate:"+this);
+		WebUtils2.setAttribute(session, KEY_MESSAGES, msgs);		
 	}		
 	
+	static private boolean stateless;
+	
+	public static void setStateless(boolean stateless) {
+		WebRequest.stateless = stateless;
+	}
+	
+	/**
+	 * 
+	 * @return session. never null. if stateless, then this is a disconnected "dummy" session.
+	 */
 	public HttpSession getSession() {
+		if (stateless) {
+			if (tempSession==null) {
+				Log.w("web", "Using a transient 'session' which will not persist across requests.");
+				// a disconnect dummy (to avoid initialising session management with a session cookie)
+				tempSession = new TestHttpSession();
+			}
+			return tempSession;
+		}
+		
 		HttpSession s = request.getSession();
 		if (s!=null) {
 			if (tempSession!=null) {
@@ -582,7 +602,7 @@ public class WebRequest implements IProperties, Closeable {
 			String vs = getRequest().getParameter(key.getName());
 			if (vs != null) {
 				IllegalArgumentException ex = new IllegalArgumentException(key
-						+ " should be an AField!");
+						+ " should be an AField! But chill we handled it.");
 				Log.report(ex);
 				return (T) vs;
 			}
@@ -804,32 +824,9 @@ public class WebRequest implements IProperties, Closeable {
 	protected String getServletPath() {
 		return "";
 	}
-
-	/**
-	 * If true, {@link #getSessionAttribute(Key)} and {@link #setSessionAttribute(Key, Object)} become no-ops.
-	 * 
-	 * Why?
-	 * It's a backwards compatible cludge to let us safely switch off sessions.
-	 * 
-	 */
-	static boolean NO_SESSIONS = false;
-
-
-	/**
-	 * If true, {@link #getSessionAttribute(Key)} and {@link #setSessionAttribute(Key, Object)} become no-ops.
-	 * 
-	 * Why?
-	 * It's a backwards compatible cludge to let us safely switch off sessions.
-	 * 
-	 */
-	@Deprecated 
-	public static void setNoSessions(boolean no) {
-		NO_SESSIONS = no;
-	}
 	
 	@SuppressWarnings("unchecked")
 	public <X> X getSessionAttribute(Key<X> key) {
-		if (NO_SESSIONS) return null;
 		HttpSession session = getSession();
 		Object v = session.getAttribute(key.getName());
 		return (X) v;
@@ -1139,7 +1136,6 @@ public class WebRequest implements IProperties, Closeable {
 	 *            If null, the key will be removed
 	 */
 	public <X> void setSessionAttribute(Key<X> key, X value) {
-		if (NO_SESSIONS) return;
 		HttpSession session = getSession();
 		if (value == null) {
 			session.removeAttribute(key.getName());
