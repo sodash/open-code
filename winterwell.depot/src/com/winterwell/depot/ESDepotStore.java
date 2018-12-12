@@ -9,6 +9,7 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 import com.winterwell.depot.IHasVersion.IHasBefore;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
+import com.winterwell.es.IESRouter;
 import com.winterwell.es.client.BulkRequestBuilder;
 import com.winterwell.es.client.DeleteRequestBuilder;
 import com.winterwell.es.client.ESHttpClient;
@@ -34,7 +35,7 @@ import com.winterwell.utils.web.XStreamUtils;
  * @author daniel
  *
  */
-public class ESStore implements IStore {
+public class ESDepotStore implements IStore {
 
 //	/**
 //	 * TODO Used for flush
@@ -44,7 +45,9 @@ public class ESStore implements IStore {
 	@Override
 	public void init() {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		esc.checkConnection();
 		DepotConfig dc = Dep.get(DepotConfig.class);
+		// Is this defunct, and we init the first time we see a class??
 		for(String tag : StrUtils.split(dc.tags)) {
 			String index = "depot_"+tag;
 			String type = "artifact";
@@ -58,13 +61,13 @@ public class ESStore implements IStore {
 		BulkRequestBuilder bulk = esc.prepareBulk();
 		// remove all
 		for (Desc desc : remove) {
-			ESPath path = pathForDesc(desc);
+			ESPath path = getPath(desc);
 			DeleteRequestBuilder rm = esc.prepareDelete(path.index(), path.type, path.id);
 			bulk.add(rm);
 		}
 		// add all
 		for (Pair2<Desc, Object> desc_artifact : add) {
-			ESPath path = pathForDesc(desc_artifact.first);
+			ESPath path = getPath(desc_artifact.first);
 			IndexRequestBuilder index = esc.prepareIndex(path);
 			ESStoreWrapper doc = new ESStoreWrapper(desc_artifact.second);
 			index.setBodyDoc(doc);
@@ -74,21 +77,12 @@ public class ESStore implements IStore {
 		IESResponse resp = bulk.get().check();			
 	}
 
-	
-	private ESPath pathForDesc(Desc desc) {
-		String tag = Utils.or(desc.getTag(), "untagged");
-		String index = "depot_"+tag;
-		String type = "artifact";
-		return new ESPath(index, type, desc.getId());
-	}
 
 	@Override
 	public String getRaw(Desc desc) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		String index = "depot_"+Utils.or(desc.getTag(), "untagged");
-		String type = "artifact";
-		initIndex(index, type);
-		GetRequestBuilder getter = new GetRequestBuilder(esc).setIndex(index).setType(type).setId(desc.getId()).setSourceOnly(true);
+		ESPath path = getPath(desc);
+		GetRequestBuilder getter = new GetRequestBuilder(esc).setPath(path).setSourceOnly(true);
 		GetResponse resp = getter.get();
 		String json = resp.getJson();
 		if (json==null) return null;
@@ -97,35 +91,62 @@ public class ESStore implements IStore {
 		return essw.raw;
 	}
 
+	/**
+	 * Key = baseIndex_type
+	 */
 	final Set<String> knownIndexes = new ConcurrentHashSet<>();
+	
+	/**
+	 * Supports the use of index = an alias -> base, which allows for easier mapping updates
+	 * and monthly data management.
+	 * @param index
+	 * @param esc
+	 * @return e.g. index_dec18
+	 */
+	public String getBaseIndex(String index, ESHttpClient esc) {		
+		return index+"_"+esc.getConfig().getIndexAliasVersion();
+	}
 	
 	private void initIndex(String index, String type) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		// make index
-		String bindex = index+"_"+esc.getConfig().getIndexAliasVersion();
-		if (knownIndexes.contains(bindex)) {
+		String bindex = getBaseIndex(index, esc);
+		String knownIndexKey = bindex+"_"+type;
+		if (knownIndexes.contains(knownIndexKey)) {
 			// already done
 			return;
 		}
+		initIndex2(index, type, esc);
+		knownIndexes.add(knownIndexKey);
+	}
+	
+	// after discussion, this doesn't need to be synchronized, but is probably faster that way
+	private synchronized void initIndex2(String index, String type, ESHttpClient esc) {
+		String bindex = getBaseIndex(index, esc);
 		CreateIndexRequest pc = esc.admin().indices().prepareCreate(bindex);
-		pc.setAlias(index);
+		if ( ! bindex.equals(index)) {
+			pc.setAlias(index);
+		}
 		pc.get(); // this will fail if it already exists - oh well
 		// mapping
 		PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(index, type);
 		// ES5+ types
 		ESType mapping = new ESType()
-				.property("raw", new ESType().text().noIndex());
+				.property("raw", new ESType().object().noIndex());
 		// TODO disable _all and other performance boosts
 		pm.setMapping(mapping);
 		IESResponse resp = pm.get().check();
+		if (resp.getError()!=null) {
+			Log.w("ES", resp.getError());
+		}
 		knownIndexes.add(bindex);
-	}
+	}	
 
 	@Override
 	public void remove(Desc desc) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		ESPath path = pathForDesc(desc);		
-		DeleteRequestBuilder del = esc.prepareDelete(path.index(), path.type, path.id);
+		ESPath path = getPath(desc);
+		DeleteRequestBuilder del = esc.prepareDelete(path.index(), path.type, desc.getId());
 		IESResponse resp = del.get();
 		// bark on failure??
 		if (resp.getError()!=null) {
@@ -137,12 +158,19 @@ public class ESStore implements IStore {
 	public boolean contains(Desc desc) {
 		return getRaw(desc) != null;
 	}
+	
+	IESRouter esRouter;
+	
+	public void setEsRouter(IESRouter esRouter) {
+		this.esRouter = esRouter;
+	}
 
 	@Override
-	public <X> void put(Desc<X> desc, X artifact) {		
+	public <X> void put(Desc<X> desc, X artifact) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		ESPath path = pathForDesc(desc);		
-		IndexRequestBuilder put = esc.prepareIndex(path);;
+		ESPath path = getPath(desc);
+		initIndex(path.index(), path.type);
+		IndexRequestBuilder put = esc.prepareIndex(path);
 		// ?? ESStoreWrapper uses XStream's xml encoding
 		// ?? Sometimes, json would be better -- is there an elegant way to switch between the two?
 		// ?? Would json be better here always? 
@@ -150,20 +178,17 @@ public class ESStore implements IStore {
 		// -- though that could be added to Gson too. See XStreamBinaryConverter
 		ESStoreWrapper doc = new ESStoreWrapper(artifact);
 		put.setBodyDoc(doc);
-		IESResponse resp = put.get().check();	
-//		indexCache.put(path.index(), tag);
+		IESResponse resp = put.get().check();
 	}
-	
-	
-	
-	
-	@Override
-	public void flush() {
-//		ESHttpClient esc = Dep.get(ESHttpClient.class);
-//		String indexList = StrUtils.join(indexCache.asMap().keySet(), ",");
-		// recent indices
-		// TODO call /indexList/_refresh
-//		throw new TodoException();
+
+	private ESPath getPath(Desc desc) {				
+		if (esRouter != null) {
+			return esRouter.getPath(desc.getType(), desc.getId(), null);
+		}
+		String tag = Utils.or(desc.getTag(), "untagged");
+		String index = "depot_"+tag;
+		String type = "artifact";
+		return new ESPath(index, type, desc.getId());
 	}
 
 	@Override
@@ -190,6 +215,10 @@ public class ESStore implements IStore {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public void flush() {
+		// throw new TodoException();
+	}
 }
 
 class ESStoreWrapper {

@@ -34,9 +34,14 @@ import com.winterwell.utils.time.TimeUtils;
  * @param <K>
  * @param <V>
  */
-public class SlowStorage extends SlowActor<Desc> 
+public class SlowStorage  
 implements IStore, Flushable, Closeable
 {
+
+	@Override
+	public void flush() {
+		actor.flush();
+	}
 	
 	@Override
 	public String getRaw(Desc desc) {
@@ -142,7 +147,7 @@ implements IStore, Flushable, Closeable
 			dt = dt.multiply(jitter);
 		}
 		// post ourselves a note to deal with it
-		sendDelayed(desc, null, dt);		
+		actor.sendDelayed(desc, null, dt);		
 	}
 
 	@Override
@@ -172,150 +177,12 @@ implements IStore, Flushable, Closeable
 	}
 
 	HashSet<Desc> batched;
-	
-	@Override
-	protected void consume(Desc desc, Actor sender) {
-		// Too many errors? 
-		RateCounter ec = errorCount;
-		if (ec!=null && ec.get() > 10) {
-			// NB: Log throttle should stop thie error message going nuts 
-			Log.e(LOGTAG, "SlowStorage back off: "+errorCount+" consecutive save errors.");
-			// pause a bit
-			sendDelayed(desc, sender, delay);
-			return;
-		}
 		
-		try {
-			if (SAVE_BATCH.equals(desc)) {
-				consume2_saveBatch();
-				errorCount = null; // success - reset
-				return;
-			}
-			
-			// batch?
-			if (batch!=null) {
-				boolean freshBatch = batched.isEmpty();
-				batched.add(desc);
-				if (freshBatch) {
-					sendDelayed(SAVE_BATCH, this, batch);
-				}
-				return;			
-			}
-			
-			// normal save one at a time
-			consume2_saveOne(desc);
-			errorCount = null; // success - reset
-			
-		} catch(Exception ex) {			
-			// try again in a bit!
-			sendDelayed(desc, sender, delay);
-			// count and back off?
-			ec = errorCount;
-			if (ec == null) {
-				ec = new RateCounter(delay);
-				errorCount = ec; // NB: race condition paranoia - ec cannot be null
-			}
-			ec.plus(1);
-		}
-	}
-	
 	/**
 	 * Count failed saves. This is reset to null after any successful save. So it should always be low
 	 *  - unless the underlying storage is down.
 	 */
 	RateCounter errorCount;
-
-	private void consume2_saveOne(Desc desc) {
-		// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map.
-		// Remove any other requests for msg
-		for(Packet p : getQ().toArray(new Packet[0])) {
-			if (desc.equals(p.msg)) {
-				getQ().remove(p);
-			}
-		}
-		// Save or remove?
-		Object v = map.get(desc); 
-		// NB: We only modify the map at the end, and only if it stays the same
-		if (v==null) {
-			Log.w(LOGTAG, "null?! Artifact already saved in race? "+desc);
-			// nothing to do
-		} else if (v==NULL) {
-			base.remove(desc);
-		} else {
-			// merge? NB: dec.before is normally null
-			if (desc.getBefore() != null) {
-				Object latest = base.get(desc);
-				if (latest!=null) {
-					Object vMerge = depot.merger.doMerge(desc.getBefore(), v, latest);
-					v = vMerge;
-					// update the binding
-					desc.bind(vMerge);
-				}
-			}
-			
-			// Store it!
-			base.put(desc, v);
-			
-			// take a new snapshot for further updates?
-			if (desc.getBefore() != null) {
-				desc.remarkForMerge();
-			}
-		}
-		// Modify the map if as expected. 
-		// Do nothing to the map if someone has just reset a fresh value.
-		map.remove(desc, v);
-	}
-
-	
-
-	private void consume2_saveBatch() {
-		List<Pair2<Desc,Object>> add = new ArrayList();
-		List<Desc> remove = new ArrayList();
-		
-		for(Desc desc : batched) {
-			// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map.
-			// Remove any other requests for msg
-			for(Packet p : getQ().toArray(new Packet[0])) {
-				if (desc.equals(p.msg)) {
-					getQ().remove(p);
-				}
-			}
-			// Save or remove?
-			Object v = map.get(desc); 
-			// NB: We only modify the map at the end, and only if it stays the same
-			if (v==null) {
-				Log.w(LOGTAG, "null?! Artifact already saved in race? "+desc);
-				// nothing to do
-			} else if (v==NULL) {
-				remove.add(desc);				
-			} else {
-				// merge? NB: dec.before is normally null
-				if (desc.getBefore() != null) {
-					Object latest = base.get(desc);
-					if (latest!=null) {
-						Object vMerge = depot.merger.doMerge(desc.getBefore(), v, latest);
-						v = vMerge;
-						// update the binding
-						desc.bind(vMerge);
-					}
-				}
-				
-				// Store it!
-				add.add(new Pair2<>(desc, v));				
-				
-				// take a new snapshot for further updates?
-				if (desc.getBefore() != null) {
-					desc.remarkForMerge();
-				}
-			}
-			// Modify the map if as expected. 
-			// Do nothing to the map if someone has just reset a fresh value.
-			map.remove(desc, v);
-		}
-		// save
-		base.storeBatch(add, remove);
-	}
-	
 
 	Depot depot;
 
@@ -335,5 +202,140 @@ implements IStore, Flushable, Closeable
 	public void setDelayJitter(double writeBehindJitter) {
 		this.delayJitter = writeBehindJitter;
 	}
+	
+	final SlowStorageActor actor = new SlowStorageActor();
+	
+	class SlowStorageActor extends SlowActor<Desc> {
 
+		@Override
+		protected void consume(Desc desc, Actor sender) {
+			// Too many errors? 
+			RateCounter ec = errorCount;
+			if (ec!=null && ec.get() > 10) {
+				// NB: Log throttle should stop thie error message going nuts 
+				Log.e(LOGTAG, "SlowStorage back off: "+errorCount+" consecutive save errors.");
+				// pause a bit
+				sendDelayed(desc, sender, delay);
+				return;
+			}
+			
+			try {
+				if (SAVE_BATCH.equals(desc)) {
+					consume2_saveBatch();
+					errorCount = null; // success - reset
+					return;
+				}
+				
+				// batch?
+				if (batch!=null) {
+					boolean freshBatch = batched.isEmpty();
+					batched.add(desc);
+					if (freshBatch) {
+						sendDelayed(SAVE_BATCH, this, batch);
+					}
+					return;			
+				}
+				
+				// normal save one at a time
+				consume2_saveOne(desc);
+				errorCount = null; // success - reset
+				
+			} catch(Throwable ex) {			
+				// try again in a bit!
+				sendDelayed(desc, sender, delay);
+				// count and back off?
+				ec = errorCount;
+				if (ec == null) {
+					ec = new RateCounter(delay);
+					errorCount = ec; // NB: race condition paranoia - ec cannot be null
+				}
+				ec.plus(1);
+			}
+		}
+		
+
+		private void consume2_saveOne(Desc desc) {
+			consume3(desc, null, null);
+		}
+
+		
+		/**
+		 * Do the work for {@link #consume2_saveOne(Desc)} and {@link #consume2_saveBatch()}
+		 * @param desc
+		 * @param remove null for save-one
+		 * @param add null for save-one
+		 */
+		private void consume3(Desc desc, List<Pair2<Desc, Object>> add, List<Desc> remove) {
+			// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map.
+			// Remove any other requests for msg
+			for(Packet p : getQ().toArray(new Packet[0])) {
+				if (desc.equals(p.msg)) {
+					getQ().remove(p);
+				}
+			}
+			// Save or remove?
+			Object v = map.get(desc); 
+			// NB: We only modify the map at the end, and only if it stays the same
+			if (v==null) {
+				Log.w(LOGTAG, "null?! Artifact already saved in race? "+desc);
+				// nothing to do
+			} else if (v==NULL) {
+				if (remove!=null) {
+					remove.add(desc);
+				} else {
+					base.remove(desc);
+				}
+			} else {
+				// merge? NB: dec.before is normally null
+				if (desc.getBefore() != null) {
+					Object latest = base.get(desc);
+					if (latest!=null) {
+						Object vMerge = depot.merger.doMerge(desc.getBefore(), v, latest);
+						v = vMerge;
+						// update the binding
+						desc.bind(vMerge);
+					}
+				}
+				
+				// Store it!
+				if (add!=null) {				
+					add.add(new Pair2<>(desc, v));
+				} else {
+					base.put(desc, v);
+				}
+				
+				// take a new snapshot for further updates?
+				if (desc.getBefore() != null) {
+					desc.remarkForMerge();
+				}
+			}
+			// Modify the map if as expected. 
+			// Do nothing to the map if someone has just reset a fresh value.
+			map.remove(desc, v);
+		}
+		
+
+		private void consume2_saveBatch() {
+			Log.d(LOGTAG, "save batch of "+batched.size());
+			List<Pair2<Desc,Object>> add = new ArrayList();
+			List<Desc> remove = new ArrayList();
+			
+			for(Desc desc : batched) {
+				consume3(desc, add, remove);
+			}
+			// save
+			base.storeBatch(add, remove);
+		}		
+	}
+
+	/**
+	 * @deprecated low level access for debug only
+	 */
+	public SlowActor getActor() {
+		return actor;
+	}
+
+	
 }
+
+

@@ -15,14 +15,14 @@ public class BuildZonefoxTemp extends BuildTask {
 		assert zflibs.isDirectory() : zflibs;
 		List<BuildWinterwellProject> projects = Arrays.asList(				
 //				new BuildWeb(),
-				new BuildMaths(),
+//				new BuildMaths(),
 //				new BuildNLP(),
-//				new BuildDepot(),
+				new BuildDepot(),
 //				new BuildDataLog(),
 //				new BuildBob(),
 //				new BuildFlexiGson(),
 //				new BuildUtils(),
-				new WWDependencyTask("elasticsearch-java-client", "BuildESJavaClient"),
+//				new WWDependencyTask("elasticsearch-java-client", "BuildESJavaClient"),
 				null
 				);
 		for (BuildWinterwellProject buildWinterwellProject : projects) {

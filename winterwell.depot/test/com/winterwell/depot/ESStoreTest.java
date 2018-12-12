@@ -26,7 +26,7 @@ public class ESStoreTest {
 
 		ArrayMap artifact = new ArrayMap("a", "apple", "b", "bee");
 		Desc desc = new Desc("test-simple", Map.class);
-		ESStore store = new ESStore();
+		ESDepotStore store = new ESDepotStore();
 		store.init();
 		store.put(desc, artifact);
 		Utils.sleep(1500);

@@ -399,17 +399,21 @@ public class BuildWinterwellProject extends BuildTask {
 		// FIXME Compile seeing errors in Windows re XStream dependency!
 		// FIXME Compile seeing errors on Linux when run from JUnit but not when bob is run from the command line ?! Nov 2018
 		if (compile) {
-			assert projectDir != null : this;
-			CompileTask compile = new CompileTask(srcDir, binDir);
-			// classpath
-			EclipseClasspath ec = new EclipseClasspath(projectDir);
-			ec.setIncludeProjectJars(true);
-			Set<File> libs = ec.getCollectedLibs();
-			compile.setClasspath(libs);		
-//			compile.setSrcJavaVersion("1.9");
-//			compile.setOutputJavaVersion("1.8");
-			compile.run();
-			compile.close();
+			try {
+				assert projectDir != null : this;
+				CompileTask compile = new CompileTask(srcDir, binDir);
+				// classpath
+				EclipseClasspath ec = new EclipseClasspath(projectDir);
+				ec.setIncludeProjectJars(true);
+				Set<File> libs = ec.getCollectedLibs();
+				compile.setClasspath(libs);		
+	//			compile.setSrcJavaVersion("1.9");
+	//			compile.setOutputJavaVersion("1.8");
+				compile.run();
+				compile.close();
+			} catch(Exception ex) {
+				Log.e(ex); // :'( Dec 2018 Why??
+			}
 		}
 		// also copy any resources across??
 		CopyTask nonJava = new CopyTask(srcDir, binDir);

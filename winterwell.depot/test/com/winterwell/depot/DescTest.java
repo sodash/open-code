@@ -46,7 +46,7 @@ public class DescTest {
 			System.out.println(StrUtils.toNSigFigs(mem/(1024*1024), 3)+"mb\t"
 					+"DescCache.sharedObject2Desc: "+DescCache.sharedObject2Desc.size()+"\t"
 					+"DescCache.desc2bound: "+DescCache.desc2bound.size()+"\t"
-					+"StoreLater.queue: "+laters.getQ().size());
+					+"StoreLater.queue: "+laters.getActor().getQ().size());
 		}	
 		long mem = ReflectionUtils.getUsedMemory();
 		assert mem / first < 5: mem+" vs "+first; 
