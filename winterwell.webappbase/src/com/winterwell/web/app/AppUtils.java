@@ -408,7 +408,9 @@ public class AppUtils {
 	 * @return
 	 */
 	private static KServerType getServerType2() {
-		// explicit config
+		// ISiteConfig??
+		
+		// explicit config ??who uses this?? is it for unit tests??
 		if (Dep.has(Properties.class)) {
 			String st = Dep.get(Properties.class).getProperty("serverType");
 			if (st!=null) {
