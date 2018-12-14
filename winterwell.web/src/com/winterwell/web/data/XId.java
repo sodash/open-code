@@ -193,7 +193,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 			id = WebUtils2.urlDecode(id);
 			i = id.lastIndexOf('@');
 		}
-		assert i>0 : id;
+		assert i>0 : "no @ in XId: "+id;
 		this.service = id.substring(i+1);
 		this.name = id.substring(0, i);
 		assert notNullNameCheck() : id;
