@@ -157,7 +157,7 @@ public final class UploadServlet implements IServlet {
 		File dest = null;
 		try {
 			// Do the upload
-			Log.report("Accepting upload of "+tempFile.length()+" bytes, temp location "+tempFile.getAbsolutePath(), Level.FINE);
+			Log.i("Accepting upload of "+tempFile.length()+" bytes, temp location "+tempFile.getAbsolutePath(), Level.FINE);
 			dest = getDestFile(uxid, tempFile);
 			// Shift it
 			FileUtils.move(tempFile, dest);
