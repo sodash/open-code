@@ -21,6 +21,11 @@ import com.winterwell.web.email.SimpleMessage;
  */
 public class Emailer implements Closeable {
 
+	@Override
+	public String toString() {
+		return "Emailer["+ld+"]";
+	}
+	
 	private LoginDetails ld;
 
 //	private String app;
