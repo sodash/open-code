@@ -16,8 +16,6 @@
 
 package com.winterwell.gson.internal;
 
-import java.lang.reflect.Constructor;
-
 /**
  * Defines a generic object construction factory. The purpose of this class is
  * to construct a default instance of a class that can be used for object

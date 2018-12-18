@@ -22,7 +22,6 @@ import com.winterwell.gson.stream.JsonToken;
 import com.winterwell.gson.stream.JsonWriter;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.ReflectionUtils;
-import com.winterwell.utils.log.Log;
 
 /**
  * Uses "@class" property to instantiate sub-classes.
