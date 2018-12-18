@@ -20,6 +20,8 @@ import com.winterwell.youagain.client.AuthToken;
  * 
  * Referer url: explicitly set via ref=, or the referring page from the http header
  * 
+ * DoNotTrack is handled by {@link WebRequest#isDoNotTrack()}
+ * 
  * @author daniel
  *
  */
@@ -83,26 +85,6 @@ public class TrackingPixelServlet implements IServlet {
 		
 		// log it
 		Log.d("track", state.getReferer()+" uid: "+uid);		
-
-//		// TODO Tag the email / tweet
-//		XId xid = state.get(Fields.XID);
-//		if (xid==null) {
-//			return;
-//		}		
-//		TempTag tag = new Tripwire().getTrackerTag(xid, grp);
-//		QueryFilter<DBText> qf = new QueryFilter(DBText.class);
-//		qf.noStdFilters();
-//		qf.addTag(tag);
-//		qf.setSecurity(false);
-//		IText text = qf.getUniqueResult();
-//		if (text!=null) {
-//			Tags.tag2(text, new TempTag(Tripwire.OPENED_TAG, tag.getGroupSlug()), KManual.BACKGROUND, false, null, null);
-//			// was it part of a campaign mailshot?
-//			XId parent = text.get(MailshotServlet.PARENT);
-//			if (parent!=null) {
-//				Stat.count(1, statTag(grp, parent));
-//			}
-//		}
 	}
 
 
