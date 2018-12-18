@@ -1,11 +1,8 @@
 package com.winterwell.youagain.client;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Generated;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.winterwell.utils.IProperties;

@@ -1,7 +1,5 @@
 package com.winterwell.youagain.client;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import com.winterwell.utils.Utils;

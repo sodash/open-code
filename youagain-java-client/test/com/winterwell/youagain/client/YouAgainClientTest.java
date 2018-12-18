@@ -1,12 +1,7 @@
 package com.winterwell.youagain.client;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
-import com.winterwell.utils.Dep;
-import com.winterwell.utils.io.ConfigFactory;
-import com.winterwell.utils.io.FileUtils;
 import com.winterwell.web.LoginDetails;
 import com.winterwell.web.data.XId;
 

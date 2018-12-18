@@ -4,9 +4,8 @@ package com.winterwell.youagain.client;
 import java.io.File;
 
 import com.winterwell.bob.tasks.MavenDependencyTask;
-import com.winterwell.utils.io.FileUtils;
-
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
+import com.winterwell.utils.io.FileUtils;
 
 
 public class BuildYouAgainJavaClient extends BuildWinterwellProject {
