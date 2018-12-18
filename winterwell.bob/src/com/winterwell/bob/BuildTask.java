@@ -1,7 +1,6 @@
 package com.winterwell.bob;
 
 import java.io.Closeable;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +17,6 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TimeOut;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.threads.TaskRunner;
@@ -81,7 +79,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	@Override
 	public Desc getDesc() {
 		if (this.desc!=null) return desc;
-		Desc _desc = new Desc(getClass().getSimpleName(), BuildTask.class);
+		Desc _desc = new Desc(getTaskName(), BuildTask.class);
 		_desc.setTag("bob");
 		try {
 			_desc.setVersionStamp(this);
@@ -95,6 +93,11 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	}
 	
 	
+	protected String getTaskName() {
+		return getClass().getSimpleName();
+	}
+
+
 	@Override
 	public final int hashCode() {
 		return getDesc().hashCode();

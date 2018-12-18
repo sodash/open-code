@@ -20,8 +20,6 @@ import javax.mail.Store;
 import javax.mail.search.ComparisonTerm;
 import javax.mail.search.ReceivedDateTerm;
 import javax.mail.search.SearchTerm;
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLSocketFactory;
 
 //import com.sun.mail.imap.IMAPFolder;
 //import com.sun.mail.imap.IMAPMessage;
@@ -32,7 +30,6 @@ import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.TimeOut;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;

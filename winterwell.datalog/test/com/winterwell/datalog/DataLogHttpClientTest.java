@@ -6,7 +6,6 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.winterwell.nlp.query.SearchQuery;
-import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.TUnit;

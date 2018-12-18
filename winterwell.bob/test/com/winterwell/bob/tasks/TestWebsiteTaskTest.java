@@ -2,8 +2,6 @@ package com.winterwell.bob.tasks;
 
 import java.util.Arrays;
 
-import org.junit.Test;
-
 public class TestWebsiteTaskTest {
 
 //	@Test ails, and who cares since we dont use this

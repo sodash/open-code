@@ -19,10 +19,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.containers.ArrayMap;

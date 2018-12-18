@@ -5,7 +5,6 @@ import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.EmailField;
 import com.winterwell.web.fields.EnumField;
-import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.SField;
 import com.winterwell.web.fields.TimeField;
 import com.winterwell.web.fields.XIdField;

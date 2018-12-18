@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -13,24 +12,10 @@ import java.util.Set;
 
 import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
-import com.winterwell.bob.IErrorHandler;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.MakeVersionPropertiesTask;
 import com.winterwell.bob.tasks.ProcessTask;
-import com.winterwell.utils.Environment;
-import com.winterwell.utils.FailureException;
-import com.winterwell.utils.IFn;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.Utils;
-import com.winterwell.utils.gui.GuiUtils;
-import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.log.KErrorPolicy;
-import com.winterwell.utils.log.Log;
-import com.winterwell.utils.log.LogFile;
-import com.winterwell.web.email.SimpleMessage;
-
 import com.winterwell.bob.wwjobs.BuildDataLog;
 import com.winterwell.bob.wwjobs.BuildDepot;
 import com.winterwell.bob.wwjobs.BuildFlexiGson;
@@ -39,6 +24,16 @@ import com.winterwell.bob.wwjobs.BuildUtils;
 import com.winterwell.bob.wwjobs.BuildWeb;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
 import com.winterwell.bob.wwjobs.WWDependencyTask;
+import com.winterwell.utils.Environment;
+import com.winterwell.utils.FailureException;
+import com.winterwell.utils.Printer;
+import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.gui.GuiUtils;
+import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.LogFile;
+import com.winterwell.web.email.SimpleMessage;
 
 
 /**
@@ -46,14 +41,16 @@ import com.winterwell.bob.wwjobs.WWDependencyTask;
  */
 public class PublishProjectTask extends BuildTask {
 	
+	/**
+	 * If true, pass the --notests flag into the bash script
+	 * 
+	 */
+	protected boolean notests;
+	
 	/** typeOfPublish can be set to either 'test' or 'production' or 'local' (local=your machine only)
 	 */
 	protected KPubType typeOfPublish = null;
 	
-	// preClean is no longer supported
-	protected String preClean =
-			"";
-//			"clean";
 	
 	protected String remoteUser = "winterwell";
 	protected String remoteWebAppDir;
@@ -67,11 +64,6 @@ public class PublishProjectTask extends BuildTask {
 	 * tmp-lib
 	 */
 	protected File localLib;
-
-	/**
-	 * frontend backend everything
-	 */
-	protected String codePart = "everything";
 
 	protected boolean compile;
 
@@ -206,7 +198,7 @@ public class PublishProjectTask extends BuildTask {
 			Log.i(LOGTAG, "local -- no publish step.");
 			return;
 		}
-		ProcessTask pubas = new ProcessTask(bashScript+" "+typeOfPublish + " "+codePart+" "+preClean);
+		ProcessTask pubas = new ProcessTask(bashScript+" "+typeOfPublish +(notests?" --notests":""));
 		pubas.setEcho(true);
 		pubas.run();
 		if ( ! Utils.isBlank(pubas.getError())) {
@@ -236,24 +228,7 @@ public class PublishProjectTask extends BuildTask {
 			FileUtils.copy(jar, localJar);
 		}
 		
-		// Remove unwanted jars? -- no too dangerous
-		
-//		// WW jars - by project -- almost no need (done by EC above) 
-//		// ??unless the build script uses a non-standard name.
-//		List<String> projects = ec.getReferencedProjects();
-//		IFn<String, File> epf = ec.getProjectFinder();
-//		for (String project : projects) {
-//			File pdir = epf.apply(project);
-//			if (pdir != null && pdir.isDirectory()) {
-//				BuildWinterwellProject bwp = new BuildWinterwellProject(pdir, project);
-//				File jar = bwp.getJar();
-//				if (jar.isFile()) {
-//					FileUtils.copy(jar, localLib);
-//				}
-//			} else {
-//				Log.d(LOGTAG, "Could not find Eclipse project "+project);
-//			}
-//		}
+		// Remove unwanted jars? -- no too dangerous		
 		
 		// This jar
 		if (buildProjectTask instanceof BuildWinterwellProject) {

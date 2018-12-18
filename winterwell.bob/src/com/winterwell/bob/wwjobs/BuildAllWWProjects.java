@@ -33,6 +33,7 @@ public class BuildAllWWProjects extends BuildTask {
 				);
 		for (BuildWinterwellProject bwp : projects) {
 			bwp.setScpToWW(true);
+			bwp.setIncSrc(true);
 			bwp.run();
 		}		
 	}

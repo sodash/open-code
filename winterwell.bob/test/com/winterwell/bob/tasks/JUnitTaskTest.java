@@ -1,14 +1,11 @@
 package com.winterwell.bob.tasks;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 
-import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.web.WebUtils2;
 
 public class JUnitTaskTest {

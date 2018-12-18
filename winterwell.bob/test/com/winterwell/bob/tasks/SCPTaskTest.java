@@ -8,8 +8,6 @@ import org.junit.Test;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 
-import junit.framework.TestCase;
-
 public class SCPTaskTest {
 
 	@Test

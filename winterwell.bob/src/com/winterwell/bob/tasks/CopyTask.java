@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;

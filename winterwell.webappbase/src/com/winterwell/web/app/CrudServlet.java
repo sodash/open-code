@@ -43,7 +43,6 @@ import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.WebRequest.KResponseType;
-import com.winterwell.web.data.IHasXId;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.SField;
 import com.winterwell.youagain.client.AuthToken;

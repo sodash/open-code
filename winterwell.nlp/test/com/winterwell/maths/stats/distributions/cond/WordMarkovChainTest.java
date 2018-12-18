@@ -1,9 +1,5 @@
 package com.winterwell.maths.stats.distributions.cond;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
 import org.junit.Test;
 
 import com.winterwell.nlp.corpus.IDocument;
@@ -13,7 +9,6 @@ import com.winterwell.nlp.io.SitnStream;
 import com.winterwell.nlp.io.Tkn;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
 import com.winterwell.utils.containers.ArraySet;
-import com.winterwell.utils.containers.Containers;
 
 public class WordMarkovChainTest {
 

@@ -1,10 +1,7 @@
 package com.winterwell.bob.tasks;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
-import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.TestTask;
 
 public class ForkJVMTaskTest {

@@ -6,7 +6,6 @@ import java.util.Collection;
 
 import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
-import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
 import com.winterwell.bob.wwjobs.BuildUtils;
 import com.winterwell.bob.wwjobs.BuildWeb;

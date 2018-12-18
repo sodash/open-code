@@ -2,12 +2,8 @@ package com.winterwell.maths.stats.distributions.cond;
 
 import java.util.Map;
 
-import com.winterwell.depot.IHasDesc;
-import com.winterwell.depot.ModularXML;
 import com.winterwell.maths.ITrainable;
 import com.winterwell.maths.matrix.ObjectMatrix;
-import com.winterwell.maths.stats.distributions.IDistributionBase;
-import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 
 /**

@@ -142,42 +142,48 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 
 	@Override
 	public Set<java.util.Map.Entry<K, V>> entrySet() {
-		return new AbstractSet<Entry<K, V>>() {
-			@Override
-			public Iterator<java.util.Map.Entry<K, V>> iterator() {
-				return new Iterator<Entry<K, V>>() {
-					MapEntry<K, V> entry = new MapEntry<K, V>(ArrayMap.this);
-					int i = 0;
-
-					@Override
-					public boolean hasNext() {
-						return i < keys.size();
-					}
-
-					@Override
-					public java.util.Map.Entry<K, V> next() {
-						entry.reset(keys.get(i), values.get(i));
-						i++;
-						return entry;
-					}
-
-					@Override
-					public void remove() {
-						keys.remove(i - 1);
-						values.remove(i - 1);
-						i--;
-					}
-
-				};
-			}
-
-			@Override
-			public int size() {
-				return keys.size();
-			}
-
-		};
+		return new EntrySet();
 	}
+	
+	/**
+	 * key-value entry set.
+	 * NB: we use a named class not an anonymous class for code stability 
+	 */
+	private final class EntrySet extends AbstractSet<Entry<K, V>> {
+		@Override
+		public Iterator<java.util.Map.Entry<K, V>> iterator() {
+			return new Iterator<Entry<K, V>>() {
+				MapEntry<K, V> entry = new MapEntry<K, V>(ArrayMap.this);
+				int i = 0;
+
+				@Override
+				public boolean hasNext() {
+					return i < keys.size();
+				}
+
+				@Override
+				public java.util.Map.Entry<K, V> next() {
+					entry.reset(keys.get(i), values.get(i));
+					i++;
+					return entry;
+				}
+
+				@Override
+				public void remove() {
+					keys.remove(i - 1);
+					values.remove(i - 1);
+					i--;
+				}
+
+			};
+		}
+
+		@Override
+		public int size() {
+			return keys.size();
+		}
+	};
+	
 
 	@Override
 	public V get(Object key) {
@@ -293,8 +299,10 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 	}
 
 	/**
+	 * @deprecated May be removed in future
+	 * 
 	 * Re-sort by value. If you want to sort by key, just use TreeMap instead.
-	 * @param comparator Can be null, in which case 
+	 * @param comparator Can be null, in which case do a default-order value sort
 	 */
 	public void sort(final Comparator<V> comparator) {
 		ArrayList<Pair2<V,K>> vk = new ArrayList();
@@ -304,14 +312,7 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 		if (comparator==null) {
 			Collections.sort(vk);
 		} else {
-			Collections.sort(vk, new Comparator<Pair2<V,K>>() {
-				@Override
-				public int compare(Pair2<V, K> o1, Pair2<V, K> o2) {
-					int c = comparator.compare(o1.first, o2.first);
-					if (c!=0) return c;
-					return Utils.compare(o1.second, o2.second);
-				}
-			});
+			Collections.sort(vk, new StdComparator(comparator));
 		}
 		// copy back
 		for(int i=0; i<keys.size(); i++) {
@@ -321,4 +322,18 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 	}
 
 	
+}
+
+final class StdComparator<V,K> implements Comparator<Pair2<V,K>> {
+	private final Comparator<V> comparator;
+	public StdComparator(Comparator<V> comparator) {
+		this.comparator = comparator;
+	}
+
+	@Override
+	public int compare(Pair2<V, K> o1, Pair2<V, K> o2) {
+		int c = comparator.compare(o1.first, o2.first);
+		if (c!=0) return c;
+		return Utils.compare(o1.second, o2.second);
+	}	
 }

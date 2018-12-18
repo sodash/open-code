@@ -1,13 +1,10 @@
 package com.winterwell.datalog.server;
 
-import java.io.File;
 import java.util.Arrays;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.IDataLogAdmin;
-import com.winterwell.utils.Dep;
-import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
@@ -15,8 +12,6 @@ import com.winterwell.web.app.AMain;
 import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.JettyLauncher;
 import com.winterwell.web.app.KServerType;
-import com.winterwell.web.app.ManifestServlet;
-import com.winterwell.youagain.client.YouAgainClient;
 
 /**
  * Runs this for a standalone DataLog micro-service server.

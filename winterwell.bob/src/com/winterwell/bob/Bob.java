@@ -1,11 +1,9 @@
 package com.winterwell.bob;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +14,6 @@ import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.bob.tasks.Classpath;
 import com.winterwell.bob.tasks.CompileTask;
-import com.winterwell.depot.Desc;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;

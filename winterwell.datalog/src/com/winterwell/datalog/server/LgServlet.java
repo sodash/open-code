@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.DataLog;
@@ -41,7 +39,6 @@ import com.winterwell.web.fields.JsonField;
 import com.winterwell.web.fields.SField;
 
 import ua_parser.Client;
-import ua_parser.OS;
 import ua_parser.Parser;
 
 

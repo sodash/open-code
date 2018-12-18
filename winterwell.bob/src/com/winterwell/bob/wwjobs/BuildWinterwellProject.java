@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
@@ -13,7 +12,6 @@ import com.winterwell.bob.tasks.BigJarTask;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
-import com.winterwell.bob.tasks.ForkJVMTask;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
@@ -25,7 +23,6 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 
@@ -42,6 +39,11 @@ public class BuildWinterwellProject extends BuildTask {
 
 	private File fatJar;
 
+	@Override
+	protected String getTaskName() {
+		return super.getTaskName()+"-"+getProjectName();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -284,19 +286,7 @@ public class BuildWinterwellProject extends BuildTask {
 		// fat jar?
 		if (makeFatJar) {
 			doFatJar();
-		}
-		
-		// Test
-		// JUnitTask junit = new JUnitTask(srcDir, binDir, new File(projectDir,
-		// "unit-tests.html"));
-		// junit.run();
-		
-//		// copy into code/lib
-//		File lib = new File(FileUtils.getWinterwellDir(), "code/lib");
-//		lib.mkdirs();
-//		File libjar = FileUtils.copy(getJar(), lib);
-//		Log.d(LOGTAG, "Copied "+getJar().getName()+" to "+lib);
-//		report.put("jar-copy", libjar);
+		}		
 		
 		// attempt to upload (but don't block)
 		doSCP();
@@ -331,8 +321,9 @@ public class BuildWinterwellProject extends BuildTask {
 		} catch(Throwable ex) {
 			Log.w(LOGTAG, ex);
 		}
-		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 
-				"version: "+StrUtils.joinWithSkip(" ", version, new Time().ddMMyyyy())
+		// include version, time, and a unique nonce
+		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 				
+				"version: "+StrUtils.joinWithSkip(" ", version, new Time().ddMMyyyy(), "nonce"+Utils.getRandomString(4))
 				+gitiv+by);
 		// vendor
 		jar.setManifestProperty("Implementation-Vendor", "Winterwell");	

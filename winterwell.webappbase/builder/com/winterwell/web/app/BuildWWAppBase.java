@@ -1,17 +1,11 @@
 package com.winterwell.web.app;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collection;
 
 import com.winterwell.bob.BuildTask;
-import com.winterwell.utils.io.FileUtils;
-
-import com.winterwell.bob.wwjobs.BuildFlexiGson;
-import com.winterwell.bob.wwjobs.BuildUtils;
-import com.winterwell.bob.wwjobs.BuildWeb;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
-import com.winterwell.bob.wwjobs.WWDependencyTask;
+import com.winterwell.utils.io.FileUtils;
 
 public class BuildWWAppBase extends BuildWinterwellProject {
 
