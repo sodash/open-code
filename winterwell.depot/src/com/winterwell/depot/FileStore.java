@@ -59,23 +59,39 @@ public class FileStore implements IStore {
 	}
 
 	/**
-	 * type directory/id based file name
+	 * type directory/id based file name. Uses {@link #getFilingFn()}
 	 * 
 	 * @param config
 	 * @return the File to use for this config (need not exist)
 	 */
 	@Override
-	public File getLocalPath(Desc desc) {
+	public File getLocalPath(Desc desc) {		
+		File _dir = getDirForTag(desc.getTag());
+		
 		try {
 			File f = getFilingFn().apply(desc);
 			if (f.isAbsolute()) {
-				assert f.getPath().startsWith(dir.getPath()) : f+" not in "+dir;
+				assert f.getPath().startsWith(_dir.getPath()) : f+" not in "+_dir;
 				return f;
 			}
-			return new File(dir, f.getPath());
+			String fs = f.toString();
+			if (fs.startsWith("~")) {				
+				File f2 = new File(FileUtils.getUserDirectory(), fs.substring(1, fs.length()));
+				return f2;
+			}
+			return new File(_dir, f.getPath());
 		} catch (Exception ex) {
 			throw Utils.runtime(ex);
 		}
+	}
+
+	private File getDirForTag(String tag) {
+		String sdir = null;
+		if (depotConfig.dir4tag !=null && tag!=null) {
+			sdir = depotConfig.dir4tag.get(tag);
+		}
+		File _dir = sdir == null? depotConfig.dir : new File(sdir);
+		return _dir;
 	}
 	
 	/**
@@ -85,27 +101,32 @@ public class FileStore implements IStore {
 	
 	/**
 	 * What file should we use for Desc?
-	 * Uses the structure
+	 * 
+	 * Default uses the structure
 	 * dir/tag/type/id
 	 * (leaving out /tag/ if null)
+	 * 
+	 * Can return absolute or relative paths. If relative, they are combined with #dir
 	 */
 	private IFn<Desc, File> filingFn = new DefaultFilingFn();
 
 	private DepotConfig depotConfig;
 
 	public FileStore(DepotConfig config) {
-		this(config.dir);
+		this.dir = config.dir.getAbsoluteFile();
 		this.depotConfig = config;
-	}
-	
-	public FileStore(File dir) {
-		this.dir = dir.getAbsoluteFile();
+
 		boolean action = dir.mkdirs();
-		assert dir.isDirectory();
+		assert dir.isDirectory();		
 		if (action) {
 			Log.i(LOGTAG, "New file depot created at: " + dir);
 		}
-	}
+		if (depotConfig.dir4tag!=null) {
+			for(String d : depotConfig.dir4tag.values()) {
+				new File(d).mkdirs();
+			}
+		}
+	}	
 
 	@Override
 	public <X> void put(Desc<X> desc, X artifact) {
@@ -429,12 +450,13 @@ public class FileStore implements IStore {
 
 	class DefaultFilingFn implements IFn<Desc, File> {		
 		@Override
-		public File apply(Desc config) {
-			String id = config.getId();
+		public File apply(Desc desc) {
+			File _dir = getDirForTag(desc.getTag());
+			String id = desc.getId();
 			// encode into filename safe format
 			String encId = FileUtils.filenameEncode(id);
 			// Note: the tag/type sub-dir structure is done in Desc.getId()
-			return new File(dir, encId);
+			return new File(_dir, encId);
 		}
 	}
 }

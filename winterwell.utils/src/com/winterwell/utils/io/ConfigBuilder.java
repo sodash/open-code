@@ -37,6 +37,9 @@ import com.winterwell.utils.time.TimeUtils;
  * Parse Unix style command line arguments. Also handles Java properties objects
  * (as created from .properties files).
  * 
+ * Supports Map fields, via the format "field.key=value"
+ * However these must be Map<String,String>, as there is no type info to convert the value.
+ * 
  * Sets fields annotated with {@link Option} in a config object.
  * 
  * <h3>Best Practice Example</h2>

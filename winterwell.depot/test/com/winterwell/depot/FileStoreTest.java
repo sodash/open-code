@@ -18,7 +18,7 @@ public class FileStoreTest {
 	@Test
 	public void testLoadKeys() {
 		File testDir = new File("test/temp").getAbsoluteFile();
-		FileStore fs = new FileStore(testDir);
+		FileStore fs = new FileStore(new DepotConfig().setDir(testDir));
 		
 		Desc<String> desc1 = new Desc("Test1", String.class);
 		desc1.setTag("test");

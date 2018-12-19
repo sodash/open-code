@@ -2,6 +2,7 @@ package com.winterwell.depot;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Map;
 
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Utils;
@@ -40,6 +41,7 @@ public class DepotConfig {
 		} catch(Exception ex) {
 			dir = new File("depot");
 		}
+		System.out.println(dir4tag);
 	}
 	
 	@Option
@@ -75,6 +77,9 @@ public class DepotConfig {
 	@Option
 	File dir;
 
+	@Option(description="Set this to store certain tags in a different directory. Only applies if FileStorage is used")
+	Map<String,String> dir4tag;
+	
 	@Option
 	KErrorPolicy errorPolicy = KErrorPolicy.DELETE_CAUSE; // !!
 
@@ -138,5 +143,10 @@ public class DepotConfig {
 			return wb;
 		}
 		return s;
+	}
+
+	public DepotConfig setDir(File dir) {
+		this.dir = dir;
+		return this;
 	}
 }

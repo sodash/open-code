@@ -993,6 +993,13 @@ public class FileUtils {
 			throw new WrappedException(e);
 		}
 	}
+	
+	public static File getUserDirectory() {
+		String uh = System.getProperty("user.home");
+		if (uh==null) throw new IllegalStateException("user.home property not set");
+		File f = new File(uh);
+		return f;
+	}
 
 	/**
 	 * @param file
