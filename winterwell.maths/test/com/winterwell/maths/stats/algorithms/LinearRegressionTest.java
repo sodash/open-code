@@ -42,7 +42,7 @@ public class LinearRegressionTest {
 		assert MathUtils.equalish(a, 0.25) : a + " " + lambda;
 		assert MathUtils.equalish(lambda, 2) : a + " " + lambda;
 		
-		Renderer.popup(chart);
+//		Renderer.popup(chart);
 	}
 
 	@Test
