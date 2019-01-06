@@ -20,7 +20,7 @@
 	<classpathentry kind="lib" path="dependencies/arpack_combined_all.jar"/>
 	<classpathentry kind="lib" path="dependencies/core.jar"/>
 	<classpathentry kind="lib" path="dependencies/jniloader.jar"/>
-	<classpathentry kind="lib" path="dependencies/mtj.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/mtj.jar"/>
 	<classpathentry kind="lib" path="dependencies/native_ref-java.jar"/>
 	<classpathentry kind="lib" path="dependencies/native_system-java.jar"/>
 	<classpathentry kind="lib" path="dependencies/netlib-native_ref-linux-armhf-natives.jar"/>
