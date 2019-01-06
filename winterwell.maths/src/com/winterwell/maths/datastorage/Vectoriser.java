@@ -119,7 +119,7 @@ public class Vectoriser<Word, Document> {
 		return list;
 	}
 
-	public List<Word> inverseIndexList(ArrayList<Integer> vs) {
+	public List<Word> inverseIndexList(List<Integer> vs) {
 		List<Word> list = new ArrayList<Word>();
 		for (int i : vs) {
 			Word v = index.get(i);

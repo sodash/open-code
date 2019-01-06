@@ -184,7 +184,7 @@ public class MarkovChain extends ADocModel implements IPruneListener {
 		assert vectoriser.isUnknownOK() : vectoriser;
 		if (startCount == 0)
 			return Double.NEGATIVE_INFINITY;
-		TIntArrayList vs = vectoriser.toIndexList(x);
+		List<Integer> vs = vectoriser.toIndexList(x);
 		if (vs.isEmpty())
 			// undefined really
 			return 0;
@@ -425,7 +425,7 @@ public class MarkovChain extends ADocModel implements IPruneListener {
 	public synchronized void train1(IDocument x) {
 		// ITokenStream tokens = tokenizer.factory(x.getText());
 		// if ( ! tokens.hasNext()) return;
-		TIntArrayList vs = vectoriser.toIndexList(x);
+		List<Integer> vs = vectoriser.toIndexList(x);
 		if (vs.isEmpty())
 			return;
 		// add in the end-of-sequence marker
