@@ -188,7 +188,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 *         Returns an empty list by default - override to specify
 	 *         some dependencies. null is also acceptable but not advisable.
 	 */
-	public Collection<? extends BuildTask> getDependencies() {
+	public List<BuildTask> getDependencies() {
 		// What about build tasks from other projects - which aren't on the classpath?
 		// Hack: see WWDependencyTask, a bit like MavenDependencyTask, which downloads a jar
 		return new ArrayList();

@@ -1,6 +1,7 @@
 package com.winterwell.bob.wwjobs;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +48,11 @@ public class BuildWinterwellProject extends BuildTask {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * Uses Eclipse .classpath file to find projects
+	 * Uses Eclipse .classpath file to find projects.
+	 * Returns a fresh ArrayList which can be modified safely.
 	 */
 	@Override
-	public Collection<? extends BuildTask> getDependencies() {
+	public List<BuildTask> getDependencies() {
 		ArraySet deps = new ArraySet();
 		// what projects does Eclipse specify?
 		EclipseClasspath ec = new EclipseClasspath(projectDir);
@@ -59,7 +61,7 @@ public class BuildWinterwellProject extends BuildTask {
 			WinterwellProjectFinder pf = new WinterwellProjectFinder();
 			getDependency2_project(deps, pname, pf);
 		}
-		return deps;
+		return new ArrayList(deps);
 	}
 
 	private void getDependency2_project(ArraySet deps, String pname, WinterwellProjectFinder pf) {

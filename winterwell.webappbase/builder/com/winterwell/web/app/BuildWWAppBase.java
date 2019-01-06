@@ -1,7 +1,7 @@
 package com.winterwell.web.app;
 
 import java.io.File;
-import java.util.Collection;
+import java.util.List;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
@@ -10,7 +10,7 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildWWAppBase extends BuildWinterwellProject {
 
 	@Override
-	public Collection<? extends BuildTask> getDependencies() {
+	public List<BuildTask> getDependencies() {
 		return super.getDependencies();
 //		return Arrays.asList(
 //				new BuildUtils(),

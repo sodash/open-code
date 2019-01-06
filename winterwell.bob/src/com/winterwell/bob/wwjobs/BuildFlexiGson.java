@@ -2,7 +2,7 @@ package com.winterwell.bob.wwjobs;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.io.FileUtils;
@@ -15,7 +15,7 @@ public class BuildFlexiGson extends BuildWinterwellProject {
 	}
 
 	@Override
-	public Collection<? extends BuildTask> getDependencies() {
+	public List<BuildTask> getDependencies() {
 		return Arrays.asList(new BuildUtils());
 	}
 	

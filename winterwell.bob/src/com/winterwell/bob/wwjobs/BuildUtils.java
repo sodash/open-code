@@ -1,7 +1,6 @@
 package com.winterwell.bob.wwjobs;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import com.winterwell.bob.BuildTask;
@@ -16,7 +15,7 @@ public class BuildUtils extends BuildWinterwellProject {
 	}
 	
 	@Override
-	public Collection<? extends BuildTask> getDependencies() {
+	public List<BuildTask> getDependencies() {
 		List<BuildTask> deps = new ArrayList(super.getDependencies());
 
 		// Maven

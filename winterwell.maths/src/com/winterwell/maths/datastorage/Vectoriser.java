@@ -15,7 +15,6 @@ import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.WeirdException;
 
-import gnu.trove.list.array.TIntArrayList;
 import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.VectorEntry;
 import no.uib.cipr.matrix.sparse.SparseVector;
@@ -120,10 +119,9 @@ public class Vectoriser<Word, Document> {
 		return list;
 	}
 
-	public List<Word> inverseIndexList(TIntArrayList vs) {
+	public List<Word> inverseIndexList(ArrayList<Integer> vs) {
 		List<Word> list = new ArrayList<Word>();
-		int[] avs = vs.toArray();
-		for (int i : avs) {
+		for (int i : vs) {
 			Word v = index.get(i);
 			list.add(v);
 		}
@@ -208,7 +206,7 @@ public class Vectoriser<Word, Document> {
 	 * @param doc
 	 * @return
 	 */
-	public TIntArrayList toIndexList(Document doc) {
+	public List<Integer> toIndexList(Document doc) {
 		return toIndexList(toBitStream(doc));
 	}
 
@@ -220,8 +218,8 @@ public class Vectoriser<Word, Document> {
 	 * @param seqn
 	 * @return list of index values
 	 */
-	public TIntArrayList toIndexList(Iterable<Word> seqn) {
-		TIntArrayList indexValues = new TIntArrayList();
+	public List<Integer> toIndexList(Iterable<Word> seqn) {
+		ArrayList indexValues = new ArrayList();
 		for (Word bit : seqn) {
 			int i = toIndex(bit);
 			if (i == -1) {
