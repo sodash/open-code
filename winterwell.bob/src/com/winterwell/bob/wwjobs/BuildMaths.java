@@ -28,6 +28,7 @@ public class BuildMaths extends BuildWinterwellProject {
 		mdt.addDependency("net.sf.trove4j", "trove4j", "3.0.3");
 		mdt.addDependency("com.google.guava", "guava", "27.0.1-jre");
 		mdt.addDependency("org.apache.commons", "commons-math3", "3.6.1");
+		mdt.addDependency("com.googlecode.matrix-toolkits-java", "mtj", "1.0.4");
 
 		deps.add(mdt);
 		

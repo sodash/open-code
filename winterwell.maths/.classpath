@@ -7,9 +7,6 @@
 	<classpathentry kind="src" path="demo"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/middleware/mtj/arpack_combo-0.1.jar"/>
-	<classpathentry kind="lib" path="/middleware/mtj/netlib-java.jar"/>
-	<classpathentry exported="true" kind="lib" path="/middleware/mtj/mtj.jar" sourcepath="/middleware/mtj/src.zip"/>
 	<classpathentry kind="lib" path="dependencies/guava.jar"/>
 	<classpathentry kind="lib" path="dependencies/listenablefuture.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/trove4j.jar"/>
@@ -20,6 +17,24 @@
 	<classpathentry kind="lib" path="dependencies/j2objc-annotations.jar"/>
 	<classpathentry kind="lib" path="dependencies/jsr305.jar"/>
 	<classpathentry kind="lib" path="dependencies/commons-math3.jar"/>
+	<classpathentry kind="lib" path="dependencies/arpack_combined_all.jar"/>
+	<classpathentry kind="lib" path="dependencies/core.jar"/>
+	<classpathentry kind="lib" path="dependencies/jniloader.jar"/>
+	<classpathentry kind="lib" path="dependencies/mtj.jar"/>
+	<classpathentry kind="lib" path="dependencies/native_ref-java.jar"/>
+	<classpathentry kind="lib" path="dependencies/native_system-java.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_ref-linux-armhf-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_ref-linux-i686-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_ref-linux-x86_64-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_ref-osx-x86_64-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_ref-win-i686-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_ref-win-x86_64-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_system-linux-armhf-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_system-linux-i686-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_system-linux-x86_64-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_system-osx-x86_64-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_system-win-i686-natives.jar"/>
+	<classpathentry kind="lib" path="dependencies/netlib-native_system-win-x86_64-natives.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.web"/>
 	<classpathentry kind="output" path="bin"/>
