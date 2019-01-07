@@ -120,6 +120,10 @@ implements Comparable<Money>, IHasJson {
 	 */
 	public Money plus(Money x) {
 		if (x.isZero()) return this;
+		if (x.currency==KCurrency.MULTIPLY) {
+			// HACK
+			return multiply(x.getValue());
+		}
 		if (currency!=null && x.currency!=null && currency != x.currency) {
 			throw new IllegalArgumentException("Cannot plus across currency "+this+ " "+x);
 		}
