@@ -13,7 +13,7 @@ import com.winterwell.web.data.XId;
 public class PersonLite extends AThing {
 
 	public String username;
-
+	
 	// NB: name and id are defined in AThing
 	
 	public PersonLite(XId from) {
