@@ -731,9 +731,10 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		DepotConfig dconfig = new DepotConfig();
 		// Load any params we can find
 		ConfigBuilder ap = new ConfigBuilder(dconfig);
+		// depot.properties is the "correct" file
 		// old code: Depot.properties (deprecated) used to be the file checked. Changed Dec 2018 
 		File propsFile = FileUtils.or(new File("config/depot.properties"), new File("config/Depot.properties"));
-		if (propsFile.exists()) {			
+		if (propsFile!=null && propsFile.exists()) {			
 			ap.set(propsFile);
 		}
 		ap.setFromSystemProperties("Depot");

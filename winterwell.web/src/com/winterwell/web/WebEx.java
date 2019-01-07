@@ -10,6 +10,17 @@ import com.winterwell.web.data.XId;
 public class WebEx extends RuntimeException {
 	
 	/**
+	 * The request is well-formed and the resource exists (so not a 404), 
+	 * but there is a semantic problem with it, e.g. a missing parameter.
+	 */
+	public static class E422Unprocessable extends E40X {
+		public E422Unprocessable(String msg) {
+			super(422, null, msg);
+		}
+		private static final long serialVersionUID = 1L;
+	}
+
+	/**
 	 * e.g. a version conflict in elastic-search
 	 * @author daniel
 	 *
