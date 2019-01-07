@@ -4,6 +4,8 @@ import com.winterwell.depot.Desc;
 import com.winterwell.depot.INotOverwritable;
 
 /**
+ * Merge = merge concurrent edits.
+ * 
  * This is for cluster-wide systems, so that multiple servers
  * can edit an object at once. However, the standard mergers do not have any dependencies,
  * so they can be used for other purposes too.

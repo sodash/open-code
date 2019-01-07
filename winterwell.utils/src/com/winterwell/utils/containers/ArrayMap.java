@@ -94,10 +94,11 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 	/**
 	 * Copy constructor
 	 * 
-	 * @param copyMe
+	 * @param copyMe Can be null (produces an empty map)
 	 */
 	public ArrayMap(Map<? extends K, ? extends V> copyMe) {
-		this(copyMe.size());
+		this(copyMe==null? 4 : copyMe.size());
+		if (copyMe==null) return;
 		for (K k : copyMe.keySet()) {
 			put(k, copyMe.get(k));
 		}

@@ -86,7 +86,7 @@ public class Merger implements IMerger<Object> {
 	 * @param before
 	 * @param after
 	 * @param latest
-	 * @return
+	 * @return latest + diff(before -> after)
 	 */
 	public Object doMerge(Object before, Object after, Object latest) {
 		if (latest==null) return after;
