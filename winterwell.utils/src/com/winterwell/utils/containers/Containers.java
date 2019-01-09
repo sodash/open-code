@@ -1,5 +1,6 @@
 package com.winterwell.utils.containers;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -1248,6 +1249,8 @@ public final class Containers  {
 	/**
 	 * Get the keys to a map, sorted by their values.
 	 * 
+	 * @NotThreadSafe: If another thread modifies the values, then this can throw an error.
+	 * 
 	 * @param map
 	 * @return The keys of map, sorted by value. Lowest first. E.g. {carol:3,
 	 *         alice:1, bob:2} would result in [alice, bob, carol]
@@ -1271,25 +1274,7 @@ public final class Containers  {
 	}
 
 	private static <K, V> Comparator<K> getValueComparator(final Map<K, V> map) {
-		return new Comparator<K>() {
-			@Override
-			public int compare(K k1, K k2) {
-				if (k1.equals(k2))
-					return 0;
-				Object v1 = map.get(k1);
-				Object v2 = map.get(k2);
-				int comp = Containers.compare(v1, v2);
-				if (comp == 0) {
-					int kc = Containers.compare(k1, k2);
-					if (kc == 0) {
-						Log.e("sort", "Error: Cant sort equals keys "+k1+"="+k2+" & values "+v1+"="+v2+"in "+map+"?!");
-						return 0;						
-					}
-					return kc;
-				}
-				return comp;
-			}
-		};
+		return new ValueComparator<K>(map);
 	}
 
 	/**
@@ -1300,15 +1285,17 @@ public final class Containers  {
 	 * @param maxNum
 	 *            -1 for all
 	 * @return an ArrayMap with keys, sorted by value
+	 * @NotThreadSafe
 	 * @testedby {@link ContainersTest#testGetValueSortedMap()} Note: builds on
 	 *           {@link #getSortedKeys(Map)}
 	 */
 	public static <K, V> Map<K, V> getValueSortedMap(final Map<K, V> map,
-			final boolean smallestFirst, final int maxNum) {
+			final boolean smallestFirst, final int maxNum) 
+	{
 		// pick keys
 		List<K> keys = getSortedKeys(map);
 		// sub set
-		if (!smallestFirst) {
+		if ( ! smallestFirst) {
 			Collections.reverse(keys);
 		}
 		if (maxNum != -1) {
@@ -2299,5 +2286,40 @@ final class Or<X> implements IFilter<X> {
 	@Override
 	public String toString() {
 		return a+" OR "+b;
+	}
+}
+
+
+/**
+ * Note: this comparator imposes orderings that are inconsistent with equals."
+ *
+ * @author daniel
+ *
+ * @param <K>
+ */
+final class ValueComparator<K> implements Comparator<K>, Serializable {
+	private static final long serialVersionUID = 1L;
+	private Map<K, ?> map;
+
+	public ValueComparator(Map<K, ?> map) {
+		this.map = map;
+	}
+
+	@Override
+	public int compare(K k1, K k2) {
+		if (k1.equals(k2))
+			return 0;
+		Object v1 = map.get(k1);
+		Object v2 = map.get(k2);
+		int comp = Containers.compare(v1, v2);
+		if (comp == 0) {
+			int kc = Containers.compare(k1, k2);
+			if (kc == 0) {
+				Log.e("sort", "Error: Cant sort equals keys "+k1+"="+k2+" & values "+v1+"="+v2+"in "+map+"?!");
+				return 0;						
+			}
+			return kc;
+		}
+		return comp;
 	}
 }

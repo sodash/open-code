@@ -4,6 +4,7 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -43,11 +44,14 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 
 	@Override
 	public String toString() {
+		// avoid costly calculations on big objects
+		if (size() > 1000) return getClass().getSimpleName()+"[size="+size()+"]";
 		try {
+			HashMap map = new HashMap(asMap()); // NB: copy for thread safety
 			return getClass().getSimpleName()+"["+Printer.toString(Containers
-					.getValueSortedMap(asMap(), false, 12))+"]";
+					.getValueSortedMap(map, false, 12))+"]";
 		} catch(Throwable ex) { // paranoia -- bug seen in ZF
-			Log.e("distro", ex);
+			Log.i("distro.toString", ex);
 			return getClass().getSimpleName()+"[size="+size()+"]";
 		}
 	}
