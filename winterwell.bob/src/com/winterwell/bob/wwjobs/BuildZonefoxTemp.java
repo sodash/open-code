@@ -17,11 +17,11 @@ public class BuildZonefoxTemp extends BuildTask {
 //				new BuildWeb(),
 //				new BuildMaths(),
 //				new BuildNLP(),
-				new BuildDepot(),
+//				new BuildDepot(),
 //				new BuildDataLog(),
 //				new BuildBob(),
 //				new BuildFlexiGson(),
-//				new BuildUtils(),
+				new BuildUtils(),
 //				new WWDependencyTask("elasticsearch-java-client", "BuildESJavaClient"),
 				null
 				);
