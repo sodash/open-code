@@ -224,7 +224,7 @@ public final class Utils {
 	 * Pick an element using uniform random choice
 	 * 
 	 * @param <X>
-	 * @param list
+	 * @param list Can be null or empty
 	 * @return a random member, or null if list is empty or null
 	 */
 	public static <X> X getRandomMember(Collection<X> list) {

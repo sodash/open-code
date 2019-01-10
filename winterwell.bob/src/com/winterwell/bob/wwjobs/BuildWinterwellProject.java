@@ -168,7 +168,7 @@ public class BuildWinterwellProject extends BuildTask {
 	/**
 	 * null by default. If set, put output files into here
 	 */
-	File outDir;
+	protected File outDir;
 	
 	/**
 	 * null by default. If set, put output files into here
