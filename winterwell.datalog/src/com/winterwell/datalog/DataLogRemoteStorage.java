@@ -88,7 +88,8 @@ public class DataLogRemoteStorage implements IDataLogStorage
 			
 			DataLogRemoteStorage.saveToRemoteServer(LG_SERVER, event);
 		} catch(Throwable ex) {
-			Log.e("datalog.hack (swallowed)", ex);
+			// remote server call failed :(
+			Log.e("datalog.hack (swallowed)", ex.toString());
 		}
 	}
 
