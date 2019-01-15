@@ -1291,6 +1291,8 @@ public class WebRequest implements IProperties, Closeable {
 	}
 	
 	/**
+	 * Is this a GET / PUT / POST / DELETE method?
+	 * 
 	 * HACK allows action=put etc as an alternative to a proper http PUT
 	 * @param method
 	 * @return
@@ -1304,6 +1306,9 @@ public class WebRequest implements IProperties, Closeable {
 	}
 	public boolean isGET() {
 		return is("GET");
+	}
+	public boolean isDELETE() {
+		return is("DELETE");
 	}
 
     /**

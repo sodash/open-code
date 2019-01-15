@@ -33,3 +33,5 @@ winterwell.datalog/dependencies
 */boblog
 !junit-4.12.jar
 winterwell.bob/test-out
+winterwell.bob/test/test.classpath.after
+winterwell.datalog/datalog.log*

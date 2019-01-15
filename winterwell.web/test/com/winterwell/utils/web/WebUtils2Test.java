@@ -1,9 +1,20 @@
 package com.winterwell.utils.web;
 
 import org.junit.Test;
+import org.w3c.dom.Document;
+
+import com.winterwell.utils.StrUtils;
 
 public class WebUtils2Test {
 
+	@Test
+	public void testXmlDocToString() {
+		String xml = "<foo blah='whatever'><bar src=''>huh?</bar></foo>";
+		Document doc = WebUtils2.parseXml(xml);
+		String xml2 = WebUtils2.xmlDocToString(doc);
+		String c = StrUtils.compactWhitespace(xml2.trim()).replaceAll("[\r\n]", "").replace('"', '\'');
+		assert c.equals(xml) : xml2+" -> "+c;
+	}
 
 	@Test
 	public void testCanonicalEmailString() {
