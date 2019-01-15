@@ -124,16 +124,19 @@ public class LgServlet {
 		DataLogEvent logged = doLog(state, ds, gby, tag, count, time, params, stdTrackerParams);
 		
 		// Reply
-		// .gif?
+		// Send a .gif for a pixel?
 		if (state.getResponseType()==KResponseType.image) {
 			FileServlet.serveFile(TrackingPixelServlet.PIXEL, state);
 			return;
 		}
+		// send the event
 		if (DataLogServer.settings.CORS) {
 			WebUtils2.CORS(state, false);
 		}
-		JsonResponse jr = new JsonResponse(state, logged);
+		Object jobj = logged==null? null : logged.toJsonPublic();
+		JsonResponse jr = new JsonResponse(state, jobj);
 		WebUtils2.sendJson(jr, state);
+		
 		// also fire a callback?
 		String cb = state.get(JsonResponse.CALLBACK);
 		if (cb!=null) {
