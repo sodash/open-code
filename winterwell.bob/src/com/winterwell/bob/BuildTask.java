@@ -222,6 +222,8 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 * Use-case: for skipping
 	 */
 	protected transient int depth;
+
+	private boolean skipFlag;
 	
 	/**
 	 * if true, the dependencies will NOT be run!
@@ -296,12 +298,20 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	}
 	
 	/**
+	 * @return true if run() was called -- but skipped
+	 */
+	public boolean isSkipFlag() {
+		return skipFlag;
+	}
+	
+	/**
 	 * Call this to run the task within Bob. This does the work of run() without a TaskRunner shutdown.
 	 */
 	public final void run() {
 		// fix desc if it wasn't before
 		String id = getDesc().getId();
 		if (skip()) {
+			skipFlag = true;
 			return;
 		}
 		
