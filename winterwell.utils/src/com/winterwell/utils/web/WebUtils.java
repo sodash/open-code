@@ -26,6 +26,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -41,6 +42,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -62,7 +64,9 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.containers.AbstractMap2;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.ITree;
 import com.winterwell.utils.containers.Tree;
 import com.winterwell.utils.gui.GuiUtils;
@@ -331,17 +335,13 @@ public class WebUtils {
 		};
 	}
 
-	public static Map<String, String> asMap(NamedNodeMap nnMap) {
-		int n = nnMap.getLength();
-		Map<String, String> map = new ArrayMap<String, String>(n);
-		for (int i = 0; i < n; i++) {
-			Node item = nnMap.item(i);
-			String name = item.getNodeName();
-			String val = item.getNodeValue();
-			String txt = item.getTextContent();
-			map.put(name, val);
-		}
-		return map;
+	/**
+	 * 
+	 * @param node
+	 * @return a Map view of the node's attributes. Edits write through to the node
+	 */
+	public static Map<String, String> getAttributeMap(Node node) {
+		return new NNMap((Element) node);
 	}
 	
 	
@@ -1619,6 +1619,17 @@ public class WebUtils {
 	 * @testedby TODO
 	 */
 	public static List<Node> xpathQuery(Object xpathQuery, Node node) {
+		return xpathQuery2(xpathQuery, node, true);
+	}
+	
+	/**
+	 * 
+	 * @param xpathQuery
+	 * @param node
+	 * @param clone false if you want to do xml surgery -- i.e. add/remove nodes.
+	 * @return
+	 */
+	public static List<Node> xpathQuery2(Object xpathQuery, Node node, boolean clone) {
 		try {
 			// what kind of input do we have? String or pre-compiled?
 			XPathExpression expr;
@@ -1629,9 +1640,8 @@ public class WebUtils {
 			}
 
 			// get a context limited to the node
-			Node clone = node.cloneNode(true);
-			NodeList nodeList = (NodeList) expr.evaluate(clone,
-					XPathConstants.NODESET);
+			Node nclone = clone? node.cloneNode(true) : node;
+			NodeList nodeList = (NodeList) expr.evaluate(nclone, XPathConstants.NODESET);
 			List<Node> nodes = asList(nodeList);
 			return nodes;
 		} catch (XPathExpressionException e) {
@@ -1793,4 +1803,48 @@ final class XmlTreeBuilder extends DefaultHandler {
 	}
 	
 
+}
+
+
+class NNMap extends AbstractMap2<String, String> {
+
+	private final Element base;
+
+	public NNMap(Element nnMap) {
+		this.base = nnMap;
+	}
+	
+	@Override
+	public String remove(Object key) {
+		String old = get(key);
+		this.base.removeAttribute((String) key);
+		return old;
+	}
+	
+	@Override
+	public Set<String> keySet() throws UnsupportedOperationException {
+		NamedNodeMap ba = base.getAttributes();
+		int n = ba.getLength();
+		ArraySet s = new ArraySet();
+		for (int i = 0; i < n; i++) {
+			Node item = ba.item(i);
+			String name = item.getNodeName();
+			s.add(name);
+		}
+		return s;
+	}
+
+	@Override
+	public String get(Object attribute) {
+		String w = base.getAttribute((String) attribute);
+		return w;
+	}
+	
+	@Override
+	public String put(String attribute, String value) {
+		String old = get(attribute);
+		base.setAttribute(attribute, value);
+		return old;
+	}
+	
 }

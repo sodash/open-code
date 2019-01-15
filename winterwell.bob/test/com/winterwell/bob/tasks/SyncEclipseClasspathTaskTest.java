@@ -15,7 +15,9 @@ public class SyncEclipseClasspathTaskTest {
 
 	@Test
 	public void testSyncEclipseClasspathTask() {
-		File projectDir = FileUtils.getWorkingDirectory(); // bob
+		File projectDir = new File("../winterwell.utils");
+		assert projectDir.isDirectory() : projectDir.getAbsolutePath();
+		// NB: utils cp
 		File cp = new File("test/test.classpath.after");
 		FileUtils.copy(new File("test/test.classpath.before"), cp);
 		SyncEclipseClasspathTask sect = new SyncEclipseClasspathTask(projectDir);
@@ -24,9 +26,9 @@ public class SyncEclipseClasspathTaskTest {
 		sect.run();
 		
 		String after = FileUtils.read(cp);
-		Tree<XMLNode> parsed = WebUtils2.parseXmlToTree(after);
-		assert after.contains(""); // TODO check preserved jars
-		assert after.contains(""); // TODO check added jars
+		System.out.println(after);
+		assert after.contains("xstream.jar"); // check preserved jars
+		assert after.contains("dependencies/xpp3_min.jar"); // check added jars
 		assert ! after.contains("wibblefruit"); // check removed jars
 	}
 

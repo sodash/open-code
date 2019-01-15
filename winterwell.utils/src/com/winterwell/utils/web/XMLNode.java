@@ -2,6 +2,7 @@ package com.winterwell.utils.web;
 
 import java.util.Map;
 
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.ArrayMap;
 
 /**
@@ -75,7 +76,17 @@ public final class XMLNode {
 	@Override
 	public String toString() {
 		// TODO test does this make proper output?
-		// TODO include attributes
-		return "<" + tag + ">" + text + "</" + tag + ">";
+		// include attributes
+		String sa = "";
+		if (attributes!=null && ! attributes.isEmpty()) {
+			sa = " ";
+			for(String k : attributes.keySet()) {
+				String v = attributes.get(k);
+				sa += k+"='"+v+"' ";
+			}
+//			sa = sa.trim();
+		}
+		// TODO children
+		return "<" + tag +sa+">" + text + "</" + tag + ">";
 	}
 }
