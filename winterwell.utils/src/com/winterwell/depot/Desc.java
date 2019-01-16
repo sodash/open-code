@@ -669,7 +669,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 
 	private void checkUnset() {
 		if (id == null) return;
-		Log.escalate(new IllegalStateException("id already set for "+this+" "+ReflectionUtils.getSomeStack(12)));
+		Log.escalate(new IllegalStateException(
+				"Lifecycle error: id already set for "+this+" "+ReflectionUtils.getSomeStack(12)));
 		id = null;		
 	}
 
