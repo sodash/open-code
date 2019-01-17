@@ -20,14 +20,15 @@ public class BuildUtils extends BuildWinterwellProject {
 
 		// Maven
 		MavenDependencyTask mdt = new MavenDependencyTask();
+		mdt.setCleanOutputDirectory(true);
 		mdt.setProjectDir(projectDir);
 		if (outDir!=null) {
 			mdt.setOutputDirectory(outDir);
 		}
 		mdt.addDependency("com.thoughtworks.xstream","xstream", "1.4.10");
 		mdt.addDependency("junit","junit","4.12");
-		mdt.addDependency("com.jolbox","bonecp","0.8.0.RELEASE");
-		deps.add(mdt);
+//		mdt.addDependency("com.jolbox","bonecp","0.8.0.RELEASE"); // NB: includes Guava ans SLF4J
+		deps.add(mdt);		
 		
 		return deps;
 	}

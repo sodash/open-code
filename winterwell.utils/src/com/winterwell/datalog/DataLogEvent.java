@@ -342,22 +342,22 @@ public final class DataLogEvent implements Serializable, IHasJson
 				}
 				// store the common prop
 				map.put(pv.getKey(), v);
-				continue;
+			} else {
+				// not common - use key-value
+				ArrayMap<String,Object> prop;
+				if (v instanceof Number) {
+					prop = new ArrayMap(
+							"k", pv.getKey(),
+							"n", v
+							);		
+				} else {				
+					prop = new ArrayMap(
+							"k", pv.getKey(),
+							"v", v.toString()
+							);
+				}
+				propslist.add(prop);
 			}
-			// not common - use key-value
-			ArrayMap<String,Object> prop;
-			if (v instanceof Number) {
-				prop = new ArrayMap(
-						"k", pv.getKey(),
-						"n", v
-						);		
-			} else {				
-				prop = new ArrayMap(
-						"k", pv.getKey(),
-						"v", v.toString()
-						);
-			}
-			propslist.add(prop);
 		}
 		map.put("props", propslist);
 		return map;
@@ -453,5 +453,25 @@ public final class DataLogEvent implements Serializable, IHasJson
 		return time;
 	}
 
+	/**
+	 * @return A nice usually flat map. This is NOT what we store in ES.
+	 */
+	public Map<String,Object> toJsonPublic() {
+		ArrayMap map = new ArrayMap(
+			"count", count,
+			"dataspace", dataspace,
+			"evt", evt,
+			"id", id,
+			"time", time);
+		// props
+		if (props==null) return map;
+		for(Entry<String, ?> pv : props.entrySet()) {
+			Object v = pv.getValue();
+			if (v==null) continue;
+			// NB: conceivably v could be an object! But that should be rare
+			map.put(pv.getKey(), v);
+		}
+		return map;
+	}
 	
 }

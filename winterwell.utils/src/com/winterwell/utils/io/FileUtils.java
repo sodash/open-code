@@ -986,7 +986,7 @@ public class FileUtils {
 	 * @return The application directory, in canonical form.
 	 */
 	public static File getWorkingDirectory() {
-		// String prop = System.getProperty("user.dir");
+		// String prop = System.getProperty("user.dir"); //??why not use this??
 		try {
 			return new File(".").getCanonicalFile();
 		} catch (IOException e) {

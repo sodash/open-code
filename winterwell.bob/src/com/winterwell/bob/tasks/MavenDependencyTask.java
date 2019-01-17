@@ -94,6 +94,7 @@ public class MavenDependencyTask extends BuildTask {
 	
 	private boolean keepJarVersioning;
 	private boolean forceUpdate;
+	private boolean cleanOutputDirectory;
 	public MavenDependencyTask setForceUpdate(boolean forceUpdate) {
 		this.forceUpdate = forceUpdate;
 		return this;
@@ -133,12 +134,19 @@ public class MavenDependencyTask extends BuildTask {
 		if (outDir==null) {
 			setOutputDirectory(new File(projectDir, "dependencies"));
 		}
+		if (cleanOutputDirectory) {
+			Log.i(LOGTAG, "Clean "+outDir);
+			FileUtils.deleteDir(outDir);
+		}
 		boolean md = outDir.mkdirs();
+		if (cleanOutputDirectory) {
+			assert outDir.list().length == 0 : outDir.list();
+		}
 		if (md) {
 			// if we made the dir, we can take charge of it -- lets git ignore by default
 			File gi = new File(outDir, ".gitignore");
 			FileUtils.write(gi, "*.jar");
-		}
+		}		
 		assert outDir.isDirectory() : this;
 		
 		if (dependencies.isEmpty()) {
@@ -261,6 +269,12 @@ public class MavenDependencyTask extends BuildTask {
 				+ projectDir + "]";
 	}
 
-	
+	public void setCleanOutputDirectory(boolean b) {
+		cleanOutputDirectory = b;
+	}
+
+	public boolean isCleanOutputDirectory() {
+		return cleanOutputDirectory;
+	}
 	
 }

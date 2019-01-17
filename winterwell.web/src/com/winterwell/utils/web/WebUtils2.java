@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -28,8 +29,16 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.w3c.dom.Document;
 
 import com.winterwell.json.JSONArray;
 import com.winterwell.utils.Environment;
@@ -1376,6 +1385,25 @@ public class WebUtils2 extends WebUtils {
 		} catch(Exception ex) {
 			Log.w("WebUtils", param+" from "+url+" -> "+ex);
 			return null;
+		}
+	}
+
+
+	
+	public static String xmlDocToString(Document doc) {
+		try {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+//			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); ??
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); // nice whitespace
+			StringWriter writer = new StringWriter();
+			Source src = new DOMSource(doc);
+			Result w = new StreamResult(writer);
+			transformer.transform(src, w);
+			String output = writer.getBuffer().toString();
+			return output;
+		} catch(Exception ex) {
+			throw Utils.runtime(ex);
 		}
 	}
 

@@ -12,7 +12,7 @@ public class BuildMaths extends BuildWinterwellProject {
 
 	public BuildMaths() {
 		super("winterwell.maths");
-		incSrc = false;
+		incSrc = true;
 	}
 
 	@Override
@@ -35,8 +35,4 @@ public class BuildMaths extends BuildWinterwellProject {
 		return deps;
 	}
 	
-	@Override
-	public void doTask() throws Exception {
-		super.doTask();		
-	}
 }

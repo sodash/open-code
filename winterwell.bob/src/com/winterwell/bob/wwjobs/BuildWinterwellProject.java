@@ -16,12 +16,15 @@ import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
+import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.bob.tasks.SCPTask;
+import com.winterwell.bob.tasks.SyncEclipseClasspathTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArraySet;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
@@ -292,6 +295,22 @@ public class BuildWinterwellProject extends BuildTask {
 		
 		// attempt to upload (but don't block)
 		doSCP();
+		
+		// update classpath? HACK (we could prob run this more but safer to do less often)
+		List<MavenDependencyTask> mdts = Containers.filterByClass(getDependencies(), MavenDependencyTask.class);
+		if ( ! mdts.isEmpty()) {
+			boolean isClean = mdts.get(0).isCleanOutputDirectory();
+			boolean skipped = mdts.get(0).isSkipFlag();
+			if (isClean && ! skipped) {
+				SyncEclipseClasspathTask sync = new SyncEclipseClasspathTask(projectDir);
+				try {
+					sync.run();
+				} catch(Exception ex) {
+					// allow failure eg file permissions as this is a nicety not a vital build step
+					Log.w(LOGTAG, ex);
+				}
+			}
+		}
 	}
 
 	private void setJarManifest(JarTask jar, File projectDir, String title) {

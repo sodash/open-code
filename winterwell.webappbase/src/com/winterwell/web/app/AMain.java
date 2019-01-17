@@ -102,8 +102,19 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 */
 	public void doMain(String[] args) {
 		// logfile before log config??! Is that right?
-		logFile = new LogFile(new File(getAppName()+".log"))
-					.setLogRotation(TUnit.DAY.dt, 14);
+		// Try to use the "logs" subdirectory - but use the app root if that's impossible.
+		File logDir = new File("logs");
+		boolean useSubDir = true;
+		if (!logDir.exists()) {
+			// Try to create it - use dir if successful
+			useSubDir = logDir.mkdir();
+		} else if (!logDir.isDirectory()) {
+			// Exists but isn't a directory - don't use dir
+			useSubDir = false;
+		}
+		File logLocation = new File((useSubDir ? "logs/" : "") + getAppName() + ".log");  
+		logFile = new LogFile(logLocation).setLogRotation(TUnit.DAY.dt, 14);
+		
 		try {
 			assert "foo".contains("bar");
 			Log.e("run", "Running Java WITHOUT assertions - please use the -ea flag!");
