@@ -1,7 +1,11 @@
 package com.winterwell.datascience;
 
+import java.util.List;
+import java.util.Map;
+
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasDesc;
+import com.winterwell.utils.log.Log;
 /**
  * An Experiment is a specific repeatable test, with outputs.
  * It is specified by a trained model (i.e. model + training data) and the test-data.
@@ -21,13 +25,9 @@ import com.winterwell.depot.IHasDesc;
 public class Experiment<Data, Model, Results> implements IHasDesc {		
 	
 	transient Model model;
-	Desc<Model> modelDesc;
+	Desc<? extends Model> modelDesc;
 	
-	Results results;
-	
-	public Results getResults() {
-		return results;
-	}
+	Results results;	
 	
 	transient Data testData;	
 	Desc<Data> testDataDesc;
@@ -38,13 +38,13 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 	private String tag = "experiment";
 
 	@Override
-	public Desc<Experiment<Data, Model, Results>> getDesc() {		
-		Desc temp = new Desc(modelDesc.getName()+"-"+testDataDesc.getName(), Experiment.class);
+	public Desc getDesc() {
+		Desc temp = new Desc("results", Experiment.class);
 		temp.setTag(tag);
-		temp.addDependency("model", modelDesc);
-		temp.addDependency("test", testDataDesc);
+		temp.put("model", modelDesc.getName());
+		temp.put("test", testDataDesc.getName());
 		if (trainDataDesc!=null) {
-			temp.addDependency("train", trainDataDesc);
+			temp.put("train", trainDataDesc.getName());
 		}
 		return temp;
 	}	
@@ -61,15 +61,23 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 		return trainData;
 	}
 	
-	public void setModel(Model model, Desc<Model> desc) {
+	public void setModel(Model model, Desc<? extends Model> desc) {
 		this.model = model;
 		this.modelDesc = desc;
+	}
+
+	public Results getResults() {
+		return this.results;
+	}
+	
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 
 	public void setResults(Results results) {
 		this.results = results;
 	}
-	
+			
 	public void setTestData(Data testData, Desc<Data> testDataDesc) {
 		this.testData = testData;
 		this.testDataDesc = testDataDesc;
@@ -84,5 +92,5 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 	public String toString() {
 		return getClass().getSimpleName()+"["+getDesc().getId()+"]";
 	}
-
 }
+
