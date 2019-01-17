@@ -41,10 +41,15 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 	public Desc getDesc() {
 		Desc temp = new Desc("results", Experiment.class);
 		temp.setTag(tag);
+		// adding dependencies provides unique identification of the configs (model, data, etc) of the experiment 
+		// while the put method ensures that the configs are human-readable 
 		temp.put("model", modelDesc.getName());
+		temp.addDependency("model", modelDesc);
 		temp.put("test", testDataDesc.getName());
+		temp.addDependency("test", testDataDesc);
 		if (trainDataDesc!=null) {
 			temp.put("train", trainDataDesc.getName());
+			temp.addDependency("train", trainDataDesc);
 		}
 		return temp;
 	}	
