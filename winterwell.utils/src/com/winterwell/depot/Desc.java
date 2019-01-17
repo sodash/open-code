@@ -243,7 +243,8 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 * making artifact B, then B should record A's details.
 	 *
 	 * @param prefix
-	 * @param upstreamDesc
+	 * @param upstreamDesc 
+	 * NB: the ID for this is lazily evaluated - so it can be unfixed, and will remain unfixed until getId() is called, e.g. by Depot.get/put.
 	 */
 	public final void addDependency(String role, Desc upstreamDesc) {
 		assert upstreamDesc != null;
