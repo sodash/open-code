@@ -54,7 +54,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	/**
 	 * aka app name
 	 */
-	@Deprecated // access via the non-static getAppName()
+	@Deprecated // access via the non-static getAppName() for preference
 	public static String appName;
 	
 	public String getAppName() {
