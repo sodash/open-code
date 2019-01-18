@@ -696,7 +696,7 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 	
 	
 	public synchronized void flush() {
-		base.flush();		
+		base.flush();
 	}
 	
 	/**
@@ -851,6 +851,11 @@ public class Depot implements Closeable, Flushable, IStore, INotSerializable
 		got = factory.get();
 		put(desc, got);
 		return got;
+	}
+
+	public void clearCache() {
+		DescCache dc = (DescCache)Desc.getDescCache();
+		dc.clear();
 	}
 	
 }

@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.winterwell.depot.ModularXML;
 import com.winterwell.nlp.corpus.brown.BrownCorpusTags;
 import com.winterwell.nlp.dict.IDictionary;
 import com.winterwell.utils.Key;
@@ -36,7 +37,9 @@ import com.winterwell.utils.web.WebUtils;
  * @author Daniel
  * @testedby {@link WordAndPunctuationTokeniserTest}
  */
-public class WordAndPunctuationTokeniser extends ATokenStream {
+public class WordAndPunctuationTokeniser extends ATokenStream 
+implements ModularXML // inherited from ITokenStream
+{
 
 //	TODO maybe support Brown style /NN POS tags?? Boolean brownPosTags;
 //	

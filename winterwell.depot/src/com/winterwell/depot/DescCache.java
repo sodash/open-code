@@ -176,4 +176,9 @@ class DescCache implements IDescCache {
 		return true;
 	}
 
+	public void clear() {
+		desc2bound.clear();
+		sharedObject2Desc.clear();
+	}
+
 }
