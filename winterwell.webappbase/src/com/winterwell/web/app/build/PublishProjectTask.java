@@ -37,7 +37,7 @@ import com.winterwell.web.email.SimpleMessage;
 
 
 /**
- * 
+ * See also wwappbase.js/project-publisher.sh + projectname
  */
 public class PublishProjectTask extends BuildTask {
 	
