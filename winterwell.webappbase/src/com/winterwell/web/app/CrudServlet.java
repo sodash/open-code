@@ -308,7 +308,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 	protected JThing<T> doPublish(WebRequest state, KRefresh forceRefresh, boolean deleteDraft) {		
 		String id = getId(state);
-		Log.d("crud", "doPublish "+id+" "+state+" deleteDraft: "+deleteDraft);
+		Log.d("crud", "doPublish "+id+" by "+state.getUserId()+" "+state+" deleteDraft: "+deleteDraft);
 		Utils.check4null(id); 
 		// load (if not loaded)
 		getThing(state);
@@ -655,6 +655,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			assert id != null : "No id? cant save! "+state; 
 			ESPath path = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
 			AppUtils.doSaveEdit(path, jthing, state);
+			Log.d("crud", "doSave "+path+" by "+state.getUserId()+" "+state+" "+jthing.string());
 		}
 	}
 	

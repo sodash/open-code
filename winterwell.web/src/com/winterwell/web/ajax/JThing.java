@@ -134,6 +134,10 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 		return java;
 	}
 	
+	/**
+	 * NOT the json - this is a short version for debug / logging.
+	 * @see #string()
+	 */
 	@Override
 	public String toString() {	
 		return "JThing"+StrUtils.ellipsize(string(), 100)+"";
