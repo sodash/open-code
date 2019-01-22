@@ -158,6 +158,9 @@ public abstract class CrudServlet<T> implements IServlet {
 			jthing = doPublish(state);
 			assert jthing.string().contains(KStatus.PUBLISHED.toString()) : jthing;
 		}
+		if (state.actionIs("unpublish")) {
+			jthing = doUnPublish(state);
+		}
 	}
 
 
@@ -344,6 +347,31 @@ public abstract class CrudServlet<T> implements IServlet {
 		return obj.setType(type);
 	}
 
+	protected JThing<T> doUnPublish(WebRequest state) {
+		String id = getId(state);
+		Log.d("crud", "doUnPublish "+id+" by "+state.getUserId()+" "+state);
+		Utils.check4null(id); 
+		// load (if not loaded)
+		getThing(state);
+		if (jthing==null) {
+			jthing = getThingFromDB(state);
+		}
+
+		ESPath draftPath = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
+		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
+
+		// set state to draft
+		AppUtils.setStatus(jthing, KStatus.DRAFT);
+		
+		AppUtils.doSaveEdit(draftPath, jthing, state);
+		Log.d("crud", "unpublish doSave "+draftPath+" by "+state.getUserId()+" "+state+" "+jthing.string());
+
+		AppUtils.doDelete(publishPath);
+		state.addMessage(id+" has been moved from published to draft");
+		return jthing;
+	}
+
+	
 	protected String getId(WebRequest state) {
 		if (_id!=null) return _id;
 		// Beware if ID can have a / in it!
