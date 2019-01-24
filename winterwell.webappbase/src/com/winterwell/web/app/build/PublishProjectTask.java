@@ -57,7 +57,7 @@ public class PublishProjectTask extends BuildTask {
 	protected File localWebAppDir;
 //	protected File jarFile;
 	/**
-	 * wwappbase.js/project-publisher.sh + projectname
+	 * wwappbase.js/project-publisher.sh + projectname + test|production|local frontend|
 	 */
 	protected String bashScript;
 	/**
@@ -72,6 +72,8 @@ public class PublishProjectTask extends BuildTask {
 	private boolean noPublishJustBuild;
 
 	private BuildTask buildProjectTask;
+
+	protected KComponent component = KComponent.everything;
 	
 	public void setBuildProjectTask(BuildTask buildProjectTask) {
 		this.buildProjectTask = buildProjectTask;
@@ -198,7 +200,7 @@ public class PublishProjectTask extends BuildTask {
 			Log.i(LOGTAG, "local -- no publish step.");
 			return;
 		}
-		ProcessTask pubas = new ProcessTask(bashScript+" "+typeOfPublish +(notests?" --notests":""));
+		ProcessTask pubas = new ProcessTask(getProjectPublishBashCommand());
 		pubas.setEcho(true);
 		pubas.run();
 		if ( ! Utils.isBlank(pubas.getError())) {
@@ -207,6 +209,12 @@ public class PublishProjectTask extends BuildTask {
 		pubas.close();
 		Log.d(pubas.getCommand(), pubas.getOutput());
 		
+	}
+
+	
+	private String getProjectPublishBashCommand() {	
+		String cmd = bashScript+" "+typeOfPublish +" "+ component +(notests?" notests":"");
+		return cmd;
 	}
 
 	/**
