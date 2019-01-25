@@ -57,6 +57,18 @@ public class TrackingPixelServlet implements IServlet {
 		return uid;
 	}
 	
+	/**
+	 * retrieve a tracker cookie
+	 * TODO move into YouAgain Client
+	 * @param state Can be null (returns null)
+	 * @return A nonce@trk XId. Can be null. 
+	 */
+	public static String getCookieTrackerId(WebRequest state) {
+		if (state==null) return null;
+		String uid = state.getCookie(trkid);
+		return uid;
+	}
+	
 	static File PIXEL = new File("web/img/tracking-pixel.gif");
 
 
