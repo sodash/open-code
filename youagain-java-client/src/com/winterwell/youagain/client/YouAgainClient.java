@@ -370,6 +370,9 @@ public final class YouAgainClient {
 		assert yac != null;
 		Utils.check4null(usernameUsuallyAnEmail, password);
 		FakeBrowser fb = new FakeBrowser();
+		
+		fb.setDebug(true); // TODO remove
+		
 		String response = fb.getPage(yac.endpoint, new ArrayMap(
 				"app", app, 
 				"action", "signup",
