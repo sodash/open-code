@@ -625,7 +625,7 @@ public class FakeBrowser {
 		} catch(IOException ex) {
 			if (ex.getMessage()==null || ! ex.getMessage().contains("http")) {
 				// include the url
-				throw new com.winterwell.utils.WrappedException("Error from "+connection.getURL().toString()+" - "+ex, ex);
+				throw new WebEx.E50X(500, connection.getURL().toString(), ex.toString());
 			}
 			throw ex; 
 		}
