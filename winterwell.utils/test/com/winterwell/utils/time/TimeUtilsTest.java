@@ -210,23 +210,35 @@ public class TimeUtilsTest {
 
 	@Test
 	public void parseExperimentalStartOfLastMonth() {
+		Time now = new Time();
 		{
 			Time f = TimeUtils.parseExperimental("end of last month");
-			assert f.dt(new Time()).isShorterThan(TUnit.MONTH.dt);
-			System.out.println("end of last month: "+f);
+			Time expected = new Time(now.getYear(), now.getMonth(), 1).minus(TUnit.MILLISECOND);
+			assertEquals(expected, f);
 		}
 		{
 			Time f = TimeUtils.parseExperimental("start of last month");
-			System.out.println("start of last month: "+f);
+			Time expected;
+			if (now.getMonth() == 1) {
+				expected = new Time(now.getYear() - 1, 12, 1);
+			} else {
+				expected = new Time(now.getYear(), now.getMonth() - 1, 1);
+			}
+			assertEquals(expected, f);
 		}
 		{
 			Time f = TimeUtils.parseExperimental("start of next month");
-			System.out.println("start of next month: "+f);
+			Time expected;
+			if (now.getMonth() == 12) {
+				expected = new Time(now.getYear() + 1, 1, 1);
+			} else {
+				expected = new Time(now.getYear(), now.getMonth() + 1, 1);
+			}
+			assertEquals(expected, f);
 		}
-		if (false) { // TODO
+		{
 			Time f = TimeUtils.parseExperimental("end month");
-			System.out.println("end this month: "+f);
-			assert f.getMonth() == new Time().getMonth();
+			assert f.getMonth() == now.getMonth();
 		}
 	}
 	
