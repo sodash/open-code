@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import com.winterwell.utils.io.FileUtils;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @tested {@link Proc}
  * @author daniel
@@ -20,21 +22,12 @@ public class ProcTest {
 	public void testBashEncode() {
 		{
 			String raw = "http://foo.com/a.html?a=1&b=a%40com";
-			String s = raw; //Proc.bashEncodeStrong(raw);
-			Proc p = new Proc(Arrays.asList("echo", s));
-			p.start();
-			p.waitFor(1000);
-			String out = p.getOutput().trim();
-			assert out.equals(raw) : out;
+			String s = Proc.bashEncodeStrong(raw);
+			assertEquals("'" + raw + "'", s);
 		}
 		{
-			String raw = "Here's my test";
-			String s = raw; //Proc.bashEncodeStrong("Here's my test");
-			Proc p = new Proc(Arrays.asList("echo", s));
-			p.start();
-			p.waitFor(1000);
-			String out = p.getOutput().trim();
-			assert out.equals("Here's my test") : out;
+			String s = Proc.bashEncodeStrong("Here's my test");
+			assertEquals("'Here'\\''s my test'", s);
 		}
 	}
 	
