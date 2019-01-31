@@ -14,7 +14,6 @@ public class WrappedExceptionTest {
 			FileUtils.copy(new File("foo/bar"), new File("bar/foo"));
 		} catch (Throwable ex) {
 			WrappedException wex = new WrappedException(ex);
-			wex.printStackTrace();
 			assert wex.getCause() == ex : wex.getCause();
 		}
 	}
@@ -22,13 +21,10 @@ public class WrappedExceptionTest {
 	@Test
 	public void testToString() {
 		try {
+			// This throws a WrappedException since the file doesn't exist
 			FileUtils.copy(new File("foo/bar"), new File("bar/foo"));
 		} catch (Throwable ex) {
-			WrappedException wex = new WrappedException(ex);
-			String s = wex.toString();
-			System.out.println(s);
-			String s2 = Printer.toString(wex, true);
-			System.out.println(s2);
+			String s2 = Printer.toString(ex, true);
 			assert s2.contains("foo");
 			assert s2.contains("FileUtils");
 		}

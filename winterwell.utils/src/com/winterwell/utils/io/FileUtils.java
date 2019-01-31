@@ -274,10 +274,12 @@ public class FileUtils {
 	 *            if true existing files will be overwritten. If false, existing
 	 *            files will lead to an IORException
 	 * @return the file/directory copied to (so out, or a file in out)
-	 * @throws IORException
+	 * @throws FailureException
 	 *             If copying a directory, this is thrown at the end of the
 	 *             operation. As many files as possible are copied, then the
 	 *             exception is thrown.
+	 * @throws WrappedException
+	 * 				If the input file does not exist, this exception is thrown.
 	 *
 	 */
 	public static File copy(File in, File out, boolean overwrite)
