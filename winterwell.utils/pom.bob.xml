@@ -7,5 +7,6 @@
 	<name>dummy</name>
 	<dependencies>
 <dependency><groupId>com.thoughtworks.xstream</groupId><artifactId>xstream</artifactId><version>1.4.10</version></dependency>
-<dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>4.12</version></dependency>	</dependencies>
+<dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>4.12</version></dependency>
+<dependency><groupId>com.jolbox</groupId><artifactId>bonecp</artifactId><version>0.8.0.RELEASE</version></dependency>	</dependencies>
 </project>

@@ -1,0 +1,15 @@
+rootProject.name = 'open-code'
+
+include \
+    'elasticsearch-java-client',
+    'flexi-gson',
+    'winterwell.bob',
+    'winterwell.datalog',
+    'winterwell.depot',
+    'winterwell.maths',
+    'winterwell.nlp',
+    'winterwell.optimization',
+    'winterwell.utils',
+    'winterwell.web',
+    'winterwell.webappbase',
+    'youagain-java-client'

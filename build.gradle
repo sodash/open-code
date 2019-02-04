@@ -1,0 +1,129 @@
+apply plugin: 'java'
+
+subprojects {
+    group = 'com.winterwell'
+    apply plugin: 'java'
+    repositories {
+        mavenCentral()
+        maven {
+            //For org.xbill:dns
+            url "http://www.jabylon.org/maven/"
+        }
+        maven {
+            // For snowball-stemmer
+            url "http://clojars.org/repo/"
+        }
+        maven {
+            // For ua_parser
+            url "http://maven.twttr.com/"
+        }
+    }
+}
+
+// Used to exclude projects whose tests require external resources
+// To include these tests, run `gradle -PintegrationTests test`
+def integrationTests = {
+    onlyIf {
+        project.hasProperty("integrationTests")
+    }
+}
+
+project(':flexi-gson') {
+    dependencies {
+        implementation project(':winterwell.utils')
+    }
+}
+
+project(':elasticsearch-java-client') {
+    dependencies {
+        implementation project(':flexi-gson')
+        implementation project(':winterwell.utils')
+        implementation project(':winterwell.web')
+    }
+    test integrationTests
+}
+
+project (':winterwell.bob') {
+    dependencies {
+        implementation project(':winterwell.utils')
+        implementation project(':winterwell.web')
+    }
+    test integrationTests
+}
+
+project (':winterwell.datalog') {
+    dependencies {
+        implementation project(':elasticsearch-java-client')
+        implementation project(':flexi-gson')
+        implementation project(':winterwell.depot')
+        implementation project(':winterwell.maths')
+        implementation project(':winterwell.nlp')
+        implementation project(':winterwell.utils')
+        implementation project(':winterwell.web')
+        implementation project(':winterwell.webappbase')
+        implementation project(':youagain-java-client')
+    }
+    test integrationTests
+}
+
+project(':winterwell.depot') {
+    dependencies {
+        implementation project(':winterwell.bob')
+        implementation project(':winterwell.utils')
+        implementation project(':winterwell.web')
+        implementation project(':flexi-gson')
+        implementation project(':elasticsearch-java-client')
+    }
+    test integrationTests
+}
+
+project(':winterwell.maths') {
+    dependencies {
+        implementation project(':winterwell.depot')
+        implementation project(':winterwell.utils')
+        implementation project(':winterwell.web')
+    }
+}
+
+project(':winterwell.nlp') {
+    dependencies {
+        implementation project(':winterwell.depot')
+        implementation project(':winterwell.maths')
+        implementation project(':winterwell.utils')
+        implementation project(':winterwell.web')
+    }
+}
+
+project(':winterwell.optimization') {
+    dependencies {
+        implementation project(':winterwell.depot')
+        implementation project(':winterwell.maths')
+        implementation project(':winterwell.utils')
+    }
+    test integrationTests
+}
+
+project(':winterwell.web') {
+    dependencies {
+        implementation project(':winterwell.utils')
+        implementation project(':flexi-gson')
+    }
+}
+
+project(':winterwell.webappbase') {
+    dependencies {
+        implementation project(':elasticsearch-java-client')
+        implementation project(':flexi-gson')
+        implementation project(':winterwell.bob')
+        implementation project(':winterwell.utils')
+        implementation project(':winterwell.web')
+        implementation project(':youagain-java-client')
+    }
+}
+
+project(':youagain-java-client') {
+    dependencies {
+        implementation project(':winterwell.utils')
+        implementation project(':winterwell.web')
+    }
+}

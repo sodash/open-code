@@ -29,8 +29,6 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.TimeUtils;
 import com.winterwell.utils.web.XStreamUtils;
 
-import winterwell.optimization.genetic.GATest;
-
 
 /**
  * This implements a simple evolutionary optimization strategy.

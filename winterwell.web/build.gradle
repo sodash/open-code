@@ -1,0 +1,49 @@
+group 'com.winterwell'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://www.jabylon.org/maven/"
+    }
+}
+
+dependencies {
+
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.12.RC2'
+    compile group: 'org.eclipse.jetty', name: 'jetty-util', version: '9.4.12.RC2'
+    compile group: 'org.eclipse.jetty', name: 'jetty-util-ajax', version: '9.4.12.RC2'
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.12.RC2'
+    compile group: 'com.sun.mail', name: 'javax.mail', version: '1.6.1'
+    compile group: 'com.sun.mail', name: 'gimap', version: '1.6.1'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    compile group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+    compile group: 'org.ccil.cowan.tagsoup', name: 'tagsoup', version: '1.2.1'
+    compile group: 'org.xbill', name: 'dns', version: '2.0.8'
+    compile group: 'eu.medsea.mimeutil', name: 'mime-util', version: '1.3'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.7'
+
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+    test {
+        java {
+            srcDir 'test'
+        }
+    }
+}
+
+build {
+
+}
