@@ -4,6 +4,11 @@ import java.util.Stack;
 
 import com.winterwell.utils.Printer;
 
+/**
+ * 
+ * @author daniel
+ *
+ */
 public class ParseSearch {
 
 	private Parser parser;
@@ -12,24 +17,17 @@ public class ParseSearch {
 		this.parser = parser;
 	}
 
-	private boolean isFinished(ParseState s) {
-		if (s.unparsed().length() != 0)
-			return false;
-		// if (s.higher != null) return false;
-		return true;
-	}
-
 	public ParseResult parse(String string) {
 		// clear any ParseFail
 		ParseFail.setParseFail(null);
 		ParseState ps = new ParseState(parser, string);
 		// parse!
-		ParseResult r = parser.parse(ps);
+		ParseResult r = parser.parse0(ps); // doParse(ps);
 		if (r != null && r.unparsed().length() == 0)
 			return r;
 		// Or...
 		Stack<ParseState> agenda = ps.getAgenda();
-		while (!agenda.isEmpty()) {
+		while ( ! agenda.isEmpty()) {
 			ps = agenda.pop();
 			assert ps != null;
 			assert ps.down != null;
@@ -45,6 +43,11 @@ public class ParseSearch {
 			if (Parser.DEBUG) {
 				Printer.out("\tignoring partial parse: " + pr + " from " + ps);
 			}
+		}
+		// fail
+		if (r != null) {
+			ParseFail pf = new ParseFail(r, "incomplete parse: "+r.unparsed());
+			ParseFail.setParseFail(pf);
 		}
 		return null;
 	}

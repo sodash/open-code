@@ -109,6 +109,10 @@ public class AST<X> extends Tree<Slice> {
 		return parser;
 	}
 
+	/**
+	 * 
+	 * @return the processed single child, or null
+	 */
 	public X getX() {
 		if (x != null)
 			return (X) x;

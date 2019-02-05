@@ -116,7 +116,7 @@ public abstract class Parser<PT> {
 	 * @param state
 	 * @return null on failure
 	 */
-	protected abstract ParseResult<PT> parse(ParseState state);
+	protected abstract ParseResult<PT> doParse(ParseState state);
 
 	public ParseResult<PT> parse(String string) {
 		ParseSearch ps = new ParseSearch(this);
@@ -124,7 +124,7 @@ public abstract class Parser<PT> {
 	}
 
 	/**
-	 * This calls {@link #parse(ParseState)}. It adds in debugging &
+	 * This calls {@link #doParse(ParseState)}. It adds in debugging &
 	 * loop-checking
 	 * 
 	 * @param ps
@@ -148,7 +148,7 @@ public abstract class Parser<PT> {
 		if (debug != null) {
 			debug.call(ps);
 		}
-		ParseResult r = parse(ps);
+		ParseResult r = doParse(ps);
 		if (r == null && failMessage != null) {
 			ParseFail.setParseFail(new ParseFail(ps, ps.posn, failMessage));
 		}
@@ -160,7 +160,7 @@ public abstract class Parser<PT> {
 			Printer.out("Parsing " + string + "...");
 		}
 		ParseResult<PT> pr = parse(string);
-		assert pr != null : '"' + string + "\" = FAIL";
+		assert pr != null : '"' + string + "\" = FAIL "+ParseFail.getParseFail();
 		if (DEBUG) {
 			Printer.out('"' + string + "\" =\n" + pr.ast);
 		}
@@ -170,7 +170,7 @@ public abstract class Parser<PT> {
 
 	protected ParseResult resume(ParseState state) {
 		assert state.down == this : state;
-		ParseResult r = parse(state);
+		ParseResult r = doParse(state);
 		if (r == null)
 			return null;
 		return state.higher.down.close(r);

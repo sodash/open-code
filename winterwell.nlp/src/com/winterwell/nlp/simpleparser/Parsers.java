@@ -24,7 +24,7 @@ class Lit extends Parser<String> {
 	}
 
 	@Override
-	public ParseResult parse(ParseState state) {
+	public ParseResult doParse(ParseState state) {
 		assert state.down == this;
 		Slice text = state.unparsed();
 		if (!text.startsWith(word))
@@ -88,7 +88,7 @@ public class Parsers {
 		}
 
 		@Override
-		protected ParseResult<String> parse(ParseState state) {
+		protected ParseResult<String> doParse(ParseState state) {
 			Slice unp = state.unparsed();
 			if (!unp.startsWith(word))
 				return null;
@@ -278,6 +278,7 @@ public class Parsers {
 	 * parsed) would match.
 	 * <p>
 	 * Uses {@link #first(Parser...)} if there are multiple words.
+	 * @return a fresh parser
 	 */
 	public static Parser<String> word(final String... words) {
 		if (words.length == 1)
@@ -309,7 +310,7 @@ final class Ref<PT> extends Parser<PT> {
 	}
 
 	@Override
-	public ParseResult parse(ParseState state) {
+	public ParseResult doParse(ParseState state) {
 		// if (p==null) { // if we want over-rides, then we have to do a lookup
 		// :(
 		p = lookup();
@@ -320,6 +321,6 @@ final class Ref<PT> extends Parser<PT> {
 		canBeZeroLength = p.canBeZeroLength;
 		// }
 		assert p != null : name;
-		return p.parse(new ParseState(p, state));
+		return p.doParse(new ParseState(p, state));
 	}
 }
