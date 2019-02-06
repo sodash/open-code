@@ -144,7 +144,8 @@ public class Parsers {
 		Parser _open = lit(open).label(null);
 		Parser _close = lit(close).label(null);
 		Parser<PT> bp = first(
-				seq(_open, first(body, ref(name)), _close).label(name), body);
+				seq(_open, first(body, ref(name)), _close).label(name), body)
+				.setDesc("?brackets");
 		return bp;
 	}
 
@@ -292,35 +293,4 @@ public class Parsers {
 		return first(lits);
 	}
 
-}
-
-final class Ref<PT> extends Parser<PT> {
-	Parser<PT> p;
-
-	public Ref(String name) {
-		super();
-		label(name);
-		assert name != null;
-		// better safe than sorry
-		canBeZeroLength = true;
-	}
-
-	final Parser lookup() {
-		return Parser.parsers.get(name);
-	}
-
-	@Override
-	public ParseResult doParse(ParseState state) {
-		// if (p==null) { // if we want over-rides, then we have to do a lookup
-		// :(
-		p = lookup();
-		if (p == null) throw new IllegalArgumentException("No parser named: "+name);
-		assert !(p instanceof Ref) : p;
-		assert p.getName().equals(name) : p + " where " + p.name + " != "
-				+ name;
-		canBeZeroLength = p.canBeZeroLength;
-		// }
-		assert p != null : name;
-		return p.doParse(new ParseState(p, state));
-	}
 }

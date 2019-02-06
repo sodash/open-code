@@ -23,6 +23,17 @@ import com.winterwell.utils.log.Log;
  * @author daniel
  */
 public abstract class Parser<PT> {
+	
+	/**
+	 * Just for debugging
+	 */
+	String desc;
+	
+	// NB: the <PT> type ought to work, but doesn't cos it isn't always passed down the chain.
+	public <PT2> Parser<PT2> setDesc(String desc) {
+		this.desc = desc;
+		return (Parser<PT2>) this;
+	}
 
 	public static boolean DEBUG = false;
 
@@ -70,14 +81,16 @@ public abstract class Parser<PT> {
 	}
 
 	/**
-	 * Test this parser with an example. For inline documentation & testing.
+	 * If DEBUGTest this parser with an example. For inline documentation & testing.
 	 * 
 	 * @param example
 	 * @return this
 	 */
 	public Parser eg(String example) {
-		ParseResult<PT> pr = parse(example);
-		assert pr != null : '"' + example + "\" = FAIL";
+		if (DEBUG) {
+			ParseResult<PT> pr = parse(example);
+			assert pr != null : '"' + example + "\" = FAIL";
+		}
 		return this;
 	}
 
@@ -199,7 +212,7 @@ public abstract class Parser<PT> {
 
 	@Override
 	public String toString() {
-		return name + "-Parser";
+		return name + "-Parser"+(desc==null? "" : " "+desc);
 	}
 
 }

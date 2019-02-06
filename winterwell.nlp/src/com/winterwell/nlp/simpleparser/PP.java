@@ -66,7 +66,12 @@ abstract public class PP<Out> extends Parser<Out> {
 
 	@Override
 	public String toString() {
-		return "PP" + (Utils.isBlank(name) ? parser : name);
+		return "PP" + (Utils.isBlank(name)? "=[" : "'"+name+"'=[")+parser.toString()+"]";
 	}
 
+	@Override
+	public <PT2> Parser<PT2> setDesc(String desc) {
+		parser.setDesc(desc);
+		return (Parser<PT2>) this;
+	}
 }
