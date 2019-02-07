@@ -18,7 +18,7 @@ public class First<PT> extends Parser<PT> {
 	}
 
 	@Override
-	protected ParseResult parse(ParseState state) {
+	protected ParseResult doParse(ParseState state) {
 		boolean len0 = state.unparsed().length() == 0;
 		for (Parser p : subs) {
 			if (len0 && !p.canBeZeroLength) {

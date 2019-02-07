@@ -3,6 +3,11 @@ package com.winterwell.nlp.simpleparser;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.containers.Slice;
 
+/**
+ * These are auto-set -- use 
+ * @author daniel
+ *
+ */
 public class ParseFail extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
@@ -82,6 +87,10 @@ public class ParseFail extends RuntimeException {
 	public String toString() {
 		String s = "ParseFail [lineNum=" + lineNum + ", slice=" + slice + "]";
 		return message == null ? s : s + " " + message;
+	}
+
+	public static ParseFail getParseFail() {
+		return Environment.get().get(Parser.ERROR);
 	}
 
 }

@@ -24,7 +24,7 @@ class Lit extends Parser<String> {
 	}
 
 	@Override
-	public ParseResult parse(ParseState state) {
+	public ParseResult doParse(ParseState state) {
 		assert state.down == this;
 		Slice text = state.unparsed();
 		if (!text.startsWith(word))
@@ -88,7 +88,7 @@ public class Parsers {
 		}
 
 		@Override
-		protected ParseResult<String> parse(ParseState state) {
+		protected ParseResult<String> doParse(ParseState state) {
 			Slice unp = state.unparsed();
 			if (!unp.startsWith(word))
 				return null;
@@ -144,7 +144,8 @@ public class Parsers {
 		Parser _open = lit(open).label(null);
 		Parser _close = lit(close).label(null);
 		Parser<PT> bp = first(
-				seq(_open, first(body, ref(name)), _close).label(name), body);
+				seq(_open, first(body, ref(name)), _close).label(name), body)
+				.setDesc("?brackets");
 		return bp;
 	}
 
@@ -278,6 +279,7 @@ public class Parsers {
 	 * parsed) would match.
 	 * <p>
 	 * Uses {@link #first(Parser...)} if there are multiple words.
+	 * @return a fresh parser
 	 */
 	public static Parser<String> word(final String... words) {
 		if (words.length == 1)
@@ -291,35 +293,4 @@ public class Parsers {
 		return first(lits);
 	}
 
-}
-
-final class Ref<PT> extends Parser<PT> {
-	Parser<PT> p;
-
-	public Ref(String name) {
-		super();
-		label(name);
-		assert name != null;
-		// better safe than sorry
-		canBeZeroLength = true;
-	}
-
-	final Parser lookup() {
-		return Parser.parsers.get(name);
-	}
-
-	@Override
-	public ParseResult parse(ParseState state) {
-		// if (p==null) { // if we want over-rides, then we have to do a lookup
-		// :(
-		p = lookup();
-		if (p == null) throw new IllegalArgumentException("No parser named: "+name);
-		assert !(p instanceof Ref) : p;
-		assert p.getName().equals(name) : p + " where " + p.name + " != "
-				+ name;
-		canBeZeroLength = p.canBeZeroLength;
-		// }
-		assert p != null : name;
-		return p.parse(new ParseState(p, state));
-	}
 }

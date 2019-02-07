@@ -9,8 +9,11 @@ public class ParseResult<X> {
 
 	public final AST<X> ast;
 	public final ParseState input;
+	/**
+	 * the parse position ie the start of unparsed
+	 */
 	final int posn;
-
+	
 	final String text;
 
 	public ParseResult(ParseState input, AST<X> ast, String text, int posn) {
@@ -55,6 +58,11 @@ public class ParseResult<X> {
 		return ast.getX();
 	}
 
+	/**
+	 * 
+	 * @param parser
+	 * @return processed result for the named node from this parser
+	 */
 	public <X2> X2 getX(Parser<X2> parser) {
 		AST<X2> node = getNode(parser);
 		if (node == null)

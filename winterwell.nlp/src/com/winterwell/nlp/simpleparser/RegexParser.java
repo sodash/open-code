@@ -25,7 +25,7 @@ public class RegexParser extends Parser<MatchResult> {
 	}
 
 	@Override
-	public ParseResult<MatchResult> parse(ParseState state) {
+	public ParseResult<MatchResult> doParse(ParseState state) {
 		Slice text = state.unparsed();
 		Matcher m = regex.matcher(text);
 		if (!m.find())

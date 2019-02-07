@@ -55,7 +55,7 @@ class SeqnParser extends Parser<Object> {
 	}
 
 	@Override
-	public ParseResult parse(final ParseState state) {
+	public ParseResult doParse(final ParseState state) {
 		AST tree = new AST(this, new Slice(state.text, state.posn, state.posn));
 		return parse2(state, 0, tree);
 	}

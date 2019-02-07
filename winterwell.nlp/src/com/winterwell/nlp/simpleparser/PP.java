@@ -36,9 +36,9 @@ abstract public class PP<Out> extends Parser<Out> {
 	}
 
 	@Override
-	protected ParseResult<Out> parse(ParseState state) {
+	protected ParseResult<Out> doParse(ParseState state) {
 		ParseState ps = new ParseState(parser, state);
-		ParseResult<?> r = parser.parse(ps);
+		ParseResult<?> r = parser.doParse(ps);
 		if (r == null)
 			return null;
 		try {
@@ -59,14 +59,19 @@ abstract public class PP<Out> extends Parser<Out> {
 	 * @return processed object for this node
 	 * @throws ParseFail
 	 *             if you wish to reject this ParseResult. The calling
-	 *             {@link #parse(ParseState)} method will log this and return
+	 *             {@link #doParse(ParseState)} method will log this and return
 	 *             null.
 	 */
 	protected abstract Out process(ParseResult<?> r) throws ParseFail;
 
 	@Override
 	public String toString() {
-		return "PP" + (Utils.isBlank(name) ? parser : name);
+		return "PP" + (Utils.isBlank(name)? "=[" : "'"+name+"'=[")+parser.toString()+"]";
 	}
 
+	@Override
+	public <PT2> Parser<PT2> setDesc(String desc) {
+		parser.setDesc(desc);
+		return (Parser<PT2>) this;
+	}
 }

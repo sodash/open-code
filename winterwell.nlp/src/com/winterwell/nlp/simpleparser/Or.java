@@ -24,7 +24,7 @@ class Or extends Parser {
 	}
 
 	@Override
-	public ParseResult parse(ParseState state) {
+	public ParseResult doParse(ParseState state) {
 		assert state.down == this : state;
 		Stack<ParseState> agenda = state.getAgenda();
 		boolean len0 = state.unparsed().length() == 0;
