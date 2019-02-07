@@ -36,6 +36,8 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 	Desc<Data> trainDataDesc;
 	
 	private String tag = "experiment";
+	
+//	private boolean loadSuccessFlag = false;
 
 	@Override
 	public Desc getDesc() {
@@ -50,7 +52,7 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 		if (trainDataDesc!=null) {
 			temp.put("train", trainDataDesc.getName());
 			temp.addDependency("train", trainDataDesc);
-		}
+		}		
 		return temp;
 	}	
 	
@@ -83,12 +85,12 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 		this.results = results;
 	}
 			
-	public void setTestData(Data testData, Desc<Data> testDataDesc) {
+	public void setTestData(Data testData, Desc<Data> testDataDesc) { 
 		this.testData = testData;
 		this.testDataDesc = testDataDesc;
 	}
 
-	public void setTrainData(Data testData, Desc<Data> testDataDesc) {
+	public void setTrainData(Data testData, Desc<Data> testDataDesc) { 
 		this.trainData = testData;
 		this.trainDataDesc = testDataDesc;
 	}
@@ -97,5 +99,14 @@ public class Experiment<Data, Model, Results> implements IHasDesc {
 	public String toString() {
 		return getClass().getSimpleName()+"["+getDesc().getId()+"]";
 	}
+//
+//	// TODO: remove temporary loadSuccessFlag flag and associated methods, this is just while I test model loading (can't hold loadSuccessFlag within model because of how we load the model)
+//	public boolean getLoadSuccessFlag() {
+//		return loadSuccessFlag;
+//	}
+//
+//	public void setLoadSuccessFlag(boolean LoadSuccessFlag) {
+//		this.loadSuccessFlag = loadSuccessFlag;
+//	}
 }
 

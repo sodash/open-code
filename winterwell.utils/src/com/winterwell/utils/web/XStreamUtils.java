@@ -208,7 +208,8 @@ public class XStreamUtils {
 			return "<null/>";
 		StringWriter sw = new StringWriter();
 		serialiseToXml(sw, object);
-		return sw.toString();
+		String s = sw.toString();		
+		return s;
 	}
 
 	/**
@@ -241,6 +242,7 @@ public class XStreamUtils {
 		}
 		synchronized (object) {
 			try {
+				// TODO our own Writer that removes any weird \f form feed chars
 				CompactWriter compact = new CompactWriter(writer);
 				xstream().marshal(object, compact);
 			} catch(Throwable ex) {

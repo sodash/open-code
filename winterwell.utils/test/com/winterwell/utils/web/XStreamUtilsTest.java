@@ -116,4 +116,13 @@ public class XStreamUtilsTest {
 		assert nll2.equals("<null/>");
 	}
 
+	@Test
+	public void testSpecialChars() { // https://stackoverflow.com/questions/22956533/xdocument-will-not-parse-html-entities-e-g-xc-but-xmldocument-will
+		// TODO: get rid of \f because it gives XML error and they're useless
+		String ff = XStreamUtils.serialiseToXml("Form feed: \f");
+		System.out.println(ff);
+		Object s = XStreamUtils.serialiseFromXml("<S>&#xc;</S>");
+		System.out.println(ff);
+	}
+	
 }
