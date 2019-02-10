@@ -66,7 +66,7 @@ public class GrammarPrinter {
 		assert sb != null && toPrint != null && printed != null : p;
 		if (p instanceof Ref) {
 			Parser p2 = ((Ref) p).lookup();
-			assert p2 != null : p;
+			assert p2 != null : "Ref failed: "+p.name;
 			addToPrint(p2, toPrint, printed);
 			return;
 		}
