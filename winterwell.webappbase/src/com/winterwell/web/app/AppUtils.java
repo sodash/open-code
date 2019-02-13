@@ -84,6 +84,8 @@ public class AppUtils {
 			"heppner"
 			);
 	
+	public static boolean DEBUG = false;
+	
 	KServerType serverType = AppUtils.getServerType(null); 
 
 	
@@ -314,19 +316,10 @@ public class AppUtils {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));		
 		// save update
 		
-//		JThing item2 = Utils.copy(item);
-//		String json = item2.string();
-//		Object start = SimpleJson.get(item2.map(), "projects", 0, "start");
-//		Object startraw = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
-		
 		// prep object via IInit? (IInit is checked within JThing)
 		// e.g. set the suggest field for NGO 
 		Object jobj = item.java();
 
-//		item2 = Utils.copy(item);
-//		String json2 = item2.string();
-//		Object start2 = SimpleJson.get(item2.map(), "projects", 0, "start");
-//		Object startraw2 = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
 		
 		// sanity check id matches path
 		String id = (String) item.map().get("@id"); //mod.getId();
@@ -337,14 +330,10 @@ public class AppUtils {
 		}
 		assert id != null && ! id.equals("new") : "use action=new "+stateCanBeNull;
 		assert id.equals(path.id) : path+" vs "+id;
-		
-//		item2 = Utils.copy(item);
-//		String json3 = item2.string();
-//		Object start3 = SimpleJson.get(item2.map(), "projects", 0, "start");
-//		Object startraw3 = SimpleJson.get(item2.map(), "projects", 0, "start_raw");
-		
+				
 		// save to ES
 		UpdateRequestBuilder up = client.prepareUpdate(path);
+		if (DEBUG) up.setDebug(DEBUG); // NB: only set if its extra debugging??
 		// This should merge against what's in the DB
 		Map map = item.map();
 		up.setDoc(map);
