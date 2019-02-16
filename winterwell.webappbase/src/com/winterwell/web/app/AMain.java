@@ -75,6 +75,8 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	
 	private volatile boolean readyFlag;
 
+	private boolean initYAflag;
+
 	public static AMain main;
 
 	/**
@@ -268,7 +270,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 	
 	protected Emailer init3_emailer() {
-		if (Dep.has(Emailer.class)) return Dep.get(Emailer.class);		
+		if (Dep.has(Emailer.class)) {
+			return Dep.get(Emailer.class);		
+		}
 		EmailConfig ec = AppUtils.getConfig(appName, EmailConfig.class, null);
 		Log.i("init", "Emailer with config "+ec);
 		LoginDetails ld = ec.getLoginDetails();
@@ -282,6 +286,10 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 	
 	protected void init3_youAgain() {
+		if (initYAflag) {
+			return;
+		}
+		initYAflag = true;
 		// app=datalog for login
 		YouAgainClient yac = new YouAgainClient(getAppName());
 		Dep.set(YouAgainClient.class, yac);				
