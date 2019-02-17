@@ -1,14 +1,18 @@
 package com.winterwell.nlp.simpleparser;
 
+import java.util.Map;
+
 import com.winterwell.utils.Environment;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Slice;
+import com.winterwell.utils.web.IHasJson;
 
 /**
  * These are auto-set -- use 
  * @author daniel
  *
  */
-public class ParseFail extends RuntimeException {
+public class ParseFail extends RuntimeException implements IHasJson {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -91,6 +95,16 @@ public class ParseFail extends RuntimeException {
 
 	public static ParseFail getParseFail() {
 		return Environment.get().get(Parser.ERROR);
+	}
+
+	@Override
+	public Map toJson2()  {
+		return new ArrayMap(
+			"@type", "ParseFail",
+			"line", lineNum,
+			"message", message,
+			"slice", slice
+		);
 	}
 
 }
