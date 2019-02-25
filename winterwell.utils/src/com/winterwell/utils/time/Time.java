@@ -258,6 +258,7 @@ public class Time implements Serializable, Comparable<Time> {
 	 * @return time from this to b, ie. positive if b is after this
 	 */
 	public Dt diff(Time b, TUnit unit) {
+		// TODO special case handling for months?? e.g. 1st March is 1 month after 1st Feb
 		long d = diff(b);
 		Dt dt = new Dt(d, TUnit.MILLISECOND);
 		return unit == TUnit.MILLISECOND ? dt : dt.convertTo(unit);
