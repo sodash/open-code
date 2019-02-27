@@ -9,9 +9,11 @@ import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -19,14 +21,14 @@ import com.winterwell.utils.Utils;
 /**
  * A map backed by an array. Fast for small collections, lousy for big ones. Has
  * a convenient constructor. Another nice property is that insertion order is
- * preserved. I.e. keySet() values() and entrySet() all return objects in the
+ * preserved (like LinkedHashMap). I.e. keySet() values() and entrySet() all return objects in the
  * order they were added.
  * <p>
  * ArrayMap provides iteration over keys which ALLOWS the map to be edited
  * during the iteration. ie. it saves you writing
  * <code>for(X x : map.keySet().toArray(new X[0]))</code> when editing a map.
  * <p>
- * ArrayMap is not thread safe. Multi-threaded writes could lead to data
+ * ArrayMap is NOT thread safe. Multi-threaded writes could lead to data
  * corruption (which will throw a ConcurrentModificationException).
  * If this happens, you best discard the map!
  * However it is safer than HashMap: doing a get in thread 1 + a put in thread 2 is fine.
