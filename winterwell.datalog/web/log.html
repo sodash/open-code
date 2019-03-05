@@ -8,7 +8,7 @@
 			 * @param {Window} caller The window which requested this log call
 			 * @param {String} callId A randomly-generated ID which was attached to the log call
 			 */
-			function log(params, caller, callId) {
+			function log(tag, params, caller, callId) {
 				// Reworked from addStdParams() in ajax.js
 				if (!params.dref) params.dref = document.referrer;
 				if (!params.ancestorOrigins) {
@@ -25,7 +25,9 @@
 				}
 
 				var xhr = new XMLHttpRequest();
-				xhr.open('POST', '/lg'); // lg expects POST
+				// Put the tag into the url as a hack to make it easier to debug in the js console!
+				
+				xhr.open('POST', '/lg?t=' + escape(tag)); // (a) lg expects POST, (b) we make the event tag a URL param for easier debugging
 				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); // lg expects form-encoded
 				xhr.withCredentials = true; // Make sure we add cookies
 				
@@ -66,7 +68,7 @@
 			window.addEventListener('message', function(event) {
 				var msg = event.data;
 				// Does it (at least claim to) come from GL code? Ignore if it doesn't.
-				if (msg.sender === 'goodloop') log(msg.logParams, event.source, msg.callId);
+				if (msg.sender === 'goodloop') log(msg.logTag, msg.logParams, event.source, msg.callId);
 			}, false);
 		</script>
 	</head>
