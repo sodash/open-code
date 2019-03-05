@@ -89,7 +89,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		// list?
 		String slug = state.getSlug();
-		if (slug.endsWith("/_list") || slug.equals("_list")) {
+		if (slug.endsWith("/_list") || LIST_SLUG.equals(slug)) {
 			doList(state);
 			return;
 		}
@@ -304,6 +304,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected String defaultSort;
 	
 	public static final SField SORT = new SField("sort");
+	public static final String LIST_SLUG =  "_list";
 
 	protected final JThing<T> doPublish(WebRequest state) {
 		// wait 1 second??
