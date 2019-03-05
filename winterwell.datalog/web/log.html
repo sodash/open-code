@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script>
+			/**
+			 * @param {Object} params The log params - tag, dataspace, etc
+			 * @param {Window} caller The window which requested this log call
+			 * @param {String} callId A randomly-generated ID which was attached to the log call
+			 */
+			function log(tag, params, caller, callId) {
+				// Reworked from addStdParams() in ajax.js
+				if (!params.dref) params.dref = document.referrer;
+				if (!params.ancestorOrigins) {
+					var ao = window.location.ancestorOrigins;
+					// This is Chrome-only for now, so not guaranteed to be present
+					if (ao && ao.length) {
+						// AncestorOrigins is a DOMStringList which doesn't have join(), so...
+						var aoArray = [];
+						for (var i = 0; i < ao.length; i++) {
+							aoArray.push(ao.item(i));
+						}
+						params.ancestorOrigins = aoArray.join(',');
+					}
+				}
+
+				var xhr = new XMLHttpRequest();
+				// Put the tag into the url as a hack to make it easier to debug in the js console!
+				
+				xhr.open('POST', '/lg?t=' + escape(tag)); // (a) lg expects POST, (b) we make the event tag a URL param for easier debugging
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'); // lg expects form-encoded
+				xhr.withCredentials = true; // Make sure we add cookies
+				
+				// TODO Catch these messages in a Promise back in the receiving window
+				// This is for the uninstall case, where deleting the context that's DOING the logging before the logging call is complete might do Weird Things
+				xhr.onload = () => {
+					if (xhr.status >= 200 && xhr.status < 400) {
+						caller.postMessage({
+							callId: callId,
+							response: xhr.response,
+						}, '*');
+					} else {
+						caller.postMessage({
+							callId: callId,
+							status: xhr.status,
+							statusText: xhr.statusText,
+						}, '*');
+					}
+				};
+
+				xhr.onerror = () => {
+					caller.postMessage({
+						callId: callId,
+						status: xhr.status,
+						statusText: xhr.statusText,
+					}, '*');
+				};
+
+				// Convert params object to payload string
+				var payload = Object.keys(params)
+					.map(function(key) { return (key + '=' + encodeURIComponent(params[key])); })
+					.join('&');
+
+				xhr.send(payload);
+			};
+
+			// Listen for "log this" messages
+			window.addEventListener('message', function(event) {
+				var msg = event.data;
+				// Does it (at least claim to) come from GL code? Ignore if it doesn't.
+				if (msg.sender === 'goodloop') log(msg.logTag, msg.logParams, event.source, msg.callId);
+			}, false);
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
