@@ -387,7 +387,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		return false;
 	}
 
-	Dt skipGap;
+	private Dt skipGap;
 	
 	public BuildTask setSkipGap(Dt skipGap) {
 		this.skipGap = skipGap;
