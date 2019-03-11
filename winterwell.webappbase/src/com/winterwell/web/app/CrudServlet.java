@@ -649,7 +649,17 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 
-
+	/**
+	 * NB: Uses AppUtils#doSaveEdit2(ESPath, JThing, WebRequest, boolean) to do a *merge* into ES.
+	 * So this will not remove parts of a document (unless you provide an over-write value).
+	 * 
+	 * Why use merge?
+	 * This allows for partial editors (e.g. edit the budget of an advert), and reduces the collision
+	 * issues with multiple online editors.
+	 * 
+	 * 
+	 * @param state
+	 */
 	protected void doSave(WebRequest state) {
 		// debug FIXME		
 		String json = getJson(state);
