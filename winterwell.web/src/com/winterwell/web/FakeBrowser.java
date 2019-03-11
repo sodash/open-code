@@ -481,7 +481,10 @@ public class FakeBrowser {
 				Object v = reqHeaders.get(h);
 				return v==null? "" : " -H '"+h+": "+v+"'";
 			}), " ");
-			String postBody = WebUtils2.urlDecode(encodedPostBody);
+			
+			String postBody = encodedPostBody;
+			if( !contentType.equals("application/json") ) postBody = WebUtils2.urlDecode(encodedPostBody);
+			
 			String curl = StrUtils.compactWhitespace("curl -XPOST -d '"+postBody+"'"+sheaders+" '"+uri+"'");
 			Log.d(LOGTAG, curl);
 			if (debugVars==null) debugVars = new ArrayMap("encodedBody", encodedPostBody);
