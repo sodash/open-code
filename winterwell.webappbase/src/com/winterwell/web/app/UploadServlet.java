@@ -249,7 +249,8 @@ public final class UploadServlet implements IServlet {
 			Map cargo = new ArrayMap();			
 			File asset = doUpload(state, cargo);
 			state.sendRedirect();
-						
+			
+			WebUtils2.CORS(state, false);
 			// loosely based on http://schema.org/MediaObject
 			WebUtils2.sendJson(new JsonResponse(state, cargo), state);
 			
