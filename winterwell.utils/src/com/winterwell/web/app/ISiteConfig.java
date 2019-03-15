@@ -8,5 +8,13 @@ package com.winterwell.web.app;
 public interface ISiteConfig {
 
 	int getPort();
-		
+	
+//	/** TODO
+//	 * @return
+//	 */
+//	default String getServerType() {
+//		return null;
+//	}
+	
+	
 }

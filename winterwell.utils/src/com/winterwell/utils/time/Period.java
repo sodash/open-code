@@ -47,13 +47,13 @@ public final class Period extends Pair<Time> {
 	}
 
 	/**
-	 * @param start Cannot be null
-	 * @param end Cannot be null, must be after or equal to start
+	 * @param start If null, will use a WELL_OLD backstop
+	 * @param end If null, will use a WELL_FUTURE backstop
 	 */
 	public Period(Time start, Time end) {
-		super(start, end);
-		// should we allow null values?
-		assert !start.isAfter(end) : start + " " + end;
+		super(start==null? TimeUtils.WELL_OLD : start, 
+				end==null? TimeUtils.WELL_FUTURE : end);
+		assert ! start.isAfter(end) : start + " " + end;
 	}
 
 	/**
@@ -148,16 +148,6 @@ public final class Period extends Pair<Time> {
 
 	public Time getMiddle() {
 		return new Time((getStart().getTime() + getEnd().getTime()) / 2);
-	}
-
-	/**
-	 * Like new Period(), except it handles nulls, by using far past/future backstops.
-	 * @param start Can be null
-	 * @param end Can be null
-	 * @return Period
-	 */
-	public static Period make(Time start, Time end) {
-		return new Period(start==null? TimeUtils.WELL_OLD : start, end==null? TimeUtils.WELL_FUTURE : end);
 	}
 
 }
