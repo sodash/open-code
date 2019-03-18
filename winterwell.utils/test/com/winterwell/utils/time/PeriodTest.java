@@ -13,6 +13,13 @@ public class PeriodTest {
 		assert ! new Period(t.plus(TUnit.DAY.dt), null).contains(t);
 		assert new Period(t.minus(TUnit.HOUR), t.plus(TUnit.HOUR)).contains(t);
 	}
+
+	@Test
+	public void testNull() {	
+		Time t = new Time();
+		assert new Period(null, null).contains(t);		
+	}
+	
 	
 	
 	@Test

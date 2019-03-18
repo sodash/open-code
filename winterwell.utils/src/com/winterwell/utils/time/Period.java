@@ -53,7 +53,7 @@ public final class Period extends Pair<Time> {
 	public Period(Time start, Time end) {
 		super(start==null? TimeUtils.WELL_OLD : start, 
 				end==null? TimeUtils.WELL_FUTURE : end);
-		assert ! start.isAfter(end) : start + " " + end;
+		assert ! first.isAfter(second) : start + " " + end;
 	}
 
 	/**
