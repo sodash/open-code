@@ -15,6 +15,9 @@ import com.winterwell.utils.log.KErrorPolicy;
 
 import junit.framework.TestCase;
 
+/**
+ @tested StrUtils
+*/
 public class StrUtilsTest extends TestCase {
 
 	@Test
