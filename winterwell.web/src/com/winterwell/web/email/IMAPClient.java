@@ -2,6 +2,7 @@ package com.winterwell.web.email;
 
 import java.io.Closeable;
 import java.security.GeneralSecurityException;
+import java.security.cert.CertPathBuilderException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -38,8 +39,6 @@ import com.winterwell.web.ConfigException;
 import com.winterwell.web.ExternalServiceException;
 import com.winterwell.web.LoginDetails;
 
-import sun.security.provider.certpath.AdjacencyList;
-import sun.security.provider.certpath.SunCertPathBuilderException;
 
 /**
  * Access an IMAP mail account.
@@ -231,8 +230,8 @@ public final class IMAPClient implements Closeable {
 			 // Certificate exceptions are deeply nested - look for one
 			 Throwable ex = e;
 			 while (ex != null) {
-				if (ex instanceof SunCertPathBuilderException) {
-					SunCertPathBuilderException sex = (SunCertPathBuilderException) ex;
+				if (ex instanceof CertPathBuilderException) {
+					CertPathBuilderException sex = (CertPathBuilderException) ex;
 					installCertificate(sex);
 					connect();
 					return;
@@ -665,12 +664,12 @@ public final class IMAPClient implements Closeable {
 		return session;
 	}
 
-	private void installCertificate(SunCertPathBuilderException sex) {
-		AdjacencyList adjl = sex.getAdjacencyList();
-		Log.d("imap", "AdjacenyList: "+adjl);
+	private void installCertificate(CertPathBuilderException sex) {
+//		AdjacencyList adjl = sex.getAdjacencyList();
+//		Log.d("imap", "AdjacenyList: "+adjl);
 		Log.d("imap", "ssl: "+isUsingSSL());
 		throw new FailureException(toString()+
-				" Need to write code to install SSL certificates: "+sex+" "+adjl);
+				" Need to write code to install SSL certificates: "+sex);
 	}
 
 	public boolean isConnected() {
