@@ -57,6 +57,7 @@ implements IStore, Flushable, Closeable
 		this.base = base;
 		this.delay = delay;
 		this.depot = depot;
+                this.batched = new HashSet();
 	}
 
 	final IStore base;
