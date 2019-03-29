@@ -321,20 +321,19 @@ implements IStore, Flushable, Closeable
 			List<Pair2<Desc,Object>> add = new ArrayList();
 			List<Desc> remove = new ArrayList();
 
-			HashSet<Desc> saved = new HashSet();
 			for(Desc desc : batched) {
 				consume3(desc, add, remove);
-				saved.add(desc);
 			}
 			// save
 			base.storeBatch(add, remove);
 
 			// Remove any other requests for msg
 			for(Packet p : getQ().toArray(new Packet[0])) {
-				if (saved.contains(p.msg)) {
+				if (batched.contains(p.msg)) {
 					getQ().remove(p);
 				}
 			}
+			batched.clear();
 		}		
 	}
 
