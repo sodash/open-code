@@ -18,6 +18,25 @@ public class SearchQueryTest {
 	}
 	
 	@Test
+	public void testCase() {
+		{
+			String q = "alice";
+			SearchQuery sq = new SearchQuery(q);
+			System.out.println(sq);
+			assert sq.matches("Hello alice!");
+			assert sq.matches("Hello Alice!");
+		}
+		{
+			String q = "Alice";
+			SearchQuery sq = new SearchQuery(q);
+			System.out.println(sq);
+			assert sq.matches("Hello alice!");
+			assert sq.matches("Hello Alice!");
+		}
+	}
+
+	
+	@Test
 	public void testKeyNull() {
 		{
 			SearchQuery sq = new SearchQuery("alice foo:null");
@@ -46,11 +65,21 @@ public class SearchQueryTest {
 	
 	@Test
 	public void testQuotedKeyVal() {
-		SearchQuery sq = new SearchQuery("campaign:\"Villa Plus\"");
-		List pt = sq.getParseTree();
-		System.out.println(pt);
-		String host = sq.getProp("campaign");
-		assert host.equals("Villa Plus") : sq;
+		{
+			SearchQuery sq = new SearchQuery("campaign:\"Villa Plus\"");
+			List pt = sq.getParseTree();
+			System.out.println(pt);
+			String host = sq.getProp("campaign");
+			assert host.equals("villa plus") : host+" "+sq;
+		}
+		{
+			SearchQuery sq = new SearchQuery("campaign:\"Villa Plus\"");
+			sq.setCaseSensitive(true);
+			List pt = sq.getParseTree();
+			System.out.println(pt);
+			String host = sq.getProp("campaign");
+			assert host.equals("Villa Plus") : host+" "+sq;
+		}
 	}
 	
 	@Test

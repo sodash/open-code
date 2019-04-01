@@ -319,13 +319,14 @@ public class SearchQuery implements Serializable, IHasJson {
 	 * Suppose http://bit.ly/abc is a youtube link
 	 * -- the search "youtube" will not match it.
 	 * 
-	 * @param text Case is ignored
+	 * @param text not case sensitive by default
 	 * @return true if this search term (ignoring service, language and
 	 *         location) matches this text. 
 	 *         
 	 * @testedby {@link SearchSpecTest#testMatches()}
 	 */
 	public boolean matches(String text) {
+		if ( ! caseSensitive) text = text.toLowerCase(); // normal to match alice ~ Alice
 		getParseTree();
 		// TODO should we remove punctuation here? But what about smilies?
 		boolean itMatches = matches2(text, parseTree);
@@ -433,6 +434,11 @@ public class SearchQuery implements Serializable, IHasJson {
 	}
 
 	Collection<String> _stopwords = new HashSet<>();
+
+	/**
+	 * Off by default. In case anyone does want case sensitive
+	 */
+	private boolean caseSensitive;
 	
 	private Collection<String> getStopWords() {
 		// TODO Auto-generated method stub
@@ -448,7 +454,7 @@ public class SearchQuery implements Serializable, IHasJson {
 	// Note: behaviour may be weird if searchTerm != this.searchTerm (though it's handy for some tests)
 	List parse() {
 		if (parseTree!=null) return parseTree;
-		String searchTerm = raw;
+		String searchTerm = caseSensitive? raw : raw.toLowerCase();
 		List output = new ArrayList();
 		output.add(KEYWORD_AND);
 		ArrayList<List> stack = new ArrayList();
@@ -800,6 +806,11 @@ public class SearchQuery implements Serializable, IHasJson {
 				);
 		// What to return if prop:value is present but its complex??
 		return prop==null? null : (String) prop.get(propName);
+	}
+
+	public void setCaseSensitive(boolean cs) {
+		caseSensitive = cs;
+		parseTree = null;
 	}
 
 }
