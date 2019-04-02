@@ -95,7 +95,7 @@ public class Pair2<A, B> implements Comparable<Pair2<A, B>>, Collection,
 	}
 
 	@Override
-	public final boolean contains(Object o) {
+	public boolean contains(Object o) {
 		return Utils.equals(o, first) || Utils.equals(o, second);
 	}
 
