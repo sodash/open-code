@@ -8,16 +8,16 @@ public class PeriodTest {
 	@Test
 	public void testContains() {	
 		Time t = new Time();
-		assert new Period(null, null).contains(t);
-		assert ! new Period(null, t.minus(TUnit.DAY.dt)).contains(t);
-		assert ! new Period(t.plus(TUnit.DAY.dt), null).contains(t);
-		assert new Period(t.minus(TUnit.HOUR), t.plus(TUnit.HOUR)).contains(t);
+		assert new Period(null, null).within(t);
+		assert ! new Period(null, t.minus(TUnit.DAY.dt)).within(t);
+		assert ! new Period(t.plus(TUnit.DAY.dt), null).within(t);
+		assert new Period(t.minus(TUnit.HOUR), t.plus(TUnit.HOUR)).within(t);
 	}
 
 	@Test
 	public void testNull() {	
 		Time t = new Time();
-		assert new Period(null, null).contains(t);		
+		assert new Period(null, null).within(t);		
 	}
 	
 	

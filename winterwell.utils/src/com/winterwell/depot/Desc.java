@@ -117,7 +117,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 				if (!m.find())
 					continue;
 				Time v = new Time(Long.valueOf(m.group()));
-				if (range.contains(v)) {
+				if (range.within(v)) {
 					w.write(line);
 					w.write('\n');
 				}

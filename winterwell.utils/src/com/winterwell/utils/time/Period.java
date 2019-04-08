@@ -68,14 +68,15 @@ public final class Period extends Pair<Time> {
 	/**
 	 * Is t inside this range? Includes the end values.
 	 */
-	public boolean contains(Time t) {
+	public boolean within(Time t) {
 		return t.longValue() >= first.longValue()
 				&& t.longValue() <= second.longValue();
 	}
 	
 	/**
-	 * @deprecated Use {@link #contains(Time)}.
-	 * This is inherited from a superclass. It is NOT what you want.
+	 * @deprecated Use {@link #within(Time)}.
+	 * This is inherited from a superclass and complies with the Iterable interface. 
+	 * It is probably NOT what you want.
 	 */
 	public boolean contains(Object x) {
 		return super.contains(x);
