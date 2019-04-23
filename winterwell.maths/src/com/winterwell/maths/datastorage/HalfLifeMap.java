@@ -196,6 +196,10 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 	 *            this
 	 */
 	public HalfLifeMap(int idealSize) {
+		// NB: we use a synchronized HashMap instead of ConcurrentHashMap because models can have _lots_ of little maps.
+		// and the extra ram overhead of ConcurrentHashMap genuinely was an issue for SoDash.
+		// Other use cases might prefer the ConcurrentHashMap for speed
+		// -- profiling both speed and memory is recommended.
 		this(idealSize, Collections.synchronizedMap(new HashMap<K,HLEntry<K,V>>()));
 	}
 	
@@ -335,7 +339,7 @@ public final class HalfLifeMap<K, V> extends AbstractMap2<K, V> implements
 		List<HLEntry> entries = Arrays.asList(map.values().toArray(new HLEntry[0]));
 		if (entries.size() <= idealSize) return; // race condition
 		// sort by score
-		// NB: HLEntry score could mutate under us, which could cause
+		// NB: HLEntry score could mutate under us during the sort, which could cause
 		// > java.lang.IllegalArgumentException: Comparison method violates its general contract!
 		boolean sorted = false;
 		for(int i=0; i<5; i++) {
