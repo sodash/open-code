@@ -57,6 +57,7 @@ implements IStore, Flushable, Closeable
 		this.base = base;
 		this.delay = delay;
 		this.depot = depot;
+ 		this.batched = new HashSet();
 	}
 
 	final IStore base;
@@ -249,6 +250,7 @@ implements IStore, Flushable, Closeable
 					ec = new RateCounter(delay);
 					errorCount = ec; // NB: race condition paranoia - ec cannot be null
 				}
+				Log.e(LOGTAG, ex);
 				ec.plus(1);
 			}
 		}
@@ -256,6 +258,12 @@ implements IStore, Flushable, Closeable
 
 		private void consume2_saveOne(Desc desc) {
 			consume3(desc, null, null);
+			// Remove any other requests for msg
+			for(Packet p : getQ().toArray(new Packet[0])) {
+				if (desc.equals(p.msg)) {
+					getQ().remove(p);
+				}
+			}
 		}
 
 		
@@ -267,12 +275,6 @@ implements IStore, Flushable, Closeable
 		 */
 		private void consume3(Desc desc, List<Pair2<Desc, Object>> add, List<Desc> remove) {
 			// The messages slowly sent are the Descs for the items to save, whilst the items themselves are stashed in map.
-			// Remove any other requests for msg
-			for(Packet p : getQ().toArray(new Packet[0])) {
-				if (desc.equals(p.msg)) {
-					getQ().remove(p);
-				}
-			}
 			// Save or remove?
 			Object v = map.get(desc); 
 			// NB: We only modify the map at the end, and only if it stays the same
@@ -319,12 +321,20 @@ implements IStore, Flushable, Closeable
 			Log.d(LOGTAG, "save batch of "+batched.size());
 			List<Pair2<Desc,Object>> add = new ArrayList();
 			List<Desc> remove = new ArrayList();
-			
+
 			for(Desc desc : batched) {
 				consume3(desc, add, remove);
 			}
 			// save
 			base.storeBatch(add, remove);
+
+			// Remove any other requests for msg
+			for(Packet p : getQ().toArray(new Packet[0])) {
+				if (batched.contains(p.msg)) {
+					getQ().remove(p);
+				}
+			}
+			batched.clear();
 		}		
 	}
 
@@ -335,7 +345,6 @@ implements IStore, Flushable, Closeable
 		return actor;
 	}
 
-	
 }
 
 
