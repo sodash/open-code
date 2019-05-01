@@ -97,6 +97,11 @@ public class FileServlet extends HttpServlet implements IServlet {
 	}
 
 	boolean listDir = true;
+	private boolean chopServlet;
+	public FileServlet setChopServlet(boolean chopServlet) {
+		this.chopServlet = chopServlet;
+		return this;
+	}
 	
 	/**
 	 * If true (default), provide a dynamic index
@@ -155,6 +160,11 @@ public class FileServlet extends HttpServlet implements IServlet {
 		}
 		// convert e.g. "%20" -> " "
 		pi = WebUtils.urlDecode(pi);
+		// chop leading path bit?		
+		if (chopServlet && pi.startsWith(req.getServletPath())) {
+			pi = pi.substring(req.getServletPath().length());
+		}
+		if (pi.isEmpty()) pi = "/";
 		// security check -- no hacking with .. or ;
 		if ( ! FileUtils.isSafe(pi))
 			throw new SecurityException("Illegal filename: " + pi);

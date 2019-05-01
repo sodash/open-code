@@ -410,7 +410,7 @@ public class Bob {
 		}
 		String id = buildTask.getDesc().getId();
 		time4task.put(id, new Time());
-		assert buildTask.skip() : buildTask;
+//		assert buildTask.skip() : buildTask;
 		// TODO save in a slow thread??
 		saveTaskHistory();
 	}
