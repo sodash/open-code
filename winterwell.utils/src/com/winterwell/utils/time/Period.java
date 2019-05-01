@@ -65,9 +65,19 @@ public final class Period extends Pair<Time> {
 	}
 
 	/**
+	 * @deprecated Confusing as it overlaps with the super Collection.contains()
 	 * Is t inside this range? Includes the end values.
 	 */
 	public boolean contains(Time t) {
+//		super.contains(t);
+		return t.longValue() >= first.longValue()
+				&& t.longValue() <= second.longValue();
+	}
+	
+	/**
+	 * Is t inside this range? Includes the end values.
+	 */
+	public boolean within(Time t) {
 		return t.longValue() >= first.longValue()
 				&& t.longValue() <= second.longValue();
 	}

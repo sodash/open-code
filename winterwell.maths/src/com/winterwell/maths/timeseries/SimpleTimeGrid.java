@@ -51,7 +51,7 @@ public class SimpleTimeGrid implements ITimeGrid {
 	
 	public SimpleTimeGrid setLimit(Period limit) {
 		this.limit = limit;
-		assert limit.contains(origin) : limit+" v "+origin;
+		assert limit.within(origin) : limit+" v "+origin;
 		return this;
 	}
 	
@@ -90,7 +90,7 @@ public class SimpleTimeGrid implements ITimeGrid {
 
 	@Override
 	public boolean contains(Time time) {
-		return limit.contains(time);
+		return limit.within(time);
 	}	
 
 }

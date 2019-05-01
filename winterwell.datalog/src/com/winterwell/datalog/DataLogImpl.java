@@ -340,7 +340,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 				t = t.plus(dt);
 			}
 			Period p = new Period(t.minus(dt), t);
-			assert p.contains(time);
+			assert p.within(time);
 			return p;
 		}
 		// the past (normal case)
