@@ -11,6 +11,7 @@ import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.maths.timeseries.TimeSlicer;
 import com.winterwell.maths.vector.CyclicMetric;
 import com.winterwell.maths.vector.XY;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
@@ -119,32 +120,32 @@ public class TimeSeriesChart extends XYChart {
 		return cc;
 	}
 
-	/**
-	 * Convenience method for eyeballing time series charts
-	 * 
-	 * @param clone
-	 */
-	public static void popup(String name, IDataStream data) {
-		TimeSeriesChart chart = new TimeSeriesChart();
-		chart.setTitle(name);
-		chart.setData(data);
-		RenderWithFlot render = new RenderWithFlot();
-		render.renderToBrowser(chart);
-	}
-
-	/**
-	 * Convenience method for eyeballing time series charts
-	 * Uses JFreeChart, so no dependency on soda.sh
-	 * @param clone
-	 */
-	public static void popupLocal(String name, IDataStream data) {
-		TimeSeriesChart chart = new TimeSeriesChart();
-		chart.setTitle(name);
-		chart.setData(data);
-		chart.setType(ChartType.LINE);
-		RenderWithJFreeChart render = new RenderWithJFreeChart();
-		render.renderAndPopupAndBlock(chart);
-	}
+//	/**
+//	 * Convenience method for eyeballing time series charts
+//	 * 
+//	 * @param clone
+//	 */
+//	public static void popup(String name, IDataStream data) {
+//		TimeSeriesChart chart = new TimeSeriesChart();
+//		chart.setTitle(name);
+//		chart.setData(data);
+//		Renderer render = Dep.get(Renderer.class);
+//		render.renderToBrowser(chart);
+//	}
+//
+//	/**
+//	 * Convenience method for eyeballing time series charts
+//	 * Uses JFreeChart, so no dependency on soda.sh
+//	 * @param clone
+//	 */
+//	public static void popupLocal(String name, IDataStream data) {
+//		TimeSeriesChart chart = new TimeSeriesChart();
+//		chart.setTitle(name);
+//		chart.setData(data);
+//		chart.setType(ChartType.LINE);
+//		Renderer render = Dep.get(Renderer.class);
+//		render.renderAndPopupAndBlock(chart);
+//	}
 
 	private Dt period;
 

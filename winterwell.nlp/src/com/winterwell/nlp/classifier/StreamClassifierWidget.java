@@ -6,13 +6,14 @@ import java.util.List;
 
 import com.winterwell.maths.chart.PieChart;
 import com.winterwell.maths.chart.Rainbow;
-import com.winterwell.maths.chart.RenderWithFlot;
+import com.winterwell.maths.chart.Renderer;
 import com.winterwell.maths.stats.distributions.cond.ExplnOfDist;
 import com.winterwell.maths.stats.distributions.cond.ISitnStream;
 import com.winterwell.maths.stats.distributions.cond.Sitn;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.io.Tkn;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.IBuildStrings;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
@@ -139,7 +140,7 @@ public class StreamClassifierWidget implements IWidget {
 			PieChart chart = new PieChart("Overall P(tag)", pTags);
 			chart.setShowLegend(false);
 			chart.setRainbow(rainbow);
-			RenderWithFlot render = new RenderWithFlot(300, 300);
+			Renderer render = Dep.get(Renderer.class);
 			sb.append("<div>"+render.renderToHtml(chart)+"</div>");
 		}		
 		

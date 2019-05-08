@@ -39,19 +39,6 @@ public class FiniteDistributionChart extends XYChart {
 		return super.getDataLabels();
 	}
 	
-	/**
-	 * Convenience method for eyeballing histograms
-	 * 
-	 * @param clone
-	 */
-	public static void popup(String name, AFiniteDistribution<?> dist) {
-		FiniteDistributionChart chart = new FiniteDistributionChart(dist);
-		chart.setTitle(name);
-		RenderWithJFreeChart render = new RenderWithJFreeChart();
-		render.setSize(900, 400);
-		render.renderAndPopupAndBlock(chart);
-	}
-
 	private final IFiniteDistribution dist;
 
 	public FiniteDistributionChart(IFiniteDistribution distribution) {
