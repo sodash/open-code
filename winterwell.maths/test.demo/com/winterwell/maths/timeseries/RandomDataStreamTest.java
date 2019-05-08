@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.winterwell.maths.chart.RenderWithFlot;
 import com.winterwell.maths.chart.ScatterPlot;
 import com.winterwell.maths.stats.distributions.AxisAlignedGaussian;
 import com.winterwell.maths.vector.XY;
@@ -22,7 +21,7 @@ public class RandomDataStreamTest {
 		List<Datum> data = stream.sample(10);
 
 		ScatterPlot plot = new ScatterPlot(data);
-		new RenderWithFlot().renderToBrowser(plot);
+//		new RenderWithFlot().renderToBrowser(plot);
 	}
 
 }

@@ -29,7 +29,7 @@ public class XYChartTest {
 			}
 			chart.setData(data);
 			chart.setJitter(0.1);
-			RenderWithJFreeChart render = new RenderWithJFreeChart();
+			RenderWithFlot render = new RenderWithFlot();
 			Image img = render.renderToImage(chart);
 			
 				GuiUtils.popupAndBlock(img);
@@ -44,7 +44,7 @@ public class XYChartTest {
 			}
 			chart.setData(data);
 			chart.setJitter(0.1);
-			RenderWithJFreeChart render = new RenderWithJFreeChart();
+			RenderWithFlot render = new RenderWithFlot();
 			Image img = render.renderToImage(chart);
 			
 				GuiUtils.popupAndBlock(img);
@@ -60,7 +60,7 @@ public class XYChartTest {
 			// reverse the call order
 			chart.setJitter(0.1);
 			chart.setData(data);
-			RenderWithJFreeChart render = new RenderWithJFreeChart();
+			RenderWithFlot render = new RenderWithFlot();
 			Image img = render.renderToImage(chart);
 			
 				GuiUtils.popupAndBlock(img);
@@ -80,7 +80,7 @@ public class XYChartTest {
 		XYChart chart = new XYChart();
 		chart.setData(data);
 		chart.setType(ChartType.LINE);
-		RenderWithJFreeChart render = new RenderWithJFreeChart();
+		RenderWithFlot render = new RenderWithFlot();
 		Image img = render.renderToImage(chart);
 		
 			GuiUtils.popupAndBlock(img);

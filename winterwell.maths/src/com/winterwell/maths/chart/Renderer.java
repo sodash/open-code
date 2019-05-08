@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 
 /**
@@ -153,6 +154,11 @@ public abstract class Renderer {
 
 	public static Renderer getDefault() {
 		return new HighchartsRenderer();
+	}
+
+	public void renderToBrowser(AChart chart) {
+		String html = renderToHtmlPage(chart);
+		WebUtils.display(html);
 	}
 	
 }

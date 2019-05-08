@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 import com.winterwell.maths.chart.CombinationChart;
-import com.winterwell.maths.chart.RenderWithFlot;
 import com.winterwell.maths.chart.TimeSeriesChart;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.web.WebUtils;
@@ -32,10 +31,10 @@ public class DetrendedStreamTest {
 		TimeSeriesChart chart2 = new TimeSeriesChart();
 		chart2.setData(new ListDataStream(data));
 		CombinationChart cc = new CombinationChart(chart1, chart2);
-		RenderWithFlot render = new RenderWithFlot();
-		String html = render.renderToHtml(cc);
-		WebUtils.display("<html><body>" + RenderWithFlot.JQUERY_DEPENDENCY
-				+ RenderWithFlot.DEPENDENCIES + html + "</body></html>");
+//		RenderWithFlot render = new RenderWithFlot();
+//		String html = render.renderToHtml(cc);
+//		WebUtils.display("<html><body>" + RenderWithFlot.JQUERY_DEPENDENCY
+//				+ RenderWithFlot.DEPENDENCIES + html + "</body></html>");
 		assert true;
 	}
 

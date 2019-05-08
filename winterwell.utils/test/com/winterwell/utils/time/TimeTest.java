@@ -260,12 +260,12 @@ public class TimeTest {
 			} catch(Exception ex) {
 				System.out.println("	SimpleDateFormat date:	"+ex);
 			}
-			try {
-				Calendar p = javax.xml.bind.DatatypeConverter.parseDateTime(s);				
-				System.out.println("	jaxb:	"+new Time(p));
-			} catch(Exception ex) {
-				System.out.println("	jaxb:	"+ex);
-			}			
+//			try {
+//				Calendar p = javax.xml.bind.DatatypeConverter.parseDateTime(s);				
+//				System.out.println("	jaxb:	"+new Time(p));
+//			} catch(Exception ex) {
+//				System.out.println("	jaxb:	"+ex);
+//			}			
 		}
 	}
 	

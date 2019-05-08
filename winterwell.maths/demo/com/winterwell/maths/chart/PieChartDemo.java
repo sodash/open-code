@@ -3,6 +3,7 @@ package com.winterwell.maths.chart;
 import org.junit.Test;
 
 import com.winterwell.maths.stats.distributions.discrete.IntegerDistribution;
+import com.winterwell.utils.Dep;
 
 public class PieChartDemo {
 
@@ -15,7 +16,7 @@ public class PieChartDemo {
 		}
 		{
 			PieChart chart = new PieChart("PieChart test 15", d);
-			RenderWithFlot render = new RenderWithFlot();
+			Renderer render = Dep.get(Renderer.class);
 			render.renderToBrowser(chart);
 		}
 	}
@@ -28,7 +29,7 @@ public class PieChartDemo {
 		}
 		{
 			PieChart chart = new PieChart("PieChart test 3", d);
-			RenderWithFlot render = new RenderWithFlot();
+			Renderer render = Dep.get(Renderer.class);
 			render.renderToBrowser(chart);
 		}
 	}
@@ -44,7 +45,7 @@ public class PieChartDemo {
 		{
 			PieChart chart = new PieChart<Double>("PieChart abs test", d);
 			chart.setLabeller(PieChart.LABEL_WITH_ABS_VALUES);
-			RenderWithFlot render = new RenderWithFlot();
+			Renderer render = Dep.get(Renderer.class);
 			render.renderToBrowser(chart);
 		}
 	}

@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.winterwell.maths.chart.RenderWithFlot;
 import com.winterwell.maths.stats.distributions.cond.Cntxt;
 import com.winterwell.maths.stats.distributions.cond.ICondDistribution;
 import com.winterwell.maths.stats.distributions.cond.ISitnStream;
@@ -57,7 +56,7 @@ public class StreamClassifierWidgetTest {
 
 		WebPage page = new WebPage();
 		page.addScript("jquery");
-		page.append(RenderWithFlot.DEPENDENCIES);		
+//		page.append(RenderWithFlot.DEPENDENCIES);		
 		w.appendHtmlTo(page);
 		WebUtils.display(page.toString());
 	}

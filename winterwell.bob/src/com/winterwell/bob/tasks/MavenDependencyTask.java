@@ -46,7 +46,7 @@ public class MavenDependencyTask extends BuildTask {
 	/**
 	 * Convenience for a single artifact dependency
 	 * @param artifactId e.g. "mystuff:artifact:1.2" 
-	 * (which is Groovy / Buildr format in Maven central mvnrepository.com)
+	 * (which is Buildr format in Maven central mvnrepository.com)
 	 */
 	public MavenDependencyTask(String artifactId) {
 		addDependency(artifactId);
