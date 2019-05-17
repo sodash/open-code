@@ -252,8 +252,13 @@ public class Log {
 	static void report(String tag, Object msg, Level error, Throwable ex) {
 		// Ignore?
 		Level minLevel = getMinLevel(tag);
-		if (minLevel.intValue() > error.intValue())
+		if (minLevel.intValue() > error.intValue()) {
 			return;
+		}
+		// stochastic (off by default)
+		if (config.keep > 0 && config.keep < 1) {
+			if ( ! Utils.getRandomChoice(config.keep)) return;
+		}
 		// null tag? Put in the calling class.method
 		if (tag == null) {
 			StackTraceElement ste = ReflectionUtils.getCaller(Log.class
