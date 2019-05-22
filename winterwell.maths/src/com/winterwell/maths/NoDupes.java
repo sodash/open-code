@@ -11,7 +11,11 @@ import com.google.common.cache.CacheBuilder;
  * @param <Key>
  */
 public class NoDupes<Key> {
-
+	@Override
+	public String toString() {
+		return "NoDupes["+seen.size()+"]";
+	}
+	
 	/**
 	 * TODO make this non-transient 
 	 *  => saner serialisation for the google cache

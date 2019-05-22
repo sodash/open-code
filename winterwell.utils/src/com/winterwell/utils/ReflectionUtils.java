@@ -534,7 +534,7 @@ public class ReflectionUtils {
 		rt.runFinalization();
 		rt.gc();
 		// The methods above shouldn't need it, but add in a pause anyway
-		Utils.sleep(100);
+		Utils.sleep(10);
 		return rt.totalMemory() - rt.freeMemory();
 	}
 

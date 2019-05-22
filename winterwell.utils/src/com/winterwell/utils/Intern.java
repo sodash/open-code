@@ -1,9 +1,10 @@
+package com.winterwell.utils;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.BiFunction;
-
-import com.winterwell.utils.Mutable;
 
 /**
  * A memory-safe alternative to Java's String.intern.
@@ -11,6 +12,7 @@ import com.winterwell.utils.Mutable;
  * Unlike intern, this can forget entries so it does NOT guarantee == implies equals()
  * 
  * @author daniel
+ * @testedby InternTest
  *
  */
 public class Intern {
@@ -20,7 +22,7 @@ public class Intern {
 	 * Hm: Or should we use a cache, e.g. CacheBuilder or HalfLifeMap?
 	 * Note: do not use CacheBuilder's weakKeys -- this relies on == testing.
 	 */
-	static final WeakHashMap<String, WeakReference<String>> strings = new WeakHashMap<>();
+	static final Map<String, WeakReference<String>> strings = Collections.synchronizedMap(new WeakHashMap<>());
 		
 	
 	public static String get(String s) {
@@ -44,5 +46,9 @@ public class Intern {
 	public static boolean contains(String s) {
 		WeakReference<String> wr = strings.get(s);
 		return wr!=null && wr.get()!=null;
+	}
+
+	public static void clear() {
+		strings.clear();
 	}
 }
