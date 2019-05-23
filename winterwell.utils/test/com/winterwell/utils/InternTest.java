@@ -1,7 +1,9 @@
+package com.winterwell.utils;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.winterwell.utils.Intern;
 import com.winterwell.utils.Utils;
 
 public class InternTest {

@@ -1,9 +1,12 @@
 package com.winterwell.datalog.server;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogImpl;
@@ -13,16 +16,21 @@ import com.winterwell.datalog.ESStorage;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.nlp.query.SearchQuery.SearchFormatException;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.io.CSVWriter;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.WebRequest;
+import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.SField;
 
@@ -98,9 +106,37 @@ public class DataServlet implements IServlet {
 			aggregations = new ArrayMap();
 		}
 		// also send eg data
-		aggregations.put("examples", sr.getHits());
+		List<Map> egs = sr.getHits();
+		aggregations.put("examples", egs);
+		
+		// csv? Send a table of the examples=results
+		if (state.getResponseType() == KResponseType.csv) {
+			doSendCSV(state, egs);
+			return;
+		}
+		
 		JsonResponse jr = new JsonResponse(state, aggregations);
 		WebUtils2.sendJson(jr, state);
+	}
+
+	/**
+	 * @deprecated TODO I'm sure we have some json to csv code somewhere
+	 * @param state
+	 * @param egs
+	 */
+	private void doSendCSV(WebRequest state, List<Map> egs) {
+		HttpServletResponse response = state.getResponse();
+		BufferedWriter out = null;
+		try {
+			response.setContentType(WebUtils.MIME_TYPE_CSV);
+			out = FileUtils.getWriter(response.getOutputStream());
+			// TODO pipe out the csv
+			out.append("TODO pipe out the csv");
+		} catch (IOException e) {
+			throw Utils.runtime(e);
+		} finally {
+			FileUtils.close(out);
+		}
 	}
 
 	/**
