@@ -121,7 +121,7 @@ public class Printer {
 		if (x.getClass().isArray()) {
 			x = new ArrayList(Containers.asList(x));
 		} else if (x instanceof Enumeration && ( ! (x instanceof List))) {
-			x = Containers.getList((Enumeration)x);
+			x = Containers.asList((Enumeration)x);
 		}
 		// already know what to do?
 		IPrinter prntr = useMe.get(x.getClass());

@@ -392,7 +392,7 @@ public class ArgsParser {
 		if (properties instanceof Properties) {
 			// this includes defaults if present
 			Enumeration ekeys = ((Properties)properties).propertyNames();
-			keys = Containers.getList(ekeys);
+			keys = Containers.asList(ekeys);
 		} else {
 			keys = properties.keySet();
 		}

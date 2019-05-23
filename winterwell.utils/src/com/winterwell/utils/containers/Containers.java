@@ -564,7 +564,10 @@ public final class Containers  {
 	public static <X> List<X> asList(final Object array) {		
 		if (array==null) return null;
 		if (array instanceof List) return (List) array;
-		if (array instanceof Collection) return getList((Collection)array);
+		// NB: Iterable includes all of Collection eg Set 
+		if (array instanceof Iterable) {
+			return getList((Iterable)array);
+		}
 		if ( ! array.getClass().isArray())
 			throw new IllegalArgumentException("Backing object is not an array: "+array.getClass());
 		// the primitive types
@@ -602,6 +605,7 @@ public final class Containers  {
 		}
 		return list2;
 	}
+
 	
 	@Deprecated
 	public static List<Object> asList(final Object[] objects) {
@@ -1121,17 +1125,6 @@ public final class Containers  {
 				return (X) object;
 		}
 		return null;
-	}
-
-	/**
-	 * Convert obsolete-Java Enumeration into List
-	 */
-	public static <X> List<X> getList(final Enumeration<X> e) {		
-		ArrayList<X> list = new ArrayList<X>();
-		while(e.hasMoreElements()) {
-			list.add(e.nextElement());
-		}
-		return list;
 	}
 
 	/**

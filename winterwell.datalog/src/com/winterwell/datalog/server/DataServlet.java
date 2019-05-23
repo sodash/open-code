@@ -18,6 +18,7 @@ import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.nlp.query.SearchQuery.SearchFormatException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -29,9 +30,11 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
+import com.winterwell.web.app.Json2Csv;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.fields.IntField;
+import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
 
 /**
@@ -120,7 +123,7 @@ public class DataServlet implements IServlet {
 	}
 
 	/**
-	 * @deprecated TODO I'm sure we have some json to csv code somewhere
+	 * Convert json into a csv (fairly crudely)
 	 * @param state
 	 * @param egs
 	 */
@@ -130,8 +133,18 @@ public class DataServlet implements IServlet {
 		try {
 			response.setContentType(WebUtils.MIME_TYPE_CSV);
 			out = FileUtils.getWriter(response.getOutputStream());
-			// TODO pipe out the csv
-			out.append("TODO pipe out the csv");
+			CSVWriter w = new CSVWriter(out, new CSVSpec());
+			Json2Csv j2c = new Json2Csv(w);
+
+			// optionally have headers set
+			List<String> headers = state.get(new ListField<>("headers"));
+			if (headers != null) {
+				j2c.setHeaders(headers);
+			}
+			// convert!
+			j2c.run(egs);
+			
+			FileUtils.close(w);
 		} catch (IOException e) {
 			throw Utils.runtime(e);
 		} finally {

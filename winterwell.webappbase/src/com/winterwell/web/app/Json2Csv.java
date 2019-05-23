@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVWriter;
@@ -36,7 +37,14 @@ public class Json2Csv {
 		for (Map hit : hits2) {
 			List<Object> line = Containers.apply(headers, h -> {
 				String[] p = h.split("\\.");
-				return SimpleJson.get(hit, p);
+				Object v = SimpleJson.get(hit, p);
+				if (v==null) {
+					return null;
+				}
+				if (v.getClass().isArray()) {
+					v = Printer.toString(Containers.asList(v), " ");
+				}
+				return v;
 			});
 			w.write(line);
 		}
