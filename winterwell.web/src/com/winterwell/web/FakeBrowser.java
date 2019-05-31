@@ -31,6 +31,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.client.RedirectException;
+import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
@@ -443,6 +444,17 @@ public class FakeBrowser {
 		this.debugVars = vars;
 		String encodedData = WebUtils.urlEncode(vars);
 		return post(uri, MIME_TYPE_URLENCODED_FORM, encodedData);
+	}
+	
+	/**
+	 * @deprecated NOT TESTED AT ALL! @Roscoe -- some stub code for you.
+	 * @param url
+	 * @param params
+	 * @return
+	 */
+	public String delete(String url, Map params) {
+		setRequestMethod("DELETE");
+		return getPage(url, params);
 	}
 	
 
