@@ -373,7 +373,9 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 	/**
 	 * Set the expected number of fields in a record. -1 to set variable width
 	 * mode. Changing this value mid-way through an iteration may result in odd
-	 * behaviour
+	 * behaviour.
+	 * 
+	 * Default: Guess from the first line! 
 	 *
 	 * @param numFields
 	 * @return this
