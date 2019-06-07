@@ -72,6 +72,9 @@ public class CompileTask extends BuildTask {
 		setOutputJavaVersion(javaVersion);
 	}
 	
+	/**
+	 * @param outputJavaVersion e.g. "1.9" or "11"
+	 */
 	public void setOutputJavaVersion(String outputJavaVersion) {
 		this.outputJavaVersion = outputJavaVersion;
 	}
