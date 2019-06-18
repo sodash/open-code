@@ -268,17 +268,7 @@ public class SimpleMessage extends MimeMessage {
 	 * @param body
 	 */
 	public SimpleMessage(InternetAddress from, InternetAddress to, String subject, String body) {
-		// use a null session
-		super((Session) null);
-		assert from != null;
-		try {
-			this.setFrom(from);
-			this.setRecipient(javax.mail.Message.RecipientType.TO, to);
-			this.setSubject(subject, "UTF-8");
-			this.setText(body, "UTF-8");
-		} catch (Exception e) {
-			throw new ExternalServiceException(e);
-		}
+		this(from, to, subject, body, null);
 	}
 
 	/**
@@ -288,11 +278,25 @@ public class SimpleMessage extends MimeMessage {
 	 * @param to
 	 * @param subject
 	 * @param bodyPlain
-	 * @param bodyHtml
+	 * @param bodyHtml Can be null / blank
 	 */
 	public SimpleMessage(InternetAddress from, InternetAddress to, String subject, String bodyPlain, String bodyHtml) {
-		this(from, to, subject, bodyPlain);
-		setHtmlContent(bodyHtml, bodyPlain);
+		// use a null session
+		super((Session) null);
+		assert from != null;
+		try {
+			this.setFrom(from);
+			this.setRecipient(javax.mail.Message.RecipientType.TO, to);
+			this.setSubject(subject, "UTF-8");			
+			// Is there html?
+			if (Utils.isBlank(bodyHtml)) {
+				setText(bodyPlain, "UTF-8");
+			} else {
+				setHtmlContent(bodyHtml, bodyPlain);
+			}
+		} catch (Exception e) {
+			throw new ExternalServiceException(e);
+		}
 	}
 
 	public SimpleMessage setHtmlContent(String bodyHtml, String bodyPlain) {

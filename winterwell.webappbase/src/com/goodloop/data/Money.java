@@ -72,6 +72,10 @@ implements Comparable<Money>, IHasJson {
 	 * best store as a string too, as otherwise json conversion would likely be a source of bugs
 	 */
 	private String value;
+	
+	// The client uses raw to hold an interim value whilst the user is typing. I don't think we need to store it. ^DW June 2019
+//	@Deprecated
+//	private String raw;
 		
 	@Override
 	public int hashCode() {
@@ -111,6 +115,15 @@ implements Comparable<Money>, IHasJson {
 
 	public Money(KCurrency currency, String value) {
 		this(currency, new BigDecimal(value));
+	}
+
+	/**
+	 * @deprecated dubious need
+	 * @param copyMe
+	 */
+	public Money(Money copyMe) {
+		this(copyMe.getCurrency(), copyMe.getValue());
+		this.name = copyMe.getName();
 	}
 
 	/**

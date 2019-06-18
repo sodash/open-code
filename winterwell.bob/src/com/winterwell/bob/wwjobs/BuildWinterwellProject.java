@@ -413,14 +413,14 @@ public class BuildWinterwellProject extends BuildTask {
 		if (compile) {
 			try {
 				assert projectDir != null : this;
-				CompileTask compile = new CompileTask(srcDir, binDir);
+				CompileTask compile = new CompileTask(srcDir, binDir);				
 				// classpath
 				EclipseClasspath ec = new EclipseClasspath(projectDir);
 				ec.setIncludeProjectJars(true);
 				Set<File> libs = ec.getCollectedLibs();
 				compile.setClasspath(libs);		
 	//			compile.setSrcJavaVersion("1.9");
-	//			compile.setOutputJavaVersion("1.8");
+				compile.setOutputJavaVersion("1.8"); // Java 8 jars??
 				compile.run();
 				compile.close();
 			} catch(Exception ex) {
