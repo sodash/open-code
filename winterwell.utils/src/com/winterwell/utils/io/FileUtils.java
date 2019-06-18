@@ -618,7 +618,7 @@ public class FileUtils {
 	 *
 	 * @param baseDir
 	 * @param regex
-	 *            A regex matching against the entire absolute file<i>path</i>.
+	 *            A regex matching against the <b>entire absolute file-path</b>.
 	 *            E.g. ".*\\.txt" for .txt files or ".*mydir/.*\\.txt" for files
 	 *            in mydir -- "*.txt" would not be valid.
 	 * @return list of files, with paths relative to the baseDir but including
