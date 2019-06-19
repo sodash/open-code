@@ -71,7 +71,7 @@ public final class Dep {
 	}
 	
 	/**
-	 * aka get-with-default
+	 * NB: Very similar to {@link #getWithDefault(Class, Object)}
 	 * NB: not thread-safe
 	 * @param klass
 	 * @param value
@@ -87,6 +87,22 @@ public final class Dep {
 		return value;
 	}
 
+
+	/**
+	 * NB: Very similar to {@link #setIfAbsent(Class, Object)}
+	 * @param <X>
+	 * @param klass
+	 * @param defaultValue
+	 * @return the value held / the default
+	 */
+	public static <X> X getWithDefault(Class<X> klass, X defaultValue) {
+		if (has(klass)) {
+			X got = get(klass);
+			// NB: race condition
+			if (got != null) return got;	
+		}
+		return defaultValue;
+	}
 
 	/**
 	 * 
@@ -211,6 +227,9 @@ public final class Dep {
 		}
 		return false;
 	}
+
+
+
 
 }
 

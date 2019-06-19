@@ -418,9 +418,8 @@ public class FakeBrowser {
 
 	/**
 	 * @return
-	 * @throws IOException
 	 */
-	public int getStatus() throws IOException {
+	public int getStatus() {
 		return code;
 	}
 
@@ -483,6 +482,7 @@ public class FakeBrowser {
 	public String post(String uri, String contentType, String encodedPostBody) 
 	throws WrappedException
 	{
+		if (uri==null) throw new NullPointerException("target post uri is null");
 		// People are never too fast
 		if (slowPosts) {
 			Utils.sleep(new Random().nextInt(750));

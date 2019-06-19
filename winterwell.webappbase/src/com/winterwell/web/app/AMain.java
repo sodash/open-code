@@ -15,6 +15,7 @@ import com.winterwell.gson.StandardAdapters;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -130,7 +131,16 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		mainLoopThread = new Thread(getClass().getSimpleName()+".doMainLoop") {
 			@Override
 			public void run() {
-				doMainLoop();
+				try {
+					doMainLoop();
+				} catch(Throwable ex) {
+					Log.e(appName, ex);
+					if (pleaseStop) return;
+					// pause a moment
+					Utils.sleep(100);
+					// loop again... 
+					// NB: use stop() to stop
+				}
 			}
 		};
 		mainLoopThread.start();
@@ -154,9 +164,10 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 	
 	/**
-	 * Overide to do a loop 
+	 * Overide to do a loop. Use {@link #stop()} to stop.
+	 * Any exceptions are caught, and the loop is restarted.
 	 */
-	protected void doMainLoop() {
+	protected void doMainLoop() throws Exception {
 		
 	}
 
@@ -205,11 +216,11 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 	
 	public void stop() {
-		if (jl!=null) {
+		pleaseStop = true;
+		if (jl != null) {
 			jl.stop();
 			jl = null;
 		}
-		pleaseStop = true;
 		// break the loop, if we are in one
 		if (mainLoopThread!=null && mainLoopThread.isAlive()) {
 			mainLoopThread.interrupt();
@@ -302,10 +313,12 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * @return
 	 */
 	protected ConfigType init2_config(String[] args) {
-		if (configType==null) {
-			return null;
+		Class ct = configType;
+		if (ct==null) {
+			ct = BasicSiteConfig.class;
+			Log.w(getAppName(), "No ConfigType given - using "+ct.getSimpleName());
 		}
-		return AppUtils.getConfig(getAppName(), configType, args);
+		return (ConfigType) AppUtils.getConfig(getAppName(), ct, args);
 	}
 
 	private void launchJetty() {

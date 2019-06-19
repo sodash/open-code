@@ -41,7 +41,7 @@ public class JSend implements IHasJson {
 	}
 	
 	/**
-	 * Send this response
+	 * Send this response!
 	 * @param request
 	 */
 	public void send(WebRequest request) {

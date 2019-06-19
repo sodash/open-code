@@ -610,9 +610,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	protected void doSave(WebRequest state) {
 		// debug FIXME		
-		String json = getJson(state);
-		Object jobj = JSON.parse(json);
-		Object start = SimpleJson.get(jobj, "projects", 0, "start");
+//		String json = getJson(state);
+//		Object jobj = JSON.parse(json);
+//		Object start = SimpleJson.get(jobj, "projects", 0, "start");
 		
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
 		T thing = getThing(state);
