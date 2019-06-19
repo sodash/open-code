@@ -39,14 +39,17 @@ public class CrudClient<T> {
 		Utils.check4null(type, endpoint);
 	}
 
+	public JSend list() {
+		FakeBrowser fb = fb();
+		
+		String response = fb.getPage(endpoint+"/"+CrudServlet.LIST_SLUG);
+		
+		JSend jsend = jsend(fb, response);
+		return jsend;
+	}
+	
 	public JSend publish(T item) {
-		FakeBrowser fb = new FakeBrowser();
-		fb.setDebug(true);
-
-		// You really should set auth!
-		if (jwt != null) {
-			fb.setAuthenticationByJWT(jwt);
-		}
+		FakeBrowser fb = fb();
 		
 		Gson gson = gson();
 		Map json = gson.toJsonObject(item);
@@ -62,9 +65,16 @@ public class CrudClient<T> {
 		}
 		
 		String response = fb.post(url, vars);
+
+		JSend jsend = jsend(fb, response);
+		return jsend;
+	}
+
+	private JSend jsend(FakeBrowser fb, String response) {
 		JSend jsend = new JSend();
 		jsend.setCode(fb.getStatus());
 		try {
+			Gson gson = gson();
 			Object data = gson.fromJson(response);
 			jsend.setData(new JThing(data));
 		} catch(Throwable ex) {
@@ -72,6 +82,17 @@ public class CrudClient<T> {
 			jsend.setMessage(response);
 		}
 		return jsend;
+	}
+
+	private FakeBrowser fb() {
+		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(true);
+
+		// You really should set auth!
+		if (jwt != null) {
+			fb.setAuthenticationByJWT(jwt);
+		}
+		return fb;
 	}
 
 	protected String getId(T item) {
