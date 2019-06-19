@@ -924,9 +924,19 @@ public class FakeBrowser {
 	private void updateCookies() {
 		String host = connection.getURL().getHost();
 		Map<String, List<String>> headers = connection.getHeaderFields();
+		// Try a few different capitalisations
+		// Why not just use connection.getHeaderField(String header) which is case-insensitive?
+		// Because that only returns the last-set value, making it useless when the server sets multiple cookies.
+		// This should catch 99.9% of "weird" capitalisations - without making big conceptual changes.
 		List<String> cookies = headers.get("Set-Cookie");
-		if (cookies == null)
-			return;
+		if (cookies == null) {
+			cookies = headers.get("set-cookie");
+		}
+		if (cookies == null) {
+			cookies = headers.get("SET-COOKIE");
+		}
+		if (cookies == null) return;
+			
 		for (String cookie : cookies) {
 			updateCookie(host, cookie);
 		}
