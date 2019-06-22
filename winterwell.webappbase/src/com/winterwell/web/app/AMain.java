@@ -249,8 +249,10 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		initFlag = true;		
 		// init DataLog
 		DataLog.getImplementation();
-		// app auth
-		init3_appAuth(config);
+		// YA - manual
+//		init3_youAgain();
+		// app auth - manual
+//		init3_appAuth(config);
 		// emailer
 		try {
 			init3_emailer();			
@@ -286,6 +288,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			return Dep.set(AuthToken.class, token);
 		}
 		if (Utils.isBlank(appAuthName) || Utils.isBlank(appAuthPassword)) {
+			Log.d(getAppName(), "No app AuthToken set by init -- no appAuthPassword in config");
 			return null;
 		}
 		AuthToken token;

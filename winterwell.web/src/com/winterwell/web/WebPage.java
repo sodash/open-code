@@ -60,6 +60,7 @@ public class WebPage implements Appendable, IBuildStrings {
 	/**
 	 * Add a stylesheet to the ordered set used by this page. Stylesheets are
 	 * appended to the page header.
+	 * 
 	 * @param stylesheet Url for the css file.
 	 */
 	public final void addStylesheet(String stylesheet) {
