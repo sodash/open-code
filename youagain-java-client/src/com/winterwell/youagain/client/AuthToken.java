@@ -80,6 +80,11 @@ public class AuthToken implements IHasXId, IProperties {
 	public AuthToken(String token) {
 		this.token = token;
 	}
+	
+	/**
+	 * 
+	 * @param jsonObj {jwt, xid}
+	 */
 	public AuthToken(Map jsonObj) {
 		this.token = (String) jsonObj.get("jwt");
 		Object _xid = jsonObj.get("xid");

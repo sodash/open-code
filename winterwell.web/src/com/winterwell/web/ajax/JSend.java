@@ -123,6 +123,13 @@ public class JSend implements IHasJson {
 
 	public JSend setCode(Integer code) {
 		this.code = code;
+		
+		// recognise failure codes
+		if (status==KAjaxStatus.success) {
+			if (code >= 500) status = KAjaxStatus.error;
+			else if (code >= 400) status = KAjaxStatus.fail;
+		}
+		
 		return this;
 	}
 
@@ -159,10 +166,25 @@ public class JSend implements IHasJson {
 		return "JSend[ " + toJSONString() + " ]";
 	}
 
+	/**
+	 * Parse a json response -- using the Eclipse JSON "vanilla" parser, which returns Map/List/primitive.
+	 * If you wish to use Gson, do this yourself (as we avoid the dependency here).
+	 *  
+	 * @param json
+	 * @return
+	 */
 	public static JSend parse(String json) {
 		Map jobj = (Map) JSON.parse(json);
+		return parse2_create(jobj);
+	}
+
+	public static JSend parse2_create(Map jobj) {
 		JSend jsend = new JSend();
-		jsend.setCode((Integer) jobj.get("code"));
+		Object _code = jobj.get("code");
+		if (_code!=null) {
+			jsend.setCode((Integer) _code); 
+			// should we assume 200 if no info??
+		}
 		
 		String msg = (String) jobj.get("message");
 		// HACK a JsonResponse format?

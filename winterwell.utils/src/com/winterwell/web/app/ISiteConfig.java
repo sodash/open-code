@@ -8,6 +8,9 @@ package com.winterwell.web.app;
 public interface ISiteConfig {
 
 	int getPort();
+
+	default String getAppAuthPassword() {return null;}
+	default String getAppAuthJWT() {return null;}
 	
 //	/** TODO
 //	 * @return

@@ -6,11 +6,14 @@ import com.winterwell.data.AThing;
 import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.ajax.JSend;
 import com.winterwell.web.ajax.JThing;
+import com.winterwell.youagain.client.App2AppAuthClient;
 
 /**
  * Status: WIP 
@@ -25,7 +28,21 @@ public class CrudClient<T> {
 	private String endpoint;
 	
 	/**
+	 * @deprecated Normally this is set from config.
+	 * @param endpoint
+	 */
+	public void setEndpoint(String endpoint) {
+		this.endpoint = endpoint;
+	}
+	
+	
+	/**
 	 * Without this, expect an auth error!
+	 * 
+	 * We want a JWT that says:
+	 * "I am app A" (identity) 
+	 * and 
+	 * "I, Bob, give app A permission to manage T" (permission)
 	 */
 	private String jwt;
 
@@ -52,10 +69,10 @@ public class CrudClient<T> {
 		FakeBrowser fb = fb();
 		
 		Gson gson = gson();
-		Map json = gson.toJsonObject(item);
+		String sjson = gson.toJson(item);
 		Map<String, String> vars = new ArrayMap(
 			WebRequest.ACTION_PARAMETER, CrudServlet.ACTION_PUBLISH,
-			AppUtils.ITEM.getName(), json
+			AppUtils.ITEM.getName(), sjson
 		);
 		String url = endpoint;
 		// ID?
@@ -71,16 +88,15 @@ public class CrudClient<T> {
 	}
 
 	private JSend jsend(FakeBrowser fb, String response) {
-		JSend jsend = new JSend();
+		Gson gson = gson();
+		Map data = gson.fromJson(response);
+		JSend jsend = JSend.parse2_create(data);
+		
+		// give a type
+		JThing jt = jsend.getData();		
+//		.setType(Map.class);
+		
 		jsend.setCode(fb.getStatus());
-		try {
-			Gson gson = gson();
-			Object data = gson.fromJson(response);
-			jsend.setData(new JThing(data));
-		} catch(Throwable ex) {
-			// oh well
-			jsend.setMessage(response);
-		}
 		return jsend;
 	}
 

@@ -353,6 +353,13 @@ public final class YouAgainClient {
 		return all2.asList();
 	}
 
+	/**
+	 * 
+	 * @param usernameUsuallyAnEmail
+	 * @param password
+	 * @return
+	 * @throws LoginFailedException
+	 */
 	public AuthToken login(String usernameUsuallyAnEmail, String password) throws LoginFailedException {
 		Utils.check4null(usernameUsuallyAnEmail, password);
 		FakeBrowser fb = new FakeBrowser();

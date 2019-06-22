@@ -23,7 +23,10 @@ import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.web.LoginDetails;
+import com.winterwell.web.WebEx;
 import com.winterwell.web.data.XId;
+import com.winterwell.youagain.client.App2AppAuthClient;
+import com.winterwell.youagain.client.AuthToken;
 import com.winterwell.youagain.client.YouAgainClient;
 
 /**
@@ -76,7 +79,6 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	
 	private volatile boolean readyFlag;
 
-	private boolean initYAflag;
 
 	public static AMain main;
 
@@ -232,6 +234,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * This is the recommended method to override for custom init stuff.
 	 * 
 	 * This base method does:
+	 *  - App YA auth
 	 *  - DataLog
 	 *  - Emailer, via {@link #init3_emailer()}
 	 *  
@@ -246,6 +249,8 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		initFlag = true;		
 		// init DataLog
 		DataLog.getImplementation();
+		// app auth
+		init3_appAuth(config);
 		// emailer
 		try {
 			init3_emailer();			
@@ -256,6 +261,40 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		}		
 		// TODO init3_gson();
 		// TODO init3_ES();
+	}
+
+	/**
+	 * Not called by base class! Call in your apps overide, AFTER 
+	 * {@link #init3_youAgain()}
+	 * 
+	 * Dep.set AuthToken, if we have login info
+	 * @param config2
+	 * @return token or null
+	 */
+	protected AuthToken init3_appAuth(ConfigType config2) {
+		// idempotent
+		if (Dep.has(AuthToken.class)) {
+			return Dep.get(AuthToken.class);
+		}
+		App2AppAuthClient a2a = new App2AppAuthClient();
+		String appAuthPassword = config2.getAppAuthPassword();
+		String appAuthName = getAppName()+"@good-loop.com@app"; // TODO get domain from the config.
+		String appAuthJWT = config2.getAppAuthJWT();
+		// use JWT if we have it
+		if ( ! Utils.isBlank(appAuthJWT)) {
+			AuthToken token = new AuthToken(appAuthJWT);			
+			return Dep.set(AuthToken.class, token);
+		}
+		if (Utils.isBlank(appAuthName) || Utils.isBlank(appAuthPassword)) {
+			return null;
+		}
+		AuthToken token;
+		try {
+			token = a2a.getIdentityTokenFromYA(appAuthName, appAuthPassword);
+		} catch(WebEx.E404 wex) {
+			token = a2a.registerIdentityTokenWithYA(appAuthName, appAuthPassword);
+		}
+		return Dep.set(AuthToken.class, token);
 	}
 
 	/**
@@ -297,10 +336,10 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 	
 	protected void init3_youAgain() {
-		if (initYAflag) {
-			return;
+		// idempotent
+		if (Dep.has(YouAgainClient.class)) {
+			return; // Dep.get(YouAgainClient.class);
 		}
-		initYAflag = true;
 		// app=datalog for login
 		YouAgainClient yac = new YouAgainClient(getAppName());
 		Dep.set(YouAgainClient.class, yac);				

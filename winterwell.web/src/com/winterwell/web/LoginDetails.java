@@ -13,6 +13,8 @@ import com.winterwell.utils.containers.ArrayMap;
  * Login details for a service such as smtp. These objects should contain the
  * info needed to open a connection (e.g. password, port number, etc).
  * 
+ * NB: doesnt handle JWT
+ * 
  * @author daniel
  * 
  */
