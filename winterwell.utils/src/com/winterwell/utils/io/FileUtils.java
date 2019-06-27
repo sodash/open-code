@@ -746,7 +746,7 @@ public class FileUtils {
 
 	/**
 	 * Like {@link #getBasename(String)}, except this will ignore endings that
-	 * are longer than 4 characters.
+	 * are one char, longer than 4 characters, or not a-zA-Z0-9.
 	 *
 	 * @param filename
 	 * @return e.g. "mybase" from "mybase.html", but
@@ -760,6 +760,15 @@ public class FileUtils {
 			return filename;
 		if (filename.length() - i > 5)
 			return filename;
+		if (filename.length() - i < 3) {
+			return filename;
+		}
+		String type = filename.substring(i+1, filename.length());
+		Pattern az09 = Pattern.compile("[a-zA-Z0-9]+");
+		if ( ! az09.matcher(type).matches()) {
+			// the end was something odder than a file-type
+			return filename;
+		}
 		return filename.substring(0, i);
 	}
 

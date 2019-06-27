@@ -78,7 +78,8 @@ public class CrudClient<T> {
 		// ID?
 		String id = getId(item);
 		if (id != null) {
-			url += "/"+WebUtils.urlEncode(id);
+			String encId = WebUtils.urlEncode(id);
+			url += "/"+encId;
 		}
 		
 		String response = fb.post(url, vars);

@@ -1561,8 +1561,8 @@ public class WebUtils {
 		return encodedData.toString();
 	}
 	/**
-	 * URL encode
-	 *
+	 * URL encode.
+	 * Note: this will encode special url chars like /
 	 * @param x
 	 *            can be null (returns ""). Will be turned into a String using
 	 *            String.valueOf()
@@ -1578,7 +1578,7 @@ public class WebUtils {
 			s = URLEncoder.encode(s);
 		}
 		s = s.replace("+", "%20"); // + for " " seems to be out of date.
-//		s = s.replace("/", "%2F"); // Should we encode / eg to protect names in slugs? 
+//		s = s.replace("/", "%2F"); // Should we encode / eg to protect names in slugs? UrlEncoder does this already. 
 		return s;
 	}
 

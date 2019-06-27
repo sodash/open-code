@@ -491,6 +491,17 @@ public class WebUtilsTest extends TestCase {
 		}
 	}
 
+	public void testUrlEncodeSlash() {
+		{
+			String a = WebUtils.urlEncode("a/b");
+			String b = WebUtils.urlEncode("/ab");
+			assert a.equals("a%2Fb");
+			assert b.equals("%2Fab");
+			String a2 = WebUtils.urlDecode(a);
+			assert a2.equals("a/b");
+		}
+	}
+	
 	public void testUrlEncode() throws UnsupportedEncodingException {
 		{
 			String a = WebUtils.urlEncode("a+b");

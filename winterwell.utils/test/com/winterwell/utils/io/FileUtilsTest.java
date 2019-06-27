@@ -278,6 +278,22 @@ public class FileUtilsTest extends TestCase {
 			String b = FileUtils.getBasenameCautious("mybase.fubar");
 			assertEquals("mybase.fubar", b);
 		}
+		{
+			String b = FileUtils.getBasenameCautious("<mybase.com>");
+			assertEquals("<mybase.com>", b);
+		}
+		{
+			String b = FileUtils.getBasenameCautious("mybase.1");
+			assertEquals("mybase.1", b);
+		}
+		{
+			String b = FileUtils.getBasenameCautious("mybase.JPG");
+			assertEquals("mybase", b);
+		}
+		{
+			String b = FileUtils.getBasenameCautious("mybase.");
+			assertEquals("mybase.", b);
+		}
 	}
 
 	public void testGetExtension() {
