@@ -71,8 +71,9 @@ public class MasterServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		WebRequest state = null;
 		try {
-			WebRequest state = new WebRequest(req, resp);
+			state = new WebRequest(req, resp);
 			// everyone wants CORS
 			WebUtils2.CORS(state, false);
 			// servlet
@@ -87,7 +88,7 @@ public class MasterServlet extends HttpServlet {
 			// do stuff
 			s.process(state);
 		} catch(Throwable ex) {
-			HttpServletWrapper.doCatch(ex, resp);
+			HttpServletWrapper.doCatch(ex, resp, state);
 		} finally {
 			Thread ct = Thread.currentThread();
 			ct.setName("...done: "+ct.getName());

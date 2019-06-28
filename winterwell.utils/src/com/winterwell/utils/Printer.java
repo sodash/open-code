@@ -448,21 +448,26 @@ public class Printer {
 	public static String toString(Throwable x, boolean stacktrace) {
 		if (x==null) return "";
 		// Don't generally unwrap, but do unwrap our own wrapper
+		String topMsg = null;
 		if (x instanceof WrappedException) {
+			topMsg = x.getMessage();
 			x = x.getCause();
 		}
 		// SQLException is a horrible class which hides the actual cause
 		if (x instanceof SQLException) {
 			x = Utils.getRootCause(x);
 		}
-		if ( ! stacktrace)
-			return x.getMessage() == null ? x.getClass().getSimpleName() : x
-					.getClass().getSimpleName() + ": " + x.getMessage();
+		if ( ! stacktrace) {
+			StringBuilder sb = new StringBuilder(x.getClass().getSimpleName());
+			if (topMsg != null) sb.append(topMsg);
+			if (x.getMessage()!=null) sb.append(x.getMessage());
+			return sb.toString();
+		}
 		// NB: the use of StringWriter here means there's little point having an
 		// append-to-StringBuilder version of this method
 		StringWriter w = new StringWriter();
-		w.append(x.getClass() + ": "
-				+ StrUtils.ellipsize(x.getMessage(), MAX_ERROR_MSG_LENGTH)
+		w.append(x.getClass().getSimpleName() + ": "
+				+ StrUtils.ellipsize(StrUtils.joinWithSkip(" ", topMsg, x.getMessage()), MAX_ERROR_MSG_LENGTH)
 				+ StrUtils.LINEEND
 				// + Environment.get().get(INDENT)
 				+ "\t");
@@ -470,12 +475,6 @@ public class Printer {
 		x.printStackTrace(pw);
 		pw.flush();
 		FileUtils.close(pw);
-		// // If the message got truncated, append it in full here
-		// if (x.getMessage().length() > MAX_ERROR_MSG_LENGTH) {
-		// w.append(StrUtils.LINEEND);
-		// w.append("Full message: ");
-		// w.append(x.getMessage());
-		// }
 		return w.toString();
 	}
 

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
@@ -63,8 +64,9 @@ public class HttpServletWrapper extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		WebRequest state = null;
 		try {
-			WebRequest state = new WebRequest(req, resp);			
+			state = new WebRequest(req, resp);			
 			IServlet servlet = getServlet(state);
 			// log everything?
 			String sname = servlet.getClass().getSimpleName();
@@ -74,7 +76,7 @@ public class HttpServletWrapper extends HttpServlet {
 			Thread.currentThread().setName(sname);
 			servlet.process(state);
 		} catch (Throwable ex) {
-			doCatch(ex, resp);
+			doCatch(ex, resp, state);
 		} finally {
 			WebRequest.close(req, resp);
 		}
@@ -84,8 +86,11 @@ public class HttpServletWrapper extends HttpServlet {
 		 return factory.get();
 	}
 
-	public static void doCatch(Throwable ex, HttpServletResponse resp) {
+	public static void doCatch(Throwable ex, HttpServletResponse resp, WebRequest state) {
 		WebEx wex = WebUtils2.runtime(ex);
+		if (state!=null) {
+			ex = new WrappedException(state.toString(), ex);
+		}
 		if (wex.code >= 500) {
 			Log.e("error."+wex.getClass().getSimpleName(), ex);
 		} else {

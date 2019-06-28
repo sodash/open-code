@@ -13,6 +13,11 @@ import java.io.PrintWriter;
 public class WrappedException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * 
+	 * @param msg This gets joined to the cause's message, so you can add in extra info.
+	 * @param e
+	 */
 	public WrappedException(String msg, Throwable e) {
 		super(msg, e);
 		assert e != null;
@@ -20,9 +25,16 @@ public class WrappedException extends RuntimeException {
 	}
 
 	public WrappedException(Throwable e) {
-		super(e);
-		assert e != null;
-		// assert ! (e instanceof WrappedException) : e; TODO
+		this(e.getMessage(), e);
+	}
+	
+	@Override
+	public String getMessage() {
+		String sm = super.getMessage();
+		String sm2 = getCause().getMessage();
+		if (sm==null) return sm2; // paranoia
+		if (sm==sm2) return sm;
+		return sm+" (wraps) "+sm2;
 	}
 
 	/**
@@ -31,6 +43,10 @@ public class WrappedException extends RuntimeException {
 	@Override
 	public final Throwable getCause() {
 		Throwable ex = super.getCause();
+		// have we double wrapped something?
+		if (ex instanceof WrappedException) {
+			return ex.getCause();
+		}
 		return ex;
 	}
 
@@ -55,7 +71,10 @@ public class WrappedException extends RuntimeException {
 	@Override
 	public String toString() {
 		Throwable e = getCause();
-		return e == null ? super.toString() : getMessage() + " (wraps) "
-				+ getCause().toString();
+		if (e==null) return super.toString(); // paranoia
+		if (super.getMessage() != e.getMessage()) {
+			return super.getMessage() + " (wraps) " + e.toString();
+		}
+		return "(wrapped) " + e.toString();
 	}
 }
