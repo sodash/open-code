@@ -510,7 +510,8 @@ public class StrUtils {
 		if (txt==null) return false;
 		return WORD.matcher(txt).matches(); 		
 	}
-	private static final Pattern WORD = Pattern.compile("\\w+"); 
+	private static final Pattern WORD = Pattern.compile("\\w+");
+	private static final Pattern WORDLIKE = Pattern.compile("[A-Za-z0-9_\\-.]+");
 
 	/**
 	 * Does this look like a wordlike token? This is more permissive than
@@ -518,11 +519,12 @@ public class StrUtils {
 	 * 
 	 * @param txt
 	 * @return true if txt is a non-empty single alphanumeric string possibly
-	 *         containing period, underscore and hyphen
+	 *         containing period, underscore and hyphen. e.g. "foo.bar" but not "foo bar;"
 	 * @testedby {@link StrUtilsTest#testIsWordlike()}
 	 */
 	public static boolean isWordlike(String txt) {
-		return txt.matches("[A-Za-z0-9_\\-.]+");
+		if (txt==null) return false;
+		return WORDLIKE.matcher(txt).matches(); 		
 	}
 
 	/**
