@@ -89,6 +89,9 @@ public class WebEx extends RuntimeException {
 	 * Wrap an exception to indicate the causing input web parameter
 	 */
 	public static class BadParameterException extends E40X {		
+		public BadParameterException(String parameter, Object value) {
+			this(parameter, value, null);
+		}
 		public BadParameterException(String parameter, Object value, Throwable ex) {
 			super(400, "Bad parameter: "+parameter+(value==null? "" : "="+value), ex);
 		}

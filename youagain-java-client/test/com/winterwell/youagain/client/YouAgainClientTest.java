@@ -4,7 +4,11 @@ import org.junit.Test;
 
 import com.winterwell.web.LoginDetails;
 import com.winterwell.web.data.XId;
-
+/**
+ * See also tests in the YA server project (which are able to spin up a server and access server classes too).
+ * @author daniel
+ *
+ */
 public class YouAgainClientTest {
 
 	@Test

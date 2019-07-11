@@ -50,6 +50,7 @@ import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.EnumField;
 import com.winterwell.web.fields.JsonField;
+import com.winterwell.youagain.client.ShareToken;
 
 
 /**
@@ -595,6 +596,24 @@ public class AppUtils {
 		dtype.property("id", ESType.keyword);
 		// type
 		dtype.property("@type", ESType.keyword);
+		// shares NB: these dont use the ESKeyword annotation to avoid a dependency in YAC
+		if (ReflectionUtils.hasField(k, "shares")) {
+			List<String> noIndex = Arrays.asList("item","token","type","app");
+			List<Field> fields = ReflectionUtils.getAllFields(ShareToken.class);
+			ESType shares = new ESType();
+			for (Field field : fields) {		
+				if (noIndex.contains(field.getName())) {
+					shares.property(field.getName(), new ESType().keyword()
+							//.noIndex() broken in ES5 -- TODO see what ES7 offers
+							);
+				} else {
+					// treat String and XId as keywords		
+					shares.property(field.getName(), ESType.keyword);
+				}
+			}
+			dtype.property("shares", shares);
+		}
+		
 		// reflection based
 		initESMappings3_putMapping_byAnnotation(k, dtype, new ArrayList());
 		

@@ -41,6 +41,8 @@ import com.winterwell.web.fields.XIdField;
  * 
  * This is a thread-safe and lightweight object.
  * 
+ * It loads a {@link YouAgainClientConfig} config via {@link ConfigFactory}
+ * 
  * @testedyb {@link YouAgainClientTest}
  * @author daniel
  */
@@ -134,6 +136,14 @@ public final class YouAgainClient {
 		}
 	}
 
+	/**
+	 * @deprecated Only used for testing
+	 * @param yacc
+	 */
+	public void setConfig(YouAgainClientConfig yacc) {
+		this.yac = yacc;
+	}
+	
 	@Override
 	public String toString() {
 		return "YouAgainClient [app=" + app + "]";
@@ -361,16 +371,20 @@ public final class YouAgainClient {
 	 * @throws LoginFailedException
 	 */
 	public AuthToken login(String usernameUsuallyAnEmail, String password) throws LoginFailedException {
-		Utils.check4null(usernameUsuallyAnEmail, password);
-		FakeBrowser fb = new FakeBrowser();
-		String response = fb.getPage(yac.endpoint, new ArrayMap(
-				"app", app, 
-				"action", "login",
-				"person", usernameUsuallyAnEmail,
-				"password", password));
-		Map user = userFromResponse(response);
-		AuthToken at = new AuthToken(user);
-		return at;
+		try {
+			Utils.check4null(usernameUsuallyAnEmail, password);
+			FakeBrowser fb = new FakeBrowser();
+			String response = fb.getPage(yac.endpoint, new ArrayMap(
+					"app", app, 
+					"action", "login",
+					"person", usernameUsuallyAnEmail,
+					"password", password));
+			Map user = userFromResponse(response);
+			AuthToken at = new AuthToken(user);
+			return at;
+		} catch(WebEx wex) {
+			throw new LoginFailedException(wex.getMessage());
+		}
 	}
 
 	public AuthToken register(String usernameUsuallyAnEmail, String password) {
@@ -456,20 +470,6 @@ public final class YouAgainClient {
 		return new ShareClient(this);
 	}
 	
-	public boolean share(String authToken, String targetUser, String item) {
-		FakeBrowser fb = new FakeBrowser();
-		fb.setAuthenticationByJWT(authToken);
-		Map<String, String> shareAction = new ArrayMap(
-			"app", app,
-			"shareWith", targetUser,
-			"entity", item,
-			"action", "shared"
-		);
-		String response = fb.getPage(yac.endpoint, shareAction);
-		JSend jsend = JSend.parse(response);
-		return jsend.isSuccess();
-	}
-
 	public void setDebug(boolean b) {
 		this.debug = b;
 	}

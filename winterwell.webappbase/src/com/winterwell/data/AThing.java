@@ -3,6 +3,7 @@ package com.winterwell.data;
 import java.util.List;
 
 import com.winterwell.depot.IInit;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.youagain.client.ShareToken;
@@ -67,6 +68,12 @@ public class AThing implements IInit {
 	KStatus status;
 	
 	/**
+	 * Cache of shares - YouAgain is the definitive source, but we can store in
+	 * the DB for speedy filtering.
+	 */
+	private List<ShareToken> shares;
+	
+	/**
 	 * Check (and patch) the data in this Thing.
 	 * @return this
 	 */
@@ -108,9 +115,6 @@ public class AThing implements IInit {
 		return result;
 	}
 	
-	List<ShareToken> getShareInfo() {
-		YouAgainClient yac;
-	}
 	
 }
 
