@@ -5,6 +5,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
 import java.util.Date;
+import java.util.Map;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
@@ -50,6 +51,10 @@ public class JWTEncoder {
 	 * @throws JoseException
 	 */
 	public String encryptJWT(XId xid) throws Exception {
+		return encryptJWT(xid, null);
+	}
+	
+	public String encryptJWT(XId xid, Map<String,Object> extraProperties) throws Exception {
 	    // Create the Claims, which will be the content of the JWT
 		Algorithm alg = algorithm();
 		Builder jwtb = JWT.create();
@@ -66,11 +71,23 @@ public class JWTEncoder {
 	    jwtb.withClaim(CLAIM_DEVICE_SIG, deviceSignature);
 //	    claims.setNotBeforeMinutesInThePast(2); // time before which the token is not yet valid (2 minutes ago)
 	    jwtb.withSubject(xid.toString()); // the subject/principal is whom the token is about
-//	    claims.setClaim("email","mail@example.com"); // additional claims/attributes about the subject can be added
+//	    claims.setClaim("email","mail@example.com"); // additional claims/attributes about the subject can be added	    
 //	    List<String> groups = Arrays.asList("group-one", "other-group", "group-three");
 //	    claims.setStringListClaim("groups", groups); // multi-valued claims work too and will end up as a JSON array
 
 	    // TODO Add oauth tokens, so this token (+ server secrets) is all you need for Twitter??
+	    
+	    if (extraProperties!=null) {
+	    	for(String p : extraProperties.keySet()) {
+	    		Object v = extraProperties.get(p);
+	    		if (v==null) continue;
+	    		if (v instanceof Boolean) {
+	    			jwtb.withClaim(p, (Boolean)v);
+	    		} else {
+	    			jwtb.withClaim(p, v.toString());
+	    		}
+	    	}
+	    }
 	    
 //	    TODO jwtb.withKeyId(getPublicKeyId());
 	    

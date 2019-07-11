@@ -1,8 +1,12 @@
 package com.winterwell.data;
 
+import java.util.List;
+
 import com.winterwell.depot.IInit;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.youagain.client.ShareToken;
+import com.winterwell.youagain.client.YouAgainClient;
 
 /**
  * Base class for things.
@@ -104,6 +108,9 @@ public class AThing implements IInit {
 		return result;
 	}
 	
+	List<ShareToken> getShareInfo() {
+		YouAgainClient yac;
+	}
 	
 }
 

@@ -452,14 +452,20 @@ public final class YouAgainClient {
 		return Collections.emptyList();
 	}
 	
+	public ShareClient sharing () {
+		return new ShareClient(this);
+	}
+	
 	public boolean share(String authToken, String targetUser, String item) {
 		FakeBrowser fb = new FakeBrowser();
 		fb.setAuthenticationByJWT(authToken);
-		String response = fb.getPage(yac.endpoint, new ArrayMap(
-				"app", app,
-				"shareWith", targetUser,
-				"entity", item,
-				"action", "shared"));
+		Map<String, String> shareAction = new ArrayMap(
+			"app", app,
+			"shareWith", targetUser,
+			"entity", item,
+			"action", "shared"
+		);
+		String response = fb.getPage(yac.endpoint, shareAction);
 		JSend jsend = JSend.parse(response);
 		return jsend.isSuccess();
 	}
