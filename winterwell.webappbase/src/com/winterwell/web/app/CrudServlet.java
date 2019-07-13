@@ -93,6 +93,10 @@ public abstract class CrudServlet<T> implements IServlet {
 			doList(state);
 			return;
 		}
+		if (slug.endsWith("/_stats") || "_stats".equals(slug)) {
+			doStats(state);
+			return;
+		}
 		
 		// crud?
 		if (state.getAction() != null) {
@@ -399,6 +403,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 
+	protected void doStats(WebRequest state) {
+		throw new WebEx.E404(state.getRequestUrl(), "_stats not available for "+type);
+	}
 
 	protected void doList(WebRequest state) throws IOException {
 		// copied from SoGive SearchServlet
@@ -475,7 +482,9 @@ public abstract class CrudServlet<T> implements IServlet {
 		// TODO paging!
 		s.setSize(10000);
 		s.setDebug(true);
-		SearchResponse sr = s.get();
+
+		// Call the DB
+		SearchResponse sr = s.get();		
 		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();
 
