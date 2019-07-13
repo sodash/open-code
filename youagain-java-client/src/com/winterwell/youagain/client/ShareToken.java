@@ -1,9 +1,13 @@
 package com.winterwell.youagain.client;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.auth0.jwt.impl.PublicClaims;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -57,8 +61,9 @@ public class ShareToken implements IHasJson {
 	}
 
 	
-	public XId getTo() {
-		return new XId(_to, false);
+	public List<XId> getTo() {
+		init();
+		return XId.xids(_to);
 	}
 
 	/**
@@ -82,7 +87,7 @@ public class ShareToken implements IHasJson {
 		this.app = app;
 		this.by = userId.toString();
 		setItem(entity);
-		this._to= shareWith.toString();
+		this._to= Arrays.asList(shareWith.toString());
 		this.read = true; // you almost always want read
 	}
 
@@ -98,16 +103,10 @@ public class ShareToken implements IHasJson {
 	}
 
 	private ShareToken(String app, XId userId, String entity) {
-		Utils.check4null(app, userId, entity);		
-		this.app = app;
-		this.by = OWNER;
-		setItem(entity);
-		this._to= userId.toString();
-		this.read = true;
-		this.write = true;
+		this(app, OWNER, entity, userId);
 	}
 
-	public static final String OWNER = "!owner";
+	public static final XId OWNER = new XId("!owner@youagain",false);
 	
 	String app;
 	
@@ -122,9 +121,25 @@ public class ShareToken implements IHasJson {
 	transient String type;
 	
 	public String getItem() {
+		init();
 		return item;
 	}
 	
+	private void init() {
+		if (item!=null) return;
+		assert token != null;
+		// get from token
+		DecodedJWT decd = new JWTDecoder(app).decryptJWT(getToken());
+		item = decd.getSubject();
+		List<String> aud = decd.getAudience();
+		_to = aud;
+		Claim cby = decd.getClaim("by");
+		by = cby.asString();
+		type = decd.getContentType();
+		read = decd.getClaim("r").asBoolean();
+		write = decd.getClaim("w").asBoolean();
+	}
+
 	/**
 	 * XId of the person sharing.  Or {@link #OWNER} to assert ownership
 	 */
@@ -134,7 +149,7 @@ public class ShareToken implements IHasJson {
 	 * XId of the person shared with.
 	 * NB: "to" is an SQL keyword, so best avoided.
 	 */
-	String _to;
+	List<String> _to;
 	
 	Integer status;
 	
@@ -155,4 +170,5 @@ public class ShareToken implements IHasJson {
 				"write", write
 		);
 	}
+
 }

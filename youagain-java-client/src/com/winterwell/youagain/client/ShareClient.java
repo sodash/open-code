@@ -1,7 +1,9 @@
 package com.winterwell.youagain.client;
 
+import java.util.List;
 import java.util.Map;
 
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.ajax.JSend;
@@ -18,6 +20,12 @@ public final class ShareClient {
 
 	YouAgainClient yac;
 
+	/**
+	 * 
+	 * @param authToken Who authorises this share?
+	 * @param item ID of the thing being shared.
+	 * @param targetUser Who is it shared with?
+	 */
 	public ShareToken share(AuthToken authToken, String item, XId targetUser) {
 		FakeBrowser fb = new FakeBrowser()
 				.setDebug(true);
@@ -37,6 +45,18 @@ public final class ShareClient {
 		d.setType(ShareToken.class);
 		Object st = d.java();
 		return (ShareToken) st;
+	}
+
+	public boolean canWrite(AuthToken authToken, String item, List<ShareToken> shares) {
+		Utils.check4null(authToken, item, shares);
+		for (ShareToken shareToken : shares) {
+			if ( ! item.equals(shareToken.getItem())) continue;
+			if ( ! shareToken.write) continue;
+			if (shareToken.getTo().contains(authToken.getXId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

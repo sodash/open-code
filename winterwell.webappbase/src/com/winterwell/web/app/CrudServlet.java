@@ -310,6 +310,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		// wait 1 second??
 		return doPublish(state, KRefresh.WAIT_FOR, false);
 	}
+	
 	protected JThing<T> doPublish(WebRequest state, KRefresh forceRefresh, boolean deleteDraft) {		
 		String id = getId(state);
 		Log.d("crud", "doPublish "+id+" by "+state.getUserId()+" "+state+" deleteDraft: "+deleteDraft);
@@ -598,6 +599,9 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	/**
+	 * 
+	 * NB: doPublish does NOT save first!
+	 * 
 	 * NB: Uses AppUtils#doSaveEdit2(ESPath, JThing, WebRequest, boolean) to do a *merge* into ES.
 	 * So this will not remove parts of a document (unless you provide an over-write value).
 	 * 
@@ -608,12 +612,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * 
 	 * @param state
 	 */
-	protected void doSave(WebRequest state) {
-		// debug FIXME		
-//		String json = getJson(state);
-//		Object jobj = JSON.parse(json);
-//		Object start = SimpleJson.get(jobj, "projects", 0, "start");
-		
+	protected void doSave(WebRequest state) {		
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
 		T thing = getThing(state);
 		assert thing != null : state;
@@ -629,13 +628,10 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		// This has probably been done already in getThing(), but harmless to repeat
 		// run the object through Java, to trigger IInit
-		jthing.java();
-		
-		// FIXME debug
-		Object start2 = SimpleJson.get(jthing.map(), "projects", 0, "start");
-		Object startraw = SimpleJson.get(jthing.map(), "projects", 0, "start_raw");
-		T ngo = jthing.java();
+		T pojo = jthing.java();
 		 
+		// add security?
+		doSave2_setSecurity(state, pojo);
 		
 		{	// update
 			String id = getId(state);
@@ -646,6 +642,17 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 	}
 	
+
+	/**
+	 * Override to implement!
+	 * @param state
+	 * @param pojo
+	 */
+	protected void doSave2_setSecurity(WebRequest state, T pojo) {
+		// TODO Auto-generated method stub		
+	}
+
+
 
 	/**
 	 * Get from field or state. Does NOT call the database.

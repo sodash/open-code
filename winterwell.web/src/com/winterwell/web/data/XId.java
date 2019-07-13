@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Warning;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.IHasJson;
@@ -179,7 +180,8 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 
 	/**
 	 * Convert a name@service String (as produced by this class) into
-	 * a XId object.
+	 * a XId object. 
+	 * This will tolerate badly formatted inputs! 
 	 * @param canonicaliseName Must be false, to switch off using plugins to canonicalise
 	 * the name.
 	 */
@@ -192,7 +194,12 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 			id = WebUtils2.urlDecode(id);
 			i = id.lastIndexOf('@');
 		}
-		assert i>0 : "no @ in XId: "+id;
+		if (i==-1) {
+			Log.e("xid.format", new Warning("No @ in XId: "+id));
+			this.service="unknown";
+			this.name=id;
+			return;
+		}
 		this.service = id.substring(i+1);
 		this.name = id.substring(0, i);
 		assert notNullNameCheck() : id;

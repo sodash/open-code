@@ -19,6 +19,18 @@ import com.winterwell.youagain.client.YouAgainClient;
 //@Data Lombok is nice, but not using it makes builds more robust
 public class AThing implements IInit {
 
+	public void setShares(List<ShareToken> shares) {
+		this.shares = shares;
+	}
+	
+	/**
+	 * @deprecated YA is the definitive source. This is a cache.
+	 * @return
+	 */
+	public List<ShareToken> getShares() {
+		return shares;
+	}
+	
 	/**
 	 * @deprecated TODO fill in from ES
 	 */

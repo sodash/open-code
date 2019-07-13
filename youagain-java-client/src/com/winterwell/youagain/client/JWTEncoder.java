@@ -54,6 +54,13 @@ public class JWTEncoder {
 		return encryptJWT(xid, null);
 	}
 	
+	/**
+	 * 
+	 * @param xid Identity aka subject
+	 * @param extraProperties
+	 * @return
+	 * @throws Exception
+	 */
 	public String encryptJWT(XId xid, Map<String,Object> extraProperties) throws Exception {
 	    // Create the Claims, which will be the content of the JWT
 		Algorithm alg = algorithm();
