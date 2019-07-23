@@ -446,7 +446,6 @@ public class FakeBrowser {
 	}
 	
 	/**
-	 * @deprecated NOT TESTED AT ALL! @Roscoe -- some stub code for you.
 	 * @param url
 	 * @param params
 	 * @return

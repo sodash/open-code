@@ -1,5 +1,8 @@
 package com.winterwell.web.data;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Interface for objects with an id.
  * 
@@ -18,5 +21,11 @@ public interface IHasXId {
 		XId xid = getXId();
 		return xid==null? null : xid.getService();
 	}
-	
+
+	/**
+	 * @return list of alternative XIds (usually empty)
+	 */
+	default List<XId> getAka() {
+		return Collections.EMPTY_LIST;
+	}
 }
