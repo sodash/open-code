@@ -100,6 +100,9 @@ public class WebEx extends RuntimeException {
 	
 	public static class RateLimitException extends E40X {
 		private static final long serialVersionUID = 1L;
+		public RateLimitException(String msg) {
+			super(400, msg);
+		}
 		public RateLimitException(XId user, String msg) {
 			super(400, StrUtils.joinWithSkip(" ", user,  msg));
 		}
