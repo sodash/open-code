@@ -28,4 +28,8 @@ public interface IHasXId {
 	default List<XId> getAka() {
 		return Collections.EMPTY_LIST;
 	}
+	
+	default void setAka(List<XId> aka) throws UnsupportedOperationException {
+		throw new UnsupportedOperationException();
+	}
 }
