@@ -26,6 +26,9 @@ public class WebEx extends RuntimeException {
 	 *
 	 */
 	public static class E409Conflict extends E40X {
+		public E409Conflict(String msg) {
+			this(null, msg);
+		}
 		public E409Conflict(String url, String msg) {
 			super(409, url, msg);
 		}

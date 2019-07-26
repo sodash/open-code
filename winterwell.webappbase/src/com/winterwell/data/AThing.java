@@ -6,6 +6,7 @@ import com.winterwell.depot.IInit;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.web.data.IHasXId;
 import com.winterwell.youagain.client.ShareToken;
 import com.winterwell.youagain.client.YouAgainClient;
 
@@ -18,7 +19,7 @@ import com.winterwell.youagain.client.YouAgainClient;
  */
 //@Data Lombok is nice, but not using it makes builds more robust
 public class AThing implements IInit {
-
+	
 	public void setShares(List<ShareToken> shares) {
 		this.shares = shares;
 	}
