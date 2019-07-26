@@ -13,7 +13,7 @@
 	<classpathentry kind="lib" path="dependencies/jetty-security.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jetty-server.jar" sourcepath="dependencies/jetty-server-sources.jar"/>
 	<classpathentry kind="lib" path="dependencies/jetty-servlet.jar" sourcepath="dependencies/jetty-servlet-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util-ajax.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util-ajax.jar" sourcepath="dependencies/jetty-util-ajax-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/javax.mail.jar" sourcepath="javamail-mail-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
