@@ -89,7 +89,7 @@ public final class Dep {
 
 
 	/**
-	 * NB: Very similar to {@link #setIfAbsent(Class, Object)}
+	 * NB: Very similar to {@link #setIfAbsent(Class, Object)} but does not set
 	 * @param <X>
 	 * @param klass
 	 * @param defaultValue

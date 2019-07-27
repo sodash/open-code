@@ -43,6 +43,7 @@ import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.WebRequest.KResponseType;
+import com.winterwell.web.data.IHasXId;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.SField;
 import com.winterwell.youagain.client.AuthToken;
@@ -150,21 +151,51 @@ public abstract class CrudServlet<T> implements IServlet {
 		// save?
 		if (state.actionIs("save") || state.actionIs(ACTION_NEW)) {
 			doSave(state);
+			return;
+		}
+		// copy / save-as?
+		if (state.actionIs("copy")) {
+			doCopy(state);
+			return;
 		}
 		if (state.actionIs("discard-edits") || state.actionIs("discardEdits")) {
 			jthing = doDiscardEdits(state);
+			return;
 		}
 		if (state.actionIs("delete")) {
 			jthing = doDelete(state);
+			return;
 		}
 		// publish?
 		if (state.actionIs(ACTION_PUBLISH)) {
 			jthing = doPublish(state);
 			assert jthing.string().contains(KStatus.PUBLISHED.toString()) : jthing;
+			return;
 		}
 		if (state.actionIs("unpublish")) {
 			jthing = doUnPublish(state);
+			return;
 		}
+	}
+
+
+	/**
+	 * Copy / save-as -- this is almost the same as save. 
+	 * But it can clear some values which should not be copied -- e.g. external linking ids.
+	 * @param state
+	 */
+	protected void doCopy(WebRequest state) {
+		// clear linking ids
+		T thing = getThing(state);
+		if (thing instanceof IHasXId) {
+			try {
+				((IHasXId) thing).setAka(new ArrayList());
+			} catch(UnsupportedOperationException ex) {
+				// oh well
+			}
+		}
+		// save 
+		doSave(state);
 	}
 
 

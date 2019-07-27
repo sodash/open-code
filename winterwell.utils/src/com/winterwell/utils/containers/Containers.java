@@ -1943,7 +1943,7 @@ public final class Containers  {
 	 * For handling data that might be a single item, but might be a list
 	 * (e.g. ES json results, or web forms)
 	 * @param itemOrListOrArray An item, or a list, or an array, or a Collection. Can be null (returns empty-list).
-	 * @return definitely a list, never null. Do not modify.
+	 * @return definitely a list, never null, can be empty. Do not modify.
 	 */
 	public static <X> List<X> list(Object itemOrListOrArray) {
 		if (itemOrListOrArray == null) {
@@ -1958,6 +1958,7 @@ public final class Containers  {
 		if (itemOrListOrArray instanceof Collection) {
 			return Collections.unmodifiableList(getList((Collection)itemOrListOrArray));
 		}		
+		// wrap a solo object as a 1-item list
 		return (List<X>) Collections.singletonList(itemOrListOrArray);
 	}
 

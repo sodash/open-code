@@ -23,7 +23,7 @@ public interface IHasXId {
 	}
 
 	/**
-	 * @return list of alternative XIds (usually empty)
+	 * @return list of alternative XIds (usually empty, never null)
 	 */
 	default List<XId> getAka() {
 		return Collections.EMPTY_LIST;
