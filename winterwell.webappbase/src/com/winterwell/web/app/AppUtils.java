@@ -287,6 +287,13 @@ public class AppUtils {
 		}
 	}
 
+	/**
+	 * Save edits to *draft*
+	 * @param path
+	 * @param item
+	 * @param state
+	 * @return
+	 */
 	public static JThing doSaveEdit(ESPath path, JThing item, WebRequest state) {
 		assert path.index().toLowerCase().contains("draft") : path;		
 		// TODO check security with YouAgain!		
