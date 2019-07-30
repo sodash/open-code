@@ -323,6 +323,7 @@ public class Bob {
 		// update Bob itself?
 		if (bob.settings.update) {
 			FakeBrowser fb = new FakeBrowser();
+			fb.setMaxDownload(50); // 50mb?!
 			File bobJar = fb.getFile("https://www.winterwell.com/software/downloads/bob-all.jar");
 			System.out.println("Bob jar downloaded to:");
 			System.out.println(bobJar);
