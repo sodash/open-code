@@ -29,7 +29,7 @@ import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.web.XStreamUtils;
+//import com.winterwell.utils.web.XStreamUtils;
 
 /**
  * Compile Java code. ??Ignores non-Java files! You may wish to use a
@@ -51,6 +51,16 @@ public class CompileTask extends BuildTask {
 	private List<File> srcFiles;
 	private String srcJavaVersion;
 	private String outputJavaVersion;
+	private boolean debug;
+	
+	/**
+	 * @param debug If true, switch on warnings output.
+	 * @return this
+	 */
+	public CompileTask setDebug(boolean debug) {
+		this.debug = debug;
+		return this;
+	}
 
 	/**
 	 * Compile Java code.
@@ -66,8 +76,8 @@ public class CompileTask extends BuildTask {
 		/*
 		 * Default to the version of Java that's running this code :)
 		 */
-		// NB: falls back to Java 9
-		String javaVersion = Utils.or(System.getProperty("java.specification.version"), "1.9");
+		// NB: falls back to Java 11 (LTS)
+		String javaVersion = Utils.or(System.getProperty("java.specification.version"), "11");
 		setSrcJavaVersion(javaVersion);
 		setOutputJavaVersion(javaVersion);
 	}
@@ -91,7 +101,7 @@ public class CompileTask extends BuildTask {
 				null);
 		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 		// quiet
-		options.add("-nowarn");
+		if ( ! debug) options.add("-nowarn");
 		// Java version: 8
 		options.add("-source"); options.add(srcJavaVersion);
 		options.add("-target"); options.add(outputJavaVersion);
@@ -122,8 +132,8 @@ public class CompileTask extends BuildTask {
 			FileUtils.write(cmdfile, 
 					"# "+StrUtils.compactWhitespace(getDesc().getId())+"\n"+
 					"javac "+StrUtils.join(options, " ")+" "+StrUtils.join(javaFiles, " ")
-					+"\n\n\n"
-					+XStreamUtils.serialiseToXml(this) // for debug - what are the diffs??
+//					+"\n\n\n"
+//					+XStreamUtils.serialiseToXml(this) // for debug - what are the diffs??
 					);
 			Log.d(LOGTAG, "javac compile command saved to: "+cmdfile.getAbsolutePath());
 		} catch(Throwable ex) {
@@ -219,7 +229,7 @@ public class CompileTask extends BuildTask {
 		System.out.println(p.getOutput());
 		System.err.println(p.getError());
 		if (ok != 0)
-			throw new FailureException(p.getError());
+			throw new FailureException(StrUtils.ellipsize(p.getCommand(), 100)+" -> "+p.getError());
 	}
 
 	@Override

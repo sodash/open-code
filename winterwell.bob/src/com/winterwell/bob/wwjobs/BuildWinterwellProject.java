@@ -420,7 +420,8 @@ public class BuildWinterwellProject extends BuildTask {
 				Set<File> libs = ec.getCollectedLibs();
 				compile.setClasspath(libs);		
 	//			compile.setSrcJavaVersion("1.9");
-				compile.setOutputJavaVersion("1.8"); // Java 8 jars??
+				compile.setOutputJavaVersion("11"); // Java 11 jars
+				compile.setDebug(true);
 				compile.run();
 				compile.close();
 			} catch(Exception ex) {

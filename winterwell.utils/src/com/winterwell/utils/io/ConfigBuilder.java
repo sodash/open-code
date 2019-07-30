@@ -379,7 +379,9 @@ public class ConfigBuilder {
 	public ConfigBuilder set(File propertiesFile) {
 		if (propertiesFile==null) return this;		
 		if ( ! propertiesFile.exists()) {
-			Log.d(LOGTAG, config.getClass().getSimpleName()+": No properties file: "+propertiesFile+" = "+propertiesFile.getAbsolutePath());
+			Log.d(LOGTAG, config.getClass().getSimpleName()+": No properties file: "+propertiesFile
+				+ (propertiesFile.isAbsolute()? "" : " = "+propertiesFile.getAbsolutePath())
+			);
 			return this;
 		}		
 		source = propertiesFile.getAbsoluteFile();

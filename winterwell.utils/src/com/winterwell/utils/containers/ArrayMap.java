@@ -152,6 +152,9 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 	 * NB: we use a named class not an anonymous class for code stability 
 	 */
 	private final class EntrySet extends AbstractSet<Entry<K, V>> {
+		public EntrySet() {		
+		}
+		
 		@Override
 		public Iterator<java.util.Map.Entry<K, V>> iterator() {
 			return new Iterator<Entry<K, V>>() {
