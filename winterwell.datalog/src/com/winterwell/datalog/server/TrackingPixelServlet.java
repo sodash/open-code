@@ -16,7 +16,10 @@ import com.winterwell.web.data.XId;
 import com.winterwell.youagain.client.AuthToken;
 
 /**
- * See {@link Tripwire} E.g. use: <img src='http://myworkspace.soda.sh/trk?via=areseller'>
+ * Call via <img src='https://lg.good-loop.com/pxl' style='position:absolute;bottom:0px;left:0px;width:1px;height:1px;' />
+ * 
+ * pxl event
+ * Defaults to dataspace "trk" but allow override
  * 
  * Referer url: explicitly set via ref=, or the referring page from the http header
  * 
