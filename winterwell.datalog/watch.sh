@@ -1,1 +1,1 @@
-npm run compile-watch
+../../wwappbase.js/project/watch.sh
