@@ -12,7 +12,10 @@ import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogImpl;
 import com.winterwell.datalog.DataLogSecurity;
 import com.winterwell.datalog.Dataspace;
+import com.winterwell.datalog.ESDataLogSearchBuilder;
 import com.winterwell.datalog.ESStorage;
+import com.winterwell.es.client.ESHttpClient;
+import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.nlp.query.SearchQuery.SearchFormatException;
@@ -23,6 +26,7 @@ import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ICallable;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils;
@@ -32,7 +36,7 @@ import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.Json2Csv;
 import com.winterwell.web.app.WebRequest;
-import com.winterwell.web.app.WebRequest.KResponseType;
+import com.winterwell.web.fields.DtField;
 import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
@@ -57,23 +61,14 @@ public class DataServlet implements IServlet {
 
 	@Override
 	public void process(WebRequest state) throws IOException {						
-		// TODO request memory use as a good graph to test
-//		"_index": "datalog.default",
-//        "_type": "evt.simple",
-//        "_id": "default/simple_6814221e746bf98518810a931070ba6c_76",
-//        "_score": 1.0,
-//        "_source": {
-//          "evt": "simple",
-//          "time": "2017-06-30T14:00:00Z",
-//          "count": 7571440.0,
-//          "tag": "mem_used",
 				
 		Dataspace dataspace = new Dataspace(state.get(DATASPACE, "default"));				
 		// Uses "paths" of breakdown1/breakdown2/... {field1:operation, field2}
 		List<String> breakdown = state.get(DataLogFields.breakdown);
 		if (breakdown==null) {
-			Log.w(LOGTAG, "You want data but no breakdown?! "+state);
+			Log.w(LOGTAG, "You want data but no breakdown?! Default to time. "+state);
 			breakdown = new ArrayList();
+			breakdown.add("time");
 		}
 
 		// security: on the dataspace, and optionally on the breakdown
@@ -100,7 +95,24 @@ public class DataServlet implements IServlet {
 		ESStorage ess = (ESStorage) dl.getStorage();
 //		ESStorage ess = Dep.get(ESStorage.class);
 		
-		SearchResponse sr = ess.doSearchEvents(dataspace, numTerms, size, start, end, filter, breakdown);
+		ESHttpClient esc = ess.client(dataspace);
+
+		// collect all the info together
+		ESDataLogSearchBuilder essb = new ESDataLogSearchBuilder(esc, dataspace);		
+		essb.setBreakdown(breakdown)
+			.setQuery(filter)
+			.setNumResults(numTerms)
+			.setStart(start)
+			.setEnd(end);
+		Dt interval = state.get(new DtField("interval"), TUnit.DAY.dt);
+		essb.setInterval(interval);
+		
+		SearchRequestBuilder search = essb.prepareSearch();		
+		search.setDebug(true);
+//		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
+		search.setSize(size);
+				
+		SearchResponse sr = search.get();
 		sr.check();
 		
 		Map aggregations = sr.getAggregations();
@@ -109,14 +121,7 @@ public class DataServlet implements IServlet {
 			aggregations = new ArrayMap();
 		}
 		// also send eg data
-		List<Map> egs = sr.getHits();
-		aggregations.put("examples", egs);
-		
-		// csv? Send a table of the examples=results
-		if (state.getResponseType() == KResponseType.csv) {
-			doSendCSV(state, egs);
-			return;
-		}
+		aggregations.put("examples", sr.getHits());
 		
 		JsonResponse jr = new JsonResponse(state, aggregations);
 		WebUtils2.sendJson(jr, state);
