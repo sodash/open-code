@@ -19,6 +19,8 @@ import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 
 /**
+ * Download dependencies from Maven central into a local `dependencies` folder.
+ * 
  * EITHER setup via
  * {@link #addDependency(String, String, String)}
  * OR setup via
