@@ -21,6 +21,8 @@ import com.winterwell.utils.log.Log;
  * DNS utilities. Basically wrappers around the antique JavaDNS library.
  *
  * The methods in the class all involve network activity and are *sloooooow*
+ * 
+ * Maven repo url "http://www.jabylon.org/maven/"
  *
  * @testedby DnsUtilsTest
  * @author Joe Halliwell <joe@winterwell.com>, Daniel
