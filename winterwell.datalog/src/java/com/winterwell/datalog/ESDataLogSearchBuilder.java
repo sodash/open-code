@@ -109,12 +109,16 @@ public class ESDataLogSearchBuilder {
 		} // ./breakdown
 		
 		// add a total count as well for each top-level terms breakdown
+		ArrayList noDupes = new ArrayList();
 		for(Aggregation agg : aggs.toArray(new Aggregation[0])) {
 			String field = agg.getField();
-			if (field != null && "terms".equals(agg.getType())) {
-				Aggregation myCount = Aggregations.stats(field, field);
-				aggs.add(myCount);
-			}
+			if (field == null) continue;
+			if ( ! "terms".equals(agg.getType())) continue;
+			// Avoid dupes. e.g. if both evt/host evt/user were requested, then evt will come up twice
+			if (noDupes.contains(field)) continue;
+			Aggregation myCount = Aggregations.stats(field, field);
+			aggs.add(myCount);			
+			noDupes.add(field);
 		}
 		
 		return aggs;
@@ -141,11 +145,12 @@ public class ESDataLogSearchBuilder {
 		Aggregation root = null;
 		Aggregation leaf = null;
 		Aggregation previousLeaf = null;
+		String s_bucketBy = StrUtils.join(bucketBy, '_');
 		for(String field : bucketBy) {
 			if (field.equals("time")) {
-				leaf = Aggregations.dateHistogram("by_time", "time", interval);
+				leaf = Aggregations.dateHistogram("by_"+s_bucketBy, "time", interval);
 			} else {
-				leaf = Aggregations.terms("by_"+field, field);
+				leaf = Aggregations.terms("by_"+s_bucketBy, field);
 				if (numResults>0) leaf.setSize(numResults);
 				// HACK avoid "unset" -> parse exception
 				leaf.setMissing(ESQueryBuilders.UNSET);
@@ -156,6 +161,10 @@ public class ESDataLogSearchBuilder {
 				previousLeaf.subAggregation(leaf);
 			}
 			previousLeaf = leaf;
+			// chop down name for the next loop, if there is one.
+			if (field.length() < s_bucketBy.length()) {
+				s_bucketBy = s_bucketBy.substring(field.length()+1);
+			}
 		}
 		
 		// add a count handler?

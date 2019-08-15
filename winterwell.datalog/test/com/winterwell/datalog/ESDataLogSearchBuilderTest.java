@@ -2,7 +2,9 @@ package com.winterwell.datalog;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +51,25 @@ public class ESDataLogSearchBuilderTest {
 				new ArrayMap("stats", new ArrayMap("field", "evt"))
 				);
 	}
-	
+
+	@Test
+	public void testSetBreakdownOverlap() {
+		ESHttpClient esc = new ESHttpClient(new ESConfig());
+		ESDataLogSearchBuilder esdsb = new ESDataLogSearchBuilder(esc, new Dataspace("test"));
+		
+		List<String> breakdown = Arrays.asList("evt/host", "evt/user");
+		esdsb.setBreakdown(breakdown);
+
+		// TODO it would be nice if the parser was smart enough to merge these into a tree. Oh well.
+		
+		List<Aggregation> aggs = esdsb.prepareSearch2_aggregations();
+		String s = Printer.toString(aggs, "\n");
+		Printer.out("evt:	"+s);
+		ArrayList<Object> names = Containers.apply(aggs,  agg -> agg.name);
+		assert names.size() == new HashSet(names).size() : names;
+		assert aggs.size() == 3;
+	}
+
 
 	@Test
 	public void testSetBreakdownAByB() {
@@ -72,7 +92,7 @@ public class ESDataLogSearchBuilderTest {
 			Map s = aggs.get(0).toJson2();
 			Printer.out("\n"+breakdown+":	"+s);
 			assert s.toString().equals(
-					"{terms={field=frog, missing=unset}, aggs={by_carrot={terms={field=carrot, missing=unset}, aggs={by_iron={terms={field=iron, missing=unset}}}}}}") : s;
+					"{terms={field=frog, missing=unset}, aggs={by_carrot_iron={terms={field=carrot, missing=unset}, aggs={by_iron={terms={field=iron, missing=unset}}}}}}") : s;
 		}
 		{	
 			List<String> breakdown = Arrays.asList("animal/vegetable {\"mycount\": \"avg\"}");
