@@ -5,6 +5,8 @@ import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.utils.TodoException;
 
 /**
+ * Should this just be done via {@link Aggregation}??
+ * 
  * e.g. pub{"count":"sum"}
  * @author daniel
  *
@@ -34,6 +36,9 @@ public class Breakdown {
 		this.op = operator;
 	}
 
+	/**
+	 * @return make an aggregation for this breakdown
+	 */
 	public Aggregation getAggregation() {
 		if (by==null) {
 			// HACK top-level total stat

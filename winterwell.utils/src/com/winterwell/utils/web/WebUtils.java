@@ -311,7 +311,10 @@ public class WebUtils {
 					v = ((ISerialize)key).toString(val);
 				} else {
 					v = String.valueOf(val);
-				}			 
+				}
+				
+				// ??Is it an array or List??
+				
 				addQueryParameter(sb, k, v);
 			} catch(Exception ex) {
 				throw Utils.runtime(ex);

@@ -92,7 +92,7 @@ public class ESDataLogSearchBuilder {
 	private List<Aggregation> doSearchEvents2_aggregations(BoolQueryBuilder filter) 
 	{
 		List<Aggregation> aggs = new ArrayList();
-		Set<String> allOutputs = new ArraySet<>();
+		Set<String> allOutputs = new ArraySet<>(); // ??is this robust against name collisions?
 		for(final String bd : breakdown) {
 			if (bd==null) {
 				Log.w("DataLog.ES", "null breakdown?! in "+breakdown);
@@ -103,13 +103,20 @@ public class ESDataLogSearchBuilder {
 			// e.g. tag/time {count:avg}
 			// TODO proper recursive handling
 			String[] breakdown_output = bd.split("\\{");
-			String[] b = breakdown_output[0].trim().split("/");
-			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms(
-					"by_"+StrUtils.join(b,'_'), b[0]);
+			String[] b = breakdown_output[0].trim().split("/");			
+			String field = b[0];
+			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms("by_"+field, field);
 			byTag.setSize(numResults);
 			if ( ! "time".equals(b[0])) { // HACK avoid "unset" -> parse exception
 				byTag.setMissing(ESQueryBuilders.UNSET);
 			}
+			// add a count handler?
+			if (breakdown_output.length <= 1) { // no - done
+				aggs.add(byTag);
+				allOutputs.add(field);
+				continue;
+			}
+			
 			Aggregation leaf = byTag;
 			if (b.length > 1) {
 				if (b[1].equals("time")) {
@@ -124,17 +131,12 @@ public class ESDataLogSearchBuilder {
 					leaf = byHost;
 				}
 			}				
-			// add a count handler?
-			if (breakdown_output.length <= 1) { // no - done
-//				search.addAggregation(byTag);
-				aggs.add(byTag);
-				continue;
-			}
+			
 			// e.g. {"count": "avg"}
 			String json = bd.substring(bd.indexOf("{"), bd.length());
 			Map<String,String> output = (Map) JSON.parse(json);
 			for(String k : output.keySet()) {
-				allOutputs.add(k);
+				allOutputs.add(k); 
 				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
 				leaf.subAggregation(myCount);
 				// filter 0s ??does this work??
