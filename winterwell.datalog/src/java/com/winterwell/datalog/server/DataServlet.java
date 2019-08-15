@@ -46,9 +46,12 @@ import com.winterwell.web.fields.SField;
  * 
  * size: number of examples
  * numRows: max terms in the breakdown
+ * breakdown: e.g. evt/time 
+ * 	See {@link ESDataLogSearchBuilder} for more info on the breakdown syntax
+
  * 
  * @author daniel
- *
+ * @testedby {@link DataServletTest}
  */
 public class DataServlet implements IServlet {
 
