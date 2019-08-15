@@ -33,8 +33,7 @@ public class ESDataLogSearchBuilderTest {
 		List<String> breakdown = Arrays.asList("evt");
 		esdsb.setBreakdown(breakdown);
 		
-		BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
-		List<Aggregation> aggs = esdsb.prepareSearch2_aggregations(filter);
+		List<Aggregation> aggs = esdsb.prepareSearch2_aggregations();
 		String s = Printer.toString(aggs, "\n");
 		Printer.out("evt:	"+s);
 		assert aggs.size() == 2;
@@ -59,8 +58,7 @@ public class ESDataLogSearchBuilderTest {
 		List<String> breakdown = Arrays.asList("evt/time");
 		esdsb.setBreakdown(breakdown);
 		
-		BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
-		List<Aggregation> aggs = esdsb.prepareSearch2_aggregations(filter);
+		List<Aggregation> aggs = esdsb.prepareSearch2_aggregations();
 		String s = Printer.toString(aggs, "\n");
 		Printer.out("evt/time:	"+s);
 	}

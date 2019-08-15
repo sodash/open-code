@@ -62,14 +62,13 @@ public class ESDataLogSearchBuilder {
 		SearchRequestBuilder search = esc.prepareSearch(index);
 	
 		// breakdown(s)
-		List<Aggregation> aggs = prepareSearch2_aggregations(filter);
+		List<Aggregation> aggs = prepareSearch2_aggregations();
 		for (Aggregation aggregation : aggs) {
 			search.addAggregation(aggregation);
 		}
 		
 		// Set filter
 		search.setQuery(filter);
-
 		
 		return search;
 	}
@@ -90,7 +89,7 @@ public class ESDataLogSearchBuilder {
 	 * @param filter This may be modified to filter out 0s
 	 * @param search
 	 */
-	List<Aggregation> prepareSearch2_aggregations(BoolQueryBuilder filter) 
+	List<Aggregation> prepareSearch2_aggregations() 
 	{
 		List<Aggregation> aggs = new ArrayList();
 		for(final String bd : breakdown) {
@@ -98,50 +97,8 @@ public class ESDataLogSearchBuilder {
 				Log.w("DataLog.ES", "null breakdown?! in "+breakdown);
 				continue;
 			}
-			// TODO new Breakdown
-			// tag & time
-			// e.g. tag/time {count:avg}
-			// TODO proper recursive handling
-			String[] breakdown_output = bd.split("\\{");
-			String[] b = breakdown_output[0].trim().split("/");			
-			String field = b[0];
-			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms("by_"+field, field);
-			if (numResults > 0) byTag.setSize(numResults);
-			if ( ! "time".equals(b[0])) { // HACK avoid "unset" -> parse exception
-				byTag.setMissing(ESQueryBuilders.UNSET);
-			}
-			// add a count handler?
-			if (breakdown_output.length <= 1) { // no - done
-				aggs.add(byTag);
-				continue;
-			}
-			
-			Aggregation leaf = byTag;
-			if (b.length > 1) {
-				if (b[1].equals("time")) {
-					com.winterwell.es.client.agg.Aggregation byTime = Aggregations.dateHistogram("by_time", "time", interval);
-					byTag.subAggregation(byTime);
-					leaf = byTime;
-				} else {
-					com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);
-					byHost.setSize(numResults);
-					byHost.setMissing(ESQueryBuilders.UNSET);
-					byTag.subAggregation(byHost);
-					leaf = byHost;
-				}
-			}				
-			
-			// e.g. {"count": "avg"}
-			String json = bd.substring(bd.indexOf("{"), bd.length());
-			Map<String,String> output = (Map) JSON.parse(json);
-			for(String k : output.keySet()) {
-				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
-				// filter 0s
-				ESQueryBuilder no0 = ESQueryBuilders.rangeQuery(k, 0, null, false);
-				Aggregation noZeroMyCount = Aggregations.filtered("no0_"+k, no0, myCount);
-				leaf.subAggregation(noZeroMyCount);
-			}		
-			aggs.add(byTag);
+			Aggregation agg = prepareSearch3_agg4breakdown(bd);
+			aggs.add(agg);
 		} // ./breakdown
 		
 		// add a total count as well for each top-level breakdown
@@ -154,6 +111,52 @@ public class ESDataLogSearchBuilder {
 		}
 		
 		return aggs;
+	}
+
+	private Aggregation prepareSearch3_agg4breakdown(String bd) {
+		// TODO new Breakdown
+		// tag & time
+		// e.g. tag/time {count:avg}
+		// TODO proper recursive handling
+		String[] breakdown_output = bd.split("\\{");
+		String[] b = breakdown_output[0].trim().split("/");			
+		String field = b[0];
+		com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms("by_"+field, field);
+		if (numResults > 0) byTag.setSize(numResults);
+		if ( ! "time".equals(b[0])) { // HACK avoid "unset" -> parse exception
+			byTag.setMissing(ESQueryBuilders.UNSET);
+		}
+		// add a count handler?
+		if (breakdown_output.length <= 1) { // no - done
+			return byTag;
+		}
+		
+		Aggregation leaf = byTag;
+		if (b.length > 1) {
+			if (b[1].equals("time")) {
+				com.winterwell.es.client.agg.Aggregation byTime = Aggregations.dateHistogram("by_time", "time", interval);
+				byTag.subAggregation(byTime);
+				leaf = byTime;
+			} else {
+				com.winterwell.es.client.agg.Aggregation byHost = Aggregations.terms("by_"+b[1], b[1]);
+				byHost.setSize(numResults);
+				byHost.setMissing(ESQueryBuilders.UNSET);
+				byTag.subAggregation(byHost);
+				leaf = byHost;
+			}
+		}				
+		
+		// e.g. {"count": "avg"}
+		String json = bd.substring(bd.indexOf("{"), bd.length());
+		Map<String,String> output = (Map) JSON.parse(json);
+		for(String k : output.keySet()) {
+			com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
+			// filter 0s
+			ESQueryBuilder no0 = ESQueryBuilders.rangeQuery(k, 0, null, false);
+			Aggregation noZeroMyCount = Aggregations.filtered("no0_"+k, no0, myCount);
+			leaf.subAggregation(noZeroMyCount);
+		}		
+		return byTag;
 	}
 
 	public ESDataLogSearchBuilder setStart(Time start) {
