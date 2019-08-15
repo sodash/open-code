@@ -48,7 +48,7 @@ public class ESDataLogSearchBuilderTest {
 		Aggregation a1 = aggs.get(1);
 		Printer.out(a1.toJson2());
 		assert Containers.same(a1.toJson2(), 
-				new ArrayMap("stats", new ArrayMap("field", "evt"))
+				new ArrayMap("stats", new ArrayMap("field", "count"))
 				);
 	}
 

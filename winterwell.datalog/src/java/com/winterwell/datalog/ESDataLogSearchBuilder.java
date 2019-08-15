@@ -16,6 +16,7 @@ import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.nlp.query.SearchQuery;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
@@ -116,8 +117,8 @@ public class ESDataLogSearchBuilder {
 			if ( ! "terms".equals(agg.getType())) continue;
 			// Avoid dupes. e.g. if both evt/host evt/user were requested, then evt will come up twice
 			if (noDupes.contains(field)) continue;
-			Aggregation myCount = Aggregations.stats(field, field);
-			aggs.add(myCount);			
+			Aggregation fCountStats = Aggregations.stats(field, ESStorage.count);
+			aggs.add(fCountStats);			
 			noDupes.add(field);
 		}
 		
@@ -168,14 +169,20 @@ public class ESDataLogSearchBuilder {
 		}
 		
 		// add a count handler?
-		if (reportSpec==null) { // no - we're done
+		if (reportSpec==null) { // no - we're done - return terms
 			return root;
 		}
 		
 		// e.g. {"count": "avg"}
 		for(String k : reportSpec.keySet()) {
+			// Note k should be a numeric field, e.g. count -- not a keyword field!
+			Class klass = DataLogEvent.COMMON_PROPS.get(k);
+			if ( ! ReflectionUtils.isa(klass, Number.class)) {
+				Log.w("ESDataLogSearch", "Possible bug! numeric op on non-numeric field "+k+" in "+bd);
+			}
+				
 			Aggregation myCount = Aggregations.stats(k, k);
-			// filter 0s
+			// filter 0s??
 			ESQueryBuilder no0 = ESQueryBuilders.rangeQuery(k, 0, null, false);
 			Aggregation noZeroMyCount = Aggregations.filtered("no0_"+k, no0, myCount);
 			leaf.subAggregation(noZeroMyCount);

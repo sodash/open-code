@@ -77,6 +77,7 @@ import com.winterwell.web.app.AppUtils;
  */
 public class ESStorage implements IDataLogStorage {
 
+	public static final String count = "count";
 	private static final String LOGTAG = "DataLog.ES";
 	private ESConfig esConfig;
 	
@@ -143,8 +144,8 @@ public class ESStorage implements IDataLogStorage {
 		for (Map hit : hits) {
 			Object t = hit.get("time");
 			Time time = Time.of(t.toString());
-			Number count = (Number) hit.get("count");
-			Datum d = new Datum(time, count.doubleValue(), tag);
+			Number vcount = (Number) hit.get(count);
+			Datum d = new Datum(time, vcount.doubleValue(), tag);
 			list.add(d);
 		}
 		// TODO interpolate and buckets
@@ -163,8 +164,8 @@ public class ESStorage implements IDataLogStorage {
 	}
 	
 	@Deprecated // use new DataLogEVent directly
-	static DataLogEvent event4tag(String tag, double count) {
-		return new DataLogEvent(tag, count);
+	static DataLogEvent event4tag(String tag, double _count) {
+		return new DataLogEvent(tag, _count);
 	}
 
 	@Override
@@ -191,8 +192,8 @@ public class ESStorage implements IDataLogStorage {
 			Object t = hit.get("time");
 			Object xtra = hit.get("xtra");
 			Time time = Time.of(t.toString());
-			Number count = (Number) hit.get("count");
-			Datum d = new Datum(time, count.doubleValue(), tag);
+			Number vcount = (Number) hit.get(count);
+			Datum d = new Datum(time, vcount.doubleValue(), tag);
 			list.add(d);
 		}
 		// TODO interpolate and buckets
@@ -340,7 +341,7 @@ public class ESStorage implements IDataLogStorage {
 		ESType simpleEvent = new ESType()
 				.property(DataLogEvent.EVT, keywordy.copy()) // ?? should we set fielddata=true??
 				.property("time", new ESType().date())
-				.property("count", new ESType().DOUBLE())
+				.property(count, new ESType().DOUBLE())
 				.property("props", props);		
 		// common probs...
 		for(Entry<String, Class> cp : DataLogEvent.COMMON_PROPS.entrySet()) {
@@ -557,7 +558,7 @@ public class ESStorage implements IDataLogStorage {
 		if (sortByTime) {
 			
 		} else {
-			search.addAggregation(Aggregations.stats("event_total", "count"));
+			search.addAggregation(Aggregations.stats("event_total", count));
 			search.setSize(0);
 		}
 //		ListenableFuture<ESHttpResponse> sf = search.execute(); TODO return a future
