@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -55,11 +56,30 @@ public class ESDataLogSearchBuilderTest {
 		ESHttpClient esc = new ESHttpClient(new ESConfig());
 		ESDataLogSearchBuilder esdsb = new ESDataLogSearchBuilder(esc, new Dataspace("test"));
 		
-		List<String> breakdown = Arrays.asList("evt/time");
-		esdsb.setBreakdown(breakdown);
-		
-		List<Aggregation> aggs = esdsb.prepareSearch2_aggregations();
-		String s = Printer.toString(aggs, "\n");
-		Printer.out("evt/time:	"+s);
+		{
+			List<String> breakdown = Arrays.asList("evt/time");
+			esdsb.setBreakdown(breakdown);
+			List<Aggregation> aggs = esdsb.prepareSearch2_aggregations();
+			Map s = aggs.get(0).toJson2();
+			Printer.out("evt/time:	"+s);
+			assert s.toString().equals(
+					"{terms={field=evt, missing=unset}, aggs={by_time={date_histogram={field=time, interval=day}}}}") : s;
+		}
+		{	
+			List<String> breakdown = Arrays.asList("frog/carrot/iron");
+			esdsb.setBreakdown(breakdown);
+			List<Aggregation> aggs = esdsb.prepareSearch2_aggregations();
+			Map s = aggs.get(0).toJson2();
+			Printer.out("\n"+breakdown+":	"+s);
+			assert s.toString().equals(
+					"{terms={field=frog, missing=unset}, aggs={by_carrot={terms={field=carrot, missing=unset}, aggs={by_iron={terms={field=iron, missing=unset}}}}}}") : s;
+		}
+		{	
+			List<String> breakdown = Arrays.asList("animal/vegetable {\"mycount\": \"avg\"}");
+			esdsb.setBreakdown(breakdown);
+			List<Aggregation> aggs = esdsb.prepareSearch2_aggregations();
+			Map s = aggs.get(0).toJson2();
+			Printer.out("\n"+breakdown+":	"+s);
+		}
 	}
 }

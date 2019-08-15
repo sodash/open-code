@@ -327,7 +327,7 @@ public final class Containers  {
 	}
 
 	/**
-	 * @deprecated use {@link #applyToMap(Map, java.util.function.BiFunction)} for preference
+	 * Convenience for {@link #applyToMap(Map, java.util.function.BiFunction)}.
 	 * Produces a new Map of key/values by mapping each entry value through a
 	 * transformation function.
 	 * 
@@ -335,26 +335,16 @@ public final class Containers  {
 	 * @param map
 	 * @return {key: fn applied to each value}
 	 */
-	public static <K, I, O> Map<K,O> applyToValues(IFn<I, O> fn, Map<? extends K, ? extends I> map) {
-		HashMap after = new HashMap(map.size());
-		for (K k : map.keySet()) {
-			try {
-				I v = map.get(k);				
-				O o = fn.apply(v);
-				if (o==null) continue;
-				after.put(k, o);
-			} catch(Exception ex) {
-				throw Utils.runtime(ex);
-			}
-		}
-		return after;
+	public static <K, I, O> Map<K,O> applyToValues(final IFn<I, O> fn, Map<? extends K, ? extends I> map) {
+		BiFunction<K,I,O> kvfn = (k, v) -> fn.apply(v);
+		return applyToMap(map, kvfn);
 	}
 
 	/**
-	 * Apply a function to change map values (and filter nulls)
+	 * Apply a function to change map *values* (and filter nulls)
 	 * @param map
 	 * @param fn
-	 * @return
+	 * @return {key: fn applied to each value}
 	 */
 	public static <K, I, O> Map<K,O> applyToMap(Map<? extends K, ? extends I> map, java.util.function.BiFunction<K, I, O> fn) {
 		HashMap after = new HashMap(map.size());
