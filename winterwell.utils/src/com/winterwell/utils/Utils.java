@@ -116,8 +116,10 @@ public final class Utils {
 	 * @return true if a.equals(b)
 	 */
 	public static boolean equals(Object a, Object b) {
-		if (a == null)
+		if (a == null) {
 			return b == null;
+		}
+		if (b == null) return false;
 		if (a.getClass().isArray() && b.getClass().isArray()) {			
 			List<Object> al = Containers.asList(a);
 			List<Object> bl = Containers.asList(b);

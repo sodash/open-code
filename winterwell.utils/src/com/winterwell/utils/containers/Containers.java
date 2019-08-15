@@ -1665,7 +1665,9 @@ public final class Containers  {
 		if (a==null) return b==null;
 		if (b==null) return false;
 		for(Object ka : a.keySet()) {
-			if ( ! Utils.equals(a.get(ka), b.get(ka))) {
+			Object va = a.get(ka);
+			Object vb = b.get(ka);
+			if ( ! Utils.equals(va, vb)) {
 				return false;
 			}
 		}

@@ -12,6 +12,7 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.BoolQueryBuilder;
+import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.StrUtils;
@@ -61,7 +62,7 @@ public class ESDataLogSearchBuilder {
 		SearchRequestBuilder search = esc.prepareSearch(index);
 	
 		// breakdown(s)
-		List<Aggregation> aggs = doSearchEvents2_aggregations(filter);
+		List<Aggregation> aggs = prepareSearch2_aggregations(filter);
 		for (Aggregation aggregation : aggs) {
 			search.addAggregation(aggregation);
 		}
@@ -86,13 +87,12 @@ public class ESDataLogSearchBuilder {
 	 * Add aggregations 
 	 * @param numResults
 	 * @param breakdown
-	 * @param filter
+	 * @param filter This may be modified to filter out 0s
 	 * @param search
 	 */
-	private List<Aggregation> doSearchEvents2_aggregations(BoolQueryBuilder filter) 
+	List<Aggregation> prepareSearch2_aggregations(BoolQueryBuilder filter) 
 	{
 		List<Aggregation> aggs = new ArrayList();
-		Set<String> allOutputs = new ArraySet<>(); // ??is this robust against name collisions?
 		for(final String bd : breakdown) {
 			if (bd==null) {
 				Log.w("DataLog.ES", "null breakdown?! in "+breakdown);
@@ -106,14 +106,13 @@ public class ESDataLogSearchBuilder {
 			String[] b = breakdown_output[0].trim().split("/");			
 			String field = b[0];
 			com.winterwell.es.client.agg.Aggregation byTag = Aggregations.terms("by_"+field, field);
-			byTag.setSize(numResults);
+			if (numResults > 0) byTag.setSize(numResults);
 			if ( ! "time".equals(b[0])) { // HACK avoid "unset" -> parse exception
 				byTag.setMissing(ESQueryBuilders.UNSET);
 			}
 			// add a count handler?
 			if (breakdown_output.length <= 1) { // no - done
 				aggs.add(byTag);
-				allOutputs.add(field);
 				continue;
 			}
 			
@@ -136,21 +135,24 @@ public class ESDataLogSearchBuilder {
 			String json = bd.substring(bd.indexOf("{"), bd.length());
 			Map<String,String> output = (Map) JSON.parse(json);
 			for(String k : output.keySet()) {
-				allOutputs.add(k); 
 				com.winterwell.es.client.agg.Aggregation myCount = Aggregations.stats(k, k);
-				leaf.subAggregation(myCount);
-				// filter 0s ??does this work??
-				filter.must(ESQueryBuilders.rangeQuery(k, 0, null));
-			}						
-//			search.addAggregation(byTag);		
+				// filter 0s
+				ESQueryBuilder no0 = ESQueryBuilders.rangeQuery(k, 0, null, false);
+				Aggregation noZeroMyCount = Aggregations.filtered("no0_"+k, no0, myCount);
+				leaf.subAggregation(noZeroMyCount);
+			}		
 			aggs.add(byTag);
 		} // ./breakdown
 		
-		// add a total count as well for each breakdown
-		for(String k : allOutputs) {
-			Aggregation myCount = new Breakdown(k).getAggregation();
-			aggs.add(myCount);
+		// add a total count as well for each top-level breakdown
+		for(Aggregation agg : aggs.toArray(new Aggregation[0])) {
+			String field = agg.getField();
+			if (field != null) {
+				Aggregation myCount = Aggregations.stats(field, field);
+				aggs.add(myCount);
+			}
 		}
+		
 		return aggs;
 	}
 
