@@ -209,7 +209,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		Map<String, Object> vars = new ArrayMap();
 		// core fields
 		vars.put(DataLogFields.d.name, 	dataspace.name);		
-		vars.put(LgServlet.GBY.name, 	event.groupById); // group it?
+		vars.put("gby"/*LgServlet.GBY.name*/, 	event.groupById); // group it?
 		vars.put(DataLogFields.t.name, 	event.getEventType0()); // type
 		vars.put("count", event.count);
 		vars.put("time", event.getTime());

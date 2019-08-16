@@ -19,6 +19,7 @@ import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
@@ -111,8 +112,7 @@ public class ESDataLogSearchBuilder {
 	{
 		List<Aggregation> aggs = new ArrayList();
 		for(final String bd : breakdown) {
-			if (bd==null) {
-				Log.w(LOGTAG, "null breakdown?! in "+breakdown);
+			if (Utils.isBlank(bd)) {				
 				continue;
 			}
 			Aggregation agg = prepareSearch3_agg4breakdown(bd);
@@ -120,17 +120,8 @@ public class ESDataLogSearchBuilder {
 		} // ./breakdown
 		
 		// add a total count as well for each top-level terms breakdown
-		ArrayList noDupes = new ArrayList();
-		for(Aggregation agg : aggs.toArray(new Aggregation[0])) {
-			String field = agg.getField();
-			if (field == null) continue;
-			if ( ! "terms".equals(agg.getType())) continue;
-			// Avoid dupes. e.g. if both evt/host evt/user were requested, then evt will come up twice
-			if (noDupes.contains(field)) continue;
-			Aggregation fCountStats = Aggregations.stats(field, ESStorage.count);
-			aggs.add(fCountStats);			
-			noDupes.add(field);
-		}
+		Aggregation fCountStats = Aggregations.stats("all", ESStorage.count);
+		aggs.add(fCountStats);			
 		
 		return aggs;
 	}
