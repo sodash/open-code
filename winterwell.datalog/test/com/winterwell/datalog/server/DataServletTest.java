@@ -21,7 +21,7 @@ public class DataServletTest {
 
 	private static final CharSequence DATASPACE = new Dataspace("testspace");
 	private static DataLogServer server;
-	private String ENDPOINT;
+	private static String ENDPOINT;
 
 	public void initDataTest() {
 		if (ENDPOINT!=null) return;
