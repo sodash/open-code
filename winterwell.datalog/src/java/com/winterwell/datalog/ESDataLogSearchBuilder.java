@@ -16,14 +16,17 @@ import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.nlp.query.SearchQuery;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+import com.winterwell.web.WebEx;
 import com.winterwell.web.app.AppUtils;
 
 /**
@@ -33,6 +36,13 @@ import com.winterwell.web.app.AppUtils;
  */
 public class ESDataLogSearchBuilder {
 	
+	private static final String no0_ = "no0_";
+	/**
+	 * maximum number of ops you can request in one breakdown.
+	 * Normally just 1!
+	 */
+	private static final int MAX_OPS = 10;
+	private static final String LOGTAG = "ESDataLogSearchBuilder";
 	final Dataspace dataspace;
 	int numResults;
 	int numExamples; 
@@ -102,7 +112,7 @@ public class ESDataLogSearchBuilder {
 		List<Aggregation> aggs = new ArrayList();
 		for(final String bd : breakdown) {
 			if (bd==null) {
-				Log.w("DataLog.ES", "null breakdown?! in "+breakdown);
+				Log.w(LOGTAG, "null breakdown?! in "+breakdown);
 				continue;
 			}
 			Aggregation agg = prepareSearch3_agg4breakdown(bd);
@@ -140,7 +150,11 @@ public class ESDataLogSearchBuilder {
 		Map<String,String> reportSpec = null;
 		if (breakdown_output.length > 1) {
 			String json = bd.substring(bd.indexOf("{"), bd.length());
-			reportSpec = (Map) JSON.parse(json);
+			try {
+				reportSpec = (Map) JSON.parse(json);
+			} catch(Exception pex) {
+				throw new WebEx.BadParameterException("breakdown", "invalid json: "+json, pex);
+			}
 		}
 		// loop over the f1/f2 part, building a chain of nested aggregations
 		Aggregation root = null;
@@ -174,17 +188,20 @@ public class ESDataLogSearchBuilder {
 		}
 		
 		// e.g. {"count": "avg"}
-		for(String k : reportSpec.keySet()) {
+		String[] rkeys = reportSpec.keySet().toArray(StrUtils.ARRAY);
+		for(int i=0; i<rkeys.length; i++) {
+			String k = rkeys[i];
 			// Note k should be a numeric field, e.g. count -- not a keyword field!
 			Class klass = DataLogEvent.COMMON_PROPS.get(k);
 			if ( ! ReflectionUtils.isa(klass, Number.class)) {
-				Log.w("ESDataLogSearch", "Possible bug! numeric op on non-numeric field "+k+" in "+bd);
+				Log.w(LOGTAG, "Possible bug! numeric op on non-numeric field "+k+" in "+bd);
 			}
 				
 			Aggregation myCount = Aggregations.stats(k, k);
 			// filter 0s??
 			ESQueryBuilder no0 = ESQueryBuilders.rangeQuery(k, 0, null, false);
-			Aggregation noZeroMyCount = Aggregations.filtered("no0_"+k, no0, myCount);
+			// NB: we could have multiple ops, so number the keys
+			Aggregation noZeroMyCount = Aggregations.filtered(no0_+i, no0, myCount);
 			leaf.subAggregation(noZeroMyCount);
 		}		
 		return root;
@@ -207,6 +224,40 @@ public class ESDataLogSearchBuilder {
 	
 	public void setInterval(Dt interval) {
 		this.interval = interval;
+	}
+
+	/**
+	 * Remove the no0_ filtering wrappers 'cos they're an annoyance at the client level.
+	 * @param aggregations 
+	 * @return cleaned aggregations
+	 */
+	public Map cleanJson(Map aggregations) {
+		Printer.out(JSON.toString(aggregations));
+		Map aggs2 = Containers.applyToJsonObject(aggregations, (old, path) -> {
+			if ( ! (old instanceof Map)) return old;
+			Map newMap = null;
+			for(int i=0; i<MAX_OPS; i++) {
+				Map<String,?> wrapped = (Map) ((Map) old).get(no0_+i);
+				// no no0s to remove?
+				if (wrapped==null) break;
+				// copy and edit
+				if (newMap==null) newMap = new ArrayMap(old);
+				newMap.remove(no0_+i);
+				for(String k : wrapped.keySet()) {
+					Object v = wrapped.get(k);
+					if (v instanceof Map) {
+						// its some aggregation results :)
+						Object oldk = newMap.put(k, v);
+						if (oldk!=null) {
+							Log.e(LOGTAG, "duplicate aggregation results for "+k+"?! "+newMap);
+						}
+					}
+				}
+			}
+			Object v = newMap==null? old : newMap;
+			return v;
+		});
+		return aggs2;
 	}
 	
 }

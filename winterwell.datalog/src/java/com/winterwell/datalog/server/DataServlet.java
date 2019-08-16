@@ -123,6 +123,8 @@ public class DataServlet implements IServlet {
 			Log.d(LOGTAG, "No aggregations?! "+state+" "+sr);
 			aggregations = new ArrayMap();
 		}
+		// strip out no0 filter wrappers
+		aggregations = essb.cleanJson(aggregations);
 		// also send eg data
 		aggregations.put("examples", sr.getHits());
 		

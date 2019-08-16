@@ -365,7 +365,8 @@ public final class Containers  {
 	/**
 	 * Walk the tree, creating a new tree
 	 * 
-	 * @param fn Apply this to each node (leaf and branch). If it returns null, remove the node
+	 * @param fn (old-value, path) -> new-value. Apply this to each node (leaf and branch). If it returns null, remove the node.
+	 * 
 	 */
 	public static Map<String, Object> applyToJsonObject(
 			Map<String, Object> jsonObject, BiFunction<Object, List<String>, Object> fn4valuePath) {
@@ -1392,7 +1393,13 @@ public final class Containers  {
 		return new IterableWrapper(iterator);
 	}
 	
+	/**
+	 * 
+	 * @param list Can be null (returns null)
+	 * @return last element or null if empty
+	 */
 	public static <X> X last(List<X> list) {
+		if (list==null || list.isEmpty()) return null;
 		return list.get(list.size() - 1);
 	}
 

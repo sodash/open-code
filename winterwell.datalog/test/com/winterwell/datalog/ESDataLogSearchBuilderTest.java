@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.junit.Test;
 
 import com.winterwell.datalog.server.DataServletTest;
@@ -28,6 +29,28 @@ import com.winterwell.utils.io.SysOutCollectorStream;
  */
 public class ESDataLogSearchBuilderTest {
 
+	@Test
+	public void testClean() {
+		{
+			String json = "{'buckets':[{'no0_0':{'doc_count':20.0,'count':{'min':1.0,'avg':1.0,'max':1.0,'count':20.0,'sum':20.0}},'doc_count':20.0,'key':'unittest'}]}".replace('\'', '"');
+			ESHttpClient esc = new ESHttpClient(new ESConfig());
+			ESDataLogSearchBuilder esdsb = new ESDataLogSearchBuilder(esc, new Dataspace("test"));
+			Map aggregations = (Map) JSON.parse(json);
+			Map clean = esdsb.cleanJson(aggregations);
+			String cj = JSON.toString(clean);
+			assert ! cj.contains("no0") : cj;
+		}
+		{
+			String json = "{'evt':{'min':1.0,'avg':1.0,'max':1.0,'count':20.0,'sum':20.0},'by_evt':{'doc_count_error_upper_bound':0.0,'sum_other_doc_count':0.0,'buckets':[{'no0_0':{'doc_count':20.0,'count':{'min':1.0,'avg':1.0,'max':1.0,'count':20.0,'sum':20.0}},'doc_count':20.0,'key':'unittest'}]}}".replace('\'', '"');
+			ESHttpClient esc = new ESHttpClient(new ESConfig());
+			ESDataLogSearchBuilder esdsb = new ESDataLogSearchBuilder(esc, new Dataspace("test"));
+			Map aggregations = (Map) JSON.parse(json);
+			Map clean = esdsb.cleanJson(aggregations);
+			String cj = JSON.toString(clean);
+			assert ! cj.contains("no0") : cj;
+		}
+	}
+	
 	@Test
 	public void testSetBreakdownSimple() {
 		ESHttpClient esc = new ESHttpClient(new ESConfig());

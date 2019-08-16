@@ -55,8 +55,24 @@ public class DataServletTest {
 				"breakdown", "evt/time,evt,user"
 				));
 		JSend resp = JSend.parse(json);
-		Map data = resp.getDataMap();
+		String data = resp.getData().string();
 		Printer.out(data);
+		assert ! data.contains("no0");
+	}
+	
+	@Test
+	public void testOps() {
+		initDataTest();
+		FakeBrowser fb = fb();		
+		String json = fb.getPage(ENDPOINT+"/data", new ArrayMap(
+				"name","test-2",
+				"dataspace", DATASPACE,
+				"breakdown", "evt {\"count\": \"sum\"}"
+				));
+		JSend resp = JSend.parse(json);
+		String data = resp.getData().string();
+		Printer.out(data);
+		assert ! data.contains("no0");
 	}
 	
 	@AfterClass

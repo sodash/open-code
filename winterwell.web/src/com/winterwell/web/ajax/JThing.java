@@ -65,6 +65,11 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 		this.json = json;
 	}
 
+	/**
+	 * @return The JSON string.
+	 * <br>
+	 * NB: This is NOT the same as {@link #toString()}, which returns a shorter snippet.
+	 */
 	public String string() {
 		if (json==null && map!=null) {
 			Gson gson = gson();
