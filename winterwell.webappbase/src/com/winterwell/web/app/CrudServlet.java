@@ -521,9 +521,9 @@ public abstract class CrudServlet<T> implements IServlet {
 
 		// If user requests ALL_BAR_TRASH, they want to see draft versions of items which have been edited
 		// So when de-duping, give priority to entries from .draft indices where the object is status: DRAFT
-		List hits2 = new ArrayList<Map>();
-		
+		List hits2 = new ArrayList<Map>();		
 		if (status == KStatus.ALL_BAR_TRASH) {
+			// de-dupe, preferring draft
 			List<Object> idOrder = new ArrayList<Object>(); // original ordering
 			Map<Object, Object> things = new HashMap<Object, Object>(); // to hold "expected" version of each hit
 			
@@ -567,7 +567,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 			
 		long total = sr.getTotal();
-		String json = Dep.get(Gson.class).toJson(
+		String json = gson().toJson(
 				new ArrayMap(
 					"hits", hits2, 
 					"total", total
@@ -575,6 +575,16 @@ public abstract class CrudServlet<T> implements IServlet {
 		JsonResponse output = new JsonResponse(state).setCargoJson(json);
 		WebUtils2.sendJson(output, state);		
 	}
+
+
+	/**
+	 * convenience
+	 * @return
+	 */
+	protected Gson gson() {
+		return Dep.get(Gson.class);
+	}
+
 
 
 	/**
