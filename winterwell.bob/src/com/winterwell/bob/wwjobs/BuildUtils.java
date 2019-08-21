@@ -27,6 +27,7 @@ public class BuildUtils extends BuildWinterwellProject {
 		}
 		mdt.addDependency("com.thoughtworks.xstream","xstream", "1.4.10");
 		mdt.addDependency("junit","junit","4.12");
+		mdt.addDependency("dnsjava","dnsjava","2.1.9");
 //		mdt.addDependency("com.jolbox","bonecp","0.8.0.RELEASE"); // NB: includes Guava ans SLF4J
 		deps.add(mdt);		
 		
