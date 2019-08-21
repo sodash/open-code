@@ -10,6 +10,23 @@ import org.junit.Test;
  */
 public class SearchQueryTest {
 
+	
+	@Test
+	public void testCaseSensitive() {		
+		SearchQuery sq = new SearchQuery("Hello").setCanonicaliseText(false);
+		assert ! sq.matches("hello");
+		assert sq.matches("Hello");	
+		assert ! sq.matches("héllo");				
+	}
+	
+	@Test
+	public void testCaseInSensitive() {		
+		SearchQuery sq = new SearchQuery("Hello").setCanonicaliseText(true);
+		assert sq.matches("hello");
+		assert sq.matches("Hello");	
+		assert sq.matches("héllo");				
+	}
+	
 	@Test
 	public void testBOASBugNov2018() {
 		String q = "evt:donation vert:Q7X1VA5c bid:unset";

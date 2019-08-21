@@ -1171,7 +1171,6 @@ public class StrUtils {
 	 *         whitespace & trim, normalised (no accents if recognised), and all punctuation
 	 *         is converted into spaces. Never null.
 	 * 
-	 *         TODO should this go further & strip all " ", "-" and "_" chars??
 	 * @testedby {@link StrUtilsTest#testToCanonical()}
 	 */
 	public static String toCanonical(String string) {

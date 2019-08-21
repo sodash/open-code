@@ -141,7 +141,6 @@ public class SearchQuery implements Serializable, IHasJson {
 	 * 
 	 * @param raw
 	 * @param services
-	 * @param noNormalisation Normally false. If true, preserve case and accents (ie true => do not lowercase or normalise unicode)
 	 */
 	public SearchQuery(String raw) 
 	{
@@ -321,11 +320,14 @@ public class SearchQuery implements Serializable, IHasJson {
 	 * 
 	 * @param text Case is ignored
 	 * @return true if this search term (ignoring service, language and
-	 *         location) matches this text. 
+	 *         location) matches this text. I.e. the search term is contained in the text. 
 	 *         
 	 * @testedby {@link SearchSpecTest#testMatches()}
 	 */
 	public boolean matches(String text) {
+		if (canonicalise) {
+			text = StrUtils.toCanonical(text.toLowerCase());
+		}
 		getParseTree();
 		// TODO should we remove punctuation here? But what about smilies?
 		boolean itMatches = matches2(text, parseTree);
@@ -433,6 +435,8 @@ public class SearchQuery implements Serializable, IHasJson {
 	}
 
 	Collection<String> _stopwords = new HashSet<>();
+
+	private boolean canonicalise;
 	
 	private Collection<String> getStopWords() {
 		// TODO Auto-generated method stub
@@ -449,6 +453,9 @@ public class SearchQuery implements Serializable, IHasJson {
 	List parse() {
 		if (parseTree!=null) return parseTree;
 		String searchTerm = raw;
+		if (canonicalise) {
+			searchTerm = StrUtils.toCanonical(searchTerm);
+		}
 		List output = new ArrayList();
 		output.add(KEYWORD_AND);
 		ArrayList<List> stack = new ArrayList();
@@ -801,5 +808,11 @@ public class SearchQuery implements Serializable, IHasJson {
 		// What to return if prop:value is present but its complex??
 		return prop==null? null : (String) prop.get(propName);
 	}
+
+	public SearchQuery setCanonicaliseText(boolean b) {
+		parseTree = null;
+		canonicalise = b;
+		return this;
+	}	
 
 }
