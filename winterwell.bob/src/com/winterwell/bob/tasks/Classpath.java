@@ -43,6 +43,7 @@ public class Classpath {
 	}
 
 	public static Classpath getSystemClasspath() {
+		// Or use ClassLoader getResources META-INF and strip from that??
 		// see https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
 		String classpath = System.getProperty("java.class.path");		
 		Classpath cp = new Classpath(classpath);

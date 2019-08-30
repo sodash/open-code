@@ -17,6 +17,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import java.util.jar.Manifest;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.io.SysOutCollectorStream;
 import com.winterwell.utils.time.Time;
 
 /**
@@ -899,6 +901,22 @@ public class ReflectionUtils {
 		} catch(Throwable ex) {
 			return -1;
 		}
+	}
+
+	public static void TODOgetClassPath() throws IOException {
+//		or see Classpath in Bob
+//		
+//		ClassLoader cl = ClassLoader.getSystemClassLoader();
+//		URL r = cl.getResource(ReflectionUtils.class.getCanonicalName());
+//		
+//		String[] bits = ("META-INF ReflectionUtils ReflectionUtils.class com.winterwell.utils.ReflectionUtils.class "+ReflectionUtils.class.getCanonicalName()).split(" ");
+//		for(String s : bits) {
+//			Printer.out("\n"+s);
+//			Enumeration<URL> rs = cl.getResources(s);		
+//			while(rs.hasMoreElements()) {
+//				Printer.out(rs.nextElement());
+//			}
+//		}
 	}
 
 }

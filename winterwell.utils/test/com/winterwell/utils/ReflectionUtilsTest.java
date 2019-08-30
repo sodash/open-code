@@ -1,10 +1,16 @@
 package com.winterwell.utils;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 import org.junit.Test;
 
 public class ReflectionUtilsTest {
+	
+	@Test
+	public void testGetClassInfo() throws IOException {
+		ReflectionUtils.TODOgetClassPath();
+	}
 	
 	@Test
 	public void testSetPrivateField() {
