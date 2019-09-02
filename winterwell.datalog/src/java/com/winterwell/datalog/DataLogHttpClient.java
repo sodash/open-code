@@ -37,6 +37,9 @@ public class DataLogHttpClient {
 	
 	private List<AuthToken> auth;
 
+	/**
+	 * TODO this is a limited hack which only supports one top-level summary  
+	 */
 	private transient Map<String,Double> overview;
 
 	private List<Map> examples;
@@ -128,6 +131,15 @@ public class DataLogHttpClient {
 	}
 		
 
+	/**
+	 * 
+	 * TODO refactor for greater flex
+	 * 
+	 * Side effects: set overview (if breakdown requested it) and examples
+	 * @param q
+	 * @param breakdown
+	 * @return {key e.g. "oxfam": value e.g. 100}
+	 */
 	public Map<String, Double> getBreakdown(SearchQuery q, Breakdown breakdown) {
 		// Call DataServlet
 		FakeBrowser fb = new FakeBrowser();
@@ -154,7 +166,13 @@ public class DataLogHttpClient {
 			throw new FailureException(jobj.getMessage());
 		}		
 		
-		List<Map> buckets = Containers.asList((Object)SimpleJson.get(jobj.getDataMap(), "by_"+breakdown.by, "buckets"));
+		// e.g. by_cid buckets		
+		List<Map> buckets = new ArrayList();
+		Map jobjMap = jobj.getDataMap();
+		for(String byi : breakdown.by) {
+			List byi_buckets = Containers.asList((Object)SimpleJson.get(jobjMap, "by_"+byi, "buckets"));
+			if (byi_buckets != null) buckets.addAll(byi_buckets);
+		}		
 		Map<String, Double> byX = new ArrayMap();
 		// convert it		
 		for (Map bucket : buckets) {
@@ -162,11 +180,10 @@ public class DataLogHttpClient {
 			Object ov = SimpleJson.get(bucket, breakdown.field, breakdown.op);
 			double v = MathUtils.toNum(ov);
 			byX.put(k, v);
-		}
-		
+		}		
 		// stash extra info in fields
-		overview = SimpleJson.get(jobj.getDataMap(), breakdown.field);
-		examples = Containers.asList((Object)SimpleJson.get(jobj.getDataMap(), "examples"));
+		overview = SimpleJson.get(jobjMap, breakdown.field); // present if breakdown included by=""
+		examples = Containers.asList((Object)SimpleJson.get(jobjMap, "examples"));
 		
 		return byX;
 	}
