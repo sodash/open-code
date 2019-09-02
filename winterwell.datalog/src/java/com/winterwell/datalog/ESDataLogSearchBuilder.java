@@ -153,6 +153,10 @@ public class ESDataLogSearchBuilder {
 		Aggregation previousLeaf = null;
 		String s_bucketBy = StrUtils.join(bucketBy, '_');
 		for(String field : bucketBy) {
+			if (Utils.isBlank(field)) {
+				// "" -- use-case: you get this with top-level "sum all"
+				continue;
+			}
 			if (field.equals("time")) {
 				leaf = Aggregations.dateHistogram("by_"+s_bucketBy, "time", interval);
 			} else {
@@ -182,6 +186,10 @@ public class ESDataLogSearchBuilder {
 		String[] rkeys = reportSpec.keySet().toArray(StrUtils.ARRAY);
 		for(int i=0; i<rkeys.length; i++) {
 			String k = rkeys[i];
+			// safety check: k is a field, not an op
+			if (k.equals("sum") || k.equals("avg")) {
+				throw new IllegalArgumentException("Bad breakdown {field:op} parameter: "+bd);
+			}
 			// Note k should be a numeric field, e.g. count -- not a keyword field!
 			Class klass = DataLogEvent.COMMON_PROPS.get(k);
 			if ( ! ReflectionUtils.isa(klass, Number.class)) {
@@ -193,7 +201,15 @@ public class ESDataLogSearchBuilder {
 			ESQueryBuilder no0 = ESQueryBuilders.rangeQuery(k, 0, null, false);
 			// NB: we could have multiple ops, so number the keys
 			Aggregation noZeroMyCount = Aggregations.filtered(no0_+i, no0, myCount);
-			leaf.subAggregation(noZeroMyCount);
+			if (leaf != null) {
+				leaf.subAggregation(noZeroMyCount);
+				assert root != null;
+				continue;
+			}
+			// this is a top-level sum
+			assert root == null;
+			leaf = noZeroMyCount;
+			root = leaf;			
 		}		
 		return root;
 	}
@@ -222,33 +238,37 @@ public class ESDataLogSearchBuilder {
 	 * @param aggregations 
 	 * @return cleaned aggregations
 	 */
-	public Map cleanJson(Map aggregations) {
+	public Map cleanJson(Map<String,Object> aggregations) {
 		Printer.out(JSON.toString(aggregations));
-		Map aggs2 = Containers.applyToJsonObject(aggregations, (old, path) -> {
-			if ( ! (old instanceof Map)) return old;
-			Map newMap = null;
-			for(int i=0; i<MAX_OPS; i++) {
-				Map<String,?> wrapped = (Map) ((Map) old).get(no0_+i);
-				// no no0s to remove?
-				if (wrapped==null) break;
-				// copy and edit
-				if (newMap==null) newMap = new ArrayMap(old);
-				newMap.remove(no0_+i);
-				for(String k : wrapped.keySet()) {
-					Object v = wrapped.get(k);
-					if (v instanceof Map) {
-						// its some aggregation results :)
-						Object oldk = newMap.put(k, v);
-						if (oldk!=null) {
-							Log.e(LOGTAG, "duplicate aggregation results for "+k+"?! "+newMap);
-						}
+		Map aggs2 = Containers.applyToJsonObject(aggregations, ESDataLogSearchBuilder::cleanJson2);
+		// also top-level
+		Map aggs3 = (Map) cleanJson2(aggs2, null);
+		return aggs3;
+	}
+	
+	static Object cleanJson2(Object old, List<String> __path) {
+		if ( ! (old instanceof Map)) return old;
+		Map newMap = null;
+		for(int i=0; i<MAX_OPS; i++) {
+			Map<String,?> wrapped = (Map) ((Map) old).get(no0_+i);
+			// no no0s to remove?
+			if (wrapped==null) break;
+			// copy and edit
+			if (newMap==null) newMap = new ArrayMap(old);
+			newMap.remove(no0_+i);
+			for(String k : wrapped.keySet()) {
+				Object v = wrapped.get(k);
+				if (v instanceof Map) {
+					// its some aggregation results :)
+					Object oldk = newMap.put(k, v);
+					if (oldk!=null) {
+						Log.e(LOGTAG, "duplicate aggregation results for "+k+"?! "+newMap);
 					}
 				}
 			}
-			Object v = newMap==null? old : newMap;
-			return v;
-		});
-		return aggs2;
+		}
+		Object v = newMap==null? old : newMap;
+		return v;		
 	}
 	
 }

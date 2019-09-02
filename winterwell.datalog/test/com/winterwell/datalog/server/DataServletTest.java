@@ -75,6 +75,24 @@ public class DataServletTest {
 		assert ! data.contains("no0");
 	}
 	
+	@Test
+	public void testOpsWithoutBreakdown() {
+		initDataTest();
+		FakeBrowser fb = fb();		
+		String json = fb.getPage(ENDPOINT+"/data", new ArrayMap(
+				"name","test-3",
+				"dataspace", DATASPACE,
+				"breakdown", "{\"dntn\": \"sum\"}"
+				));
+		JSend resp = JSend.parse(json);
+		String data = resp.getData().string();
+		Printer.out(data);
+		assert ! data.contains("no0");
+		Map map = resp.getDataMap();
+		Map stats = (Map) map.get("dntn");
+		assert stats != null;
+	}
+	
 	@AfterClass
 	public static void close() {
 		server.stop();
