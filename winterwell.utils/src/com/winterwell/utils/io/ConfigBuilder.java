@@ -163,6 +163,16 @@ public class ConfigBuilder {
 			}
 			throw new IllegalArgumentException("Unrecognised type: " + type+" Odd? "+recognisedTypes.contains(type));
 		} catch (Exception e) {
+			// HACK: allow a few falsy values for null
+			try {
+				boolean y = Utils.yes(string);
+				if ( ! y) {
+					Log.i(LOGTAG, "Handling "+type.getSimpleName()+" "+string+" as null");
+					return null;
+				}
+			} catch(Exception ex) {
+				// not a truthy/falsy value then. oh well
+			}
 			throw new ParseException(e.getMessage(), 1);
 		}
 	}
