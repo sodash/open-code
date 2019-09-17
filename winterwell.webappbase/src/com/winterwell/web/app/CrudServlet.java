@@ -236,7 +236,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param state
 	 * @return thing or null
 	 */
-	protected JThing<T> getThingFromDB(WebRequest state) {		
+	protected JThing<T> getThingFromDB(WebRequest state) {
 		ESPath path = getPath(state);
 		KStatus status = state.get(AppUtils.STATUS);
 		// fetch from DB
@@ -251,16 +251,26 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (status == KStatus.DRAFT) {			
 			// Try for the published version
 			// NB: all published should be in draft, so this should be redundant
+			// ?? maybe refactor to use a getThinfFromDB2(state, status) method? But beware CharityServlet has overriden this
 			WebRequest state2 = new WebRequest(state.request, state.response);
 			state2.put(AppUtils.STATUS, KStatus.PUBLISHED);
 			JThing<T> pubThing = getThingFromDB(state2);
 			return pubThing;
 		}
+		// Was status unset? Maybe the published version got archived?
+		if (status == null) {			
+			// Try for an archived version
+			WebRequest state2 = new WebRequest(state.request, state.response);
+			state2.put(AppUtils.STATUS, KStatus.ARCHIVED);
+			JThing<T> pubThing = getThingFromDB(state2);
+			return pubThing;
+		}		
 		return null;
 	}
 
 	/**
-	 * Use getId() to make an ESPath 
+	 * Use getId() to make an ESPath.
+	 * NB: the path depends on status - defaulting to published 
 	 * @param state
 	 * @return
 	 */
@@ -272,7 +282,8 @@ public abstract class CrudServlet<T> implements IServlet {
 					state.getRequestUrl(),
 					"Bad input: 'list' was interpreted as an ID -- use /_list.json to retrieve a list.");
 		}
-		ESPath path = esRouter.getPath(dataspace,type, id, state.get(AppUtils.STATUS, KStatus.PUBLISHED));
+		KStatus status = state.get(AppUtils.STATUS, KStatus.PUBLISHED);
+		ESPath path = esRouter.getPath(dataspace,type, id, status);
 		return path;
 	}
 
