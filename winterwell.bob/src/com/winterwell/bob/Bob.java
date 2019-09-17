@@ -258,7 +258,7 @@ public class Bob {
 			String json = JSON.toString(time4task);
 			FileUtils.write(file, json);
 		} catch(Throwable ex) {
-			Log.d(LOGTAG, ex);
+			Log.d(LOGTAG, "Warning: saveTaskHistory failed: "+ex);
 		}		
 	}
 	
