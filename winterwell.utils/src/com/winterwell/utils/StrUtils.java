@@ -1679,6 +1679,7 @@ public class StrUtils {
 	/**
 	 * Convenience for null-or-toString(). You may wish to use via <br><code>import static com.winterwell.utils.StrUtils.str;</code>
 	 * 
+	 * This is a null-safe op. If you want a nice flexible toString -- Use {@link Printer#str(Object)}
 	 * @param whatever
 	 * @return whatever.toString() or null
 	 */

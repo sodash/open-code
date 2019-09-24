@@ -422,6 +422,10 @@ public class Printer {
 		return toString(x);
 	}
 	
+	/**
+	 * @param x Anything, including null.
+	 * @return a sensible String for x, "" if x is null.
+	 */
 	public static String toString(Object x) {
 		if (x == null)
 			return "";
