@@ -455,15 +455,22 @@ public abstract class CrudServlet<T> implements IServlet {
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
 		/// which index? draft (which should include copies of published) by default
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
-		if (status!=null && status != KStatus.ALL_BAR_TRASH) {
-			s.setIndex(
-					esRouter.getPath(dataspace, type, null, status).index()
-					);
-		} else {
+		switch(status) {
+		case ALL_BAR_TRASH:
 			s.setIndices(
 					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
 					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index()
 				);
+			break;
+		case PUB_OR_ARC:
+			s.setIndices(
+					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
+					esRouter.getPath(dataspace, type, null, KStatus.ARCHIVED).index()
+				);
+			break;
+		default:
+			// normal
+			s.setIndex(esRouter.getPath(dataspace, type, null, status).index());
 		}
 		
 		// query

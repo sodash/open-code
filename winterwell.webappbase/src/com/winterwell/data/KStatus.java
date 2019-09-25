@@ -41,7 +41,10 @@ public enum KStatus {
 	TRASH,
 
 	/** special value for use only in url parameters */
-	ALL_BAR_TRASH;
+	ALL_BAR_TRASH,
+
+	/** Special value for use only in url parameters. This covers the case that archived stuff should still show in some lists. */
+	PUB_OR_ARC;
 
 	/**
 	 * We only have three main ES indices, published and draft (which holds all the non-published)
