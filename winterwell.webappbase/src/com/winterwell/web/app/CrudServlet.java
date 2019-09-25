@@ -459,7 +459,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		case ALL_BAR_TRASH:
 			s.setIndices(
 					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
-					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index()
+					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index(),
+					esRouter.getPath(dataspace, type, null, KStatus.ARCHIVED).index()
 				);
 			break;
 		case PUB_OR_ARC:

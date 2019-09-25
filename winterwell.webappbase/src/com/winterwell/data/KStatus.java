@@ -33,7 +33,7 @@ public enum KStatus {
 	PUBLISHED,
 
 	/**
-	 * Still in the back catalogue. @deprecated Not currently used
+	 * Still in the back catalogue.
 	 *  */
 	ARCHIVED,
 
