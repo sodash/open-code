@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
 import com.winterwell.utils.io.FileUtils;
 
@@ -11,17 +12,13 @@ public class BuildWWAppBase extends BuildWinterwellProject {
 
 	@Override
 	public List<BuildTask> getDependencies() {
-		return super.getDependencies();
-//		return Arrays.asList(
-//				new BuildUtils(),
-//				new BuildBob().setMakeFatJar(false),
-//				new BuildWeb(),
-//				new BuildFlexiGson(),
-////				new BuildYouAgainJavaClient()
-//				new WWDependencyTask("youagain-java-client", "com.winterwell.youagain.client.BuildYouAgainJavaClient"),
-////				new BuildESJavaClient(),
-//				new WWDependencyTask("elasticsearch-java-client", "com.winterwell.es.BuildESJavaClient")
-//				);
+		List<BuildTask> deps = super.getDependencies();
+		// Lombok
+		MavenDependencyTask mdt = new MavenDependencyTask();
+		mdt.addDependency("org.projectlombok:lombok:1.18.10");
+		deps.add(mdt);
+		
+		return deps;
 	}
 	
 	public BuildWWAppBase() {
