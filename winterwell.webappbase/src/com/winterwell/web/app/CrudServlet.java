@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jetty.util.ajax.JSON;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
 import com.winterwell.data.AThing;
@@ -24,9 +22,11 @@ import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.KRefresh;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
+import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.gson.Gson;
+import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
@@ -36,7 +36,6 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
@@ -505,8 +504,10 @@ public abstract class CrudServlet<T> implements IServlet {
 				qb = ESQueryBuilders.boolQuery().mustNot(setFilter);
 			}	
 			if ( ! Utils.isBlank(q) && ! "ALL".equals(q)) {
-				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
-				qb = ESQueryBuilders.must(qb, qsq);
+				SearchQuery sq = new SearchQuery(q);
+				BoolQueryBuilder esq = AppUtils.makeESFilterFromSearchQuery(sq, null, null);
+//				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
+				qb = ESQueryBuilders.must(qb, esq);
 			}
 		}
 		// NB: exq can be null for ALL

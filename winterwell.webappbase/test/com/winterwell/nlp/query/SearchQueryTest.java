@@ -10,6 +10,14 @@ import org.junit.Test;
  */
 public class SearchQueryTest {
 
+
+	@Test
+	public void testCrudListWIthId() {		
+		SearchQuery sq = new SearchQuery("eventId:5eBoOIPa").setCanonicaliseText(false);
+		System.out.println(sq.getParseTree());	
+		assert sq.getParseTree().toString().equals(
+				"[and, {eventId=5eBoOIPa}]");
+	}
 	
 	@Test
 	public void testCaseSensitive() {		
@@ -32,6 +40,8 @@ public class SearchQueryTest {
 		String q = "evt:donation vert:Q7X1VA5c bid:unset";
 		SearchQuery sq = new SearchQuery(q);
 		System.out.println(sq);
+		System.out.println(sq.getParseTree());
+		assert sq.getParseTree().toString().equals("[and, {evt=donation}, {vert=Q7X1VA5c}, {bid=unset}]");
 	}
 	
 	@Test

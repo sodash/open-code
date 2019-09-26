@@ -1099,6 +1099,9 @@ public class SqlUtils {
 		if (v==null) return "null";
 		if (v instanceof Number) return v.toString();
 		if (v.getClass().isEnum()) return SqlUtils.sqlEncode(v.toString());
+		// Not a String / number? :( Hopefully a boolean or something
+		// TODO (sep 2019) block this (but old code risk)
+		Log.w(LOGTAG, "sqlEncode non-String "+v.getClass()+" = "+v);
 		return v.toString();		
 	}
 

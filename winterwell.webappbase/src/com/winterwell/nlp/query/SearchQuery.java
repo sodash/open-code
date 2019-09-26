@@ -481,7 +481,7 @@ public class SearchQuery implements Serializable, IHasJson {
 		}
 	}
 	
-	static Pattern kv = Pattern.compile("([a-z]+):(.+)");
+	static Pattern kv = Pattern.compile("([a-zA-Z]+):(.+)");
 
 	/**
 	 * Modify output - Convert "k:v" into {k:v}. Filters nulls
