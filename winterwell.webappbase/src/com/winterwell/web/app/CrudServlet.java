@@ -378,8 +378,8 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @return
 	 */
 	protected JThing<T> doPublish2(CharSequence dataspace, JThing<T> _jthing, KRefresh forceRefresh, boolean deleteDraft, String id) {
-		ESPath draftPath = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
-		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
+		ESPath draftPath = esRouter.getPath(dataspace, type, id, KStatus.DRAFT);
+		ESPath publishPath = esRouter.getPath(dataspace, type, id, KStatus.PUBLISHED);
 		// id must match
 		if (_jthing.java() instanceof AThing) {
 			String thingId = ((AThing) _jthing.java()).getId();

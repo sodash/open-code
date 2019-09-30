@@ -75,7 +75,7 @@ public class AppUtils {
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
 	
 	private static final List<String> LOCAL_MACHINES = Arrays.asList(
-			"stross", "aardvark", "burgess"
+			"stross", "aardvark", "burgess", "kornbluth"
 			);
 	private static final List<String> TEST_MACHINES = Arrays.asList(
 			"hugh", "mail.soda.sh"
