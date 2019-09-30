@@ -898,7 +898,7 @@ public class AppUtils {
 		KStatus ks = (KStatus) status;
 		if (ks==null) ks = KStatus.PUBLISHED;
 		switch(ks) {
-		case PUBLISHED:
+		case PUBLISHED: case ARCHIVED:
 			break;
 		case DRAFT: case PENDING: case REQUEST_PUBLISH: case MODIFIED:
 			index += ".draft";
@@ -906,6 +906,12 @@ public class AppUtils {
 		case TRASH:
 			index += ".trash";
 			break;
+		case PUB_OR_ARC:
+		case ALL_BAR_TRASH:
+			String i1 = index;
+			String i2 = index+".draft";
+			ESPath esp = new ESPath(new String[] {i1, i2}, stype, id);
+			return esp;
 		default:
 			throw new IllegalArgumentException(type+" "+status);
 		}
