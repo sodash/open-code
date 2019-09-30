@@ -66,6 +66,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 	
 	public static LogFile logFile;
+	public static LogFile auditlogFile;
 
 	protected static boolean initFlag;
 
@@ -121,6 +122,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		}
 		File logLocation = new File((useSubDir ? "logs/" : "") + getAppName() + ".log");  
 		logFile = new LogFile(logLocation).setLogRotation(TUnit.DAY.dt, 14);
+		// also add a never-rotates! audit log for important audit trail info only (ie stuff tagged "audit"		
+		File auditlogLocation = new File((useSubDir ? "logs/" : "") + getAppName() + ".audit");
+		auditlogFile = new LogFile(auditlogLocation).setFilter(r -> "audit".equals(r.tag));
 		
 		try {
 			assert "foo".contains("bar");

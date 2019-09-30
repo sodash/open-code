@@ -113,6 +113,8 @@ public class LogFile implements ILogListener, Closeable {
 			try {
 				if ( ! filter.accept(report)) {
 					return; // skip it
+				} else {
+					assert true; // keep it (this line is for breakpointing)
 				}
 			} catch(Throwable ex) {
 				// bugger!
