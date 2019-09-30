@@ -541,11 +541,13 @@ public class SqlUtils {
 		if (vc == type)
 			return val;
 		// numbers
-		if (vc == BigInteger.class) {
-			if (type == Long.class)
-				return ((BigInteger) val).longValue();
-			if (type == Double.class)
-				return ((BigInteger) val).doubleValue();
+		if (ReflectionUtils.isaNumber(vc)) {
+			if (type == Long.class || type==long.class)
+				return ((Number) val).longValue();
+			if (type == Double.class || type==double.class)
+				return ((Number) val).doubleValue();
+			if (type == Integer.class || type==int.class)
+				return ((Number) val).intValue();
 		}
 		// enums
 		if (ReflectionUtils.isa(type, Enum.class)) {

@@ -1172,7 +1172,8 @@ public class WebRequest implements IProperties, Closeable {
 			sb.append(", ");
 		});	
 		if ( ! pmap.isEmpty()) StrUtils.pop(sb, 2);
-		sb.append('}');
+		sb.append("}-");
+		sb.append(getBrowserType());
 		return sb.toString();
 	}
 

@@ -152,7 +152,7 @@ public class BrowserType {
 
 	@Override
 	public String toString() {
-		return "BrowserType[os=" + os + ", make=" + make + ", version=" + version + ", isMobile()=" + isMobile() + "]";
+		return "Browser[" + getOS() + " " + getBrowserMake() + " mobile=" + isMobile() + "]";
 	}
 
 	/**
