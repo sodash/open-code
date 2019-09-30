@@ -75,7 +75,7 @@ public class AppUtils {
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
 	
 	private static final List<String> LOCAL_MACHINES = Arrays.asList(
-			"stross", "aardvark", "burgess"
+			"stross", "aardvark", "burgess", "kornbluth"
 			);
 	private static final List<String> TEST_MACHINES = Arrays.asList(
 			"hugh", "mail.soda.sh"
@@ -515,16 +515,16 @@ public class AppUtils {
 					// No - cos a gap would open between the data in the two versions. We have to reindex and switch as instantaneously as we can.
 //					ReindexRequest rr = new ReindexRequest(es, path.index(), index);
 					if (AppUtils.getServerType() == KServerType.LOCAL) {
-						Log.i("ES.init", "LOCAL - So try to reindex:\n"+
-								"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
+						Log.i("ES.init", "LOCAL - So trying to reindex now");
+//								"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
 						ReindexRequest rr = new ReindexRequest(es, path.index(), index);
 						rr.setDebug(true);
 						IESResponse resp = rr.get();
-						System.out.println(resp);
+						if (resp.isSuccess()) Log.d(resp); else Log.e("ES.init.reindex.fail", resp);
 					} else {
 						// dont auto reindex test or live
-						Log.i("ES.init", "To reindex:\n"+
-								"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
+						Log.i("ES.init", "To reindex:\n\n"+
+								"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n\n");
 					}
 					// and shout fail!
 					//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
@@ -550,19 +550,24 @@ public class AppUtils {
 						// oh well
 					}
 
-					String switchjson = ("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
-							.replace('\'', '"');
-					Log.i("ES.init", "To switch old -> new:\n"
-							+"curl http://localhost:9200/_aliases -d '"+switchjson+"'");
+					// Switch aliases
 					// do it if local
+					IndicesAliasesRequest ar = es.admin().indices().prepareAliases();
+					ar.addAlias(index, alias);
+					// NB: the index has had ''s added to it
+					ar.removeAlias(OLD.substring(1, OLD.length()-1), alias);
 					if (AppUtils.getServerType() == KServerType.LOCAL) {
-						IndicesAliasesRequest ar = es.admin().indices().prepareAliases();
-						ar.addAlias(index, alias);
-						// NB: the index has had ''s added to it
-						ar.removeAlias(OLD.substring(1, OLD.length()-1), alias);
 						ar.setDebug(true);
 						IESResponse resp = ar.get();
 						System.out.println(resp);
+					} else {
+						// log how to switch
+						String switchjson = 
+								ar.getBodyJson();
+//								("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
+//								.replace('\'', '"');
+						Log.i("ES.init", "To switch old -> new:\n\n"
+								+"curl http://localhost:9200/_aliases -d '"+switchjson+"'\n\n");
 					}
 					// record fail - but loop over the rest so we catch all the errors in one loop
 					err = ex;

@@ -2,6 +2,7 @@ package com.winterwell.data;
 
 import java.util.Map;
 
+import com.winterwell.es.ESKeyword;
 import com.winterwell.utils.Utils;
 import com.winterwell.web.data.XId;
 
@@ -12,6 +13,7 @@ import com.winterwell.web.data.XId;
  */
 public class PersonLite extends AThing {
 
+	@ESKeyword // Hm: Twitter and email are case insensitive, but other sites eg LinkedIn are case sensitive :(
 	public String username;
 	
 	// NB: name and id are defined in AThing
