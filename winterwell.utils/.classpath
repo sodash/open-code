@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <classpath>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -35,7 +37,9 @@
     
     
     <classpathentry kind="src" path="src"/>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -70,7 +74,9 @@
     
     
     <classpathentry kind="src" output="bin.test" path="test"/>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -105,7 +111,9 @@
     
     
     <classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -140,7 +148,9 @@
     
     
     <classpathentry kind="lib" path="dependencies/xmlpull.jar"/>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -175,7 +185,9 @@
     
     
     <classpathentry kind="lib" path="dependencies/xpp3_min.jar"/>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -210,7 +222,9 @@
     
     
     <classpathentry exported="true" kind="lib" path="dependencies/xstream.jar"/>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -245,7 +259,9 @@
     
     
     <classpathentry kind="lib" path="dependencies/hamcrest-core.jar"/>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -280,7 +296,9 @@
     
     
     <classpathentry kind="lib" path="dependencies/junit.jar"/>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -315,7 +333,9 @@
     
     
     <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-                                                                                                                                                                                                                                                                                		
+                                                                                                                                                                                                                                                                                                		
+        
+        
         
         
         
@@ -350,7 +370,9 @@
         
         
         <attributes>
-                                                                                                                                                                                                                                                                                                                                                                                                                        			
+                                                                                                                                                                                                                                                                                                                                                                                                                                                			
+            
+            
             
             
             
@@ -385,7 +407,9 @@
             
             
             <attribute name="module" value="true"/>
-                                                                                                                                                                                                                                                                                                                                                                                                                        		
+                                                                                                                                                                                                                                                                                                                                                                                                                                                		
+        
+        
         
         
         
@@ -420,7 +444,9 @@
         
         
         </attributes>
-                                                                                                                                                                                                                                                                                	
+                                                                                                                                                                                                                                                                                                	
+    
+    
     
     
     
@@ -455,7 +481,9 @@
     
     
     </classpathentry>
-                                                                                                                                        	
+                                                                                                                                                	
+    
+    
     
     
     
@@ -490,7 +518,7 @@
     
     
     <classpathentry kind="output" path="bin"/>
-                                                                                                                                        
+                                                                                                                                                
     
     
     
@@ -544,8 +572,12 @@
     
     
     
+    
+    
     <classpathentry kind="lib" path="dependencies/dnsjava.jar"/>
-                        
+                                
+
+
 
 
 
