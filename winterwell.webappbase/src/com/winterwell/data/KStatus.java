@@ -1,6 +1,10 @@
 package com.winterwell.data;
 
+import com.winterwell.es.StdESRouter;
+
 /**
+ * If you edit this -- you MUST check {@link StdESRouter}
+ * 
  * NB: Copy-pasta from Creole's KStatus
  * @author daniel
  *
