@@ -705,7 +705,7 @@ public class WebUtils2 extends WebUtils {
 
 	/**
 	 * Convenience wrapper for {@link StringEscapeUtils#escapeHtml(String)}.
-	 * Converts e.g. "bread & butter" to &quot;bread &amp; butter&quot; Note
+	 * Converts e.g. "&" to "& amp;", eg "bread & butter" to <code>&quot;bread &amp; butter&quot;</code> Note
 	 * that any html tags in the string will be encoded for display as text!
 	 * <p>
 	 * This is a little over-zealous: it converts " and ' which browsers will
