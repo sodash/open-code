@@ -418,7 +418,11 @@ public abstract class CrudServlet<T> implements IServlet {
 		return jthing;
 	}
 
-	
+	/**
+	 * `new` gets turned into userid + nonce
+	 * @param state
+	 * @return 
+	 */
 	protected String getId(WebRequest state) {
 		if (_id!=null) return _id;
 		// Beware if ID can have a / in it!

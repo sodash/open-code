@@ -14,6 +14,7 @@ import com.winterwell.datalog.server.DataLogFields;
 import com.winterwell.datalog.server.LgServlet;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.timeseries.IDataStream;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -78,18 +79,20 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	 * // HACK log to lg (this should really be done by altering the DataLog settings)
 	 * @param event
 	 * @param state
+	 * @return 
 	 */
-	public static void hackRemoteDataLog(DataLogEvent event) {
+	public static boolean hackRemoteDataLog(DataLogEvent event) {
 		try {
 			// TODO replace with use of DatalogConfig
 			KServerType st = AppUtils.getServerType(null);
 			StringBuilder su = AppUtils.getServerUrl(st, "lg.good-loop.com");			
 			String LG_SERVER = su.toString();
 			
-			DataLogRemoteStorage.saveToRemoteServer(LG_SERVER, event);
+			return DataLogRemoteStorage.saveToRemoteServer(LG_SERVER, event);
 		} catch(Throwable ex) {
 			// remote server call failed :(
-			Log.e("datalog.hack (swallowed)", ex.toString());
+			Log.e("datalog.hack (swallowed)", Printer.toString(ex, true));
+			return false;
 		}
 	}
 

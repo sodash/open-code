@@ -434,7 +434,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 	}
 
 	public String getEventType0() {
-		assert evt.length == 1 : this;
+		assert evt != null && evt.length == 1 : "No evt "+this;
 		return evt[0];
 	}
 

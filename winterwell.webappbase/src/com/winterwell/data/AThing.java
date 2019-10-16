@@ -58,7 +58,7 @@ public class AThing implements IInit {
 	}
 
 	public void setId(String id) {
-		if (this.id!=null) {
+		if (this.id!=null && ! this.id.equals("new")) {
 			Log.w(LOGTAG(), "Change id from "+this.id+" to "+id+" "+ReflectionUtils.getSomeStack(10));
 		}
 		this.id = id;
