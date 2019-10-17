@@ -15,7 +15,7 @@ import junit.framework.TestCase;
 public class DtTest extends TestCase {
 
 	public void testScratch() {
-		System.out.println(TimeUtils.toString(new Dt(18000000, TUnit.MILLISECOND)));
+		System.out.println(new Time().minus(90, TUnit.DAY));
 	}
 
 	
