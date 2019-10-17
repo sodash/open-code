@@ -356,9 +356,18 @@ public class FakeBrowser {
 				assert timeOutMilliSecs > 0 : "problem with timeOutMilliSecs";
 				// Build URI with query params
 				uri = WebUtils.addQueryParameters(uri, vars);
+				// debug spew
 				if (debug) {
 					Log.d("get", uri);
+					// curl??
+					String sheaders = StrUtils.join(Containers.apply(reqHeaders.keySet(), h -> {
+						Object v = reqHeaders.get(h);
+						return v==null? "" : " -H '"+h+": "+v+"'";
+					}), " ");										
+					String curl = StrUtils.compactWhitespace("curl -XGET "+sheaders+" '"+uri+"'");
+					Log.d(LOGTAG, curl);
 				}
+				
 				// Setup a connection
 				setupConnection(uri, timeOutMilliSecs);
 				location = uri;
