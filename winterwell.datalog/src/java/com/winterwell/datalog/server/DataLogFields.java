@@ -7,7 +7,7 @@ import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
 import com.winterwell.web.fields.TimeField;
 
-public class DataLogFields extends CommonFields
+public class DataLogFields extends CommonFields {
 	public static final AField<Dataspace> d = new DataspaceField("d");
 	public static final ListField<String> breakdown = new ListField<String>("breakdown").setSplitPattern(",");
 	/**
