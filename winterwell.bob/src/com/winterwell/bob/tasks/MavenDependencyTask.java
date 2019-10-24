@@ -206,6 +206,11 @@ public class MavenDependencyTask extends BuildTask {
 				String error = proc.getError();
 				throw new FailureException(error);
 			}		
+			// readme
+			if ( ! new File(outDir,"README.md").isFile()) {
+				FileUtils.write(new File(outDir,"README.md"),  
+						"This directory of project dependencies from Maven is managed by a Bob build script. \nWarning: Best not to edit it directly!\n");
+			}
 //			FileUtils.delete(pom);
 		} finally {
 			if (pomPrev != null) {
