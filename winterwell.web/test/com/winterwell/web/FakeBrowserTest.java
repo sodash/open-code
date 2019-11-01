@@ -2,6 +2,11 @@ package com.winterwell.web;
 
 import org.junit.Test;
 
+import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.log.ILogListener;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.Report;
+
 public class FakeBrowserTest {
 
 	@Test
@@ -31,6 +36,20 @@ public class FakeBrowserTest {
 			assert false;
 		} catch(Exception ex) {
 			assert ex.toString().contains("UnknownHost");
+		}
+	}
+	
+	@Test
+	public void testCurl() {
+		{	// simple unset
+			StringBuilder slog = new StringBuilder();
+			Log.addListener(report -> slog.append(report.toString()));
+			FakeBrowser fb = new FakeBrowser();
+			fb.setRequestHeader("XMyHeader", "whatever");
+			fb.setUserAgent(null);
+			fb.setDebug(true);
+			String beeb = fb.getPage("https://bbc.co.uk", new ArrayMap("foo", "bar", "msg", "Hello World!"));
+			assert slog.toString().contains("foo");
 		}
 	}
 
