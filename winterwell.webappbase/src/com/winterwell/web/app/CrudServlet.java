@@ -581,7 +581,6 @@ public abstract class CrudServlet<T> implements IServlet {
  * @return unique hits, source
  */
 	private List doList3_source_dedupe(KStatus status, List<Map> hits) {
-		String[] indeces = esRouter.getPath(type, null).indices;
 		if (status != KStatus.ALL_BAR_TRASH && status!=KStatus.PUB_OR_ARC) {
 			// One index = no deduping necessary.
 			ArrayList<Object> hits2 = Containers.apply(hits, h -> h.get("_source"));
