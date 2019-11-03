@@ -452,7 +452,13 @@ public abstract class CrudServlet<T> implements IServlet {
 		throw new WebEx.E404(state.getRequestUrl(), "_stats not available for "+type);
 	}
 
-	protected void doList(WebRequest state) throws IOException {
+	/**
+	 * 
+	 * @param state
+	 * @return for debug purposes! The results are sent back in state
+	 * @throws IOException
+	 */
+	protected List doList(WebRequest state) throws IOException {
 		// copied from SoGive SearchServlet
 		// TODO refactor to use makeESFilterFromSearchQuery
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
@@ -543,43 +549,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();
 
-		// If user requests ALL_BAR_TRASH, they want to see draft versions of items which have been edited
-		// So when de-duping, give priority to entries from .draft indices where the object is status: DRAFT
-		List hits2 = new ArrayList<Map>();		
-		if (status == KStatus.ALL_BAR_TRASH) {
-			// de-dupe, preferring draft
-			List<Object> idOrder = new ArrayList<Object>(); // original ordering
-			Map<Object, Object> things = new HashMap<Object, Object>(); // to hold "expected" version of each hit
-			
-			for (Map h : hits) {
-				// pull out the actual object from the hit (NB: may be Map or AThing)
-				Object hit = h.get("_source");
-				if (hit == null) continue;
-				Object id = getIdFromHit(hit);
-				
-				// First time we've seen this object? Save it.
-				if (!things.containsKey(id)) {
-					idOrder.add(id);
-					things.put(id, hit);
-					continue;
-				}
-				// Is this an object from .draft with non-published status? Overwrite the previous entry.
-				Object index = h.get("_index");
-				if (index != null && index.toString().contains(".draft")) {
-					KStatus hitStatus = KStatus.valueOf(getStatus(hit));
-					if (KStatus.DRAFT.equals(hitStatus) || KStatus.MODIFIED.equals(hitStatus)) {
-						things.put(id, hit);
-					}
-				}
-			}
-			// Put the deduped hits in the list in their original order.
-			for (Object id : idOrder) {
-				if (things.containsKey(id)) hits2.add(things.get(id));
-			}
-		} else {
-			// One index = no deduping necessary.
-			hits2 = Containers.apply(hits, h -> h.get("_source"));
-		}
+		List hits2 = doList3_source_dedupe(status, hits);
 		
 		// sanitise for privacy
 		hits2 = cleanse(hits2, state);
@@ -587,7 +557,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		// HACK: send back csv?
 		if (state.getResponseType() == KResponseType.csv) {
 			doSendCsv(state, hits2);
-			return;
+			return hits2;
 		}
 			
 		long total = sr.getTotal();
@@ -597,7 +567,64 @@ public abstract class CrudServlet<T> implements IServlet {
 					"total", total
 				));
 		JsonResponse output = new JsonResponse(state).setCargoJson(json);
-		WebUtils2.sendJson(output, state);		
+		WebUtils2.sendJson(output, state);
+		return hits2;
+	}
+
+
+/**
+ * 		// If user requests ALL_BAR_TRASH, they want to see draft versions of items which have been edited
+		// So when de-duping, give priority to entries from .draft indices where the object is status: DRAFT
+
+ * @param status
+ * @param hits
+ * @return unique hits, source
+ */
+	private List doList3_source_dedupe(KStatus status, List<Map> hits) {
+		String[] indeces = esRouter.getPath(type, null).indices;
+		if (status != KStatus.ALL_BAR_TRASH && status!=KStatus.PUB_OR_ARC) {
+			// One index = no deduping necessary.
+			ArrayList<Object> hits2 = Containers.apply(hits, h -> h.get("_source"));
+			return hits2;
+		}
+		List hits2 = new ArrayList<Map>();
+		// de-dupe
+//		KStatus preferredStatus = status==KStatus.ALL_BAR_TRASH? KStatus.DRAFT : KStatus.PUB_OR_ARC;
+		List<Object> idOrder = new ArrayList<Object>(); // original ordering
+		Map<Object, Object> things = new HashMap<Object, Object>(); // to hold "expected" version of each hit
+		
+		for (Map h : hits) {
+			// pull out the actual object from the hit (NB: may be Map or AThing)
+			Object hit = h.get("_source");
+			if (hit == null) continue;
+			Object id = getIdFromHit(hit);			
+			// First time we've seen this object? Save it.
+			if ( ! things.containsKey(id)) {
+				idOrder.add(id);
+				things.put(id, hit);
+				continue;
+			}
+			// Which copy to keep?
+			// Is this an object from .draft with non-published status? Overwrite the previous entry.
+			Object index = h.get("_index");
+			KStatus hitStatus = KStatus.valueOf(getStatus(hit));
+			if (status==KStatus.ALL_BAR_TRASH) {
+				// prefer draft
+				if (index != null && index.toString().contains(".draft")) {
+					things.put(id, hit);	
+				}
+			} else {
+				// prefer published over archived
+				if (KStatus.PUBLISHED == hitStatus) {
+					things.put(id, hit);	
+				}										
+			}
+		}
+		// Put the deduped hits in the list in their original order.
+		for (Object id : idOrder) {
+			if (things.containsKey(id)) hits2.add(things.get(id));
+		}
+		return hits2;
 	}
 
 

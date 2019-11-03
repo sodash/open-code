@@ -340,7 +340,7 @@ public class BuildWinterwellProject extends BuildTask {
 			// So we pack them into version.
 			by = " by: "+WebUtils2.hostname();
 		} catch(Throwable ex) {
-			Log.w(LOGTAG, ex);
+			Log.w(LOGTAG, this+" "+ex);
 		}
 		// include version, time, and a unique nonce
 		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 				
