@@ -765,6 +765,9 @@ public class AppUtils {
 	
 	
 	private static ESQueryBuilder parseTreeToQuery(Object rawClause) {
+		if (rawClause instanceof String) {
+			return ESQueryBuilders.simpleQueryStringQuery((String) rawClause);
+		}
 		if ( ! (rawClause instanceof List) && ! (rawClause instanceof Map)) {
 			throw new IllegalArgumentException("clause is not list or map: " + rawClause);
 		}		
