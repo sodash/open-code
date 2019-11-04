@@ -491,94 +491,102 @@ public class AppUtils {
 		ESException err = null;
 		for(KStatus status : statuses) {			
 			for(Class k : dbclasses) {
-				ESPath path = esRouter.getPath(null, k, null, status);
-				try {
-					// Normal setup
-					String index = path.index();
-					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
-					
-				} catch(ESException ex) {
-					// map the base index (so we can do a reindex with the right mapping)
-					String index = path.index()
-							+"_"+Dep.get(ESConfig.class).getIndexAliasVersion()
-							;
-					// make if not exists
-					if ( ! es.admin().indices().indexExists(index)) {
-						CreateIndexRequest pi = es.admin().indices().prepareCreate(index);
-//						pi.setFailIfAliasExists(true);
-//						pi.setAlias(path.index()); // no alias - the old version is still in place
-						IESResponse r = pi.get().check();
-					}
-					// setup the right mapping
-					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
-					// attempt a simple reindex?
-					// No - cos a gap would open between the data in the two versions. We have to reindex and switch as instantaneously as we can.
-//					ReindexRequest rr = new ReindexRequest(es, path.index(), index);
-					if (AppUtils.getServerType() == KServerType.LOCAL) {
-						Log.i("ES.init", "LOCAL - So trying to reindex now");
-//								"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
-						ReindexRequest rr = new ReindexRequest(es, path.index(), index);
-						rr.setDebug(true);
-						IESResponse resp = rr.get();
-						if (resp.isSuccess()) Log.d(resp); else Log.e("ES.init.reindex.fail", resp);
-					} else {
-						// dont auto reindex test or live
-						Log.i("ES.init", "To reindex:\n\n"+
-								"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n\n");
-					}
-					// and shout fail!
-					//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
-					// c.f. https://issues.soda.sh/stream?tag=35538&as=su
-					
-					// After this, the sysadmin should (probably) remove the link old-base -> alias, 
-					// and put in a new-base -> alias link
-					
-					// To see mappings:
-					Log.i("ES.init", "To see mappings:\n"
-							+" curl http://localhost:9200/_cat/aliases/"+k.getSimpleName().toLowerCase()+"*\n"
-							+" curl http://localhost:9200/_cat/indices/"+k.getSimpleName().toLowerCase()+"*\n"
-							);
-					
-					// Switch Info
-					// https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
-					String alias = path.index();					
-					String OLD = "OLD";
-					try {
-						List<String> oldIndexes = es.admin().indices().getAliasesResponse(alias);
-						OLD = "'"+oldIndexes.get(0)+"'";
-					} catch(Exception aex) {
-						// oh well
-					}
-
-					// Switch aliases
-					// do it if local
-					IndicesAliasesRequest ar = es.admin().indices().prepareAliases();
-					ar.addAlias(index, alias);
-					// NB: the index has had ''s added to it
-					ar.removeAlias(OLD.substring(1, OLD.length()-1), alias);
-					if (AppUtils.getServerType() == KServerType.LOCAL) {
-						ar.setDebug(true);
-						IESResponse resp = ar.get();
-						System.out.println(resp);
-					} else {
-						// log how to switch
-						String switchjson = 
-								ar.getBodyJson();
-//								("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
-//								.replace('\'', '"');
-						Log.i("ES.init", "To switch old -> new:\n\n"
-								+"curl http://localhost:9200/_aliases -d '"+switchjson+"'\n\n");
-					}
-					// record fail - but loop over the rest so we catch all the errors in one loop
-					err = ex;
-					Log.e("init", ex.toString());
-				}
+				ESException ex = initESMappings2(mappingFromClass, esRouter, es, status, k);
+				if (ex!=null) err = ex;
 			}
 		}
 		if (err != null) {	
 			// ??IF we add auto reindex, then wait for ES
 //			es.flush();
 			throw err;
+		}
+	}
+
+
+	private static ESException initESMappings2(Map<Class, Map> mappingFromClass, IESRouter esRouter, ESHttpClient es,
+			KStatus status, Class k) 
+	{
+		ESPath path = esRouter.getPath(null, k, null, status);
+		try {
+			// Normal setup
+			String index = path.index();
+			initESMappings2_putMapping(mappingFromClass, es, k, path, index);
+			return null;
+		} catch(ESException ex) {
+			// map the base index (so we can do a reindex with the right mapping)
+			String index = path.index()
+					+"_"+Dep.get(ESConfig.class).getIndexAliasVersion()
+					;
+			// make if not exists
+			if ( ! es.admin().indices().indexExists(index)) {
+				CreateIndexRequest pi = es.admin().indices().prepareCreate(index);
+//						pi.setFailIfAliasExists(true);
+//						pi.setAlias(path.index()); // no alias - the old version is still in place
+				IESResponse r = pi.get().check();
+			}
+			// setup the right mapping
+			initESMappings2_putMapping(mappingFromClass, es, k, path, index);
+			// attempt a simple reindex?
+			// No - cos a gap would open between the data in the two versions. We have to reindex and switch as instantaneously as we can.
+//					ReindexRequest rr = new ReindexRequest(es, path.index(), index);
+			if (AppUtils.getServerType() == KServerType.LOCAL) {
+				Log.i("ES.init", "LOCAL - So trying to reindex now");
+//								"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n");
+				ReindexRequest rr = new ReindexRequest(es, path.index(), index);
+				rr.setDebug(true);
+				IESResponse resp = rr.get();
+				if (resp.isSuccess()) Log.d(resp); else Log.e("ES.init.reindex.fail", resp);
+			} else {
+				// dont auto reindex test or live
+				Log.i("ES.init", "To reindex:\n\n"+
+						"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n\n");
+			}
+			// and shout fail!
+			//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
+			// c.f. https://issues.soda.sh/stream?tag=35538&as=su
+			
+			// After this, the sysadmin should (probably) remove the link old-base -> alias, 
+			// and put in a new-base -> alias link
+			
+			// To see mappings:
+			Log.i("ES.init", "To see mappings:\n"
+					+" curl http://localhost:9200/_cat/aliases/"+k.getSimpleName().toLowerCase()+"*\n"
+					+" curl http://localhost:9200/_cat/indices/"+k.getSimpleName().toLowerCase()+"*\n"
+					);
+			
+			// Switch Info
+			// https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
+			String alias = path.index();					
+			String OLD = "OLD";
+			try {
+				List<String> oldIndexes = es.admin().indices().getAliasesResponse(alias);
+				OLD = "'"+oldIndexes.get(0)+"'";
+			} catch(Exception aex) {
+				// oh well
+			}
+
+			// Switch aliases
+			// do it if local
+			IndicesAliasesRequest ar = es.admin().indices().prepareAliases();
+			ar.addAlias(index, alias);
+			// NB: the index has had ''s added to it
+			ar.removeAlias(OLD.substring(1, OLD.length()-1), alias);
+			if (AppUtils.getServerType() == KServerType.LOCAL) {
+				ar.setDebug(true);
+				IESResponse resp = ar.get();
+				System.out.println(resp);
+			} else {
+				// log how to switch
+				String switchjson = 
+						ar.getBodyJson();
+//								("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
+//								.replace('\'', '"');
+				Log.i("ES.init", "To switch old -> new:\n\n"
+						+"curl http://localhost:9200/_aliases -d '"+switchjson+"'\n\n");
+			}
+			// record fail - but loop over the rest so we catch all the errors in one loop
+			Log.e("init", ex.toString());
+			return ex;
 		}
 	}
 

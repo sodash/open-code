@@ -40,6 +40,7 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
+import com.winterwell.es.fail.ESIndexAlreadyExistsException;
 import com.winterwell.gson.Gson;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.timeseries.Datum;
@@ -304,7 +305,10 @@ public class ESStorage implements IDataLogStorage {
 			aliasSwap.get().check(); // What happens if we fail here??		
 			return true;
 			
-		} catch(Throwable ex) {
+		} catch (ESIndexAlreadyExistsException ex) {
+			Log.i(LOGTAG, ex); // race condition - harmless
+			return false;
+		} catch(Throwable ex) {			
 			Log.e(LOGTAG, ex);
 			// swallow and carry on -- an out of date schema may not be a serious issue
 			return false;
