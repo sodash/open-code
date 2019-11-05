@@ -1737,7 +1737,7 @@ public class FileUtils {
 	 * 
 	 * @param dir
 	 * @param f
-	 * @return true if f is in dir
+	 * @return true if f is in dir -- includes sub-directories and dir = f
 	 */
 	public static boolean contains(File dir, File f) {
 		String fp = f.getAbsolutePath();
