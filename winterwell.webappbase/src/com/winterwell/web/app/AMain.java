@@ -370,18 +370,24 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 
 	private void launchJetty() {
-		Log.i("Go!");
-		assert jl==null;
-		jl = new JettyLauncher(getWebRootDir(), getPort());
-		jl.setup();		
-		// no sessions!
-		WebRequest.setStateless(true);
-		addJettyServlets(jl);
-				
-		Log.i("web", "...Launching Jetty web server on port "+jl.getPort());
-		jl.run();		
-		
-		Log.i("Running...");
+		try {
+			Log.i("Go!");
+			assert jl==null;
+			jl = new JettyLauncher(getWebRootDir(), getPort());
+			jl.setup();		
+			// no sessions!
+			WebRequest.setStateless(true);
+			addJettyServlets(jl);
+					
+			Log.i("web", "...Launching Jetty web server on port "+jl.getPort());
+			jl.run();		
+			
+			Log.i("Running...");
+		} catch (Throwable ex) {
+			// make sure it gets logged
+			Log.e("launchJetty", ex);
+			throw Utils.runtime(ex);
+		}
 	}
 
 	/**
