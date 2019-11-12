@@ -3,12 +3,23 @@ package com.winterwell.web;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.data.XId;
 
 public class WebEx extends RuntimeException {
 	
+	/**
+	 * Loop detected
+	 */
+	public static class E508Loop extends WebEx.E50X {
+		private static final long serialVersionUID = 1L;
+		public E508Loop(String msg, Throwable e) {
+			super(508, null, msg+" "+Printer.toString(e, true));
+		}
+	}
+
 	/**
 	 * The request is well-formed and the resource exists (so not a 404), 
 	 * but there is a semantic problem with it, e.g. a missing parameter.

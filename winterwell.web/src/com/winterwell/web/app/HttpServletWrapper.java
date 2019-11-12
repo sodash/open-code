@@ -1,6 +1,7 @@
 package com.winterwell.web.app;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Supplier;
 
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
@@ -98,6 +100,15 @@ public class HttpServletWrapper extends HttpServlet {
 		} else {
 			Log.w(wex.getClass().getSimpleName(), exs);
 		}
+
+		// are we in an nginx loop? Where nginx keeps getting the same error, and trying different servers
+		String ip = state.getRemoteAddr();
+		String ip2 = state.getRequest().getRemoteAddr();
+		String[] ips = (ip+","+ip2).split(",\\s*");
+		if (ips.length > 30) {
+			wex = new WebEx.E508Loop(state.toString(), ex);
+		}
+		
 		WebUtils2.sendError(wex.code, wex.getMessage()+" \n\n<details>"+exs+"</details>", resp);
 	}
 
