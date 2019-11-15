@@ -102,11 +102,13 @@ public class HttpServletWrapper extends HttpServlet {
 		}
 
 		// are we in an nginx loop? Where nginx keeps getting the same error, and trying different servers
-		String ip = state.getRemoteAddr();
-		String ip2 = state.getRequest().getRemoteAddr();
-		String[] ips = (ip+","+ip2).split(",\\s*");
-		if (ips.length > 30) {
-			wex = new WebEx.E508Loop(state.toString(), ex);
+		if (state != null) {
+			String ip = state.getRemoteAddr();
+			String ip2 = state.getRequest().getRemoteAddr();
+			String[] ips = (ip+","+ip2).split(",\\s*");
+			if (ips.length > 30) {
+				wex = new WebEx.E508Loop(state.toString(), ex);
+			}
 		}
 		
 		WebUtils2.sendError(wex.code, wex.getMessage()+" \n\n<details>"+exs+"</details>", resp);

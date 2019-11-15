@@ -809,7 +809,7 @@ public class WebRequest implements IProperties, Closeable {
 	}
 
 	/**
-	 * The servlet handling this request. Never null
+	 * The servlet handling this request. Can be null
 	 */
 	public Object getServlet() {
 		return servlet;
