@@ -78,11 +78,7 @@ public class AppUtils {
 			"stross", "aardvark", "burgess", "kornbluth"
 			);
 	private static final List<String> TEST_MACHINES = Arrays.asList(
-			"hugh", "mail.soda.sh"
-			);
-	@Deprecated
-	private static final List<String> PROD_MACHINES = Arrays.asList(
-			"heppner"
+			"hugh", "mail.soda.sh", "mail"
 			);
 	
 	public static boolean DEBUG = false;
@@ -423,10 +419,6 @@ public class AppUtils {
 		if (TEST_MACHINES.contains(hostname)) {
 			Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.TEST);
 			return KServerType.TEST;
-		}
-		if (PROD_MACHINES.contains(hostname)) {
-			Log.i("init", "Treating "+hostname+" as serverType = "+KServerType.PRODUCTION);
-			return KServerType.PRODUCTION;
 		}
 
 		Log.i("init", "Fallback: Treating "+hostname+" as serverType = "+KServerType.PRODUCTION);
