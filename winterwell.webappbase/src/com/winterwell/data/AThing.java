@@ -68,6 +68,10 @@ public class AThing implements IInit {
 		return getClass().getSimpleName();
 	}
 
+	/**
+	 * Set the local flag. Does NOT trigger a save or any database level action.
+	 * @param status
+	 */
 	public void setStatus(KStatus status) {
 		this.status = status;
 	}
