@@ -78,7 +78,7 @@ public class AppUtils {
 			"stross", "aardvark", "burgess", "kornbluth"
 			);
 	private static final List<String> TEST_MACHINES = Arrays.asList(
-			"hugh", "mail.soda.sh", "mail"
+			"hugh", "mail.soda.sh", "mail", "mail.sodash.net"
 			);
 	
 	public static boolean DEBUG = false;
