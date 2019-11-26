@@ -1,178 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <classpath>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="src" path="src"/>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="src" output="bin.test" path="test"/>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="lib" path="dependencies/xmlpull.jar"/>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="lib" path="dependencies/xpp3_min.jar"/>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry exported="true" kind="lib" path="dependencies/xstream.jar"/>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="lib" path="dependencies/hamcrest-core.jar"/>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="lib" path="dependencies/junit.jar"/>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-<<<<<<< HEAD
-                                                
-=======
-                                                        
-        
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-        
-        
-        
-        
         <attributes>
-<<<<<<< HEAD
-                                                                        
-=======
-                                                                                    
-            
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-            
-            
-            
-            
             <attribute name="module" value="true"/>
-<<<<<<< HEAD
-                                                                    
-=======
-                                                                                
-        
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-        
-        
-        
-        
         </attributes>
-<<<<<<< HEAD
-                                            
-=======
-                                                    
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     </classpathentry>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="output" path="bin"/>
-<<<<<<< HEAD
-                        
-=======
-                            
-    
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-    
-    
-    
-    
     <classpathentry kind="lib" path="dependencies/dnsjava.jar"/>
-<<<<<<< HEAD
-                    
-=======
-                        
-
->>>>>>> 415cea4281f4d7eb0fdedf619e08137abe62f002
-
-
-
-
 </classpath>
