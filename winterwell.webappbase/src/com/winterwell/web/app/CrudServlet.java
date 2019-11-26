@@ -60,6 +60,10 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	public static final String ACTION_PUBLISH = "publish";
 	private static final String ACTION_NEW = "new";
+	/**
+	 * get, or create if absent
+	 */
+	private static final String ACTION_GETORNEW = "getornew";
 
 	public CrudServlet(Class<T> type) {
 		this(type, Dep.get(IESRouter.class));
@@ -141,12 +145,24 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected void doAction(WebRequest state) {
 		// make a new thing?
+		// ...only if absent?
+		if (state.actionIs(ACTION_GETORNEW)) {
+			JThing<T> thing = getThingFromDB(state);
+			if (thing != null) {
+				jthing = thing;
+				return;
+			}
+			// absent => new
+			state.setAction(ACTION_NEW);
+		}
+		// ...new
 		if (state.actionIs(ACTION_NEW)) {
 			// add is "special" as the only request that doesn't need an id
 			String id = getId(state);
 			jthing = doNew(state, id);
 			jthing.setType(type);
 		}
+		
 		// save?
 		if (state.actionIs("save") || state.actionIs(ACTION_NEW)) {
 			doSave(state);
@@ -234,8 +250,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * 
 	 * @param state
 	 * @return thing or null
+	 * @throws TODO WebEx.E403
 	 */
-	protected JThing<T> getThingFromDB(WebRequest state) {
+	protected JThing<T> getThingFromDB(WebRequest state) throws WebEx.E403 {
 		ESPath path = getPath(state);
 		KStatus status = state.get(AppUtils.STATUS);
 		// fetch from DB
