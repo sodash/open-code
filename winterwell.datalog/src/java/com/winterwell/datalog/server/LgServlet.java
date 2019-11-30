@@ -293,7 +293,9 @@ public class LgServlet {
 		boolean mobile = bt.isMobile();		
 		params.putIfAbsent("mbl", mobile);		
 		// browser
-		String browser = bt.getBrowserMake()+"_"+bt.getVersion();		
+		String browser = bt.getBrowserMake(); //+"_"+bt.getVersion(); actually no version: its more useful to group by chrome vs firefox; the version is more noise than signal.
+		// And we do also store the user-agent
+		// TODO s/_\d+//g in the old data to remove the version numbers
 		params.putIfAbsent("browser", browser);
 		// OS
 		String os = bt.getOS();
