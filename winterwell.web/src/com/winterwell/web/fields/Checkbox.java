@@ -61,6 +61,15 @@ public class Checkbox extends AField<Boolean> {
 	// field?
 	private String label;
 
+
+	/**
+	 * Checkbox uses the values "true" and "false". Missing is interpreted as false. This
+	 * means Checkboxes never return null in normal usage!
+	 * <p>
+	 * They also accept "unknown", which does return as null.
+	 * 
+	 * No-label constructor
+	 */
 	public Checkbox(String name) {
 		this(name, null);
 	}

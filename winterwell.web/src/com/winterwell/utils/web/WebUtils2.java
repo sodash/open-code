@@ -1255,6 +1255,10 @@ public class WebUtils2 extends WebUtils {
 	}
 
 	static final BoolField CORS_set = new BoolField("CORS_set");
+
+	public static final boolean DEBUG = false;
+
+	private static final Checkbox WITH_CREDENTIALS = new Checkbox("withCredentials");
 	
 	/**
 	 * Unravel long urls, e.g. from bitly to original. Convenience for {@link #getLongUrl(String, int)}
@@ -1285,27 +1289,36 @@ public class WebUtils2 extends WebUtils {
 		Object already = state.get(CORS_set);
 		state.put(CORS_set, true);
 		if (Utils.yes(already)) {
-			Log.d("web", "potential header x2 bug - CORS set twice: "+ReflectionUtils.getSomeStack(6)+" "+state);
+			Log.d("cors", "potential header x2 bug - CORS set twice: "+ReflectionUtils.getSomeStack(6)+" "+state);
 			return;
 		}
 		
 		// Note: wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header 
 		// when the credentials flag is true (ie with cookies).
 		// We rely on the caller to explicitly tell us this (see hooru.js). By default ajax does not!
-		Boolean wc = state.get(new Checkbox("withCredentials"));
+		boolean wc = state.get(WITH_CREDENTIALS);
 		String origin = state.getRequest().getHeader("Origin");
 		String originOut = origin; 
 		if (origin==null || origin.equals("null")) {
-			if ( ! wc) originOut= "*"; //URI(state.getRequestUrl()).getHost();
+			if (wc) {
+				Log.d("cors", "Huh? Blank origin, and withCredentials is set so we cant use * "+ReflectionUtils.getSomeStack(8));
+			} else {
+				originOut= "*";
+			}
 		}
 		// is getResponse an error??
 		if (forceSet && Utils.isBlank(state.getResponse().getHeader("Access-Control-Allow-Origin"))) {
 			if ( ! wc) originOut = "*"; // Do we need this??
 		}
 		// see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i		
-		if ( ! "*".equals(originOut)) {
-//			Log.d("cors", "set Access-Control-Allow-Credentials: true from "+ReflectionUtils.getSomeStack(8));			
+		// See also Error seen by us:
+		//   Failed to load https://as.winterwell.com/vast.xml: The value of the 'Access-Control-Allow-Origin' header in the response must not 
+		//   be the wildcard '*' when the request's credentials mode is 'include'. Origin 'https://imasdk.googleapis.com' is therefore not allowed access. 
+		//   The credentials mode of requests initiated by the XMLHttpRequest is controlled by the withCredentials attribute.
+		if ( ! "*".equals(originOut)) {			
 			state.setHeader(ALLOW_CREDENTIALS_HEADER, "true");
+		} else {
+			Log.d("cors", "NOT setting Access-Control-Allow-Credentials for origin: "+originOut+" from "+ReflectionUtils.getSomeStack(8));			
 		}
 		state.setHeader("Access-Control-Allow-Origin", originOut);
 	}
