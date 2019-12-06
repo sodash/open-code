@@ -168,6 +168,11 @@ public abstract class Parser<PT> {
 		return r;
 	}
 
+	/**
+	 * debug tool: parse (and assert != null, and output to sysout if DEBUG) 
+	 * @param string
+	 * @return
+	 */
 	public ParseResult<PT> parseOut(String string) {
 		if (DEBUG) {
 			Printer.out("Parsing " + string + "...");
