@@ -223,6 +223,10 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		init(new String[0]);
 	}
 	
+	/**
+	 * Stop the app!
+	 * Sets {@link #pleaseStop} to true, requests Jetty stop, and interrupts the {@link #mainLoopThread} if used.
+	 */
 	public void stop() {
 		pleaseStop = true;
 		if (jl != null) {

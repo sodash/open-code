@@ -30,6 +30,9 @@ import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.KServerType;
 
 /**
+ * 
+ * Normally use DataLogHttpClient as a front-end on this.
+ * 
  * This is a kind of DatalogClient API class
  * TODO Remote server storage for DataLog
  * So the adserver can log stuff into lg.

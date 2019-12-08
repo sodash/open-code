@@ -25,6 +25,7 @@ import com.winterwell.utils.log.Log;
 	 * "I Alice certify that this is Bob"
 
  * @author daniel
+ * @testedby {@link App2AppAuthClientTest}
  *
  */
 public class App2AppAuthClient {

@@ -62,6 +62,11 @@ public class DataLogHttpClient {
 		this(null, namespace);
 	}
 	
+	/**
+	 * Save to remote lg server
+	 * @param event
+	 * @return
+	 */
 	public Object save(DataLogEvent event) {
 		String server = WebUtils2.getHost(ENDPOINT);
 		// HACK: preserve (local testing) http protocol
