@@ -168,6 +168,8 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 		
 		IDoCanonical plugin = service2canonical.get(service);
 		String _name = id.substring(0, i);
+		// guard against an easy error
+		assert ! _name.endsWith("@"+service) : "Bad XId "+id+" - duplicate service";
 		this.name = plugin==null? _name : plugin.canonical(_name, kind);
 		assert notNullNameCheck() : id;
 	}
