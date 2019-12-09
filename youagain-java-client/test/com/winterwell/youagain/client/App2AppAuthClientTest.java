@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.winterwell.utils.TodoException;
+
 public class App2AppAuthClientTest {
 
 	@Test
@@ -30,7 +32,14 @@ public class App2AppAuthClientTest {
 
 	@Test
 	public void testGetPermissionsToken() {
-		fail("Not yet implemented");
+		YouAgainClient yac = new YouAgainClient("test");
+		App2AppAuthClient a2a = new App2AppAuthClient(yac);
+		AuthToken appIdToken = a2a.getIdentityTokenFromYA("testapp2", "testpwd");
+		AuthToken userToken = yac.login("spoonmcguffin@gmail.com", "my1stpassword");
+//		yac.sharing().
+//		AuthToken userIdAndPermissionsToken;
+//		AuthToken ptoken = a2a.getPermissionsToken(appIdToken, userIdAndPermissionsToken);
+		throw new TodoException();
 	}
 
 }

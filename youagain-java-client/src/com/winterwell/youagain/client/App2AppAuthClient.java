@@ -43,7 +43,7 @@ public class App2AppAuthClient {
 	 * 
 	 * @param appAuthName e.g. "myapp@mydomain.com"
 	 * @param appAuthPassword
-	 * @return "This is MyApp, signed YA"
+	 * @return "This is MyApp (signed by YA to verify)"
 	 * 
 	 * TODO also support self-signed, "This is MyApp, signed MyApp"
 	 */

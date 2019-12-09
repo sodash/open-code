@@ -298,14 +298,14 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			return Dep.set(AuthToken.class, token);
 		}
 		if (Utils.isBlank(appAuthName) || Utils.isBlank(appAuthPassword)) {
-			Log.d(getAppName(), "No app AuthToken set by init -- no appAuthPassword in config");
+			Log.d(getAppName(), "Missing app-auth details: app-name: "+appAuthName+" p: "+appAuthPassword+" from "+config2.getClass());
 			return null;
 		}
 		AuthToken token;
 		App2AppAuthClient a2a = new App2AppAuthClient(yac);
 		try {
 			token = a2a.getIdentityTokenFromYA(appAuthName, appAuthPassword);
-		} catch(WebEx.E404 wex) {
+		} catch(Exception wex) {
 			token = a2a.registerIdentityTokenWithYA(appAuthName, appAuthPassword);
 		}
 		return Dep.set(AuthToken.class, token);
