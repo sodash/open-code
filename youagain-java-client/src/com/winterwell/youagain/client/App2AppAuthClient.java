@@ -30,7 +30,19 @@ import com.winterwell.utils.log.Log;
  */
 public class App2AppAuthClient {
 
+	private YouAgainClient yac;
+
+	/**
+	 * Relies on Dep for the {@link YouAgainClient}
+	 */
+	public App2AppAuthClient() {
+		this(Dep.get(YouAgainClient.class));
+	}
 	
+	public App2AppAuthClient(YouAgainClient yac) {
+		this.yac = yac;
+	}
+
 	private String LOGTAG = "A2A";
 
 	/**
@@ -41,8 +53,7 @@ public class App2AppAuthClient {
 	 * 
 	 * TODO also support self-signed, "This is MyApp, signed MyApp"
 	 */
-	public AuthToken getIdentityTokenFromYA(String appAuthName, String appAuthPassword) {
-		YouAgainClient yac = Dep.get(YouAgainClient.class);
+	public AuthToken getIdentityTokenFromYA(String appAuthName, String appAuthPassword) {		
 		if (appAuthName==null || appAuthPassword==null) {
 			Log.w(LOGTAG, "missing appAuthName / appAuthPassword "+ReflectionUtils.getSomeStack(8));
 			return null;
@@ -52,7 +63,6 @@ public class App2AppAuthClient {
 	}
 	
 	public AuthToken registerIdentityTokenWithYA(String appAuthName, String appAuthPassword) {
-		YouAgainClient yac = Dep.get(YouAgainClient.class);
 		if (appAuthName==null || appAuthPassword==null) {
 			Log.w(LOGTAG, "missing appAuthName / appAuthPassword "+ReflectionUtils.getSomeStack(8));
 			return null;

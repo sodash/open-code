@@ -8,15 +8,24 @@ public class App2AppAuthClientTest {
 
 	@Test
 	public void testGetIdentityTokenFromYA() {
-		App2AppAuthClient a2a = new App2AppAuthClient();
-		String appAuthName = "testapp";
+		YouAgainClient yac = new YouAgainClient("test");
+		App2AppAuthClient a2a = new App2AppAuthClient(yac);
+		String appAuthName = "testapp2@test";
 		String appAuthPassword = "testpwd";
-		a2a.getIdentityTokenFromYA(appAuthName, appAuthPassword);
+		AuthToken token = a2a.getIdentityTokenFromYA(appAuthName, appAuthPassword);
+		System.out.println(token);
+		assert token != null;
 	}
 
 	@Test
 	public void testRegisterIdentityTokenWithYA() {
-		fail("Not yet implemented");
+		YouAgainClient yac = new YouAgainClient("test");
+		App2AppAuthClient a2a = new App2AppAuthClient(yac);
+		String appAuthName = "testapp2@test";
+		String appAuthPassword = "testpwd";
+		AuthToken token = a2a.registerIdentityTokenWithYA(appAuthName, appAuthPassword);
+		System.out.println(token);
+		assert token != null;
 	}
 
 	@Test
