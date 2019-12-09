@@ -10,7 +10,7 @@ public class App2AppAuthClientTest {
 	public void testGetIdentityTokenFromYA() {
 		YouAgainClient yac = new YouAgainClient("test");
 		App2AppAuthClient a2a = new App2AppAuthClient(yac);
-		String appAuthName = "testapp2@test";
+		String appAuthName = "testapp2";
 		String appAuthPassword = "testpwd";
 		AuthToken token = a2a.getIdentityTokenFromYA(appAuthName, appAuthPassword);
 		System.out.println(token);
@@ -21,7 +21,7 @@ public class App2AppAuthClientTest {
 	public void testRegisterIdentityTokenWithYA() {
 		YouAgainClient yac = new YouAgainClient("test");
 		App2AppAuthClient a2a = new App2AppAuthClient(yac);
-		String appAuthName = "testapp2@test";
+		String appAuthName = "testapp2";
 		String appAuthPassword = "testpwd";
 		AuthToken token = a2a.registerIdentityTokenWithYA(appAuthName, appAuthPassword);
 		System.out.println(token);

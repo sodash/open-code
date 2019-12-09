@@ -288,9 +288,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		if (Dep.has(AuthToken.class)) {
 			return Dep.get(AuthToken.class);
 		}
-		App2AppAuthClient a2a = new App2AppAuthClient();
+		YouAgainClient yac = Dep.get(YouAgainClient.class);
 		String appAuthPassword = config2.getAppAuthPassword();
-		String appAuthName = getAppName()+"@good-loop.com@app"; // TODO get domain from the config.
+		String appAuthName = getAppName()+"@good-loop.com"; // TODO get domain from the config.
 		String appAuthJWT = config2.getAppAuthJWT();
 		// use JWT if we have it
 		if ( ! Utils.isBlank(appAuthJWT)) {
@@ -302,6 +302,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			return null;
 		}
 		AuthToken token;
+		App2AppAuthClient a2a = new App2AppAuthClient(yac);
 		try {
 			token = a2a.getIdentityTokenFromYA(appAuthName, appAuthPassword);
 		} catch(WebEx.E404 wex) {

@@ -365,7 +365,7 @@ public final class YouAgainClient {
 
 	/**
 	 * 
-	 * @param usernameUsuallyAnEmail
+	 * @param usernameUsuallyAnEmail or an XId
 	 * @param password
 	 * @return
 	 * @throws LoginFailedException
@@ -387,6 +387,10 @@ public final class YouAgainClient {
 		}
 	}
 
+	public AuthToken register(XId xid, String password) {
+		return register(xid.toString(), password);
+	}
+	
 	public AuthToken register(String usernameUsuallyAnEmail, String password) {
 		assert yac != null;
 		Utils.check4null(usernameUsuallyAnEmail, password);
@@ -479,6 +483,10 @@ public final class YouAgainClient {
 		auths.remove(authToken);
 		auths.add(authToken);
 		state.put(AUTHS, auths);
+	}
+
+	public AuthToken login(XId xid, String password) {
+		return login(xid.toString(), password);
 	}
 
 }

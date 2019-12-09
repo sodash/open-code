@@ -3,6 +3,7 @@ package com.winterwell.youagain.client;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.web.data.XId;
 
 
 /**
@@ -32,13 +33,6 @@ public class App2AppAuthClient {
 
 	private YouAgainClient yac;
 
-	/**
-	 * Relies on Dep for the {@link YouAgainClient}
-	 */
-	public App2AppAuthClient() {
-		this(Dep.get(YouAgainClient.class));
-	}
-	
 	public App2AppAuthClient(YouAgainClient yac) {
 		this.yac = yac;
 	}
@@ -47,7 +41,7 @@ public class App2AppAuthClient {
 
 	/**
 	 * 
-	 * @param appAuthName
+	 * @param appAuthName e.g. "myapp@mydomain.com"
 	 * @param appAuthPassword
 	 * @return "This is MyApp, signed YA"
 	 * 
@@ -58,7 +52,8 @@ public class App2AppAuthClient {
 			Log.w(LOGTAG, "missing appAuthName / appAuthPassword "+ReflectionUtils.getSomeStack(8));
 			return null;
 		}
-		AuthToken auth = yac.login(appAuthName, appAuthPassword);
+		XId appXid = getAppXId(appAuthName);
+		AuthToken auth = yac.login(appXid, appAuthPassword);
 		return auth;
 	}
 	
@@ -67,10 +62,19 @@ public class App2AppAuthClient {
 			Log.w(LOGTAG, "missing appAuthName / appAuthPassword "+ReflectionUtils.getSomeStack(8));
 			return null;
 		}
-		AuthToken auth = yac.register(appAuthName, appAuthPassword);
+		XId appXid = getAppXId(appAuthName);
+		AuthToken auth = yac.register(appXid, appAuthPassword);
 		return auth;
 	}
 	
+	private XId getAppXId(String appAuthName) {
+		if (appAuthName.endsWith("@app")) {
+			Log.w(LOGTAG, "Already an XId");
+			return new XId(appAuthName);
+		}
+		return new XId(appAuthName, "app");
+	}
+
 	/**
 	 * 
 	 * @param appIdToken
