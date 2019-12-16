@@ -963,6 +963,10 @@ public class FakeBrowser {
 		this.debug = debug;
 		return this;
 	}
+	
+	public boolean getDebug() {
+		return debug;
+	}
 
 	/**
 	 * Set the request method. This will override the normal use of GET or POST, 
