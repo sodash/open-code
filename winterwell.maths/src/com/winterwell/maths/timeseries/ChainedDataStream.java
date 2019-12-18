@@ -3,12 +3,14 @@ package com.winterwell.maths.timeseries;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.winterwell.maths.datastorage.ChainedIterable;
 import com.winterwell.utils.containers.AbstractIterator;
 
 /**
  * Chain together several data streams in sequence.
  * 
  * @author daniel
+ * @see ChainedIterable
  * 
  */
 public final class ChainedDataStream extends ADataStream {

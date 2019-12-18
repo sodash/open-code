@@ -3,6 +3,12 @@ package com.winterwell.maths.datastorage;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/**
+ * Chain together several iterables into one long one.
+ * @author daniel
+ *
+ * @param <T>
+ */
 public class ChainedIterable<T> implements Iterable<T>, Iterator<T> {
 
 	private int i = 0;

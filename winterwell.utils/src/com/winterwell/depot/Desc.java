@@ -516,7 +516,7 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 	 *            Descs (see Desc notes).<br>
 	 *            Warning: Descs must be repeatable, so beware of using
 	 *            toString() methods!
-	 * @return The old mapping for this key, or null.
+	 * @return this
 	 *         <p>
 	 *         These are slightly different from normal. If you set a property
 	 *         to the default, this will actually set it to null (allowing the
@@ -535,24 +535,31 @@ public final class Desc<X> implements IProperties, Serializable, Comparable<Desc
 
 	/**
 	 * Equivalent to {@link #put(Key, Object)}
+	 * @return this
 	 */
-	public Object put(String key, Object value) {
+	public Desc<X> put(String key, Object value) {
 		checkUnset();
 		assert key != null;		
 		Object old = properties.get(key);
 		if (Utils.equals(old, value)) {
-			return old; // no-op
+			return this; // no-op
 		}				
-		assert old==null : "Cannot overrite "+key+"="+Printer.toString(old)+" w "+Printer.toString(value)+" in "+this;
+		if (old != null) {
+			throw new IllegalStateException("Cannot overrite "+key+"="+Printer.toString(old)+" w "+Printer.toString(value)+" in "+this);
+		}
 		// An arbitrary limit on key-name length
 		if (key.length() > MAX_KEY_LENGTH) {
 			throw new IllegalArgumentException(key);
+		} 
+		if (value == null) {
+			// Hm: but old was null, so this is a no-op
+			properties.remove(key);
+			return this;
 		}
-		if (value == null)
-			return properties.remove(key);
 		// is it an allowed class?
 		put2_checkValue(key, value);
-		return properties.put(key, value);
+		properties.put(key, value);
+		return this;
 	}
 	
 	/**
