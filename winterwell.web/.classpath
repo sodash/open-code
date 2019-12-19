@@ -15,7 +15,7 @@
 	<classpathentry kind="lib" path="dependencies/jetty-servlet.jar" sourcepath="dependencies/jetty-servlet-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util-ajax.jar" sourcepath="dependencies/jetty-util-ajax-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/javax.mail.jar" sourcepath="javamail-mail-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/javax.mail.jar" sourcepath="dependencies/javax.mail-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-4.X.jar" sourcepath="/middleware/jakarta/httpclient-4.1.2-src.zip"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-cache-4.X.jar"/>

@@ -8,6 +8,16 @@ import com.winterwell.utils.StrUtils;
 public class WebUtils2Test {
 
 	@Test
+	public void testQuotedPrintableEncodeDecode() {
+		String qp = "<div align=3D\"center\" >=09=09Hello!</div>";
+		String plain = WebUtils2.decodeQuotedPrintable(qp);
+		String enc = WebUtils2.encodeQuotedPrintable(plain);
+		assert plain.equals("<div align=\"center\" >		Hello!</div>") : plain;
+		assert enc.equals(qp) : enc;
+	}
+
+	
+	@Test
 	public void testXmlDocToString() {
 		String xml = "<foo blah='whatever'><bar src=''>huh?</bar></foo>";
 		Document doc = WebUtils2.parseXml(xml);

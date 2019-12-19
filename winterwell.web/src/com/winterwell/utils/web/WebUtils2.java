@@ -1,10 +1,14 @@
 package com.winterwell.utils.web;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -23,6 +27,7 @@ import java.util.regex.Pattern;
 import javax.mail.Address;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeUtility;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -37,6 +42,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.input.ReaderInputStream;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.w3c.dom.Document;
 
@@ -83,6 +90,40 @@ import eu.medsea.util.MimeUtil;
  */
 public class WebUtils2 extends WebUtils {
 
+	/**
+	 * See Content-Transfer-Encoding: quoted-printable
+	 */
+	public static String decodeQuotedPrintable(String text) {
+		try {
+			String encoding = "quoted-printable";
+			InputStream stext = new ReaderInputStream(new StringReader(text));
+			InputStream ds = MimeUtility.decode(stext, encoding);
+			String decoded = FileUtils.read(ds);
+			return decoded;
+		} catch(Exception ex) {
+			throw Utils.runtime(ex);
+		}
+	}
+	
+	/**
+	 * See Content-Transfer-Encoding: quoted-printable
+	 */
+	public static String encodeQuotedPrintable(String text) {
+		try {
+			String encoding = "quoted-printable";
+			StringWriter w = new StringWriter(text.length()+100);
+			WriterOutputStream os = new WriterOutputStream(w);
+			OutputStream es = MimeUtility.encode(os, encoding);
+			BufferedWriter ew = FileUtils.getWriter(es);
+			ew.write(text);
+			ew.flush();
+			String encoded = w.getBuffer().toString();
+			return encoded;
+		} catch(Exception ex) {
+			throw Utils.runtime(ex);
+		}
+	}
+	
 	/**
 	 * What do we have that identifies this device? Not much really! 
 	 * Just the browser & OS via the user-agent string.
