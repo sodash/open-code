@@ -59,7 +59,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	public static final String ACTION_PUBLISH = "publish";
-	private static final String ACTION_NEW = "new";
+	public static final String ACTION_NEW = "new";
 	/**
 	 * get, or create if absent
 	 */
