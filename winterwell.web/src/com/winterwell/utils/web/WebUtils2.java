@@ -1419,6 +1419,10 @@ public class WebUtils2 extends WebUtils {
 			// probably a 404
 			return new WebEx.E40X(400, ex.getMessage(), ex); // wrap the stacktrace??
 		}
+		// security exception - report as 403 (user forbidden)
+		if (ex instanceof SecurityException) {
+			return new WebEx.E403(null, ex.toString());
+		}
 		// send it via Utils which may improve some errors, eg SQL 
 		RuntimeException wrap = Utils.runtime(ex);
 		if (wrap instanceof WrappedException) {

@@ -88,13 +88,14 @@ public class HttpServletWrapper extends HttpServlet {
 		 return factory.get();
 	}
 
-	public static void doCatch(Throwable ex, HttpServletResponse resp, WebRequest state) {
-		WebEx wex = WebUtils2.runtime(ex);
-		// include state info
+	public static void doCatch(Throwable ex, HttpServletResponse resp, WebRequest state) {		
+		// include state info in the string
 		if (state!=null) {
 			ex = new WrappedException(state.toString(), ex);
 		}
 		String exs = Printer.toString(ex, true);
+		
+		WebEx wex = WebUtils2.runtime(ex);
 		if (wex.code >= 500) {
 			Log.e("error."+wex.getClass().getSimpleName(), exs);
 		} else {

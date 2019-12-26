@@ -58,17 +58,18 @@ import com.winterwell.youagain.client.YouAgainClient;
 public abstract class CrudServlet<T> implements IServlet {
 
 
+	protected boolean dataspaceFromPath;
 	public static final String ACTION_PUBLISH = "publish";
 	public static final String ACTION_NEW = "new";
 	/**
 	 * get, or create if absent
 	 */
-	private static final String ACTION_GETORNEW = "getornew";
+	public static final String ACTION_GETORNEW = "getornew";
+	public static final String ACTION_SAVE = "save";
 
 	public CrudServlet(Class<T> type) {
 		this(type, Dep.get(IESRouter.class));
 	}
-	
 	
 	
 	public CrudServlet(Class<T> type, IESRouter esRouter) {
@@ -78,7 +79,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 	protected JThing<T> doDiscardEdits(WebRequest state) {
-		ESPath path = esRouter.getPath(dataspace,type, getId(state), KStatus.DRAFT);
+		ESPath path = esRouter.getPath(dataspace, type, getId(state), KStatus.DRAFT);
 		DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
 		IESResponse ok = del.get().check();		
 		getThing(state);
@@ -88,6 +89,12 @@ public abstract class CrudServlet<T> implements IServlet {
 	public void process(WebRequest state) throws Exception {
 		// CORS??
 		WebUtils2.CORS(state, false);
+		
+		// dataspace?
+		if (dataspaceFromPath) {
+			String ds = state.getSlugBits(1);
+			setDataspace(ds);
+		}
 		
 		doSecurityCheck(state);
 		
@@ -164,7 +171,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		// save?
-		if (state.actionIs("save") || state.actionIs(ACTION_NEW)) {
+		if (state.actionIs(ACTION_SAVE) || state.actionIs(ACTION_NEW)) {
 			doSave(state);
 			return;
 		}
@@ -445,7 +452,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		// Beware if ID can have a / in it!
 		String[] slugBits = state.getSlugBits();
 		
-		String sid = slugBits[slugBits.length - 1]; // NB: slug-bit-0 is the servlet
+		String sid = slugBits[slugBits.length - 1]; 
+		// NB: slug-bit-0 is the servlet, slug-bit-1 might be the ID - or the dataspace for e.g. SegmentServlet
 		_id = getId2(state, sid);
 		return _id;
 	}

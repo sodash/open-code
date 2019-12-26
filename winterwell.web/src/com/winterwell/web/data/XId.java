@@ -19,6 +19,8 @@ import com.winterwell.web.LoginDetails;
 /**
  * An id for an external service.
  *
+ *
+ * 
  * @see DBLogin (database backed)
  * @see LoginDetails (this is lighter and a bit different)
  * @author daniel
@@ -34,21 +36,29 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 			"(\\S+)@([A-Za-z\\.]+)?");
 
 	/**
+	 * @deprecated - better to use a "sub-service" e.g. company.linkedin.com
 	 * Company-type. Added to the start of the XId name for SOME data-sources,
 	 * to avoid any overlap with other types.  
 	 */
 	public static final String WART_C = "c_";
+	
 	/**
+	 * @deprecated - better to use a "sub-service" e.g. person.linkedin.com. Or just assume person as the default.
+	 * 
 	 * Person-type. Added to the start of the XId name for SOME data-sources,
 	 * to avoid any overlap with other types.  
 	 */
 	public static final String WART_P = "p_";
+	
 	/**
+	 * @deprecated
 	 * Video-type. Added to the start of the XId name for SOME data-sources,
 	 * to avoid any overlap with other types.
 	 */
 	public static final String WART_V = "v_";
+	
 	/**
+	 * @deprecated
 	 * Group-type. Added to the start of the XId name for SOME data-sources,
 	 * to avoid any overlap with other types.
 	 */
@@ -59,7 +69,18 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	 */
 	public static final XId ANON = new XId(WART_P+"anon@unspecified", false);
 	
+	/**
+	 * The service-specific ID -- e.g. Twitter username 
+	 */
 	public final String name;
+	
+	/**
+	 * The service. Canonical pattern we'd like to adopt (but mostly dont use at present): 
+	 * 	`type.domain`, e.g. advert.good-loop.com
+	 * 
+	 * IF type is included in the service, it must always be used!
+	 * Historically, we've used warts on the name for type -- this is deprecated.
+	 */
 	public final String service;
 
 	/**
@@ -87,7 +108,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 		assert ! service.contains("@") : service;
 	}
 
-	static Map<String,IDoCanonical> service2canonical = IDoCanonical.DUMMY_CANONICALISER;
+	static Map<String,IDoCanonical> canonicalForService = IDoCanonical.DUMMY_CANONICALISER;
 	
 	/**
 	 * Use with {@link IDoCanonical#DUMMY_CANONICALISER} to allow XIds to be used _without_ initialising Creole.
@@ -96,7 +117,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	public static void setService2canonical(
 			Map<String, IDoCanonical> service2canonical) 
 	{
-		XId.service2canonical = service2canonical;
+		XId.canonicalForService = service2canonical;
 	}
 
 	/**
@@ -104,7 +125,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	 * @param service
 	 */
 	public XId(String name, String service) {
-		this(name, service, service2canonical.get(service));
+		this(name, service, canonicalForService.get(service));
 	}
 
 	/**
@@ -166,7 +187,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 			return;
 		}
 		
-		IDoCanonical plugin = service2canonical.get(service);
+		IDoCanonical plugin = canonicalForService.get(service);
 		String _name = id.substring(0, i);
 		// guard against an easy error
 		assert ! _name.endsWith("@"+service) : "Bad XId "+id+" - duplicate service";
