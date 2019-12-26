@@ -7,6 +7,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.data.IHasXId;
+import com.winterwell.web.data.XId;
 import com.winterwell.youagain.client.ShareToken;
 import com.winterwell.youagain.client.YouAgainClient;
 
@@ -19,6 +20,20 @@ import com.winterwell.youagain.client.YouAgainClient;
  */
 //@Data Lombok is nice, but not using it makes builds more robust
 public class AThing implements IInit {
+
+	/**
+	 * 
+	 * @return default pattern: if id has an @, use it - otherwise add "@type.good-loop.com"
+	 */
+	public XId getXId() {
+		if (XId.XID_PATTERN.matcher(getId()).matches()) {
+			return new XId(getId());
+		}
+		String type = getClass().getSimpleName().toLowerCase();
+		String service = type+".good-loop.com";
+		return new XId(getId(), service, false);
+	}
+
 	
 	public void setShares(List<ShareToken> shares) {
 		this.shares = shares;
