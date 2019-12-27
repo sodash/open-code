@@ -2,7 +2,9 @@ package com.winterwell.utils;
 
 import java.io.File;
 import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -276,10 +278,12 @@ public final class Utils {
 	}
 
 	/**
-	 * A random lower case string
+	 * A random lower case string.
+	 * Roughly consonant-consonant-vowel for pronounceability
 	 * 
 	 * @param len
 	 * @return
+	 * @see getNon
 	 */
 	public static String getRandomString(int len) {
 		Random rnd = getRandom();
@@ -296,6 +300,18 @@ public final class Utils {
 		}
 		return new String(s);
 	}	
+	
+	/**
+	 * @return a random long, in url-safe base-64 encoding
+	 */
+	public static String getNonce() {
+		long rnd = getRandom().nextLong();
+		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+	    buffer.putLong(rnd);
+		byte[] src = buffer.array();
+		String s = Base64.getUrlEncoder().encodeToString(src);
+		return s;
+	}
 	
 	public static class PowerLawDistribution {
 		double exponent;
