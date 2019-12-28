@@ -287,7 +287,7 @@ public class AppUtils {
 	 * Save edits to *draft*
 	 * @param path
 	 * @param item
-	 * @param state
+	 * @param state Can be null
 	 * @return
 	 */
 	public static JThing doSaveEdit(ESPath path, JThing item, WebRequest state) {
