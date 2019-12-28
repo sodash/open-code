@@ -105,7 +105,7 @@ public final class Dep {
 	}
 
 	/**
-	 * 
+	 * Set - can override
 	 * @param klass
 	 * @param value
 	 * @return value
@@ -114,9 +114,12 @@ public final class Dep {
 		Log.d("dep", "set "+klass+" = "+value+" "+ReflectionUtils.getSomeStack(6, Dep.class.getName()));
 		DepContext ctxt = getContext();
 		DKey key = key(klass, ctxt);
-		stash.put(key, value);
+		Object old = stash.put(key, value);		
 		// as a debug aid 
 		key.stacktrace = ReflectionUtils.getSomeStack(12);
+		if (old != null) {
+			Log.w("dep", "set "+klass+" Override! "+old+" with "+value+" Best practice is NOT to override.");
+		}
 		return value;
 	}
 	
