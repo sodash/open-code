@@ -118,7 +118,7 @@ public class AppUtils {
 	/**
 	 * Will try path.indices in order if multiple
 	 * @param path
-	 * @return
+	 * @return object or null for 404
 	 */
 	public static <X> X get(ESPath path, Class<X> klass) {
 		return get(path, klass, null);
@@ -221,18 +221,20 @@ public class AppUtils {
 	/**
 	 * 
 	 * @param draft
-	 * @param draftPath
+	 * @param draftPath Can be null
 	 * @param publishPath
 	 * @param forceRefresh true - use refresh=true to make the index update now
 	 * @param deleteDraft Normally we leave the draft, for future editing. But if the object is not editable once published - delete the draft.
 	 * @return
 	 */
-	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath, 
+	public static JThing doPublish(
+			JThing draft, ESPath draftPath, ESPath publishPath, 
 			KRefresh refresh, boolean deleteDraft) 
 	{
 		Log.d("doPublish", "to "+publishPath+"... deleteDraft "+deleteDraft);
 		// prefer being given the draft to avoid ES race conditions
 		if (draft==null) {
+			assert draftPath != null : "no draft or draftpath! "+publishPath;
 			Map<String, Object> draftMap = get(draftPath, null);
 			draft = new JThing().setMap(draftMap);
 		}
@@ -254,7 +256,7 @@ public class AppUtils {
 		
 		// Also update draft?
 		Log.d("doPublish", publishPath+" deleteDraft: "+deleteDraft);
-		if ( ! draftPath.equals(publishPath)) {
+		if (draftPath!=null && ! draftPath.equals(publishPath)) {
 			if (deleteDraft) {
 				doDelete(draftPath);
 			} else {

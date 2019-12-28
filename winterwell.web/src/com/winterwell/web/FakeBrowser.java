@@ -364,7 +364,9 @@ public class FakeBrowser {
 						Object v = reqHeaders.get(h);
 						return v==null? "" : " -H '"+h+": "+v+"'";
 					}), " ");										
-					String curl = StrUtils.compactWhitespace("curl -XGET "+sheaders+" '"+uri+"'");
+					String curl = StrUtils.compactWhitespace("curl -XGET "
+							+(password==null? "" : "--user "+name+":"+password+" ") // Warning: may not work for all chars TODO give the base64 encoded header instead
+							+sheaders+" '"+uri+"'");
 					Log.d(LOGTAG, curl);
 				}
 				
@@ -376,6 +378,9 @@ public class FakeBrowser {
 				return response;
 			} catch (WebEx.Redirect e) {
 				return getPage3_redirect(uri, vars, depth, e);
+			} catch(WebEx.E40X userError) {
+				err = userError; 
+				break; // no retries
 			} catch (Exception ex) {
 				// pause, unless that was our last try (in which case we'll exit the for loop and throw an exception)
 				if (t < tries-1) {					

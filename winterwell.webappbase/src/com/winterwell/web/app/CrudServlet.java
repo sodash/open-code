@@ -28,6 +28,7 @@ import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Key;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -44,6 +45,7 @@ import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.data.IHasXId;
 import com.winterwell.web.data.XId;
+import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.SField;
 import com.winterwell.youagain.client.AuthToken;
 import com.winterwell.youagain.client.NoAuthException;
@@ -374,6 +376,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 	public static final SField SORT = new SField("sort");
 	public static final String LIST_SLUG =  "_list";
+	private static final IntField SIZE = new IntField("size");
 
 	protected final JThing<T> doPublish(WebRequest state) {
 		// wait 1 second??
@@ -484,11 +487,51 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @throws IOException
 	 */
 	protected List doList(WebRequest state) throws IOException {
+		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
+		String q = state.get("q");
+		String sort = state.get(SORT, defaultSort);		
+		int size = state.get(SIZE, 1000);
+		
+		SearchResponse sr = doList2(q, status, sort, size, state);
+		
+		Map<String, Object> jobj = sr.getParsedJson();
+		List<Map> hits = sr.getHits();
+
+		// TODO dedupe can cause the total reported to be off
+		List hits2 = doList3_source_dedupe(status, hits);
+		
+		// sanitise for privacy
+		hits2 = cleanse(hits2, state);
+
+		// HACK: send back csv?
+		if (state.getResponseType() == KResponseType.csv) {
+			doSendCsv(state, hits2);
+			return hits2;
+		}
+			
+		long total = sr.getTotal();
+		String json = gson().toJson(
+				new ArrayMap(
+					"hits", hits2, 
+					"total", total
+				));
+		JsonResponse output = new JsonResponse(state).setCargoJson(json);
+		WebUtils2.sendJson(output, state);
+		return hits2;
+	}
+
+
+	/**
+	 * Do the search! 
+	 * 
+	 * Does NOT dedupe (eg multiple copies with diff status) or security cleanse.
+	 * @param num 
+	 */
+	public SearchResponse doList2(String q, KStatus status, String sort, int size, WebRequest stateOrNull) {
 		// copied from SoGive SearchServlet
 		// TODO refactor to use makeESFilterFromSearchQuery
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
 		/// which index? draft (which should include copies of published) by default
-		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
 		switch(status) {
 		case ALL_BAR_TRASH:
 			s.setIndices(
@@ -509,19 +552,21 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		// query
-		String q = state.get("q");
 		ESQueryBuilder qb = null;
 		if ( q != null) {
 			// convert "me" to specific IDs
 			if (Pattern.compile("\\bme\\b").matcher(q).find()) {
+				if (stateOrNull==null) {
+					throw new NullPointerException("`me` requires webstate to resolve who: "+q);
+				}
 				YouAgainClient ya = Dep.get(YouAgainClient.class);
-				List<AuthToken> tokens = ya.getAuthTokens(state);
+				List<AuthToken> tokens = ya.getAuthTokens(stateOrNull);
 				StringBuilder mes = new StringBuilder();
 				for (AuthToken authToken : tokens) {
 					mes.append(authToken.xid+" OR ");
 				}
 				if (mes.length()==0) {
-					Log.w("crud", "No mes "+q+" "+state);
+					Log.w("crud", "No mes "+q+" "+stateOrNull);
 					mes.append("ANON OR " ); // fail - WTF? How come no logins?!
 				}
 				StrUtils.pop(mes, 4);
@@ -546,13 +591,12 @@ public abstract class CrudServlet<T> implements IServlet {
 			}
 		}
 		// NB: exq can be null for ALL
-		ESQueryBuilder exq = doList2_query(state);
+		ESQueryBuilder exq = doList2_query(stateOrNull);
 		qb = ESQueryBuilders.must(qb, exq);
 
 		if (qb!=null) s.setQuery(qb);
 				
 		// Sort e.g. sort=date-desc for most recent first
-		String sort = state.get(SORT, defaultSort);
 		if (sort!=null) {
 			// HACK: order?
 			SortOrder order = SortOrder.ASC;
@@ -566,35 +610,12 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		// TODO paging!
-		s.setSize(10000);
+		s.setSize(size);
 		s.setDebug(true);
 
 		// Call the DB
 		SearchResponse sr = s.get();		
-		Map<String, Object> jobj = sr.getParsedJson();
-		List<Map> hits = sr.getHits();
-
-		// TODO dedupe can cause the total reported to be off
-		List hits2 = doList3_source_dedupe(status, hits);
-		
-		// sanitise for privacy
-		hits2 = cleanse(hits2, state);
-		
-		// HACK: send back csv?
-		if (state.getResponseType() == KResponseType.csv) {
-			doSendCsv(state, hits2);
-			return hits2;
-		}
-			
-		long total = sr.getTotal();
-		String json = gson().toJson(
-				new ArrayMap(
-					"hits", hits2, 
-					"total", total
-				));
-		JsonResponse output = new JsonResponse(state).setCargoJson(json);
-		WebUtils2.sendJson(output, state);
-		return hits2;
+		return sr;
 	}
 
 
@@ -715,7 +736,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	/**
-	 * 
+	 * Override to add custom filtering
 	 * @param state
 	 * @return null or a query
 	 */

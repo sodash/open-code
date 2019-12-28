@@ -302,15 +302,15 @@ public final class Utils {
 	}	
 	
 	/**
-	 * @return a random long, in url-safe base-64 encoding
+	 * @return a random long, in base64url encoding (url and filename safe)
 	 */
 	public static String getNonce() {
 		long rnd = getRandom().nextLong();
 		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
 	    buffer.putLong(rnd);
 		byte[] src = buffer.array();
-		String s = Base64.getUrlEncoder().encodeToString(src);
-		return s;
+		String s = Base64.getUrlEncoder().encodeToString(src);		
+		return s.endsWith("=")? s.substring(0, s.length()-1) : s; // pop trailing = pad
 	}
 	
 	public static class PowerLawDistribution {

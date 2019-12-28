@@ -48,6 +48,10 @@ import com.winterwell.web.fields.XIdField;
  */
 public final class YouAgainClient {
 
+	public String getApp() {
+		return app;
+	}
+	
 	public static XId xidFromEmail(String email) {
 		return new XId(WebUtils2.canonicalEmail(email), "email");
 	}
@@ -107,6 +111,10 @@ public final class YouAgainClient {
 	 */
 	static final String MASTERAPP = "youagain";
 	
+	/**
+	 * What app are you using? e.g. "sogive" or "profiler".
+	 * Each app has its own namespace for auth data.
+	 */
 	final String app;
 
 	private boolean debug;

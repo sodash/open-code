@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.winterwell.utils.containers.ArrayMap;
 
@@ -13,6 +14,18 @@ import junit.framework.TestCase;
 
 public class UtilsTest extends TestCase {
 
+	public void testNonce() throws Exception {
+		String n1 = Utils.getNonce();
+		String n2 = Utils.getNonce();
+		String n3 = Utils.getNonce();
+		assert ! n1.equals(n2);
+		for(String n : new String[] {n1,n2,n3}) {
+			assert n.length() < 16;
+			assert n.length() > 5;
+			assert Pattern.compile("[a-zA-Z0-9\\-_]+").matcher(n).matches() : n;
+		}
+	}
+	
 	public void testTruthy() throws Exception {
 		assert Utils.truthy(1);
 		assert ! Utils.truthy(false);
