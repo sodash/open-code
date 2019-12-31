@@ -39,7 +39,7 @@ public class BuildWinterwellProject extends BuildTask {
 	
 	protected boolean makeFatJar;
 	
-	protected String mainClass;
+	private String mainClass;
 
 	private File fatJar;
 
@@ -180,6 +180,11 @@ public class BuildWinterwellProject extends BuildTask {
 		this.outDir = outDir;
 	}
 	
+	/**
+	 * @deprecated This creates a build-time dependency on a *compiled* version of the main class.
+	 * Which probably blocks command-line invocation. Use the String version instead
+	 * @param mainClass
+	 */
 	public void setMainClass(Class mainClass) {
 		setMainClass(mainClass.getCanonicalName());
 	}
@@ -316,6 +321,7 @@ public class BuildWinterwellProject extends BuildTask {
 	private void setJarManifest(JarTask jar, File projectDir, String title) {
 		jar.setManifestProperty(JarTask.MANIFEST_TITLE, title);
 		if (mainClass!=null) {
+			// TODO itd be nice to test after whether the mainClass is in the jar
 			jar.setManifestProperty(JarTask.MANIFEST_MAIN_CLASS, mainClass);
 		}
 		// Version
