@@ -486,13 +486,14 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @return for debug purposes! The results are sent back in state
 	 * @throws IOException
 	 */
-	protected List doList(WebRequest state) throws IOException {
+	public final List doList(WebRequest state) throws IOException {
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
 		String q = state.get("q");
+		String prefix = state.get("prefix");
 		String sort = state.get(SORT, defaultSort);		
 		int size = state.get(SIZE, 1000);
 		
-		SearchResponse sr = doList2(q, status, sort, size, state);
+		SearchResponse sr = doList2(q, prefix, status, sort, size, state);
 		
 		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();
@@ -525,9 +526,10 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * Do the search! 
 	 * 
 	 * Does NOT dedupe (eg multiple copies with diff status) or security cleanse.
+	 * @param prefix 
 	 * @param num 
 	 */
-	public SearchResponse doList2(String q, KStatus status, String sort, int size, WebRequest stateOrNull) {
+	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, WebRequest stateOrNull) {
 		// copied from SoGive SearchServlet
 		// TODO refactor to use makeESFilterFromSearchQuery
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
@@ -589,7 +591,13 @@ public abstract class CrudServlet<T> implements IServlet {
 //				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
 				qb = ESQueryBuilders.must(qb, esq);
 			}
+		} // ./q
+		if (prefix != null) {
+			// prefix is on a field -- we use name
+			ESQueryBuilder qp = ESQueryBuilders.prefixQuery("name", prefix);
+			qb = ESQueryBuilders.must(qb, qp);
 		}
+		
 		// NB: exq can be null for ALL
 		ESQueryBuilder exq = doList2_query(stateOrNull);
 		qb = ESQueryBuilders.must(qb, exq);
