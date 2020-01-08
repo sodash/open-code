@@ -378,6 +378,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	public static final String LIST_SLUG =  "_list";
 	private static final IntField SIZE = new IntField("size");
 	public static final SField Q = new SField("q");
+	public static final String ALL = "all";
 
 	protected final JThing<T> doPublish(WebRequest state) {
 		// wait 1 second??
@@ -586,7 +587,7 @@ public abstract class CrudServlet<T> implements IServlet {
 				ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
 				qb = ESQueryBuilders.boolQuery().mustNot(setFilter);
 			}	
-			if ( ! Utils.isBlank(q) && ! "ALL".equals(q)) {
+			if ( ! Utils.isBlank(q) && ! ALL.equalsIgnoreCase(q)) { // ??make all case-sensitive??
 				SearchQuery sq = new SearchQuery(q);
 				BoolQueryBuilder esq = AppUtils.makeESFilterFromSearchQuery(sq, null, null);
 //				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
