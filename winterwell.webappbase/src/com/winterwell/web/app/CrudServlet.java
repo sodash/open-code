@@ -752,9 +752,9 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	/**
-	 * Override to add custom filtering
+	 * Override to add custom filtering.
 	 * @param state
-	 * @return null or a query
+	 * @return null or a query. This is ANDed to the normal query.
 	 */
 	protected ESQueryBuilder doList4_ESquery_custom(WebRequest state) {
 		return null;
