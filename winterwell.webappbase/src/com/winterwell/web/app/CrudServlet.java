@@ -377,6 +377,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	public static final SField SORT = new SField("sort");
 	public static final String LIST_SLUG =  "_list";
 	private static final IntField SIZE = new IntField("size");
+	public static final SField Q = new SField("q");
 
 	protected final JThing<T> doPublish(WebRequest state) {
 		// wait 1 second??
@@ -488,7 +489,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	public final List doList(WebRequest state) throws IOException {
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
-		String q = state.get("q");
+		String q = state.get(Q);
 		String prefix = state.get("prefix");
 		String sort = state.get(SORT, defaultSort);		
 		int size = state.get(SIZE, 1000);
