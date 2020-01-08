@@ -208,7 +208,6 @@ public class PublishProjectTask extends BuildTask {
 		}
 		pubas.close();
 		Log.d(pubas.getCommand(), pubas.getOutput());
-		
 	}
 
 	

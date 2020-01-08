@@ -59,6 +59,8 @@ public class ProcessTask extends BuildTask {
 	 */
 	private boolean echo;
 
+	private Integer code;
+
 	/**
 	 * false by default. If true, also send all output to system out
 	 */
@@ -126,9 +128,9 @@ public class ProcessTask extends BuildTask {
 		// Do it!
 		Log.d(getClass().getSimpleName(), cmd+"...");
 		p.setEcho(echo);
-		p.run();
+		p.start();
 		
-		int code = p.waitFor(); //(timeout);
+		code = p.waitFor(); //(timeout);
 		// Done?
 		output = p.getOutput();
 		error = p.getError();
@@ -143,6 +145,13 @@ public class ProcessTask extends BuildTask {
 			throw new FailureException(cmd.toString(), 
 					output + " " + error);
 		}
+	}
+	
+	/**
+	 * @return null if not run/completed, 0 for OK, other values prob indicate an error
+	 */
+	public Integer getOutputCode() {
+		return code;
 	}
 
 	/**
