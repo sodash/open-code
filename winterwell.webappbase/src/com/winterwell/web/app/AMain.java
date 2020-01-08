@@ -139,15 +139,17 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		mainLoopThread = new Thread(getClass().getSimpleName()+".doMainLoop") {
 			@Override
 			public void run() {
-				try {
-					doMainLoop();
-				} catch(Throwable ex) {
-					Log.e(appName, ex);
-					if (pleaseStop) return;
-					// pause a moment
-					Utils.sleep(100);
-					// loop again... 
-					// NB: use stop() to stop
+				while( ! pleaseStop) {
+					try {
+						doMainLoop();
+					} catch(Throwable ex) {
+						Log.e(appName, ex);
+						if (pleaseStop) return;
+						// pause a moment
+						Utils.sleep(100);
+						// loop again... 
+						// NB: use stop() to stop
+					}
 				}
 			}
 		};
