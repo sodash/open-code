@@ -556,6 +556,34 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		// query
+		ESQueryBuilder qb = doList3_ESquery(q, prefix, stateOrNull);
+
+		if (qb!=null) s.setQuery(qb);
+				
+		// Sort e.g. sort=date-desc for most recent first
+		if (sort!=null) {
+			// HACK: order?
+			SortOrder order = SortOrder.ASC;
+			if (sort.endsWith("-desc")) {
+				sort = sort.substring(0, sort.length()-5);
+				order = SortOrder.DESC;
+			} else if (sort.endsWith("-asc")) {
+				sort = sort.substring(0, sort.length()-4);
+			}
+			s.addSort(sort, order);
+		}
+		
+		// TODO paging!
+		s.setSize(size);
+		s.setDebug(true);
+
+		// Call the DB
+		SearchResponse sr = s.get();		
+		return sr;
+	}
+
+
+	protected ESQueryBuilder doList3_ESquery(String q, String prefix, WebRequest stateOrNull) {
 		ESQueryBuilder qb = null;
 		if ( q != null) {
 			// convert "me" to specific IDs
@@ -594,38 +622,16 @@ public abstract class CrudServlet<T> implements IServlet {
 				qb = ESQueryBuilders.must(qb, esq);
 			}
 		} // ./q
-		if (prefix != null) {
+		if (prefix != null) {			
 			// prefix is on a field -- we use name
 			ESQueryBuilder qp = ESQueryBuilders.prefixQuery("name", prefix);
 			qb = ESQueryBuilders.must(qb, qp);
 		}
 		
 		// NB: exq can be null for ALL
-		ESQueryBuilder exq = doList2_query(stateOrNull);
+		ESQueryBuilder exq = doList4_ESquery_custom(stateOrNull);
 		qb = ESQueryBuilders.must(qb, exq);
-
-		if (qb!=null) s.setQuery(qb);
-				
-		// Sort e.g. sort=date-desc for most recent first
-		if (sort!=null) {
-			// HACK: order?
-			SortOrder order = SortOrder.ASC;
-			if (sort.endsWith("-desc")) {
-				sort = sort.substring(0, sort.length()-5);
-				order = SortOrder.DESC;
-			} else if (sort.endsWith("-asc")) {
-				sort = sort.substring(0, sort.length()-4);
-			}
-			s.addSort(sort, order);
-		}
-		
-		// TODO paging!
-		s.setSize(size);
-		s.setDebug(true);
-
-		// Call the DB
-		SearchResponse sr = s.get();		
-		return sr;
+		return qb;
 	}
 
 
@@ -750,7 +756,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param state
 	 * @return null or a query
 	 */
-	protected ESQueryBuilder doList2_query(WebRequest state) {
+	protected ESQueryBuilder doList4_ESquery_custom(WebRequest state) {
 		return null;
 	}
 
