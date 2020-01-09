@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.CookieManager;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -265,11 +267,14 @@ public class WebUtils2 extends WebUtils {
 	 * @param timeTolive
 	 * @param cookieDomain
 	 *            e.g. ".soda.sh" Can be null for default behaviour
+	 * @param sameSite Strict / Lax / None (allows cross-site cookies).
+	 * Strict is usually a bad idea - it doesn't work for links into your site. 
 	 * @return 
 	 */
 	public static Cookie addCookie(HttpServletResponse response, String name,
-			Object value, Dt timeTolive, String cookieDomain) {
-		String cname = urlEncode(name);
+			Object value, Dt timeTolive, String cookieDomain, String sameSite) 
+	{				
+		String cname = urlEncode(name);			
 		Cookie cookie = new Cookie(cname, value.toString());
 		cookie.setMaxAge((int) (timeTolive.getMillisecs() / 1000));
 		if (cookieDomain != null) {
@@ -277,9 +282,22 @@ public class WebUtils2 extends WebUtils {
 		}
 		// make the cookie available across the server
 		cookie.setPath("/");
-//		// TODO same site and secure
-//		cookie.setSecure(flag);
-//		response.SameSite=None; Secure (or Lax or Strict)
+		// same site and secure -- HACK needed (Jan 2019) as HttpServletResponse doesn't seem up to date 
+		if (sameSite!=null) {
+			switch(sameSite) {
+			case "None":
+				cookie.setComment(org.eclipse.jetty.http.HttpCookie.SAME_SITE_NONE_COMMENT);
+				cookie.setSecure(true);
+				break;
+			case "Lax":
+				cookie.setComment(org.eclipse.jetty.http.HttpCookie.SAME_SITE_LAX_COMMENT); break;
+			case "Strict":
+				cookie.setComment(org.eclipse.jetty.http.HttpCookie.SAME_SITE_STRICT_COMMENT); break;
+			default:
+				throw new IllegalArgumentException("Unrecognised SameSite: "+sameSite);
+			} 
+		}
+					
 		// FIXME WHy is Jetty sometimes wrapping names in quotes? It seems to happen if the name uses a % encoding.		
 		response.addCookie(cookie);
 		Log.d("cookie", "add "+name+" = "+value);

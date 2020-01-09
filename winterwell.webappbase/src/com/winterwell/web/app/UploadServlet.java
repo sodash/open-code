@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Key;
@@ -244,7 +242,7 @@ public final class UploadServlet implements IServlet {
 		YouAgainClient ya = Dep.get(YouAgainClient.class);
 		List<AuthToken> tokens = ya.getAuthTokens(state);		
 		if (state.getUser() == null) throw new NoAuthException(state);
-		if (ServletFileUpload.isMultipartContent(state.getRequest())) {
+		if (state.isMultipartContent()) {
 //			try {
 			Map cargo = new ArrayMap();			
 			File asset = doUpload(state, cargo);

@@ -3,7 +3,11 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="builder"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.bob"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.web"/>
@@ -12,7 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.depot"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/youagain-java-client"/>
 	<classpathentry kind="lib" path="/middleware/lombok/lombok.jar"/>
-	<classpathentry kind="lib" path="/middleware/jakarta/commons-fileupload-1.2.1.jar" sourcepath="/middleware/jakarta/commons-fileupload-1.2.1-sources.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
