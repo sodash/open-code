@@ -15,7 +15,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/jetty-server.jar" sourcepath="dependencies/jetty-server-sources.jar"/>
 	<classpathentry kind="lib" path="dependencies/jetty-servlet.jar" sourcepath="dependencies/jetty-servlet-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util-ajax.jar" sourcepath="dependencies/jetty-util-ajax-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util.jar" sourcepath="dependencies/jetty-util-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/javax.mail.jar" sourcepath="dependencies/javax.mail-sources.jar"/>
 	<classpathentry kind="lib" path="dependencies/mime-util.jar"/>
 	<classpathentry kind="lib" path="dependencies/httpclient.jar"/>
@@ -26,8 +26,6 @@
 	<classpathentry kind="lib" path="dependencies/jakarta.activation.jar"/>
 	<classpathentry kind="lib" path="dependencies/jakarta.mail.jar"/>
 	<classpathentry kind="lib" path="dependencies/log4j.jar"/>
-	<classpathentry kind="lib" path="dependencies/slf4j-api.jar"/>
-	<classpathentry kind="lib" path="dependencies/slf4j-log4j12.jar"/>
 	<classpathentry kind="lib" path="dependencies/commons-fileupload.jar"/>
 	<classpathentry kind="lib" path="dependencies/tagsoup.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>

@@ -262,7 +262,7 @@ public class Bob {
 		}		
 	}
 	
-	private static File getHistoryFile() {
+	static File getHistoryFile() {
 		BobSettings _settings = Bob.dflt==null? new BobSettings() : Bob.dflt.settings;
 		File file = new File(_settings.logDir, "time4task.json");
 		return file;

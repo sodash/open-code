@@ -1,11 +1,13 @@
 package jobs;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
 import com.winterwell.bob.wwjobs.BuildUtils;
 import com.winterwell.bob.wwjobs.BuildWeb;
@@ -51,7 +53,15 @@ public class BuildBob extends BuildWinterwellProject {
 
 	@Override
 	public List<BuildTask> getDependencies() {
-		return Arrays.asList(new BuildUtils(), new BuildWeb());
+		List<BuildTask> uw = new ArrayList();
+		uw.add(new BuildUtils());
+		uw.add(new BuildWeb());
+		
+//		MavenDependencyTask mdt = new MavenDependencyTask();
+//		mdt.addDependency("org.slf4j", "slf4j-api", "1.7.30");
+//		uw.add(mdt);
+		
+		return uw;
 	}
 
 }
