@@ -73,9 +73,9 @@ public class WebRequest implements IProperties, Closeable {
 		freshCookies.put(name, value);
 		String p = request.getProtocol();
 		String ph = getRequestProtocolHost();
-		assert true;
-		
-		return WebUtils2.addCookie(getResponse(), name, value, timeTolive, cookieDomain, "None");
+		String sameSite = "None";
+		Log.d("cookie", "set "+name+" with SameSite="+sameSite+" from protocol: "+p+" protocol-host: "+ph);		
+		return WebUtils2.addCookie(getResponse(), name, value, timeTolive, cookieDomain, sameSite);
 	}
 
 	/**
