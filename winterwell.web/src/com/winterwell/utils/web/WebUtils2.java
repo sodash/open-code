@@ -78,7 +78,7 @@ import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.MissingFieldException;
 import com.winterwell.web.test.TestHttpServletRequest;
 
-import eu.medsea.util.MimeUtil;
+import eu.medsea.mimeutil.MimeUtil;
 
 
 /**
@@ -277,6 +277,9 @@ public class WebUtils2 extends WebUtils {
 		}
 		// make the cookie available across the server
 		cookie.setPath("/");
+//		// TODO same site and secure
+//		cookie.setSecure(flag);
+//		response.SameSite=None; Secure (or Lax or Strict)
 		// FIXME WHy is Jetty sometimes wrapping names in quotes? It seems to happen if the name uses a % encoding.		
 		response.addCookie(cookie);
 		Log.d("cookie", "add "+name+" = "+value);
@@ -526,7 +529,7 @@ public class WebUtils2 extends WebUtils {
 			String mimetype = (String) Z_COMMON_MIMES.get(type);
 			if (mimetype != null) return mimetype;
 			// Ugly library, but hopefully effective
-			return MimeUtil.getMimeType(fileName);
+			return MimeUtil.getFirstMimeType(fileName).toString();
 		} catch(Throwable ex) { // get mimetype can fail on a missing jar
 			Log.e("FileServlet", "getMimeType is using limited built-in type info: "+ex.toString());
 			return null;

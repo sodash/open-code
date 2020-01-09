@@ -7,10 +7,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/middleware/jakarta/commons-fileupload-1.2.1.jar" sourcepath="/middleware/jakarta/commons-fileupload-1.2.1-sources.jar"/>
-	<classpathentry kind="lib" path="/middleware/MimeUtil/dist/mime-util.jar" sourcepath="/middleware/MimeUtil/src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/middleware/jakarta/commons-lang.jar" sourcepath="/middleware/jakarta/commons-lang3-3.1-sources.jar"/>
-	<classpathentry kind="lib" path="/middleware/java2html/java2html.jar" sourcepath="/middleware/java2html/java2html_src.zip"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/javax.servlet-api.jar" sourcepath="/middleware/servlet/servlet-api-3.0.20100224-sources.jar"/>
 	<classpathentry kind="lib" path="dependencies/jetty-http.jar"/>
 	<classpathentry kind="lib" path="dependencies/jetty-io.jar"/>
@@ -20,16 +17,23 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util-ajax.jar" sourcepath="dependencies/jetty-util-ajax-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jetty-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/javax.mail.jar" sourcepath="dependencies/javax.mail-sources.jar"/>
+	<classpathentry kind="lib" path="dependencies/mime-util.jar"/>
+	<classpathentry kind="lib" path="dependencies/httpclient.jar"/>
+	<classpathentry kind="lib" path="dependencies/httpcore.jar"/>
+	<classpathentry kind="lib" path="dependencies/commons-codec.jar"/>
+	<classpathentry kind="lib" path="dependencies/commons-logging.jar"/>
+	<classpathentry kind="lib" path="dependencies/gimap.jar"/>
+	<classpathentry kind="lib" path="dependencies/jakarta.activation.jar"/>
+	<classpathentry kind="lib" path="dependencies/jakarta.mail.jar"/>
+	<classpathentry kind="lib" path="dependencies/log4j.jar"/>
+	<classpathentry kind="lib" path="dependencies/slf4j-api.jar"/>
+	<classpathentry kind="lib" path="dependencies/slf4j-log4j12.jar"/>
+	<classpathentry kind="lib" path="dependencies/commons-fileupload.jar"/>
+	<classpathentry kind="lib" path="dependencies/tagsoup.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-4.X.jar" sourcepath="/middleware/jakarta/httpclient-4.1.2-src.zip"/>
-	<classpathentry kind="lib" path="/middleware/jakarta/httpclient-cache-4.X.jar"/>
-	<classpathentry kind="lib" path="/middleware/jakarta/httpcore-4.X.jar"/>
-	<classpathentry kind="lib" path="/middleware/jakarta/httpmime-4.X.jar"/>
-	<classpathentry kind="lib" path="/middleware/log4j/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-io-2.X.jar" sourcepath="/middleware/jakarta/commons-io-2.4-sources.jar"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="/middleware/jakarta/commons-logging.jar"/>
-	<classpathentry kind="lib" path="/middleware/tagsoup/tagsoup.jar"/>
 	<classpathentry kind="lib" path="/middleware/dnsjava/dnsjava.jar" sourcepath="/middleware/dnsjava/dnsjava-2.1.3-src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry kind="lib" path="/middleware/guava/guava.jar" sourcepath="/middleware/guava/src.zip"/>

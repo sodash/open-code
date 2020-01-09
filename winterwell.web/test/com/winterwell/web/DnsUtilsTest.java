@@ -17,18 +17,8 @@ public class DnsUtilsTest {
 		{
 			List<String> hosts = DnsUtils.getHosts("soda.sh");
 			Printer.out(hosts);
-			assert hosts.contains("egan");
-			assert hosts.contains("brown");
+			assert hosts.contains("egan") : hosts;
 		}
-		// The requests below fail
-		// {
-		// List<String> hosts = DnsUtils.getHosts("egan.soda.sh");
-		// System.out.println(hosts);
-		// }
-		// {
-		// List<String> hosts = DnsUtils.getHosts("egan");
-		// System.out.println(hosts);
-		// }
 	}
 
 	@Test

@@ -19,7 +19,7 @@ public class BuildYouAgainJavaClient extends BuildWinterwellProject {
 	@Override
 	public void doTask() throws Exception {
 		MavenDependencyTask mdt = new MavenDependencyTask();		
-		mdt.addDependency("com.auth0", "java-jwt", "3.4.0");
+		mdt.addDependency("com.auth0", "java-jwt", "3.8.3");
 		mdt.setOutputDirectory(new File(projectDir, "dependencies"));
 		mdt.setIncSrc(true);
 //		mdt.setForceUpdate(true);
