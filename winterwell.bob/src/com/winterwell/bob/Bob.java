@@ -77,7 +77,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.20";
+	public final static String VERSION_NUMBER = "0.9.21";
 
 	public static final String LOGTAG = "bob";
 
@@ -290,6 +290,11 @@ public class Bob {
 		ConfigBuilder cb = cf.getConfigBuilder(BobSettings.class);
 		BobSettings _settings = cb.get();
 		
+		if (_settings.update) {
+			doUpdate();
+			return;
+		}
+		
 		List<String> argsLeft = cb.getRemainderArgs();
 		
 		if (argsLeft.size() == 0) {
@@ -319,25 +324,7 @@ public class Bob {
 		Bob bob = new Bob(_settings);
 		dflt = bob;
 		bob.init();
-		
-		// update Bob itself?
-		if (bob.settings.update) {
-			FakeBrowser fb = new FakeBrowser();
-			fb.setMaxDownload(50); // 50mb?!
-			File bobJar = fb.getFile("https://www.winterwell.com/software/downloads/bob-all.jar");
-			System.out.println("Bob jar downloaded to:");
-			System.out.println(bobJar);
-			// HACK
-			File wwbobjar = new File(FileUtils.getWinterwellDir(), "open-code/winterwell.bob/bob-all.jar");
-			if (wwbobjar.isFile()) {
-				FileUtils.move(wwbobjar, FileUtils.changeType(wwbobjar, ".jar.old"));
-				FileUtils.move(bobJar, wwbobjar);
-				System.out.println("Bob jar moved to:\n"+wwbobjar);
-			}
-			// exit
-			return;
-		}
-		
+				
 		// Build each target
 		for (String clazzName : argsLeft) {
 			try {
@@ -364,6 +351,22 @@ public class Bob {
 			if (success!=null && ! success.isEmpty()) {
 				System.out.println(StrUtils.LINEEND+Printer.toString(success, StrUtils.LINEEND, ":\t"));
 			}
+		}
+	}
+
+	private static void doUpdate() {
+		// update Bob itself?
+		FakeBrowser fb = new FakeBrowser();
+		fb.setMaxDownload(50); // 50mb?!
+		File bobJar = fb.getFile("https://www.winterwell.com/software/downloads/bob-all.jar");
+		System.out.println("Bob jar downloaded to:");
+		System.out.println(bobJar);
+		// HACK
+		File wwbobjar = new File(FileUtils.getWinterwellDir(), "open-code/winterwell.bob/bob-all.jar");
+		if (wwbobjar.isFile()) {
+			FileUtils.move(wwbobjar, FileUtils.changeType(wwbobjar, ".jar.old"));
+			FileUtils.move(bobJar, wwbobjar);
+			System.out.println("Bob jar moved to:\n"+wwbobjar);
 		}
 	}
 
