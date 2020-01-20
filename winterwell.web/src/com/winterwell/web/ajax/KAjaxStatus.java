@@ -12,5 +12,9 @@ public enum KAjaxStatus {
 	 *  */
 	fail, 
 	/** server problem. Should return a message */
-	error
+	error,
+	/**
+	 * http code 202 - wait
+	 */
+	accepted
 }

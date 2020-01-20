@@ -104,7 +104,7 @@ public class TaskRunner {
 	}
 
 	/**
-	 * Includes cancelled tasks
+	 * Includes cancelled and error tasks
 	 */
 	private final Queue<WeakReference<ATask>> done = new ConcurrentLinkedQueue<WeakReference<ATask>>();
 
@@ -353,11 +353,18 @@ public class TaskRunner {
 	/**
 	 * 
 	 * @param matchMe
-	 * @return a pending or currently running task that equals() matchMe, if there is one, or null
+	 * @return a pending or currently running or done task that equals() matchMe, if there is one, or null
 	 */
 	public ATask getTaskMatching(ATask matchMe) {
 		assert matchMe != null; // Probably a bug
+		// running?
 		for (ATask aTask : todo) {
+			if (matchMe.equals(aTask)) {
+				return aTask;
+			}
+		}
+		// done?
+		for (ATask aTask : getDone()) {
 			if (matchMe.equals(aTask)) {
 				return aTask;
 			}
@@ -381,6 +388,25 @@ public class TaskRunner {
 			// ignore
 			return false;
 		}
+	}
+
+	/**
+	 * Remove a task from `todo` and `done`. Does NOT cancel or modify the task itself.
+	 * @param task
+	 * @return true if task was removed
+	 */
+	public boolean forget(ATask task) {
+		if (task==null) return false;
+		boolean rm = todo.remove(task);
+		for (WeakReference<ATask> ref : done) {
+			ATask at = ref.get();
+			if (task.equals(at)) {
+				ref.clear();
+				done.remove(ref);
+				rm = true;
+			}
+		}
+		return rm;
 	}
 	
 

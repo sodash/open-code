@@ -120,6 +120,8 @@ public abstract class ATask<V> implements Callable<V>, IProgress {
 
 	private Time qtime;
 
+	private Throwable error;
+
 	/**
 	 * @return time spent in the queue. Never null (falls back to zero)
 	 */
@@ -171,6 +173,7 @@ public abstract class ATask<V> implements Callable<V>, IProgress {
 			return output;
 		} catch (Throwable e) {
 			status = QStatus.ERROR;
+			error = e;
 			if (runner != null) {
 				runner.report(this, e);
 			}
@@ -185,10 +188,18 @@ public abstract class ATask<V> implements Callable<V>, IProgress {
 		}
 	}
 
+	/**
+	 * Only set on status=ERROR!
+	 * @return error or null
+	 */
+	public Throwable getError() {
+		return error;
+	}
+
 	private volatile boolean closedFlag;
 	
 	/**
-	 * Stop the time-out (if set), other sub-class clean-up ops, & let the
+	 * Stop the time-out (if set), cancel if needed, other sub-class clean-up ops, & let the
 	 * TaskRunner know. Repeated calls have no effect.
 	 */
 	public final void close() {
@@ -405,6 +416,14 @@ public abstract class ATask<V> implements Callable<V>, IProgress {
 			return getClass().getName() + "[" + name + "]";
 		// have a predictable name for TaskRunnerWithStats
 		return getClass().getName();
+	}
+
+	/**
+	 * Convenience for: this task has finished, one way or another, and isnt moving.
+	 * @return true for done|error|cancelled
+	 */
+	public boolean isFinished() {
+		return status == QStatus.DONE || status == QStatus.ERROR || status == QStatus.CANCELLED;
 	}
 
 }
