@@ -404,6 +404,7 @@ public class TaskRunner {
 				ref.clear();
 				done.remove(ref);
 				rm = true;
+				break;
 			}
 		}
 		return rm;
