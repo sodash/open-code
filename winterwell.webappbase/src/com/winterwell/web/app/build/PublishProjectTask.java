@@ -229,6 +229,9 @@ public class PublishProjectTask extends BuildTask {
 		// Ensure desired jars are present
 		for (File jar : jars) {
 			File localJar = new File(localLib, jar.getName()).getAbsoluteFile();
+			
+			// FIXME: can we check versions and pick which one to keep?
+			
 			if (localJar.isFile() && localJar.lastModified() >= jar.lastModified()) {
 				continue;
 			}

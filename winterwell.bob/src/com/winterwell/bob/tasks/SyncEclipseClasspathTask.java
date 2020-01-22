@@ -40,7 +40,7 @@ public class SyncEclipseClasspathTask extends BuildTask {
 	
 	public SyncEclipseClasspathTask(File projectDir) {
 		this.projectDir = projectDir;
-		depsDir = new File(projectDir, "dependencies");
+		depsDir = new File(projectDir, MavenDependencyTask.MAVEN_DEPENDENCIES_FOLDER);
 		classpathFile = new File(projectDir, ".classpath");
 	}
 	
