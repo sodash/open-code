@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-import org.eclipse.jetty.util.ajax.JSON;
-
 import com.winterwell.bob.tasks.Classpath;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.utils.Dep;
@@ -32,6 +30,7 @@ import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.web.FakeBrowser;
 
 /**
@@ -77,7 +76,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.21";
+	public final static String VERSION_NUMBER = "0.9.22";
 
 	public static final String LOGTAG = "bob";
 
@@ -238,7 +237,8 @@ public class Bob {
 				return new HashMap();
 			}
 			String json = FileUtils.read(file);
-			Map jobj = (Map) JSON.parse(json);
+			SimpleJson sj = new SimpleJson();
+			Map jobj = (Map) sj.fromJson(json);
 			ArrayMap<String,Time> t4t = new ArrayMap();
 			for(Object id : jobj.keySet()) {
 				Object v = jobj.get(id);
@@ -255,7 +255,8 @@ public class Bob {
 	private static void saveTaskHistory() {
 		try {
 			File file = getHistoryFile();
-			String json = JSON.toString(time4task);
+			SimpleJson sj = new SimpleJson(); // not our favourite, but Jetty JSON was causing weird breakage
+			String json = sj.toJson(time4task);
 			FileUtils.write(file, json);
 		} catch(Throwable ex) {
 			Log.d(LOGTAG, "Warning: saveTaskHistory failed: "+ex);

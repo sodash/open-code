@@ -31,6 +31,8 @@ import com.winterwell.utils.web.XStreamUtils;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.LoginDetails;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.ajax.AjaxMsg;
+import com.winterwell.web.ajax.AjaxMsg.KNoteType;
 import com.winterwell.web.ajax.JSend;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.data.XId;
@@ -268,9 +270,9 @@ public final class YouAgainClient {
 				Log.i(LOGTAG, e);
 				// issuer mismatch is fine - e.g. a SoGive + Good-Loop user 
 //				// pass back to the user but keep on trucking
-//				if (state!=null) {
-//					state.addMessage(new AjaxMsg(KNoteType.warning, "JWT token error", e.toString()));
-//				}
+				if (state!=null) {
+					state.addMessage(new AjaxMsg(KNoteType.warning, "JWT token error", e.toString()));
+				}
 			}
 		}
 		return list;		
@@ -293,7 +295,7 @@ public final class YouAgainClient {
 		dec = new JWTDecoder(app);
 		if (yaPubKey==null) {
 			String publickeyendpoint = yac.endpoint.replace("youagain.json", "publickey");
-			// load from the server, so we could change keys
+			// load from the server, so we could change keys			
 			String skey = new FakeBrowser().getPage(publickeyendpoint);
 			yaPubKey = JWTDecoder.keyFromString(skey);
 			Log.d(LOGTAG, "GOT key "+yaPubKey+" from "+publickeyendpoint);	
@@ -309,6 +311,7 @@ public final class YouAgainClient {
 	 * @return
 	 */
 	public List<String> getAllJWTTokens(WebRequest state) {		
+
 		Collection<String> all = new ArrayList();		
 		// Auth header
 		String authHeader = state.getRequest().getHeader("Authorization");

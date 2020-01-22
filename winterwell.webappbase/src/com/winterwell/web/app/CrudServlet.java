@@ -145,7 +145,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		// logged in?					
 		if (Utils.isEmpty(tokens)) {
-			Log.w("crud", "No auth tokens for "+this+" "+state);
+			Log.w("crud", "No auth tokens for "+this+" "+state+" All JWT: "+ya.getAllJWTTokens(state));
 			throw new NoAuthException(state);
 		}
 	}
