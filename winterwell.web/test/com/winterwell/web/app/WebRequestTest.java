@@ -1,12 +1,5 @@
 package com.winterwell.web.app;
 
-import static org.junit.Assert.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.junit.Test;
-
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.web.test.TestHttpServletRequest;
 import com.winterwell.web.test.TestHttpServletResponse;

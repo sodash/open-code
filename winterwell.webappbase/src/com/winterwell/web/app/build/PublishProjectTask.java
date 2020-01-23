@@ -14,6 +14,7 @@ import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
+import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.MakeVersionPropertiesTask;
 import com.winterwell.bob.tasks.ProcessTask;
 import com.winterwell.bob.wwjobs.BuildDataLog;
@@ -223,14 +224,19 @@ public class PublishProjectTask extends BuildTask {
 		EclipseClasspath ec = new EclipseClasspath(localWebAppDir);
 		ec.setIncludeProjectJars(true);
 		Set<File> jars = ec.getCollectedLibs();
+		Log.d(LOGTAG, "Dependency graph:\n"
+				+Printer.toString(ec.getDepsFor(), "\n", " <- "));
 		// Create local lib dir			
 		localLib.mkdirs();
 		assert localLib.isDirectory();
 		// Ensure desired jars are present
 		for (File jar : jars) {
 			File localJar = new File(localLib, jar.getName()).getAbsoluteFile();
-			if (localJar.isFile() && localJar.lastModified() >= jar.lastModified()) {
-				continue;
+			
+			// check versions and pick which one to keep?
+			if (localJar.isFile()) {
+				File newJar = JarTask.pickNewerVersion(localJar, jar);
+				if (newJar.equals(localJar)) continue;
 			}
 			FileUtils.copy(jar, localJar);
 		}

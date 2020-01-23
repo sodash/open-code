@@ -6,7 +6,6 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.io.SysOutCollectorStream;
 import com.winterwell.utils.time.Time;
 
 public class SimpleJsonTest {

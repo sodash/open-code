@@ -37,6 +37,11 @@ import com.winterwell.utils.web.WebUtils2;
  */
 public class BuildWinterwellProject extends BuildTask {
 	
+	/**
+	 * @deprecated Is this used??
+	 */
+	private static final String DEPENDENCIES_ALL = "lib";
+
 	protected boolean makeFatJar;
 	
 	private String mainClass;
@@ -110,13 +115,13 @@ public class BuildWinterwellProject extends BuildTask {
 		// this projects jar!
 		jars.add(getJar());
 		// lib
-		File libs = new File(projectDir, "lib");
+		File libs = new File(projectDir, DEPENDENCIES_ALL);
 		if (libs.isDirectory()) {
 			List<File> jars2 = FileUtils.find(libs, ".*\\.jar");
 			jars.addAll(jars2);
 		}		
 		// maven deps
-		File deps = new File(projectDir, "dependencies");
+		File deps = new File(projectDir, MavenDependencyTask.MAVEN_DEPENDENCIES_FOLDER);
 		if (deps.isDirectory()) {
 			List<File> jars2 = FileUtils.find(deps, ".*\\.jar");
 			jars.addAll(jars2);

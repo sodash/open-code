@@ -4,7 +4,6 @@ import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.function.BiFunction;
 
 /**
  * A memory-safe alternative to Java's String.intern.

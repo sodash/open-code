@@ -76,8 +76,6 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public final static String VERSION_NUMBER = "0.9.22";
-
 	public static final String LOGTAG = "bob";
 
 	/**
@@ -307,7 +305,7 @@ public class Bob {
 		}
 		
 		if (argsLeft.size() == 0 || Containers.contains("--help", args)) {
-			System.err.println(StrUtils.LINEEND + "Bob the Builder   version: "+Bob.VERSION_NUMBER
+			System.err.println(StrUtils.LINEEND + "Bob the Builder   version: "+BobSettings.VERSION_NUMBER
 					+ StrUtils.LINEEND + "---------------"
 					+ StrUtils.LINEEND
 					+ "Default usage (looks for a BuildX.java file in the builder directory):"+ StrUtils.LINEEND
@@ -317,8 +315,8 @@ public class Bob {
 					+ StrUtils.LINEEND + cb.getOptionsMessage());
 			System.exit(1);
 		}
-		System.out.println(StrUtils.LINEEND + "Bob the Builder   version: "+Bob.VERSION_NUMBER);
-		Log.d(LOGTAG, "Bob version: "+Bob.VERSION_NUMBER+" building "+argsLeft+"...");
+		System.out.println(StrUtils.LINEEND + "Bob the Builder   version: "+BobSettings.VERSION_NUMBER);
+		Log.d(LOGTAG, "Bob version: "+BobSettings.VERSION_NUMBER+" building "+argsLeft+"...");
 
 
 		// Make Bob

@@ -1,26 +1,17 @@
 package com.winterwell.bob.tasks;
 
 import java.io.File;
-import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.winterwell.bob.BuildTask;
-import com.winterwell.utils.containers.Tree;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
-import com.winterwell.utils.web.XMLNode;
 
 /**
  * status: SKETCH
@@ -40,7 +31,7 @@ public class SyncEclipseClasspathTask extends BuildTask {
 	
 	public SyncEclipseClasspathTask(File projectDir) {
 		this.projectDir = projectDir;
-		depsDir = new File(projectDir, "dependencies");
+		depsDir = new File(projectDir, MavenDependencyTask.MAVEN_DEPENDENCIES_FOLDER);
 		classpathFile = new File(projectDir, ".classpath");
 	}
 	

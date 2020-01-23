@@ -35,6 +35,7 @@ import com.winterwell.utils.time.TUnit;
  */
 public class MavenDependencyTask extends BuildTask {
 
+	public static final String MAVEN_DEPENDENCIES_FOLDER = "dependencies";
 	private String mavenArtifactSpec;
 	
 	/**
@@ -134,7 +135,7 @@ public class MavenDependencyTask extends BuildTask {
 		// files
 		// output  jars into ./dependencies by default
 		if (outDir==null) {
-			setOutputDirectory(new File(projectDir, "dependencies"));
+			setOutputDirectory(new File(projectDir, MAVEN_DEPENDENCIES_FOLDER));
 		}
 		if (cleanOutputDirectory) {
 			Log.i(LOGTAG, "Clean "+outDir);

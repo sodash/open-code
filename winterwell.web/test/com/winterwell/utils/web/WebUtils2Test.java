@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,16 +17,12 @@ import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.io.SysOutCollectorStream;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebPage;
-import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.JettyLauncher;
 import com.winterwell.web.app.WebRequest;
-import com.winterwell.web.test.TestHttpServletResponse;
 
-import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil;
 
 public class WebUtils2Test {

@@ -16,6 +16,8 @@ import com.winterwell.utils.io.Option;
  */
 public class BobSettings {
 
+	public final static String VERSION_NUMBER = "0.9.23";
+
 	@Option(tokens="-update", description="Download a fresh copy of Bob itself")
 	public boolean update;
 	

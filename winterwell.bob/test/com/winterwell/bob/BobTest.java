@@ -1,7 +1,6 @@
 package com.winterwell.bob;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jetty.util.ajax.JSON;
