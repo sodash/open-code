@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,8 +20,10 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import com.winterwell.bob.BuildTask;
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -43,16 +46,15 @@ public class JarTask extends BuildTask {
 	 * @return
 	 */
 	public static Map<String, Object> getManifest(File jar) {		
-		try {
-			JarFile jf = new JarFile(jar);
+		try (JarFile jf = new JarFile(jar)) {
 			Manifest m = jf.getManifest();
+			if (m==null) return Collections.emptyMap();
 			Map<String, Attributes> es = m.getEntries();
 			Attributes ma = m.getMainAttributes();			
 			Map<String, Object> map = Containers.applyToKeys(ma, k -> k.toString());
 			return map;
 		} catch (IOException e) {
 			throw Utils.runtime(e);
-		} finally {
 		}
 	}
 	
@@ -291,6 +293,36 @@ public class JarTask extends BuildTask {
 	 */
 	public void setManifestProperty(String key, String value) {
 		manifestProps.put(key, value);
+	}
+
+	public static File pickNewerVersion(File jara, File jarb) {
+		Map<String, Object> ma = getManifest(jara);
+		Map<String, Object> mb = getManifest(jarb);
+		String va = (String) ma.get("Implementation-Version");
+		String vb = (String) mb.get("Implementation-Version");
+		if (va==null || vb==null || va.equals(vb)) {
+			// fallback to file date
+			return jara.lastModified() >= jarb.lastModified()? jara : jarb;
+		}
+		String[] vabits = va.split("\\.");
+		String[] vbbits = vb.split("\\.");
+		int n = Math.min(vabits.length, vbbits.length);
+		for(int i=0; i<n; i++) {
+			String vai = vabits[i];
+			String vbi = vbbits[i];
+			try {
+				Integer vain = Integer.valueOf(vai);
+				Integer vbin = Integer.valueOf(vbi);
+				if (vain == vbin) continue;
+				return vain > vbin? jara : jarb;
+			} catch(Exception ex) {
+				// not a num -- and not a semantic version
+				Log.d("JarTask", "Cannot compare versions for "+jara.getName()+": "+va+" vs "+vb);
+				break;
+			}
+		}
+		// fallback to file date
+		return jara.lastModified() >= jarb.lastModified()? jara : jarb;
 	}
 
 }

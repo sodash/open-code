@@ -2,12 +2,11 @@ package jobs;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.winterwell.bob.Bob;
+import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
-import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
 import com.winterwell.bob.wwjobs.BuildUtils;
 import com.winterwell.bob.wwjobs.BuildWeb;
@@ -35,7 +34,7 @@ public class BuildBob extends BuildWinterwellProject {
 		setMakeFatJar(true);
 		
 		// Manually set the version
-		String v = Bob.VERSION_NUMBER;
+		String v = BobSettings.VERSION_NUMBER;
 		setVersion(v);
 	}
 

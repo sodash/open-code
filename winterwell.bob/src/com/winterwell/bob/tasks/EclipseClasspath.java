@@ -16,6 +16,8 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.containers.ListMap;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
@@ -156,7 +158,7 @@ public class EclipseClasspath {
 	 * @param name the short name of the user library e.g. "akka"
 	 * @return The list of jars in that library
 	 */
-	public Set<File> getUserLibrary(String name) {
+	public Set<File> getUserLibraryJars(String name) {
 		File mware = projectFinder.apply("middleware");
 		File userLibraries =  new File(mware, "userlibraries.userlibraries");
 		String xml = FileUtils.read(userLibraries);
@@ -216,29 +218,43 @@ public class EclipseClasspath {
 	public Set<File> getCollectedLibs() {
 		Set<File> libs = new HashSet();
 		Set<String> projects = new HashSet();
-		getCollectedLibs2(libs, projects);
+		getCollectedLibs2(libs, projects, depsFor);
 		return libs;
+	}
+	
+	/**
+	 * dependency graph. uses jar file & project names
+	 */
+	ListMap<String,String> depsFor = new ListMap<>();
+	
+	public ListMap<String, String> getDepsFor() {
+		return depsFor;
 	}
 
 	/**
 	 * 
 	 * @param libs
 	 * @param projects Avoid repeats
+	 * @param depsFor 
 	 */
-	private void getCollectedLibs2(Set<File> libs, Set<String> projects)
+	private void getCollectedLibs2(Set<File> libs, Set<String> projects, ListMap<String, String> depsFor)
 	{
+		String pro = getProjectName();
 		List<File> libs2 = getReferencedLibraries();
 		libs.addAll(libs2);
+		depsFor.put(pro, Containers.apply(libs2, File::getName));
 
 		// User libraries
 		for (String lib : getUserLibraries()) {
-			libs.addAll(getUserLibrary(lib));
+			Set<File> userLibraryJars = getUserLibraryJars(lib);
+			libs.addAll(userLibraryJars);
+			depsFor.put(lib, Containers.apply(userLibraryJars, File::getName));
 		}
 
-		String pro = getProjectName();
 		projects.add(pro);
 		List<String> pros = getReferencedProjects();
 		for (String p : pros) {
+			depsFor.add(pro, p);
 			if (projects.contains(p)) continue;			
 			// prefer top level projects
 			File fp = null;
@@ -252,7 +268,7 @@ public class EclipseClasspath {
 			try {
 				EclipseClasspath pec = new EclipseClasspath(fp);
 				pec.setIncludeProjectJars(includeProjectJars);
-				pec.getCollectedLibs2(libs, projects);
+				pec.getCollectedLibs2(libs, projects, depsFor);
 			} catch(Exception ex) {
 				Log.w("eclipse", ex);
 			}
@@ -261,6 +277,7 @@ public class EclipseClasspath {
 				File projectJar = new File(fp, p+".jar");
 				if (projectJar.isFile()) {
 					libs.add(projectJar);
+					depsFor.add(pro, projectJar.getName());
 				} else {
 					Log.d(LOGTAG, "No project jar for "+p);
 				}
