@@ -2,6 +2,7 @@ package com.winterwell.utils.web;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -1429,8 +1430,16 @@ public class WebUtils2 extends WebUtils {
 	 * @return ex (wrapped if need be)
 	 */
 	public static WebEx runtime(Throwable ex) {
+		// already webex?
 		if (ex instanceof WebEx) {
 			return (WebEx) ex;
+		}
+		if (ex.getCause() instanceof WebEx) {
+			return (WebEx) ex.getCause();
+		}
+		// IO?
+		if (ex instanceof FileNotFoundException) {
+			return new WebEx.E404(null, ex.getMessage());
 		}
 		if (ex instanceof IOException) {
 			// probably a 404
