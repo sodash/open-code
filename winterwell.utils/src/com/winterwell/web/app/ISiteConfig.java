@@ -10,14 +10,13 @@ public interface ISiteConfig {
 	int getPort();
 
 	default String getAppAuthPassword() {return null;}
-	default String getAppAuthJWT() {return null;}
-	
-//	/** TODO
-//	 * @return
-//	 */
-//	default String getServerType() {
-//		return null;
-//	}
-	
+
+
+	/**
+	 * Allows the server to verify itself with You-Again.
+	 * 
+	 * ??How to get this
+	 */
+	default String getAppAuthJWT() {return null;}	
 	
 }

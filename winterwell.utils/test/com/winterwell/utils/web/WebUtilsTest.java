@@ -66,6 +66,24 @@ public class WebUtilsTest extends TestCase {
 		assert u3.toString().equals("http://www.bestofyoutube.com/video.php?id=2366") : u3;
 	}
 	
+	public void testURIAndPort() {
+		{
+			URI u = WebUtils.URI("http://localhost:9200");
+			int p = u.getPort();
+			assert p == 9200 : p;
+		}
+		if (false) {
+			URI u = WebUtils.URI("google.com:9200");
+			int p = u.getPort();
+			assert p == 9200 : p; // -1
+		}
+		{	// unset = -1
+			URI u = WebUtils.URI("http://localhost");
+			int p = u.getPort();
+			assert p == -1 : p;
+		}
+	}
+	
 	public void testGetType() {
 		{
 			String t = WebUtils.getType("/foo.css");

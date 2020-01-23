@@ -13,6 +13,12 @@ public class BasicSiteConfig implements ISiteConfig {
 	public int port = 8180; // Best to change this
 
 	@Option public String appAuthPassword;
+	
+	/**
+	 * Allows the server to verify itself with You-Again.
+	 * 
+	 * ??How to get this
+	 */
 	@Option String appAuthJWT;
 	
 

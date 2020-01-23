@@ -7,7 +7,9 @@ import java.util.Map;
 
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.web.WebUtils;
 
 /**
  * Login details for a service such as smtp. These objects should contain the
@@ -65,10 +67,13 @@ public class LoginDetails implements IProperties, Serializable {
 	 */
 	public LoginDetails(String server, String loginName, String password,
 			int port) {
-		// actually this isn't always required
-		// if ( ! "localhost".equalsIgnoreCase(server)) {
-		// Utils.check4null(server, loginName, password);
-		// }
+		server = server.trim();
+//		// Does server specify a port?
+//		if (server != null && WebUtils.URI(server).getPort() > 0) {
+//			int p = WebUtils.URI(server).getPort();
+//			if (port>0 && port!=p) throw new IllegalArgumentException("Port mismatch: "+server+" vs "+port);
+//			port = p;
+//		}		
 		this.server = server;
 		if (server==null || server.contains(" ") || server.contains("\n")) {
 			throw new IllegalArgumentException("bad server ["+ server+"]"); 

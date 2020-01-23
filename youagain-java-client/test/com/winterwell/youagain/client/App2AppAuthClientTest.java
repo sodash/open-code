@@ -7,7 +7,7 @@ import org.junit.Test;
 import com.winterwell.utils.TodoException;
 
 public class App2AppAuthClientTest {
-
+	
 	@Test
 	public void testGetIdentityTokenFromYA() {
 		YouAgainClient yac = new YouAgainClient("test");

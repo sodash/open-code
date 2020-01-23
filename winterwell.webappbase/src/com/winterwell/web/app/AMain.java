@@ -300,7 +300,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			return Dep.set(AuthToken.class, token);
 		}
 		if (Utils.isBlank(appAuthName) || Utils.isBlank(appAuthPassword)) {
-			Log.d(getAppName(), "Missing app-auth details: app-name: "+appAuthName+" p: "+appAuthPassword+" from "+config2.getClass());
+			Log.d(getAppName(), ":( Expected config to provide appAuthJWT for connecting with YouAgain. Missing app-auth details: app-name: "+appAuthName+" p: "+appAuthPassword+" from "+config2.getClass());
 			return null;
 		}
 		AuthToken token;

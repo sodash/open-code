@@ -1490,7 +1490,7 @@ public class WebUtils {
 	}
 
 	public static URI URI(String uri) {
-		try {
+		try {			
 			// HACK: Spaces are not permitted in URIs, but:
 			// - every browser ever has handled this situation sensibly
 			// - they are not uncommon on the web
