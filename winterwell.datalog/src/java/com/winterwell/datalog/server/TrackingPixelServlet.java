@@ -8,6 +8,7 @@ import com.winterwell.datalog.Dataspace;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.app.FileServlet;
 import com.winterwell.web.app.IServlet;
@@ -42,21 +43,34 @@ public class TrackingPixelServlet implements IServlet {
 	/**
 	 * Make/retrieve a tracker cookie
 	 * TODO move into YouAgain Client
+	 * 
+	 * <p>
+	 * If do-not-track is set: this will *still* return a value
+	 *  -- but the cookie is set to expire instantly.
+	 * Use case: the server could report this in ajax json, and the client can decide whether or not
+	 * to keep it for a session, or drop it for anonymity. Allows for the user to say "yes" a
+	 * couple of interactions in (as with the AdUnit Consent CTA).
+	 * </p>
+	 * 
 	 * @param state Can be null (returns null)
-	 * @return A nonce@trk XId. Can be null for do-not-track. Repeated calls will return the same uid. 
+	 * @return A nonce@trk XId. 
+	 * 
+	 * Repeated calls will return the same uid. 
 	 */
 	public static String getCreateCookieTrackerId(WebRequest state) {
 		if (state==null) return null;
 		String uid = state.getCookie(trkid);
 		if (uid!=null) return uid;
+		uid = Utils.getRandomString(20)+"@trk";
+		DataLogConfig dls = Dep.get(DataLogConfig.class);
 		// Do not track?
 		boolean dnt = state.isDoNotTrack();
 		if (dnt) {
-			return null;			
+			// still set it (so repeated calls to this method within one server call return the same id)
+			state.setCookie(trkid, uid, new Dt(0,TUnit.MILLISECOND), dls.COOKIE_DOMAIN);			
+		} else {
+			state.setCookie(trkid, uid, TUnit.YEAR.dt, dls.COOKIE_DOMAIN);
 		}
-		uid = Utils.getRandomString(20)+"@trk";
-		DataLogConfig dls = Dep.get(DataLogConfig.class);
-		state.setCookie(trkid, uid, TUnit.YEAR.dt, dls.COOKIE_DOMAIN);
 		return uid;
 	}
 	
