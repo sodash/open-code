@@ -1,15 +1,10 @@
 package com.winterwell.bob.tasks;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 
 import org.junit.Test;
 
-import com.winterwell.utils.containers.Tree;
 import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.web.WebUtils2;
-import com.winterwell.utils.web.XMLNode;
 
 public class SyncEclipseClasspathTaskTest {
 

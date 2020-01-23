@@ -21,7 +21,6 @@ import com.winterwell.utils.IBuildStrings;
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
@@ -606,7 +605,7 @@ public class WebRequest implements IProperties, Closeable {
 			if (vs != null) {
 				IllegalArgumentException ex = new IllegalArgumentException(key
 						+ " should be an AField! But chill we handled it.");
-				Log.report(ex);
+				Log.w(ex);
 				return (T) vs;
 			}
 		}
@@ -1091,24 +1090,22 @@ public class WebRequest implements IProperties, Closeable {
 			}
 			// protect against loops TODO fix & delete
 			if (redirect.contains(_LOOP_CHECK)) {
-				Log.report("Loopy redirect: " + redirect);
+				Log.w("Loopy redirect: " + redirect);
 				return false;
 			}
 		} else {
 			if (redirect.equals(getRequestUrl())) {
-				Log.report("Loopy redirect: " + redirect);
+				Log.w("Loopy redirect: " + redirect);
 				return false;
 			}
 		}
 		assert ! response.isCommitted();
 		
 		try {
-			// HACK FIXME delete - debug spew
-			Log.d("redirect", redirect+" from "+WebRequest.getCurrent()+" at "+ReflectionUtils.getSomeStack(10));
-						
+			// debug spew
+//			Log.d("redirect", redirect+" from "+WebRequest.getCurrent()+" at "+ReflectionUtils.getSomeStack(10));		
 			response.sendRedirect(redirect);
-
-			assert !isOpen();
+			assert ! isOpen();
 			return true;
 		} catch (IOException e) {
 			throw Utils.runtime(e);

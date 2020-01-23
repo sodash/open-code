@@ -3,9 +3,7 @@ package com.winterwell.web;
 import org.junit.Test;
 
 import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.log.ILogListener;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.log.Report;
 
 public class FakeBrowserTest {
 

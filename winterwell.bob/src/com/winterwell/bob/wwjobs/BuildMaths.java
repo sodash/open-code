@@ -1,8 +1,5 @@
 package com.winterwell.bob.wwjobs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import com.winterwell.bob.BuildTask;

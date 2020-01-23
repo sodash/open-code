@@ -31,7 +31,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.client.RedirectException;
-import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;

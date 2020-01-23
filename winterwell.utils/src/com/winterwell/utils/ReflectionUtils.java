@@ -17,7 +17,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import java.util.jar.Manifest;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.io.SysOutCollectorStream;
 import com.winterwell.utils.time.Time;
 
 /**
