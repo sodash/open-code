@@ -283,6 +283,8 @@ public class Bob {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		System.out.println("Bob the Builder   version: "+BobSettings.VERSION_NUMBER+StrUtils.LINEEND);
+		
 		// Load settings
 		ConfigFactory cf = ConfigFactory.get();
 		cf.setArgs(args);
@@ -314,10 +316,8 @@ public class Bob {
 					+ "Usage: java -jar bob-all.jar [options] [TargetBuildTasks...]"
 					+ StrUtils.LINEEND + cb.getOptionsMessage());
 			System.exit(1);
-		}
-		System.out.println(StrUtils.LINEEND + "Bob the Builder   version: "+BobSettings.VERSION_NUMBER);
+		}		
 		Log.d(LOGTAG, "Bob version: "+BobSettings.VERSION_NUMBER+" building "+argsLeft+"...");
-
 
 		// Make Bob
 		Bob bob = new Bob(_settings);
