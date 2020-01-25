@@ -61,7 +61,10 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	@Deprecated // access via the non-static getAppName() for preference
 	public static String appName;
 	
-	public String getAppName() {
+	/**
+	 * @return e.g. "myapp" Note: Use "myapp.mydomain.com" with YouAgain
+	 */
+	public String getAppNameLocal() {
 		return appName;
 	}
 	
@@ -120,10 +123,10 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			// Exists but isn't a directory - don't use dir
 			useSubDir = false;
 		}
-		File logLocation = new File((useSubDir ? "logs/" : "") + getAppName() + ".log");  
+		File logLocation = new File((useSubDir ? "logs/" : "") + getAppNameLocal() + ".log");  
 		logFile = new LogFile(logLocation).setLogRotation(TUnit.DAY.dt, 14);
 		// also add a never-rotates! audit log for important audit trail info only (ie stuff tagged "audit"		
-		File auditlogLocation = new File((useSubDir ? "logs/" : "") + getAppName() + ".audit");
+		File auditlogLocation = new File((useSubDir ? "logs/" : "") + getAppNameLocal() + ".audit");
 		auditlogFile = new LogFile(auditlogLocation).setFilter(r -> "audit".equals(r.tag));
 		
 		try {
@@ -292,7 +295,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		}
 		YouAgainClient yac = Dep.get(YouAgainClient.class);
 		String appAuthPassword = config2.getAppAuthPassword();
-		String appAuthName = getAppName()+"@good-loop.com"; // TODO get domain from the config.
+		String appAuthName = getAppNameLocal()+"@good-loop.com"; // TODO get domain from the config.
 		String appAuthJWT = config2.getAppAuthJWT();
 		// use JWT if we have it
 		if ( ! Utils.isBlank(appAuthJWT)) {
@@ -300,7 +303,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			return Dep.set(AuthToken.class, token);
 		}
 		if (Utils.isBlank(appAuthName) || Utils.isBlank(appAuthPassword)) {
-			Log.d(getAppName(), ":( Expected config to provide appAuthJWT for connecting with YouAgain. Missing app-auth details: app-name: "+appAuthName+" p: "+appAuthPassword+" from "+config2.getClass());
+			Log.d(getAppNameLocal(), ":( Expected config to provide appAuthJWT for connecting with YouAgain. Missing app-auth details: app-name: "+appAuthName+" p: "+appAuthPassword+" from "+config2.getClass());
 			return null;
 		}
 		AuthToken token;
@@ -357,7 +360,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			return; // Dep.get(YouAgainClient.class);
 		}
 		// app=datalog for login
-		YouAgainClient yac = new YouAgainClient(getAppName());
+		YouAgainClient yac = new YouAgainClient(getAppNameLocal());
 		Dep.set(YouAgainClient.class, yac);				
 	}
 
@@ -371,9 +374,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		Class ct = configType;
 		if (ct==null) {
 			ct = BasicSiteConfig.class;
-			Log.w(getAppName(), "No ConfigType given - using "+ct.getSimpleName());
+			Log.w(getAppNameLocal(), "No ConfigType given - using "+ct.getSimpleName());
 		}
-		return (ConfigType) AppUtils.getConfig(getAppName(), ct, args);
+		return (ConfigType) AppUtils.getConfig(getAppNameLocal(), ct, args);
 	}
 
 	private void launchJetty() {

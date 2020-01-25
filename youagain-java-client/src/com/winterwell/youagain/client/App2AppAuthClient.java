@@ -62,6 +62,9 @@ public class App2AppAuthClient {
 			Log.w(LOGTAG, "missing appAuthName / appAuthPassword "+ReflectionUtils.getSomeStack(8));
 			return null;
 		}
+		if ( ! appAuthName.contains(".")) {
+			throw new IllegalArgumentException("Rejecting name: "+appAuthName+" Apps should use a valid domain name, managed by the app-owner. E.g. myapp.good-loop.com");
+		}
 		XId appXid = getAppXId(appAuthName);
 		AuthToken auth = yac.register(appXid, appAuthPassword);
 		return auth;

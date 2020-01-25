@@ -44,6 +44,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.eclipse.jetty.http.Syntax;
 import org.w3c.dom.Document;
 
 import com.winterwell.json.JSONArray;
@@ -271,8 +272,17 @@ public class WebUtils2 extends WebUtils {
 	public static Cookie addCookie(HttpServletResponse response, String name,
 			Object value, Dt timeTolive, String cookieDomain, String sameSite) 
 	{				
-		String cname = urlEncode(name);			
-		Cookie cookie = new Cookie(cname, value.toString());
+		String cname = urlEncode(name);		
+		String vs = value.toString();
+		// oh god the cookie spec is horrible
+		try {
+			Syntax.requireValidRFC6265CookieValue(vs);
+		} catch(Exception ex) {
+			// Warning: this could cause issues elsewhere :(
+			Log.w("cookie."+name, "URL encoding value: "+value+" to comply with cookie spec 6265 which bans eg spaces.");
+			vs = urlEncode(vs);
+		}
+		Cookie cookie = new Cookie(cname, vs);
 		cookie.setMaxAge((int) (timeTolive.getMillisecs() / 1000));
 		if (cookieDomain != null) {
 			cookie.setDomain(cookieDomain);

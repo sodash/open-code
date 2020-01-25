@@ -31,6 +31,17 @@ public class App2AppAuthClientTest {
 	}
 
 	@Test
+	public void testMakeApp() {
+		YouAgainClient yac = new YouAgainClient(YouAgainClient.MASTERAPP);
+		App2AppAuthClient a2a = new App2AppAuthClient(yac);
+		String appAuthName = "mytestapp.good-loop.com";
+		String appAuthPassword = "testpwd";
+		AuthToken token = a2a.registerIdentityTokenWithYA(appAuthName, appAuthPassword);
+		System.out.println(token);
+		assert token != null;
+	}
+
+	@Test
 	public void testGetPermissionsToken() {
 		YouAgainClient yac = new YouAgainClient("test");
 		App2AppAuthClient a2a = new App2AppAuthClient(yac);

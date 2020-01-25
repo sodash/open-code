@@ -111,7 +111,7 @@ public final class YouAgainClient {
 	/**
 	 * @Deprecated This is the YA app itself
 	 */
-	static final String MASTERAPP = "youagain";
+	public static final String MASTERAPP = "youagain";
 	
 	/**
 	 * What app are you using? e.g. "sogive" or "profiler".
