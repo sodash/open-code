@@ -330,7 +330,7 @@ public class BuildWinterwellProject extends BuildTask {
 			jar.setManifestProperty(JarTask.MANIFEST_MAIN_CLASS, mainClass);
 		}
 		// Version
-		String gitiv = "", by = "";
+		String gitiv = null, by = null;
 		try {
 			// go up until we're in git or fail
 			File repo = projectDir;
@@ -341,7 +341,7 @@ public class BuildWinterwellProject extends BuildTask {
 			if (repo!=null) {
 				Map<String, Object> gitInfo = GitTask.getLastCommitInfo(repo);
 				Object branch = gitInfo.get("branch");
-				gitiv = " git: "+gitInfo.get("hash")
+				gitiv = "git: "+gitInfo.get("hash")
 					+" "+gitInfo.get("subject")
 					// non-master branch (master is not worth stating)
 					+ (branch!=null && ! "master".equals(branch)? " "+branch : "") 
@@ -349,14 +349,15 @@ public class BuildWinterwellProject extends BuildTask {
 			}
 			// Git details as their own property e.g. "branch"? No this upsets IntelliJ
 			// So we pack them into version.
-			by = " by: "+WebUtils2.hostname();
+			by = "by: "+WebUtils2.hostname();
 		} catch(Throwable ex) {
 			Log.w(LOGTAG, this+" "+ex);
 		}
 		// include version, time, and a unique nonce
 		jar.setManifestProperty(JarTask.MANIFEST_IMPLEMENTATION_VERSION, 				
-				"version: "+StrUtils.joinWithSkip(" ", version, new Time().ddMMyyyy(), "nonce"+Utils.getRandomString(4))
-				+gitiv+by);
+			StrUtils.joinWithSkip(" ", 
+				version, new Time().ddMMyyyy(), "nonce_"+Utils.getRandomString(4), gitiv, by
+		));
 		// vendor
 		jar.setManifestProperty("Implementation-Vendor", "Winterwell");	
 	}
