@@ -194,12 +194,16 @@ public class WebUtils {
 	 * Matches urls. Note: Excludes any trailing .	<br>
 	 * Group 1: the host/domain (including subdomain)	<br>
 	 * Urls must contain the http(s) or ftp protocol (compare with Twitter's regex which doesn't rrequire a protocol).
+	 * 
+	 * E.g. "https://twitter.com/foo"
+	 * 
 	 * @testedy {@link WebUtilsTest#testUrlRegex()}
 	 * 
 	 * See #URL {@link winterwell.jtwitter.Regex#VALID_URL}, which is more flexible */
 	public static final Pattern URL_REGEX = Pattern
 			.compile("[a-z]{3,6}://([a-zA-Z0-9_\\-\\.]+)\\/?([a-zA-Z0-9_%\\-\\.,\\?&\\/=\\+'~#!\\*:]+[a-zA-Z0-9_%\\-&\\/=\\+])?");
 
+	
 	private static final Pattern URL_WEB_DOMAIN_FALLBACK_REGEX = Pattern.compile(URL_REGEX.pattern()+"|[a-z0-9_\\-\\.]+\\.(\\w{2,24})");
 
 	/**

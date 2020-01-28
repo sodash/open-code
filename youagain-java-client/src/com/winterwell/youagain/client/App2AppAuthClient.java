@@ -1,8 +1,11 @@
 package com.winterwell.youagain.client;
 
+import java.util.regex.Pattern;
+
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.data.XId;
 
 
@@ -70,11 +73,18 @@ public class App2AppAuthClient {
 		return auth;
 	}
 	
+
+	/**
+	 * 
+	 * @param appAuthName e.g. "my.good-loop.com"
+	 * @return e.g. my.good-loop.com@app
+	 */
 	private XId getAppXId(String appAuthName) {
 		if (appAuthName.endsWith("@app")) {
-			Log.w(LOGTAG, "Already an XId");
+			Log.w(LOGTAG, "Already an XId (which is bad practice): "+appAuthName);
 			return new XId(appAuthName);
 		}
+		appAuthName = canonical(appAuthName, true);
 		return new XId(appAuthName, "app");
 	}
 
@@ -88,5 +98,28 @@ public class App2AppAuthClient {
 		// TODO	appIdToken.addClaim
 		return appIdToken;
 	}
+
+
+	/**
+	 * NB: the AppPlugin canonical code is here so it can be used by 3rd party apps 
+	 * without a dependency on YA-server code.
+	 * 
+	 * @param appAuthName e.g. "my.good-loop.com"
+	 * @return e.g. "my.good-loop.com"
+	 */
+	public static String canonical(String name, boolean strict) {
+		String n = name.toLowerCase().trim();
+		// domain name?
+		if ( ! WebUtils2.URL_WEB_DOMAIN_REGEX.matcher(name).matches()) {
+			if (strict) {
+				throw new IllegalArgumentException("ya.app Deprecated app name: "+name+" Please use a domain name, e.g. myapp.mydomain.com");
+			}
+			Log.w("ya.app", "Deprecated app name: "+name+" Please use a domain name, e.g. myapp.mydomain.com");
+		}
+		// all good
+		return n;
+	}
+	
+	static Pattern APP_ID = Pattern.compile("[a-z0-9\\.\\-\\_]+");
 	
 }
