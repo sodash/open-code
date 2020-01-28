@@ -527,4 +527,8 @@ public final class YouAgainClient {
 		return at;
 	}
 
+	public App2AppAuthClient appAuth() {
+		return new App2AppAuthClient(this);
+	}
+
 }
