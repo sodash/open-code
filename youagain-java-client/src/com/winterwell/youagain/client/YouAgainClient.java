@@ -1,5 +1,6 @@
 package com.winterwell.youagain.client;
 
+import java.io.File;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.ConfigFactory;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
@@ -498,6 +500,31 @@ public final class YouAgainClient {
 
 	public AuthToken login(XId xid, String password) {
 		return login(xid.toString(), password);
+	}
+
+	public void storeLocal(AuthToken token) {
+		yac.localTokenStore.mkdirs();
+		String xml = XStreamUtils.serialiseToXml(token);
+		XId xid = token.getXId();
+		File out = storeLocal2(xid);		
+		FileUtils.write(out, xml);
+	}
+	
+	private File storeLocal2(XId xid) {
+		return new File(yac.localTokenStore, 
+			FileUtils.safeFilename(xid.getName())
+			+"@"
+			+FileUtils.safeFilename(xid.service)
+		);
+	}
+
+	public AuthToken loadLocal(XId xid) {
+		File out = storeLocal2(xid);		
+		if ( ! out.isFile()) return null;
+		String xml = FileUtils.read(out);
+		if (Utils.isBlank(xml)) return null;
+		AuthToken at = XStreamUtils.serialiseFromXml(xml);
+		return at;
 	}
 
 }
