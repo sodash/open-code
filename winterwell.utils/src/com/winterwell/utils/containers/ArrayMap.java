@@ -106,8 +106,10 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 
 	/**
 	 * Awesomely convenient constructor:
-	 * <code>new ArrayMap(key1, value1, key2, value2, ...)</code> Warning: Does
-	 * not check for duplicates!
+	 * <code>new ArrayMap(key1, value1, key2, value2, ...)</code>
+	 *  
+	 * Warning: Does not check for duplicates!
+	 * Null values are filtered out :)
 	 * 
 	 * @param keyValuePairs
 	 */
@@ -125,9 +127,13 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 			return;
 		}
 		assert keyValuePairs.length % 2 == 0;
-		for (int i = 0; i < keyValuePairs.length; i += 2) {
-			keys.add((K) keyValuePairs[i]);
-			values.add((V) keyValuePairs[i + 1]);
+		for (int i = 0; i < keyValuePairs.length; i += 2) {			
+			V v = (V) keyValuePairs[i + 1];			
+			if (v==null) continue;
+			K k = (K) keyValuePairs[i];
+			assert k != null;
+			keys.add(k);
+			values.add(v);
 		}
 	}
 

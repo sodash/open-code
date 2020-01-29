@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.elasticsearch.search.sort.SortOrder;
-
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.depot.IInit;
@@ -25,6 +23,8 @@ import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
+import com.winterwell.es.client.sort.KSortOrder;
+import com.winterwell.es.client.sort.Sort;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
@@ -561,16 +561,17 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (qb!=null) s.setQuery(qb);
 				
 		// Sort e.g. sort=date-desc for most recent first
-		if (sort!=null) {
+		if (sort!=null) {			
 			// HACK: order?
-			SortOrder order = SortOrder.ASC;
+			KSortOrder order = KSortOrder.asc;
 			if (sort.endsWith("-desc")) {
 				sort = sort.substring(0, sort.length()-5);
-				order = SortOrder.DESC;
+				order = KSortOrder.desc;
 			} else if (sort.endsWith("-asc")) {
 				sort = sort.substring(0, sort.length()-4);
 			}
-			s.addSort(sort, order);
+			Sort _sort = new Sort().setField(sort).setOrder(order);			
+			s.addSort(_sort);
 		}
 		
 		// TODO paging!

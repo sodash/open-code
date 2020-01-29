@@ -14,7 +14,6 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
-import org.elasticsearch.search.sort.SortOrder;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -40,6 +39,8 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
+import com.winterwell.es.client.sort.KSortOrder;
+import com.winterwell.es.client.sort.Sort;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
 import com.winterwell.gson.Gson;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
@@ -555,7 +556,8 @@ public class ESStorage implements IDataLogStorage {
 		
 		search.setQuery(filter);
 		if (sortByTime) {
-			search.addSort("time", SortOrder.ASC);
+			Sort sort = new Sort("time", KSortOrder.asc);
+			search.addSort(sort);
 		}
 
 		// stats or just sum??

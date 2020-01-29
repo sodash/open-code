@@ -178,7 +178,8 @@ public class MavenDependencyTask extends BuildTask {
 				FileUtils.copy(pom, pomProper);
 			}
 			assert pomProper.exists():  "no pom file?! "+pomProper+" should be a copy of "+pom;
-			
+
+			// The Command
 			Proc proc = new Proc(
 					"mvn "
 					+ (forceUpdate? "-U " : "")
