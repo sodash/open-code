@@ -27,6 +27,7 @@ import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
 
@@ -264,6 +265,8 @@ public class BuildWinterwellProject extends BuildTask {
 		assert projectDir.isDirectory() : projectDir+" "+this;
 		if (projectName==null) projectName = projectDir.getName();
 		this.projectName = projectName;
+		// dependencies shouldnt need rebuilding all the time
+		setSkipGap(TUnit.DAY.dt);
 	}
 
 	public BuildWinterwellProject(File projectDir) {

@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
@@ -72,7 +74,14 @@ public class Bob {
 
 	private static Bob dflt;
 
+	/**
+	 * end time for tasks, including other runs loaded in from boblog
+	 */
 	private static Map<String, Time> time4task;
+	/**
+	 * end time for tasks, but only within this JVM
+	 */
+	private static final Set<String> taskThisJVMOnly = new HashSet();
 
 	private static volatile Time runStart;
 
@@ -226,6 +235,12 @@ public class Bob {
 		}
 		return TimeUtils.WELL_OLD;
 	}
+	
+	public static boolean isRunAlreadyThisJVM(BuildTask buildTask) {
+		assert buildTask != null;
+		String id = buildTask.getDesc().getId();
+		return taskThisJVMOnly.contains(id);
+	}
 
 	private static Map<String, Time> loadTaskHistory() {
 		// load from file
@@ -306,7 +321,7 @@ public class Bob {
 			}
 		}
 		
-		if (argsLeft.size() == 0 || Containers.contains("--help", args)) {
+		if (_settings.help || argsLeft.size() == 0 || Containers.contains("--help", args)) {
 			System.err.println(StrUtils.LINEEND + "Bob the Builder   version: "+BobSettings.VERSION_NUMBER
 					+ StrUtils.LINEEND + "---------------"
 					+ StrUtils.LINEEND
@@ -413,6 +428,7 @@ public class Bob {
 		}
 		String id = buildTask.getDesc().getId();
 		time4task.put(id, new Time());
+		taskThisJVMOnly.add(id);
 //		assert buildTask.skip() : buildTask;
 		// TODO save in a slow thread??
 		saveTaskHistory();
@@ -438,6 +454,13 @@ public class Bob {
 
 	public int adjustBobCount(int dn) {
 		return bobCount.addAndGet(dn);
+	}
+	
+	/**
+	 * @return active tasks
+	 */
+	public int getBobCount() {
+		return bobCount.get();
 	}
 
 	void build(Class clazz) throws Exception {

@@ -21,6 +21,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
 
@@ -305,14 +306,20 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	}
 	
 	/**
-	 * Call this to run the task within Bob. This does the work of run() without a TaskRunner shutdown.
+	 * Call this to run the task within Bob. This does the work of runViaJUnit() without a TaskRunner shutdown.
 	 */
 	public final void run() {
 		// fix desc if it wasn't before
 		String id = getDesc().getId();
-		if (skip()) {
-			skipFlag = true;
-			return;
+
+		// skip repeat/recent runs?
+		// ...NB: no skip for the top level task
+		int activeTasks = Bob.getSingleton().getBobCount();
+		if (activeTasks!=0) {
+			if (skip()) {
+				skipFlag = true;
+				return;				
+			}
 		}
 		
 		// Add an output and error listener
@@ -364,31 +371,41 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 * @return true if this should not be run eg for repeats
 	 * @see #skip(Time) which can be over-ridden
 	 */
-	public final boolean skip() {		
+	public final boolean skip() {				
+		// already done this run? This cannot be skipped by -clean
+		if (Bob.isRunAlreadyThisJVM(this)) {
+			Log.i(LOGTAG, "Skip repeat for dependency: "+getClass().getSimpleName()+" "+getDesc().getId());
+			return true;
+		}
+		// -clean? rerun inspite of any previous runs
 		if (Bob.getSingleton().getSettings().skippingOff) {
 			return false;
-		}
-		// already done this run?
+		}		
 		Time rs = Bob.getRunStart();
 		Time lastRun = Bob.getLastRunDate(this);
 		if (lastRun==null) {
-			return false; // first time
+			return false; // first time, run it
 		}
 		if (lastRun.isAfterOrEqualTo(rs)) {
 			Log.i(LOGTAG, "Skip repeat this run dependency: "+getClass().getSimpleName()+" "+getDesc().getId());
 			return true;
 		}
-		// what about recently?
+		// So it has been run -- but was it recent enough?
 		boolean skip = skip(lastRun);
 		if (skip) {
 			Log.i(LOGTAG, "Skip recent dependency: "+getClass().getSimpleName()+" "+getDesc().getId());
 			return true;
 		}
+		// do it again
 		return false;
 	}
 
 	private Dt skipGap;
-	
+
+	/**
+	 * @param skipGap null by default, which means "always rerun". 
+	 * Set this to allow recent previous runs to count as valid.
+	 */
 	public BuildTask setSkipGap(Dt skipGap) {
 		this.skipGap = skipGap;
 		return this;
@@ -402,12 +419,13 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	 * @see #setSkipGap(Dt)
 	 */
 	protected final boolean skip(Time lastRun) {
-		if (skipGap!=null && lastRun!=null) {
-			Dt gap = lastRun.dt(new Time());
-			if (gap.isShorterThan(skipGap)) {
-				Log.d(LOGTAG, "skip "+this+" - last run "+gap+" < "+skipGap);
-				return true;
-			}
+		if (skipGap==null) return false;
+		if (lastRun==null) return false; // paranoia
+		Dt gap = lastRun.dt(new Time());
+		Dt hours = gap = gap.convertTo(TUnit.HOUR); // debug
+		if (gap.isShorterThan(skipGap)) {
+			Log.d(LOGTAG, "skip "+this+" - last run "+gap+" < "+skipGap);
+			return true;
 		}
 		return false;
 	}
