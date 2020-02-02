@@ -126,9 +126,15 @@ public class WebEx extends RuntimeException {
 	 * Forbidden
 	 */
 	public static class E403 extends E40X {
+		/**
+		 * Forbidden
+		 */
 		public E403(String url) {
 			super(403, url);
 		}
+		/**
+		 * Forbidden
+		 */
 		public E403(String url, String msg) {
 			super(403, url, msg);
 		}
