@@ -78,6 +78,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"xbid", String.class, // someone elses (possibly broken) bid id
 			"variant", String.class,
 			"campaign", String.class,
+			"lineitem", String.class, // LineItem ID, e.g. from AppNexus
 			"cid", String.class, // SoGive charity-ID. This is preferred to 'charity' as a property-name			
 			"via", String.class, // exchange / DSP / agency used to make the connection. ??Can be a list.??is that supported			
 			"invalid", String.class, // keyword for "bot" | "test" (ie us or the publisher). Blank for fine!
