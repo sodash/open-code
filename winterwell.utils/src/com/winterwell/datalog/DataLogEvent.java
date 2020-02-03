@@ -38,8 +38,13 @@ public final class DataLogEvent implements Serializable, IHasJson
 	public static final String EVT = "evt";
 
 	/**
-	 * these get special treatment - as direct properties not key/value props.
+	 * These get special treatment - as direct properties not key/value props.
 	 * Which means nicer json + they can have a type in ES.
+	 * 
+	 * It allows for one DataLogEvent to hold a few stats. This is handy for one DL event describes one advert.
+	 * 
+	 * The other DatLog approach is to turn multiple stats into multiple events, and let ES handle it. 
+	 * 
 	 * 
 	 * HACK: use StringBuilder.class as a marker for "text with tokenisation", and String.class for keywords.
 	 * HACK: use Object.class to mark special-case
@@ -62,6 +67,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"tag", String.class, 
 			"action", String.class, 
 			"verb", String.class,
+			"col", String.class, // Column name
 			"as", String.class,
 			"turl", String.class,
 			"href", String.class,
@@ -90,6 +96,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"message", StringBuilder.class,
 			// Can we do an aggregation on message??
 //			"m", String.class, // the keyword version of message (for doing exact-text repeat breakdowns, which are handy)
+
 			// a few XId properties
 			"id", String.class,
 			"xid", String.class,
@@ -99,6 +106,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"uxid", String.class,
 			"su",String.class,
 			"gby", String.class, // group-by ID -- for collating events together into one summary event
+
 			// a few scoring/results properties
 			"start", Time.class,
 			"end", Time.class,
