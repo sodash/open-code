@@ -506,7 +506,7 @@ public class WebUtils2 extends WebUtils {
 				// null/""/"undefined" = null
 				if (cv==null) continue;
 				if (cv.isEmpty() || cv.equals("undefined")) {
-					Log.d("cookie", name+"="+cv+" skipped as null");
+					Log.w("cookie", name+"="+cv+" skipped as null");
 					continue;
 				}
 				return cv;
