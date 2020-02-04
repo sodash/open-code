@@ -501,8 +501,16 @@ public class WebUtils2 extends WebUtils {
 		if (cookies == null)
 			return null;
 		for (Cookie cookie : cookies) {
-			if (cookie.getName().equals(name))
-				return cookie.getValue();
+			if (cookie.getName().equals(name)) {
+				String cv = cookie.getValue();
+				// null/""/"undefined" = null
+				if (cv==null) continue;
+				if (cv.isEmpty() || cv.equals("undefined")) {
+					Log.d("cookie", name+"="+cv+" skipped as null");
+					continue;
+				}
+				return cv;
+			}
 		}
 		return null;
 	}

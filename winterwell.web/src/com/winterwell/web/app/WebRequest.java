@@ -94,13 +94,16 @@ public class WebRequest implements IProperties, Closeable {
 	 * @param name
 	 * @return cookie value -- a fresh cookie from {@link #setCookie(String, String, Dt, String)}
 	 * or (normal) from the request.
+	 * 
+	 * Note: "undefined" is converted to null
 	 */
 	public String getCookie(String name) {
 		if (freshCookies!=null) {
 			String v = freshCookies.get(name);
 			if (v!=null) return v;
 		}
-		return WebUtils2.getCookie(getRequest(), name);
+		String c = WebUtils2.getCookie(getRequest(), name);
+		return c;
 	}
 
 	/**
