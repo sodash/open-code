@@ -60,7 +60,9 @@ public class TrackingPixelServlet implements IServlet {
 	public static String getCreateCookieTrackerId(WebRequest state) {
 		if (state==null) return null;
 		String uid = state.getCookie(trkid);
-		if (uid!=null) return uid;
+		if (uid!=null) {
+			return uid;
+		}
 		uid = Utils.getRandomString(20)+"@trk";
 		DataLogConfig dls = Dep.get(DataLogConfig.class);
 		// Do not track?
