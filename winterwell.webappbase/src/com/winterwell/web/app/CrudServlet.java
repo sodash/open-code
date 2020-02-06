@@ -702,13 +702,17 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	/**
-	 * TODO remove sensitive details for privacy
-	 * @param hits2
+	 * Remove sensitive details for privacy - override to do anything!
+	 * 
+	 * This is (currently) only used with the _list endpoint!
+	 * TODO expand to get-by-id requests too -- but carefully, as there's more risk of breaking stuff.
+	 * 
+	 * @param hits
 	 * @param state
-	 * @return
+	 * @return hits
 	 */
-	protected List<Map> cleanse(List<Map> hits2, WebRequest state) {
-		return hits2;
+	protected List<Map> cleanse(List<Map> hits, WebRequest state) {
+		return hits;
 	}
 
 
