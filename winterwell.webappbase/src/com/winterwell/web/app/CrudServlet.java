@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.depot.IInit;
@@ -25,6 +28,7 @@ import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.es.client.sort.KSortOrder;
 import com.winterwell.es.client.sort.Sort;
+import com.winterwell.gson.FlexiGson;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
@@ -39,12 +43,14 @@ import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.utils.web.XStreamUtils;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.data.IHasXId;
 import com.winterwell.web.data.XId;
+import com.winterwell.web.fields.Checkbox;
 import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.SField;
 import com.winterwell.youagain.client.AuthToken;
@@ -150,9 +156,18 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 	}
 
-
-
+	/**
+	 * ES takes 1 second to update by default, so save actions within a second could
+	 * cause an issue. Allow an extra second to be safe.
+	 */
+	static final Cache<String,Boolean> ANTI_OVERLAPPING_EDITS_CACHE = CacheBuilder.newBuilder()
+			.expireAfterWrite(2, TimeUnit.SECONDS)
+			.build();
+	private static final Checkbox ALLOW_OVERLAPPING_EDITS = new Checkbox("allowOverlappingEdits");
+	
 	protected void doAction(WebRequest state) {
+		// Defend against repeat calls from the front end
+		doAction2_blockRepeats(state);		
 		// make a new thing?
 		// ...only if absent?
 		if (state.actionIs(ACTION_GETORNEW)) {
@@ -200,6 +215,21 @@ public abstract class CrudServlet<T> implements IServlet {
 			jthing = doUnPublish(state);
 			return;
 		}
+	}
+
+
+	private void doAction2_blockRepeats(WebRequest state) {
+		if (state.get(ALLOW_OVERLAPPING_EDITS)) {
+			return;
+		}
+		Map<String, Object> pmap = state.getParameterMap();
+		String ckey = state.getAction()+FlexiGson.toJSON(pmap);
+		Log.d(LOGTAG(), "Anti overlap key: "+ckey);
+		if (ANTI_OVERLAPPING_EDITS_CACHE.getIfPresent(ckey)!=null) {
+			throw new WebEx.E409Conflict("Duplicate request within 2 seconds. Blocked for edit safety. "+state
+					+" Note: this behaviour could be switched off via "+ALLOW_OVERLAPPING_EDITS);
+		}		
+		ANTI_OVERLAPPING_EDITS_CACHE.put(ckey, true);
 	}
 
 

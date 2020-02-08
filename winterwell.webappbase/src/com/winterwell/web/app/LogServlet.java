@@ -12,7 +12,9 @@ import com.winterwell.youagain.client.YouAgainClient;
 
 
 /**
- * Provide views into the logs -- and Ajax logging.
+ * Provide Ajax logging.
+ * 
+ * Note: This does not allow viewing logs over API -- as that would be a security risk (logs can easily contain sensitive data).
  * 
  * <h3>AJAX Logging</h3>
  * 
@@ -23,8 +25,6 @@ import com.winterwell.youagain.client.YouAgainClient;
  *  - msg
  * 
  * @see AServlet
- * <p>
- * TODO filter by time
  * @author daniel
  *
  */
@@ -54,19 +54,11 @@ public class LogServlet implements IServlet {
 		}		
 	}
 
-	private static final IntField NUM_LINES = new IntField("LogServlet.numLines");
-	private static final SafeString FILTER = new SafeString("LogServlet.filter");
 	public static final AField<String> TAG = new SafeString("tag");
 
 	/**
 	 * log. prepended to all log requests made by ajax.
 	 */
 	public static final String AJAX_TAG_PREFIX = "ajax.";
-
-
-
-	public static Pattern severityPattern() {
-		return Pattern.compile("\\]\\s*([A-Z]+)");
-	}
 	
 }
