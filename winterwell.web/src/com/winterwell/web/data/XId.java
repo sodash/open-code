@@ -103,7 +103,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 		this.name = name;
 		this.service = service;
 		// null@twitter is a real user :( c.f. bug #14109 
-		assert notNullNameCheck() : name;		
+		assert notNullNameCheck() : "XID without a name?! '"+name+"' for "+service;		
 		assert name != null;
 		assert ! service.contains("@") : service;
 	}
@@ -142,8 +142,8 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 		this.service = service;
 		this.name = name;
 		assert notNullNameCheck() : name+"@"+service;
-		assert ! checkName;
-		assert ! service.contains("@") : service;
+		assert ! checkName : "Wrong constructor! This one is for checkName=false "+this;
+		assert ! service.contains("@") : "Bad service: "+service+" for "+this;
 		return;
 	}
 
