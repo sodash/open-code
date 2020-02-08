@@ -218,18 +218,27 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 
-	private void doAction2_blockRepeats(WebRequest state) {
+	protected void doAction2_blockRepeats(WebRequest state) {
 		if (state.get(ALLOW_OVERLAPPING_EDITS)) {
 			return;
 		}
-		Map<String, Object> pmap = state.getParameterMap();
-		String ckey = state.getAction()+FlexiGson.toJSON(pmap);
+		String ckey = doAction2_blockRepeats2_actionId(state);
 		Log.d(LOGTAG(), "Anti overlap key: "+ckey);
 		if (ANTI_OVERLAPPING_EDITS_CACHE.getIfPresent(ckey)!=null) {
 			throw new WebEx.E409Conflict("Duplicate request within 2 seconds. Blocked for edit safety. "+state
 					+" Note: this behaviour could be switched off via "+ALLOW_OVERLAPPING_EDITS);
 		}		
 		ANTI_OVERLAPPING_EDITS_CACHE.put(ckey, true);
+	}
+
+	/**
+	 * @param state
+	 * @return the id for this action -- this determines what counts as identical (and hence will be blocked)
+	 */
+	protected String doAction2_blockRepeats2_actionId(WebRequest state) {
+		Map<String, Object> pmap = state.getParameterMap();
+		String ckey = state.getAction()+FlexiGson.toJSON(pmap);
+		return ckey;
 	}
 
 

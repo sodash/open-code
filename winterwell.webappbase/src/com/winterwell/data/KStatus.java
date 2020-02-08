@@ -57,4 +57,22 @@ public enum KStatus {
 	public static KStatus[] main() {
 		return new KStatus[] {PUBLISHED, DRAFT, TRASH};
 	}
+
+	/**
+	 * Convenience for testing a few states that mean the item was (probably) published
+	 * @param itemStatus
+	 * @return true if the item has been published. null for TRASH
+	 */
+	public static Boolean wasPublished(KStatus itemStatus) {
+		switch(itemStatus) {
+		case PUBLISHED: case MODIFIED: case ARCHIVED:
+			return true;
+		case DRAFT: case PENDING: case REQUEST_PUBLISH:
+			return false;
+		case TRASH:
+			return null;
+		default:
+			throw new IllegalArgumentException("Neither published nor draft: "+itemStatus);
+		}		
+	}
 }
