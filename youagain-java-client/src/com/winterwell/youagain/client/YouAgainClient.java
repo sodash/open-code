@@ -388,7 +388,7 @@ public final class YouAgainClient {
 			Utils.check4null(usernameUsuallyAnEmail, password);
 			FakeBrowser fb = new FakeBrowser();
 			String response = fb.getPage(yac.endpoint, new ArrayMap(
-					"app", app, 
+					"app", app,
 					"action", "login",
 					"person", usernameUsuallyAnEmail,
 					"password", password));
@@ -412,7 +412,7 @@ public final class YouAgainClient {
 		fb.setDebug(true); // TODO remove
 		
 		String response = fb.getPage(yac.endpoint, new ArrayMap(
-				"app", app, 
+				"app", app,
 				"action", "signup",
 				"person", usernameUsuallyAnEmail,
 				"password", password));
@@ -472,7 +472,7 @@ public final class YouAgainClient {
 		FakeBrowser fb = new FakeBrowser();
 		fb.setAuthenticationByJWT(authToken);
 		String response = fb.getPage(yac.endpoint, new ArrayMap(
-				"app", app, 
+				"app", app,
 				"action", "shared-with"));
 		
 		Map jobj = (Map) JSON.parse(response);
@@ -481,6 +481,23 @@ public final class YouAgainClient {
 			return Arrays.stream((Object[]) shares).map(share -> (String) SimpleJson.get(share, "item")).collect(Collectors.toList());
 		}
 		return Collections.emptyList();
+	}
+	
+	/** List the users a particular entity is shared to */
+	public List<String> getShareList(String share) {
+		FakeBrowser fb = new FakeBrowser();
+		// fb.setAuthenticationByJWT(authToken); // TODO Needed for this?
+		String response = fb.getPage(yac.endpoint, new ArrayMap(
+			"app", app,
+			"action", "share-list",
+			"entity", share));
+
+		Map jobj = (Map) JSON.parse(response);
+		Object shares = SimpleJson.get(jobj, "cargo");
+		if (shares instanceof Object[]) {
+			return Arrays.stream((Object[]) shares).map(s -> (String) SimpleJson.get(s, "_to")).collect(Collectors.toList());
+		}
+		return null;
 	}
 	
 	public ShareClient sharing () {

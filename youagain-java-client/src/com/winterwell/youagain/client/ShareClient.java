@@ -13,6 +13,7 @@ import com.winterwell.web.data.XId;
 public final class ShareClient {
 
 	public static final String ACTION_SHARE = "share";
+	public static final String ACTION_DELETE = "delete-share";
 
 	ShareClient(YouAgainClient youAgainClient) {
 		this.yac = youAgainClient;
@@ -45,6 +46,25 @@ public final class ShareClient {
 		d.setType(ShareToken.class);
 		Object st = d.java();
 		return (ShareToken) st;
+	}
+	
+	public boolean delete(AuthToken authToken, String item, XId targetUser) {
+		FakeBrowser fb = new FakeBrowser()
+				.setDebug(true);
+		fb.setAuthenticationByJWT(authToken.getToken());
+		Map<String, String> shareAction = new ArrayMap(
+			"action", ACTION_DELETE,
+			"app", yac.app,
+			"shareWith", targetUser,
+			"entity", item
+		);
+		// call the server
+		System.out.println("");
+		fb.getPage(yac.yac.endpoint, shareAction);
+		
+		// No exception? It's done.
+		if (fb.getStatus() >= 200 && fb.getStatus() < 400) return true;
+		return false;
 	}
 
 	public boolean canWrite(AuthToken authToken, String item, List<ShareToken> shares) {
