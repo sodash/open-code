@@ -102,6 +102,9 @@ public class AThing implements IInit {
 	/**
 	 * Cache of shares - YouAgain is the definitive source, but we can store in
 	 * the DB for speedy filtering.
+	 * 
+	 * TODO have YA make calls to set these (using an endpoint registered against an app).
+	 * TODO but the app should have logic to create shares, e.g. "an anon-xid donation is shared with the donor's email"
 	 */
 	private List<ShareToken> shares;
 	
