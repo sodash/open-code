@@ -41,8 +41,14 @@ public abstract class Parser<PT> {
 
 	static final Map<String, Parser> parsers = new HashMap<String, Parser>();
 
+	/**
+	 * @deprecated Not working at present!
+	 * remove all named parsers
+	 */
 	public static void clearGrammar() {
-		parsers.clear();
+		// TODO The parsers are initialised by class loading. Which means they don't reset after a cleat :(
+		// TODO move LangX classes to have explicit init methods.
+//		parsers.clear();
 	}
 
 	/**
@@ -112,7 +118,7 @@ public abstract class Parser<PT> {
 			return this;
 		if (parsers.containsKey(name)) {
 			Parser old = parsers.get(name);
-			Log.report("Replacing parser for " + name + "!", Level.WARNING);
+			Log.report("Replacing parser for " + name + " old:"+old+" new:"+this, Level.WARNING);
 		}
 		parsers.put(name, this);
 		return this;
