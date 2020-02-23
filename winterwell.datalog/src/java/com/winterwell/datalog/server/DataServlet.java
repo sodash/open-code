@@ -79,8 +79,11 @@ public class DataServlet implements IServlet {
 
 		// num results
 		int numTerms = state.get(numRows, 1000);		
+		
 		// num examples
 		int size = state.get(new IntField("size"), 10);
+		// FIXME ONLY give examples for logged in users
+		
 		// time window
 		ICallable<Time> cstart = state.get(DataLogFields.START);
 		Time start = cstart==null? new Time().minus(TUnit.MONTH) : cstart.call();
