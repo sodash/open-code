@@ -247,4 +247,9 @@ public class DataLogHttpClient {
 		return lastCall;
 	}
 
+	public void setDebug(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
