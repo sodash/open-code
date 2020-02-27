@@ -14,6 +14,7 @@ public final class ShareClient {
 
 	public static final String ACTION_SHARE = "share";
 	public static final String ACTION_DELETE = "delete-share";
+	public static final String ACTION_CLAIM = "claim";
 
 	ShareClient(YouAgainClient youAgainClient) {
 		this.yac = youAgainClient;
