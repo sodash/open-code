@@ -107,9 +107,11 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 	/**
 	 * Awesomely convenient constructor:
 	 * <code>new ArrayMap(key1, value1, key2, value2, ...)</code>
-	 *  
+	 * 
 	 * Warning: Does not check for duplicates!
-	 * Null values are filtered out :)
+	 * RM: I removed null filtering here because:
+	 * (a) it doesn't match the put() behaviour
+	 * (b) it was breaking SQLDB.bidKeys and budgetKeys and by extension bid retrieval and, eventually, VAST serving
 	 * 
 	 * @param keyValuePairs
 	 */
@@ -118,25 +120,24 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 		keys = new ArrayList<K>(n);
 		values = new ArrayList<V>(n);
 		// wrong constructor?
-		if (keyValuePairs.length==1 && keyValuePairs[0] instanceof Map) {
+		if (keyValuePairs.length == 1 && keyValuePairs[0] instanceof Map) {
 			// should have been a call to the copy constructor! Handle it here anyway
 			Map<K,V> copyMe = (Map) keyValuePairs[0];
 			for (K k : copyMe.keySet()) {
 				put(k, copyMe.get(k));
-			}	
+			}
 			return;
 		}
 		assert keyValuePairs.length % 2 == 0;
-		for (int i = 0; i < keyValuePairs.length; i += 2) {			
-			V v = (V) keyValuePairs[i + 1];			
-			if (v==null) continue;
+		for (int i = 0; i < keyValuePairs.length; i += 2) {
+			V v = (V) keyValuePairs[i + 1];
 			K k = (K) keyValuePairs[i];
 			assert k != null;
 			keys.add(k);
 			values.add(v);
 		}
 	}
-
+	
 	@Override
 	public boolean containsKey(Object key) {
 		return keys.contains(key);
@@ -154,10 +155,10 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> implements
 	
 	/**
 	 * key-value entry set.
-	 * NB: we use a named class not an anonymous class for code stability 
+	 * NB: we use a named class not an anonymous class for code stability
 	 */
 	private final class EntrySet extends AbstractSet<Entry<K, V>> {
-		public EntrySet() {		
+		public EntrySet() {
 		}
 		
 		@Override
@@ -345,5 +346,5 @@ final class StdComparator<V,K> implements Comparator<Pair2<V,K>> {
 		int c = comparator.compare(o1.first, o2.first);
 		if (c!=0) return c;
 		return Utils.compare(o1.second, o2.second);
-	}	
+	}
 }
