@@ -88,30 +88,14 @@ public final class YouAgainClient {
 		return (String[]) tokens;
 	}
 	
-//	/**
-//	 * TODO refactor to exclusively use {@link YouAgainClientConfig#yac.endpoint}
-//	 * 
-//	 * For testing, this can be set via config/youagainclient.properties yac.endpoint=
-//	 * Or by calling {@link #setyac.endpoint(String)}
-//	 */
-//	static String yac.endpoint = 
-//				"https://youagain.good-loop.com/youagain.json";
-////				"http://localyouagain.good-loop.com/youagain.json";
-
-//	/**
-//	 * @deprecated for testing only
-//	 * @param yac.endpoint
-//	 */
-//	public static void setyac.endpoint(String yac.endpoint) {
-//		yac.endpoint = yac.endpoint;
-//	}
-//	
 	private static final Key<List<AuthToken>> AUTHS = new Key("ya_auths");
 
 	private static final String LOGTAG = "youagain";
 	
 	/**
 	 * @Deprecated This is the YA app itself
+	 * 
+	 * TODO shouldnt this be youagain.good-loop.com?? But would that break existing login setups??
 	 */
 	public static final String MASTERAPP = "youagain";
 	

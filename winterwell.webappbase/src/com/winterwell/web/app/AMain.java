@@ -56,13 +56,14 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	protected JettyLauncher jl;
 	
 	/**
-	 * aka app name
+	 * aka app local name e.g. "myapp" (and NOT myapp.mydomain.com)
 	 */
 	@Deprecated // access via the non-static getAppName() for preference
 	public static String appName;
 	
 	/**
 	 * @return e.g. "myapp" Note: Use "myapp.mydomain.com" with YouAgain
+	 * @see #getAppNameFull()
 	 */
 	public String getAppNameLocal() {
 		return appName;
@@ -295,7 +296,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		}
 		YouAgainClient yac = Dep.get(YouAgainClient.class);
 		String appAuthPassword = config2.getAppAuthPassword();
-		String appAuthName = getAppNameLocal()+".good-loop.com"; // TODO get domain from the config		
+		String appAuthName = getAppNameFull();		
 		String appAuthJWT = config2.getAppAuthJWT();
 		// use JWT if we have it
 		if ( ! Utils.isBlank(appAuthJWT)) {
@@ -321,6 +322,13 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			Log.d(appName, "AuthToken registered with name+password "+token.getXId());
 		}
 		return Dep.set(AuthToken.class, token);
+	}
+
+	/**
+	 * @return e.g. "myapp.mydomain.com"
+	 */
+	public String getAppNameFull() {
+		return getAppNameLocal()+".good-loop.com";
 	}
 
 	/**

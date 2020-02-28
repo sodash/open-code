@@ -10,9 +10,9 @@ public class App2AppAuthClientTest {
 	
 	@Test
 	public void testGetIdentityTokenFromYA() {
-		YouAgainClient yac = new YouAgainClient("test");
+		YouAgainClient yac = new YouAgainClient("test.example.com");
 		App2AppAuthClient a2a = new App2AppAuthClient(yac);
-		String appAuthName = "testapp2";
+		String appAuthName = "testapp2.example.com";
 		String appAuthPassword = "testpwd";
 		AuthToken token = a2a.getIdentityTokenFromYA(appAuthName, appAuthPassword);
 		System.out.println(token);
@@ -21,9 +21,9 @@ public class App2AppAuthClientTest {
 
 	@Test
 	public void testRegisterIdentityTokenWithYA() {
-		YouAgainClient yac = new YouAgainClient("test");
+		YouAgainClient yac = new YouAgainClient("test.example.com");
 		App2AppAuthClient a2a = new App2AppAuthClient(yac);
-		String appAuthName = "testapp2";
+		String appAuthName = "testapp2.example.com";
 		String appAuthPassword = "testpwd";
 		AuthToken token = a2a.registerIdentityTokenWithYA(appAuthName, appAuthPassword);
 		System.out.println(token);
@@ -43,14 +43,14 @@ public class App2AppAuthClientTest {
 
 	@Test
 	public void testGetPermissionsToken() {
-		YouAgainClient yac = new YouAgainClient("test");
+		YouAgainClient yac = new YouAgainClient("test.example.com");
 		App2AppAuthClient a2a = new App2AppAuthClient(yac);
-		AuthToken appIdToken = a2a.getIdentityTokenFromYA("testapp2", "testpwd");
-		AuthToken userToken = yac.login("spoonmcguffin@gmail.com", "my1stpassword");
+		AuthToken appIdToken = a2a.getIdentityTokenFromYA("testapp2.example.com", "testpwd");
+		AuthToken userToken = YATestUtils.getAuthTokenForSpoonMcGuffin(yac);
 //		yac.sharing().
 //		AuthToken userIdAndPermissionsToken;
 //		AuthToken ptoken = a2a.getPermissionsToken(appIdToken, userIdAndPermissionsToken);
-		throw new TodoException();
+//		throw new TodoException();
 	}
 
 }

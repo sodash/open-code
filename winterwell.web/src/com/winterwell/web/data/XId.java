@@ -36,38 +36,9 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 			"(\\S+)@([A-Za-z\\.]+)?");
 
 	/**
-	 * @deprecated - better to use a "sub-service" e.g. company.linkedin.com
-	 * Company-type. Added to the start of the XId name for SOME data-sources,
-	 * to avoid any overlap with other types.  
-	 */
-	public static final String WART_C = "c_";
-	
-	/**
-	 * @deprecated - better to use a "sub-service" e.g. person.linkedin.com. Or just assume person as the default.
-	 * 
-	 * Person-type. Added to the start of the XId name for SOME data-sources,
-	 * to avoid any overlap with other types.  
-	 */
-	public static final String WART_P = "p_";
-	
-	/**
-	 * @deprecated
-	 * Video-type. Added to the start of the XId name for SOME data-sources,
-	 * to avoid any overlap with other types.
-	 */
-	public static final String WART_V = "v_";
-	
-	/**
-	 * @deprecated
-	 * Group-type. Added to the start of the XId name for SOME data-sources,
-	 * to avoid any overlap with other types.
-	 */
-	public static final String WART_G = "g_";
-
-	/**
 	 * XId for unknown person + unspecified service
 	 */
-	public static final XId ANON = new XId(WART_P+"anon@unspecified", false);
+	public static final XId ANON = new XId("anon@unspecified", false);
 	
 	/**
 	 * The service-specific ID -- e.g. Twitter username 
@@ -82,24 +53,16 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	 * Historically, we've used warts on the name for type -- this is deprecated.
 	 */
 	public final String service;
-
-	/**
-	 * @param name Canonicalises via {@link IPlugin#canonical(XId, KKind)}
-	 * @param plugin
-	 */
-	public XId(String name, String service, IDoCanonical plugin) {
-		this(name, null, service, plugin);
-	}
 	
 	/**
 	 * 
-	 * @param name
+	 * @param name Canonicalises via {@link IDoCanonical}
 	 * @param kind Can be null
 	 * @param service
 	 * @param plugin
 	 */
-	public XId(String name, Object kind, String service, IDoCanonical plugin) {
-		if (plugin != null) name = plugin.canonical(name, kind);
+	public XId(String name, String service, IDoCanonical plugin) {
+		if (plugin != null) name = plugin.canonical(name);
 		this.name = name;
 		this.service = service;
 		// null@twitter is a real user :( c.f. bug #14109 
@@ -150,18 +113,10 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	/**
 	 * Convert a name@service String (as produced by this class) into
 	 * a XId object.
-	 * @throws IllegalArgumentException if id cannot be parsed
-	 */
-	public XId(String id) {
-		this(id, (Object)null);
-	}
-	
-	/**
-	 * 
 	 * @param id e.g. "alice@twitter"
 	 * @param kind e.g. KKind.Person
 	 */
-	public XId(String id, Object kind) {
+	public XId(String id) {
 		int i = id.lastIndexOf('@');
 		if (i <= 0) {
 			throw new IllegalArgumentException("Invalid XId " + id);
@@ -191,7 +146,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 		String _name = id.substring(0, i);
 		// guard against an easy error
 		assert ! _name.endsWith("@"+service) : "Bad XId "+id+" - duplicate service";
-		this.name = plugin==null? _name : plugin.canonical(_name, kind);
+		this.name = plugin==null? _name : plugin.canonical(_name);
 		assert notNullNameCheck() : id;
 	}
 	
@@ -226,14 +181,6 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 		this.service = id.substring(i+1);
 		this.name = id.substring(0, i);
 		assert notNullNameCheck() : id;
-	}
-
-	public XId(String name, IDoCanonical plugin) {
-		this(name, null, plugin.getService(), plugin);
-	}
-	
-	public XId(String name, Object kind, IDoCanonical plugin) {
-		this(name, kind, plugin.getService(), plugin);
 	}
 
 	/**
@@ -320,27 +267,6 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	 */
 	public boolean isService(String _service) {
 		return this.service.equals(_service);
-	}
-
-
-
-
-	/**
-	 * @return The name, minus any Hungarian warts SoDash has added
-	 * to ensure uniqueness between types.
-	 */
-	public String dewart() {
-		// person?
-		if (name.startsWith(WART_P)) return name.substring(WART_P.length());
-		if (name.startsWith(WART_G)) return name.substring(WART_G.length());
-		if (name.startsWith(WART_V)) return name.substring(WART_V.length());
-		if (name.startsWith(WART_C)) return name.substring(WART_C.length());
-		// TODO do we use any others?
-		return name;
-	}
-
-	public boolean hasWart(String wart) {
-		return name.startsWith(wart);
 	}
 
 	/**

@@ -44,7 +44,7 @@ public class App2AppAuthClient {
 
 	/**
 	 * 
-	 * @param appAuthName e.g. "myapp@mydomain.com"
+	 * @param appAuthName e.g. "myapp.mydomain.com"
 	 * @param appAuthPassword
 	 * @return "This is MyApp (signed by YA to verify)"
 	 * 
