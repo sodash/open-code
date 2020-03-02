@@ -112,8 +112,9 @@ public class ShareToken implements IHasJson {
 	
 	/**
 	 * A path or XId, E.g. /myfolder/myfile, or winterstein@twitter
+	 * Private so we can enforce type-as-substring-of-item through setItem()
 	 */
-	String item;
+	private String item;
 	
 	/**
 	 * TODO If item starts foo:bar, then store "foo" here for fast search.
@@ -130,12 +131,12 @@ public class ShareToken implements IHasJson {
 		assert token != null;
 		// get from token
 		DecodedJWT decd = new JWTDecoder(app).decryptJWT(getToken());
-		item = decd.getSubject();
+		setItem(decd.getSubject());
 		List<String> aud = decd.getAudience();
 		_to = aud;
 		Claim cby = decd.getClaim("by");
 		by = cby.asString();
-		type = decd.getContentType();
+		// type = decd.getContentType(); // cwt field is useless & type should match DBShare.type
 		read = decd.getClaim("r").asBoolean();
 		write = decd.getClaim("w").asBoolean();
 	}
