@@ -822,7 +822,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected void doSave(WebRequest state) {		
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
 		T thing = getThing(state);
-		assert thing != null : state;
+		assert thing != null : "null thing?! "+state;
 		// HACK set modified = true on maps
 		if (thing instanceof Map) {
 			((Map) thing).put("modified", true);	

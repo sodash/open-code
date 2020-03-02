@@ -4,15 +4,21 @@ import java.util.Map;
 
 import com.winterwell.utils.containers.AbstractMap2;
 
-
-public interface IDoCanonical<Kind> {
+/**
+ * NB: For services like Twitter, which have different id spaces for users, messages, and DMs
+ *  -- use multiple services, e.g. "twitter" for people (the default) vs "twitter.post" for posts.
+ * @author daniel
+ *
+ * @param <Kind>
+ */
+public interface IDoCanonical {
 
 	/**
 	 * A no-op identity function.
 	 */
-	static final IDoCanonical DUMMY = new IDoCanonical<Object>() {
+	static final IDoCanonical DUMMY = new IDoCanonical() {
 		@Override
-		public String canonical(String name, Object kind) {
+		public String canonical(String name) {
 			return name;
 		}
 
@@ -39,14 +45,12 @@ public interface IDoCanonical<Kind> {
 	
 
 	/**
-	 * Used by XId to catch equivalent ids
+	 * Used by XId to catch equivalent ids.
 	 * @param name
-	 * @param kind Extra information about what kind of object this is for.
-	 * OFTEN null
 	 * @return canonical form of this login name, e.g. lowercase
 	 * @throws RuntimeException if the syntax is bad, e.g. "Alice" is not a valid email address. 
 	 */
-	String canonical(String name, Kind kind);
+	String canonical(String name);
 
 	/**
 	 * The service this plugin relates to. E.g. "twitter"

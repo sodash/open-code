@@ -75,7 +75,7 @@ public class DataLogHttpClient {
 		if (ENDPOINT.startsWith("http://")) server = "http://"+server;
 		return DataLogRemoteStorage.saveToRemoteServer(server, event);
 	}
-	/**
+	/**null
 	 * 
 	 * @param endpoint Can be null (uses the default {@link #ENDPOINT})
 	 * @param namespace
@@ -136,7 +136,13 @@ public class DataLogHttpClient {
 		this.auth = auth;
 		return this;
 	}
-		
+	
+	/** As a bit of security (cos examples carry more data than aggregate stats), we default to 0 */
+	int numExamples = 0;
+	
+	public void setNumExamples(int numExamples) {
+		this.numExamples = numExamples;
+	}
 
 	/**
 	 * 
@@ -148,30 +154,18 @@ public class DataLogHttpClient {
 	 * @return {key e.g. "oxfam": value e.g. 100}
 	 */
 	public Map<String, Double> getBreakdown(SearchQuery q, Breakdown breakdown) {
-		// Call DataServlet
-		FakeBrowser fb = new FakeBrowser();
-		fb.setDebug(debug);
-		
-		// auth!
-		if (auth!=null) {
-			AuthToken.setAuth(fb, auth);
-		}
-		
+		// Call DataServlet		
 		String b = breakdown.toString();		
-		String json = fb.getPage(ENDPOINT, new ArrayMap(
+		ArrayMap vars = new ArrayMap(
 				"dataspace", dataspace,				
 				"q", q.getRaw(), 
 				"breakdown", b,
 				DataLogFields.START.name, startParam(),
 				DataLogFields.END.name, end==null? null : end.toISOString(),
-				"size", 5)); // size is num examples
+				"size", numExamples);
 		
-		lastCall = fb.getLocation();
-		
-		JSend jobj = JSend.parse(json);
-		if ( ! jobj.isSuccess()) {
-			throw new FailureException(jobj.getMessage());
-		}		
+		// Call!
+		JSend jobj = get2_httpCall(vars);		
 		
 		// e.g. by_cid buckets		
 		List<Map> buckets = new ArrayList();
@@ -193,6 +187,29 @@ public class DataLogHttpClient {
 		examples = Containers.asList((Object)SimpleJson.get(jobjMap, "examples"));
 		
 		return byX;
+	}
+
+	/**
+	 * Call DataLog!
+	 * NB: Can be over-ridden to implement a cache
+	 * @param vars
+	 * @return
+	 */
+	protected JSend get2_httpCall(ArrayMap vars) {		
+		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(debug);		
+		// auth!
+		if (auth!=null) {
+			AuthToken.setAuth(fb, auth);
+		}		
+		String json = fb.getPage(ENDPOINT, vars);		
+		lastCall = fb.getLocation();
+		
+		JSend jobj = JSend.parse(json);
+		if ( ! jobj.isSuccess()) {
+			throw new FailureException(jobj.getMessage());
+		}
+		return jobj;
 	}
 
 	/**
