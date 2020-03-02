@@ -451,7 +451,11 @@ public final class YouAgainClient {
 		return uxid;
 	}
 	
-	
+	/**
+	 * 
+	 * @param authToken TODO manage this better
+	 * @return
+	 */
 	public List<String> getSharedWith(String authToken) {
 		FakeBrowser fb = new FakeBrowser();
 		fb.setAuthenticationByJWT(authToken);
@@ -470,7 +474,7 @@ public final class YouAgainClient {
 	/** List the users a particular entity is shared to */
 	public List<String> getShareList(String share) {
 		FakeBrowser fb = new FakeBrowser();
-		// fb.setAuthenticationByJWT(authToken); // TODO Needed for this?
+//		 fb.setAuthenticationByJWT(authToken); // TODO Needed for this?
 		String response = fb.getPage(yac.endpoint, new ArrayMap(
 			"app", app,
 			"action", "share-list",
