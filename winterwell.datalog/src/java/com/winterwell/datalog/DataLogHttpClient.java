@@ -47,6 +47,8 @@ public class DataLogHttpClient {
 	private Time start;
 
 	private Time end;
+	
+	private boolean debug = true;
 
 	/**
 	 * @deprecated for debug - the last url fetched
@@ -91,7 +93,7 @@ public class DataLogHttpClient {
 	public List<DataLogEvent> getEvents(SearchQuery q, int maxResults) {
 		// Call DataServlet
 		FakeBrowser fb = new FakeBrowser();
-		fb.setDebug(true);
+		fb.setDebug(debug);
 		// auth!
 		if (auth!=null) {
 			AuthToken.setAuth(fb, auth);
@@ -148,7 +150,7 @@ public class DataLogHttpClient {
 	public Map<String, Double> getBreakdown(SearchQuery q, Breakdown breakdown) {
 		// Call DataServlet
 		FakeBrowser fb = new FakeBrowser();
-		fb.setDebug(true);
+		fb.setDebug(debug);
 		
 		// auth!
 		if (auth!=null) {
@@ -228,6 +230,11 @@ public class DataLogHttpClient {
 
 	public String getLastCall() {
 		return lastCall;
+	}
+	
+	// Set whether the client's FakeBrowsers should run in debug mode
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 
 }
