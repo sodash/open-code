@@ -25,6 +25,11 @@ import com.winterwell.utils.web.SimpleJson;
 
 /**
  * For logging an event -- which can have arbitrary detail.
+ * 
+ * TODO Best Practice for Logging a Table of Data
+ * Do you need to do sums & averages?
+ * 
+ * 
  * @author daniel
  */
 public final class DataLogEvent implements Serializable, IHasJson
