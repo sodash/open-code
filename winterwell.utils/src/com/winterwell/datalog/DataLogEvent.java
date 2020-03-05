@@ -26,8 +26,17 @@ import com.winterwell.utils.web.SimpleJson;
 /**
  * For logging an event -- which can have arbitrary detail.
  * 
- * TODO Best Practice for Logging a Table of Data
+ * Best Practice for Logging a Table of Data
+ * 
  * Do you need to do sums & averages?
+ *  - Use count, or a {@link #COMMON_PROPS} numerical field.
+ *  - Create multiple events, which can be selected via a shared COMMON_PROPS key=value,
+ *  and use count for each event.
+ *   
+ * 
+ * Use uncommon props for "audit trail" details -- stored but not easily
+ * searchable.
+ * 
  * 
  * 
  * @author daniel
