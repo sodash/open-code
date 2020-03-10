@@ -164,5 +164,17 @@ public class AuthToken implements IHasXId, IProperties {
 		StrUtils.pop(tokens, 2);
 		fb.setRequestHeader("Authorization", tokens);
 	}
+
+	/**
+	 * @return true if this is for a temporary ID, eg a session cookie.
+	 * 
+	 * See TrackingPixelServlet which makes nonce@trk cookie ids
+	 */
+	public boolean isTemp() {
+		if (getXId().isService("temp") || getXId().isService("trk")) {
+			return true;
+		}
+		return false;
+	}
 	
 }

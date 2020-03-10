@@ -19,6 +19,7 @@ import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.nlp.query.SearchQuery.SearchFormatException;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.CSVSpec;
@@ -40,6 +41,8 @@ import com.winterwell.web.fields.DtField;
 import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.ListField;
 import com.winterwell.web.fields.SField;
+import com.winterwell.youagain.client.AuthToken;
+import com.winterwell.youagain.client.YouAgainClient;
 
 /**
  * Serves up aggregations data.
@@ -59,6 +62,7 @@ public class DataServlet implements IServlet {
 	 * Number of results in aggregations
 	 */
 	private static final IntField numRows = new IntField("numRows");
+	private static final IntField SIZE = new IntField("size");
 	public static final SField DATASPACE = new SField("dataspace");
 	private static final String LOGTAG = "DataServlet";
 
@@ -81,8 +85,11 @@ public class DataServlet implements IServlet {
 		int numTerms = state.get(numRows, 1000);		
 		
 		// num examples
-		int size = state.get(new IntField("size"), 10);
-		// FIXME ONLY give examples for logged in users
+		int size = state.get(SIZE, 10);
+		// ONLY give examples for logged in users
+		if ( ! isLoggedIn(state)) {			
+			size = 0;
+		}
 		
 		// time window
 		ICallable<Time> cstart = state.get(DataLogFields.START);
@@ -133,6 +140,20 @@ public class DataServlet implements IServlet {
 		
 		JsonResponse jr = new JsonResponse(state, aggregations);
 		WebUtils2.sendJson(jr, state);
+	}
+
+	/**
+	 * @param state
+	 * @return true if state has an AuthToken. Does NOT check validity of the token!
+	 */
+	boolean isLoggedIn(WebRequest state) {		
+		YouAgainClient yac = Dep.get(YouAgainClient.class);
+		List<AuthToken> authd = yac.getAuthTokens(state);
+		for(AuthToken at : authd) {
+			if (at.isTemp()) continue;
+			return true;
+		}
+		return false;
 	}
 
 	/**

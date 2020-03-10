@@ -27,8 +27,8 @@
     "react-markdown": "^4.1.0",
     "react-scroll": "^1.7.11",
     "sjtest": "^0.4.9",
-    "wwutils": "^0.9.4",
-    "you-again": "^0.8.4"
+	 "wwutils": "^0.9.4",
+	 "you-again": "^0.8.6"
   },
   "scripts": {
     "compile": "webpack --config $PWD/webpack.config.js --progress --colors",
