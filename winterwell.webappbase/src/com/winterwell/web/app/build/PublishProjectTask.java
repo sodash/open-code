@@ -106,6 +106,9 @@ public class PublishProjectTask extends BuildTask {
 		bashScript = new File(FileUtils.getWinterwellDir(), "wwappbase.js/project-publisher.sh")+" "+projectName;
 	}
 
+	/**
+	 * BuildX + std WW libs
+	 */
 	@Override
 	public List<BuildTask> getDependencies() {		
 		// the builder for this project?
