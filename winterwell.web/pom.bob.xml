@@ -6,10 +6,14 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>dummy</name>
 	<dependencies>
-<dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-server</artifactId><version>9.4.12.RC2</version></dependency>
-<dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-util</artifactId><version>9.4.12.RC2</version></dependency>
-<dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-util-ajax</artifactId><version>9.4.12.RC2</version></dependency>
-<dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-servlet</artifactId><version>9.4.12.RC2</version></dependency>
-<dependency><groupId>com.sun.mail</groupId><artifactId>javax.mail</artifactId><version>1.6.1</version></dependency>
-<dependency><groupId>com.sun.mail</groupId><artifactId>gimap</artifactId><version>1.6.1</version></dependency>	</dependencies>
+<dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-server</artifactId><version>9.4.24.v20191120</version></dependency>
+<dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-util</artifactId><version>9.4.24.v20191120</version></dependency>
+<dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-util-ajax</artifactId><version>9.4.24.v20191120</version></dependency>
+<dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-servlet</artifactId><version>9.4.24.v20191120</version></dependency>
+<dependency><groupId>com.sun.mail</groupId><artifactId>javax.mail</artifactId><version>1.6.2</version></dependency>
+<dependency><groupId>com.sun.mail</groupId><artifactId>gimap</artifactId><version>1.6.4</version></dependency>
+<dependency><groupId>eu.medsea.mimeutil</groupId><artifactId>mime-util</artifactId><version>1.3</version></dependency>
+<dependency><groupId>org.apache.httpcomponents</groupId><artifactId>httpclient</artifactId><version>4.5.10</version></dependency>
+<dependency><groupId>org.ccil.cowan.tagsoup</groupId><artifactId>tagsoup</artifactId><version>1.2.1</version></dependency>
+<dependency><groupId>commons-fileupload</groupId><artifactId>commons-fileupload</artifactId><version>1.4</version></dependency>	</dependencies>
 </project>
