@@ -206,7 +206,7 @@ public class MavenDependencyTask extends BuildTask {
 			// did it work??		
 			if ( ! proc.getOutput().contains("BUILD SUCCESS")) {
 				String error = proc.getError();
-				throw new FailureException(error);
+				throw new FailureException(dependencies+" led to "+error);
 			}		
 			// readme
 			if ( ! new File(outDir,"README.md").isFile()) {
