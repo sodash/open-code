@@ -435,7 +435,8 @@ public class ReflectionUtils {
 		Field f = ReflectionUtils.getField(obj.getClass(), fieldName);
 		if (f==null) {
 			throw Utils.runtime(new NoSuchFieldException(fieldName));
-		}	    
+		}
+		checkCanSetField(f);
 		try {
 			f.setAccessible(true);
 			int m = f.getModifiers();
@@ -452,6 +453,12 @@ public class ReflectionUtils {
 		} 
 	}
 
+	private static void checkCanSetField(Field f) {
+		if (f.getType() == Boolean.class || isaNumber(f.getType())) {
+			throw new IllegalArgumentException("Too primitive - Dont set "+f);
+		}
+	}
+
 	/**
 	 * Set a field, which can be private. Throws exceptions if the field does
 	 * not exist or if you cannot do this.
@@ -466,6 +473,7 @@ public class ReflectionUtils {
 		if (f==null) {
 			throw Utils.runtime(new NoSuchFieldException(fieldName));
 		}
+		checkCanSetField(f);
 		f.setAccessible(true);
 		try {
 			f.set(obj, value);
@@ -761,6 +769,7 @@ public class ReflectionUtils {
 			}
 			// Poke the field
 			Field f = getField(klass, propertyName);
+			checkCanSetField(f);
 			f.set(obj, value);
 		} catch(Exception ex) {
 			throw Utils.runtime(ex);
