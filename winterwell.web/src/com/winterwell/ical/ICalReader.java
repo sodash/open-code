@@ -1,7 +1,4 @@
 package com.winterwell.ical;
-/**
- * 
- */
 
 
 import java.text.Format;

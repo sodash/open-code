@@ -36,6 +36,9 @@ public class BuildWeb2 extends BuildWinterwellProject {
 		mdt.addDependency("org.apache.httpcomponents", "httpclient", "4.5.10");
 		mdt.addDependency("org.ccil.cowan.tagsoup", "tagsoup", "1.2.1");
 		mdt.addDependency("commons-fileupload","commons-fileupload","1.4");
+		mdt.addDependency("commons-io", "commons-io", "2.6");
+		// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+		mdt.addDependency("org.apache.commons","commons-lang3","3.9");
 		
 		mdt.setIncSrc(true); // we like source code
 //		mdt.setForceUpdate(true);
