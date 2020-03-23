@@ -293,8 +293,11 @@ public class AppUtils {
 	 * @return
 	 */
 	public static JThing doSaveEdit(ESPath path, JThing item, WebRequest state) {
-		assert path.index().toLowerCase().contains("draft") : path;		
+		// NB: Most classes have a draft phase -- but not Task.java
+		// assert path.index().toLowerCase().contains("draft") : path;
+		
 		// TODO check security with YouAgain!		
+		
 		// update status TODO factor out the status logic
 		Object s = item.map().get("status");
 		if (Utils.streq(s, KStatus.PUBLISHED)) {
@@ -508,14 +511,13 @@ public class AppUtils {
 			return null;
 		} catch(ESException ex) {
 			// map the base index (so we can do a reindex with the right mapping)
-			String index = path.index()
-					+"_"+Dep.get(ESConfig.class).getIndexAliasVersion()
-					;
-			// make if not exists
+			// NB: The default naming, {index}_{month}{year}, assumes we only do one mapping change per month.
+			ESConfig esConfig = Dep.get(ESConfig.class);
+			String index = path.index()+"_"+esConfig.getIndexAliasVersion();
+			// make if not exists (which it shouldn't)
 			if ( ! es.admin().indices().indexExists(index)) {
 				CreateIndexRequest pi = es.admin().indices().prepareCreate(index);
-//						pi.setFailIfAliasExists(true);
-//						pi.setAlias(path.index()); // no alias - the old version is still in place
+				// NB: no alias yet - the old version is still in place
 				IESResponse r = pi.get().check();
 			}
 			// setup the right mapping
@@ -637,7 +639,12 @@ public class AppUtils {
 		r2.check();
 	}
 
-
+	/**
+	 * Look for ESKeyword annotations on fields.
+	 * @param k
+	 * @param dtype
+	 * @param seenAlready
+	 */
 	private static void initESMappings3_putMapping_byAnnotation(Class k, ESType dtype, Collection<Class> seenAlready) {
 		List<Field> fields = ReflectionUtils.getAllFields(k);
 		for (Field field : fields) {
@@ -657,6 +664,10 @@ public class AppUtils {
 				dtype.property(fname, ESType.keyword);
 				continue;
 			}
+			if (String.class.equals(type)) {
+				// trust the text default? -- That's not always wise!
+				continue;
+			}
 			// IDs
 			if (type.equals(XId.class) || ReflectionUtils.isa(type, AString.class)) {
 				dtype.property(fname, ESType.keyword);
@@ -664,6 +675,10 @@ public class AppUtils {
 			}
 			// ??anything else ES is liable to guess wrong??
 			
+			// trust the defaults for some stuff
+			if (ReflectionUtils.isaNumber(type) || boolean.class.equals(type) || Boolean.class.equals(type)) {
+				continue;
+			}
 			// Recurse (but not into everything)
 			if (type != Object.class && ! type.isPrimitive() && ! type.isArray() 
 					&& ! ReflectionUtils.isa(type, Collection.class)
