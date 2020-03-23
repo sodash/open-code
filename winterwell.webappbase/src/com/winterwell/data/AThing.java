@@ -3,6 +3,7 @@ package com.winterwell.data;
 import java.util.List;
 
 import com.winterwell.depot.IInit;
+import com.winterwell.es.ESKeyword;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
@@ -93,7 +94,7 @@ public class AThing implements IInit {
 
 	public String name;
 	
-	ES type??
+	@ESKeyword
 	public String url;
 	/**
 	 * Normally an XId (so that it has service, and is in a canonical form for that service)
