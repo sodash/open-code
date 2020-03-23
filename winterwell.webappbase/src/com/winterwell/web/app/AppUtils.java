@@ -680,10 +680,13 @@ public class AppUtils {
 				continue;
 			}
 			// Recurse (but not into everything)
-			if (type != Object.class && ! type.isPrimitive() && ! type.isArray() 
-					&& ! ReflectionUtils.isa(type, Collection.class)
-					&& ! ReflectionUtils.isa(type, Map.class)) 
-			{
+			if (type != Object.class 
+				&& ! type.isPrimitive() 
+				&& ! type.isArray() 
+				&& ! ReflectionUtils.isa(type, Collection.class)
+				&& ! ReflectionUtils.isa(type, Map.class)
+				&& ! ReflectionUtils.isa(type, Throwable.class)
+			) {
 				if (seenAlready.contains(type)) continue;
 				ESType ftype = new ESType();
 				assert ftype.isEmpty();
