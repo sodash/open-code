@@ -92,6 +92,8 @@ public class AThing implements IInit {
 	}
 
 	public String name;
+	
+	ES type??
 	public String url;
 	/**
 	 * Normally an XId (so that it has service, and is in a canonical form for that service)
