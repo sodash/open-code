@@ -476,7 +476,10 @@ public class ReflectionUtils {
 		checkCanSetField(f);
 		f.setAccessible(true);
 		try {
+			// Do it!
 			f.set(obj, value);
+			return;
+			
 		} catch(IllegalArgumentException ex) {
 			// coerce type?
 			try {

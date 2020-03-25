@@ -144,7 +144,12 @@ public final class YouAgainClient {
 	public String toString() {
 		return "YouAgainClient [app=" + app + "]";
 	}
-
+	
+	/**
+	 * See TrackingPixelServlet
+	 */
+	public static final String TRK_APP = "trk";
+			
 	/**
 	 * This is the method you want :)
 	 * 
@@ -162,16 +167,15 @@ public final class YouAgainClient {
 			return new ArrayList(tokens);
 		}
 		
+		// all jwt
 		List<String> jwt = getAllJWTTokens(state);
+		
 		// basic auth?
 		AuthToken basicToken = null;
 		Pair<String> np = WebUtils2.getBasicAuthentication(state.getRequest());
 		if (np !=null) {
 			// verify it
 			basicToken = verifyNamePassword(np.first, np.second);
-		}
-		if (jwt.isEmpty() && basicToken==null) {
-			return new ArrayList();
 		}
 		if ( ! jwt.isEmpty()) {
 			// verify the tokens
@@ -180,10 +184,21 @@ public final class YouAgainClient {
 			// just name/password
 			tokens = new ArrayList();
 		}
+		assert(tokens!=null);
+		
 		// add the name/password user first, if set
 		if (basicToken!=null) {
 			tokens.add(0, basicToken);
 		}
+		
+		// add tracking cookie		
+		String trkId = state.getCookie("trkid");
+		if (trkId != null) {
+			String token = null; // NB: to get the right AuthToken constructor
+			AuthToken ta = new AuthToken(token).setApp(TRK_APP).setXId(new XId(trkId, false));
+			tokens.add(ta);
+		}
+		
 		// stash them
 		state.put(AUTHS, tokens);
 		// set user?
