@@ -407,7 +407,7 @@ public class Bob {
 		List<File> files = FileUtils.find(bdir, namePattern);
 		if (files.isEmpty()) return null;
 		if (files.size()==1) {
-			Log.w(LOGTAG, "Auto-build: found file "+files.get(0));
+			Log.i(LOGTAG, "Auto-build: found file "+files.get(0));
 			return files.get(0);
 		}
 		Log.w(LOGTAG, "Auto-build: could not pick between "+files.size()+" tasks in "+bdir);
