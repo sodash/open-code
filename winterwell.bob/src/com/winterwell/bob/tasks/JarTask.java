@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -138,7 +139,7 @@ public class JarTask extends BuildTask {
 		String path = inputBase == null ? f.getPath() : FileUtils
 				.getRelativePath(f, inputBase);
 		FileInputStream in = new FileInputStream(f);
-		addFile2(path, in, out);
+		addFile2(path, f, in, out);
 		in.close();
 	}
 
@@ -146,11 +147,12 @@ public class JarTask extends BuildTask {
 	 * Shared by files and zipentrys
 	 * 
 	 * @param path
+	 * @param f 
 	 * @param in
 	 * @param out
 	 * @throws IOException
 	 */
-	void addFile2(String path, InputStream in, ZipOutputStream out)
+	void addFile2(String path, File f, InputStream in, ZipOutputStream out)
 			throws IOException {
 		// convert separators in path?
 		// I think this causes a bug in Windows
@@ -163,7 +165,19 @@ public class JarTask extends BuildTask {
 		}
 		filenames.add(path);
 		// Add it
-		out.putNextEntry(new ZipEntry(path));
+		ZipEntry ze = new ZipEntry(path);
+////		// HACK for libreoffice -- nope, no joy
+//		if (path.equals("mimetype")) {
+//			ze.setMethod(ZipEntry.STORED);
+//			ze.setCompressedSize(f.length());
+//			ze.setSize(f.length());
+//			CRC32 crc = new CRC32();
+//			crc.reset();
+//			crc.update(FileUtils.readRaw(new FileInputStream(f)));
+//			ze.setCrc(crc.getValue());
+//		}
+		
+		out.putNextEntry(ze);
 		// Transfer bytes from the file to the ZIP file
 		while (true) {
 			int len = in.read(bytes);
@@ -239,7 +253,7 @@ public class JarTask extends BuildTask {
 			ZipEntry entry = zin.getNextEntry();
 			while (entry != null) {
 				String name = entry.getName();
-				addFile2(name, zin, out);
+				addFile2(name, null, zin, out);
 				entry = zin.getNextEntry();
 			}
 			// Delete temp file
