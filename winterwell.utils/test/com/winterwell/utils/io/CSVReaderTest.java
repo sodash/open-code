@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TimeOut;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.time.StopWatch;
 
@@ -100,6 +102,14 @@ public class CSVReaderTest extends TestCase {
 		assertEquals(
 				"International Exchange & Cooperation Centre, Mingde College",
 				ls.get(0)[4]);
+	}
+	
+	public void testAsListOfMaps() {
+		StringReader in = new StringReader(
+				"Name,Animal,Food\nAlice,penguin,fish\nBob,aardvark,ants");
+		CSVReader r = new CSVReader(in, ',', '"', '#');
+		List<Map<String, String>> ls = Containers.getList(r.asListOfMaps());
+		assert Containers.same(ls.get(0), new ArrayMap("Name","Alice","Animal","penguin","Food","fish")) : ls;
 	}
 
 	public void testQuoting() {

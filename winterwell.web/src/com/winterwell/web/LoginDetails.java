@@ -1,14 +1,19 @@
 package com.winterwell.web;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.web.WebUtils;
 
 /**
@@ -90,7 +95,6 @@ public class LoginDetails implements IProperties, Serializable {
 
 	@Override
 	public <T> T get(Key<T> key) {
-		// TODO older versions of LoginDetails did not have a property bag
 		Object v = properties == null ? null : properties.get(key);
 		if (v == null) {
 			v = defaultProperties.get(key);
@@ -136,5 +140,32 @@ public class LoginDetails implements IProperties, Serializable {
 			s += ":" + port;
 		}
 		return s;
+	}
+
+	/**
+	 * Load from a file
+	 * @param propertiesFile
+	 * @return
+	 */
+	public static LoginDetails load(File propertiesFile) {
+		assert propertiesFile.isFile() : propertiesFile;		
+		try {
+			Properties props = new Properties();
+			props.load(FileUtils.getReader(propertiesFile));
+			String _port = props.getProperty("port");
+			LoginDetails ld = new LoginDetails(
+					props.getProperty("server"),
+					// a bit flexible on case 
+					Utils.or(props.getProperty("loginName"), props.getProperty("loginname")),
+					props.getProperty("password"),
+					_port==null? 0 : Integer.valueOf(_port)
+			);
+			
+			// TODO other properties
+			
+			return ld;
+		} catch (IOException e) {
+			throw Utils.runtime(e);
+		}
 	}
 }

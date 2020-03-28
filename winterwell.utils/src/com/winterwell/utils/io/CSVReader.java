@@ -7,7 +7,10 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.winterwell.utils.BestOne;
@@ -15,6 +18,8 @@ import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
+import com.winterwell.utils.containers.AbstractIterator;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.IOneShot;
 import com.winterwell.utils.log.Log;
 
@@ -32,7 +37,7 @@ import com.winterwell.utils.log.Log;
  * TODO refactor to use AbstractIterator TODO add skipTo(Time)
  *
  * @testedby {@link CSVReaderTest}
- * @author Joe Halliwell <joe@winterwell.com>
+ * @author Daniel, Joe Halliwell <joe@winterwell.com>
  *
  */
 public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closeable, IOneShot {
@@ -68,29 +73,42 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 		return this;
 	}
 	
-	int currentLineNumber = 0; // The starting line number of the current record
+	/**
+	 * The starting line number of the current record
+	 */
+	int currentLineNumber = 0;
 
 	final PushbackReader input;
-	int nextLineNumber = 0; // The starting line number of the next record (i.e.
+	
+	/**
+	 *  The starting line number of the next record (i.e.
 	// handling comments)
+	 */
+	int nextLineNumber = 0; //
 
+
+	/** record (i.e. handling multi-line records) */
 	String[] nextRecord;
 
-	// Fields for keeping track of row and line counts
-	// NB scanLineNumber >= nextLineNumber >= currentLineNumber
+	/** Fields for keeping track of row and line counts
+	NB scanLineNumber >= nextLineNumber >= currentLineNumber
+	*/
 	int nextRowNumber = 0;
 	/**
 	 * -1 for variable width mode. The starting value will get over-written by
 	 * the constructor!
 	 */
 	int numFields = -1;
-	int scanLineNumber = 0; // The starting line number of the next but one
-
-	// record (i.e. handling multi-line records)
+	
+	/**
+	 *  The starting line number of the next but one
+	 */
+	int scanLineNumber = 0;
 
 
 	private File file;
 	private CSVSpec spec;
+	private String[] headers;
 
 	/**
 	 * @return the file we're looking at. Can be null if this was created using
@@ -144,6 +162,7 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 	
 	public CSVReader(Reader input, CSVSpec spec) {
 		this.spec = spec;
+		// Why pushback??
 		this.input = new PushbackReader(input);
 		try {
 			nextRecord = getNextRecord();
@@ -169,9 +188,8 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 
 	/**
 	 * The number of the line on which the last row returned began.
-	 * Zero-indexed.
-	 *
-	 * @return
+	 * Zero-indexed. This can be higher than the row-number, as it includes comments and
+	 * multi-line rows.
 	 */
 	public int getLineNumber() {
 		return currentLineNumber;
@@ -279,8 +297,7 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 	}
 
 	/**
-	 * The number of the last row returned. zero indexed (zero at the beginning
-	 * too). This may be less than the line number due to comments and
+	 * The number of the last row returned. zero indexed (-1 at the beginning). This may be less than the line number due to comments and
 	 * multi-line items
 	 *
 	 * @see #getLineNumber()
@@ -408,5 +425,53 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 		}
 		return sep.getBest();
 	}
+
+	/**
+	 * e.g. if the first row is headers `csvReader.setHeaders(csvReader.next())`
+	 * @param rowOfHeaders
+	 */
+	public void setHeaders(String[] rowOfHeaders) {
+		this.headers = rowOfHeaders;
+		for (int i=0; i<headers.length; i++) {
+			headers[i] = headers[i].trim();
+		}	
+	}
+	
+	public List<String> getHeaders() {
+		return Arrays.asList(headers);
+	}
+
+	/**
+	 * Use headers to convert each row into a map.
+	 * 
+	 * If {@link #setHeaders(String[])} has not been called, the first row will be used by default.
+	 * 
+	 * @return
+	 */
+	public Iterable<Map<String,String>> asListOfMaps() {
+		if (headers==null) {
+			assert getRowNumber() == -1 : "No headers set, and beyond 1st row "+file;
+			// Use first row as headers
+			setHeaders(next());
+		}
+		final CSVReader r = this;
+		
+		return () -> new AbstractIterator() {
+			@Override
+			protected Object next2() throws Exception {
+				if ( ! r.hasNext()) return null;
+				String[] row = r.next();
+				Map rmap = new ArrayMap();
+				for (int i=0; i<headers.length; i++) {
+					String hi = headers[i];
+					String ri = row[i];
+					if (ri != null) ri = ri.strip();
+					rmap.put(hi, ri);
+				}
+				return rmap;
+			}
+		};
+	}
+	
 
 }

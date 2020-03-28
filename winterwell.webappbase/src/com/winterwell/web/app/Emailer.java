@@ -4,6 +4,7 @@ import java.io.Closeable;
 
 import javax.mail.internet.InternetAddress;
 
+import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
@@ -27,11 +28,17 @@ public class Emailer implements Closeable {
 	}
 	
 	private LoginDetails ld;
+	private String displayName;
 
 //	private String app;
 	
 	public Emailer(LoginDetails ld) {
 		this.ld = ld;
+		this.displayName = (String) Utils.or(
+			ld.get(new Key("displayName")),
+			ld.get(new Key("displayname")),
+			StrUtils.toTitleCase(AMain.appName)+" Notifications"			
+		);				
 	}
 	
 	
@@ -39,7 +46,12 @@ public class Emailer implements Closeable {
 	private SMTPClient smtpClient;
 
 	public InternetAddress getFrom() {
-		return getBotEmail();
+		try {
+			InternetAddress addr = new InternetAddress(ld.loginName, displayName);
+			return addr;
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		}
 	}
 	
 	/**
