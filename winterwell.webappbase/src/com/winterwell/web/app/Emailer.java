@@ -37,7 +37,8 @@ public class Emailer implements Closeable {
 		this.displayName = (String) Utils.or(
 			ld.get(new Key("displayName")),
 			ld.get(new Key("displayname")),
-			StrUtils.toTitleCase(AMain.appName)+" Notifications"			
+			! Utils.isBlank(AMain.appName)? StrUtils.toTitleCase(AMain.appName)+" Notifications" : null,
+			ld.loginName
 		);				
 	}
 	
