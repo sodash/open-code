@@ -48,7 +48,7 @@ public class BigJarTask extends JarTask {
 //					entry = zin.getNextEntry();
 //					continue;
 //				}
-				addFile2(name, zin, out);
+				addFile2(name, null, zin, out);
 				entry = zin.getNextEntry();
 			}			
 		}
