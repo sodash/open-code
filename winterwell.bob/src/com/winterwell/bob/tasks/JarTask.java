@@ -147,7 +147,7 @@ public class JarTask extends BuildTask {
 	 * Shared by files and zipentrys
 	 * 
 	 * @param path
-	 * @param f 
+	 * @param f For debug / hacks
 	 * @param in
 	 * @param out
 	 * @throws IOException
