@@ -97,7 +97,9 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"bid", String.class, // Our Bid ID
 			"xbid", String.class, // someone elses (possibly broken) bid id
 			"variant", String.class,
-			"campaign", String.class,
+			"campaign", String.class, // also a utm_ parameter
+			"medium", String.class, // utm_ parameter
+			"source", String.class, // utm_ parameter
 			"lineitem", String.class, // LineItem ID, e.g. from AppNexus
 			"cid", String.class, // SoGive charity-ID. This is preferred to 'charity' as a property-name			
 			"via", String.class, // exchange / DSP / agency used to make the connection. ??Can be a list.??is that supported			
