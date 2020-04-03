@@ -46,6 +46,10 @@ public class CrudClient<T> {
 	 */
 	private String jwt;
 
+	/**
+	 * Set authentication! Without this, expect an auth error.
+	 * @param jwt
+	 */
 	public void setJwt(String jwt) {
 		this.jwt = jwt;
 	}
