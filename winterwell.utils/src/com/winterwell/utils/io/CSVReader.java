@@ -444,7 +444,7 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 	/**
 	 * Use headers to convert each row into a map.
 	 * 
-	 * If {@link #setHeaders(String[])} has not been called, the first row will be used by default.
+	 * If {@link #setHeaders(String[])} has not been called, the first row will be used (and consumed) by default.
 	 * 
 	 * @return
 	 */

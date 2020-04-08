@@ -938,6 +938,8 @@ public class FileUtils {
 	 * WINTERWELL_HOME if defined. This is the directory which contains code,
 	 * companies, business, etc.
 	 * It's /home/winterwell on servers.
+	 * 
+	 * @see WinterwellProjectFinder
 	 */
 	public static File getWinterwellDir() throws FailureException {
 		try {
