@@ -7,6 +7,7 @@ import com.winterwell.es.ESKeyword;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Time;
 import com.winterwell.web.data.IHasXId;
 import com.winterwell.web.data.XId;
 import com.winterwell.youagain.client.ShareToken;
@@ -22,6 +23,11 @@ import com.winterwell.youagain.client.YouAgainClient;
 //@Data Lombok is nice, but not using it makes builds more robust
 public class AThing implements IInit {
 
+	/**
+	 * Note: sadly this is not present on data before April 2020
+	 */
+	Time created = new Time();
+	
 	/**
 	 * 
 	 * @return default pattern: if id has an @, use it - otherwise add "@type.good-loop.com"
