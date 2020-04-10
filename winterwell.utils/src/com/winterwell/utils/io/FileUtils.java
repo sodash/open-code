@@ -20,6 +20,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.sql.Connection;
@@ -1746,6 +1748,25 @@ public class FileUtils {
 		String bp = dir.getAbsolutePath();
 		boolean yes = fp.startsWith(bp);
 		return yes;
+	}
+
+	/**
+	 * Glob matching, e.g. "*.txt". 
+	 *
+	 * NB: This makes Java NIO's methods more user-friendly - but you may at times need to use PathMatcher directly. 
+	 * @param glob e.g. "*.txt" or "**\/foo\/*.txt"
+	 * @param file Unless the glob starts "**", then only the filename is used (ie parent directories are ignored)
+	 */
+	public static boolean globMatch(String glob, File file) {
+//		File justTheName = new File(file.getName()); // otherwise PathMatcher behaves wierdly!
+		PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:"+glob);
+		boolean m = pathMatcher.matches(file.toPath());
+		if ( ! m && ! glob.startsWith("**/")) {
+			glob = "**/"+glob; // try again, allowing parent dirs (NB: "**/*.txt" would not match eg "foo.txt")
+			pathMatcher = FileSystems.getDefault().getPathMatcher("glob:"+glob);
+			m = pathMatcher.matches(file.toPath());
+		}
+		return m;
 	}
 
 

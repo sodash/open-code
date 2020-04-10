@@ -17,12 +17,31 @@ import junit.framework.TestCase;
 
 public class FileUtilsTest extends TestCase {
 
+	public void testGlobMatch() throws IOException {
+		{
+			File f = new File("foo.txt");
+			assert FileUtils.globMatch("*.txt", f);
+			assert FileUtils.globMatch("f*", f);
+			assert FileUtils.globMatch("f*.txt", f);
+			assert ! FileUtils.globMatch("x*.txt", f);
+		}
+		{	// director is ignored
+			File f = new File("bar/foo.txt");
+			assert FileUtils.globMatch("*.txt", f);
+			assert FileUtils.globMatch("f*", f);
+			assert FileUtils.globMatch("f*.txt", f);
+			assert ! FileUtils.globMatch("b*.txt", f);
+			assert ! FileUtils.globMatch("x*.txt", f);
+		}
+	}
+	
 	public void testGetWWDir() throws IOException {
 		File wwd = FileUtils.getWinterwellDir();
 		System.out.println(wwd);
 		assert new File(wwd, "open-code").isDirectory();
 	}
 
+	
 	/**
 	 * TODO add a chunky file
 	 * @throws IOException
