@@ -475,8 +475,9 @@ public abstract class CrudServlet<T> implements IServlet {
 		ESPath draftPath = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
 		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
 
-		// set state to draft
-		AppUtils.setStatus(jthing, KStatus.DRAFT);
+		// set state to draft (or archived if specified as such)
+		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
+		AppUtils.setStatus(jthing, status);
 		
 		AppUtils.doSaveEdit(draftPath, jthing, state);
 		Log.d("crud", "unpublish doSave "+draftPath+" by "+state.getUserId()+" "+state+" "+jthing.string());
