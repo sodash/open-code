@@ -306,7 +306,11 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	}
 	
 	/**
-	 * Call this to run the task within Bob. This does the work of runViaJUnit() without a TaskRunner shutdown.
+	 * Call this to run the task within Bob. 
+	 * This does the work of runViaJUnit() without a TaskRunner shutdown.
+	 * It can skip repeats.
+	 * 
+	 * Outside of Bob, you can call {@link #doTask()} instead. 
 	 */
 	public final void run() {
 		// fix desc if it wasn't before
