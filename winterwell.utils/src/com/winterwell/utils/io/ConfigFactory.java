@@ -169,6 +169,10 @@ public class ConfigFactory {
 		return files;
 	}	
 
+	/**
+	 * Note: on first use, also call {@link #setArgs(String[])}
+	 * @return the shared ConfigFactory
+	 */
 	public synchronized static ConfigFactory get() {
 		if (Dep.has(ConfigFactory.class)) {
 			ConfigFactory cf = Dep.get(ConfigFactory.class);

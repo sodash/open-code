@@ -635,6 +635,7 @@ public class AppUtils {
 		
 		// Call ES...
 		pm.setMapping(dtype);
+		pm.setDebug(true); // TODO debug
 		IESResponse r2 = pm.get();
 		r2.check();
 	}

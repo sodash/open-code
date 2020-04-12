@@ -20,8 +20,6 @@ public class WrappedException extends RuntimeException {
 	 */
 	public WrappedException(String msg, Throwable e) {
 		super(msg, e);
-		assert e != null;
-		// assert ! (e instanceof WrappedException) : e; TODO
 	}
 
 	public WrappedException(Throwable e) {
@@ -43,6 +41,9 @@ public class WrappedException extends RuntimeException {
 	@Override
 	public final Throwable getCause() {
 		Throwable ex = super.getCause();
+		if (ex==null) {
+			return this; // Huh - nothing was wrapped? See ESException which does this.
+		}
 		// have we double wrapped something?
 		if (ex instanceof WrappedException) {
 			return ex.getCause();

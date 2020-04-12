@@ -45,6 +45,14 @@ public class EclipseClasspath {
 	 */
 	private File file;
 	private File projectDir;
+	
+
+	/**
+	 * the .classpath file
+	 */
+	public File getFile() {
+		return file;
+	}
 
 	/**
 	 *

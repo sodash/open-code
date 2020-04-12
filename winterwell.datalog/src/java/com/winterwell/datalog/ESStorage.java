@@ -282,6 +282,7 @@ public class ESStorage implements IDataLogStorage {
 			// aliases: index and index.all both point to baseIndex  
 			// Set the query index here. The write one is set later as an atomic swap.			
 			pc.setAlias(readIndexFromDataspace(dataspace));
+			pc.setDebug(true);			
 			IESResponse cres = pc.get();
 			cres.check();
 
