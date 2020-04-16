@@ -467,8 +467,14 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 	
 	protected JThing<T> doUnPublish(WebRequest state) {
+		KStatus status = KStatus.DRAFT;
+		return doUnPublish2(state, status);
+	}
+	
+	protected JThing<T> doUnPublish2(WebRequest state, KStatus status) {
+		assert status!=null;
 		String id = getId(state);
-		Log.d("crud", "doUnPublish "+id+" by "+state.getUserId()+" "+state);
+		Log.d("crud."+status, "doUnPublish "+id+" by "+state.getUserId()+" "+state);
 		Utils.check4null(id); 
 		// load (if not loaded)
 		getThing(state);
@@ -476,43 +482,23 @@ public abstract class CrudServlet<T> implements IServlet {
 			jthing = getThingFromDB(state);
 		}
 
-		ESPath draftPath = esRouter.getPath(dataspace,type, id, KStatus.DRAFT);
+		ESPath draftPath = esRouter.getPath(dataspace,type, id, status);
 		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
 
-		// set state to draft (or archived if specified as such)
-		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
+		// set state to draft (NB: archived is now handled by an action=archive flag)
+//		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
 		AppUtils.setStatus(jthing, status);
 		
 		AppUtils.doSaveEdit(draftPath, jthing, state);
-		Log.d("crud", "unpublish doSave "+draftPath+" by "+state.getUserId()+" "+state+" "+jthing.string());
+		Log.d("crud", "unpublish "+status+" doSave "+draftPath+" by "+state.getUserId()+" "+state+" "+jthing.string());
 
 		AppUtils.doDelete(publishPath);
-		state.addMessage(id+" has been moved from published to draft");
+		state.addMessage(id+" has been moved to "+status.toString().toLowerCase());
 		return jthing;
 	}
 	
 	protected JThing<T> doArchive(WebRequest state) {
-		String id = getId(state);
-		Log.d("crud", "doArchived "+id+" by "+state.getUserId()+" "+state);
-		Utils.check4null(id); 
-		// load (if not loaded)
-		getThing(state);
-		if (jthing==null) {
-			jthing = getThingFromDB(state);
-		}
-
-		ESPath archivedPath = esRouter.getPath(dataspace,type, id, KStatus.ARCHIVED);
-		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
-
-		// set state to archive
-		AppUtils.setStatus(jthing, KStatus.ARCHIVED);
-		
-		AppUtils.doSaveEdit(archivedPath, jthing, state);
-		Log.d("crud", "archived doSave "+archivedPath+" by "+state.getUserId()+" "+state+" "+jthing.string());
-
-		AppUtils.doDelete(publishPath);
-		state.addMessage(id+" has been moved from published to draft");
-		return jthing;
+		return doUnPublish2(state, KStatus.ARCHIVED);
 	}
 
 	/**
