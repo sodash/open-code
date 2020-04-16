@@ -9,13 +9,14 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 
 /**
- * A simple tree data structure. TODO iteration lets you step through all the
- * values.
+ * A simple tree data structure. 
+ * Iteration lets you step through ALL the nodes.
  * 
  * @author daniel
  * @testedby {@link TreeTest}
  */
-public class Tree<X> implements Iterable<X>, ITree<X> {
+public class Tree<X> 
+implements Iterable<Tree<X>>, ITree<X> {
 
 	private final List<ITree<X>> children = new ArrayList<ITree<X>>();
 
@@ -43,8 +44,10 @@ public class Tree<X> implements Iterable<X>, ITree<X> {
 		setValue(value);
 	}
 
+	/**
+	 * @deprecated Use {@link #setParent(ITree)} instead. This method should only be called by setParent()!
+	 */
 	@Override
-	@Deprecated
 	public void addChild(ITree<X> childNode) {
 		assert !children.contains(childNode);
 		children.add(childNode);
@@ -184,8 +187,8 @@ public class Tree<X> implements Iterable<X>, ITree<X> {
 	}
 
 	@Override
-	public Iterator<X> iterator() {
-		List<X> flat = flattenToValues();
+	public Iterator<Tree<X>> iterator() {
+		List<Tree<X>> flat = flatten();
 		return flat.iterator();
 	}
 

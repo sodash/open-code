@@ -1621,7 +1621,7 @@ public class WebUtils {
 	 * @param xpathQuery
 	 *            Either a String or a pre-compiled {@link XPathExpression}
 	 * @param node
-	 * @return Can be empty, never null
+	 * @return Can be empty, never null. Uses clone=true.
 	 * @testedby TODO
 	 */
 	public static List<Node> xpathQuery(Object xpathQuery, Node node) {
@@ -1630,7 +1630,7 @@ public class WebUtils {
 	
 	/**
 	 * 
-	 * @param xpathQuery
+	 * @param xpathQuery eg "//book[author="Joseph Heller"]/title"
 	 * @param node
 	 * @param clone false if you want to do xml surgery -- i.e. add/remove nodes.
 	 * @return

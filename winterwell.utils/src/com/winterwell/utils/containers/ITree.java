@@ -8,7 +8,7 @@ import java.util.List;
  * @author Daniel
  */
 public interface ITree<X> {
-
+	
 	/**
 	 * Add a child node.
 	 * 
@@ -18,8 +18,7 @@ public interface ITree<X> {
 	 * @Deprecated Use {@link #setParent(ITree)} instead. This method should
 	 *             only be called by setParent()!
 	 */
-	@Deprecated
-	// Use setParent instead
+	@Deprecated 	// Use setParent instead
 	abstract void addChild(ITree<X> childNode);
 
 	public abstract List<? extends ITree<X>> getChildren();

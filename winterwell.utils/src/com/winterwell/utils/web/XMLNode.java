@@ -37,6 +37,7 @@ public final class XMLNode {
 	 * @return value or null. Never ""
 	 */
 	public String getAttribute(String attribute) {
+		if (attributes==null) return null;
 		String v = attributes.get(attribute);
 		return v == null || v.length() == 0 ? null : v;
 	}
