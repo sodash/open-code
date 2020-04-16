@@ -202,7 +202,6 @@ public class AppUtils {
 		
 		return thing;
 	}
-	
 
 	public static JThing doPublish(JThing draft, ESPath draftPath, ESPath publishPath) {
 		return doPublish(draft, draftPath, publishPath, KRefresh.FALSE, false);
@@ -302,9 +301,9 @@ public class AppUtils {
 		Object s = item.map().get("status");
 		if (Utils.streq(s, KStatus.PUBLISHED)) {
 			AppUtils.setStatus(item, KStatus.MODIFIED);
-		} else {
+		} else if (!Utils.streq(s, KStatus.ARCHIVED)) {
 			AppUtils.setStatus(item, KStatus.DRAFT);
-		}		
+		}
 		// talk to ES
 		return doSaveEdit2(path, item, state);
 	}
