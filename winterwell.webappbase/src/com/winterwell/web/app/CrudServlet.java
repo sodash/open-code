@@ -215,6 +215,10 @@ public abstract class CrudServlet<T> implements IServlet {
 			jthing = doUnPublish(state);
 			return;
 		}
+		if (state.actionIs("archive")) {
+			jthing = doArchive(state);
+			return;
+		}
 	}
 
 
@@ -461,7 +465,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		JThing obj = AppUtils.doPublish(_jthing, draftPath, publishPath, forceRefresh, deleteDraft);
 		return obj.setType(type);
 	}
-
+	
 	protected JThing<T> doUnPublish(WebRequest state) {
 		String id = getId(state);
 		Log.d("crud", "doUnPublish "+id+" by "+state.getUserId()+" "+state);
@@ -481,6 +485,30 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		AppUtils.doSaveEdit(draftPath, jthing, state);
 		Log.d("crud", "unpublish doSave "+draftPath+" by "+state.getUserId()+" "+state+" "+jthing.string());
+
+		AppUtils.doDelete(publishPath);
+		state.addMessage(id+" has been moved from published to draft");
+		return jthing;
+	}
+	
+	protected JThing<T> doArchive(WebRequest state) {
+		String id = getId(state);
+		Log.d("crud", "doArchived "+id+" by "+state.getUserId()+" "+state);
+		Utils.check4null(id); 
+		// load (if not loaded)
+		getThing(state);
+		if (jthing==null) {
+			jthing = getThingFromDB(state);
+		}
+
+		ESPath archivedPath = esRouter.getPath(dataspace,type, id, KStatus.ARCHIVED);
+		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
+
+		// set state to archive
+		AppUtils.setStatus(jthing, KStatus.ARCHIVED);
+		
+		AppUtils.doSaveEdit(archivedPath, jthing, state);
+		Log.d("crud", "archived doSave "+archivedPath+" by "+state.getUserId()+" "+state+" "+jthing.string());
 
 		AppUtils.doDelete(publishPath);
 		state.addMessage(id+" has been moved from published to draft");
