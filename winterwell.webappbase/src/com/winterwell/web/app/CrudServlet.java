@@ -471,7 +471,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		return doUnPublish2(state, status);
 	}
 	
-	protected JThing<T> doUnPublish2(WebRequest state, KStatus status) {
+	private JThing<T> doUnPublish2(WebRequest state, KStatus status) {
 		assert status!=null;
 		String id = getId(state);
 		Log.d("crud."+status, "doUnPublish "+id+" by "+state.getUserId()+" "+state);
