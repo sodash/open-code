@@ -604,6 +604,12 @@ public abstract class CrudServlet<T> implements IServlet {
 					esRouter.getPath(dataspace, type, null, KStatus.ARCHIVED).index()
 				);
 			break;
+		case PUB_OR_DRAFT:
+			s.setIndices(
+					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
+					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index()
+				);
+			break;
 		default:
 			// normal
 			s.setIndex(esRouter.getPath(dataspace, type, null, status).index());
@@ -699,7 +705,7 @@ public abstract class CrudServlet<T> implements IServlet {
  * @return unique hits, source
  */
 	private List doList3_source_dedupe(KStatus status, List<Map> hits) {
-		if (status != KStatus.ALL_BAR_TRASH && status!=KStatus.PUB_OR_ARC) {
+		if (!KStatus.isMultiIndex(status)) {
 			// One index = no deduping necessary.
 			ArrayList<Object> hits2 = Containers.apply(hits, h -> h.get("_source"));
 			return hits2;

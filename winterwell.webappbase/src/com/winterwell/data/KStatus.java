@@ -1,5 +1,7 @@
 package com.winterwell.data;
 
+import java.util.Arrays;
+
 import com.winterwell.es.StdESRouter;
 
 /**
@@ -48,14 +50,24 @@ public enum KStatus {
 	ALL_BAR_TRASH,
 
 	/** Special value for use only in url parameters. This covers the case that archived stuff should still show in some lists. */
-	PUB_OR_ARC;
-
+	PUB_OR_ARC,
+	
+	/** Special value for use only in url parameters. For lists where we want to see active and WIP items but not past/trashed ones. */
+	PUB_OR_DRAFT;
+	
 	/**
 	 * We only have three main ES indices, published and draft (which holds all the non-published)
 	 * and trash index, but this is not normally searched.
 	 */
 	public static KStatus[] main() {
-		return new KStatus[] {PUBLISHED, DRAFT, TRASH};
+		return new KStatus[] {PUBLISHED, DRAFT, ARCHIVED, TRASH};
+	}
+	
+	/**
+	 * Utility for "is this a special value which translates to multiple indices?"
+	 */
+	public static boolean isMultiIndex(KStatus status) {
+		return Arrays.asList(ALL_BAR_TRASH, PUB_OR_ARC, PUB_OR_DRAFT).contains(status);
 	}
 
 	/**

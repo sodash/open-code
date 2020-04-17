@@ -929,9 +929,9 @@ public class AppUtils {
 		case TRASH:
 			index += ".trash";
 			break;		
-		case ALL_BAR_TRASH:
+		case ALL_BAR_TRASH: case PUB_OR_DRAFT: // NB PUB_OR_DRAFT is overridden where ARCHIVED is an index
 			String i1 = index; // pub or arc
-			String i2 = index+".draft"; // draft etc
+			String i2 = index + ".draft"; // draft etc
 			ESPath esp = new ESPath(new String[] {i1, i2}, stype, id);
 			return esp;
 		default:
