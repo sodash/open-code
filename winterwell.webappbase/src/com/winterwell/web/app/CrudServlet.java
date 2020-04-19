@@ -449,7 +449,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param id
 	 * @return
 	 */
-	protected JThing<T> doPublish2(CharSequence dataspace, JThing<T> _jthing, KRefresh forceRefresh, boolean deleteDraft, String id, WebRequest state) {
+	protected JThing<T> doPublish2(CharSequence dataspace, JThing<T> _jthing, 
+			KRefresh forceRefresh, boolean deleteDraft, String id, WebRequest stateIgnored) 
+	{
 		ESPath draftPath = esRouter.getPath(dataspace, type, id, KStatus.DRAFT);
 		ESPath publishPath = esRouter.getPath(dataspace, type, id, KStatus.PUBLISHED);
 		ESPath archivedPath = esRouter.getPath(dataspace,type, id, KStatus.ARCHIVED);
