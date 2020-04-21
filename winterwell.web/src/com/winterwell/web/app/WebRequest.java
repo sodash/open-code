@@ -860,6 +860,9 @@ public class WebRequest implements IProperties, Closeable {
 	 *         the url is http://foobar.com/servlet/red%20fish/sub?x=1, the slug
 	 *         is "red fish/sub" The final file-type ending is removed, so
 	 *         http://foobar.com/wibble.html would give the slug "wibble"
+	 * 	 		<p>
+	 * 			HOWEVER if {@link MasterServlet} is used, 
+	 * 			then the slug will contain the (non-master) servlet name.
 	 * 
 	 * @see #getSlugBits()
 	 */
@@ -895,6 +898,10 @@ public class WebRequest implements IProperties, Closeable {
 	 * Convenience method for {@link #getSlug()} where the slug is split up by
 	 * the path separator /. Never returns null - returns an empty array
 	 * instead.
+	 * <p>
+	 * The top-most servlet is not included - but that might be a routing servlet.
+	 * IF {@link MasterServlet} is used, this will contain the servlet-name.
+	 * ELSE it does not.
 	 */
 	public final String[] getSlugBits() {
 		String slug = getSlug();
