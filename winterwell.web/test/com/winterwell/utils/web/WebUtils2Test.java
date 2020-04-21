@@ -27,6 +27,28 @@ import eu.medsea.mimeutil.MimeUtil;
 
 public class WebUtils2Test {
 
+	@Test
+	public void testCleanUp() {
+		{
+			String u = WebUtils2.cleanUp("http://bbc.co.uk/foo=bar&um=whatever");
+			assert u.equals("http://bbc.co.uk/foo=bar&um=whatever");
+		}
+		{
+			String ref = "https://www.drynites.co.uk/?utm_source=mysauce&utm_medium=clairvoyant&utm_campaign=freedom";
+			String u = WebUtils2.cleanUp(ref);
+			assert u.equals("https://www.drynites.co.uk/") : u;
+		}
+		{	// malformed
+			String ref = "https://www.drynites.co.uk/?utm_source=&utm_medium=Hello World&utmcampaign=freedom";
+			String u = WebUtils2.cleanUp(ref);
+			assert u.equals("https://www.drynites.co.uk/?utmcampaign=freedom") : u;
+		}
+		{
+			String ref = "";
+			String u = WebUtils2.cleanUp(ref);
+			assert u.equals("") : u;
+		}
+	}
 
 	@Test
 	public void testAddCookie() {

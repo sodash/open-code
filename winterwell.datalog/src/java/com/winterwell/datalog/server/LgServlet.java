@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
@@ -23,6 +25,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.ajax.JsonResponse;
@@ -65,7 +68,9 @@ public class LgServlet {
 	public LgServlet() {		
 	}
 		
-	
+	/**
+	 * Either set this to send json. Or add p.key=value to the url.
+	 */
 	static JsonField PARAMS = new JsonField("p");
 	
 	static final List<String> NOTP = Arrays.asList(TAG.getName(), DATASPACE.getName(), "via", "track");
@@ -95,13 +100,13 @@ public class LgServlet {
 		Map<String,Object> params = (Map) state.get(PARAMS);		
 		if (params==null) {
 			// params from the url?
+			final Map<String, String> smap = state.getMap();
 			// e.g. 
 			// https://lg.good-loop.com/lg?d=gl&t=install&idfa={idfa}&adid={adid}&android_id={android_id}&gps_adid={gps_adid}
 			// &fire_adid={fire_adid}&win_udid={win_udid}&ua={user_agent}&ip={ip_address}&country={country}
 			// &time={created_at}&app_id={app_id}&app_name={app_name}&store={store}&tracker_name={tracker_name}&tracker={tracker}
 			// &bid={dcp_bid}
-			// or use p.param for unambiguity
-			Map<String, String> smap = state.getMap();			
+			// or use p.param for unambiguity					
 			params = new HashMap();
 			for(Map.Entry<String, String> kv : smap.entrySet()) {
 				String v = kv.getValue();
@@ -112,6 +117,15 @@ public class LgServlet {
 				params.put(k, v);
 			}
 		}
+		assert params != null;
+		
+		// Google Analytics UTM parameters?
+		// NB: these are also removed from the url later -- look for WebUtils2.cleanUp()
+		String ref = state.getReferer();
+		if (ref != null) {
+			readGoogleAnalyticsTokens(ref, params);
+		}
+						
 		// group by
 		String gby = state.get(GBY);
 		if (gby==null) {
@@ -154,6 +168,33 @@ public class LgServlet {
 		Object jobj = logged==null? null : logged.toJsonPublic();
 		JsonResponse jr = new JsonResponse(state, jobj);
 		WebUtils2.sendJson(jr, state);				
+	}
+
+	/**
+	 * add utm_X=v to params as X=v -- but only if X=v is not already present
+	 * @param ref
+	 * @param params
+	 */
+	static void readGoogleAnalyticsTokens(String ref, Map<String, Object> params) {
+		if (ref==null) return;
+//		Campaign Source (utm_source) – Required parameter to identify the source of your traffic such as: search engine, newsletter, or other referral.
+//		Campaign Medium (utm_medium) – Required parameter to identify the medium the link was used upon such as: email, CPC, or other method of sharing.
+//		Campaign Term (utm_source) – Optional parameter suggested for paid search to identify keywords for your ad. You can skip this for Google AdWords if you have connected your AdWords and Analytics accounts and use the auto-tagging feature instead.
+//		Campaign Content (utm_content) – Optional parameter for additional details for A/B testing and content-targeted ads.
+//		Campaign Name (utm_campaign) – Required parameter to identify a specific product promotion or strategic campaign such as a spring sale or othe
+		Matcher m = WebUtils2.UTM_PARAMETERS.matcher(ref);
+		int s = 0;
+		while(m.find(s)) {
+			s = m.end()-1; // the pattern captures the boundaries, so go back one
+//			String g1 = m.group(1);
+			String g2 = m.group(2);
+			String g3 = m.group(3);
+			if (g3.isEmpty()) {
+				continue;
+			}
+			String val = WebUtils.urlDecode(g3);
+			params.put(g2, val);			
+		}
 	}
 
 	/**

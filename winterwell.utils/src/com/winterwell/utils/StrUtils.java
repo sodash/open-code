@@ -1761,6 +1761,12 @@ public class StrUtils {
 	}
 
 
+	/**
+	 * 
+	 * @param regex
+	 * @param text
+	 * @return list of whole-group matches
+	 */
 	public static List<String> findAll(Pattern regex, String text) {
 		ArrayList list = new ArrayList();
 		if (text==null) return list;

@@ -1,9 +1,13 @@
 package com.winterwell.datalog.server;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.junit.Test;
 
+import com.winterwell.datalog.DataLogConfig;
+import com.winterwell.utils.Dep;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.FakeBrowser;
 
@@ -12,6 +16,26 @@ import ua_parser.Parser;
 
 public class LgServletTest {
 
+
+	@Test
+	public void testUTM() {
+		Dep.setIfAbsent(DataLogConfig.class, new DataLogConfig());
+		{
+			Map<String, Object> params = new ArrayMap();		
+			String ref = "https://www.drynites.co.uk/?utm_source=mysauce&utm_medium=clairvoyant&utm_campaign=freedom";
+			LgServlet.readGoogleAnalyticsTokens(ref, params);
+			assert params.get("source").equals("mysauce");
+			assert params.get("medium").equals("clairvoyant");
+			assert params.get("campaign").equals("freedom");
+		}
+		{	// malformed
+			Map<String, Object> params = new ArrayMap();		
+			String ref = "https://www.drynites.co.uk/?utm_source=&utm_campaign";
+			LgServlet.readGoogleAnalyticsTokens(ref, params);
+			LgServlet.readGoogleAnalyticsTokens("", params);
+		}
+	}
+	
 	@Test
 	public void testHttp() {
 		try {

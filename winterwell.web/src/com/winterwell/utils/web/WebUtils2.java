@@ -164,19 +164,22 @@ public class WebUtils2 extends WebUtils {
 		// de-bounce & lengthen urls? No, it's slow and can fail -- call #getLongUrl() if you want that.
 		return removeGoogleTrackingParameters(url.trim());
 	}
-	
+
+	/**
+	 * //		Campaign Source (utm_source) – Required parameter to identify the source of your traffic such as: search engine, newsletter, or other referral.<br>
+//		Campaign Medium (utm_medium) – Required parameter to identify the medium the link was used upon such as: email, CPC, or other method of sharing.<br>
+//		Campaign Term (utm_term) – Optional parameter suggested for paid search to identify keywords for your ad. You can skip this for Google AdWords if you have connected your AdWords and Analytics accounts and use the auto-tagging feature instead.<br>
+//		Campaign Content (utm_content) – Optional parameter for additional details for A/B testing and content-targeted ads.<br>
+//		Campaign Name (utm_campaign) – Required parameter to identify a specific product promotion or strategic campaign such as a spring sale or other		
+	 */
+	public static final Pattern UTM_PARAMETERS = Pattern.compile(
+			"([&?])utm_(source|medium|content|campaign|term)=(.*?)(&|$)");
 	/**
 	 * 
 	 * @param path
 	 * @return url, without any Google UTM parameters
 	 */
 	static String removeGoogleTrackingParameters(String path) {
-//		Campaign Source (utm_source) – Required parameter to identify the source of your traffic such as: search engine, newsletter, or other referral.
-//		Campaign Medium (utm_medium) – Required parameter to identify the medium the link was used upon such as: email, CPC, or other method of sharing.
-//		Campaign Term (utm_source) – Optional parameter suggested for paid search to identify keywords for your ad. You can skip this for Google AdWords if you have connected your AdWords and Analytics accounts and use the auto-tagging feature instead.
-//		Campaign Content (utm_content) – Optional parameter for additional details for A/B testing and content-targeted ads.
-//		Campaign Name (utm_campaign) – Required parameter to identify a specific product promotion or strategic campaign such as a spring sale or othe
-		Pattern UTM_PARAMETERS = Pattern.compile("([&?])utm_(source|medium|content|campaign|term)=.*?(&|$)");
 		while (true) {
 			Matcher m = UTM_PARAMETERS.matcher(path);
 			int len = path.length();
