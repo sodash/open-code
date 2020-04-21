@@ -1264,7 +1264,7 @@ public class WebUtils {
 			assert temp1.exists() && temp1.length() > 0;
 
 			// 2. Render, trim and convert to PNG with convert
-			pngFromPdf(file, temp1);
+			pngFromPdf(temp1, file);
 		} catch (Exception e) {
 			throw Utils.runtime(e);
 		} finally {
