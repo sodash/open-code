@@ -91,7 +91,10 @@ public class WebUtils2Test {
 		Document doc = WebUtils2.parseXml(xml);
 		String xml2 = WebUtils2.xmlDocToString(doc);
 		String c = StrUtils.compactWhitespace(xml2.trim()).replaceAll("[\r\n]", "").replace('"', '\'');
-		assert c.equals(xml) : xml2+" -> "+c;
+		// chop xml version string
+		int i = c.indexOf("?>");
+		if (i!=-1) c = c.substring(i+2, c.length());
+		assert c.equals(xml) : xml+" -> "+c;
 	}
 
 	@Test
