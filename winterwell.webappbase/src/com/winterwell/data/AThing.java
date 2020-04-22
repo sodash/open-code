@@ -28,6 +28,11 @@ public class AThing implements IInit {
 	 */
 	Time created = new Time();
 	
+
+	public void setCreated(Time created) {
+		this.created = created;
+	}
+	
 	/**
 	 * 
 	 * @return default pattern: if id has an @, use it - otherwise add "@type.good-loop.com"
