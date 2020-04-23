@@ -429,15 +429,22 @@ public class SqlUtils {
 	 */
 	public static void initCommonJdbcDriver(String dbUrl) throws Exception {
 		if (dbUrl == null) throw new NullPointerException();
-		if (dbUrl.startsWith("jdbc:postgresql:")) { // PostgreSQL
-			Class.forName("org.postgresql.Driver");
-		} else if (dbUrl.startsWith("jdbc:mysql:")) { // MySQL
-			Class.forName("com.mysql.jdbc.Driver");
-		} else if (dbUrl.startsWith("jdbc:h2:")) { // H2
-			// H2 is a lightweight pure Java db. Useful for testing.
-			Class.forName("org.h2.Driver");
-		} else {
-			Log.report("sql", "Unrecognised DB " + dbUrl, Level.WARNING);
+		try {
+			if (dbUrl.startsWith("jdbc:postgresql:")) { // PostgreSQL
+				Class.forName("org.postgresql.Driver");
+			} else if (dbUrl.startsWith("jdbc:mysql:")) { // MySQL
+				Class.forName("com.mysql.jdbc.Driver");
+			} else if (dbUrl.startsWith("jdbc:h2:")) { // H2
+				// H2 is a lightweight pure Java db. Useful for testing.
+				Class.forName("org.h2.Driver");
+			} else {
+				Log.report("sql", "Unrecognised DB " + dbUrl, Level.WARNING);
+			}
+		} catch(ClassNotFoundException e) {
+			Log.e("Couldn't load DB interface class for database at URL: " + dbUrl
+					+ ". Make sure the project invoking SqlUtils has the appropriate driver"
+					+ "(see the following ClassNotFoundException) in its dependencies.");
+			throw e;
 		}
 	}
 

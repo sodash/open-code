@@ -19,7 +19,7 @@ public class BuildDataLog extends BuildWinterwellProject {
 		List<BuildTask> deps = super.getDependencies();
 		
 		MavenDependencyTask mdt = new MavenDependencyTask();
-//		mdt.addDependency("org.postgresql", "postgresql", "42.2.11");
+		mdt.addDependency("org.postgresql", "postgresql", "42.2.11");
 //		mdt.addDependency("ua_parser", "ua-parser", "1.3.0"); // causes an error??
 		deps.add(mdt);
 		

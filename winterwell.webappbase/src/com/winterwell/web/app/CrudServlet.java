@@ -737,7 +737,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			// Is this an object from .draft with non-published status? Overwrite the previous entry.
 			Object index = h.get("_index");
 			KStatus hitStatus = KStatus.valueOf(getStatus(hit));
-			if (status==KStatus.ALL_BAR_TRASH) {
+			if (status == KStatus.ALL_BAR_TRASH) {
 				// prefer draft
 				if (index != null && index.toString().contains(".draft")) {
 					things.put(id, hit);	

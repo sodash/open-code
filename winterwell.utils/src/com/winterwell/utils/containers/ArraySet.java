@@ -53,8 +53,7 @@ public final class ArraySet<T> extends AbstractSet<T>
 	private final ArrayList<T> backing;
 
 	public ArraySet() {
-		backing = new ArrayList<T>(4); // assume small (otherwise a HashSet is
-										// better)
+		backing = new ArrayList<T>(4); // assume small (otherwise a HashSet is better)
 	}
 
 	/**
