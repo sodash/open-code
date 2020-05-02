@@ -15,7 +15,7 @@ import com.winterwell.youagain.client.YouAgainClient;
 
 /**
  * Base class for things.
- * 
+ * {created, id, name, shares, status, url}
  * Goal: loosely base on https://schema.org/Thing
  * @author daniel
  *

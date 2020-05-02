@@ -10,7 +10,34 @@ import org.junit.Test;
  */
 public class SearchQueryTest {
 
-
+	@Test
+	public void testIdWithSpace() {
+		{	// keyword is fine
+			SearchQuery sq = new SearchQuery("campaign:all_fine-here");
+			System.out.println(sq.getParseTree());	
+			assert sq.getParseTree().toString().equals(
+					"[and, {campaign=all_fine-here}]");
+		}
+		{	// quote marks work
+			SearchQuery sq = new SearchQuery("campaign:\"smart william\"");
+			System.out.println(sq.getParseTree());	
+			assert sq.getParseTree().toString().equals(
+					"[and, {campaign=smart william}]");
+		}
+		{	// quote marks are harmless
+			SearchQuery sq = new SearchQuery("campaign:\"alice\"");
+			System.out.println(sq.getParseTree());	
+			assert sq.getParseTree().toString().equals(
+					"[and, {campaign=alice}]");
+		}
+		{	// no quotes -> spaces break stuff!
+			SearchQuery sq = new SearchQuery("campaign:silly billy");
+			System.out.println(sq.getParseTree());	
+			assert sq.getParseTree().toString().equals(
+					"[and, {campaign=silly}, billy]");
+		}
+	}
+	
 	@Test
 	public void testCrudListWIthId() {		
 		SearchQuery sq = new SearchQuery("eventId:5eBoOIPa").setCanonicaliseText(false);

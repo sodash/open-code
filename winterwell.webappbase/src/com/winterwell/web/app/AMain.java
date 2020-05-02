@@ -1,8 +1,11 @@
 package com.winterwell.web.app;
 
 import java.io.File;
+import java.util.Map;
 
+import com.winterwell.data.KStatus;
 import com.winterwell.datalog.DataLog;
+import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;
 import com.winterwell.es.StdESRouter;
 import com.winterwell.es.XIdTypeAdapter;
@@ -16,6 +19,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -351,6 +355,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			// nope - use a default
 			Dep.setIfAbsent(IESRouter.class, new StdESRouter());
 		}
+		// ?? standard with dbclasses??
+//		AppUtils.initESIndices(KStatus.main(), dbclasses);
+//		AppUtils.initESMappings(KStatus.main(), dbclasses, mappingFromClass);
 	}
 	
 	protected Emailer init3_emailer() {

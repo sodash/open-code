@@ -465,6 +465,8 @@ public abstract class CrudServlet<T> implements IServlet {
 			}
 		}
 		
+		doBeforeSaveOrPublish(_jthing, stateIgnored);
+		
 		// Delete any archived copies
 		AppUtils.doDelete(archivedPath);
 		
@@ -472,6 +474,17 @@ public abstract class CrudServlet<T> implements IServlet {
 		return obj.setType(type);
 	}
 	
+	/**
+	 * Does nothing by default - override to add custom logic.
+	 * This is called by both {@link #doSave(WebRequest)} and {@link #doPublish(WebRequest)}
+	 * @param _jthing
+	 * @param stateIgnored
+	 */
+	protected void doBeforeSaveOrPublish(JThing<T> _jthing, WebRequest stateIgnored) {
+		
+	}
+
+
 	protected JThing<T> doUnPublish(WebRequest state) {
 		KStatus status = KStatus.DRAFT;
 		return doUnPublish2(state, status);
@@ -863,7 +876,9 @@ public abstract class CrudServlet<T> implements IServlet {
 		// This has probably been done already in getThing(), but harmless to repeat
 		// run the object through Java, to trigger IInit
 		T pojo = jthing.java();
-		 
+		
+		doBeforeSaveOrPublish(jthing, state);
+		
 		// add security?
 		doSave2_setSecurity(state, pojo);
 		

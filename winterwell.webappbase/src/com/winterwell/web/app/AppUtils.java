@@ -673,6 +673,11 @@ public class AppUtils {
 				dtype.property(fname, ESType.keyword);
 				continue;
 			}
+			// Time
+			if (type.equals(Time.class)) {
+				dtype.property(fname, new ESType().date());
+				continue;
+			}
 			// ??anything else ES is liable to guess wrong??
 			
 			// trust the defaults for some stuff
