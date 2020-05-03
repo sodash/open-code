@@ -14,6 +14,14 @@ import com.winterwell.web.data.XId;
  * Sketch code for app-to-app auth
  * NB: auth covers authentication and authorisation!
  * 
+ * How to get an AuthToken / jwt TODO for an app:
+ * Login online
+ * in console, do Login.getUser().jwt
+ * Run YAC.storeLocal() from a unit test
+ * NB: see AppUtils.initAuthToken()
+ * 
+ * 
+ * Note: there's no real difference between an app and a human agent.
  * We want a JWT that says:
 	 * "I am app A" (identity) 
 	 * and 

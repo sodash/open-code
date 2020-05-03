@@ -1526,7 +1526,7 @@ public class FileUtils {
 		}
 		// impose a max length TODO on a per directory basis
 		// 12345678901234567890123456789012345678901234567890
-		if (name.length() > 50) {
+		if (name.length() > 100) {
 			name = name.substring(0, 10) + name.hashCode()
 					+ name.substring(name.length() - 10);
 		}

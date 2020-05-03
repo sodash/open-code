@@ -113,5 +113,9 @@ public class AjaxMsg extends AbstractMap2<String, Object> implements Serializabl
 		AjaxMsg am = new AjaxMsg(KNoteType.warning, "warningAboutInput", msg);
 		return am;
 	}
+	public static AjaxMsg error(Throwable ex) {
+		AjaxMsg am = new AjaxMsg(KNoteType.error, ex.toString(), ex.toString());
+		return am;
+	}
 
 }

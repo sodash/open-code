@@ -365,9 +365,14 @@ public class WebUtils2 extends WebUtils {
 		int lastSlash = url.lastIndexOf("/", qm);
 		int lastDot = url.lastIndexOf(".", qm);
 		if (lastDot > lastSlash) {
-			// chop out the current .type
-			link.delete(lastDot, qm);
-			qm = lastDot;
+			if (qm - lastDot > 8) {
+				// types should not be this long 3,4 chars is normal - we risk chopping filename "meat" here
+				Log.d("webutils", "Not chopping "+url);
+			} else {
+				// chop out the current .type
+				link.delete(lastDot, qm);
+				qm = lastDot;
+			}
 		}
 		if (type == null)
 			return link.toString();

@@ -17,6 +17,7 @@ public class YouAgainClientTest {
 		assert yac.yac.endpoint != null;
 	}
 	
+
 //	@Test // needs a proper password to work
 	public void testGetOAuthTokens() {
 		YouAgainClient yac = new YouAgainClient("sogive");

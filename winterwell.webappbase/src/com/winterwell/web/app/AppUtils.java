@@ -50,7 +50,10 @@ import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.EnumField;
 import com.winterwell.web.fields.JsonField;
+import com.winterwell.youagain.client.App2AppAuthClient;
+import com.winterwell.youagain.client.AuthToken;
 import com.winterwell.youagain.client.ShareToken;
+import com.winterwell.youagain.client.YouAgainClient;
 
 
 /**
@@ -943,6 +946,47 @@ public class AppUtils {
 			throw new IllegalArgumentException(type+" "+status);
 		}
 		return new ESPath(index, stype, id);
+	}
+
+/**
+ * Setup notes - see App2AppAuthClientTest
+ * @param config
+ * @param appAuthName
+ * @return
+ */
+	public static AuthToken initAppAuth(ISiteConfig config, String appAuthName) {
+		// idempotent
+		if (Dep.has(AuthToken.class)) {
+			return Dep.get(AuthToken.class);
+		}
+		YouAgainClient yac = Dep.get(YouAgainClient.class);
+		String appAuthJWT = config.getAppAuthJWT();
+		// use JWT if we have it
+		if ( ! Utils.isBlank(appAuthJWT)) {
+			AuthToken token = new AuthToken(appAuthJWT);
+			Log.d("init.auth", "AuthToken set from config.getAppAuthJWT "+token.getXId());
+			return Dep.set(AuthToken.class, token);
+		}
+		AuthToken token = yac.loadLocal(new XId(appAuthName+"@app"));
+		if (token != null) {
+			Log.d("init.auth", "AuthToken set from loadLocal .token folder "+token.getXId());
+			return Dep.set(AuthToken.class, token);
+		}
+		String appAuthPassword = config.getAppAuthPassword();			
+		if (Utils.isBlank(appAuthName) || Utils.isBlank(appAuthPassword)) {
+			Log.d(appAuthName, ":( Expected config to provide appAuthJWT for connecting with YouAgain. Missing app-auth details: app-name: "+
+					appAuthName+" p: "+appAuthPassword+" from "+config.getClass());
+			return null;
+		}
+		App2AppAuthClient a2a = yac.appAuth();
+		try {
+			token = a2a.getIdentityTokenFromYA(appAuthName, appAuthPassword);
+			Log.d("init.auth", "AuthToken fetched by name+password "+token.getXId());
+		} catch(Exception wex) {
+			token = a2a.registerIdentityTokenWithYA(appAuthName, appAuthPassword);
+			Log.d("init.auth", "AuthToken registered with name+password "+token.getXId());
+		}
+		return Dep.set(AuthToken.class, token);
 	}
 
 

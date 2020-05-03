@@ -294,38 +294,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * @return token or null
 	 */
 	protected AuthToken init3_appAuth(ConfigType config2) {
-		// idempotent
-		if (Dep.has(AuthToken.class)) {
-			return Dep.get(AuthToken.class);
-		}
-		YouAgainClient yac = Dep.get(YouAgainClient.class);
-		String appAuthPassword = config2.getAppAuthPassword();
-		String appAuthName = getAppNameFull();		
-		String appAuthJWT = config2.getAppAuthJWT();
-		// use JWT if we have it
-		if ( ! Utils.isBlank(appAuthJWT)) {
-			AuthToken token = new AuthToken(appAuthJWT);
-			Log.d(appName, "AuthToken set from config.getAppAuthJWT "+token.getXId());
-			return Dep.set(AuthToken.class, token);
-		}
-		AuthToken token = yac.loadLocal(new XId(appAuthName+"@app"));
-		if (token != null) {
-			Log.d(appName, "AuthToken set from loadLocal .token folder "+token.getXId());
-			return Dep.set(AuthToken.class, token);
-		}
-		if (Utils.isBlank(appAuthName) || Utils.isBlank(appAuthPassword)) {
-			Log.d(getAppNameLocal(), ":( Expected config to provide appAuthJWT for connecting with YouAgain. Missing app-auth details: app-name: "+appAuthName+" p: "+appAuthPassword+" from "+config2.getClass());
-			return null;
-		}
-		App2AppAuthClient a2a = yac.appAuth();
-		try {
-			token = a2a.getIdentityTokenFromYA(appAuthName, appAuthPassword);
-			Log.d(appName, "AuthToken fetched by name+password "+token.getXId());
-		} catch(Exception wex) {
-			token = a2a.registerIdentityTokenWithYA(appAuthName, appAuthPassword);
-			Log.d(appName, "AuthToken registered with name+password "+token.getXId());
-		}
-		return Dep.set(AuthToken.class, token);
+		return AppUtils.initAppAuth(config2, getAppNameFull());
 	}
 
 	/**

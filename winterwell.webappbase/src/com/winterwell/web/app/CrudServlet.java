@@ -461,7 +461,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			if (thingId==null || ACTION_NEW.equals(thingId)) {
 				_jthing.put("id", id);
 			} else if ( ! thingId.equals(id)) {
-				throw new IllegalStateException("ID mismatch "+thingId+" vs "+id);
+				throw new IllegalStateException("ID mismatch remote: "+thingId+" vs local: "+id);
 			}
 		}
 		
@@ -528,6 +528,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected String getId(WebRequest state) {
 		if (_id!=null) return _id;
 		// Beware if ID can have a / in it!
+		String slug = state.getSlug();
 		String[] slugBits = state.getSlugBits();
 		
 		String sid = slugBits[slugBits.length - 1]; 
