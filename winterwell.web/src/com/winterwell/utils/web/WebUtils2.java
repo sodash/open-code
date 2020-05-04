@@ -1287,6 +1287,20 @@ public class WebUtils2 extends WebUtils {
 	 * @return url (as far down the chain as we got)
 	 */
 	public static String getLongUrl(final String startUrl, int fastStopUrlLength, Mutable.Ref<Exception> error) {
+		return resolveRedirectsInUrl2(startUrl, fastStopUrlLength, error);
+	}
+	
+	/**
+	 * Similar to {@link #getLongUrl(String)}
+	 * @param startUrl
+	 * @param error
+	 * @return
+	 */
+	public static String resolveRedirectsInUrl(final String startUrl, Mutable.Ref<Exception> error) {
+		return resolveRedirectsInUrl2(startUrl, 10000, error);
+	}
+	
+	static String resolveRedirectsInUrl2(final String startUrl, int fastStopUrlLength, Mutable.Ref<Exception> error) {
 		String url = startUrl;
 		String prev = startUrl;
 		for(int i=0; i<MAX_REDIRECTS; i++) {

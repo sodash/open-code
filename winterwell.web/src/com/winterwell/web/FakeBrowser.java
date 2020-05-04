@@ -236,6 +236,8 @@ public class FakeBrowser {
 	/**
 	 * Sets whether HTTP redirects (requests with response code 3xx) should be automatically followed. 
 	 * True by default.
+	 * 
+	 * @see WebUtils2#resolveRedirectsInUrl(String, com.winterwell.utils.Mutable.Ref)
 	 */
 	public void setFollowRedirects(boolean followRedirects) {
 		this.followRedirects = followRedirects;
