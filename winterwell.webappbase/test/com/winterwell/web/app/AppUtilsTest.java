@@ -5,8 +5,13 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.winterwell.data.AThing;
+import com.winterwell.es.ESKeyword;
+import com.winterwell.es.ESNoIndex;
+import com.winterwell.es.ESType;
 import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.nlp.query.SearchQuery;
+import com.winterwell.utils.containers.Containers;
 
 public class AppUtilsTest {
 
@@ -47,4 +52,36 @@ public class AppUtilsTest {
 		}
 	}
 
+	@Test
+	public void testESMapping() {
+		Map mapping = new ESType().object().property("foo", ESType.keyword);
+		ESType est = AppUtils.estypeForClass(TestThing.class, mapping);		
+		System.out.println(est);
+		Map props = (Map) est.get("properties");
+		Map c1 = (Map) props.get("child");
+		Map c2 = (Map) props.get("child2");
+		assert Containers.same(c1, c2);
+	}
+	
+}
+
+class TestThing extends AThing {
+	
+	String texty;
+	
+	@ESKeyword
+	String keyy;
+	
+	String foo;
+	
+	double d;
+	
+	Integer i;
+	
+	TestThing child;
+	
+	TestThing child2;
+	
+	@ESNoIndex
+	TestThing ignored;
 }

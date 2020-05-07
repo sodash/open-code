@@ -596,9 +596,21 @@ public class AppUtils {
 	{
 		PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(
 				index, path.type);
-		final ESType dtype = new ESType();
+		
+		// ESType
 		// passed in
-		Map mapping = mappingFromClass==null? null : mappingFromClass.get(k);
+		Map mapping = mappingFromClass==null? null : mappingFromClass.get(k);		
+		ESType dtype = estypeForClass(k, mapping);
+		
+		// Call ES...
+		pm.setMapping(dtype);
+		pm.setDebug(true); // TODO debug
+		IESResponse r2 = pm.get();
+		r2.check();
+	}
+
+	public static ESType estypeForClass(Class k, Map mapping) {
+		final ESType dtype = new ESType();
 		if (mapping != null) {
 			// merge in
 			// NB: done here, so that it doesn't accidentally trash the settings below
@@ -606,7 +618,7 @@ public class AppUtils {
 			// Future: It'd be nice to have a deep merge, and give the passed in mapping precendent.
 			dtype.putAll(mapping);
 		}
-
+		
 		// some common props
 		dtype.property("name", new ESType().text()
 								// enable keyword based sorting
@@ -624,9 +636,7 @@ public class AppUtils {
 			ESType shares = new ESType();
 			for (Field field : fields) {		
 				if (noIndex.contains(field.getName())) {
-					shares.property(field.getName(), new ESType().keyword()
-							//.noIndex() broken in ES5 -- TODO see what ES7 offers
-							);
+					shares.property(field.getName(), new ESType().keyword().noIndex());
 				} else {
 					// treat String and XId as keywords		
 					shares.property(field.getName(), ESType.keyword);
@@ -638,12 +648,10 @@ public class AppUtils {
 		// reflection based
 		initESMappings3_putMapping_reflection(k, dtype, new ArrayList());
 		
-		// Call ES...
-		pm.setMapping(dtype);
-		pm.setDebug(true); // TODO debug
-		IESResponse r2 = pm.get();
-		r2.check();
+		// done
+		return dtype;
 	}
+
 
 	/**
 	 * Look for ESKeyword annotations on fields.
@@ -655,6 +663,13 @@ public class AppUtils {
 		List<Field> fields = ReflectionUtils.getAllFields(k);
 		for (Field field : fields) {
 			String fname = field.getName();
+			
+			// already setup?
+			Map props = (Map) dtype.get("properties");
+			if (props != null && props.containsKey(fname)) {
+				continue;
+			}
+			
 			Class<?> type = field.getType();
 			// loop check??
 			if (dtype.containsKey(fname) || dtype.containsKey(fname.toLowerCase())) {
@@ -664,29 +679,34 @@ public class AppUtils {
 			if (propType==null) {
 				continue; // eg no-index or default primitive
 			}
-			dtype.property(fname, propType);
-			
+			// set?
+			if ( ! propType.isEmpty()) {
+				dtype.property(fname, propType);
+			}			
 			// Recurse (but not into everything)
 			if ( ! propType.isIndexed()) {
 				continue;
 			}
-			if (type != Object.class 
-				&& ! type.isPrimitive() 
-				&& ! type.isArray() 
-				&& ! ReflectionUtils.isa(type, Collection.class)
-				&& ! ReflectionUtils.isa(type, Map.class)
-				&& ! ReflectionUtils.isa(type, Throwable.class)
+			if (type == Object.class 
+				|| type.isPrimitive() 
+				|| type.isArray() 
+				|| ReflectionUtils.isa(type, Collection.class)
+				|| ReflectionUtils.isa(type, Map.class)
+				|| ReflectionUtils.isa(type, Throwable.class)
+				|| type.isEnum()
 			) {
-				if (seenAlready.contains(type)) continue;
-				ESType ftype = new ESType();
-				assert ftype.isEmpty();
-				ArrayList<Class> seenAlready2 = new ArrayList(seenAlready);
-				seenAlready2.add(type);
-				initESMappings3_putMapping_reflection(type, ftype, seenAlready2);
-				if ( ! ftype.isEmpty()) {
-					dtype.property(fname, ftype);
-				}
-			}		
+				continue;
+			}
+			if (seenAlready.contains(type)) {
+				continue; // no infinite recursion
+			}
+			ArrayList<Class> seenAlready2 = new ArrayList(seenAlready);
+			seenAlready2.add(type);
+			initESMappings3_putMapping_reflection(type, propType, seenAlready2);
+			// set (in case we didnt earlier)
+			if ( ! propType.isEmpty()) {
+				dtype.property(fname, propType);
+			}					
 		}
 	}
 
@@ -724,7 +744,7 @@ public class AppUtils {
 			if (esno==null) {
 				return null;			
 			}
-			return new ESType().index(false);
+			return new ESType().setType(type).index(false);
 		}	
 		if (est==null) est = new ESType(); 
 		if (esno != null) {
