@@ -13,6 +13,7 @@ import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
 import com.winterwell.es.ESKeyword;
+import com.winterwell.es.ESNoIndex;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;
@@ -588,13 +589,14 @@ public class AppUtils {
 		}
 	}
 
-	private static void initESMappings2_putMapping(Map<Class, Map> mappingFromClass, ESHttpClient es, 
+	private static void initESMappings2_putMapping(
+			Map<Class, Map> mappingFromClass, ESHttpClient es, 
 			Class k,
 			ESPath path, String index) 
 	{
 		PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(
 				index, path.type);
-		ESType dtype = new ESType();
+		final ESType dtype = new ESType();
 		// passed in
 		Map mapping = mappingFromClass==null? null : mappingFromClass.get(k);
 		if (mapping != null) {
@@ -612,8 +614,9 @@ public class AppUtils {
 		// ID, either thing.org or sane version
 		dtype.property("@id", ESType.keyword);
 		dtype.property("id", ESType.keyword);
-		// type
-		dtype.property("@type", ESType.keyword);
+		// Java class type - not indexed
+		dtype.property("@type", new ESType().keyword().noIndex());
+		dtype.property("@class", new ESType().keyword().noIndex());
 		// shares NB: these dont use the ESKeyword annotation to avoid a dependency in YAC
 		if (ReflectionUtils.hasField(k, "shares")) {
 			List<String> noIndex = Arrays.asList("item","token","type","app");
@@ -633,7 +636,7 @@ public class AppUtils {
 		}
 		
 		// reflection based
-		initESMappings3_putMapping_byAnnotation(k, dtype, new ArrayList());
+		initESMappings3_putMapping_reflection(k, dtype, new ArrayList());
 		
 		// Call ES...
 		pm.setMapping(dtype);
@@ -648,46 +651,25 @@ public class AppUtils {
 	 * @param dtype
 	 * @param seenAlready
 	 */
-	private static void initESMappings3_putMapping_byAnnotation(Class k, ESType dtype, Collection<Class> seenAlready) {
+	private static void initESMappings3_putMapping_reflection(Class k, ESType dtype, Collection<Class> seenAlready) {
 		List<Field> fields = ReflectionUtils.getAllFields(k);
 		for (Field field : fields) {
 			String fname = field.getName();
+			Class<?> type = field.getType();
+			// loop check??
 			if (dtype.containsKey(fname) || dtype.containsKey(fname.toLowerCase())) {
 				continue;
 			}
-			Class<?> type = field.getType();
-			// annotation?
-			ESKeyword esk = field.getAnnotation(ESKeyword.class);
-			if (esk!=null) {
-				dtype.property(fname, ESType.keyword);
-				continue;
+			ESType propType = initESMappings4_putMapping_reflection_field(field, type);
+			if (propType==null) {
+				continue; // eg no-index or default primitive
 			}
-			// enum = keyword
-			if (type.isEnum()) {
-				dtype.property(fname, ESType.keyword);
-				continue;
-			}
-			if (String.class.equals(type)) {
-				// trust the text default? -- That's not always wise!
-				continue;
-			}
-			// IDs
-			if (type.equals(XId.class) || ReflectionUtils.isa(type, AString.class)) {
-				dtype.property(fname, ESType.keyword);
-				continue;
-			}
-			// Time
-			if (type.equals(Time.class)) {
-				dtype.property(fname, new ESType().date());
-				continue;
-			}
-			// ??anything else ES is liable to guess wrong??
+			dtype.property(fname, propType);
 			
-			// trust the defaults for some stuff
-			if (ReflectionUtils.isaNumber(type) || boolean.class.equals(type) || Boolean.class.equals(type)) {
+			// Recurse (but not into everything)
+			if ( ! propType.isIndexed()) {
 				continue;
 			}
-			// Recurse (but not into everything)
 			if (type != Object.class 
 				&& ! type.isPrimitive() 
 				&& ! type.isArray() 
@@ -700,13 +682,57 @@ public class AppUtils {
 				assert ftype.isEmpty();
 				ArrayList<Class> seenAlready2 = new ArrayList(seenAlready);
 				seenAlready2.add(type);
-				initESMappings3_putMapping_byAnnotation(type, ftype, seenAlready2);
+				initESMappings3_putMapping_reflection(type, ftype, seenAlready2);
 				if ( ! ftype.isEmpty()) {
 					dtype.property(fname, ftype);
 				}
-			}
+			}		
 		}
 	}
+
+	
+	private static ESType initESMappings4_putMapping_reflection_field(Field field, Class<?> type) 
+	{			
+		// keyword annotation?
+		ESKeyword esk = field.getAnnotation(ESKeyword.class);
+		if (esk!=null) {
+			return ESType.keyword;
+		}
+		// class -> type
+		// enum = keyword
+		ESType est = null;
+		if (type.isEnum()) {
+			est = ESType.keyword;
+		}
+		if (String.class.equals(type)) {
+			// trust the text default? -- That's not always wise!
+			est = new ESType().text();
+		}
+		// IDs
+		if (type.equals(XId.class) || ReflectionUtils.isa(type, AString.class)) {
+			est = ESType.keyword;
+		}
+		// Time
+		if (type.equals(Time.class)) {
+			est = new ESType().date();
+		}
+		// ??anything else ES is liable to guess wrong??		
+		ESNoIndex esno = field.getAnnotation(ESNoIndex.class);
+
+		// trust the defaults for some stuff
+		if (ReflectionUtils.isaNumber(type) || boolean.class.equals(type) || Boolean.class.equals(type)) {
+			if (esno==null) {
+				return null;			
+			}
+			return new ESType().index(false);
+		}	
+		if (est==null) est = new ESType(); 
+		if (esno != null) {
+			est = est.copy().noIndex(); // NB: copy for keyword, which is locked against edits
+		}
+		return est;
+	}
+
 
 	/**
 	 * 

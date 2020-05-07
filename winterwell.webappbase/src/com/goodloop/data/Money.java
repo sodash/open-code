@@ -35,6 +35,8 @@ implements Comparable<Money>, IHasJson {
 			.lock();
 	
 	private static final long serialVersionUID = 1L;
+	
+	// FIXME are these used??
 	private Time start;
 	private Time end;
 	private int year;
