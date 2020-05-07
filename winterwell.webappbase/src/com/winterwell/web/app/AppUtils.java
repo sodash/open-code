@@ -626,9 +626,6 @@ public class AppUtils {
 		// ID, either thing.org or sane version
 		dtype.property("@id", ESType.keyword);
 		dtype.property("id", ESType.keyword);
-		// Java class type - not indexed
-		dtype.property("@type", new ESType().keyword().noIndex());
-		dtype.property("@class", new ESType().keyword().noIndex());
 		// shares NB: these dont use the ESKeyword annotation to avoid a dependency in YAC
 		if (ReflectionUtils.hasField(k, "shares")) {
 			List<String> noIndex = Arrays.asList("item","token","type","app");
@@ -646,7 +643,7 @@ public class AppUtils {
 		}
 		
 		// reflection based
-		initESMappings3_putMapping_reflection(k, dtype, new ArrayList());
+		estypeForClass2_reflection(k, dtype, new ArrayList());
 		
 		// done
 		return dtype;
@@ -659,13 +656,21 @@ public class AppUtils {
 	 * @param dtype
 	 * @param seenAlready
 	 */
-	private static void initESMappings3_putMapping_reflection(Class k, ESType dtype, Collection<Class> seenAlready) {
+	private static void estypeForClass2_reflection(Class k, ESType dtype, Collection<Class> seenAlready) {
+		Map props = (Map) dtype.get("properties");
+		// Java class type (from Gson) - not indexed
+		if (props == null || ! props.containsKey("@type")) {
+			dtype.property("@type", new ESType().keyword().noIndex());
+		}
+		if (props == null || ! props.containsKey("@class")) {
+			dtype.property("@class", new ESType().keyword().noIndex());
+		}
+
 		List<Field> fields = ReflectionUtils.getAllFields(k);
 		for (Field field : fields) {
 			String fname = field.getName();
 			
-			// already setup?
-			Map props = (Map) dtype.get("properties");
+			// already setup?			
 			if (props != null && props.containsKey(fname)) {
 				continue;
 			}
@@ -675,7 +680,7 @@ public class AppUtils {
 			if (dtype.containsKey(fname) || dtype.containsKey(fname.toLowerCase())) {
 				continue;
 			}
-			ESType propType = initESMappings4_putMapping_reflection_field(field, type);
+			ESType propType = estypeForClass3_reflection_field(field, type);
 			if (propType==null) {
 				continue; // eg no-index or default primitive
 			}
@@ -694,7 +699,11 @@ public class AppUtils {
 				|| ReflectionUtils.isa(type, Map.class)
 				|| ReflectionUtils.isa(type, Throwable.class)
 				|| type.isEnum()
+				|| String.class.equals(type) 
 			) {
+				continue;
+			}
+			if (propType.get("type") != null && ! "object".equals(propType.get("type"))) {
 				continue;
 			}
 			if (seenAlready.contains(type)) {
@@ -702,7 +711,7 @@ public class AppUtils {
 			}
 			ArrayList<Class> seenAlready2 = new ArrayList(seenAlready);
 			seenAlready2.add(type);
-			initESMappings3_putMapping_reflection(type, propType, seenAlready2);
+			estypeForClass2_reflection(type, propType, seenAlready2);
 			// set (in case we didnt earlier)
 			if ( ! propType.isEmpty()) {
 				dtype.property(fname, propType);
@@ -711,7 +720,7 @@ public class AppUtils {
 	}
 
 	
-	private static ESType initESMappings4_putMapping_reflection_field(Field field, Class<?> type) 
+	private static ESType estypeForClass3_reflection_field(Field field, Class<?> type) 
 	{			
 		// keyword annotation?
 		ESKeyword esk = field.getAnnotation(ESKeyword.class);
@@ -729,7 +738,9 @@ public class AppUtils {
 			est = new ESType().text();
 		}
 		// IDs
-		if (type.equals(XId.class) || ReflectionUtils.isa(type, AString.class)) {
+		if (type.equals(XId.class) 
+				|| ReflectionUtils.isa(type, AString.class) 
+				|| "id".equals(field.getName())) {
 			est = ESType.keyword;
 		}
 		// Time
