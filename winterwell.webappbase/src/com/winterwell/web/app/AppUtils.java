@@ -457,25 +457,46 @@ public class AppUtils {
 		ESException err = null;
 		for(KStatus s : main) {
 			for(Class klass : dbclasses) {
-				ESPath path = esRouter.getPath(null, klass, null, s);
-				String index = path.index();
-				if (es.admin().indices().indexExists(index)) {
-					continue;
-				}
-				try {
-					// make with an alias to allow for later switching if we change the schema
-					String baseIndex = index+"_"+es.getConfig().getIndexAliasVersion();
-					CreateIndexRequest pi = es.admin().indices().prepareCreate(baseIndex);
-					pi.setFailIfAliasExists(true);
-					pi.setAlias(index);
-					IESResponse r = pi.get().check();
-				} catch(ESException ex) {
-					Log.e("ES.init", ex.toString());
-					err = ex;
-				}
+				err = initESindex2(esRouter, es, err, s, klass);
 			}
 		}
 		if (err!=null) throw err;
+	}
+
+
+	private static ESException initESindex2(
+			IESRouter esRouter, ESHttpClient es, ESException err, KStatus s,
+			Class klass) 
+	{		
+		ESPath path = esRouter.getPath(null, klass, null, s);
+		String index = path.index();
+		if (es.admin().indices().indexExists(index)) {
+			return err;
+		}
+		Log.d("ES.init", "init index for "+klass+"...");
+		try {					
+			// make with an alias to allow for later switching if we change the schema
+			String baseIndex = index+"_"+es.getConfig().getIndexAliasVersion();
+			// what if base-index wo alias??
+			if (es.admin().indices().indexExists(baseIndex)) {
+				Log.d("ES.init", "Base index "+baseIndex+" exists but not the alias "+index+" - Let's link them...");
+				IndicesAliasesRequest alias = es.admin().indices().prepareAliases();
+				alias.addAlias(baseIndex, index);
+				alias.setDebug(true);
+				alias.get().check();
+			} else {
+				// make a new index
+				CreateIndexRequest pi = es.admin().indices().prepareCreate(baseIndex);
+				pi.setDebug(true);
+				pi.setFailIfAliasExists(true);
+				pi.setAlias(index);
+				IESResponse r = pi.get().check();
+			}
+		} catch(ESException ex) {
+			Log.e("ES.init", ex.toString());
+			err = ex;
+		}
+		return err;
 	}
 
 
@@ -513,6 +534,7 @@ public class AppUtils {
 			initESMappings2_putMapping(mappingFromClass, es, k, path, index);
 			return null;
 		} catch(ESException ex) {
+			Log.w("ES.init", path.index()+" Mapping change?! "+ex);
 			// map the base index (so we can do a reindex with the right mapping)
 			// NB: The default naming, {index}_{month}{year}, assumes we only do one mapping change per month.
 			ESConfig esConfig = Dep.get(ESConfig.class);
@@ -522,6 +544,14 @@ public class AppUtils {
 				CreateIndexRequest pi = es.admin().indices().prepareCreate(index);
 				// NB: no alias yet - the old version is still in place
 				IESResponse r = pi.get().check();
+			} else {
+				// the index exists! use a temp index (otherwise the put below will fail like the one above)
+				index = index+".fix";
+				if ( ! es.admin().indices().indexExists(index)) {
+					CreateIndexRequest pi = es.admin().indices().prepareCreate(index);
+					// NB: no alias yet - the old version is still in place
+					IESResponse r = pi.get().check();
+				}
 			}
 			// setup the right mapping
 			initESMappings2_putMapping(mappingFromClass, es, k, path, index);

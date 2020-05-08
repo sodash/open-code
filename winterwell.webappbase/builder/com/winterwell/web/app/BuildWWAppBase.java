@@ -24,7 +24,7 @@ public class BuildWWAppBase extends BuildWinterwellProject {
 	public BuildWWAppBase() {
 		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.webappbase"));
 		setIncSrc(true);
-//		setScpToWW(true);
+		setScpToWW(true);
 	}
 	
 
