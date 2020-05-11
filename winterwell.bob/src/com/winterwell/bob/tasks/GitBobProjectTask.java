@@ -30,6 +30,8 @@ public class GitBobProjectTask extends BuildTask {
 	public GitBobProjectTask(String gitUrl, File dir) {
 		this.gitUrl = gitUrl;
 		this.dir = dir;
+		// dependencies shouldnt need rebuilding all the time
+		setSkipGap(TUnit.DAY.dt);
 	}
 	
 	/**
