@@ -80,8 +80,9 @@ public class GitBobProjectTask extends BuildTask {
 		Log.d(LOGTAG, proc.getOutput());
 	}
 
-	public void setSubDir(File subdir) {
-		projectSubDir = subdir.isAbsolute()? subdir : new File(dir, subdir.toString());		
+	public GitBobProjectTask setSubDir(String subdir) {
+		projectSubDir = new File(dir, subdir.toString());
+		return this;
 	}
 
 }

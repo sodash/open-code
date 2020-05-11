@@ -17,7 +17,7 @@ public class GitBobProjectTaskTest {
 		File tempDir = File.createTempFile("bob", "test");
 		FileUtils.delete(tempDir);
 		GitBobProjectTask gb = new GitBobProjectTask("git@github.com:sodash/open-code", tempDir);
-		gb.setSubDir(new File("winterwell.utils"));
+		gb.setSubDir("winterwell.utils");
 		gb.run();
 	}
 

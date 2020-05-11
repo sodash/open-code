@@ -64,15 +64,8 @@ public class BuildWinterwellProject extends BuildTask {
 	 */
 	@Override
 	public List<BuildTask> getDependencies() {
-//		ArraySet deps = new ArraySet();
 		// what projects does Eclipse specify?
 		ArraySet deps = getDependencies2_wwProjects();
-//		EclipseClasspath ec = new EclipseClasspath(projectDir);
-//		List<String> projects = ec.getReferencedProjects();
-//		for (String pname : projects) {			
-//			WinterwellProjectFinder pf = new WinterwellProjectFinder();
-//			getDependency2_project(deps, pname, pf);
-//		}
 		return new ArrayList(deps);
 	}
 
@@ -131,7 +124,9 @@ public class BuildWinterwellProject extends BuildTask {
 		String gitUrl = found[1];
 		
 		GitBobProjectTask gb = new GitBobProjectTask(gitUrl, dir);
-		if (subdir!=null) gb.setSubDir(new File(subdir));
+		if (subdir!=null) gb.setSubDir(subdir);
+		
+		Log.i("*** GitBob", gitUrl+" "+dir+" "+subdir);
 		return gb;
 	}
 
