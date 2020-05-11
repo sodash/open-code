@@ -61,6 +61,8 @@ public class ProcessTask extends BuildTask {
 
 	private Integer code;
 
+	private long pid;
+
 	/**
 	 * false by default. If true, also send all output to system out
 	 */
@@ -129,22 +131,24 @@ public class ProcessTask extends BuildTask {
 		Log.d(getClass().getSimpleName(), cmd+"...");
 		p.setEcho(echo);
 		p.start();
-		
+		try {
+			pid = p.getProcessId();
+		} catch(Throwable ex) {
+			//oh well
+		}
 		code = p.waitFor(); //(timeout);
 		// Done?
 		output = p.getOutput();
 		error = p.getError();
-		
-//		if ( ! echoStdOut) {
-//			System.out.println(output);
-//			System.out.println(error);
-//		}
 		
 		// Error?
 		if (processFailed(code)) {
 			throw new FailureException(cmd.toString(), 
 					output + " " + error);
 		}
+		
+		// Note: close() will be called finally by BuildTask.run() 
+		// to hopefully ensure clean-up 
 	}
 	
 	/**
@@ -200,6 +204,7 @@ public class ProcessTask extends BuildTask {
 
 	/**
 	 * Ensure the process is destroyed.
+	 * Note: This is auto called finally by {@link #run()}
 	 */
 	@Override
 	public void close() {
@@ -214,6 +219,10 @@ public class ProcessTask extends BuildTask {
 	protected void finalize() throws Throwable {
 		if (p!=null) p.destroy();
 		super.finalize();
+	}
+
+	public long getProcessID() {
+		return pid;
 	}
 
 }

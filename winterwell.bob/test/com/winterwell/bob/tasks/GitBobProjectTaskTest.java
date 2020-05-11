@@ -21,4 +21,10 @@ public class GitBobProjectTaskTest {
 		gb.run();
 	}
 
+	@Test
+	public void testRunWithDeps() throws IOException {
+		GitBobProjectTask gbt = WinterwellProjectFinder.getKnownProject("winterwell.web");
+		gbt.run();
+	}
+
 }

@@ -330,11 +330,6 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		report("Running " + toString() + " at "
 				+ TimeUtils.getTimeStamp() + "...", Level.FINE);
 		bob.adjustBobCount(1);
-		// Add an extra indent to log messages
-		Printer.addIndent("   "); // FIXME something dodgy with the indents; oh
-		// well
-//		System.out.flush(); // Otherwise new indent is not written for 1st line
-//		System.err.flush(); // Otherwise new indent is not written for 1st line
 		TimeOut timeOut = null;
 		try {
 			if (maxTime!=null) timeOut = new TimeOut(maxTime.getMillisecs());
@@ -358,7 +353,6 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			if (timeOut!=null) timeOut.cancel();
 			// Adjust count
 			int bc = bob.adjustBobCount(-1);
-			Printer.removeIndent("   ");
 			// clean up
 			try {
 				close();				

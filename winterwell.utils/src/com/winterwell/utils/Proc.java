@@ -95,7 +95,8 @@ public class Proc implements Closeable {
 		if (process == null)
 			return;
 		closeStreams();
-		process.destroy();
+		process.destroyForcibly();
+//		process.destroy();
 		process = null;
 	}
 
@@ -158,9 +159,10 @@ public class Proc implements Closeable {
 	 * @return The UNIX process id (pid), or 0 on failure
 	 */
 	@Deprecated
-	public int getProcessId() {
-		Integer id = ReflectionUtils.getPrivateField(process, "pid");
-		return id;		
+	public long getProcessId() {
+		return process.pid();
+//		Integer id = ReflectionUtils.getPrivateField(process, "pid");
+//		return id;		
 	}
 
 	/**
@@ -262,6 +264,10 @@ public class Proc implements Closeable {
 	 */
 	public void setDirectory(File dir) {
 		pb.directory(dir);
+	}
+	
+	public File getDirectory() {
+		return pb.directory();
 	}
 
 	/**

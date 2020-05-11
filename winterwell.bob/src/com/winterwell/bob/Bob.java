@@ -372,7 +372,11 @@ public class Bob {
 		// update Bob itself?
 		FakeBrowser fb = new FakeBrowser();
 		fb.setMaxDownload(50); // 50mb?!
-		File bobJar = fb.getFile("https://www.winterwell.com/software/downloads/bob-all.jar");
+		File tbobJar = fb.getFile("https://www.winterwell.com/software/downloads/bob-all.jar");
+		File bobJar = new File(tbobJar.getParentFile(), "bob-all.jar");
+		if ( ! tbobJar.equals(bobJar)) {
+			FileUtils.move(tbobJar, bobJar);
+		}
 		System.out.println("Bob jar downloaded to:");
 		System.out.println(bobJar);
 		// HACK

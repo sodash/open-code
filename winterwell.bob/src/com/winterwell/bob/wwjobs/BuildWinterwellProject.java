@@ -65,15 +65,6 @@ public class BuildWinterwellProject extends BuildTask {
 	@Override
 	public List<BuildTask> getDependencies() {
 		// what projects does Eclipse specify?
-		ArraySet deps = getDependencies2_wwProjects();
-		return new ArrayList(deps);
-	}
-
-	/**
-	 * Use forked Bob to build WW deps
-	 * @return
-	 */
-	protected ArraySet getDependencies2_wwProjects() {
 		ArraySet deps = new ArraySet();
 		// what projects does Eclipse specify?
 		EclipseClasspath ec = new EclipseClasspath(projectDir);
@@ -82,26 +73,34 @@ public class BuildWinterwellProject extends BuildTask {
 			WinterwellProjectFinder pf = new WinterwellProjectFinder();			
 			File pdir = pf.apply(pname);
 			if (pdir==null || ! pdir.isDirectory()) {
+				// known GitBob project?
+				BuildTask bt = WinterwellProjectFinder.getKnownProject(pname);
+				if (bt!=null) {
+					deps.add(bt);				
+				}
 				continue;
 			}
 			
-			GitBobProjectTask gb = getDependencies3_ww1Project(pdir);
-//			BuildTask gb = getDependency2_project(pname, pdir);
+			// NB: We'd prefer to use the "local" builder class over GitBob
+			// But the GitBob version is wanted for deployment
+			BuildTask bt = getDependencies2a_builderClass(pname, pdir);
 			
-			if (gb==null) {
-				continue;
-			}
-			deps.add(gb);
+			// Debug: make this just as a handy way to get setup output for KNOWN_PROJECTS
+//			GitBobProjectTask gbpt = getDependencies3_gitBob(pdir);
+			
+			if (bt!=null) deps.add(bt);
 		}
-		return deps;
+		// done
+		return new ArrayList(deps);
 	}
 	
-	private GitBobProjectTask getDependencies3_ww1Project(File pdir) {
+	private GitBobProjectTask getDependencies2b_gitBob(File pdir) {
 		File bfile = Bob.findBuildScript2(pdir, null);
 		if (bfile==null) {
 			return null;
 		}
-		File bobdir = new File(FileUtils.getWinterwellDir(),"bobwarehouse");
+		
+		File bobdir = GitBobProjectTask.getGitBobDir();
 		File dir = new File(bobdir, pdir.getName());
 		
 		// Git repo
@@ -125,8 +124,7 @@ public class BuildWinterwellProject extends BuildTask {
 		
 		GitBobProjectTask gb = new GitBobProjectTask(gitUrl, dir);
 		if (subdir!=null) gb.setSubDir(subdir);
-		
-		Log.i("*** GitBob", gitUrl+" "+dir+" "+subdir);
+		Log.i("GitBob", gitUrl+" "+dir.getName()+" "+subdir);
 		return gb;
 	}
 
@@ -136,7 +134,7 @@ public class BuildWinterwellProject extends BuildTask {
 	 * @param pname
 	 * @param pf
 	 */
-	private BuildTask getDependency2_project(String pname, File pdir) {
+	private BuildTask getDependencies2a_builderClass(String pname, File pdir) {
 		File bfile = Bob.findBuildScript2(pdir, null);
 		if (bfile != null) {					
 			// Use a forked Bob to pull in dependencies??
