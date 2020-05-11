@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
@@ -13,6 +14,7 @@ import com.winterwell.bob.tasks.BigJarTask;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
+import com.winterwell.bob.tasks.GitBobProjectTask;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
@@ -62,22 +64,84 @@ public class BuildWinterwellProject extends BuildTask {
 	 */
 	@Override
 	public List<BuildTask> getDependencies() {
+//		ArraySet deps = new ArraySet();
+		// what projects does Eclipse specify?
+		ArraySet deps = getDependencies2_wwProjects();
+//		EclipseClasspath ec = new EclipseClasspath(projectDir);
+//		List<String> projects = ec.getReferencedProjects();
+//		for (String pname : projects) {			
+//			WinterwellProjectFinder pf = new WinterwellProjectFinder();
+//			getDependency2_project(deps, pname, pf);
+//		}
+		return new ArrayList(deps);
+	}
+
+	/**
+	 * Use forked Bob to build WW deps
+	 * @return
+	 */
+	protected ArraySet getDependencies2_wwProjects() {
 		ArraySet deps = new ArraySet();
 		// what projects does Eclipse specify?
 		EclipseClasspath ec = new EclipseClasspath(projectDir);
 		List<String> projects = ec.getReferencedProjects();
 		for (String pname : projects) {			
-			WinterwellProjectFinder pf = new WinterwellProjectFinder();
-			getDependency2_project(deps, pname, pf);
+			WinterwellProjectFinder pf = new WinterwellProjectFinder();			
+			File pdir = pf.apply(pname);
+			if (pdir==null || ! pdir.isDirectory()) {
+				continue;
+			}
+			
+			GitBobProjectTask gb = getDependencies3_ww1Project(pdir);
+//			BuildTask gb = getDependency2_project(pname, pdir);
+			
+			if (gb==null) {
+				continue;
+			}
+			deps.add(gb);
 		}
-		return new ArrayList(deps);
+		return deps;
+	}
+	
+	private GitBobProjectTask getDependencies3_ww1Project(File pdir) {
+		File bfile = Bob.findBuildScript2(pdir, null);
+		if (bfile==null) {
+			return null;
+		}
+		File bobdir = new File(FileUtils.getWinterwellDir(),"bobwarehouse");
+		File dir = new File(bobdir, pdir.getName());
+		
+		// Git repo
+		File conf = new File(pdir,".git/config");
+		String subdir = null;
+		if ( ! conf.isFile()) {
+			// up one eg open-code?
+			subdir = pdir.getName();
+			dir = new File(bobdir, pdir.getParentFile().getName());
+			conf = new File(dir, ".git/config");				
+		}
+		if ( ! conf.isFile()) {
+			return null;
+		}
+		String gitconfig = FileUtils.read(conf);
+		String[] found = StrUtils.find(Pattern.compile("url\\s=\\s(\\S+)",Pattern.DOTALL), gitconfig);
+		if (found==null) {
+			return null;
+		}
+		String gitUrl = found[1];
+		
+		GitBobProjectTask gb = new GitBobProjectTask(gitUrl, dir);
+		if (subdir!=null) gb.setSubDir(new File(subdir));
+		return gb;
 	}
 
-	private void getDependency2_project(ArraySet deps, String pname, WinterwellProjectFinder pf) {
-		File pdir = pf.apply(pname);
-		if (pdir==null || ! pdir.isDirectory()) {
-			return;
-		}
+	/**
+	 * Use in-JVM bob build or jar download
+	 * @param deps
+	 * @param pname
+	 * @param pf
+	 */
+	private BuildTask getDependency2_project(String pname, File pdir) {
 		File bfile = Bob.findBuildScript2(pdir, null);
 		if (bfile != null) {					
 			// Use a forked Bob to pull in dependencies??
@@ -92,17 +156,18 @@ public class BuildWinterwellProject extends BuildTask {
 			builderClass = builderClass.replace('/', '.').substring(0, builderClass.length()-5);
 			// make a WWDep task
 			WWDependencyTask wwdt = new WWDependencyTask(pname, builderClass);
-			deps.add(wwdt);			
+			return wwdt;			
 		} else {
 			// HACK look in wwjobs
 			try {
 				String pname2 = pname.replace("winterwell.", "");
 				String cname = BuildUtils.class.getPackage().getName()+".Build"+StrUtils.toTitleCase(pname2);
 				Class<?> bt = Class.forName(cname);
-				deps.add(bt.newInstance());
+				return (BuildTask) bt.newInstance();
 			} catch(Throwable ex) {
 				// oh well
 				Log.d("BuildWinterwellProject", "skip dep for project "+pname);
+				return null;
 			}
 		}		
 	}
