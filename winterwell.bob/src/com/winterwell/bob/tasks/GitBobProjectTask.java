@@ -76,6 +76,7 @@ public class GitBobProjectTask extends BuildTask {
 			proc.setDirectory(dir);
 		}
 		proc.setEcho(true);
+		Log.i(LOGTAG, "Child-Bob: "+proc.getCommand());
 		proc.start();
 		proc.waitFor(new Dt(15, TUnit.MINUTE));
 		Log.d(LOGTAG, proc.getError());
