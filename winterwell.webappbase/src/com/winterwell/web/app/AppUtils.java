@@ -234,6 +234,14 @@ public class AppUtils {
 			JThing draft, ESPath draftPath, ESPath publishPath, 
 			KRefresh refresh, boolean deleteDraft) 
 	{
+		return doPublish(draft, draftPath, publishPath, null, refresh, deleteDraft);
+	}
+	
+	// TODO refactor to consume IESRouter
+	public static JThing doPublish(
+			JThing draft, ESPath draftPath, ESPath publishPath, ESPath archivePath,
+			KRefresh refresh, boolean deleteDraft) 
+	{
 		Log.d("doPublish", "to "+publishPath+"... deleteDraft "+deleteDraft);
 		// prefer being given the draft to avoid ES race conditions
 		if (draft==null) {
@@ -271,6 +279,10 @@ public class AppUtils {
 				IESResponse respd = upd.get().check();
 			}
 		}
+		// Delete any archived copies
+		if (archivePath !=null && ! archivePath.equals(publishPath)) {
+			AppUtils.doDelete(archivePath);
+		}			
 
 		return draft;
 	}

@@ -466,11 +466,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		doBeforeSaveOrPublish(_jthing, stateIgnored);
-		
-		// Delete any archived copies
-		AppUtils.doDelete(archivedPath);
-		
-		JThing obj = AppUtils.doPublish(_jthing, draftPath, publishPath, forceRefresh, deleteDraft);
+				
+		JThing obj = AppUtils.doPublish(_jthing, draftPath, publishPath, archivedPath, forceRefresh, deleteDraft);
 		return obj.setType(type);
 	}
 	
