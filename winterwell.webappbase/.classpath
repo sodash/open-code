@@ -15,7 +15,6 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/flexi-gson"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.depot"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/youagain-java-client"/>
-	<classpathentry kind="lib" path="/middleware/lombok/lombok.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

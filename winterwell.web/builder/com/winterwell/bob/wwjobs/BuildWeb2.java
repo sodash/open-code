@@ -35,10 +35,15 @@ public class BuildWeb2 extends BuildWinterwellProject {
 		mdt.addDependency("eu.medsea.mimeutil", "mime-util", "1.3"); // latest is "2.1.3" but that seems borked
 		mdt.addDependency("org.apache.httpcomponents", "httpclient", "4.5.10");
 		mdt.addDependency("org.ccil.cowan.tagsoup", "tagsoup", "1.2.1");
+		// Apache
 		mdt.addDependency("commons-fileupload","commons-fileupload","1.4");
 		mdt.addDependency("commons-io", "commons-io", "2.6");
 		// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
 		mdt.addDependency("org.apache.commons","commons-lang3","3.9");
+
+		// DNS Java -- NB: Latest is v3 Carson tried it in 2019, and it had oddly poor outputs! (worse than v2) 
+		// Surely it must be better if we have the time to work it out? OTOH v2 is fine and we don't care.
+		mdt.addDependency("dnsjava", "dnsjava", "2.1.9");
 		
 		mdt.setIncSrc(true); // we like source code
 //		mdt.setForceUpdate(true);

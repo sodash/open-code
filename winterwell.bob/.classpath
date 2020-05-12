@@ -11,7 +11,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.web"/>
-	<classpathentry kind="lib" path="/middleware/jakarta/commons-net.jar"/>
-	<classpathentry kind="lib" path="/middleware/jsch/jsch.jar" sourcepath="/middleware/jsch/src.zip"/>
+	<classpathentry kind="lib" path="dependencies/jsch.jar"/>
+	<classpathentry kind="lib" path="dependencies/commons-net.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

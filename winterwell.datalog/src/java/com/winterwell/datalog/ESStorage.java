@@ -243,7 +243,9 @@ public class ESStorage implements IDataLogStorage {
 		}
 		// init
 		ArraySet<Dataspace> dataspaces = new ArraySet();
-		if (config.namespace!=null) dataspaces.add(new Dataspace(config.namespace));
+		if ( ! Utils.isBlank(config.namespace)) {
+			dataspaces.add(new Dataspace(config.namespace));
+		}
 		if (config.namespaceConfigs!=null) {
 			dataspaces.addAll(Containers.apply(config.namespaceConfigs, Dataspace::new));
 		}
