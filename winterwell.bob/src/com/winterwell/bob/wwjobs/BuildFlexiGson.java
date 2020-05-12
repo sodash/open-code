@@ -12,6 +12,7 @@ public class BuildFlexiGson extends BuildWinterwellProject {
 	public BuildFlexiGson() {
 		super(new File(FileUtils.getWinterwellDir(), "flexi-gson"));
 		setIncSrc(true);
+		setScpToWW(true);
 	}
 
 	@Override
@@ -19,9 +20,4 @@ public class BuildFlexiGson extends BuildWinterwellProject {
 		return Arrays.asList(new BuildUtils());
 	}
 	
-	@Override
-	public void doTask() throws Exception {
-		super.doTask();		
-		// copy the file??
-	}
 }

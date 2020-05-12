@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.wwjobs.WWDependencyTask;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Proc;
 import com.winterwell.utils.ReflectionUtils;
