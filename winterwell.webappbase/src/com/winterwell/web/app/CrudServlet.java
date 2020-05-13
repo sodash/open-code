@@ -403,6 +403,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 	/**
 	 * Optional support for dataspace based data access.
+	 * Call {@link #setDataspace(CharSequence)} to use this
 	 */
 	// NB: the Dataspace class is not in the scope of this project, hence the super-class CharSequence
 	protected CharSequence dataspace = null;
