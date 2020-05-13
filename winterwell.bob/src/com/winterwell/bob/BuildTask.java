@@ -348,6 +348,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			reportIssues();
 			// Swallow or rethrow exception depending on settings
 			handleException(e);
+			Log.w(LOGTAG, "Exit "+this+" with error "+e);
 			return;
 		} finally {
 			if (timeOut!=null) timeOut.cancel();

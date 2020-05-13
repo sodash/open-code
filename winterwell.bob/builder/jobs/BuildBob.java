@@ -9,10 +9,13 @@ import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
+import com.winterwell.bob.wwjobs.BuildHacks;
 import com.winterwell.bob.wwjobs.BuildUtils;
 import com.winterwell.bob.wwjobs.BuildWeb;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.app.KServerType;
 
 /**
  * Naturally Bob is built by Bob.
@@ -30,9 +33,11 @@ public class BuildBob extends BuildWinterwellProject {
 		incSrc = true;
 		setMainClass(Bob.class);
 		
-		// uncomment if releasing Bob
-//		setScpToWW(true);
-//		setMakeFatJar(true);
+		// edit if releasing Bob
+		if (BuildHacks.getServerType()==KServerType.LOCAL) {
+			setScpToWW(true);
+			setMakeFatJar(true);
+		}
 		
 		// Manually set the version
 		String v = BobSettings.VERSION_NUMBER;

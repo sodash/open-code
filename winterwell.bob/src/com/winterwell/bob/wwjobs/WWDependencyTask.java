@@ -64,7 +64,7 @@ public class WWDependencyTask extends BuildWinterwellProject {
 		}
 		
 		// download jar
-		String url = "https://www.winterwell.com/software/downloads/"+projectName+".jar";
+		String url = getJarDownloadUrl();
 		Log.i(LOGTAG, "Downloading jar "+url);
 		FakeBrowser fb = new FakeBrowser();
 		File jar = fb.getFile(url);
@@ -90,6 +90,14 @@ public class WWDependencyTask extends BuildWinterwellProject {
 				// NB: fork includes a finally: close block
 			}
 		}
+	}
+
+	private String getJarDownloadUrl() {
+		// HACK!
+		if ("winterwell.bob".equals(projectName) ){
+			return "https://www.winterwell.com/software/downloads/bob.jar";
+		}
+		return "https://www.winterwell.com/software/downloads/"+projectName+".jar";
 	}
 
 }
