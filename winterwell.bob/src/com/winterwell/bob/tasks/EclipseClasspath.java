@@ -64,7 +64,9 @@ public class EclipseClasspath {
 	 */
 	public EclipseClasspath(File file) {
 		assert file != null;
-		if (file.isDirectory()) file = new File(file, ".classpath");
+		if (file.isDirectory()) {
+			file = new File(file, ".classpath");
+		}
 		this.file = file;
 		this.projectDir = file.getParentFile();
 		if ( ! file.exists()) {

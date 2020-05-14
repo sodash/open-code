@@ -67,6 +67,7 @@ public class BuildWinterwellProject extends BuildTask {
 		// what projects does Eclipse specify?
 		ArraySet deps = new ArraySet();
 		// what projects does Eclipse specify?
+		assert projectDir != null : this;
 		EclipseClasspath ec = new EclipseClasspath(projectDir);
 		List<String> projects = ec.getReferencedProjects();
 		for (String pname : projects) {			
