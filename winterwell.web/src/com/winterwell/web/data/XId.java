@@ -236,6 +236,10 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	 * TODO poke this value on JVM start-up
 	 */
 	static String MAIN_SERVICE = initMAIN_SERVICE();
+	/**
+	 * Special service for "Uses a local ID, so not a proper global XId"
+	 */
+	public static String LOCAL_SERVICE = "local"; 
 	
 	public boolean isMainService() {
 		return MAIN_SERVICE.equals(service);
