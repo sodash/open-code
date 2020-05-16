@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.winterwell.depot.Desc;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 
 /**
@@ -91,6 +92,12 @@ public class Merger implements IMerger<Object> {
 	public Object doMerge(Object before, Object after, Object latest) {
 		if (latest==null) return after;
 		Class type = after.getClass();
+		if (type.isArray()) {
+			type = List.class;
+			before = Containers.asList(before);			
+			after = Containers.asList(after);
+			latest = Containers.asList(latest);
+		}
 		IMerger m = mergers.get(type);
 		if (m==null) {
 			Log.e(TAG, "No merger for "+type+" - returning unmodified after");

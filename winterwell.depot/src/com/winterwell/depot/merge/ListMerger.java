@@ -1,6 +1,7 @@
 package com.winterwell.depot.merge;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.winterwell.utils.Utils;
@@ -20,6 +21,7 @@ public class ListMerger<X> extends AMerger<List<X>> {
 	
 	@Override
 	public Diff<List> diff(List<X> before, List<X> after) {
+		if (before==null) before = Collections.EMPTY_LIST;
 		List diff = new ArrayList();
 		int dCnt = 0;
 		for(int i=0,n=after.size(); i<n; i++) {
@@ -67,8 +69,11 @@ public class ListMerger<X> extends AMerger<List<X>> {
 	}
 
 	@Override
-	public List<X> applyDiff(List<X> a, Diff _diff) {		
-		List<Object> diff = (List) _diff.diff;
+	public List<X> applyDiff(List<X> a, Diff _diff) {
+		if (a==null) {
+			a = new ArrayList();
+		}
+		List<Object> diff = (List) _diff.diff;		
 		for (int i = 0; i < diff.size(); i++) {
 			Object v = diff.get(i);
 			if (v==null) continue;

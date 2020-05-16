@@ -1,6 +1,9 @@
 package com.winterwell.depot.merge;
 
+import java.util.ArrayList;
+
 import com.winterwell.depot.Desc;
+import com.winterwell.utils.containers.Containers;
 
 /**
  * Useful base for {@link IMerger}s
@@ -56,6 +59,11 @@ public abstract class AMerger<X> implements IMerger<X> {
 		Diff diff = diff(before, after);
 		// no edits
 		if (diff==null) return latest;
+		// HACK
+		if (latest.getClass().isArray()) {
+			// turn into an editable list
+			latest = (X) new ArrayList(Containers.asList(latest));
+		}
 		X merged = applyDiff(latest, diff);
 		return merged;
 	}
