@@ -98,7 +98,8 @@ public class SimpleMessage extends MimeMessage {
 	@Override
 	public Address[] getAllRecipients() {
 		try {
-			return super.getAllRecipients();
+			Address[] recips = super.getAllRecipients();
+			return recips==null? new Address[0] : recips;
 		} catch (Exception ex) {
 			// TODO be more robust about bad formatting
 			Log.w("SimpleMessage", ex);

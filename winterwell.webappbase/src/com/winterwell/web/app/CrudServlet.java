@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.mail.internet.AddressException;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.winterwell.data.AThing;
@@ -165,7 +167,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			.build();
 	private static final Checkbox ALLOW_OVERLAPPING_EDITS = new Checkbox("allowOverlappingEdits");
 	
-	protected void doAction(WebRequest state) {
+	protected void doAction(WebRequest state) throws Exception {
 		// Defend against repeat calls from the front end
 		doAction2_blockRepeats(state);		
 		// make a new thing?
