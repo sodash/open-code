@@ -13,7 +13,7 @@ import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.KServerType;
 
 /**
- * TODO should we use an Actor model here for high-throughput low-latency?
+ * Using an Actor model here for high-throughput low-latency
  * @author daniel
  *
  */
@@ -71,7 +71,7 @@ public class CallbackManager extends Actor<DataLogEvent> implements IInit {
 		}
 	}
 
-	void consume2_doCallback(DataLogEvent msg, Callback callback) {
+	protected void consume2_doCallback(DataLogEvent msg, Callback callback) {
 		String json = Gson.toJSON(msg);
 		Log.d(LOGTAG, callback.url+" for "+msg+" Posting "+json);
 		FakeBrowser fb = new FakeBrowser();
