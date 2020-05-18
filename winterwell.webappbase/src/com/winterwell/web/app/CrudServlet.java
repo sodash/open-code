@@ -43,6 +43,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.utils.web.XStreamUtils;
@@ -563,6 +564,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @throws IOException
 	 */
 	public final List doList(WebRequest state) throws IOException {
+		Time now = new Time();
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
 		String q = state.get(Q);
 		String prefix = state.get("prefix");
@@ -580,6 +582,15 @@ public abstract class CrudServlet<T> implements IServlet {
 		// sanitise for privacy
 		hits2 = cleanse(hits2, state);
 
+		// HACK: avoid created = during load just now
+		for(Object hit : hits2) {
+			if ( ! (hit instanceof AThing)) continue;
+			AThing at = (AThing) hit;
+			if (at.getCreated()!=null && at.getCreated().isAfter(now)) {
+				at.setCreated(null);
+			}
+		}
+		
 		// HACK: send back csv?
 		if (state.getResponseType() == KResponseType.csv) {
 			doSendCsv(state, hits2);
