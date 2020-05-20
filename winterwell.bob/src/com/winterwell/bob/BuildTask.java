@@ -377,13 +377,17 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			return true;
 		}
 		// -clean? rerun inspite of any previous runs
-		if (Bob.getSingleton().getSettings().skippingOff) {
+		BobSettings settings = Bob.getSingleton().getSettings();
+		if (settings.clean) {
 			return false;
 		}		
 		Time rs = Bob.getRunStart();
 		Time lastRun = Bob.getLastRunDate(this);
 		if (lastRun==null) {
 			return false; // first time, run it
+		}
+		if (settings.cleanBefore!=null && lastRun.isAfterOrEqualTo(settings.cleanBefore)) {
+			return false; // e.g. a child Bob getting the parents clean setting
 		}
 		if (lastRun.isAfterOrEqualTo(rs)) {
 			Log.i(LOGTAG, "Skip repeat this run dependency: "+getClass().getSimpleName()+" "+getDesc().getId());

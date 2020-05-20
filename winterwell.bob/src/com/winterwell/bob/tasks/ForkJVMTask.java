@@ -2,15 +2,20 @@ package com.winterwell.bob.tasks;
 
 import java.io.File;
 
+import com.winterwell.bob.Bob;
+import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Proc;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 
+import sun.jvm.hotspot.oops.GenerateOopMap;
+
 /**
- * This task runs a separate Java process
+ * This task runs a child Bob in a separate Java process
  * 
  * FIXME It does not preserve the file settings
  * Maybe send an xstream aml blob via a temp file??
@@ -29,6 +34,9 @@ public class ForkJVMTask extends BuildTask {
 		this(target.getName());
 	}
 	
+	public ForkJVMTask() {
+		this(""); // find it!
+	}
 	public ForkJVMTask(String target) {
 		this.target = target;
 		// odds are, you don't need to repeat these every time
@@ -57,24 +65,35 @@ public class ForkJVMTask extends BuildTask {
 	
 	@Override
 	protected void doTask() throws Exception {
-		String command = "java -cp "+classpath+" com.winterwell.bob.Bob "+target;
+		// TODO pass on Bob settings like -clean
+		// BUT we dont want to rebuild utils n times in one build -- so use cleanBefore
+		String options = "";
+		BobSettings config = Bob.getSingleton().getSettings();
+		if (config.cleanBefore != null) {
+			options += "-cleanBefore "+config.cleanBefore.getTime()+" ";
+		} else if (config.clean) {
+			options += "-cleanBefore "+Bob.getRunStart().getTime()+" ";
+		}		
+		
+		String command = "java -cp "+classpath+" com.winterwell.bob.Bob "
+				+options
+				+target;
 		Log.d(LOGTAG, "fork "+target+" Full command: "+command);
-		Proc proc = null;
+		
+		// child call to Bob
+		ProcessTask proc = null;
 		try {
-			proc = new Proc(command);
-			if (dir !=null) proc.setDirectory(dir);
-			
-			proc.start();
-			int ok = proc.waitFor();
-			
-			if (ok != 0) {
-				throw new FailureException(command+"\n -> "+proc.getError());
-			}
-			Log.d(LOGTAG, "fork error: "+proc.getError());
-			Log.d(LOGTAG, "fork output: "+proc.getOutput());
+			proc = new ProcessTask(command);
+			if (maxTime!=null) proc.setMaxTime(maxTime);
+			proc.setDirectory(dir);
+			proc.setEcho(true);
+			Log.i(LOGTAG, "Child-Bob: "+proc.getCommand()+" \r\n[in dir "+dir+"]");
+			proc.run();
 		} finally {
-			FileUtils.close(proc);
-		}
+			long pid = proc.getProcessID();		
+			FileUtils.close(proc); // paranoia
+			Log.d(LOGTAG, "closed process "+pid);			
+		}		
 	}
 
 }

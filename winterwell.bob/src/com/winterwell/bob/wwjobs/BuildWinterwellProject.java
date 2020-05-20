@@ -160,7 +160,7 @@ public class BuildWinterwellProject extends BuildTask {
 				return (BuildTask) bt.newInstance();
 			} catch(Throwable ex) {
 				// oh well
-				Log.d("BuildWinterwellProject", "skip dep for project "+pname);
+				Log.w(LOGTAG, "Whilst building "+projectName+" Skip dep "+pname+" with dir "+pdir);
 				return null;
 			}
 		}		

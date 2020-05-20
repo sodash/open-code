@@ -23,6 +23,7 @@ import com.winterwell.web.app.KServerType;
  * You can get the latest version of Bob from:
  * https://www.winterwell.com/software/downloads/bob-all.jar
  * 
+ * @see BobSettings
  * @author daniel
  *
  */

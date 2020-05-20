@@ -76,44 +76,16 @@ public class GitBobProjectTask extends BuildTask {
 		}
 		
 		// build				
-		Properties props = System.getProperties();
-//		Printer.out(props.keySet());
-		String cp = props.getProperty("java.class.path");
-		if (Utils.isBlank(cp)) {
-			Printer.out(props);
-			cp = "bob-all.jar"; // hail mary
-			Log.d(LOGTAG, "GUESS cp "+cp);
+		ForkJVMTask childBob = new ForkJVMTask();
+		File pd;
+		if (projectSubDir!=null) {			
+			pd = projectSubDir;
 		} else {
-			Log.d(LOGTAG, "Got cp "+cp);
+			pd = dir;
 		}
-		
-//		// FIXME pass on Bob settings like -clean
-		// BUT we dont want to rebuild utils n times in one build
-		String options = "";
-//		if (Bob.getSingleton().getSettings().skippingOff) {
-//			options += " -clean";
-//		}
-		
-		// child call to Bob
-		ProcessTask proc = null;
-		try {
-			proc = new ProcessTask("java -cp "+cp+" com.winterwell.bob.Bob"+options, new Dt(15, TUnit.MINUTE).getMillisecs());
-	//			Proc proc = new Proc();
-			File pd;
-			if (projectSubDir!=null) {			
-				pd = projectSubDir;
-			} else {
-				pd = dir;
-			}
-			proc.setDirectory(projectSubDir);
-			proc.setEcho(true);
-			Log.i(LOGTAG, "Child-Bob: "+proc.getCommand()+" \r\n[in dir "+pd+"]");
-			proc.run();
-		} finally {
-			long pid = proc.getProcessID();
-			if (proc!=null) proc.close();
-			Log.d(LOGTAG, "closed process "+pid);
-		}
+		childBob.setDir(pd);
+		// Do it!
+		childBob.run();
 	}
 
 	public GitBobProjectTask setSubDir(String subdir) {
