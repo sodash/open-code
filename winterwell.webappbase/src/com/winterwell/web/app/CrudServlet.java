@@ -424,7 +424,6 @@ public abstract class CrudServlet<T> implements IServlet {
 	public static final SField SORT = new SField("sort");
 	public static final String LIST_SLUG =  "_list";
 	private static final IntField SIZE = new IntField("size");
-	public static final SField Q = new SField("q");
 	public static final String ALL = "all";
 
 	protected final JThing<T> doPublish(WebRequest state) {
@@ -566,7 +565,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	public final List doList(WebRequest state) throws IOException {
 		Time now = new Time();
 		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
-		String q = state.get(Q);
+		String q = state.get(CommonFields.Q);
 		String prefix = state.get("prefix");
 		String sort = state.get(SORT, defaultSort);		
 		int size = state.get(SIZE, 1000);

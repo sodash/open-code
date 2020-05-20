@@ -30,6 +30,7 @@ public class CommonFields {
 
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
 	public static final SField DESC = new SField("desc");
+	public static final SField Q = new SField("q");
 		
 
 }

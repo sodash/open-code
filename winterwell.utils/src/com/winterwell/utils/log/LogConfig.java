@@ -26,32 +26,32 @@ public class LogConfig {
 	}
 	
 	@Option
-	List<String> verbosetags; 
+	public List<String> verbosetags; 
 	
 	@Option(description="reports to filter out.")
-	List<String> exclude;
+	public List<String> exclude;
 	
 	@Option(description="reports to downgrade from error or warning to just info. Uses case-sensitive keyword matching.")
 	List<String> downgrade;
 	
 	@Option(description="Window to apply throttling (ie silently skipping reports). The first throttled report does generate a 'throttling' log message.")
-	Dt throttleWindow = TUnit.MINUTE.dt;
+	public Dt throttleWindow = TUnit.MINUTE.dt;
 	
 	@Option(description="How much is too much? Can be null for unlimited")
-	Rate throttleAt = new Rate(1000, TUnit.MINUTE);
+	public Rate throttleAt = new Rate(1000, TUnit.MINUTE);
 	
 	@Option(description="How big can an individual log file get? e.g. 1gb or 100mb. Setting this does have a minor performance hit. The first overflow report will generate a 'file too big' log message.")
-	String fileMaxSize;
+	public String fileMaxSize;
 	
 	/**
 	 * TODO How can we make this configurable at the LogListener level? So you could have e.g. a 1 week audit log, and a sampled log for feeding Kibana?? 
 	 */
 	@Option(description="[0,1] What fraction of log messages to keep. If set, this leads to a sampling approach -- stochastically dropping messages, which reduces log size. E.g. keep=0.1 is a good way to handle giant logs, provided a full audit trail is not needed.")
-	double keep = 1;
+	public double keep = 1;
 	
 	@Option
-	Dt fileInterval;
+	public Dt fileInterval;
 	
 	@Option
-	Integer fileHistory;
+	public Integer fileHistory;
 }
