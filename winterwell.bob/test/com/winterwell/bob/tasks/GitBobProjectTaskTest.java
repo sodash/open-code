@@ -12,7 +12,7 @@ import com.winterwell.utils.io.FileUtils;
 
 public class GitBobProjectTaskTest {
 
-	@Test
+//	@Test slow
 	public void testClone() throws IOException {
 		File tempDir = File.createTempFile("bob", "test");
 		FileUtils.delete(tempDir);
@@ -27,4 +27,10 @@ public class GitBobProjectTaskTest {
 		gbt.run();
 	}
 
+	@Test
+	public void testRunWithDeps_stashOn() throws IOException {
+		GitBobProjectTask gbt = WinterwellProjectFinder.getKnownProject("winterwell.web");
+		gbt.stashLocalChanges = true;
+		gbt.run();
+	}
 }

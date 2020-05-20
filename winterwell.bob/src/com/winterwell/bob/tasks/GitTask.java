@@ -141,6 +141,7 @@ public class GitTask extends ProcessTask {
 	public static final String COMMIT_ALL = "commit -a";
 	public static final String PULL_REBASE = "pull --rebase";
 	public static final String PULL = "pull";
+	public static final String STASH = "stash";
 	public static final String PUSH = "push";
 	public static final String ADD = "add";
 	public static final String CLONE = "clone";

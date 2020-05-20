@@ -54,11 +54,19 @@ public class GitBobProjectTask extends BuildTask {
 	 */
 	File projectSubDir;
 
+	boolean stashLocalChanges;
+	
 	@Override
 	protected void doTask() throws Exception {
 		Log.d(LOGTAG, dir+" < "+this);
 		// clone or pull
 		if (dir.isDirectory()) {
+			// stash?
+			if (stashLocalChanges) {
+				GitTask gt0 = new GitTask(GitTask.STASH, dir);
+				gt0.run();
+				gt0.close();
+			}
 			// pull
 			GitTask gt = new GitTask(GitTask.PULL, dir);
 			gt.run();
