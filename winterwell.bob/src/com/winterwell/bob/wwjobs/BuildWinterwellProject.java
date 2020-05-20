@@ -33,6 +33,7 @@ import com.winterwell.utils.threads.ATask.QStatus;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.app.KServerType;
 
 /**
  * Build & copy into code/lib
@@ -371,18 +372,25 @@ public class BuildWinterwellProject extends BuildTask {
 		
 		// update classpath? HACK (we could prob run this more but safer to do less often)
 		List<MavenDependencyTask> mdts = Containers.filterByClass(getDependencies(), MavenDependencyTask.class);
-		if ( ! mdts.isEmpty()) {
-			boolean isClean = mdts.get(0).isCleanOutputDirectory();
-			boolean skipped = mdts.get(0).isSkipFlag();
-			if (isClean && ! skipped) {
-				SyncEclipseClasspathTask sync = new SyncEclipseClasspathTask(projectDir);
-				try {
-					sync.run();
-				} catch(Exception ex) {
-					// allow failure eg file permissions as this is a nicety not a vital build step
-					Log.w(LOGTAG, ex);
-				}
-			}
+		doUpdateClasspath(mdts);		
+	}
+
+	private void doUpdateClasspath(List<MavenDependencyTask> mdts) {
+		if (mdts.isEmpty()) return;			
+		boolean isClean = mdts.get(0).isCleanOutputDirectory();
+		boolean skipped = mdts.get(0).isSkipFlag();
+		if ( ! isClean || skipped) {
+			return;
+		}
+		if (BuildHacks.getServerType() != KServerType.LOCAL) {
+			return;
+		}
+		try {
+			SyncEclipseClasspathTask sync = new SyncEclipseClasspathTask(projectDir);
+			sync.run();
+		} catch(Exception ex) {
+			// allow failure eg file permissions as this is a nicety not a vital build step
+			Log.w(LOGTAG, ex);
 		}
 	}
 
