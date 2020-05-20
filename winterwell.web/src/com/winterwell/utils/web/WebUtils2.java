@@ -1417,7 +1417,8 @@ public class WebUtils2 extends WebUtils {
 		if ( ! "*".equals(originOut)) {			
 			state.setHeader(ALLOW_CREDENTIALS_HEADER, "true");
 		} else {
-			Log.d("cors", "NOT setting Access-Control-Allow-Credentials for origin: "+originOut+" from "+ReflectionUtils.getSomeStack(8));			
+			// verbose log -- switch on in log.properties if you want to see it
+			Log.v("cors", "NOT setting Access-Control-Allow-Credentials for origin: "+originOut+" from "+ReflectionUtils.getSomeStack(8));			
 		}
 		state.setHeader("Access-Control-Allow-Origin", originOut);
 	}

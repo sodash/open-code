@@ -27,7 +27,7 @@ public class BuildAllWWProjects extends BuildTask {
 				new BuildWeb(),
 				new BuildMaths(),
 				new BuildNLP(),
-				new BuildDepot(),
+//				new BuildDepot(),
 				new WWDependencyTask("winterwell.bob", "jobs.BuildBob")
 				);
 		for (BuildWinterwellProject bwp : projects) {
