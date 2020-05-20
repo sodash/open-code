@@ -14,7 +14,7 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildNLP extends BuildWinterwellProject {
 
 	public BuildNLP() {
-		super(new File(FileUtils.getWinterwellDir(), "open-code/winterwell.nlp"), "winterwell.nlp");
+		super("winterwell.nlp");
 		incSrc = false;
 	}
 

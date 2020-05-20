@@ -2,7 +2,9 @@
 package com.winterwell.youagain.client;
 
 import java.io.File;
+import java.util.List;
 
+import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
 import com.winterwell.utils.io.FileUtils;
@@ -11,20 +13,27 @@ import com.winterwell.utils.io.FileUtils;
 public class BuildYouAgainJavaClient extends BuildWinterwellProject {
 
 	public BuildYouAgainJavaClient() {
-		super(new File(FileUtils.getWinterwellDir(), "open-code/youagain-java-client"));
+		super("youagain-java-client");
 		setIncSrc(true);
 		setVersion("0.3.1");
 	}
 
 	@Override
-	public void doTask() throws Exception {
+	public List<BuildTask> getDependencies() {
+		List<BuildTask> deps = super.getDependencies();
+
 		MavenDependencyTask mdt = new MavenDependencyTask();		
 		mdt.addDependency("com.auth0", "java-jwt", "3.8.3");
 		mdt.setOutputDirectory(new File(projectDir, "dependencies"));
 		mdt.setIncSrc(true);
 //		mdt.setForceUpdate(true);
-		mdt.run();
-		
+
+		deps.add(mdt);
+		return deps;
+	}
+	
+	@Override
+	public void doTask() throws Exception {		
 		super.doTask();
 	}
 
