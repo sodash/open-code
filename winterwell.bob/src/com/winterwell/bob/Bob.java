@@ -298,6 +298,7 @@ public class Bob {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		Bob bob = null;
 		try {
 			System.out.println("Bob the Builder   version: "+BobSettings.VERSION_NUMBER+StrUtils.LINEEND);
 			
@@ -340,7 +341,7 @@ public class Bob {
 			Log.d(LOGTAG, "Bob version: "+BobSettings.VERSION_NUMBER+" building "+argsLeft+"...");
 	
 			// Make Bob
-			Bob bob = new Bob(_settings);
+			bob = new Bob(_settings);
 			dflt = bob;
 			bob.init();
 			
@@ -384,7 +385,13 @@ public class Bob {
 			// make sure everything is closed 
 			TaskRunner tr = Dep.get(TaskRunner.class);
 			tr.shutdownNow();
-			throw ex;
+			// finish with debug output
+			System.err.println(Printer.toString(ex, true));
+			if (bob!=null) {
+				Log.e(LOGTAG, " ERROR EXIT for "+bob.lastScript);
+			}
+			// send a bleurgh code out
+			System.exit(1);
 		}
 	}
 
