@@ -9,9 +9,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.wwjobs.BuildHacks;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
+import com.winterwell.web.app.KServerType;
 
 /**
  * status: SKETCH
@@ -37,6 +39,11 @@ public class SyncEclipseClasspathTask extends BuildTask {
 	
 	@Override
 	protected void doTask() throws Exception {
+		if (BuildHacks.getServerType() != KServerType.LOCAL) {
+			Log.d(LOGTAG, "SKIP sync task because not a local dev box");
+			return;
+		}
+		
 		String[] ajars = depsDir.list();
 		HashSet<String> jars = new HashSet();
 		for (String j : ajars) {
