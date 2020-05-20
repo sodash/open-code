@@ -14,7 +14,6 @@ import com.winterwell.bob.wwjobs.BuildUtils;
 import com.winterwell.bob.wwjobs.BuildWeb;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
 import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.app.KServerType;
 
 /**

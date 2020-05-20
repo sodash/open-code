@@ -2,18 +2,10 @@ package com.winterwell.bob.tasks;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
 
-import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
-import com.winterwell.bob.wwjobs.WWDependencyTask;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.Proc;
-import com.winterwell.utils.ReflectionUtils;
-import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 /**
  * @tested {@link GitBobProjectTaskTest}

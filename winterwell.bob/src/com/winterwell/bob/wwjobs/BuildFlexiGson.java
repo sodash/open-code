@@ -1,18 +1,20 @@
 package com.winterwell.bob.wwjobs;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import com.winterwell.bob.BuildTask;
-import com.winterwell.utils.io.FileUtils;
+import com.winterwell.web.app.KServerType;
 
 public class BuildFlexiGson extends BuildWinterwellProject {
 
 	public BuildFlexiGson() {
-		super(new File(FileUtils.getWinterwellDir(), "flexi-gson"));
-//		setIncSrc(true);
-//		setScpToWW(true);
+		super("flexi-gson");
+
+		// HACK edit if releasing
+		if (BuildHacks.getServerType()==KServerType.LOCAL) {
+			setScpToWW(true);
+		}
 	}
 
 	@Override

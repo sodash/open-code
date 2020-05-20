@@ -5,14 +5,10 @@ import java.io.File;
 import com.winterwell.bob.Bob;
 import com.winterwell.bob.BobSettings;
 import com.winterwell.bob.BuildTask;
-import com.winterwell.utils.FailureException;
-import com.winterwell.utils.Proc;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 
-import sun.jvm.hotspot.oops.GenerateOopMap;
 
 /**
  * This task runs a child Bob in a separate Java process

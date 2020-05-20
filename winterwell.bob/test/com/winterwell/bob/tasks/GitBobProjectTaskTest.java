@@ -1,13 +1,10 @@
 package com.winterwell.bob.tasks;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
 
-import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 
 public class GitBobProjectTaskTest {
