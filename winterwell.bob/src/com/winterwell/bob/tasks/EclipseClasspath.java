@@ -89,7 +89,7 @@ public class EclipseClasspath {
 		String xml = FileUtils.read(file);
 		List<Node> tags = WebUtils.xpathQuery("//classpathentry[@kind='lib']", xml);
 		if (tags.isEmpty()) {
-			Log.report("eclipse", "No classpath info found in "+file+". Is this a valid .classpath file?", Level.WARNING);
+			Log.i("eclipse", "No classpath kind=lib tags found in "+file);
 		}
 		List<File> files = new ArrayList<File>();
 		for (Node node : tags) {

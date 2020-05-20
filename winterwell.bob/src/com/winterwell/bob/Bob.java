@@ -549,7 +549,7 @@ public class Bob {
 	public void close() {		
 		// clean up ops
 		TaskRunner tr = Dep.get(TaskRunner.class);
-		Log.d(LOGTAG, "close... active-tasks: "+tr.getQueueSize());
+		Log.d(LOGTAG, "close... active-tasks: "+tr.getQueueSize()+" "+tr.getTodo());
 		tr.shutdown();
 		tr.awaitTermination();
 		Log.d(LOGTAG, "...closed");
