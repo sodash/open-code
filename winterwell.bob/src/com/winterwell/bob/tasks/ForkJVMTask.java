@@ -89,6 +89,10 @@ public class ForkJVMTask extends BuildTask {
 			proc.setEcho(true);
 			Log.i(LOGTAG, "Child-Bob: "+proc.getCommand()+" \r\n[in dir "+dir+"]");
 			proc.run();
+			
+			// for debug - what did it try to build?
+//			String out = proc.getOutput();
+//			#bob Auto-build: found file /home/daniel/winterwell/open-code/winterwell.utils/builder/com/winterwell/bob/wwjobs/BuildUtils.java
 		} finally {
 			long pid = proc.getProcessID();		
 			FileUtils.close(proc); // paranoia
