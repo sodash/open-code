@@ -62,7 +62,7 @@ public class ESDepotStore implements IStore {
 		// remove all
 		for (Desc desc : remove) {
 			ESPath path = getPath(desc);
-			DeleteRequestBuilder rm = esc.prepareDelete(path.index(), path.type, path.id);
+			DeleteRequestBuilder rm = esc.prepareDelete(path.index(), path.type, path.id);			
 			bulk.add(rm);
 		}
 		// add all

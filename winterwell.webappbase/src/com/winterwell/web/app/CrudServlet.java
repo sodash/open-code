@@ -289,14 +289,10 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		for(KStatus s : KStatus.main()) {
 			if (s==KStatus.TRASH) continue;
-			try {
-				ESPath path = esRouter.getPath(dataspace,type, id, s);
-				DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
-				del.setRefresh("wait_for");
-				IESResponse ok = del.get().check();
-			} catch(WebEx.E404 e404) {
-				// gone already				
-			}
+			ESPath path = esRouter.getPath(dataspace,type, id, s);
+			DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
+			del.setRefresh("wait_for");
+			IESResponse ok = del.get().check();			
 		}
 		return null;
 	}
