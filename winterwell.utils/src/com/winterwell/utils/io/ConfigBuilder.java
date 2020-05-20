@@ -149,6 +149,9 @@ public class ConfigBuilder {
 			// Date
 			if (type == Date.class)
 				return DateFormat.getInstance().parse(string);
+			if (type==Time.class) {
+				return TimeUtils.parseExperimental(string);
+			}
 			if (type==Dt.class) {
 				return TimeUtils.parseDt(string);
 			}

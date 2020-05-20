@@ -96,9 +96,9 @@ public class PublishProjectTask extends BuildTask {
 	}
 	
 	public PublishProjectTask(String projectName, String remoteWebAppDir, File localWebAppDir) {
-		Utils.check4null(projectName, remoteWebAppDir);
+		Utils.check4null(projectName);
 		this.projectName = projectName;
-		this.remoteWebAppDir = remoteWebAppDir;
+		this.remoteWebAppDir = remoteWebAppDir; // could be null for local
 		// local
 		this.localWebAppDir = localWebAppDir;
 		localLib = new File(localWebAppDir,"tmp-lib");

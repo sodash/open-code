@@ -19,7 +19,7 @@ public class BobSettings {
 
 	public static final Key<Boolean> VERBOSE = new Key<Boolean>("verbose");
 
-	public final static String VERSION_NUMBER = "0.9.39";
+	public final static String VERSION_NUMBER = "0.9.40";
 	
 	@Option(tokens="-cp,-classpath", description="Classpath used for dynamically compiling build scripts. Uses the file1:file2 format of Java")
 	// NB: This is not the classpath used for CompileTasks which are part of a build script run.
