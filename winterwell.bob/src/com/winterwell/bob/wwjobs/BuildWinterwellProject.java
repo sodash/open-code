@@ -29,6 +29,7 @@ import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.ATask.QStatus;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils2;
@@ -499,7 +500,13 @@ public class BuildWinterwellProject extends BuildTask {
 				compile.run();
 				compile.close();
 			} catch(Exception ex) {
-				Log.e(ex); // :'( Dec 2018 Why??
+				// HACK to allow ignoring via -ignore flag
+				if (getSettings().ignoreAllExceptions) {
+					Log.e(ex); // :'( Dec 2018 Why??
+					setStatus(QStatus.ERROR);
+				} else {
+					throw ex;
+				}
 			}
 		}
 		// also copy any resources across??

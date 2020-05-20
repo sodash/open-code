@@ -272,9 +272,12 @@ public class EclipseClasspath {
 			// prefer top level projects
 			File fp = null;
 			try {
-				fp = projectFinder.apply(p);
-				if (fp==null) throw new FileNotFoundException(); 
+				fp = projectFinder.apply(p);				
 			} catch(Exception ex) {
+				Log.w(LOGTAG, "Could not find project "+p+" for collecting libs: "+ex);
+				continue;
+			}
+			if (fp==null || ! fp.exists()) {
 				Log.i(LOGTAG, "Could not find project "+p+" for collecting libs");
 				continue;
 			}
@@ -283,7 +286,7 @@ public class EclipseClasspath {
 				pec.setIncludeProjectJars(includeProjectJars);
 				pec.getCollectedLibs2(libs, projects, depsFor);
 			} catch(Exception ex) {
-				Log.w("eclipse", ex);
+				Log.w("eclipse."+projectDir.getName(), ex);
 			}
 			// HACK add in the project jar?
 			if (includeProjectJars) {

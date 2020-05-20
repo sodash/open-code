@@ -17,9 +17,11 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TimeOut;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.threads.TaskRunner;
+import com.winterwell.utils.threads.ATask.QStatus;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
@@ -196,7 +198,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	}
 
 	private void handleException(Throwable e) {
-		if (bob.getSettings().ignoreAllExceptions) {
+		if (getSettings().ignoreAllExceptions) {
 			System.out.println("Ignoring: " + e);
 			return;
 		}
@@ -217,12 +219,6 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	protected String LOGTAG = Bob.LOGTAG+"."+getClass().getSimpleName();
 
 	private boolean skipDependencies;
-
-	/**
-	 * How many tasks down have we recursed? 
-	 * Use-case: for skipping
-	 */
-	protected transient int depth;
 
 	private boolean skipFlag;
 	
@@ -328,23 +324,27 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		
 		// Add an output and error listener
 		report("Running " + toString() + " at "
-				+ TimeUtils.getTimeStamp() + "...", Level.FINE);
+				+ TimeUtils.getTimeStamp() + "...", Level.FINE);		
 		bob.adjustBobCount(1);
 		TimeOut timeOut = null;
 		try {
 			if (maxTime!=null) timeOut = new TimeOut(maxTime.getMillisecs());
 			// call dependencies?
+			setStatus(QStatus.WAITING);
 			doDependencies();
 
-			// run
+			// run			
+			setStatus(QStatus.RUNNING);
 			doTask();
 
 			// Done
+			setStatus(QStatus.DONE);
 			reportIssues();
 			Bob.setLastRunDate(this);
 			return;
 
 		} catch (Throwable e) {
+			setStatus(QStatus.ERROR);
 			reportIssues();
 			// Swallow or rethrow exception depending on settings
 			handleException(e);
@@ -361,8 +361,17 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 				// Swallow!
 				Log.e(LOGTAG, e);				
 			}
-			Log.report(LOGTAG, "...exiting " + toString(), Level.FINE);
+			Log.d(LOGTAG, "...exiting " + toString()+" "+status);
 		}
+	}
+	
+	volatile QStatus status = QStatus.NOT_SUBMITTED;
+	
+	protected void setStatus(QStatus status) {
+		if (this.status==QStatus.ERROR && status != null) {
+			return; // requires explicit clear via null
+		}
+		this.status = status;
 	}
 	
 	/**
@@ -377,7 +386,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 			return true;
 		}
 		// -clean? rerun inspite of any previous runs
-		BobSettings settings = Bob.getSingleton().getSettings();
+		BobSettings settings = getSettings();
 		if (settings.clean) {
 			return false;
 		}		
@@ -477,16 +486,14 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 		Collection<? extends BuildTask> deps = getDependencies();
 		if (deps!=null) {
 			for (BuildTask bs : deps) {
-				bs.setDepth(depth+1);
+				// TODO use getID and getName as [label=]
+				FileUtils.append('"'+getDesc().getName()+"\" -> \""+bs.getDesc().getName()+"\"\n", getSettings().dotFile);
 				bs.run();
 			}
 		}
 		return true;
 	}
 
-	private void setDepth(int depth) {
-		this.depth = depth;
-	}
 
 	protected void report(String msg, Level level) {
 		// skip if we're ignoring these
@@ -496,7 +503,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	
 	public boolean isVerbose() {
 		return (verbosity!=null && verbosity.intValue() >= Level.FINEST.intValue())
-				|| Bob.getSingleton().getSettings().verbose;
+				|| getSettings().verbose;
 	}
 
 	/**

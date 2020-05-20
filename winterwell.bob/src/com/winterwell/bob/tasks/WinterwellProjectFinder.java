@@ -30,7 +30,7 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 			possDirs.add(FileUtils.getWorkingDirectory());
 		}
 		try {
-			// TODO this will fail on a "strange" computer as it uses winterwell-home :(
+			// This will likely fail on a "strange" computer as it uses winterwell-home :(
 			EclipseClasspath ec = new EclipseClasspath(FileUtils.getWorkingDirectory());
 			String pname = ec.getProjectName();
 			if (_projectName.equals(pname)) {
@@ -51,12 +51,22 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 			// no WINTERWELL_HOME
 			Log.w("BuildWinterwellProject", "No WINTERWELL_HOME found "+ex);			
 		}		
-		File pdir = FileUtils.or(possDirs);
-		if (pdir==null) {
-			Log.e("BuildWinterwellProject", "Could not find project directory for "+_projectName+" Tried "+possDirs);
-			return null;
+		// Bug seen May 2020: beware of basically empty dirs
+		for (File pd : possDirs) {
+			if ( ! pd.exists()) continue;
+			// HACK look for some file to confirm its valid
+			for(String f : "src .classpath .project config".split(" ")) {
+				if (new File(pd, f).exists()) {
+					return pd;
+				}
+			}
 		}
-		return pdir;
+//		File pdir = FileUtils.or(possDirs);
+//		if (pdir==null) {
+		Log.e("BuildWinterwellProject", "Could not find project directory for "+_projectName+" Tried "+possDirs);
+		return null;
+//		}
+//		return pdir;
 	}
 
 	/**

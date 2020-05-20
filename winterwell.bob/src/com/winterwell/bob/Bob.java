@@ -85,7 +85,7 @@ public class Bob {
 
 	private static volatile Time runStart;
 
-	public static final String LOGTAG = "bob";
+	public static String LOGTAG = "bob";
 
 	/**
 	 * @throws Exception 
@@ -298,73 +298,93 @@ public class Bob {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("Bob the Builder   version: "+BobSettings.VERSION_NUMBER+StrUtils.LINEEND);
-		
-		// Load settings
-		ConfigFactory cf = ConfigFactory.get();
-		cf.setArgs(args);
-		ConfigBuilder cb = cf.getConfigBuilder(BobSettings.class);
-		BobSettings _settings = cb.get();
-		
-		if (_settings.update) {
-			doUpdate();
-			return;
-		}
-		
-		List<String> argsLeft = cb.getRemainderArgs();
-		
-		if (argsLeft.size() == 0) {
-			// find a file?
-			File buildFile = findBuildScript(null);
-			if (buildFile != null) {
-				argsLeft = Arrays.asList(buildFile.toString());
+		try {
+			System.out.println("Bob the Builder   version: "+BobSettings.VERSION_NUMBER+StrUtils.LINEEND);
+			
+			// Load settings
+			ConfigFactory cf = ConfigFactory.get();
+			cf.setArgs(args);
+			ConfigBuilder cb = cf.getConfigBuilder(BobSettings.class);
+			BobSettings _settings = cb.get();
+			if ( ! Utils.isBlank(_settings.label)) {
+				LOGTAG += "."+_settings.label;
 			}
-		}
-		
-		if (_settings.help || argsLeft.size() == 0 || Containers.contains("--help", args)) {
-			System.err.println(StrUtils.LINEEND + "Bob the Builder   version: "+BobSettings.VERSION_NUMBER
-					+ StrUtils.LINEEND + "---------------"
-					+ StrUtils.LINEEND
-					+ "Default usage (looks for a BuildX.java file in the builder directory):"+ StrUtils.LINEEND
-					+ "	java -jar bob-all.jar"+ StrUtils.LINEEND
-					+ StrUtils.LINEEND
-					+ "Usage: java -jar bob-all.jar [options] [TargetBuildTasks...]"
-					+ StrUtils.LINEEND + cb.getOptionsMessage());
-			System.exit(1);
-		}		
-		Log.d(LOGTAG, "Bob version: "+BobSettings.VERSION_NUMBER+" building "+argsLeft+"...");
-
-		// Make Bob
-		Bob bob = new Bob(_settings);
-		dflt = bob;
-		bob.init();
-				
-		// Build each target
-		for (String clazzName : argsLeft) {
-			try {
-				Class clazz = getClass(clazzName);
-				bob.build(clazz);
-				bob.built.add(clazz);
-			} catch (ClassNotFoundException e) {
-				classNotFoundMessage(e);
-				bob.maybeCarryOn(e);
-			} catch (NoClassDefFoundError e) {
-				classNotFoundMessage(e);
-				bob.maybeCarryOn(e);
-			} catch (Exception e) {
-				bob.maybeCarryOn(e);
+			
+			// Just update the jar?
+			if (_settings.update) {
+				doUpdate();
+				return;
 			}
-		}
-		
-		// all done
-		bob.close();
-		
-		// report
-		if (bob.lastScript instanceof BuildTask) {
-			Map success = ((BuildTask) bob.lastScript).getReport();
-			if (success!=null && ! success.isEmpty()) {
-				System.out.println(StrUtils.LINEEND+Printer.toString(success, StrUtils.LINEEND, ":\t"));
+			
+			List<String> argsLeft = cb.getRemainderArgs();
+			
+			if (argsLeft.size() == 0) {
+				// find a file?
+				File buildFile = findBuildScript(null);
+				if (buildFile != null) {
+					argsLeft = Arrays.asList(buildFile.toString());
+				}
 			}
+			
+			if (_settings.help || argsLeft.size() == 0 || Containers.contains("--help", args)) {
+				System.err.println(StrUtils.LINEEND + "Bob the Builder   version: "+BobSettings.VERSION_NUMBER
+						+ StrUtils.LINEEND + "---------------"
+						+ StrUtils.LINEEND
+						+ "Default usage (looks for a BuildX.java file in the builder directory):"+ StrUtils.LINEEND
+						+ "	java -jar bob-all.jar"+ StrUtils.LINEEND
+						+ StrUtils.LINEEND
+						+ "Usage: java -jar bob-all.jar [options] [TargetBuildTasks...]"
+						+ StrUtils.LINEEND + cb.getOptionsMessage());
+				System.exit(1);
+			}		
+			Log.d(LOGTAG, "Bob version: "+BobSettings.VERSION_NUMBER+" building "+argsLeft+"...");
+	
+			// Make Bob
+			Bob bob = new Bob(_settings);
+			dflt = bob;
+			bob.init();
+			
+			// clean dot?
+			if (bob.settings.dotFile != null && bob.settings.depth==0) {
+				FileUtils.write(bob.settings.dotFile, "digraph Tasks {\n");
+			}
+			
+			// Build each target
+			for (String clazzName : argsLeft) {
+				try {
+					Class clazz = getClass(clazzName);
+					bob.build(clazz);
+					bob.built.add(clazz);
+				} catch (ClassNotFoundException e) {
+					classNotFoundMessage(e);
+					bob.maybeCarryOn(e);
+				} catch (NoClassDefFoundError e) {
+					classNotFoundMessage(e);
+					bob.maybeCarryOn(e);
+				} catch (Exception e) {
+					bob.maybeCarryOn(e);
+				}
+			}
+			
+			// all done
+			bob.close();
+			
+			if (bob.settings.dotFile != null && bob.settings.depth==0) {
+				FileUtils.append("}\n", bob.settings.dotFile);
+			}
+			
+			// report
+			if (bob.lastScript instanceof BuildTask) {
+				Map success = ((BuildTask) bob.lastScript).getReport();
+				if (success!=null && ! success.isEmpty()) {
+					System.out.println(StrUtils.LINEEND+Printer.toString(success, StrUtils.LINEEND, ":\t"));
+				}
+			}
+		} catch(Throwable ex) {
+			// make sure everything is closed 
+			TaskRunner tr = Dep.get(TaskRunner.class);
+			tr.shutdownNow();
+			throw ex;
 		}
 	}
 
@@ -419,11 +439,12 @@ public class Bob {
 		return null;
 	}
 
-	private void maybeCarryOn(Throwable e) {
+	private void maybeCarryOn(Throwable e) throws RuntimeException {
 		if (settings.ignoreAllExceptions) {
 			Log.report(LOGTAG, "Ignoring: " + e.getMessage(), Level.WARNING);
-		} else
-			throw Utils.runtime(e);		
+		} else {
+			throw Utils.runtime(e);
+		}
 	}
 
 	public static void setLastRunDate(BuildTask buildTask) {
