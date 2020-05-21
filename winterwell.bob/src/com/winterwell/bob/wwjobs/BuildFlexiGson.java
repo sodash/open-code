@@ -10,11 +10,6 @@ public class BuildFlexiGson extends BuildWinterwellProject {
 
 	public BuildFlexiGson() {
 		super("flexi-gson");
-
-		// HACK edit if releasing
-		if (BuildHacks.getServerType()==KServerType.LOCAL) {
-			setScpToWW(true);
-		}
 	}
 
 	@Override

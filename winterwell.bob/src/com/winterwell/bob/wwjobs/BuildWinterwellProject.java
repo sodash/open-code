@@ -320,6 +320,11 @@ public class BuildWinterwellProject extends BuildTask {
 		return wpg.apply(_projectName);
 	}
 
+	/**
+	 * @deprecated Better to use the String constructor, and let {@link WinterwellProjectFinder} find the dir
+	 * @param projectDir
+	 * @param projectName
+	 */	
 	public BuildWinterwellProject(File projectDir, String projectName) {
 		assert projectDir != null : projectName;
 		this.projectDir = projectDir;
@@ -328,12 +333,13 @@ public class BuildWinterwellProject extends BuildTask {
 		this.projectName = projectName;
 		// dependencies shouldnt need rebuilding all the time
 		setSkipGap(TUnit.DAY.dt);
+		
+		// HACK edit if releasing
+		if (BuildHacks.getServerType()==KServerType.LOCAL) {
+			setScpToWW(true);
+		}
 	}
-
-	public BuildWinterwellProject(File projectDir) {
-		this(projectDir, null);
-	}
-
+	
 	@Override
 	public void doTask() throws Exception {
 		File srcDir = getJavaSrcDir();

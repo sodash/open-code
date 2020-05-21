@@ -33,7 +33,7 @@ public class BuildBob extends BuildWinterwellProject {
 		incSrc = true;
 		setMainClass(Bob.class);
 		
-		// edit if releasing Bob
+		// For releasing Bob
 		if (BuildHacks.getServerType()==KServerType.LOCAL) {
 			setScpToWW(true);
 			setMakeFatJar(true);

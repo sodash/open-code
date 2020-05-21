@@ -73,7 +73,7 @@ import com.winterwell.utils.time.TimeUtils;
  * @author daniel
  * 
  */
-public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
+public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuildTask {
 
 	protected Map<String,Object> report = new ArrayMap();
 
@@ -176,26 +176,22 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable {
 	private void config() {
 	}
 
+	@Override
+	public List<BuildTask> getDependencies() {
+		// What about build tasks from other projects - which aren't on the classpath?
+		// Hack: see WWDependencyTask, a bit like MavenDependencyTask, which downloads a jar
+		return new ArrayList();
+	}
+	
+
 	/**
 	 * Performs the actual work of the class. 
 	 * Mostly you will want to call the wrapper method {@link #run()} instead.
 	 * 
 	 * @throws Exception
 	 */
-	protected abstract void doTask() throws Exception;
-
-	/**
-	 * @return The build tasks this task depends on. Dependencies are run
-	 *         first, and will be checked to avoid repeats. 
-	 *         
-	 *         Returns an empty list by default - override to specify
-	 *         some dependencies. null is also acceptable but not advisable.
-	 */
-	public List<BuildTask> getDependencies() {
-		// What about build tasks from other projects - which aren't on the classpath?
-		// Hack: see WWDependencyTask, a bit like MavenDependencyTask, which downloads a jar
-		return new ArrayList();
-	}
+	protected abstract void doTask() throws Exception;	
+	
 
 	private void handleException(Throwable e) {
 		if (getSettings().ignoreAllExceptions) {

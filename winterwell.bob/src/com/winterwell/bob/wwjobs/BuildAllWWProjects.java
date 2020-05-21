@@ -31,7 +31,6 @@ public class BuildAllWWProjects extends BuildTask {
 				new WWDependencyTask("winterwell.bob", "jobs.BuildBob")
 				);
 		for (BuildWinterwellProject bwp : projects) {
-			bwp.setScpToWW(true);
 			bwp.setIncSrc(true);
 			bwp.run();
 		}		
