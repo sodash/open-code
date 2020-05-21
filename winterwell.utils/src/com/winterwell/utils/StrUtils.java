@@ -412,6 +412,12 @@ public class StrUtils {
 	 * @return
 	 */
 	public static String hash(String hashAlgorithm, String txt) {
+		// HACK: short = 6 letters of md5
+		if (SHORT_ALGORITHM.equals(hashAlgorithm)) {
+			String md5 = md5(txt);
+			return md5.substring(0, 6);
+		}
+		
 		if ("SHA256".equals(hashAlgorithm)) hashAlgorithm = "SHA-256";
 		try {
 			java.security.MessageDigest md = java.security.MessageDigest
@@ -1477,6 +1483,13 @@ public class StrUtils {
 	 * toString() as a function. Can handle nulls
 	 */
 	public static final IFn<Object, String> STR = new StrFn();
+
+	/**
+	 * This takes a string, and produces a decent (ie hopefully unique within your use-case) 
+	 * and *short* nonsense hash token.
+	 * NOT cryptographically secure.
+	 */
+	public static final String SHORT_ALGORITHM = "short";
 
 
 	/**

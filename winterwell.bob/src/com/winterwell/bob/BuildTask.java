@@ -2,6 +2,7 @@ package com.winterwell.bob;
 
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -480,14 +481,23 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 		}
 		// run
 		Collection<? extends BuildTask> deps = getDependencies();
-		if (deps!=null) {
+		if (deps!=null) {			
+			String a = labelTask(getDesc());	
 			for (BuildTask bs : deps) {
 				// TODO use getID and getName as [label=]
-				FileUtils.append('"'+getDesc().getName()+"\" -> \""+bs.getDesc().getName()+"\"\n", getSettings().dotFile);
+				String b = labelTask(bs.getDesc());
+				FileUtils.append(
+						'"'+a+"\" -> \""+b+"\"\n", getSettings().dotFile);
+				// Do it
 				bs.run();
 			}
 		}
 		return true;
+	}
+
+
+	private String labelTask(Desc desc) {
+		return desc.getName()+"."+StrUtils.hash(StrUtils.SHORT_ALGORITHM, desc.getId());
 	}
 
 
