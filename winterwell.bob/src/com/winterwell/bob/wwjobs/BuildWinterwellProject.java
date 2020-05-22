@@ -334,8 +334,13 @@ public class BuildWinterwellProject extends BuildTask {
 		// dependencies shouldnt need rebuilding all the time
 		setSkipGap(TUnit.DAY.dt);
 		
-		// HACK edit if releasing
-		if (BuildHacks.getServerType()==KServerType.LOCAL) {
+		// HACK scp to release the jar?
+		int bc = Bob.getSingleton().getBobCount();
+		if (BuildHacks.getServerType()==KServerType.LOCAL 
+				&& getSettings().depth==0
+				&& bc==0
+				) 
+		{
 			setScpToWW(true);
 		}
 	}

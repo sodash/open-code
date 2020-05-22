@@ -2,6 +2,7 @@ package com.winterwell.bob.wwjobs;
 
 import java.io.File;
 
+import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.ForkJVMTask;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -41,20 +42,26 @@ public class WWDependencyTask extends BuildWinterwellProject {
 		if (builderClass!=null) {			
 			try {
 				Class<?> clazz = Class.forName(builderClass);
-				BuildWinterwellProject builder = (BuildWinterwellProject) clazz.newInstance();
-				// copy settings: the ones that might get overridden by the caller.
-				// Don't copy all -- 'cos BuildX may have done some setup in its constructor.
-				builder.setCompile(isCompile());
-				builder.setErrorHandler(errorHandler);
-				builder.setIncSrc(incSrc);
-				builder.setMaxTime(maxTime);
-				builder.setScpToWW(scpToWW);
-				builder.setSkipDependencies(isSkipDependencies());
-				builder.setVerbosity(getVerbosity());
+				BuildTask _builder = (BuildTask) clazz.newInstance();
+				_builder.setErrorHandler(errorHandler);
+				_builder.setMaxTime(maxTime);
+				_builder.setSkipDependencies(isSkipDependencies());
+				_builder.setVerbosity(getVerbosity());
+				if (_builder instanceof BuildWinterwellProject) {
+					BuildWinterwellProject builder = (BuildWinterwellProject) _builder;
+					// copy settings: the ones that might get overridden by the caller.
+					// Don't copy all -- 'cos BuildX may have done some setup in its constructor.
+					builder.setCompile(isCompile());
+					builder.setIncSrc(incSrc);
+					builder.setScpToWW(scpToWW);
+				}
 				
 				// run!
-				builder.run();
-				setJar(builder.getJar());
+				_builder.run();
+				
+				if (_builder instanceof BuildWinterwellProject) {
+					setJar(((BuildWinterwellProject) _builder).getJar());
+				}
 				
 				// success :)
 				return;

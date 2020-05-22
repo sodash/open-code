@@ -35,7 +35,6 @@ public class BuildBob extends BuildWinterwellProject {
 		
 		// For releasing Bob
 		if (BuildHacks.getServerType()==KServerType.LOCAL) {
-			setScpToWW(true);
 			setMakeFatJar(true);
 		}
 		
