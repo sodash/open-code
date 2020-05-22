@@ -21,11 +21,13 @@ public class MakeVersionPropertiesTask extends BuildTask {
 	private File configDir;
 	private File appDir;
 	private Properties props;
+	private File gitDir;
 
 
 	public MakeVersionPropertiesTask() {
 		appDir = FileUtils.getWorkingDirectory();
 		configDir = new File("config").getAbsoluteFile();
+		gitDir = appDir;
 	}
 	
 	public MakeVersionPropertiesTask setAppDir(File appDir) {
@@ -55,10 +57,10 @@ public class MakeVersionPropertiesTask extends BuildTask {
 		props.setProperty("publishDate", new Time().toISOString());
 		try {
 			// set info on the git branch
-			String branch = GitTask.getGitBranch(appDir);
+			String branch = GitTask.getGitBranch(gitDir);
 			props.setProperty("branch", branch);
 			// ...and commit IDs
-			Map<String, Object> info = GitTask.getLastCommitInfo(appDir);
+			Map<String, Object> info = GitTask.getLastCommitInfo(gitDir);
 			for(String k : info.keySet()) {
 				Object v = info.get(k);
 				if (v==null) continue;
@@ -83,6 +85,10 @@ public class MakeVersionPropertiesTask extends BuildTask {
 		
 		// also update .js??
 		doUpdateJSVersionInfo();
+	}
+	
+	public void setGitDir(File gitDir) {
+		this.gitDir = gitDir;
 	}
 
 	private void doUpdateJSVersionInfo() {

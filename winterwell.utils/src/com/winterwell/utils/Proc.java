@@ -95,8 +95,9 @@ public class Proc implements Closeable {
 		if (process == null)
 			return;
 		closeStreams();
+//		process.destroy(); Send a polite request to destroy?! Java, what is this nonsense? 
+		// Destroy! Exterminate! Kill -9!
 		process.destroyForcibly();
-//		process.destroy();
 		process = null;
 	}
 

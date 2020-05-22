@@ -128,7 +128,7 @@ public class ProcessTask extends BuildTask {
 		}
 		
 		// Do it!
-		Log.d(getClass().getSimpleName(), cmd+"...");
+		Log.d(LOGTAG, "dir: "+workingDir+" command: "+cmd+" ...");
 		p.setEcho(echo);
 		p.start();
 		try {

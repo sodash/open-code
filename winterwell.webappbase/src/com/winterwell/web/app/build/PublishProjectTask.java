@@ -85,6 +85,9 @@ public class PublishProjectTask extends BuildTask {
 		return this;
 	}
 	
+	public PublishProjectTask(String projectName) {
+		this(projectName, "/home/winterwell/"+projectName);
+	}
 	/**
 	 * 
 	 * @param projectName
