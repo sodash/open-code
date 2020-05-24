@@ -3,6 +3,7 @@ package com.winterwell.web.app;
 import java.io.File;
 import java.util.Map;
 
+import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.datalog.DataLog;
 import com.winterwell.es.ESType;
@@ -15,6 +16,7 @@ import com.winterwell.gson.Gson;
 import com.winterwell.gson.GsonBuilder;
 import com.winterwell.gson.KLoopPolicy;
 import com.winterwell.gson.StandardAdapters;
+import com.winterwell.utils.AString;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
@@ -215,6 +217,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		.setLenientReader(true)
 		.registerTypeAdapter(Time.class, new StandardAdapters.TimeTypeAdapter())
 		.registerTypeAdapter(XId.class, new XIdTypeAdapter())
+		.registerTypeHierarchyAdapter(AString.class, new StandardAdapters.ToStringSerialiser())
 		.serializeSpecialFloatingPointValues()
 		.setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 //		.setClassProperty(null)

@@ -33,5 +33,7 @@ public final class Dataspace extends AString {
 		}
 	}
 
-	
+	public Dataspace(String name) {
+		this((CharSequence)name);
+	}
 }

@@ -21,6 +21,13 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 	}
 
 	/**
+	 * Needed for reflection-based de-serialisation, eg from json
+	 */
+	public AString(String name) {
+		this((CharSequence)name);
+	}
+	
+	/**
 	 * 
 	 * @param name String or an AString wrapper. Cannot be null.
 	 * If it is an AString, the class must match -- this provides type-safety
@@ -50,7 +57,7 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 			return false;
 		if ( ! (obj instanceof CharSequence)) return false;
 		// match or not?
-		if (name.equals(obj.toString())) {
+		if ( ! name.equals(obj.toString())) {
 			return false;
 		}
 		if (getClass().equals(obj.getClass())) return true;
