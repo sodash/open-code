@@ -1514,7 +1514,11 @@ public class WebUtils2 extends WebUtils {
 	}
 
 
-	
+	/**
+	 * Warning: can insert extra blank lines
+	 * @param doc
+	 * @return
+	 */
 	public static String xmlDocToString(Document doc) {
 		try {
 			TransformerFactory tf = TransformerFactory.newInstance();

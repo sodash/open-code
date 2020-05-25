@@ -14,7 +14,6 @@
 	<classpathentry kind="lib" path="dependencies/guava.jar"/>
 	<classpathentry kind="lib" path="dependencies/listenablefuture.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/trove4j.jar"/>
-	<classpathentry kind="lib" path="dependencies/animal-sniffer-annotations.jar"/>
 	<classpathentry kind="lib" path="dependencies/checker-qual.jar"/>
 	<classpathentry kind="lib" path="dependencies/error_prone_annotations.jar"/>
 	<classpathentry kind="lib" path="dependencies/failureaccess.jar"/>
