@@ -180,7 +180,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 		}
 		this.service = id.substring(i+1);
 		this.name = id.substring(0, i);
-		assert notNullNameCheck() : id;
+		assert notNullNameCheck() : "null name in XId: "+id;
 	}
 
 	/**
