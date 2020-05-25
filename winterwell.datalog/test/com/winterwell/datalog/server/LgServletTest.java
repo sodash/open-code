@@ -10,6 +10,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.app.BrowserType;
 
 import ua_parser.Client;
 import ua_parser.Parser;
@@ -34,6 +35,14 @@ public class LgServletTest {
 			LgServlet.readGoogleAnalyticsTokens(ref, params);
 			LgServlet.readGoogleAnalyticsTokens("", params);
 		}
+	}
+	
+	@Test
+	public void testBrowserType() {
+		Dep.setIfAbsent(DataLogConfig.class, new DataLogConfig());
+		String ua = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+		BrowserType bi = LgServlet.getBrowserInfo(ua);
+		System.out.println(bi);
 	}
 	
 	@Test
