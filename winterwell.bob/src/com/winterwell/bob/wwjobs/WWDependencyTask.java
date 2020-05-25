@@ -43,6 +43,7 @@ public class WWDependencyTask extends BuildWinterwellProject {
 			try {
 				Class<?> clazz = Class.forName(builderClass);
 				BuildTask _builder = (BuildTask) clazz.newInstance();
+				_builder.setDepth(getDepth()+1);
 				_builder.setErrorHandler(errorHandler);
 				_builder.setMaxTime(maxTime);
 				_builder.setSkipDependencies(isSkipDependencies());
@@ -54,7 +55,7 @@ public class WWDependencyTask extends BuildWinterwellProject {
 					builder.setCompile(isCompile());
 					builder.setIncSrc(incSrc);
 					builder.setScpToWW(scpToWW);
-				}
+				}								
 				
 				// run!
 				_builder.run();
@@ -89,6 +90,7 @@ public class WWDependencyTask extends BuildWinterwellProject {
 		if (builderClass!=null) {			
 			try {
 				ForkJVMTask forked = new ForkJVMTask(builderClass);
+				forked.setDepth(getDepth()+1);
 				forked.setDir(projectDir);
 				forked.getClasspath().add(jar);
 				forked.run();

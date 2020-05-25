@@ -358,6 +358,7 @@ public class BuildWinterwellProject extends BuildTask {
 		// Jar	
 		File tempJar = File.createTempFile("temp", ".jar");
 		JarTask jar = new JarTask(tempJar, getBinDir());
+		jar.setDepth(getDepth()+1);
 		jar.setAppend(false);
 		setJarManifest(jar, srcDir, projectDir.getName()+" library (c) Winterwell. All rights reserved.");
 		jar.run();
@@ -369,6 +370,7 @@ public class BuildWinterwellProject extends BuildTask {
 		// source code?
 		if (incSrc) {
 			JarTask jar2 = new JarTask(getJar(), new File(projectDir, "src"));
+			jar2.setDepth(getDepth()+1);
 			jar2.setAppend(true);
 			jar2.run();			
 		}
@@ -398,6 +400,7 @@ public class BuildWinterwellProject extends BuildTask {
 		}
 		try {
 			SyncEclipseClasspathTask sync = new SyncEclipseClasspathTask(projectDir);
+			sync.setDepth(getDepth()+1);
 			sync.run();
 		} catch(Exception ex) {
 			// allow failure eg file permissions as this is a nicety not a vital build step
@@ -450,6 +453,7 @@ public class BuildWinterwellProject extends BuildTask {
 			String remoteJar = "/home/winterwell/public-software/"+getJar().getName();
 			SCPTask scp = new SCPTask(getJar(), "winterwell@winterwell.com",				
 					remoteJar);
+			scp.setDepth(getDepth()+1);
 			// this is online at: https://www.winterwell.com/software/downloads
 			scp.setMkdirTask(false);			
 			scp.runInThread();
@@ -459,6 +463,7 @@ public class BuildWinterwellProject extends BuildTask {
 			String remoteJar = "/home/winterwell/public-software/"+getFatJar().getName();
 			SCPTask scp = new SCPTask(getFatJar(), "winterwell@winterwell.com",				
 					remoteJar);
+			scp.setDepth(getDepth()+1);
 			// this is online at: https://www.winterwell.com/software/downloads
 			scp.setMkdirTask(false);			
 			scp.runInThread();
@@ -507,7 +512,8 @@ public class BuildWinterwellProject extends BuildTask {
 		if (compile) {
 			try {
 				assert projectDir != null : this;
-				CompileTask compile = new CompileTask(srcDir, binDir);				
+				CompileTask compile = new CompileTask(srcDir, binDir);
+				compile.setDepth(getDepth()+1);
 				// classpath
 				EclipseClasspath ec = new EclipseClasspath(projectDir);
 				ec.setIncludeProjectJars(true);

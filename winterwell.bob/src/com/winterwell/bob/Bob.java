@@ -14,6 +14,7 @@ import java.util.logging.Level;
 
 import com.winterwell.bob.tasks.Classpath;
 import com.winterwell.bob.tasks.CompileTask;
+import com.winterwell.bob.tasks.GitBobProjectTask;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
@@ -24,6 +25,9 @@ import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.containers.Pair2;
+import com.winterwell.utils.io.CSVReader;
+import com.winterwell.utils.io.CSVSpec;
+import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
@@ -245,19 +249,32 @@ public class Bob {
 	private static Map<String, Time> loadTaskHistory() {
 		// load from file
 		try {
-			File file = getHistoryFile();
-			if ( ! file.isFile()) {
-				return new HashMap();
-			}
-			String json = FileUtils.read(file);
-			SimpleJson sj = new SimpleJson();
-			Map jobj = (Map) sj.fromJson(json);
 			ArrayMap<String,Time> t4t = new ArrayMap();
-			for(Object id : jobj.keySet()) {
-				Object v = jobj.get(id);
-				Time time = v instanceof Time? (Time) v : new Time(v.toString());
-				t4t.put(id.toString(), time);
+			File csvfile = getHistoryFile();
+			CSVSpec spec = new CSVSpec(',', '"', '#');
+			CSVReader r = new CSVReader(csvfile, spec).setNumFields(-1);
+			for (String[] row : r) {
+				try {
+					t4t.put(row[0], new Time(row[1]));
+				} catch(Exception ex) {
+					Log.e(LOGTAG, ex);
+				}
 			}
+			r.close();
+			
+//			File file = getHistoryFile();
+//			if ( ! file.isFile()) {
+//				return new HashMap();
+//			}
+//			String json = FileUtils.read(file);
+//			SimpleJson sj = new SimpleJson();
+//			Map jobj = (Map) sj.fromJson(json);			
+//			for(Object id : jobj.keySet()) {
+//				Object v = jobj.get(id);
+//				Time time = v instanceof Time? (Time) v : new Time(v.toString());
+//				t4t.put(id.toString(), time);
+//			}
+			
 			return t4t;			
 		} catch(Throwable ex) {
 			Log.d(LOGTAG, ex);
@@ -266,20 +283,23 @@ public class Bob {
 	}
 
 	private static void saveTaskHistory() {
-		try {
-			File file = getHistoryFile();
-			SimpleJson sj = new SimpleJson(); // not our favourite, but Jetty JSON was causing weird breakage
-			String json = sj.toJson(time4task);
-			FileUtils.write(file, json);
-		} catch(Throwable ex) {
-			Log.d(LOGTAG, "Warning: saveTaskHistory failed: "+ex);
-		}		
+//		try {
+//			File file = getHistoryFile();
+//			SimpleJson sj = new SimpleJson(); // not our favourite, but Jetty JSON was causing weird breakage
+//			String json = sj.toJson(time4task);
+//			FileUtils.write(file, json);
+//		} catch(Throwable ex) {
+//			Log.d(LOGTAG, "Warning: saveTaskHistory failed: "+ex);
+//		}		
 	}
 	
 	static File getHistoryFile() {
-		BobSettings _settings = Bob.dflt==null? new BobSettings() : Bob.dflt.settings;
-		File file = new File(_settings.logDir, "time4task.json");
-		return file;
+		File bobwarehouse = GitBobProjectTask.getGitBobDir(); // // getHistoryFile();
+		File csvfile = new File(bobwarehouse, "bobhistory.csv");
+		return csvfile;
+//		BobSettings _settings = Bob.dflt==null? new BobSettings() : Bob.dflt.settings;
+//		File file = new File(_settings.logDir, "time4task.json");
+//		return file;
 	}
 
 	public static Bob getSingleton() {
@@ -459,10 +479,17 @@ public class Bob {
 			time4task = loadTaskHistory();
 		}
 		String id = buildTask.getDesc().getId();
-		time4task.put(id, new Time());
+		Time now = new Time();
+		time4task.put(id, now);
 		taskThisJVMOnly.add(id);
 //		assert buildTask.skip() : buildTask;
 		// TODO save in a slow thread??
+		
+		File csvfile = getHistoryFile();
+		CSVWriter w = new CSVWriter(csvfile, ',', true);
+		w.write(id, now, buildTask.toString());		
+		w.close(); //flush the edit
+		
 		saveTaskHistory();
 	}
 
