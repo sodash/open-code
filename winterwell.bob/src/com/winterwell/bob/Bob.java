@@ -251,30 +251,18 @@ public class Bob {
 		try {
 			ArrayMap<String,Time> t4t = new ArrayMap();
 			File csvfile = getHistoryFile();
-			CSVSpec spec = new CSVSpec(',', '"', '#');
-			CSVReader r = new CSVReader(csvfile, spec).setNumFields(-1);
-			for (String[] row : r) {
-				try {
-					t4t.put(row[0], new Time(row[1]));
-				} catch(Exception ex) {
-					Log.e(LOGTAG, ex);
+			if (csvfile.exists()) {
+				CSVSpec spec = new CSVSpec(',', '"', '#');
+				CSVReader r = new CSVReader(csvfile, spec).setNumFields(-1);
+				for (String[] row : r) {
+					try {
+						t4t.put(row[0], new Time(row[1]));
+					} catch(Exception ex) {
+						Log.e(LOGTAG, ex);
+					}
 				}
-			}
-			r.close();
-			
-//			File file = getHistoryFile();
-//			if ( ! file.isFile()) {
-//				return new HashMap();
-//			}
-//			String json = FileUtils.read(file);
-//			SimpleJson sj = new SimpleJson();
-//			Map jobj = (Map) sj.fromJson(json);			
-//			for(Object id : jobj.keySet()) {
-//				Object v = jobj.get(id);
-//				Time time = v instanceof Time? (Time) v : new Time(v.toString());
-//				t4t.put(id.toString(), time);
-//			}
-			
+				r.close();
+			}			
 			return t4t;			
 		} catch(Throwable ex) {
 			Log.d(LOGTAG, ex);
@@ -282,17 +270,6 @@ public class Bob {
 		}		
 	}
 
-	private static void saveTaskHistory() {
-//		try {
-//			File file = getHistoryFile();
-//			SimpleJson sj = new SimpleJson(); // not our favourite, but Jetty JSON was causing weird breakage
-//			String json = sj.toJson(time4task);
-//			FileUtils.write(file, json);
-//		} catch(Throwable ex) {
-//			Log.d(LOGTAG, "Warning: saveTaskHistory failed: "+ex);
-//		}		
-	}
-	
 	static File getHistoryFile() {
 		File bobwarehouse = GitBobProjectTask.getGitBobDir(); // // getHistoryFile();
 		File csvfile = new File(bobwarehouse, "bobhistory.csv");
@@ -488,9 +465,7 @@ public class Bob {
 		File csvfile = getHistoryFile();
 		CSVWriter w = new CSVWriter(csvfile, ',', true);
 		w.write(id, now, buildTask.toString());		
-		w.close(); //flush the edit
-		
-		saveTaskHistory();
+		w.close(); //flush the edit		
 	}
 
 	/**
