@@ -536,7 +536,7 @@ public class AppUtils {
 			} else {
 				// dont auto reindex test or live
 				Log.i("ES.init", "To reindex:\n\n"+
-						"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n\n");
+						"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}' -H 'Content-Type:application/json'\n\n");
 			}
 			// and shout fail!
 			//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
@@ -579,7 +579,7 @@ public class AppUtils {
 //								("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
 //								.replace('\'', '"');
 				Log.i("ES.init", "To switch old -> new:\n\n"
-						+"curl http://localhost:9200/_aliases -d '"+switchjson+"'\n\n");
+						+"curl http://localhost:9200/_aliases -d '"+switchjson+"' -H 'Content-Type:application/json'\n\n");
 			}
 			// record fail - but loop over the rest so we catch all the errors in one loop
 			Log.e("init", ex.toString());

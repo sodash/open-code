@@ -2,6 +2,7 @@ package com.winterwell.bob.wwjobs;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.SyncEclipseClasspathTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArraySet;
@@ -247,15 +249,6 @@ public class BuildWinterwellProject extends BuildTask {
 		this.outDir = outDir;
 	}
 	
-	/**
-	 * @deprecated This creates a build-time dependency on a *compiled* version of the main class.
-	 * Which probably blocks command-line invocation. Use the String version instead
-	 * @param mainClass
-	 */
-	public void setMainClass(Class mainClass) {
-		setMainClass(mainClass.getCanonicalName());
-	}
-	
 	public void setMainClass(String mainClass) {
 		this.mainClass = mainClass;
 	}
@@ -360,7 +353,7 @@ public class BuildWinterwellProject extends BuildTask {
 		JarTask jar = new JarTask(tempJar, getBinDir());
 		jar.setDepth(getDepth()+1);
 		jar.setAppend(false);
-		setJarManifest(jar, srcDir, projectDir.getName()+" library (c) Winterwell. All rights reserved.");
+		setJarManifest(jar, srcDir, projectDir.getName()+" library (c) Good-Loop. All rights reserved.");
 		jar.run();
 		if ( ! tempJar.isFile()) throw new FailureException("make jar failed?! "+this+" "+getJar());
 		// replace the old jar
@@ -576,5 +569,39 @@ public class BuildWinterwellProject extends BuildTask {
 	}
 
 	
-	
+
+	/**
+	 * Find jars and move them into tmp-lib
+	 */
+	protected void collectJars(File libBuild) {
+		EclipseClasspath ec = new EclipseClasspath(projectDir);
+		ec.setIncludeProjectJars(true);
+		Set<File> jars = ec.getCollectedLibs();
+		Log.d(LOGTAG, "Dependency graph:\n"
+				+Printer.toString(ec.getDepsFor(), "\n", " <- "));
+		// Create local lib dir			
+		libBuild.mkdirs();
+		assert libBuild.isDirectory();
+		// Ensure desired jars are present
+		for (File jar : jars) {
+			File localJar = new File(libBuild, jar.getName()).getAbsoluteFile();
+			
+			// check versions and pick which one to keep?
+			if (localJar.isFile()) {
+				File newJar = JarTask.pickNewerVersion(localJar, jar);
+				if (newJar.equals(localJar)) continue;
+			}
+			FileUtils.copy(jar, localJar);
+		}
+		
+		// Remove unwanted jars? -- no too dangerous		
+		
+		// This jar
+//		BuildCalstat buildProject = new BuildCalstat();
+//		File jar = buildProject.getJar();
+//		FileUtils.copy(jar, localLib);		
+		
+		System.out.println("Jars: "+Printer.toString(Arrays.asList(libBuild.list()), "\n"));
+	}
+
 }

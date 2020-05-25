@@ -31,7 +31,7 @@ public class BuildBob extends BuildWinterwellProject {
 	public BuildBob() {
 		super(new WinterwellProjectFinder().apply("winterwell.bob"), "bob");
 		incSrc = true;
-		setMainClass(Bob.class);
+		setMainClass(Bob.class.getCanonicalName());
 		
 		// For releasing Bob
 		if (BuildHacks.getServerType()==KServerType.LOCAL) {

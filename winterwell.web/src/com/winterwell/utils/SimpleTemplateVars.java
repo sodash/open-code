@@ -74,10 +74,13 @@ public final class SimpleTemplateVars {
 	 * TODO It will even convert object properties (one deep - not recursive). E.g.
 	 * $person.name This only handles properties that have a no-arg getXXX() method.  
 	 * ??
-	 * @param txtWithVars
+	 * @param txtWithVars Can be blank (returned as-is)
 	 * @return 
 	 */
-	public String process(String txtWithVars) {		
+	public String process(String txtWithVars) {
+		if (Utils.isBlank(txtWithVars)) {
+			return txtWithVars; // blank = no-op
+		}
 		// process js
 		String txt2 = txtWithVars;
 		if (useJS) {
