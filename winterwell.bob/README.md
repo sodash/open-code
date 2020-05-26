@@ -17,6 +17,7 @@ Winterwell runs a flavour of Debian Linux. These instructions assume that you ha
 
  - Java
  - maven (apt install mvn)
+ - optional: nodejs and npm
 
 ### Install Bob
 
@@ -47,11 +48,11 @@ Suppose your project is in the folder `myproject`, with a Bob build script in `m
 2. Run Bob:
 	- (a) If you installed via npm:
 	   
-		bob
+		`bob`
 
 	- (b) If you installed by downloading the bob-all.jar, invoke it:
 	
-		java -ea -jar bob-all.jar
+		`java -ea -jar bob-all.jar`
 
 Bob should find that build script, compile, and execute it.
 
