@@ -493,8 +493,8 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 			for (BuildTask bs : deps) {
 				// TODO use getID and getName as [label=]
 				String b = labelTask(bs.getDesc());
-				FileUtils.append(
-						'"'+a+"\" -> \""+b+"\"\n", getSettings().dotFile);
+				BobLog.logDot('"'+a+"\" -> \""+b+"\"\n");
+				
 				bs.setDepth(getDepth()+1);
 				// Do it
 				bs.run();

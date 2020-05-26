@@ -250,7 +250,7 @@ public class Bob {
 		// load from file
 		try {
 			ArrayMap<String,Time> t4t = new ArrayMap();
-			File csvfile = getHistoryFile();
+			File csvfile = BobLog.getHistoryFile();
 			if (csvfile.exists()) {
 				CSVSpec spec = new CSVSpec(',', '"', '#');
 				CSVReader r = new CSVReader(csvfile, spec).setNumFields(-1);
@@ -268,15 +268,6 @@ public class Bob {
 			Log.d(LOGTAG, ex);
 			return new HashMap();
 		}		
-	}
-
-	static File getHistoryFile() {
-		File bobwarehouse = GitBobProjectTask.getGitBobDir(); // // getHistoryFile();
-		File csvfile = new File(bobwarehouse, "bobhistory.csv");
-		return csvfile;
-//		BobSettings _settings = Bob.dflt==null? new BobSettings() : Bob.dflt.settings;
-//		File file = new File(_settings.logDir, "time4task.json");
-//		return file;
 	}
 
 	public static Bob getSingleton() {
@@ -344,7 +335,7 @@ public class Bob {
 			
 			// clean dot?
 			if (bob.settings.dotFile != null && bob.settings.depth==0) {
-				FileUtils.write(bob.settings.dotFile, "digraph Tasks {\n");
+				BobLog.logDot("\n\ndigraph Tasks"+argsLeft.get(0)+" {\n");
 			}
 			
 			// Build each target
@@ -368,7 +359,7 @@ public class Bob {
 			bob.close();
 			
 			if (bob.settings.dotFile != null && bob.settings.depth==0) {
-				FileUtils.append("}\n", bob.settings.dotFile);
+				BobLog.logDot("}\n\n");
 			}
 			
 			// report
@@ -462,7 +453,7 @@ public class Bob {
 //		assert buildTask.skip() : buildTask;
 		// TODO save in a slow thread??
 		
-		File csvfile = getHistoryFile();
+		File csvfile = BobLog.getHistoryFile();
 		CSVWriter w = new CSVWriter(csvfile, ',', true);
 		w.write(id, now, buildTask.toString());		
 		w.close(); //flush the edit		
