@@ -3,6 +3,8 @@
 
 See also: https://www.winterwell.com/software/bob/
 
+<img style='float:right' src='https://www.winterwell.com/res/images/bob-the-builder-edited-scaled.png' alt='Bob the Builder'>
+
 ## Can we build it?
 
 "Bob" or "winterwell.bob" is a java project which leverages maven's abilities, in order to ultimately build other winterwell projects.
