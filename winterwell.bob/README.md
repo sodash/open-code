@@ -24,7 +24,8 @@ Recommended: Use npm:
 
 	`npm i -g java-bob`
 
-Then run `bob` -- the first run will download the jar file to ~/bin.
+Then run `bob`   
+The first run will download the jar file to ~/bin/bob-all.jar.
 
 Alternative: Download bob-all.jar from <https://www.winterwell.com/software/downloads/bob-all.jar>
 
@@ -66,9 +67,9 @@ Or 	`bob BuildMyProject` should find it.
 This folder is auto-generated and managed by Bob. It contains
 
  - `bobhistory.csv` The run history. Delete this file to make Bob do everything from scratch.
- Note: this is big-stick equivalent to running `bob -clean`.
+ Note: this is roughly equivalent to running `bob -clean`.
  
- - `calls.dot` Call graph info.
+ - `calls.dot` Call graph info in graphviz dot format.
 
  - git clones of dependency projects.
  
@@ -80,4 +81,10 @@ side-effects.
 
 ## Issues
 
-Something broke? Email Good-Loop support or Daniel Winterstein
+Something broke? 
+
+Maybe run `bob -upgrade` to make sure you have the latest Bob?
+
+Maybe do a clean build `bob -clean`
+
+Still broken? Email Good-Loop support or Daniel Winterstein
