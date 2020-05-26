@@ -31,6 +31,7 @@ import com.winterwell.utils.time.Time;
 import com.winterwell.web.LoginDetails;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.data.XId;
+import com.winterwell.web.email.EmailConfig;
 import com.winterwell.youagain.client.App2AppAuthClient;
 import com.winterwell.youagain.client.AuthToken;
 import com.winterwell.youagain.client.YouAgainClient;
@@ -343,7 +344,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			Log.i("init", "No Emailer: no login details");
 			return null;
 		}
-		Emailer emailer = new Emailer(ld);
+		Emailer emailer = new Emailer(ec);
 		Dep.set(Emailer.class, emailer);
 		return emailer;
 	}

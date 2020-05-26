@@ -9,11 +9,14 @@ import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.ConfigException;
 import com.winterwell.web.LoginDetails;
+import com.winterwell.web.app.Emailer;
 import com.winterwell.web.data.XId;
+import com.winterwell.web.email.EmailConfig;
 import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
 
 /**
+ * TODO replace with {@link Emailer}
  * Copy pasta from YouAgainEmailer
  * @author daniel
  *
@@ -22,7 +25,7 @@ public class HackyEmailer implements Closeable {
 
 	
 	private static boolean initFlag;
-	private static LoginDetails sin;
+	private static EmailConfig sin;
 	private static String from;
 
 	public static void init() {
@@ -36,13 +39,14 @@ public class HackyEmailer implements Closeable {
 				throw new ConfigException("Please symlink the logins/local.properties file or make a file with email login details here: "+propsFile+".");
 			}
 		}
-		Properties props = FileUtils.loadProperties(propsFile);
-		LoginDetails ld = new LoginDetails(props.getProperty("server").trim(), 
-				props.getProperty("from").trim(), props.getProperty("password").trim(), 25);
-		ld.put(SMTPClient.USE_SSL, false);
-		XId xid = new XId(ld.loginName, "email");
-		sin = ld;
-		from = sin.loginName;
+		Properties props = FileUtils.loadProperties(propsFile);				
+		sin = new EmailConfig();
+		sin.emailServer = props.getProperty("server").trim();
+		sin.emailFrom = props.getProperty("from").trim();
+		sin.emailPassword = props.getProperty("password").trim();
+		sin.emailPort = 25;
+		sin.emailSSL = false;		
+		from = sin.emailFrom;
 	}
 	
 	public HackyEmailer() {
