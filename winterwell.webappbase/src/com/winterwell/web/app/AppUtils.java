@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.sogive.server.payment.IForSale;
+
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
@@ -1042,6 +1044,17 @@ public class AppUtils {
 			Log.d("init.auth", "AuthToken registered with name+password "+token.getXId());
 		}
 		return Dep.set(AuthToken.class, token);
+	}
+
+
+	/**
+	 * @deprecated Better to manage the save-path directly.
+	 * @param item
+	 * @param state
+	 */
+	public static void doSaveEdit(AThing item, WebRequest state) {
+		ESPath path = getPath(null, item.getClass(), item.getId(), item.getStatus());
+		doSaveEdit(path, new JThing(item), state);		
 	}
 
 
