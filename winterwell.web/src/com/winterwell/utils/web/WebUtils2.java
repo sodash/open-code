@@ -1311,7 +1311,17 @@ public class WebUtils2 extends WebUtils {
 				return url;
 			}
 			try {
-				HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+				// HACK: Google search results use a js redirect instead of a proper http redirect.
+				URL _url = new URL(url);
+				if (_url.getHost()!=null && _url.getHost().endsWith("google.com")) {
+					String googleUrl = WebUtils2.getQueryParameter(url, "url");
+					if (googleUrl!=null) {
+						url = googleUrl;
+						_url = new URL(url);
+					}
+				}
+				// fetch
+				HttpURLConnection connection = (HttpURLConnection) _url.openConnection();
 				connection.setFollowRedirects(false);
 				connection.setDoOutput(false);
 				connection.connect();

@@ -28,6 +28,14 @@ import eu.medsea.mimeutil.MimeUtil;
 public class WebUtils2Test {
 
 	@Test
+	public void testResolveRedirectsGoogle() {
+		String gu = "https://www.google.com/url?rct=j&sa=t&url=https://www.weareumi.co.uk/news/sectors/creative-media/good-loop-secures-soap-glory-campaign-against-hygiene-poverty&ct=ga&cd=CAEYAioUMTQ4MzAwMjk0NzczNDc4MTk5NDUyGjQ4ZmEyZmZhY2M4OTUyZGU6Y29tOmVuOlVT&usg=AFQjCNFFs6KqQS9eWjEW_mLxZClfiKostg;";
+		String u = WebUtils2.resolveRedirectsInUrl(gu, null);
+		assert ! u.contains("google.com") : u;
+		assert u.equals("https://www.weareumi.co.uk/news/sectors/creative-media/good-loop-secures-soap-glory-campaign-against-hygiene-poverty") : u;
+	}
+	
+	@Test
 	public void testCleanUp() {
 		{
 			String u = WebUtils2.cleanUp("http://bbc.co.uk/foo=bar&um=whatever");

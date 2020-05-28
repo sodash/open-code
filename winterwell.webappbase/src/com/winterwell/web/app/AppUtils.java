@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.sogive.server.payment.IForSale;
-
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
