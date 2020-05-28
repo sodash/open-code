@@ -455,6 +455,7 @@ public class ReflectionUtils {
 
 	private static void checkCanSetField(Field f) {
 		if (f.getType() == Boolean.class || isaNumber(f.getType())) {
+			//  why not??
 			throw new IllegalArgumentException("Too primitive - Dont set "+f);
 		}
 	}
