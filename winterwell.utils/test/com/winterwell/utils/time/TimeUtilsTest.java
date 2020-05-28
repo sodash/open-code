@@ -129,6 +129,12 @@ public class TimeUtilsTest {
 		assert f.equals(new Time(3001, 1, 1)) : f;
 	}
 	
+	@Test
+	public void testDateSpaceTime() {
+		String dt = "2020-05-14 13:19:19";
+		Time t = TimeUtils.parseExperimental(dt);
+		assert t.getYear() == 2020: t;		
+	}
 
 	@Test
 	public void parseExperimental_iso() {

@@ -22,8 +22,8 @@ import com.winterwell.utils.Utils;
  * @author daniel
  *
  */
-public class TimeParser {
-
+public class TimeParser {	
+	
 	/**
 	 * Parse a string representing a time/date. Uses the
 	 * {@link SimpleDateFormat} format.
@@ -184,6 +184,12 @@ public class TimeParser {
 	}
 	
 	/**
+	 * yyyy-MM-dd -- be careful to sanity check values
+	 */
+	static final Pattern pISODATE = Pattern.compile("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)");
+	static final Pattern pMONTH = Pattern.compile("jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec");
+	static final Pattern pDAY = Pattern.compile("mon|tue|wed|thu|fri|sat|sun");
+	/**
 	 * TODO break this out into a TimeParser class so we can have language & timezone support.
 	 * WARNING: will return a point time (a 0-length period) for many cases
 	 * @param s a period or a time. Anything really, but only English.
@@ -192,12 +198,14 @@ public class TimeParser {
 	 * @throws IllegalArgumentException
 	 */
 	public Period parsePeriod(String s, AtomicBoolean isRelative) throws IllegalArgumentException {
+		// split?
 		if (s.contains(" to ")) {
 			String[] bits = s.split(" to ");
 			Time t0 = parseExperimental(bits[0], isRelative);
 			Time t1 = parseExperimental(bits[1], isRelative);
 			return new Period(t0, t1);
 		}
+				
 		s = s.trim().toLowerCase();
 		// standard?
 		try {
@@ -212,12 +220,27 @@ public class TimeParser {
 		} catch (Exception e) {
 			// oh well
 		}
+		
+		// TODO use this more
+		TimeFragment tf = new TimeFragment();
+		
+		{	// Do we have an ISO date? (but a non-ISO time) e.g. "yyyy-MM-dd HH:mm" or "yyyy-MM-dd HH:mm:ss"		
+			Matcher m = pISODATE.matcher(s);
+			if (m.find()) {				
+				int y = Integer.valueOf(m.group(1));
+				int mm = Integer.valueOf(m.group(2));
+				int d = Integer.valueOf(m.group(3));
+				if (mm>0 && mm<13 && d>0 && d<32) {
+					Time date = new Time(y,mm,d);
+					tf.setDate(date);
+				}
+			}
+		}
 
 		// Use regexs to pick out markers for day, month, hour, dt
-		String month = null, day = null, hour = null;
-		int year = -1;
 		// - build a time object based on what we find
 
+		int year = -1;
 		{ // year
 			Matcher m = TimeUtils.YEAR.matcher(s);
 			if (m.find()) {
@@ -226,21 +249,24 @@ public class TimeParser {
 				if (m.group().contains("b")) {
 					year = -year;
 				}
+				tf.put(Calendar.YEAR, year);
 			}
 		}
 
+		String month = null;
 		{ // month markers -- 3 letters is enough to id a month
-			Pattern MONTH = Pattern
-					.compile("jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec");
-			Matcher m = MONTH.matcher(s);
+			Matcher m = pMONTH.matcher(s);
 			if (m.find()) {
 				month = m.group();
+				int mi = pMONTH.pattern().indexOf(month);
+				int mii = mi / 4;
+				tf.setMonth(mii+1);
 			}
 		}
 
-		{ // day of week
-			Pattern DAY = Pattern.compile("mon|tue|wed|thu|fri|sat|sun");
-			Matcher m = DAY.matcher(s);
+		String day = null;
+		{ // day of week			
+			Matcher m = pDAY.matcher(s);
 			if (m.find()) {
 				day = m.group();
 				// guard against mon = month false match
@@ -250,9 +276,16 @@ public class TimeParser {
 						day = m.group();
 					}
 				}
+				// to index
+				if (day!=null) {
+					int idow = pDAY.pattern().indexOf(day);
+					int dow = idow / 4;
+					tf.put(Calendar.DAY_OF_WEEK, dow);
+				}
 			}
 		}
 		
+		String hour = null;
 		{ // TODO hour:minute
 			Pattern HOUR = Pattern.compile("(\\d\\d):(\\d\\d)|(\\d\\d?)am|(\\d\\d?)pm");
 			Matcher m = HOUR.matcher(s);
@@ -379,9 +412,10 @@ public class TimeParser {
 		// a time? e.g. "7pm", "7pm today"??
 		// TODO an actual time description, like "Monday 1st, December 1968"
 
-		Calendar cal = new Time().getCalendar();
-		if (year != -1) {
-			cal.set(Calendar.YEAR, year);
+		// what do we have?
+		if (tf.numset() > 1) {
+			Time tft = tf.getTime();
+			if (tft!=null) return new Period(tft);
 		}
 
 		// parse failed

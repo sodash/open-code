@@ -15,19 +15,35 @@ public class TimeFragment {
 	/**
 	 * Calendar field-index to value (String or Integer)
 	 */
+
 	private Map<Integer, Object> values = new HashMap();
 
+	@Override
+	public String toString() {
+		return "TimeFragment[values=" + values +", time="+getTime()+"]";
+	}
+	/**
+	 * How many properties have been set?
+	 * @return
+	 */
+	public int numset() {
+		return values.size();
+	}
 	/**
 	 * Dangerous: this uses base (normally `now`) as a default to work from! 
 	 * @return the time represented by this.
 	 * TODO a getPeriod() version, which could better represent eg. "2018"
+	 * @return null if base is unset, or day is unset 
 	 */
     public Time getTime() {
-    	GregorianCalendar cal = base; // modify base?! a bit dodgy
+    	if (base==null) {
+    		return null;
+    	}
     	// do we have a date?
 		if ( ! isDaySpecific()) {
 			return null;
-		}    	
+		}
+    	GregorianCalendar cal = (GregorianCalendar) base.clone();    	
     	for(Map.Entry<Integer, Object> me : values.entrySet()) {    		    		
     		Integer vi = getIntValue(me.getKey(), me.getValue());
     		if (vi != null) {
@@ -158,5 +174,25 @@ public class TimeFragment {
     public void put(int calendarField, int value) {
         values.put(calendarField, value);
     }
+
+    /**
+     * Convenience for set year, month, day
+     * @param date
+     */
+	public void setDate(Time date) {
+		put(Calendar.YEAR, date.getYear());
+		// why is month zero-indexed when other fields aren't?
+		put(Calendar.MONTH, date.getMonth() - 1);
+		put(Calendar.DAY_OF_MONTH, date.getDayOfMonth());
+	}
+
+	/**
+	 * 
+	 * @param i 1-12 (not zero-indexed)
+	 */
+	public void setMonth(int i) {
+		assert i > 0 && i < 13 : i;
+		put(Calendar.MONTH, i);
+	}
     
 }
