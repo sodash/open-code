@@ -1404,7 +1404,7 @@ public class WebUtils2 extends WebUtils {
 		
 		// Note: wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header 
 		// when the credentials flag is true (ie with cookies).
-		// We rely on the caller to explicitly tell us this (see hooru.js). By default ajax does not!
+		// We rely on the caller to explicitly tell us this (see youagain.js). By default ajax does not!
 		boolean wc = state.get(WITH_CREDENTIALS);
 		String origin = state.getRequest().getHeader("Origin");
 		String originOut = origin; 
