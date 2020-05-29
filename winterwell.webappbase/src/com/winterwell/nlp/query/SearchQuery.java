@@ -173,6 +173,8 @@ public class SearchQuery implements Serializable, IHasJson {
 	}
 
 	/**
+	 * @deprecated - probably worth a rewrite
+	 * 
 	 * Disjunctive normal form, which is what we need for pulling data from
 	 * twitter.
 	 * @return a top-level OR containing only ANDs. 
@@ -326,6 +328,7 @@ public class SearchQuery implements Serializable, IHasJson {
 	 */
 	public boolean matches(String text) {
 		if (canonicalise) {
+			// NB: this will strip punctuation from the text
 			text = StrUtils.toCanonical(text.toLowerCase());
 		}
 		getParseTree();
@@ -453,9 +456,7 @@ public class SearchQuery implements Serializable, IHasJson {
 	List parse() {
 		if (parseTree!=null) return parseTree;
 		String searchTerm = raw;
-		if (canonicalise) {
-			searchTerm = StrUtils.toCanonical(searchTerm);
-		}
+		// NB: canonicalise at the top-level would lose brackets. So do it at the leaf level 
 		List output = new ArrayList();
 		output.add(KEYWORD_AND);
 		ArrayList<List> stack = new ArrayList();
@@ -574,10 +575,16 @@ public class SearchQuery implements Serializable, IHasJson {
 				stack.add(open);
 			}
 			
-			// Just a normal keyword
+			// Just a normal keyword!
 			// - was it quoted? (different match behaviour)
 			// Note: i>1 since we've pulled a word off
+			if (canonicalise) {
+				word = StrUtils.toCanonical(word);
+			}
 			if (searchTerm.charAt(startI) == '"') {
+				// NB: canonicalise could mess with desired "" matching behaviour.
+				// However since we're using canonicalise on the input in matches(), we better apply
+				// it here too.
 				open.add(Arrays.asList(KEYWORD_QUOTED, word));
 			} else {
 				open.add(word);
