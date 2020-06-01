@@ -317,7 +317,8 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 
 		// skip repeat/recent runs?
 		// ...NB: no skip for the top level task
-		int activeTasks = Bob.getSingleton().getBobCount();
+		int activeTasks = getSettings().depth + getDepth();
+//				Bob.getSingleton().getBobCount() + ;
 		if (activeTasks!=0) {
 			if (skip()) {
 				skipFlag = true;
@@ -503,8 +504,11 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 		return true;
 	}
 
-	transient int depth;
+	private transient int depth;
 
+	/**
+	 * @return 0 for top-level
+	 */
 	protected int getDepth() {		
 		return depth;
 	}

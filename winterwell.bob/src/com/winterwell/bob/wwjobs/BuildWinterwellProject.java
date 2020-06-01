@@ -200,6 +200,7 @@ public class BuildWinterwellProject extends BuildTask {
 		File fatjar = new File(projectName+"-all.jar");
 //		System.out.println(Printer.toString(jars,"\n\t"));
 		BigJarTask jt = new BigJarTask(fatjar, jars);
+		jt.setDepth(getDepth()+1);
 		setJarManifest(jt, projectDir, 
 				projectDir.getName()+" fat-jar (c) Winterwell. All rights reserved.");
 		jt.run();
