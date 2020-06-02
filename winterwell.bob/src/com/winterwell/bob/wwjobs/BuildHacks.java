@@ -71,7 +71,7 @@ public class BuildHacks {
 			"stross", "aardvark", "burgess", "kornbluth"
 			);
 	private static final List<String> TEST_MACHINES = Arrays.asList(
-			"hugh", "mail.soda.sh", "mail", "mail.sodash.net"
+			"hugh", "baker", "mail.soda.sh", "mail", "mail.sodash.net"
 			);
 
 	public static String getFullHostname() {
