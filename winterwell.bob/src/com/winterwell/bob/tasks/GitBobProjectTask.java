@@ -56,11 +56,13 @@ public class GitBobProjectTask extends BuildTask {
 			// stash?
 			if (stashLocalChanges) {
 				GitTask gt0 = new GitTask(GitTask.STASH, dir);
+				gt0.setDepth(getDepth()+1);
 				gt0.run();
 				gt0.close();
 			}
 			// pull
 			GitTask gt = new GitTask(GitTask.PULL, dir);
+			gt.setDepth(getDepth()+1);
 			gt.run();
 			gt.close();
 		} else {
@@ -69,6 +71,7 @@ public class GitBobProjectTask extends BuildTask {
 			boolean ok = dir.getAbsoluteFile().mkdirs();
 			if ( ! ok) throw new IOException("Could not make directory "+dir);
 			GitTask gt = new GitTask(GitTask.CLONE, dir);
+			gt.setDepth(getDepth()+1);
 			gt.addArg(gitUrl);
 			gt.addArg(dir.getAbsolutePath());
 			gt.run();
@@ -77,6 +80,7 @@ public class GitBobProjectTask extends BuildTask {
 		
 		// build				
 		ForkJVMTask childBob = new ForkJVMTask();
+		childBob.setDepth(getDepth()+1);
 		File pd;
 		if (projectSubDir!=null) {			
 			pd = projectSubDir;

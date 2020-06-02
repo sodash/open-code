@@ -21,7 +21,7 @@ public class BobSettings {
 
 	public static final Key<Boolean> VERBOSE = new Key<Boolean>("verbose");
 
-	public final static String VERSION_NUMBER = "0.9.48";
+	public final static String VERSION_NUMBER = "1.0.2";
 	
 	@Option(tokens="-cp,-classpath", description="Classpath used for dynamically compiling build scripts. Uses the file1:file2 format of Java")
 	// NB: This is not the classpath used for CompileTasks which are part of a build script run.
@@ -61,7 +61,7 @@ public class BobSettings {
 	@Option(tokens = "-v,-verbose")
 	public boolean verbose;
 	
-	@Option(description="Set by Bob when making recursive child Bobs")
+	@Option(description="Set by Bob when making recursive child Bob. 0 for top-level")
 	public int depth;
 
 	@Option(description="Save call dependency graph in dot format")

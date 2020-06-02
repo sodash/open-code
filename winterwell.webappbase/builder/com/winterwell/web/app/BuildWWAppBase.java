@@ -12,13 +12,7 @@ public class BuildWWAppBase extends BuildWinterwellProject {
 
 	@Override
 	public List<BuildTask> getDependencies() {
-		List<BuildTask> deps = super.getDependencies();
-
-//		// Lombok - not used anymore for robust builds :'(
-//		MavenDependencyTask mdt = new MavenDependencyTask();
-//		mdt.addDependency("org.projectlombok:lombok:1.18.10");
-//		deps.add(mdt);
-		
+		List<BuildTask> deps = super.getDependencies();		
 		return deps;
 	}
 	

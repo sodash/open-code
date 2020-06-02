@@ -62,7 +62,7 @@ public final class Report implements Serializable {
 		return time;
 	}
 
-	public final Thread thread = Thread.currentThread();
+	final String thread = Thread.currentThread().toString();
 	
 	/**
 	 * [time] level #tag message details context thread

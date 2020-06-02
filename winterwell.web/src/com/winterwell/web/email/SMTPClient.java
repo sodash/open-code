@@ -16,6 +16,7 @@ import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
 import com.winterwell.utils.Key;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -44,8 +45,10 @@ final class SMTPAuthenticator extends javax.mail.Authenticator {
 }
 
 /**
- * Send emails via SMTP. Uses http://code.google.com/p/javamail-android/ which
- * is under BSD license.
+ * Send emails via SMTP. 
+ * 
+ * See:
+ * https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html
  * 
  * <p>
  * Weird behaviour: if multiple Session objects are created, some
@@ -83,9 +86,34 @@ public class SMTPClient implements Closeable {
 
 	private Session smtpSession;
 
-	public SMTPClient(LoginDetails smtp) {
-		assert smtp != null;
-		this.loginDetails = smtp;
+	private EmailConfig config;
+
+	public SMTPClient(EmailConfig config) {
+		this.loginDetails = config.getLoginDetails();
+		this.config = config;
+	}
+
+	public SMTPClient(LoginDetails ld) {
+		this(configFromLoginDetails(ld));
+	}
+
+	private static EmailConfig configFromLoginDetails(LoginDetails ld) {
+		EmailConfig ec = new EmailConfig();
+		ec.emailPort = ld.port;
+		ec.emailFrom = ld.loginName;
+		ec.emailPassword = ld.password;
+		ec.emailServer = ld.server;
+		// copy properties, like SSL or plaintext (SMTPClient.USE_SSL)?
+		for(Key k : ld.getKeys()) {
+			Object v = ld.get(k);
+			try {				
+				ReflectionUtils.setPrivateField(ec, k.name, v);
+			} catch(Throwable ex) {
+				Log.e("smtp", "Unable to pass on LoginDetails prop "+k+"="+v+" to EmailConfig");
+			}
+		}
+
+		return ec;
 	}
 
 	/**
@@ -109,7 +137,7 @@ public class SMTPClient implements Closeable {
 		Boolean ssl = loginDetails.get(USE_SSL);
 		if (ssl != null && ssl) {
 			protocol = "smtps";
-			props.put("mail.transport.protocol", protocol);
+			props.put("mail.transport.protocol", protocol);			
 		}
 		// default is infinite timeout - let's not do that
 		// set connection and IO timeouts
@@ -117,6 +145,9 @@ public class SMTPClient implements Closeable {
 		props.put("mail." + protocol + ".timeout", TIMEOUT_MILLISECS);
 		// -- Attaching to default Session, or we could start a new one --
 		props.put("mail." + protocol + ".host", loginDetails.server);
+		if (Utils.yes(config.starttls)) {
+			props.put("mail." + protocol + ".starttls.enable", "true");
+		}
 		int port = loginDetails.port;
 		if (port != 0) {
 			props.put("mail." + protocol + ".port", port);

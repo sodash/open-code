@@ -14,7 +14,7 @@ import com.winterwell.utils.StrUtils;
  * 
  * Just a String wrapper for some type safety.
  * @author daniel
- *
+ * @see DataController in Profiler
  */
 public final class Dataspace extends AString {
 	private static final long serialVersionUID = 1L;

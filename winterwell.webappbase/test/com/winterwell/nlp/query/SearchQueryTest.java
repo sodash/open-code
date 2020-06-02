@@ -10,6 +10,26 @@ import org.junit.Test;
  */
 public class SearchQueryTest {
 
+
+	@Test
+	public void testParseTreeAndOr() {
+		{
+			String s = "(Andris OR AU) AND holiday";
+			SearchQuery sq = new SearchQuery(s);
+			List pt = sq.getParseTree();
+			String pts = pt.toString();
+			assert pts.equals("[and, [or, Andris, AU], holiday]") : pts;
+		}
+		{
+			String s = "(Andris OR AU) AND holiday";
+			SearchQuery sq = new SearchQuery(s);
+			sq.setCanonicaliseText(true);
+			List pt = sq.getParseTree();
+			String pts = pt.toString();
+			assert pts.equals("[and, [or, andris, au], holiday]") : pts;
+		}
+	}
+	
 	@Test
 	public void testIdWithSpace() {
 		{	// keyword is fine

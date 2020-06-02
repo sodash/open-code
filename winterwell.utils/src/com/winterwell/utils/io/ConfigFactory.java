@@ -213,8 +213,10 @@ public class ConfigFactory {
 			cb.setFromSystemProperties(null);
 			// check several config files
 			List<File> propsPath = getPropFileOptions(configClass);
-			for(File pp : propsPath) {				
-				cb.set(pp);
+			for(File pp : propsPath) {		
+				if (pp.isFile()) {
+					cb.set(pp);
+				}
 			}
 			// args
 			cb.setFromMain(args);

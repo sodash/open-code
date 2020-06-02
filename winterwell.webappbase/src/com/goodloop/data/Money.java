@@ -120,7 +120,7 @@ implements Comparable<Money>, IHasJson {
 	}
 
 	/**
-	 * @deprecated dubious need
+	 * Copy currency, value, name
 	 * @param copyMe
 	 */
 	public Money(Money copyMe) {

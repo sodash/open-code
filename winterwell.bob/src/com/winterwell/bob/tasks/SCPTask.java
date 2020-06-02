@@ -189,6 +189,7 @@ public class SCPTask extends ProcessTask {
 				FileUtils.move(new File(tempPath), localFile);
 			} else {
 				RemoteTask mvTask = new RemoteTask(userAtServer, "mv "+tempPath+" "+remotePath);
+				mvTask.setDepth(getDepth()+1);
 				mvTask.run();
 			}
 		}

@@ -2,6 +2,7 @@ package com.winterwell.bob.wwjobs;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.SyncEclipseClasspathTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArraySet;
@@ -198,6 +200,7 @@ public class BuildWinterwellProject extends BuildTask {
 		File fatjar = new File(projectName+"-all.jar");
 //		System.out.println(Printer.toString(jars,"\n\t"));
 		BigJarTask jt = new BigJarTask(fatjar, jars);
+		jt.setDepth(getDepth()+1);
 		setJarManifest(jt, projectDir, 
 				projectDir.getName()+" fat-jar (c) Winterwell. All rights reserved.");
 		jt.run();
@@ -245,15 +248,6 @@ public class BuildWinterwellProject extends BuildTask {
 	 */
 	public void setOutDir(File outDir) {
 		this.outDir = outDir;
-	}
-	
-	/**
-	 * @deprecated This creates a build-time dependency on a *compiled* version of the main class.
-	 * Which probably blocks command-line invocation. Use the String version instead
-	 * @param mainClass
-	 */
-	public void setMainClass(Class mainClass) {
-		setMainClass(mainClass.getCanonicalName());
 	}
 	
 	public void setMainClass(String mainClass) {
@@ -358,8 +352,9 @@ public class BuildWinterwellProject extends BuildTask {
 		// Jar	
 		File tempJar = File.createTempFile("temp", ".jar");
 		JarTask jar = new JarTask(tempJar, getBinDir());
+		jar.setDepth(getDepth()+1);
 		jar.setAppend(false);
-		setJarManifest(jar, srcDir, projectDir.getName()+" library (c) Winterwell. All rights reserved.");
+		setJarManifest(jar, srcDir, projectDir.getName()+" library (c) Good-Loop. All rights reserved.");
 		jar.run();
 		if ( ! tempJar.isFile()) throw new FailureException("make jar failed?! "+this+" "+getJar());
 		// replace the old jar
@@ -369,6 +364,7 @@ public class BuildWinterwellProject extends BuildTask {
 		// source code?
 		if (incSrc) {
 			JarTask jar2 = new JarTask(getJar(), new File(projectDir, "src"));
+			jar2.setDepth(getDepth()+1);
 			jar2.setAppend(true);
 			jar2.run();			
 		}
@@ -398,6 +394,7 @@ public class BuildWinterwellProject extends BuildTask {
 		}
 		try {
 			SyncEclipseClasspathTask sync = new SyncEclipseClasspathTask(projectDir);
+			sync.setDepth(getDepth()+1);
 			sync.run();
 		} catch(Exception ex) {
 			// allow failure eg file permissions as this is a nicety not a vital build step
@@ -450,6 +447,7 @@ public class BuildWinterwellProject extends BuildTask {
 			String remoteJar = "/home/winterwell/public-software/"+getJar().getName();
 			SCPTask scp = new SCPTask(getJar(), "winterwell@winterwell.com",				
 					remoteJar);
+			scp.setDepth(getDepth()+1);
 			// this is online at: https://www.winterwell.com/software/downloads
 			scp.setMkdirTask(false);			
 			scp.runInThread();
@@ -459,6 +457,7 @@ public class BuildWinterwellProject extends BuildTask {
 			String remoteJar = "/home/winterwell/public-software/"+getFatJar().getName();
 			SCPTask scp = new SCPTask(getFatJar(), "winterwell@winterwell.com",				
 					remoteJar);
+			scp.setDepth(getDepth()+1);
 			// this is online at: https://www.winterwell.com/software/downloads
 			scp.setMkdirTask(false);			
 			scp.runInThread();
@@ -507,7 +506,8 @@ public class BuildWinterwellProject extends BuildTask {
 		if (compile) {
 			try {
 				assert projectDir != null : this;
-				CompileTask compile = new CompileTask(srcDir, binDir);				
+				CompileTask compile = new CompileTask(srcDir, binDir);
+				compile.setDepth(getDepth()+1);
 				// classpath
 				EclipseClasspath ec = new EclipseClasspath(projectDir);
 				ec.setIncludeProjectJars(true);
@@ -570,5 +570,39 @@ public class BuildWinterwellProject extends BuildTask {
 	}
 
 	
-	
+
+	/**
+	 * Find jars and move them into tmp-lib
+	 */
+	protected void collectJars(File libBuild) {
+		EclipseClasspath ec = new EclipseClasspath(projectDir);
+		ec.setIncludeProjectJars(true);
+		Set<File> jars = ec.getCollectedLibs();
+		Log.d(LOGTAG, "Dependency graph:\n"
+				+Printer.toString(ec.getDepsFor(), "\n", " <- "));
+		// Create local lib dir			
+		libBuild.mkdirs();
+		assert libBuild.isDirectory();
+		// Ensure desired jars are present
+		for (File jar : jars) {
+			File localJar = new File(libBuild, jar.getName()).getAbsoluteFile();
+			
+			// check versions and pick which one to keep?
+			if (localJar.isFile()) {
+				File newJar = JarTask.pickNewerVersion(localJar, jar);
+				if (newJar.equals(localJar)) continue;
+			}
+			FileUtils.copy(jar, localJar);
+		}
+		
+		// Remove unwanted jars? -- no too dangerous		
+		
+		// This jar
+//		BuildCalstat buildProject = new BuildCalstat();
+//		File jar = buildProject.getJar();
+//		FileUtils.copy(jar, localLib);		
+		
+		System.out.println("Jars: "+Printer.toString(Arrays.asList(libBuild.list()), "\n"));
+	}
+
 }

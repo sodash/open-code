@@ -420,67 +420,80 @@ public class AppUtils {
 	 * @param dbclasses
 	 */
 	public static void initESIndices(KStatus[] main, Class... dbclasses) {
+		initESIndices(main, null, dbclasses);
+	}
+	
+	public static void initESIndices(KStatus[] main, CharSequence dataspace, Class... dbclasses) {
 		IESRouter esRouter = Dep.get(IESRouter.class);
 		ESHttpClient es = Dep.get(ESHttpClient.class);
+		
+		// if a class fails -- do the others, then report the failure
 		ESException err = null;
+		
 		for(KStatus s : main) {
 			for(Class klass : dbclasses) {
-				err = initESindex2(esRouter, es, err, s, klass);
+				try {
+					initESindex2(esRouter, es, s, klass, dataspace);
+				} catch (ESException ex) {
+					Log.w("init.ES", ex);
+					if (err==null) err = ex;					
+				}
 			}
 		}
 		if (err!=null) throw err;
 	}
 
 
-	private static ESException initESindex2(
-			IESRouter esRouter, ESHttpClient es, ESException err, KStatus s,
-			Class klass) 
+	private static void initESindex2(
+			IESRouter esRouter, ESHttpClient es, KStatus s,
+			Class klass, CharSequence dataspace) 
 	{		
-		ESPath path = esRouter.getPath(null, klass, null, s);
+		ESPath path = esRouter.getPath(dataspace, klass, null, s);
 		String index = path.index();
 		if (es.admin().indices().indexExists(index)) {
-			return err;
+			return;
 		}
-		Log.d("ES.init", "init index for "+klass+"...");
-		try {					
-			// make with an alias to allow for later switching if we change the schema
-			String baseIndex = index+"_"+es.getConfig().getIndexAliasVersion();
-			// what if base-index wo alias??
-			if (es.admin().indices().indexExists(baseIndex)) {
-				Log.d("ES.init", "Base index "+baseIndex+" exists but not the alias "+index+" - Let's link them...");
-				IndicesAliasesRequest alias = es.admin().indices().prepareAliases();
-				alias.addAlias(baseIndex, index);
-				alias.setDebug(true);
-				alias.get().check();
-			} else {
-				// make a new index
-				CreateIndexRequest pi = es.admin().indices().prepareCreate(baseIndex);
-				pi.setDebug(true);
-				pi.setFailIfAliasExists(true);
-				pi.setAlias(index);
-				IESResponse r = pi.get().check();
-			}
-		} catch(ESException ex) {
-			Log.e("ES.init", ex.toString());
-			err = ex;
+		Log.d("ES.init", "init index for "+klass+"...");			
+		// make with an alias to allow for later switching if we change the schema
+		String baseIndex = index+"_"+es.getConfig().getIndexAliasVersion();
+		// what if base-index wo alias??
+		if (es.admin().indices().indexExists(baseIndex)) {
+			Log.d("ES.init", "Base index "+baseIndex+" exists but not the alias "+index+" - Let's link them...");
+			IndicesAliasesRequest alias = es.admin().indices().prepareAliases();
+			alias.addAlias(baseIndex, index);
+			alias.setDebug(true);
+			alias.get().check();
+		} else {
+			// make a new index
+			CreateIndexRequest pi = es.admin().indices().prepareCreate(baseIndex);
+			pi.setDebug(true);
+			pi.setFailIfAliasExists(true);
+			pi.setAlias(index);
+			IESResponse r = pi.get().check();
 		}
-		return err;
 	}
 
+	public static void initESMappings(KStatus[] statuses, Class[] dbclasses, Map<Class,Map> mappingFromClass) 
+	{
+		initESMappings(statuses, dbclasses, mappingFromClass, null);
+	}
 
 	/**
 	 * Create mappings. Some common fields are set: "name", "id", "@type"
 	 * @param statuses
 	 * @param dbclasses
 	 * @param mappingFromClass Setup more fields. Can be null
+	 * @param dataspace 
 	 */
-	public static void initESMappings(KStatus[] statuses, Class[] dbclasses, Map<Class,Map> mappingFromClass) {
+	public static void initESMappings(KStatus[] statuses, Class[] dbclasses, 
+			Map<Class,Map> mappingFromClass, CharSequence dataspace) 
+	{
 		IESRouter esRouter = Dep.get(IESRouter.class);
 		ESHttpClient es = Dep.get(ESHttpClient.class);
 		ESException err = null;
 		for(KStatus status : statuses) {			
 			for(Class k : dbclasses) {
-				ESException ex = initESMappings2(mappingFromClass, esRouter, es, status, k);
+				ESException ex = initESMappings2(mappingFromClass, esRouter, es, status, k, dataspace);
 				if (ex!=null) err = ex;
 			}
 		}
@@ -493,9 +506,9 @@ public class AppUtils {
 
 
 	private static ESException initESMappings2(Map<Class, Map> mappingFromClass, IESRouter esRouter, ESHttpClient es,
-			KStatus status, Class k) 
+			KStatus status, Class k, CharSequence dataspace) 
 	{
-		ESPath path = esRouter.getPath(null, k, null, status);
+		ESPath path = esRouter.getPath(dataspace, k, null, status);
 		try {
 			// Normal setup
 			String index = path.index();
@@ -536,7 +549,7 @@ public class AppUtils {
 			} else {
 				// dont auto reindex test or live
 				Log.i("ES.init", "To reindex:\n\n"+
-						"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}'\n\n");
+						"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}' -H 'Content-Type:application/json'\n\n");
 			}
 			// and shout fail!
 			//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
@@ -579,7 +592,7 @@ public class AppUtils {
 //								("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
 //								.replace('\'', '"');
 				Log.i("ES.init", "To switch old -> new:\n\n"
-						+"curl http://localhost:9200/_aliases -d '"+switchjson+"'\n\n");
+						+"curl http://localhost:9200/_aliases -d '"+switchjson+"' -H 'Content-Type:application/json'\n\n");
 			}
 			// record fail - but loop over the rest so we catch all the errors in one loop
 			Log.e("init", ex.toString());
@@ -1042,6 +1055,17 @@ public class AppUtils {
 			Log.d("init.auth", "AuthToken registered with name+password "+token.getXId());
 		}
 		return Dep.set(AuthToken.class, token);
+	}
+
+
+	/**
+	 * @deprecated Better to manage the save-path directly.
+	 * @param item
+	 * @param state
+	 */
+	public static void doSaveEdit(AThing item, WebRequest state) {
+		ESPath path = getPath(null, item.getClass(), item.getId(), item.getStatus());
+		doSaveEdit(path, new JThing(item), state);		
 	}
 
 

@@ -1311,7 +1311,17 @@ public class WebUtils2 extends WebUtils {
 				return url;
 			}
 			try {
-				HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+				// HACK: Google search results use a js redirect instead of a proper http redirect.
+				URL _url = new URL(url);
+				if (_url.getHost()!=null && _url.getHost().endsWith("google.com")) {
+					String googleUrl = WebUtils2.getQueryParameter(url, "url");
+					if (googleUrl!=null) {
+						url = googleUrl;
+						_url = new URL(url);
+					}
+				}
+				// fetch
+				HttpURLConnection connection = (HttpURLConnection) _url.openConnection();
 				connection.setFollowRedirects(false);
 				connection.setDoOutput(false);
 				connection.connect();
@@ -1394,21 +1404,36 @@ public class WebUtils2 extends WebUtils {
 		
 		// Note: wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header 
 		// when the credentials flag is true (ie with cookies).
-		// We rely on the caller to explicitly tell us this (see hooru.js). By default ajax does not!
+		// We rely on the caller to explicitly tell us this (see youagain.js). By default ajax does not!
 		boolean wc = state.get(WITH_CREDENTIALS);
 		String origin = state.getRequest().getHeader("Origin");
 		String originOut = origin; 
-		if (origin==null || origin.equals("null")) {
+		if (Utils.isBlank(origin) || origin.equals("null")) {
 			if (wc) {
-				Log.d("cors", "Huh? Blank origin, and withCredentials is set so we cant use * "+ReflectionUtils.getSomeStack(8));
+				Log.d("cors", "Huh? Blank origin, and withCredentials is set so we cant use ACAO = * "+ReflectionUtils.getSomeStack(8));
 			} else {
+				Log.d("cors", "Altering ACAO from unset Origin "+origin+" to * for "+state.getRequestUrl());
 				originOut= "*";
 			}
 		}
-		// is getResponse an error??
+		
+		// Force-set the ACAO header to *?
+		// when/where is this needed?? Logging added May 2020 to learn more
+		// Likely error: If we have a value Origin, we should probably stick with that.
+		// --possibly this is behind the Greek adomium.com bug seen 29th May 2020.
+		// (for now, I am making a safety-first hack ^DW)
 		if (forceSet && Utils.isBlank(state.getResponse().getHeader("Access-Control-Allow-Origin"))) {
-			if ( ! wc) originOut = "*"; // Do we need this??
+			if ( ! wc) {
+				// HACK fix for Greek campaign
+				if (origin!=null && origin.contains("platform.adomium.com")) {
+					Log.d("cors", "HACK override of forceSet! Leaving ACAO as Origin "+origin+" for "+state.getRequestUrl());
+				} else {
+					Log.d("cors", "forceSet! Altering ACAO from Origin "+origin+" to * for "+state.getRequestUrl());
+					originOut = "*"; // Do we need this??
+				}
+			}
 		}
+		
 		// see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i		
 		// See also Error seen by us:
 		//   Failed to load https://as.winterwell.com/vast.xml: The value of the 'Access-Control-Allow-Origin' header in the response must not 
@@ -1418,7 +1443,7 @@ public class WebUtils2 extends WebUtils {
 			state.setHeader(ALLOW_CREDENTIALS_HEADER, "true");
 		} else {
 			// verbose log -- switch on in log.properties if you want to see it
-			Log.v("cors", "NOT setting Access-Control-Allow-Credentials for origin: "+originOut+" from "+ReflectionUtils.getSomeStack(8));			
+			Log.v("cors", "NOT setting Access-Control-Allow-Credentials (ACAC) for origin: "+originOut+" from "+ReflectionUtils.getSomeStack(8));			
 		}
 		state.setHeader("Access-Control-Allow-Origin", originOut);
 	}
@@ -1514,7 +1539,11 @@ public class WebUtils2 extends WebUtils {
 	}
 
 
-	
+	/**
+	 * Warning: can insert extra blank lines
+	 * @param doc
+	 * @return
+	 */
 	public static String xmlDocToString(Document doc) {
 		try {
 			TransformerFactory tf = TransformerFactory.newInstance();

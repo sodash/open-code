@@ -80,7 +80,7 @@ public class ForkJVMTask extends BuildTask {
 			options.add("-ignore "+config.ignoreAllExceptions);
 		}
 		options.add("-label "+config.label);
-		options.add("-depth "+config.depth+1);
+		options.add("-depth "+(config.depth+1));
 		String soptions = StrUtils.join(options, " ")+" ";
 		
 		String command = "java -cp "+classpath+" com.winterwell.bob.Bob "

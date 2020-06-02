@@ -11,6 +11,7 @@ import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.ConfigException;
 import com.winterwell.web.LoginDetails;
+import com.winterwell.web.email.EmailConfig;
 import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
 
@@ -24,16 +25,17 @@ public class Emailer implements Closeable {
 
 	@Override
 	public String toString() {
-		return "Emailer["+ld+"]";
+		return "Emailer["+config+"]";
 	}
 	
-	private LoginDetails ld;
+	private EmailConfig config;
 	private String displayName;
 
 //	private String app;
 	
-	public Emailer(LoginDetails ld) {
-		this.ld = ld;
+	public Emailer(EmailConfig config) {
+		this.config = config;
+		LoginDetails ld = config.getLoginDetails();		
 		this.displayName = (String) Utils.or(
 			ld.get(new Key("displayName")),
 			ld.get(new Key("displayname")),
@@ -48,7 +50,7 @@ public class Emailer implements Closeable {
 
 	public InternetAddress getFrom() {
 		try {
-			InternetAddress addr = new InternetAddress(ld.loginName, displayName);
+			InternetAddress addr = new InternetAddress(config.emailFrom, displayName);
 			return addr;
 		} catch (Exception e) {
 			throw Utils.runtime(e);
@@ -64,7 +66,7 @@ public class Emailer implements Closeable {
 	 */
 	public InternetAddress getBotEmail() {
 		try {
-			InternetAddress addr = new InternetAddress(ld.loginName,					 
+			InternetAddress addr = new InternetAddress(config.emailFrom,					 
 					StrUtils.toTitleCase(AMain.appName)+" Notifications");
 			return addr;
 		} catch (Exception e) {
@@ -83,7 +85,7 @@ public class Emailer implements Closeable {
 		assert ! closed : "email client has been closed";
 		if (smtpClient != null)
 			return smtpClient;
-		smtpClient = new SMTPClient(ld);		
+		smtpClient = new SMTPClient(config);		
 		return smtpClient;
 	}
 

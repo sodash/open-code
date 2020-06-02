@@ -1,25 +1,27 @@
-package com.winterwell.web.app;
+package com.winterwell.web.email;
 
 import com.winterwell.utils.io.Option;
 import com.winterwell.web.LoginDetails;
-import com.winterwell.web.email.SMTPClient;
 
 public class EmailConfig {
 
 	@Option
-	String emailServer; 
+	public String emailServer; 
 	
 	@Option
-	String emailFrom;
+	public String emailFrom;
 	
 	@Option
-	String emailPassword;
+	public String emailPassword;
 	
 	@Option
-	int emailPort;
+	public Boolean starttls;
 	
 	@Option
-	boolean emailSSL;
+	public int emailPort;
+	
+	@Option
+	public boolean emailSSL;
 	
 	public LoginDetails getLoginDetails() {
 		if (emailServer==null) return null;

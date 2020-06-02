@@ -380,6 +380,8 @@ public class LgServlet {
 
 
 	static Parser uaParser() throws IOException {
+		// The constructor loads files, so lets stash one copy and reuse it.
+		// Thread safety: not sure!
 		if (parser==null) {
 			parser = new Parser();
 		}

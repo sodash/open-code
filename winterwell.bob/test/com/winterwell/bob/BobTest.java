@@ -20,7 +20,7 @@ public class BobTest {
 	
 	@Test
 	public void testLoadHistory() {
-		File file = Bob.getHistoryFile();
+		File file = BobLog.getHistoryFile();
 		String json = FileUtils.read(file);
 		Map jobj = (Map) JSON.parse(json);
 	}

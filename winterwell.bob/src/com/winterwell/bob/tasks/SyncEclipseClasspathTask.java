@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -87,7 +88,16 @@ public class SyncEclipseClasspathTask extends BuildTask {
 		}
 		// output
 		String xml2 = WebUtils2.xmlDocToString(doc);
-		FileUtils.write(classpathFile, xml2);
+		// WTF extra blank lines??
+		Pattern p = Pattern.compile("\\n[ \\t]*\\n");
+		String xml3;
+		while(true) {
+			xml3 = p.matcher(xml2).replaceAll("\n");
+			if (xml3.equals(xml2)) break;
+			xml2 = xml3;
+		}
+		//		String xml3 = xml2.replaceAll(p, "\n");
+		FileUtils.write(classpathFile, xml3);
 	}
 
 }

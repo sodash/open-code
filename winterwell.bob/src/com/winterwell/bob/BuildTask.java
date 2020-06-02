@@ -1,6 +1,7 @@
 package com.winterwell.bob;
 
 import java.io.Closeable;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -76,9 +77,14 @@ import com.winterwell.utils.time.TimeUtils;
  */
 public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuildTask {
 
-	protected Map<String,Object> report = new ArrayMap();
+	protected transient Map<String,Object> report = new ArrayMap();
 
-	private Desc desc;
+	/**
+	 * This will get set at the start of the BuildTask.run()
+	 * It is "version stamped" by any fields at that time.
+	 *  -- it should be safe against fields modified later in the run.
+	 */
+	private transient Desc desc;
 
 	@Override
 	public Desc getDesc() {
@@ -122,7 +128,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 
 	protected IErrorHandler errorHandler;
 
-	private Level verbosity;
+	private transient Level verbosity;
 	
 	public Level getVerbosity() {
 		return verbosity;
@@ -166,21 +172,21 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	transient private int hashcode;
 
 	protected BuildTask() {
-		config();
-	}
-
-	/**
-	 * TODO Load a config class getClass()+"Config" for settings actions
-	 * provided via an init method 1st try qualified class name, then simple
-	 * name
-	 */
-	private void config() {
+		setDepth(0);
 	}
 
 	@Override
 	public List<BuildTask> getDependencies() {
 		// What about build tasks from other projects - which aren't on the classpath?
-		// Hack: see WWDependencyTask, a bit like MavenDependencyTask, which downloads a jar
+		// Use GitBobProjectTask
+		return new ArrayList();
+	}
+	
+	/** 
+	 * TODO
+	 * @return files this task makes -- and which should be collected up if packaging binaries
+	 */
+	public List<File> getOutputs() {
 		return new ArrayList();
 	}
 	
@@ -213,7 +219,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	
 	protected Dt maxTime;
 
-	protected String LOGTAG = Bob.LOGTAG+"."+getClass().getSimpleName();
+	protected transient String LOGTAG;
 
 	private boolean skipDependencies;
 
@@ -311,7 +317,8 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 
 		// skip repeat/recent runs?
 		// ...NB: no skip for the top level task
-		int activeTasks = Bob.getSingleton().getBobCount();
+		int activeTasks = getSettings().depth + getDepth();
+//				Bob.getSingleton().getBobCount() + ;
 		if (activeTasks!=0) {
 			if (skip()) {
 				skipFlag = true;
@@ -362,7 +369,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 		}
 	}
 	
-	volatile QStatus status = QStatus.NOT_SUBMITTED;
+	transient volatile QStatus status = QStatus.NOT_SUBMITTED;
 	
 	protected void setStatus(QStatus status) {
 		if (this.status==QStatus.ERROR && status != null) {
@@ -433,9 +440,10 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 		Dt gap = lastRun.dt(new Time());
 		Dt hours = gap = gap.convertTo(TUnit.HOUR); // debug
 		if (gap.isShorterThan(skipGap)) {
-			Log.d(LOGTAG, "skip "+this+" - last run "+gap+" < "+skipGap);
+			Log.d(LOGTAG, "skip recent "+this+" - last run "+gap+" < "+skipGap);
 			return true;
 		}
+		Log.d(LOGTAG, "Dont skip "+this+" - prev run "+lastRun+" dt: "+hours+" > "+skipGap);
 		return false;
 	}
 
@@ -452,7 +460,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	 * If the task can produce a large number of repetitive ignorable issues, 
 	 * then use this to group them. Only a few will be displayed (unless verbose is set)
 	 */
-	protected List<String> issues = new ArrayList();
+	protected transient List<String> issues = new ArrayList();
 
 	protected void addIssue(String msg) {
 		if (getSettings().verbose) {
@@ -463,7 +471,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	}
 
 
-	protected BobSettings getSettings() {
+	protected static BobSettings getSettings() {
 		return Bob.getSingleton().getSettings();
 	}
 
@@ -486,8 +494,9 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 			for (BuildTask bs : deps) {
 				// TODO use getID and getName as [label=]
 				String b = labelTask(bs.getDesc());
-				FileUtils.append(
-						'"'+a+"\" -> \""+b+"\"\n", getSettings().dotFile);
+				BobLog.logDot('"'+a+"\" -> \""+b+"\"\n");
+				
+				bs.setDepth(getDepth()+1);
 				// Do it
 				bs.run();
 			}
@@ -495,6 +504,20 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 		return true;
 	}
 
+	private transient int depth;
+
+	/**
+	 * @return 0 for top-level
+	 */
+	protected int getDepth() {		
+		return depth;
+	}
+
+	public BuildTask setDepth(int depth) {
+		this.depth = depth;
+		LOGTAG = Bob.LOGTAG+"."+getSettings().depth+"."+getDepth()+"."+getClass().getSimpleName();
+		return this;
+	}
 
 	private String labelTask(Desc desc) {
 		return desc.getName()+"."+StrUtils.hash(StrUtils.SHORT_ALGORITHM, desc.getId());
