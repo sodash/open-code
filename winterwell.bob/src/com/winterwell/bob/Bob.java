@@ -229,7 +229,7 @@ public class Bob {
 	public static Time getLastRunDate(BuildTask buildTask) {
 		assert buildTask != null;
 		if (time4task==null) {
-			time4task = loadTaskHistory();
+			loadTaskHistory();
 		}
 		// relies on equals()
 		String id = buildTask.getDesc().getId();
@@ -246,7 +246,13 @@ public class Bob {
 		return taskThisJVMOnly.contains(id);
 	}
 
-	private static Map<String, Time> loadTaskHistory() {
+	
+	/**
+	 * Sets time4task
+	 * Repeated calls will do a fresh load from file.
+	 * This is to allow info from forked bobs to be loaded in.
+	 */
+	public static void loadTaskHistory() {
 		// load from file
 		try {
 			ArrayMap<String,Time> t4t = new ArrayMap();
@@ -263,10 +269,10 @@ public class Bob {
 				}
 				r.close();
 			}			
-			return t4t;			
+			time4task = t4t;			
 		} catch(Throwable ex) {
 			Log.d(LOGTAG, ex);
-			return new HashMap();
+			if (time4task==null) time4task = new HashMap();
 		}		
 	}
 
@@ -405,14 +411,16 @@ public class Bob {
 
 	private static File findBuildScript(String optionalName) {
 		File baseDir = FileUtils.getWorkingDirectory();
-		return findBuildScript2(baseDir, optionalName);
+		File f = findBuildScript2(baseDir, optionalName);
+		return f;
 	}
 	
 	/**
 	 * ??how best to expose this method
 	 * @param projectDir
 	 * @param optionalName
-	 * @return
+	 * @return BuildX.java, or null 
+	 * ??change to List so we can better communicate around failed-to-find/pick
 	 */
 	public static File findBuildScript2(File projectDir, String optionalName) {
 		File bdir = new File(projectDir, "builder");
@@ -444,7 +452,7 @@ public class Bob {
 
 	public static void setLastRunDate(BuildTask buildTask) {
 		if (time4task==null) {
-			time4task = loadTaskHistory();
+			loadTaskHistory();
 		}
 		String id = buildTask.getDesc().getId();
 		Time now = new Time();
