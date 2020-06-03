@@ -1405,10 +1405,14 @@ public class WebUtils2 extends WebUtils {
 		// Note: wildcard '*' cannot be used in the 'Access-Control-Allow-Origin' header 
 		// when the credentials flag is true (ie with cookies).
 		// We rely on the caller to explicitly tell us this (see youagain.js). By default ajax does not!
-		boolean wc = state.get(WITH_CREDENTIALS);
-		String origin = state.getRequest().getHeader("Origin");
+		// RM 2020-06: This is causing us problems in a campaign where the agency's system is setting
+        // withCredentials but not flagging it explicitly like we do.
+        Cookie[] cookies = state.getRequest().getCookies();
+		boolean wc = state.get(WITH_CREDENTIALS) || (cookies != null && cookies.length > 0);
+		String origin = state.getRequest().getHeader("Origin");		
 		String originOut = origin; 
-		if (Utils.isBlank(origin) || origin.equals("null")) {
+		boolean hasOrigin = ! Utils.isBlank(origin) && ! origin.equals("null");
+		if ( ! hasOrigin) {
 			if (wc) {
 				Log.d("cors", "Huh? Blank origin, and withCredentials is set so we cant use ACAO = * "+ReflectionUtils.getSomeStack(8));
 			} else {
@@ -1427,6 +1431,8 @@ public class WebUtils2 extends WebUtils {
 				// HACK fix for Greek campaign
 				if (origin!=null && origin.contains("platform.adomium.com")) {
 					Log.d("cors", "HACK override of forceSet! Leaving ACAO as Origin "+origin+" for "+state.getRequestUrl());
+				} else if (hasOrigin) {
+					Log.d("cors", "override of forceSet! Leaving ACAO as Origin "+origin+" for "+state.getRequestUrl());
 				} else {
 					Log.d("cors", "forceSet! Altering ACAO from Origin "+origin+" to * for "+state.getRequestUrl());
 					originOut = "*"; // Do we need this??
