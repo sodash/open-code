@@ -625,6 +625,7 @@ public class WebUtils2 extends WebUtils {
 	private static final int MAX_REDIRECTS = 5;
 
 	private static final String ALLOW_CREDENTIALS_HEADER = "Access-Control-Allow-Credentials";
+	private static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER = "Access-Control-Allow-Origin";																	 
 
 
 	/**	
@@ -1445,13 +1446,24 @@ public class WebUtils2 extends WebUtils {
 		//   Failed to load https://as.winterwell.com/vast.xml: The value of the 'Access-Control-Allow-Origin' header in the response must not 
 		//   be the wildcard '*' when the request's credentials mode is 'include'. Origin 'https://imasdk.googleapis.com' is therefore not allowed access. 
 		//   The credentials mode of requests initiated by the XMLHttpRequest is controlled by the withCredentials attribute.
-		if ( ! "*".equals(originOut)) {			
-			state.setHeader(ALLOW_CREDENTIALS_HEADER, "true");
+		if ( ! "*".equals(originOut)) {
+			// huh? debugging June 2020
+			if (Utils.isBlank(state.getResponse().getHeader(ALLOW_CREDENTIALS_HEADER))) {
+				state.setHeader(ALLOW_CREDENTIALS_HEADER, "true");
+			} else {
+				Log.w("cors", "Already set?! NOT setting 2 x Access-Control-Allow-Credentials (ACAC) for origin: "+originOut+" from "+ReflectionUtils.getSomeStack(8));
+			}
 		} else {
 			// verbose log -- switch on in log.properties if you want to see it
 			Log.v("cors", "NOT setting Access-Control-Allow-Credentials (ACAC) for origin: "+originOut+" from "+ReflectionUtils.getSomeStack(8));			
 		}
-		state.setHeader("Access-Control-Allow-Origin", originOut);
+		
+		// Set Allow Origin
+		if ( ! Utils.isBlank(state.getResponse().getHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER))) {
+			// huh? debugging June 2020
+			Log.w("cors", "Already set?! Risk of 2 x Access-Control-Allow-Origin (ACAO) for origin: "+originOut+" from "+ReflectionUtils.getSomeStack(8));			
+		}
+		state.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, originOut);
 	}
 
 	/**
