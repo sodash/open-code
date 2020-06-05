@@ -7,6 +7,7 @@ import java.util.Properties;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
+import com.winterwell.web.app.ISiteConfig;
 import com.winterwell.web.app.KServerType;
 
 public class BuildHacks {
@@ -16,10 +17,9 @@ public class BuildHacks {
 	 */
 	public static KServerType getServerType() {
 		// cache the answer
-		if (_serverType==null) {
-			_serverType = getServerType2();
-			Log.d("AppUtils", "Using serverType "+_serverType);
-		}
+		if (_serverType!=null) return _serverType;
+		_serverType = getServerType2();
+		Log.d("BuildHacks", "Using serverType "+_serverType);		
 		return _serverType;		
 	}
 	
@@ -37,7 +37,13 @@ public class BuildHacks {
 	 * @return
 	 */
 	private static KServerType getServerType2() {
-		// ISiteConfig??
+		// ISiteConfig?
+		if (Dep.has(ISiteConfig.class)) {
+			ISiteConfig config = Dep.get(ISiteConfig.class);
+			Object _st = config.getServerType();
+			KServerType st = (KServerType) _st;			
+			if (st != null) return st;
+		}
 		
 		// explicit config ??who uses this?? is it for unit tests??
 		if (Dep.has(Properties.class)) {
@@ -51,6 +57,7 @@ public class BuildHacks {
 		} else {
 			Log.d("init", "No Properties for explicit serverType");
 		}
+		
 		// explicitly listed
 		String hostname = getFullHostname();
 		Log.d("init", "serverType for host "+hostname+" ...?");

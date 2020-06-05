@@ -369,6 +369,7 @@ public class AppUtils {
 	}	
 
 	/**
+	 * @deprecated replace with {@link BuildHacks#getServerType()}
 	 * local / test / production
 	 */
 	public static KServerType getServerType(WebRequest state) {
@@ -385,15 +386,11 @@ public class AppUtils {
 	
 	
 	/**
+	 * @deprecated replace with {@link BuildHacks#getServerType()}
 	 * local / test / production
 	 */
-	public static KServerType getServerType() {
-		// cache the answer
-		if (_serverType==null) {
-			_serverType = BuildHacks.getServerType();
-			Log.d("AppUtils", "Using serverType "+_serverType);
-		}
-		return _serverType;		
+	public static KServerType getServerType() {		
+		return BuildHacks.getServerType();
 	}
 	
 	
