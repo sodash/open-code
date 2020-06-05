@@ -49,7 +49,7 @@ public class BobSettings {
 			description="Switch off task-history dependency skipping (if on, avoids re-running recent sub-tasks). Kind of equivalent to deleting boblog.")
 	public boolean clean;
 	
-	@Option(description="TODO Clean anything before the given time.")
+	@Option(description="Clean anything before the given time (this is also used by clean for child Bobs).")
 	public Time cleanBefore;
 
 	@Option(description="TODO sniff the script .java file for Bob settings in javadoc, e.g. @Bob -classpath lib/foo.jar")

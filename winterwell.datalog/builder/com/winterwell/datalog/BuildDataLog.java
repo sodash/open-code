@@ -27,14 +27,7 @@ public class BuildDataLog extends BuildWinterwellProject {
 		deps.add(mdt);
 		
 		return deps;
-	}
-	
-	@Override
-	public void doTask() throws Exception {	
-		super.doTask();
-		doTest();
-			
-	}
+	}	
 
 	@Override
 	protected File getTestBinDir() {
