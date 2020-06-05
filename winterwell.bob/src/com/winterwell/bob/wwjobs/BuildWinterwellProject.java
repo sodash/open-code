@@ -88,17 +88,21 @@ public class BuildWinterwellProject extends BuildTask {
 				continue;
 			}
 			
-			// Try a git pull (fail quietly)
-			GitTask gt = new GitTask(GitTask.PULL, pdir);
-			gt.setErrorHandler(IGNORE_EXCEPTIONS);
-			deps.add(gt);
+			BuildTask bt;
+			if (false) {
+				// Try a git pull (fail quietly)
+				GitTask gt = new GitTask(GitTask.PULL, pdir);
+				gt.setErrorHandler(IGNORE_EXCEPTIONS);
+				deps.add(gt);
+				
+				// NB: We'd prefer to use the "local" builder class over GitBob
+				// But the GitBob version is wanted for deployment
+				// ... and best to have local & deployment behave the same
+				bt = getDependencies2a_builderClass(pname, pdir);
+			} else {
 			
-			// NB: We'd prefer to use the "local" builder class over GitBob
-			// But the GitBob version is wanted for deployment
-			BuildTask bt = getDependencies2a_builderClass(pname, pdir);
-			
-			// Debug: make this just as a handy way to get setup output for KNOWN_PROJECTS
-//			GitBobProjectTask gbpt = getDependencies3_gitBob(pdir);
+				bt = getDependencies2b_gitBob(pdir);
+			}
 			
 			if (bt!=null) deps.add(bt);
 		}
@@ -375,6 +379,9 @@ public class BuildWinterwellProject extends BuildTask {
 			jar2.setAppend(true);
 			jar2.run();			
 		}
+		
+		// collect jars
+		collectJars(new File(projectDir, "build-lib"));
 		
 		// fat jar?
 		if (makeFatJar) {
