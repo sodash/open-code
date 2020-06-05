@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import com.winterwell.bob.Bob;
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.IErrorHandler;
 import com.winterwell.bob.tasks.BigJarTask;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;
@@ -77,6 +78,7 @@ public class BuildWinterwellProject extends BuildTask {
 		for (String pname : projects) {			
 			WinterwellProjectFinder pf = new WinterwellProjectFinder();			
 			File pdir = pf.apply(pname);
+			// no local project? maybe GitBob can get it
 			if (pdir==null || ! pdir.isDirectory()) {
 				// known GitBob project?
 				BuildTask bt = WinterwellProjectFinder.getKnownProject(pname);
@@ -85,6 +87,11 @@ public class BuildWinterwellProject extends BuildTask {
 				}
 				continue;
 			}
+			
+			// Try a git pull (fail quietly)
+			GitTask gt = new GitTask(GitTask.PULL, pdir);
+			gt.setErrorHandler(IGNORE_EXCEPTIONS);
+			deps.add(gt);
 			
 			// NB: We'd prefer to use the "local" builder class over GitBob
 			// But the GitBob version is wanted for deployment

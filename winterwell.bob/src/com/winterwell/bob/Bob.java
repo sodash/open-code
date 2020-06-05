@@ -299,7 +299,12 @@ public class Bob {
 			// Load settings
 			ConfigFactory cf = ConfigFactory.get();
 			cf.setArgs(args);
+			// ...system-wide Bob settings
 			ConfigBuilder cb = cf.getConfigBuilder(BobSettings.class);
+			File warehouse = GitBobProjectTask.getGitBobDir();
+			File bcf = new File(warehouse, "bob.properties");
+			if (bcf.isFile()) cb.set(bcf);
+			// ...load
 			BobSettings _settings = cb.get();
 			if ( ! Utils.isBlank(_settings.label)) {
 				LOGTAG += "."+_settings.label;

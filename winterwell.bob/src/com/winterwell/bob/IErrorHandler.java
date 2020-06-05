@@ -8,11 +8,13 @@ public interface IErrorHandler {
 
 	void handle(Throwable ex); // throws Exception;
 	
+	public static IErrorHandler IGNORE = err -> {}; 
+	
 	public static IErrorHandler forPolicy(KErrorPolicy policy) {
 		switch(policy) {
 		case ACCEPT:
 		case IGNORE:
-			return err -> {};
+			return IGNORE;
 		case DIE:
 			return err -> {
 				Log.e(err);
