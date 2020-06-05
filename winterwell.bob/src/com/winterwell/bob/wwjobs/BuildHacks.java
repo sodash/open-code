@@ -40,7 +40,7 @@ public class BuildHacks {
 		// ISiteConfig?
 		if (Dep.has(ISiteConfig.class)) {
 			ISiteConfig config = Dep.get(ISiteConfig.class);
-			Object _st = config.getServerType();
+			Object _st = config.getServerType2();
 			KServerType st = (KServerType) _st;			
 			if (st != null) return st;
 		}

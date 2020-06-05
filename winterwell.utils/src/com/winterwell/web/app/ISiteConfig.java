@@ -25,9 +25,10 @@ public interface ISiteConfig {
 	 * Override to allow setting local / test / production from a .properties file.
 	 * 
 	 * ??Callers should use BuildHacks#getServerType() instead, which checks this plus
-	 * other info.
+	 * other info. (hm - a config that shouldnt be used directly - that's inelegant)
+	 * @return KServerType
 	 */
-	default Object getServerType() {
+	default Object getServerType2() {
 		return null;
 	}
 }
