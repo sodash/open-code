@@ -17,7 +17,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import com.winterwell.bob.Bob;
-import com.winterwell.bob.BobSettings;
+import com.winterwell.bob.BobConfig;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
@@ -120,7 +120,7 @@ public class CompileTask extends BuildTask {
 				);
 		// save a linux command
 		try {			
-			BobSettings bs = Dep.has(BobSettings.class)? Dep.get(BobSettings.class) : new BobSettings();
+			BobConfig bs = Dep.has(BobConfig.class)? Dep.get(BobConfig.class) : new BobConfig();
 			// HACK - to pick a nice name for the debug file
 			File projectDir = srcDir;			
 			List<String> notThese = Arrays.asList("src", "test", "source", "java", "build", "builder", "main");
@@ -148,7 +148,7 @@ public class CompileTask extends BuildTask {
 		// Diagnostic output
 		StringBuilder diags = new StringBuilder();
 		for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
-			if (!Bob.getSingleton().getSettings().verbose
+			if (!Bob.getSingleton().getConfig().verbose
 					&& diagnostic.getKind() != Kind.ERROR)
 				continue;
 			Printer.appendFormat(diags, "{0}: {1} in {2}\n", diagnostic
@@ -240,7 +240,7 @@ public class CompileTask extends BuildTask {
 			Printer.out("Nothing to compile");
 			return;
 		}
-		if (Bob.getSingleton().getSettings().verbose) {
+		if (Bob.getSingleton().getConfig().verbose) {
 			Printer.out("Compiling to " + outputDir + ":");
 			Printer.out(javaFiles);
 		}

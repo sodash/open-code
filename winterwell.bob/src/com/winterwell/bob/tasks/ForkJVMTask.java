@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.winterwell.bob.Bob;
-import com.winterwell.bob.BobSettings;
+import com.winterwell.bob.BobConfig;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
@@ -70,7 +70,7 @@ public class ForkJVMTask extends BuildTask {
 		// TODO pass on Bob settings like -clean
 		// BUT we dont want to rebuild utils n times in one build -- so use cleanBefore
 		List<String> options = new ArrayList();
-		BobSettings config = Bob.getSingleton().getSettings();
+		BobConfig config = Bob.getSingleton().getConfig();
 		if (config.cleanBefore != null) {
 			options.add("-cleanBefore "+config.cleanBefore.getTime());
 		} else if (config.clean) {

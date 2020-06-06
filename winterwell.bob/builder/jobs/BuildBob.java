@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.bob.Bob;
-import com.winterwell.bob.BobSettings;
+import com.winterwell.bob.BobConfig;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
@@ -22,7 +22,7 @@ import com.winterwell.web.app.KServerType;
  * You can get the latest version of Bob from:
  * https://www.winterwell.com/software/downloads/bob-all.jar
  * 
- * @see BobSettings
+ * @see BobConfig
  * @author daniel
  *
  */
@@ -39,7 +39,7 @@ public class BuildBob extends BuildWinterwellProject {
 		}
 		
 		// Manually set the version
-		String v = BobSettings.VERSION_NUMBER;
+		String v = BobConfig.VERSION_NUMBER;
 		setVersion(v);
 	}
 

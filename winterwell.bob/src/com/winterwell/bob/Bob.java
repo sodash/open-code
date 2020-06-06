@@ -1,7 +1,9 @@
 package com.winterwell.bob;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.winterwell.bob.tasks.Classpath;
 import com.winterwell.bob.tasks.CompileTask;
@@ -31,6 +35,7 @@ import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.io.LineReader;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.threads.TaskRunner;
@@ -80,6 +85,7 @@ public class Bob {
 
 	/**
 	 * end time for tasks, including other runs loaded in from boblog
+	 * Key is Desc-id
 	 */
 	private static Map<String, Time> time4task;
 	/**
@@ -197,7 +203,7 @@ public class Bob {
 	}
 
 	private Classpath getClasspath() {
-		BobSettings _settings = getSingleton().getSettings();
+		BobConfig _settings = getSingleton().getConfig();
 		Classpath cpfiles;
 		if (_settings.classpath!=null && ! _settings.classpath.isEmpty()) {
 			cpfiles = new Classpath(_settings.classpath);
@@ -281,7 +287,7 @@ public class Bob {
 			return dflt;
 		}
 		// make it
-		dflt = new Bob(new BobSettings());
+		dflt = new Bob(new BobConfig());
 		dflt.init();
 		return dflt;
 	}
@@ -294,28 +300,35 @@ public class Bob {
 	public static void main(String[] args) {
 		Bob bob = null;
 		try {
-			System.out.println("Bob the Builder   version: "+BobSettings.VERSION_NUMBER+StrUtils.LINEEND);
+			System.out.println("Bob the Builder   version: "+BobConfig.VERSION_NUMBER+StrUtils.LINEEND);
 			
 			// Load settings
 			ConfigFactory cf = ConfigFactory.get();
 			cf.setArgs(args);
 			// ...system-wide Bob settings
-			ConfigBuilder cb = cf.getConfigBuilder(BobSettings.class);
+			ConfigBuilder cb = cf.getConfigBuilder(BobConfig.class);
 			File warehouse = GitBobProjectTask.getGitBobDir();
 			File bcf = new File(warehouse, "bob.properties");
 			if (bcf.isFile()) cb.set(bcf);
 			// ...load
-			BobSettings _settings = cb.get();
+			BobConfig _settings = cb.get();
 			if ( ! Utils.isBlank(_settings.label)) {
 				LOGTAG += "."+_settings.label;
 			}
 			
+			// ??should update be "update" not "-update"??
 			// Just update the jar?
 			if (_settings.update) {
 				doUpdate();
 				return;
 			}
+			// forget some history?
+			if ( ! Utils.isBlank(_settings.forget)) {
+				doForget(_settings.forget);
+				return;
+			}
 			
+			// What to build?
 			List<String> argsLeft = cb.getRemainderArgs();
 			
 			if (argsLeft.size() == 0) {
@@ -327,7 +340,7 @@ public class Bob {
 			}
 			
 			if (_settings.help || argsLeft.size() == 0 || Containers.contains("--help", args)) {
-				System.err.println(StrUtils.LINEEND + "Bob the Builder   version: "+BobSettings.VERSION_NUMBER
+				System.err.println(StrUtils.LINEEND + "Bob the Builder   version: "+BobConfig.VERSION_NUMBER
 						+ StrUtils.LINEEND + "---------------"
 						+ StrUtils.LINEEND
 						+ "Default usage (looks for a BuildX.java file in the builder directory):"+ StrUtils.LINEEND
@@ -337,7 +350,7 @@ public class Bob {
 						+ StrUtils.LINEEND + cb.getOptionsMessage());
 				System.exit(1);
 			}		
-			Log.d(LOGTAG, "Bob version: "+BobSettings.VERSION_NUMBER+" building "+argsLeft+"...");
+			Log.d(LOGTAG, "Bob version: "+BobConfig.VERSION_NUMBER+" building "+argsLeft+"...");
 	
 			// Make Bob
 			bob = new Bob(_settings);
@@ -345,7 +358,7 @@ public class Bob {
 			bob.init();
 			
 			// clean dot?
-			if (bob.settings.dotFile != null && bob.settings.depth==0) {
+			if (bob.config.dotFile != null && bob.config.depth==0) {
 				BobLog.logDot("\n\ndigraph Tasks"+argsLeft.get(0)+" {\n");
 			}
 			
@@ -369,7 +382,7 @@ public class Bob {
 			// all done
 			bob.close();
 			
-			if (bob.settings.dotFile != null && bob.settings.depth==0) {
+			if (bob.config.dotFile != null && bob.config.depth==0) {
 				BobLog.logDot("}\n\n");
 			}
 			
@@ -392,6 +405,26 @@ public class Bob {
 			// send a bleurgh code out
 			System.exit(1);
 		}
+	}
+
+	private static void doForget(String forget) throws IOException {
+		time4task = null; // should be null anyway, but just in case - this will ensure a reload
+
+		File csvfile = BobLog.getHistoryFile();
+		File csvfile2 = File.createTempFile("bobhistory", ".csv");
+		BufferedWriter w = FileUtils.getWriter(csvfile2);
+		LineReader lr = new LineReader(csvfile);
+		Pattern p = Pattern.compile(forget);
+		for (String string : lr) {
+			if (p.matcher(string).find()) {
+				Log.d(LOGTAG, "forget "+string);
+				continue;
+			}
+			w.write(string); w.write(StrUtils.LINEEND);			
+		}
+		w.close();
+		lr.close();
+		FileUtils.move(csvfile2, csvfile);
 	}
 
 	private static void doUpdate() {
@@ -448,7 +481,7 @@ public class Bob {
 	}
 
 	private void maybeCarryOn(Throwable e) throws RuntimeException {
-		if (settings.ignoreAllExceptions) {
+		if (config.ignoreAllExceptions) {
 			Log.report(LOGTAG, "Ignoring: " + e.getMessage(), Level.WARNING);
 		} else {
 			throw Utils.runtime(e);
@@ -479,14 +512,14 @@ public class Bob {
 
 	private volatile boolean initFlag;
 
-	private BobSettings settings;
+	private BobConfig config;
 
 	private LogFile logfile;
 
 	private Runnable lastScript;
 
-	private Bob(BobSettings settings) {
-		this.settings = settings;
+	private Bob(BobConfig settings) {
+		this.config = settings;
 	}
 
 
@@ -532,11 +565,11 @@ public class Bob {
 		String name = buildTask.getClass().getSimpleName()
 		// + dash + hc
 				+ ".log";
-		return new File(settings.logDir, name);
+		return new File(config.logDir, name);
 	}
 
-	public BobSettings getSettings() {
-		return settings;
+	public BobConfig getConfig() {
+		return config;
 	}
 
 	void init() {
@@ -548,7 +581,7 @@ public class Bob {
 		logfile = new LogFile(new File("bob.log"));
 		
 		try {
-			settings.logDir.mkdirs();
+			config.logDir.mkdirs();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -567,17 +600,17 @@ public class Bob {
 	 */
 	void resetAll() {
 		init();
-		FileUtils.deleteDir(settings.logDir);
-		settings.logDir.mkdir();
+		FileUtils.deleteDir(config.logDir);
+		config.logDir.mkdir();
 	}
 
 	public void setLogging(boolean on) {
-		settings.loggingOff = !on;
+		config.loggingOff = !on;
 	}
 
 	@Deprecated // normally set by main()
-	public void setSettings(BobSettings settings) {
-		this.settings = settings;
+	public void setConfig(BobConfig settings) {
+		this.config = settings;
 	}
 
 	public void close() {		

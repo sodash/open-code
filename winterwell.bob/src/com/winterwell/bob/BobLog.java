@@ -42,9 +42,9 @@ public class BobLog {
 		FileUtils.append(string, df);
 	}
 
-	private static BobSettings getSettings() {
+	private static BobConfig getSettings() {
 		// Dep.get(BobSettings.class) not set in JUnit runs! ??fix that
-		return Bob.getSingleton().getSettings();
+		return Bob.getSingleton().getConfig();
 	}
 
 }

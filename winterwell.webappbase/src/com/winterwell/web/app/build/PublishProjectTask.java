@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.winterwell.bob.BobSettings;
+import com.winterwell.bob.BobConfig;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitTask;
@@ -187,7 +187,7 @@ public class PublishProjectTask extends BuildTask {
 
 		Log.i("publish", "Publishing to "+typeOfPublish+":"+ remoteWebAppDir);
 		// What's going on?
-		Environment.get().push(BobSettings.VERBOSE, true);		
+		Environment.get().push(BobConfig.VERBOSE, true);		
 		
 		// make version.properties					
 		MakeVersionPropertiesTask mvpt = new MakeVersionPropertiesTask().setAppDir(localWebAppDir);

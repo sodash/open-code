@@ -272,7 +272,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	 * If not, it will call {@link #doTask()}
 	 * <p> 
 	 * Exceptions are usually thrown.
-	 * Though they may be ignored (see {@link BobSettings#ignoreAllExceptions})
+	 * Though they may be ignored (see {@link BobConfig#ignoreAllExceptions})
 	 * or handled by a custom error-handler (see {@link #setErrorHandler(IErrorHandler)}).
 	 * 
 	 * @param context
@@ -390,7 +390,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 			return true;
 		}
 		// -clean? rerun inspite of any previous runs
-		BobSettings settings = getSettings();
+		BobConfig settings = getSettings();
 		if (settings.clean) {
 			return false;
 		}		
@@ -471,8 +471,8 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	}
 
 
-	protected static BobSettings getSettings() {
-		return Bob.getSingleton().getSettings();
+	protected static BobConfig getSettings() {
+		return Bob.getSingleton().getConfig();
 	}
 
 

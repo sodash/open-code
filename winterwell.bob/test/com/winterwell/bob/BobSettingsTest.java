@@ -10,18 +10,18 @@ public class BobSettingsTest extends TestCase {
 
 	public void testContinue() {
 		Bob bob = Bob.getSingleton();
-		BobSettings settings = new BobSettings();
+		BobConfig settings = new BobConfig();
 		settings.ignoreAllExceptions = true;
-		bob.setSettings(settings);
+		bob.setConfig(settings);
 
 		// TODO
 	}
 
 	public void testSettings() {
 		Bob bob = Bob.getSingleton();
-		BobSettings settings = new BobSettings();
+		BobConfig settings = new BobConfig();
 		settings.logDir = new File("dummy");
-		bob.setSettings(settings);
+		bob.setConfig(settings);
 
 		File logFile = bob.getLogFile(new CompileTask(null, null));
 		assert logFile.getPath().startsWith("dummy");
