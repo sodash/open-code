@@ -34,13 +34,14 @@ public class BuildUtils extends BuildWinterwellProject {
 		if (outDir!=null) {
 			mdt.setOutputDirectory(outDir);
 		}
-		mdt.addDependency("com.thoughtworks.xstream","xstream", "1.4.10");
+		mdt.addDependency("com.thoughtworks.xstream","xstream", "1.4.12");
 		mdt.addDependency("junit","junit","4.12");
 		mdt.addDependency("dnsjava","dnsjava","2.1.9"); // Note: not usually used, unless you need DnsUtils
-		mdt.addDependency("org.postgresql", "postgresql", "42.2.12");
-		mdt.addDependency("mysql", "mysql-connector-java", "8.0.19");
-		mdt.addDependency("com.h2database", "h2", "1.4.200");
-	
+
+		// DBs -- can we drop these?? If a project needs them they can add
+//		mdt.addDependency("org.postgresql", "postgresql", "42.2.13");
+//		mdt.addDependency("mysql", "mysql-connector-java", "8.0.19");
+//		mdt.addDependency("com.h2database", "h2", "1.4.200");
 //		mdt.addDependency("com.jolbox","bonecp","0.8.0.RELEASE"); // NB: includes Guava ans SLF4J
 		deps.add(mdt);		
 		
