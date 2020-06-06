@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,7 @@ import com.winterwell.bob.tasks.GitBobProjectTask;
 import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JUnitTask;
 import com.winterwell.bob.tasks.JarTask;
+import com.winterwell.bob.tasks.MakeVersionPropertiesTask;
 import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.bob.tasks.SCPTask;
 import com.winterwell.bob.tasks.SyncEclipseClasspathTask;
@@ -382,6 +384,13 @@ public class BuildWinterwellProject extends BuildTask {
 		
 		// collect jars
 		collectJars(new File(projectDir, "build-lib"));
+		
+		// version.properties
+		MakeVersionPropertiesTask mvpt = new MakeVersionPropertiesTask().setAppDir(projectDir);
+		Properties props = new Properties();
+		mvpt.setProperties(props);
+		mvpt.run();
+		mvpt.close();
 		
 		// fat jar?
 		if (makeFatJar) {
