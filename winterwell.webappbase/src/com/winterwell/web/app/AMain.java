@@ -382,6 +382,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			jl.setup();		
 			// no sessions!
 			WebRequest.setStateless(true);
+			Log.d("AMain", "Call addJettyServlets in "+getClass());
 			addJettyServlets(jl);
 					
 			Log.i("web", "...Launching Jetty web server on port "+jl.getPort());
@@ -427,6 +428,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * @param jl
 	 */
 	protected void addJettyServlets(JettyLauncher jl) {
+		Log.d("AMain", "Base addJettyServlets() in "+getClass());
 		jl.addServlet("/manifest", new HttpServletWrapper(ManifestServlet::new));
 		// NB: not "test" cos there's often a test directory, and nginx gets confused
 		jl.addServlet("/testme/*", new HttpServletWrapper(TestmeServlet::new));
