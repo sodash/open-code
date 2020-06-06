@@ -307,6 +307,8 @@ public class JarTask extends BuildTask {
 	}
 
 	public static File pickNewerVersion(File jara, File jarb) {
+		assert jara.isFile() : jara;
+		assert jarb.isFile() : jarb;
 		Map<String, Object> ma = getManifest(jara);
 		Map<String, Object> mb = getManifest(jarb);
 		String va = (String) ma.get("Implementation-Version");
