@@ -480,7 +480,7 @@ public class FileUtils {
 	 *            directories).
 	 */
 	public static void deleteDir(File file) {
-		if (!file.isDirectory())
+		if ( ! file.isDirectory())
 			throw new FailureException(file + " is not a directory");
 		if (isSymLink(file)) {
 			// Just delete the link, not the contents

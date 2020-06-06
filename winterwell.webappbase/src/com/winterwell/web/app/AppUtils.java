@@ -71,6 +71,7 @@ public class AppUtils {
 		s.setPath(path);
 		com.winterwell.es.client.query.BoolQueryBuilder f = makeESFilterFromSearchQuery(q, null, null);
 		s.setQuery(f);
+		s.setDebug(DEBUG);
 		SearchResponse sr = s.get();
 		return sr;
 	}

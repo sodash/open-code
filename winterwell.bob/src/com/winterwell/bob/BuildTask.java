@@ -201,7 +201,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	
 
 	private void handleException(Throwable e) {
-		if (getSettings().ignoreAllExceptions) {
+		if (getConfig().ignoreAllExceptions) {
 			System.out.println("Ignoring: " + e);
 			return;
 		}
@@ -317,7 +317,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 
 		// skip repeat/recent runs?
 		// ...NB: no skip for the top level task
-		int activeTasks = getSettings().depth + getDepth();
+		int activeTasks = getConfig().depth + getDepth();
 //				Bob.getSingleton().getBobCount() + ;
 		if (activeTasks!=0) {
 			if (skip()) {
@@ -390,7 +390,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 			return true;
 		}
 		// -clean? rerun inspite of any previous runs
-		BobConfig settings = getSettings();
+		BobConfig settings = getConfig();
 		if (settings.clean) {
 			return false;
 		}		
@@ -463,7 +463,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	protected transient List<String> issues = new ArrayList();
 
 	protected void addIssue(String msg) {
-		if (getSettings().verbose) {
+		if (getConfig().verbose) {
 			Log.w(LOGTAG, msg);
 			return;
 		}
@@ -471,7 +471,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	}
 
 
-	protected static BobConfig getSettings() {
+	protected static BobConfig getConfig() {
 		return Bob.getSingleton().getConfig();
 	}
 
@@ -515,7 +515,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 
 	public BuildTask setDepth(int depth) {
 		this.depth = depth;
-		LOGTAG = Bob.LOGTAG+"."+getSettings().depth+"."+getDepth()+"."+getClass().getSimpleName();
+		LOGTAG = Bob.LOGTAG+"."+getConfig().depth+"."+getDepth()+"."+getClass().getSimpleName();
 		return this;
 	}
 
@@ -532,7 +532,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	
 	public boolean isVerbose() {
 		return (verbosity!=null && verbosity.intValue() >= Level.FINEST.intValue())
-				|| getSettings().verbose;
+				|| getConfig().verbose;
 	}
 
 	/**

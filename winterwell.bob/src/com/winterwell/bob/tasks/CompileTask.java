@@ -44,6 +44,17 @@ public class CompileTask extends BuildTask {
 	List<String> options = new ArrayList<String>();
 
 	private final File outputDir;
+	
+	/**
+	 * False by default.
+	 * If true, then all files in the outputDir are deleted before the compile.
+	 * This prevents any old .class files sneaking into a jar.
+	 */
+	boolean cleanOutputDir;
+	
+	public void setCleanOutputDir(boolean cleanOutputDir) {
+		this.cleanOutputDir = cleanOutputDir;
+	}
 
 	private final File srcDir;
 	
@@ -240,9 +251,16 @@ public class CompileTask extends BuildTask {
 			Printer.out("Nothing to compile");
 			return;
 		}
-		if (Bob.getSingleton().getConfig().verbose) {
+		if (getConfig().verbose) {
 			Printer.out("Compiling to " + outputDir + ":");
 			Printer.out(javaFiles);
+		}
+		if (cleanOutputDir) {
+			if (outputDir.exists()) {
+				Log.d(LOGTAG, "Cleaning old outputs "+outputDir);
+				FileUtils.deleteDir(outputDir);
+				outputDir.mkdir();
+			}			
 		}
 		// Try Java 6
 		try {

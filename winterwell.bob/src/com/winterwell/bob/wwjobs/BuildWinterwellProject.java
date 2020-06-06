@@ -344,7 +344,7 @@ public class BuildWinterwellProject extends BuildTask {
 		// HACK scp to release the jar?
 		int bc = Bob.getSingleton().getBobCount();
 		if (BuildHacks.getServerType()==KServerType.LOCAL 
-				&& getSettings().depth==0
+				&& getConfig().depth==0
 				&& bc==0
 				) 
 		{
@@ -530,6 +530,7 @@ public class BuildWinterwellProject extends BuildTask {
 			try {
 				assert projectDir != null : this;
 				CompileTask compile = new CompileTask(srcDir, binDir);
+				compile.setCleanOutputDir(true);
 				compile.setDepth(getDepth()+1);
 				// classpath
 				EclipseClasspath ec = new EclipseClasspath(projectDir);
@@ -543,7 +544,7 @@ public class BuildWinterwellProject extends BuildTask {
 				compile.close();
 			} catch(Exception ex) {
 				// HACK to allow ignoring via -ignore flag
-				if (getSettings().ignoreAllExceptions) {
+				if (getConfig().ignoreAllExceptions) {
 					Log.e(ex); // :'( Dec 2018 Why??
 					setStatus(QStatus.ERROR);
 				} else {
