@@ -19,4 +19,12 @@
     <classpathentry kind="lib" path="dependencies/postgresql.jar"/>
     <classpathentry kind="lib" path="dependencies/protobuf-java.jar"/>
     <classpathentry kind="lib" path="dependencies/mysql-connector-java.jar"/>
+    <classpathentry kind="lib" path="dependencies/slf4j-api.jar"/>
+    <classpathentry kind="lib" path="dependencies/jna-platform.jar"/>
+    <classpathentry kind="lib" path="dependencies/caffeine.jar"/>
+    <classpathentry kind="lib" path="dependencies/org.osgi.core.jar"/>
+    <classpathentry kind="lib" path="dependencies/jcl-over-slf4j.jar"/>
+    <classpathentry kind="lib" path="dependencies/waffle-jna.jar"/>
+    <classpathentry kind="lib" path="dependencies/jna.jar"/>
+    <classpathentry kind="lib" path="dependencies/org.osgi.enterprise.jar"/>
 </classpath>
