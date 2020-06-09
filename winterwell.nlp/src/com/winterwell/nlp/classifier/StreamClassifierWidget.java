@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 
-import com.winterwell.maths.chart.PieChart;
-import com.winterwell.maths.chart.Rainbow;
-import com.winterwell.maths.chart.Renderer;
 import com.winterwell.maths.stats.distributions.cond.ExplnOfDist;
 import com.winterwell.maths.stats.distributions.cond.ISitnStream;
 import com.winterwell.maths.stats.distributions.cond.Sitn;
@@ -19,6 +16,7 @@ import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.containers.Pair2;
+import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
@@ -83,7 +81,7 @@ public class StreamClassifierWidget implements IWidget {
 		// colours
 		List<String> pTagsList = Containers.getList(pTags);
 		if (pTagsList.isEmpty()) pTagsList = classifier.getTags();
-		Rainbow rainbow = pTagsList.isEmpty()? new Rainbow<String>(2) : new Rainbow<String>(pTagsList);
+//		Rainbow rainbow = pTagsList.isEmpty()? new Rainbow<String>(2) : new Rainbow<String>(pTagsList);
 		int e = 0;
 		int sitnCnt = 0;
 		for (Pair2<Sitn, IFiniteDistribution<String>> pair2 : tokenProbs.tokenProbs) {
@@ -112,7 +110,7 @@ public class StreamClassifierWidget implements IWidget {
 			sb.append("<span onclick=\"addArg('sitn',"+sitnCnt+");\" title='"+title+"' ");
 											
 			if (p > 0.5) {
-				Color col = rainbow.getColorSafe(ml);		
+				Color col = GuiUtils.getRandomColour(0.5); // FIXME rainbow.getColorSafe(ml);		
 				col = new Color(col.getRed(), col.getGreen(), col.getBlue(), (int)(255*p));
 //			col = GuiUtils.fade(p, TRANSPARENT, col);
 				String rgba = WebUtils.color2html(col);
@@ -136,19 +134,20 @@ public class StreamClassifierWidget implements IWidget {
 		}
 		sb.append("<p>" + pTags + "</p>");
 		sb.append("<div style='clear:both;'></div>");
-		if (chartsOn) {
-			PieChart chart = new PieChart("Overall P(tag)", pTags);
-			chart.setShowLegend(false);
-			chart.setRainbow(rainbow);
-			Renderer render = Dep.get(Renderer.class);
-			sb.append("<div>"+render.renderToHtml(chart)+"</div>");
-		}		
+//		if (chartsOn) {
+//			PieChart chart = new PieChart("Overall P(tag)", pTags);
+//			chart.setShowLegend(false);
+//			chart.setRainbow(rainbow);
+//			Renderer render = Dep.get(Renderer.class);
+//			sb.append("<div>"+render.renderToHtml(chart)+"</div>");
+//		}		
 		
 		sb.append("<div style='clear:both;'></div>"); // force the pie-chart inside
 		sb.append("</div>"); // close 1st div
 	}
 
 	/**
+	 * @deprecated
 	 * Pie-chart? true by default
 	 * @param chartsOn
 	 */

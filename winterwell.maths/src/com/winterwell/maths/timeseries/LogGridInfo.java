@@ -1,7 +1,6 @@
-package com.winterwell.maths.chart;
+package com.winterwell.maths.timeseries;
 
 import com.winterwell.maths.IGridInfo;
-import com.winterwell.maths.timeseries.VariableGridInfo;
 
 /**
  * Makes buckets based on evenly slicing the *log* (base 2 or 10 depending on the constructor) of the range. TODO a common

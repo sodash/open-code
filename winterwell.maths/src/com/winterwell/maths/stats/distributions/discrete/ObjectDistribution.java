@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.winterwell.maths.ITrainable;
-import com.winterwell.maths.chart.FiniteDistributionChart;
 import com.winterwell.maths.datastorage.IForget;
 import com.winterwell.maths.datastorage.IPruneListener;
 import com.winterwell.utils.MathUtils;

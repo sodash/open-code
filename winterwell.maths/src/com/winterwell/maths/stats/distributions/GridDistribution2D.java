@@ -2,7 +2,6 @@ package com.winterwell.maths.stats.distributions;
 
 import com.winterwell.maths.GridInfo;
 import com.winterwell.maths.ITrainable;
-import com.winterwell.maths.chart.Distribution2DChart;
 import com.winterwell.maths.vector.XY;
 import com.winterwell.utils.TodoException;
 

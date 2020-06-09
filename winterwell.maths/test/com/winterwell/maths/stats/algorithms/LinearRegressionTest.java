@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.winterwell.maths.chart.ChartType;
-import com.winterwell.maths.chart.XYChart;
 import com.winterwell.maths.stats.distributions.d1.Gaussian1D;
 import com.winterwell.maths.timeseries.DataUtils;
 import com.winterwell.maths.vector.X;
@@ -29,9 +27,9 @@ public class LinearRegressionTest {
 			lr.train1(new X(i), Math.log(y));
 			data.add(new XY(i, Math.log(y)));
 		}
-		XYChart chart = new XYChart();
-		chart.setType(ChartType.SCATTER);
-		chart.setData(data);
+//		XYChart chart = new XYChart();
+//		chart.setType(ChartType.SCATTER);
+//		chart.setData(data);
 		
 		lr.finishTraining();
 		Printer.out(lr.a);
