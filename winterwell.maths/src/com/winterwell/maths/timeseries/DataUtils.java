@@ -28,6 +28,7 @@ import com.winterwell.maths.stats.distributions.IDistribution;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 import com.winterwell.maths.timeseries.ExtraDimensionsDataStream.KMatchPolicy;
+import com.winterwell.maths.vector.VectorUtilsTest;
 import com.winterwell.maths.vector.X;
 import com.winterwell.maths.vector.XY;
 import com.winterwell.maths.vector.XYZ;

@@ -1,15 +1,12 @@
 package com.winterwell.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
 import org.junit.Test;
 
-import com.winterwell.utils.IProperties;
-import com.winterwell.utils.SimpleTemplateVars;
 import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.containers.Properties;
 
 public class SimpleTemplateVarsTest {
 

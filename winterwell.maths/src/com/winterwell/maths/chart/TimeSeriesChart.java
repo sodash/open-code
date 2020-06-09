@@ -11,7 +11,6 @@ import com.winterwell.maths.timeseries.ListDataStream;
 import com.winterwell.maths.timeseries.TimeSlicer;
 import com.winterwell.maths.vector.CyclicMetric;
 import com.winterwell.maths.vector.XY;
-import com.winterwell.utils.Dep;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;

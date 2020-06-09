@@ -10,11 +10,9 @@ import java.util.Properties;
 
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
-import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.web.WebUtils;
 
 /**
  * Login details for a service such as smtp. These objects should contain the

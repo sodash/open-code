@@ -2,7 +2,6 @@ package com.winterwell.bob;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,23 +12,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.winterwell.bob.tasks.Classpath;
-import com.winterwell.bob.tasks.CompileTask;
-import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitBobProjectTask;
 import com.winterwell.utils.Dep;
-import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
-import com.winterwell.utils.containers.Pair;
-import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.CSVReader;
 import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
@@ -42,7 +34,6 @@ import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.threads.TaskRunner;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
-import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.web.FakeBrowser;
 
 /**

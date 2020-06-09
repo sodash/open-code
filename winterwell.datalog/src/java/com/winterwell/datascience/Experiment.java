@@ -1,11 +1,7 @@
 package com.winterwell.datascience;
 
-import java.util.List;
-import java.util.Map;
-
 import com.winterwell.depot.Desc;
 import com.winterwell.depot.IHasDesc;
-import com.winterwell.utils.log.Log;
 /**
  * An Experiment is a specific repeatable test, with outputs.
  * It is specified by a trained model (i.e. model + training data) and the test-data.

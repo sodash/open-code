@@ -11,7 +11,6 @@ import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.datalog.DataLog.KInterpolate;
 import com.winterwell.datalog.server.DataLogFields;
-import com.winterwell.datalog.server.LgServlet;
 import com.winterwell.maths.stats.distributions.d1.IDistribution1D;
 import com.winterwell.maths.timeseries.IDataStream;
 import com.winterwell.utils.Printer;

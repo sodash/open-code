@@ -1,12 +1,7 @@
 package com.winterwell.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,22 +12,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import com.winterwell.utils.IProperties;
-import com.winterwell.utils.IReplace;
-import com.winterwell.utils.Key;
-import com.winterwell.utils.Mutable;
-import com.winterwell.utils.ReflectionUtils;
-import com.winterwell.utils.containers.AbstractMap2;
-import com.winterwell.utils.containers.Properties;
-import com.winterwell.utils.containers.Slice;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
-
-import jdk.nashorn.api.scripting.NashornScriptEngine;
-
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.Utils;
 
 
 /**

@@ -6,7 +6,6 @@ import java.util.List;
 import org.junit.Test;
 
 import com.winterwell.maths.chart.ChartType;
-import com.winterwell.maths.chart.Renderer;
 import com.winterwell.maths.chart.XYChart;
 import com.winterwell.maths.stats.distributions.d1.Gaussian1D;
 import com.winterwell.maths.timeseries.DataUtils;

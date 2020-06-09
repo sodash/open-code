@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.bob.BuildTask;
-import com.winterwell.depot.Desc;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Proc;
 import com.winterwell.utils.log.Log;

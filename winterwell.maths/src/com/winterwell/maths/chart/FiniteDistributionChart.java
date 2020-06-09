@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.maths.stats.distributions.discrete.AFiniteDistribution;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.maths.vector.XY;
 import com.winterwell.utils.containers.Containers;

@@ -6,15 +6,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.winterwell.bob.wwjobs.BuildHacks;
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.data.PersonLite;
 import com.winterwell.es.ESKeyword;
 import com.winterwell.es.ESNoIndex;
-import com.winterwell.bob.wwjobs.BuildHacks;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;

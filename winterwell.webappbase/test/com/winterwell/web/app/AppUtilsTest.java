@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.goodloop.data.Money;
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.es.ESKeyword;

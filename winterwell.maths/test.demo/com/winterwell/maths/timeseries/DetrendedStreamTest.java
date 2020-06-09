@@ -7,7 +7,6 @@ import org.junit.Test;
 import com.winterwell.maths.chart.CombinationChart;
 import com.winterwell.maths.chart.TimeSeriesChart;
 import com.winterwell.utils.time.TUnit;
-import com.winterwell.utils.web.WebUtils;
 
 public class DetrendedStreamTest {
 

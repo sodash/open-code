@@ -5,7 +5,6 @@ import javax.mail.internet.InternetAddress;
 
 import org.junit.Test;
 
-import com.winterwell.web.LoginDetails;
 import com.winterwell.web.email.EmailConfig;
 import com.winterwell.web.email.SimpleMessage;
 

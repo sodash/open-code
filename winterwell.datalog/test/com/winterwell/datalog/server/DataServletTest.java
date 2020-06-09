@@ -1,7 +1,5 @@
 package com.winterwell.datalog.server;
 
-import static org.junit.Assert.*;
-
 import java.util.Map;
 
 import org.junit.AfterClass;
@@ -13,7 +11,6 @@ import com.winterwell.datalog.Dataspace;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.io.SysOutCollectorStream;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.ajax.JSend;
 

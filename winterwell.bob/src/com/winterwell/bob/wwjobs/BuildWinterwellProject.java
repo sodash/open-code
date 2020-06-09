@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import com.winterwell.bob.Bob;
 import com.winterwell.bob.BobScriptFactory;
 import com.winterwell.bob.BuildTask;
-import com.winterwell.bob.IErrorHandler;
 import com.winterwell.bob.tasks.BigJarTask;
 import com.winterwell.bob.tasks.CompileTask;
 import com.winterwell.bob.tasks.CopyTask;

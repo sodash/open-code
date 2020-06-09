@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
-import org.eclipse.jetty.util.ajax.JSON;
-
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.winterwell.datalog.DataLog.KInterpolate;
@@ -35,7 +33,6 @@ import com.winterwell.es.client.admin.GetAliasesRequest;
 import com.winterwell.es.client.admin.IndicesAdminClient;
 import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
-import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
@@ -51,7 +48,6 @@ import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Null;
-import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -68,7 +64,6 @@ import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.XStreamUtils;
-import com.winterwell.web.app.AppUtils;
 
 /**
  * ElasticSearch backed storage for DataLog

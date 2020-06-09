@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import com.winterwell.bob.wwjobs.BuildUtils;
 import com.winterwell.depot.Desc;
-import com.winterwell.utils.containers.ArrayMap;
 
 public class BuildTaskTest {
 

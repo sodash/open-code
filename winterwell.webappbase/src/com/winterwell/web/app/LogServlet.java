@@ -1,12 +1,9 @@
 package com.winterwell.web.app;
 
-import java.util.regex.Pattern;
-
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.fields.AField;
-import com.winterwell.web.fields.IntField;
 import com.winterwell.web.fields.SafeString;
 import com.winterwell.youagain.client.YouAgainClient;
 
