@@ -137,7 +137,7 @@ public class MavenDependencyTask extends BuildTask {
 		if (outDir==null) {
 			setOutputDirectory(new File(projectDir, MAVEN_DEPENDENCIES_FOLDER));
 		}
-		if (cleanOutputDirectory) {
+		if (cleanOutputDirectory && outDir.isDirectory()) {
 			Log.i(LOGTAG, "Clean "+outDir);
 			FileUtils.deleteDir(outDir);
 		}
@@ -152,6 +152,7 @@ public class MavenDependencyTask extends BuildTask {
 		}		
 		assert outDir.isDirectory() : this;
 		
+		// pom
 		if (dependencies.isEmpty()) {
 			if (pom==null) pom = FileUtils.or(new File(projectDir, "pom.bob.xml"), new File(projectDir, "pom.xml"));
 			if (pom==null || ! pom.isFile()) {
