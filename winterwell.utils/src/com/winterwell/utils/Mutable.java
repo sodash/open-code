@@ -15,7 +15,7 @@ public final class Mutable {
 	 * Mis-spelled Double to avoid name-clashes
 	 */
 	public static final class Dble {
-		public double value;
+		public volatile double value;
 
 		@Override
 		public int hashCode() {
@@ -57,7 +57,7 @@ public final class Mutable {
 
 
 	public static final class Bool {
-		public boolean value;
+		public volatile boolean value;
 
 		public Bool() {
 			this(false);
@@ -97,7 +97,7 @@ public final class Mutable {
 	}
 
 	public static final class Int {
-		public int value;
+		public volatile int value;
 
 		public Int() {
 			this(0);
@@ -142,7 +142,7 @@ public final class Mutable {
 	 * @see AtomicReference (this is lighter for single thread use)
 	 */
 	public static final class Ref<T> {
-		public T value;
+		public volatile T value;
 
 		/**
 		 * A mutable object reference with null value.
@@ -190,7 +190,7 @@ public final class Mutable {
 	 * Mis-spelled String to avoid name-clashes
 	 */
 	public static final class Strng {
-		public String value;
+		public volatile String value;
 
 		public Strng() {
 			this("");

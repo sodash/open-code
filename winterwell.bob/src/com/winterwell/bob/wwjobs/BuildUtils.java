@@ -25,7 +25,10 @@ public class BuildUtils extends BuildWinterwellProject {
 
 		// Maven
 		MavenDependencyTask mdt = new MavenDependencyTask();
-		mdt.setCleanOutputDirectory(true);
+		if (getConfig().clean || getConfig().cleanBefore != null) {
+			// NB: recklessly cleaning directories can upset Eclipse
+			mdt.setCleanOutputDirectory(true);
+		}
 		mdt.setProjectDir(projectDir);
 		if (outDir!=null) {
 			mdt.setOutputDirectory(outDir);

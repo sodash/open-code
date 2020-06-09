@@ -18,7 +18,11 @@ import java.util.concurrent.TimeUnit;
 
 import com.winterwell.utils.log.Log;
 
-
+/**
+ * @testedby WatchFilesTest
+ * @author daniel
+ *
+ */
 public class WatchFiles implements Runnable {
 	
 	public static interface IListenToFileEvents {
@@ -46,14 +50,16 @@ public class WatchFiles implements Runnable {
 	public void run() {
 		while( ! pleaseStop) {
 			try {
-			    WatchKey watchKey = watcher.poll(10, TimeUnit.SECONDS);
+			    WatchKey watchKey = watcher.poll(1, TimeUnit.SECONDS);
 			    if (watchKey == null) continue;
 		        List<WatchEvent<?>> events = watchKey.pollEvents();
 		        Path watched = (Path) watchKey.watchable();
 		        List<FileEvent> fileEvents = new ArrayList();
 		        for (WatchEvent event : events) {
 		        	Path path = (Path) event.context();
-		        	File file = path.toAbsolutePath().toFile();	            
+		        	// OMG - toAbsolutePath does NOT give the right path!
+		        	// see https://stackoverflow.com/questions/32691350/watchservice-incorrectly-resolved-absolute-path
+		        	File file = path.toFile(); //toAbsolutePath().toFile();	            
 					fileEvents.add(new FileEvent(file, event.kind()));
 		            totalEventCount++;
 		        }
@@ -74,15 +80,22 @@ public class WatchFiles implements Runnable {
 		}
 	}
 	
-	public void addFile(File projectDir) throws IOException {
+	public WatchFiles addDir(File projectDir) throws IOException {
 		assert projectDir.exists();
+		if (projectDir.isFile()) {
+			throw new IllegalArgumentException("Not a directory "+projectDir);
+		}
 		Files.walkFileTree(projectDir.toPath(), new WatchServiceRegisteringVisitor());
+		return this;
 	}
 
 	private class WatchServiceRegisteringVisitor extends SimpleFileVisitor<Path> {
 	    @Override
 	    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-	         dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+	    	Log.d("watch", dir);
+	         dir.register(watcher, 
+	        		 StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+	         
 	         return FileVisitResult.CONTINUE;
 	    }
 	}	
@@ -99,3 +112,43 @@ public class WatchFiles implements Runnable {
 	
 }
 
+// Linux complains!
+//final class DirWatcher implements WatchService {
+//
+//	final WatchService base;
+//	final File dir;
+//	
+//	public DirWatcher(WatchService base, File dir) {
+//		this.base = base;
+//		this.dir = dir;
+//	}
+//
+//	@Override
+//	public void close() throws IOException {
+//		base.close();
+//	}
+//
+//	@Override
+//	public WatchKey poll() {
+//		WatchKey wk = base.poll();
+//		return addContext(wk);
+//	}
+//
+//	private WatchKey addContext(WatchKey wk) {
+//		// TODO Auto-generated method stub
+//		return wk;
+//	}
+//
+//	@Override
+//	public WatchKey poll(long arg0, TimeUnit arg1) throws InterruptedException {
+//		WatchKey wk = base.poll(arg0, arg1);
+//		return addContext(wk);
+//	}
+//
+//	@Override
+//	public WatchKey take() throws InterruptedException {
+//		WatchKey wk = base.take();
+//		return addContext(wk);
+//	}	
+//}
+//

@@ -477,6 +477,13 @@ public class BuildWinterwellProject extends BuildTask {
 			report.put("scp to remote", "winterwell.com:"+remoteJar);
 		}
 		if (makeFatJar && getFatJar()!=null) {
+			// copy to local bin
+			try {
+				FileUtils.copy(getFatJar(), new File(FileUtils.getUserDirectory(), "bin"));
+			} catch (Exception ex) {
+				Log.w(LOGTAG, "jar copy to local bin failed: "+ex);
+			}
+			// remote
 			String remoteJar = "/home/winterwell/public-software/"+getFatJar().getName();
 			SCPTask scp = new SCPTask(getFatJar(), "winterwell@winterwell.com",				
 					remoteJar);
