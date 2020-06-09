@@ -17,14 +17,7 @@ import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.bob.tasks.MakeVersionPropertiesTask;
 import com.winterwell.bob.tasks.ProcessTask;
-import com.winterwell.bob.wwjobs.BuildDataLog;
-import com.winterwell.bob.wwjobs.BuildDepot;
-import com.winterwell.bob.wwjobs.BuildFlexiGson;
-import com.winterwell.bob.wwjobs.BuildMaths;
-import com.winterwell.bob.wwjobs.BuildUtils;
-import com.winterwell.bob.wwjobs.BuildWeb;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
-import com.winterwell.bob.wwjobs.WWDependencyTask;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Printer;
@@ -38,6 +31,8 @@ import com.winterwell.web.email.SimpleMessage;
 
 
 /**
+ * @deprecated move to build on server
+ * 
  * See also wwappbase.js/project-publisher.sh + projectname
  */
 public class PublishProjectTask extends BuildTask {
@@ -140,32 +135,33 @@ public class PublishProjectTask extends BuildTask {
 			return deps;
 		}
 		
-		// no builder found :( -- list std ww projects
-		// All the WW libs
-		List<BuildTask> deps = new ArrayList(Arrays.asList(
-				new BuildUtils(),
-				new BuildMaths(),
-				new WWDependencyTask("winterwell.bob", "jobs.BuildBob"),
-				new BuildWeb(),
-				new BuildDataLog(),
-				new BuildDepot(),				
-				
-				// these might not be on the classpath
-				new WWDependencyTask("jtwitter", "winterwell.jtwitter.BuildJTwitter"),
-				new WWDependencyTask("winterwell.webappbase", "com.winterwell.web.app.BuildWWAppBase"),
-				new WWDependencyTask("youagain-java-client", "com.winterwell.youagain.client.BuildYouAgainJavaClient"),
-				new WWDependencyTask("elasticsearch-java-client", "com.winterwell.es.BuildESJavaClient"),
-				new BuildFlexiGson()
-				));
-		for (BuildTask buildTask : deps) {
-			if (buildTask instanceof BuildWinterwellProject) {
-				((BuildWinterwellProject) buildTask).setCompile(compile);
-				// don't scp??
-				((BuildWinterwellProject) buildTask).setScpToWW(false);
-			}
-		}
-		
-		return deps;
+		// These cause bob CLI issues 'cos the classes arent part of the jars
+//		// no builder found :( -- list std ww projects
+//		// All the WW libs
+//		List<BuildTask> deps = new ArrayList(Arrays.asList(
+//				new BuildUtils(),
+//				new BuildMaths(),
+//				new WWDependencyTask("winterwell.bob", "jobs.BuildBob"),
+//				new BuildWeb(),
+//				new BuildDataLog(),
+//				new BuildDepot(),				
+//				
+//				// these might not be on the classpath
+//				new WWDependencyTask("jtwitter", "winterwell.jtwitter.BuildJTwitter"),
+//				new WWDependencyTask("winterwell.webappbase", "com.winterwell.web.app.BuildWWAppBase"),
+//				new WWDependencyTask("youagain-java-client", "com.winterwell.youagain.client.BuildYouAgainJavaClient"),
+//				new WWDependencyTask("elasticsearch-java-client", "com.winterwell.es.BuildESJavaClient"),
+//				new BuildFlexiGson()
+//				));
+//		for (BuildTask buildTask : deps) {
+//			if (buildTask instanceof BuildWinterwellProject) {
+//				((BuildWinterwellProject) buildTask).setCompile(compile);
+//				// don't scp??
+//				((BuildWinterwellProject) buildTask).setScpToWW(false);
+//			}
+//		}		
+//		return deps;
+		return new ArrayList();
 	}
 
 	@Override

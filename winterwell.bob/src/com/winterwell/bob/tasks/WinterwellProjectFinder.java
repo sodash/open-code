@@ -45,12 +45,13 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 		}
 		try {
 			File wdir = FileUtils.getWinterwellDir();
-			possDirs.add(new File(wdir, "open-code/"+_projectName));
-			possDirs.add(new File(wdir, "code/"+_projectName));
-			possDirs.add(new File(wdir, _projectName));
+			// prefer the warehouse
 			possDirs.add(new File(wdir, "bobwarehouse/"+_projectName));
 			possDirs.add(new File(wdir, "bobwarehouse/open-code/"+_projectName));
-//			possDirs.add(new File(wdir, "egbot")); // hack to allow egbot publish, otherwise getting this error: com.winterwell.utils.FailureException: Could not find project directory for home Tried [/home/irina/winterwell/open-code/home, /home/irina/winterwell/code/home, /home/irina/winterwell/home] @com.winterwell.bob.tasks.WinterwellProjectFinder.apply(WinterwellProjectFinder.java:49)
+			// only the warehouse? For robustly repeatable builds
+//			possDirs.add(new File(wdir, "open-code/"+_projectName));
+//			possDirs.add(new File(wdir, "code/"+_projectName));
+//			possDirs.add(new File(wdir, _projectName));
 		} catch(Exception ex) {
 			// no WINTERWELL_HOME
 			Log.w("BuildWinterwellProject", "No WINTERWELL_HOME found "+ex);			

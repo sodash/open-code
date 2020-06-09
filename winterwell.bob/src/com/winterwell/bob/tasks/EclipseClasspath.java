@@ -294,7 +294,7 @@ public class EclipseClasspath {
 					libs.add(projectJar);
 					depsFor.add(pro, projectJar.getName());
 				} else {
-					Log.d(LOGTAG, "No project jar for "+p);
+					Log.d(LOGTAG, "No project jar for "+p+" dir: "+fp);
 				}
 			} else {
 				Log.d(LOGTAG, "Dont include project jar for "+p);
