@@ -8,7 +8,7 @@ import com.winterwell.bob.BuildTask;
 public class BuildDepot extends BuildWinterwellProject {
 
 	public BuildDepot() {
-		super("winterwell.depot");
+		super("winterwell.depot");	
 	}	
 
 	@Override
