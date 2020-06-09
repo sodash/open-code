@@ -56,13 +56,23 @@ public class CompileTask extends BuildTask {
 		this.cleanOutputDir = cleanOutputDir;
 	}
 
-	private final File srcDir;
+	/**
+	 * HACK: Can also contain single files!
+	 */
+	private final List<File> srcDirs = new ArrayList();
 	
 	private Classpath classpath;
 	private List<File> srcFiles;
 	private String srcJavaVersion;
 	private String outputJavaVersion;
 	private boolean debug;
+	
+	public CompileTask addSrcDir(File srcDir) {
+		if ( ! srcDirs.contains(srcDir)) {
+			srcDirs.add(srcDir);
+		}		
+		return this;
+	}
 	
 	/**
 	 * @param debug If true, switch on warnings output.
@@ -82,7 +92,7 @@ public class CompileTask extends BuildTask {
 	 *            This will be created if needed
 	 */
 	public CompileTask(File srcDir, File outputDir) {
-		this.srcDir = srcDir;
+		if (srcDir!=null) addSrcDir(srcDir);
 		this.outputDir = outputDir;
 		/*
 		 * Default to the version of Java that's running this code :)
@@ -133,11 +143,11 @@ public class CompileTask extends BuildTask {
 		try {			
 			BobConfig bs = Dep.has(BobConfig.class)? Dep.get(BobConfig.class) : new BobConfig();
 			// HACK - to pick a nice name for the debug file
-			File projectDir = srcDir;			
+			File projectDir = srcDirs.isEmpty()? outputDir : srcDirs.get(0);			
 			List<String> notThese = Arrays.asList("src", "test", "source", "java", "build", "builder", "main");
 			while (projectDir!=null && notThese.contains(projectDir.getName())) projectDir = projectDir.getParentFile();			
-			String sname = FileUtils.safeFilename(Utils.or(projectDir!=null? projectDir.getName() : null, 
-					srcDir, srcFiles, "weird").toString(), 
+			String sname = FileUtils.safeFilename(Utils.or(
+					projectDir!=null? projectDir.getName() : null, srcFiles, "weird").toString(), 
 					false);
 			File cmdfile = new File(bs.logDir, "CompileTask."+sname+".sh");
 			FileUtils.write(cmdfile, 
@@ -277,11 +287,24 @@ public class CompileTask extends BuildTask {
 		// copyNonJavaFiles();
 	}
 
+	/**
+	 * Collect all java files from srcDirs
+	 * @return
+	 */
 	private ArrayList<File> getFiles() {
 		if (srcFiles != null) {
 			return new ArrayList(srcFiles);
 		}
-		List<File> files = FileUtils.find(srcDir, ".*\\.java");
+		List<File> files = new ArrayList();
+		for(File srcDir : srcDirs) {
+			if (srcDir.isDirectory()) {
+				List<File> sdFiles = FileUtils.find(srcDir, ".*\\.java");
+				files.addAll(sdFiles);
+			} else {
+				// HACK - we allow single files in too
+				files.add(srcDir);
+			}
+		}
 		ArrayList<File> jFiles = new ArrayList<File>(files.size());
 		// Remove dirs from files 'cos the compiler gets upset
 		for (File f : files.toArray(new File[0])) {
@@ -341,6 +364,10 @@ public class CompileTask extends BuildTask {
 
 	public void setClasspath(Classpath cpfiles) {
 		this.classpath = cpfiles;
+	}
+
+	public void addSrcFile(File f) {
+		srcDirs.add(f);
 	}
 
 }

@@ -393,18 +393,23 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 		BobConfig settings = getConfig();
 		if (settings.clean) {
 			return false;
-		}		
+		}
 		Time rs = Bob.getRunStart();
 		Time lastRun = Bob.getLastRunDate(this);
 		if (lastRun==null) {
 			return false; // first time, run it
 		}
-		if (settings.cleanBefore!=null && lastRun.isAfterOrEqualTo(settings.cleanBefore)) {
-			return false; // e.g. a child Bob getting the parents clean setting
+		if (settings.cleanBefore!=null && lastRun.isBeforeOrEqualTo(settings.cleanBefore)) {
+			return false; // e.g. a child Bob getting the parent's clean setting
 		}
 		if (lastRun.isAfterOrEqualTo(rs)) {
 			Log.i(LOGTAG, "Skip repeat this run dependency: "+getClass().getSimpleName()+" "+getDesc().getId());
 			return true;
+		}
+		// smart skip?
+		Boolean _skip = skipSmart();
+		if (_skip!=null) {
+			return _skip;
 		}
 		// So it has been run -- but was it recent enough?
 		boolean skip = skip(lastRun);
@@ -415,6 +420,18 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 		// do it again
 		return false;
 	}
+
+	/**
+	 * Override to do something.
+	 * e.g. "if the output file is missing, return false (always run), otherwise return null (and a time-based skip
+	 * might be used)" 
+	 * 
+	 * @return null for "normal skip behaviour", true for "yes, skip this", false for "no, run this".
+	 */
+	protected Boolean skipSmart() {
+		return null;
+	}
+
 
 	private Dt skipGap;
 
@@ -428,7 +445,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	}
 	
 	/**
-	 * Override to have more lenient skipping, e.g. "skip if downloaded within a day"
+	 * E.g. "skip if downloaded within a day"
 	 * @param lastRun
 	 * @return true to skip, false to run. If in doubt, return false.
 	 * Note: This will be ignored if -noskip / -clean is set true.

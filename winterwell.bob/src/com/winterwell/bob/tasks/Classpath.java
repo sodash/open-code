@@ -2,6 +2,7 @@ package com.winterwell.bob.tasks;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.winterwell.utils.StrUtils;
@@ -58,7 +59,7 @@ public class Classpath {
 	 * 		dedupe and add
 	 * @param files2
 	 */
-	public void addAll(List<File> files2) {
+	public void addAll(Collection<File> files2) {
 		for (File file : files2) {
 			String fs = stringForFile(file);
 			if (files.contains(fs)) continue;

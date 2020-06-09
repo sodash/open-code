@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import com.winterwell.bob.wwjobs.BuildUtils;
 import com.winterwell.depot.Desc;
+import com.winterwell.utils.containers.ArrayMap;
 
 public class BuildTaskTest {
 
@@ -23,7 +24,8 @@ public class BuildTaskTest {
 		assert a.equals(b);
 		assert a.hashCode() == b.hashCode();		
 	}
-
+	
+	
 	@Test
 	public void testEqualsAfterRun() {
 		BuildUtils a = new BuildUtils();
@@ -34,6 +36,7 @@ public class BuildTaskTest {
 		Desc descb = b.getDesc();
 		
 		assert a != b;
+		assert desca.equals(descb);
 		assert a.equals(b);
 		assert a.hashCode() == b.hashCode();		
 	}

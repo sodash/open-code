@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.winterwell.bob.Bob;
+import com.winterwell.bob.BobScriptFactory;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.IErrorHandler;
 import com.winterwell.bob.tasks.BigJarTask;
@@ -113,7 +114,7 @@ public class BuildWinterwellProject extends BuildTask {
 	}
 	
 	private GitBobProjectTask getDependencies2b_gitBob(File pdir) {
-		File bfile = Bob.findBuildScript2(pdir, null);
+		File bfile = new BobScriptFactory(pdir).findBuildScript2(pdir, null);
 		if (bfile==null) {
 			return null;
 		}
@@ -153,7 +154,7 @@ public class BuildWinterwellProject extends BuildTask {
 	 * @param pf
 	 */
 	private BuildTask getDependencies2a_builderClass(String pname, File pdir) {
-		File bfile = Bob.findBuildScript2(pdir, null);
+		File bfile = new BobScriptFactory(pdir).findBuildScript2(pdir, null);
 		if (bfile != null) {					
 			// Use a forked Bob to pull in dependencies??
 			// or a WW task??

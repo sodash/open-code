@@ -38,7 +38,7 @@ public class GitTaskTest {
 	@Test
 	public void testGetLastCommitInfo() {
 		Map<String, Object> info = GitTask.getLastCommitInfo(null);
-		System.out.println(info);		
+		System.out.println(info);	
 	}
 
 	

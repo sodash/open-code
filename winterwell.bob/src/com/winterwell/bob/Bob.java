@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 import com.winterwell.bob.tasks.Classpath;
 import com.winterwell.bob.tasks.CompileTask;
+import com.winterwell.bob.tasks.EclipseClasspath;
 import com.winterwell.bob.tasks.GitBobProjectTask;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
@@ -97,112 +98,9 @@ public class Bob {
 
 	public static String LOGTAG = "bob";
 
-	/**
-	 * @throws Exception 
-	 */
-	static Class getClass(String classOrFileName) throws Exception {
-		try {
-			return getClass2(classOrFileName);
-		} catch(Exception ex) {
-			// partial name? try a find
-			File buildFile = findBuildScript(classOrFileName);
-			if (buildFile!=null && ! buildFile.toString().equals(classOrFileName)) {
-				return getClass2(buildFile.toString());
-			}
-			throw ex;
-		}
-	}
+
 	
-	static Class getClass2(String classOrFileName) throws Exception {
-		String className = classOrFileName;
-		// Strip endings if they were used
-		if (classOrFileName.endsWith(".java")) {
-			className = classOrFileName.substring(0, classOrFileName.length() - 5);
-		}
-		if (classOrFileName.endsWith(".class")) {
-			className = classOrFileName.substring(0, classOrFileName.length() - 6);
-		}		
-		try {
-			Class<?> clazz = Class.forName(className);
-			return clazz;
-		} catch(ClassNotFoundException ex) {
-			// is it a directory?
-			File dir = new File(classOrFileName);
-			if (dir.isDirectory()) {
-				File found = findBuildScript2(dir, null);
-				if (found!=null) {
-					Log.d(LOGTAG, "located build-script "+found+" in directory "+dir);
-					classOrFileName = found.toString();
-				}
-			}
-			
-			Pair2<File, File> klass = compileClass(classOrFileName);
-			if (klass != null) {
-				// classpath
-				List<File> cpfiles = getSingleton().getClasspath().getFiles();
-//				classpath = Utils.isEmpty(cp)? null : Containers.
-				// dynamically load a class from a file?
-				Class clazz = ReflectionUtils.loadClassFromFile(klass.first, klass.second, cpfiles);
-				return clazz;
-			}
-			throw ex;
-		}
-	}
-
-	/**
-	 * From a .java file or fully-qualified classname,
-	 * compile it to a .class file 
-	 * @param classOrFileName
-	 * @return (temp-output-dir, class-file)
-	 * @throws Exception
-	 */
-	private static Pair<File> compileClass(String classOrFileName) throws Exception {
-		// TODO can we compile it here and now?? But how would we load it?
-		// 1. Look for the .java file		
-		String fileName = classOrFileName;
-		File f = new File(fileName);
-		if ( ! f.isFile()) {
-			// classname? turn into a file
-			fileName = fileName.replace('.', '/');
-			// .java ending
-			if (fileName.endsWith("/java")) {
-				fileName = fileName.substring(0, fileName.length()-5)+".java";
-			}
-			if ( ! fileName.endsWith(".java")) {
-				fileName = fileName+".java";
-			}
-			f = new File(fileName);
-			if ( f.isDirectory()) {
-				throw new IllegalArgumentException(f+" from "+classOrFileName+" should have been handled via find-build-script");
-			}
-			if ( ! f.isFile()) {
-				throw new FileNotFoundException(f+" = "+f.getAbsolutePath()+" from "+classOrFileName);
-			}
-		}
-		
-		// sniff package
-		String src = FileUtils.read(f);
-		String[] fnd = StrUtils.find("package (.+);", src);
-		// full classname
-		String className = (fnd==null? "" : fnd[1]+".") + new File(FileUtils.getBasename(f)).getName();
-		
-		File tempDir = FileUtils.createTempDir();
-		CompileTask cp = new CompileTask(null, tempDir);
-		// classpath
-		Classpath claspath = Bob.getSingleton().getClasspath();
-		cp.setClasspath(claspath);
-		// our .java file to compile
-		cp.setSrcFiles(f);
-		// ...compile
-		cp.doTask();
-		File klass = new File(tempDir, className.replace('.', '/')+".class");
-		if (klass.isFile()) {
-			return new Pair<File>(tempDir, klass);
-		}
-		throw new FailureException("Bootstrap compile failed for "+classOrFileName+" = "+f);
-	}
-
-	private Classpath getClasspath() {
+	Classpath getClasspath() {
 		BobConfig _settings = getSingleton().getConfig();
 		Classpath cpfiles;
 		if (_settings.classpath!=null && ! _settings.classpath.isEmpty()) {
@@ -330,10 +228,11 @@ public class Bob {
 			
 			// What to build?
 			List<String> argsLeft = cb.getRemainderArgs();
+			BobScriptFactory bsf = new BobScriptFactory(FileUtils.getWorkingDirectory());
 			
 			if (argsLeft.size() == 0) {
 				// find a file?
-				File buildFile = findBuildScript(null);
+				File buildFile = bsf.findBuildScript(null);
 				if (buildFile != null) {
 					argsLeft = Arrays.asList(buildFile.toString());
 				}
@@ -362,10 +261,10 @@ public class Bob {
 				BobLog.logDot("\n\ndigraph Tasks"+argsLeft.get(0)+" {\n");
 			}
 			
-			// Build each target
+			// Build each target					
 			for (String clazzName : argsLeft) {
 				try {
-					Class clazz = getClass(clazzName);
+					Class clazz = bsf.getClass(clazzName);
 					bob.build(clazz);
 					bob.built.add(clazz);
 				} catch (ClassNotFoundException e) {
@@ -445,39 +344,6 @@ public class Bob {
 			FileUtils.move(bobJar, wwbobjar);
 			System.out.println("Bob jar moved to:\n"+wwbobjar);
 		}
-	}
-
-	private static File findBuildScript(String optionalName) {
-		File baseDir = FileUtils.getWorkingDirectory();
-		File f = findBuildScript2(baseDir, optionalName);
-		return f;
-	}
-	
-	/**
-	 * ??how best to expose this method
-	 * @param projectDir
-	 * @param optionalName
-	 * @return BuildX.java, or null 
-	 * ??change to List so we can better communicate around failed-to-find/pick
-	 */
-	public static File findBuildScript2(File projectDir, String optionalName) {
-		File bdir = new File(projectDir, "builder");
-		if ( ! bdir.isDirectory()) {
-			return null;
-		}
-		String namePattern = ".*Build.*\\.java";
-		if (optionalName!=null) {
-			namePattern = ".*"+optionalName+"\\.java";
-		}
-		List<File> files = FileUtils.find(bdir, namePattern);
-		if (files.isEmpty()) return null;
-		if (files.size()==1) {
-			Log.i(LOGTAG, "Auto-build: found file "+files.get(0));
-			return files.get(0);
-		}
-		Log.w(LOGTAG, "Auto-build: could not pick between "+files.size()+" tasks in "+bdir);
-		Log.w(LOGTAG, Containers.apply(files, FileUtils::getBasename));
-		return null;
 	}
 
 	private void maybeCarryOn(Throwable e) throws RuntimeException {

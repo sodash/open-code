@@ -321,4 +321,19 @@ public class EclipseClasspath {
 		includeProjectJars = b;		
 	}
 
+	public List<File> getSrcDirs() {
+		// copy pasta from getRefProjects -- TODO merge
+		String xml = FileUtils.read(file);
+		List<Node> tags = WebUtils.xpathQuery("//classpathentry[@kind='src']", xml);
+		List<File> files = new ArrayList();
+		for (Node node : tags) {
+			Node path = node.getAttributes().getNamedItem("path");
+			String f = path.getTextContent();
+			// not a local src folder?
+			if (f.startsWith("/") || f.startsWith("\\")) continue;
+			files.add(new File(projectDir, f));
+		}
+		return files;
+	}
+
 }

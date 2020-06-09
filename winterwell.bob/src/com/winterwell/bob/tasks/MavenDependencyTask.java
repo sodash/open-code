@@ -38,6 +38,14 @@ public class MavenDependencyTask extends BuildTask {
 	public static final String MAVEN_DEPENDENCIES_FOLDER = "dependencies";
 	private String mavenArtifactSpec;
 	
+	@Override
+	protected Boolean skipSmart() {
+		if ( ! getOutputDirectory().isDirectory()) {
+			return false; // run
+		}
+		return null; // dont run too often. it is tedious
+	}
+	
 	/**
 	 * 
 	 * @param mavenArtifactSpec "groupId:artifactId:version"
@@ -67,7 +75,7 @@ public class MavenDependencyTask extends BuildTask {
 		return this;
 	}
 
-	File outDir;
+	private File outDir;
 	File projectDir = FileUtils.getWorkingDirectory();
 
 	boolean incSrc;
@@ -133,10 +141,8 @@ public class MavenDependencyTask extends BuildTask {
 	@Override
 	protected void doTask() throws Exception {
 		// files
-		// output  jars into ./dependencies by default
-		if (outDir==null) {
-			setOutputDirectory(new File(projectDir, MAVEN_DEPENDENCIES_FOLDER));
-		}
+		// output  jars into ./dependencies by default		
+		getOutputDirectory();
 		if (cleanOutputDirectory && outDir.isDirectory()) {
 			Log.i(LOGTAG, "Clean "+outDir);
 			FileUtils.deleteDir(outDir);
@@ -222,6 +228,16 @@ public class MavenDependencyTask extends BuildTask {
 				FileUtils.delete(pomProper);
 			}
 		}
+	}
+
+	/**
+	 * @return never null (will set outDir to default if unset)
+	 */
+	private File getOutputDirectory() {
+		if (outDir==null) {
+			setOutputDirectory(new File(projectDir, MAVEN_DEPENDENCIES_FOLDER));
+		}
+		return outDir;
 	}
 
 	private void doTask2_sources(String output) throws IOException {

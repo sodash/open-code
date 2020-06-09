@@ -24,6 +24,10 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 	 */
 	@Override
 	public File apply(String _projectName) {
+		// HACK portal is in adserver
+		if ("portal".equals(_projectName)) {
+			_projectName = "adserver";
+		}
 		List<File> possDirs = new ArrayList();
 		// are we in the project dir?
 		if (FileUtils.getWorkingDirectory().getName().equals(_projectName)) {
@@ -71,7 +75,7 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 
 	/**
 	 * HACK for deploying WW libs
-	 * project-name: repo_url repo_folder
+	 * {project-name: "repo_url repo_folder"}
 	 */
 	private static final Map<String,String> KNOWN_PROJECTS = new ArrayMap(
 		"winterwell.utils", 

@@ -106,15 +106,7 @@ public class Log {
 		Level minLevel = MIN_LEVEL;
 		setMinLevel(OFF);
 		// Add a simple console output listener
-		addListener(new ILogListener() {
-			@Override
-			public void listen(Report report) {
-				Printer.out(// Environment.get().get(Printer.INDENT)+
-				'#' + report.tag + " " + report.getMessage()
-				+(report.ex==null? "" : report.getDetails()
-						));
-			}
-		});
+		addListener(new SystemOutLogListener());
 
 		// config
 		try {
