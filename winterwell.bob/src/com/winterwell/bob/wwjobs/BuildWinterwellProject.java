@@ -628,10 +628,10 @@ public class BuildWinterwellProject extends BuildTask {
 		
 		// Remove unwanted jars? -- no too dangerous		
 		
-		// This jar
-//		BuildCalstat buildProject = new BuildCalstat();
-//		File jar = buildProject.getJar();
-//		FileUtils.copy(jar, localLib);		
+		// Copy this jar in to
+		if (getJar().isFile()) {
+			FileUtils.copy(getJar(), libBuild);	
+		}		
 		
 		System.out.println("Jars: "+Printer.toString(Arrays.asList(libBuild.list()), "\n"));
 	}
