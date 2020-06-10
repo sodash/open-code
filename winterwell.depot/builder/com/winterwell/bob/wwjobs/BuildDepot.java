@@ -11,10 +11,4 @@ public class BuildDepot extends BuildWinterwellProject {
 		super("winterwell.depot");	
 	}	
 
-	@Override
-	public List<BuildTask> getDependencies() {
-		return Arrays.asList(new BuildUtils(), new BuildWeb());
-	}
-
-
 }

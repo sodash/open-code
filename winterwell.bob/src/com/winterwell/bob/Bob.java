@@ -256,6 +256,8 @@ public class Bob {
 			for (String clazzName : argsLeft) {
 				try {
 					Class clazz = bsf.getClass(clazzName);
+					Log.i(LOGTAG, "Build script loaded: "+clazz);
+					
 					bob.build(clazz);
 					bob.built.add(clazz);
 				} catch (ClassNotFoundException e) {

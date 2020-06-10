@@ -164,6 +164,7 @@ public class BobScriptFactory {
 			// our .java file to compile
 			cp.setSrcFiles(f);
 			// ...compile
+			Log.i(LOGTAG, "Compiling the Bob build script...");
 			cp.doTask();
 			FileUtils.close(cp);
 		} catch(FailureException fex) {
