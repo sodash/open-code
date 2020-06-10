@@ -200,7 +200,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 
 	private void handleException(Throwable e) {
 		if (getConfig().ignoreAllExceptions) {
-			System.out.println("Ignoring: " + e);
+			Log.d(LOGTAG, "Ignoring: " + e);
 			return;
 		}
 		if (errorHandler!=null) {
@@ -211,7 +211,7 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 				throw Utils.runtime(e2);		
 			}
 		}
-		throw Utils.runtime(e);		
+		throw new BobBuildException(this, e);		
 	}
 
 	
@@ -359,9 +359,9 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 			// clean up
 			try {
 				close();				
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				// Swallow!
-				Log.e(LOGTAG, e);				
+				Log.w(LOGTAG, "error in closing: "+e);				
 			}
 			Log.d(LOGTAG, "...exiting " + toString()+" "+status);
 		}
@@ -496,24 +496,27 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 	 * This includes a check to avoid repeat building of the same dependency. 
 	 * 
 	 * @return
+	 * @throws BobBuildException 
 	 */
-	private boolean doDependencies() {
+	private boolean doDependencies() throws BobBuildException {
 		if (skipDependencies) {
 			// was there a change in the dependencies? who knows
 			return true;
 		}
 		// run
 		Collection<? extends BuildTask> deps = getDependencies();
-		if (deps!=null) {			
-			String a = labelTask(getDesc());	
-			for (BuildTask bs : deps) {
-				// TODO use getID and getName as [label=]
-				String b = labelTask(bs.getDesc());
-				BobLog.logDot('"'+a+"\" -> \""+b+"\"\n");
-				
-				bs.setDepth(getDepth()+1);
-				// Do it
+		if (deps==null) return true;			
+		String a = labelTask(getDesc());	
+		for (BuildTask bs : deps) {
+			// TODO use getID and getName as [label=]
+			String b = labelTask(bs.getDesc());
+			BobLog.logDot('"'+a+"\" -> \""+b+"\"\n");			
+			bs.setDepth(getDepth()+1);
+			// Do it				
+			try {
 				bs.run();
+			} catch (Throwable ex) {
+				throw new BobBuildException(bs, ex);
 			}
 		}
 		return true;

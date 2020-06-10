@@ -291,6 +291,7 @@ public class Bob {
 			System.err.println(Printer.toString(ex, true));
 			if (bob!=null) {
 				Log.e(LOGTAG, " ERROR EXIT for "+bob.lastScript);
+				Log.e(LOGTAG, ex.toString()); // a short error - hopefully a BobBuildException with a stack of tasks
 			}
 			// send a bleurgh code out
 			System.exit(1);
