@@ -57,9 +57,7 @@ public class BuildBob extends BuildWinterwellProject {
 
 	@Override
 	public List<BuildTask> getDependencies() {
-		List<BuildTask> uw = new ArrayList();
-		uw.add(new BuildUtils());
-		uw.add(new BuildWeb());
+		List<BuildTask> uw = super.getDependencies();
 		
 		MavenDependencyTask mdt = new MavenDependencyTask();
 //		mdt.addDependency("org.slf4j", "slf4j-api", "1.7.30");

@@ -11,10 +11,4 @@ public class BuildOptimization extends BuildWinterwellProject {
 		super("winterwell.optimization");
 	}
 
-	@Override
-	public List<BuildTask> getDependencies() {
-		return Arrays.asList(new BuildUtils(), new BuildMaths());
-	}
-
-
 }
