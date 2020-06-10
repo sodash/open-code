@@ -35,7 +35,7 @@ public class BuildTaskTest {
 		Desc descb = b.getDesc();
 		
 		assert a != b;
-		assert desca.equals(descb);
+		assert desca.equals(descb) : desca.getId() +" vs "+descb.getId();
 		assert a.equals(b);
 		assert a.hashCode() == b.hashCode();		
 	}
