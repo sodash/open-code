@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.tools.bzip2.CBZip2InputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 import com.winterwell.nlp.NLPWorkshop;
 import com.winterwell.nlp.corpus.ICorpus;
@@ -118,7 +118,7 @@ public class WikipediaCorpus implements ICorpus {
 		// the command line bzip program to mark the stream.
 		int b1 = fin.read();
 		int b2 = fin.read();
-		CBZip2InputStream in = new CBZip2InputStream(fin);
+		BZip2CompressorInputStream in = new BZip2CompressorInputStream(fin); // was CBZip2InputStream in an earlier apache/jakarta library
 		return in;
 	}
 

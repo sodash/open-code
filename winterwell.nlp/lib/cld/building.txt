@@ -1,0 +1,25 @@
+# Getting started
+
+Probably "build-essential" is enough. I had to add -fPIC to AM_CPP_FLAGS
+
+Need to run the autohell tools (something like):
+
+$ aclocal
+$ autoreconf -i
+$ automake -a
+$ ./configure
+$ make
+$ make install [?]
+
+# Java/JNI build
+
+Requires maven 2
+
+The JNI build/link appeared to work, but didn't. NB The unit tests are misleading -- they don't actually test whether language detection is working...
+
+I resorted to building and linking by hand, with something like:
+
+$ gcc -c -fPIC -DCLD_WINDOWS -rdynamic -Inull/include/linux -I/usr/local/include/cld -I/home/joe/winterwell/cld/ports/java/native/src/main/native -I/usr/lib/jvm/java-6-openjdk-amd64/jre/../include -I/usr/lib/jvm/java-6-openjdk-amd64/jre/../include/unix -o /home/joe/winterwell/cld/ports/java/native/unix/target/objs/com_mzsanford_cld_CompactLanguageDetector.o -c /home/joe/winterwell/cld/ports/java/native/src/main/native/com_mzsanford_cld_CompactLanguageDetector.cpp
+$ gcc -shared -o /home/joe/winterwell/cld/ports/java/native/unix/target/libcld.so /home/joe/winterwell/cld/ports/java/native/unix/target/objs/com_mzsanford_cld_CompactLanguageDetector.o /usr/local/lib/cld/libcld.a
+
+[What's important: adding -fPIC; "statically" linking against the system.so]

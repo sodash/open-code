@@ -7,6 +7,7 @@ import java.util.List;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.CopyRequiredClassesTask;
 import com.winterwell.bob.tasks.JarTask;
+import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.io.FileUtils;
@@ -20,7 +21,17 @@ public class BuildNLP extends BuildWinterwellProject {
 
 	@Override
 	public List<BuildTask> getDependencies() {
-		return Arrays.asList(new BuildUtils());
+		List<BuildTask> deps = super.getDependencies();
+
+		MavenDependencyTask mdt = new MavenDependencyTask();
+//		mdt.addDependency("snowball-stemmer", "snowball-stemmer", "0.1.0"); throws an error?!
+//		mdt.addDependency("net.didion", "jwnl", "1.4.1"); // error?!
+		mdt.addDependency("org.apache.commons", "commons-compress", "1.20");
+		mdt.setIncSrc(true); // we like source code
+		mdt.setProjectDir(projectDir);
+		deps.add(mdt);
+		
+		return deps;
 	}
 	
 	@Override
