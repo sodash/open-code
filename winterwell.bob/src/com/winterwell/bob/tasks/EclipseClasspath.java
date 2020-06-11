@@ -114,7 +114,7 @@ public class EclipseClasspath {
 		case THROW_EXCEPTION: 
 			throw new WrappedException(new FileNotFoundException(path));
 		case REPORT:
-			Log.e("eclipse.classpath", "Cannot resolve file for path: "+path);
+			Log.e("eclipse.classpath", projectDir+" Cannot resolve file for path: "+path);
 		case IGNORE: case ACCEPT:
 			break;
 		case DELETE_CAUSE: case RETURN_NULL: 
@@ -140,8 +140,8 @@ public class EclipseClasspath {
 		String[] pathBits = path.split("[/\\\\]");
 		// Drop the first bit (which wil be empty -- from the leading /)
 		List<String> rest = Arrays.asList(Arrays.copyOfRange(pathBits, 2, pathBits.length));
-		File f = new File(getProjectDir(pathBits[1]),
-				StrUtils.join(rest, "/"));
+		File pdir = projectFinder.apply(pathBits[1]);
+		File f = new File(pdir, StrUtils.join(rest, "/"));
 		return f;
 	}
 
@@ -210,16 +210,6 @@ public class EclipseClasspath {
 			files.add(f.substring(1));
 		}
 		return files;
-	}
-
-	/**
-	 * @param projectName
-	 * @return the directory for this project, based on {@link #workspaceDir}
-	 */
-	private File getProjectDir(String projectName) {
-		assert ! Utils.isBlank(projectName);
-		File f = projectFinder.apply(projectName);
-		return f;
 	}
 
 	/**

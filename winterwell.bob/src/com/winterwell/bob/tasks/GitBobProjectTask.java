@@ -56,7 +56,7 @@ public class GitBobProjectTask extends BuildTask {
 			// stash?
 			if (stashLocalChanges) {
 				GitTask gt0 = new GitTask(GitTask.STASH, dir);
-				gt0.setDepth(getDepth()+1);
+				gt0.setDepth(getDepth()+1);				
 				gt0.run();
 				gt0.close();
 			}
@@ -72,6 +72,7 @@ public class GitBobProjectTask extends BuildTask {
 			if ( ! ok) throw new IOException("Could not make directory "+dir);
 			GitTask gt = new GitTask(GitTask.CLONE, dir);
 			gt.setDepth(getDepth()+1);
+			gt.addArg("--depth 1");
 			gt.addArg(gitUrl);
 			gt.addArg(dir.getAbsolutePath());
 			gt.run();
@@ -90,6 +91,7 @@ public class GitBobProjectTask extends BuildTask {
 		childBob.setDir(pd);
 		// Do it!
 		childBob.run();
+		childBob.close();
 	}
 
 	public GitBobProjectTask setSubDir(String subdir) {

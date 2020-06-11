@@ -107,9 +107,14 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 		"jtwitter",
 			"https://github.com/winterstein/JTwitter.git",
 		"flexi-gson", 
-			"https://github.com/winterstein/flexi-gson.git"
-//		"dataloader", private code repos??
-//			"git@git.winterwell.com:winterwell-code winterwell-code dataloader"
+			"https://github.com/winterstein/flexi-gson.git",
+		"dataloader",
+			"git@git.winterwell.com:winterwell-code winterwell-code dataloader",
+		"youagain-server",
+			"git@git.winterwell.com:winterwell-code winterwell-code youagain-server",
+		"winterwell.demographics",
+			"git@git.winterwell.com:winterwell-code winterwell-code winterwell.demographics"
+
 	);
 	
 	public static GitBobProjectTask getKnownProject(String pname) {

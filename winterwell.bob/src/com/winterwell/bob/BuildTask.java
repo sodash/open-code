@@ -531,6 +531,11 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 		return depth;
 	}
 
+	/**
+	 * This is Bob build-stack depth -- not a task parameter
+	 * @param depth
+	 * @return
+	 */
 	public BuildTask setDepth(int depth) {
 		this.depth = depth;
 		LOGTAG = Bob.LOGTAG+"."+getConfig().depth+"."+getDepth()+"."+getClass().getSimpleName();

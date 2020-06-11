@@ -307,6 +307,9 @@ public class JarTask extends BuildTask {
 	}
 
 	public static File pickNewerVersion(File jara, File jarb) {
+		// odd no-such-file bug (maybe a race condition?) seen june 2020
+		if ( ! jara.exists()) return jarb;
+		if ( ! jarb.exists()) return jara;
 		assert jara.isFile() : jara;
 		assert jarb.isFile() : jarb;
 		Map<String, Object> ma = getManifest(jara);
