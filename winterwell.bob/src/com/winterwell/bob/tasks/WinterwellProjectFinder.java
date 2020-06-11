@@ -48,6 +48,7 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 			// prefer the warehouse
 			possDirs.add(new File(wdir, "bobwarehouse/"+_projectName));
 			possDirs.add(new File(wdir, "bobwarehouse/open-code/"+_projectName));
+			possDirs.add(new File(wdir, "bobwarehouse/code/"+_projectName));
 			// only the warehouse? For robustly repeatable builds
 //			possDirs.add(new File(wdir, "open-code/"+_projectName));
 //			possDirs.add(new File(wdir, "code/"+_projectName));
