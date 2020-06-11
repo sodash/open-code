@@ -5,6 +5,8 @@ See also: https://www.winterwell.com/software/bob/
 
 <img style='float:right; max-height:200px;' src='https://www.winterwell.com/res/images/bob-the-builder-edited-scaled.png' alt='Bob the Builder'>
 
+## Latest version: 1.1.9
+
 ## Can we build it?
 
 "Bob" or "winterwell.bob" is a java project which leverages maven's abilities, in order to ultimately build other winterwell projects.
@@ -27,6 +29,8 @@ Recommended: Use npm:
 
 Then run `bob`   
 The first run will download the jar file to ~/bin/bob-all.jar.
+
+You can download updates using `bob -update`
 
 Alternative: Download bob-all.jar from <https://www.winterwell.com/software/downloads/bob-all.jar>
 

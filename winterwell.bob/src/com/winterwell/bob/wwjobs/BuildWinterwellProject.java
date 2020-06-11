@@ -278,6 +278,12 @@ public class BuildWinterwellProject extends BuildTask {
 	protected boolean scpToWW;
 
 	protected String projectName;
+
+	/**
+	 * HACK Is this the top-level task on a local dev build, on master branch?
+	 * In which case, we should do scp.
+	 */
+	protected boolean isTopLocalBuild;
 	
 	public String getProjectName() {
 		return projectName;
@@ -341,13 +347,17 @@ public class BuildWinterwellProject extends BuildTask {
 		// dependencies shouldnt need rebuilding all the time
 		setSkipGap(TUnit.DAY.dt);
 		
-		// HACK scp to release the jar?
+		// HACK scp to release the jar?		
 		int bc = Bob.getSingleton().getBobCount();
 		if (BuildHacks.getServerType()==KServerType.LOCAL 
 				&& getConfig().depth==0
-				&& bc==0
-				) 
-		{
+				&& bc==0) {
+			String branch = GitTask.getGitBranch(projectDir);
+			if ("master".equals(branch)) {
+				isTopLocalBuild = true;
+			}
+		}
+		if (isTopLocalBuild) {
 			setScpToWW(true);
 		}
 	}

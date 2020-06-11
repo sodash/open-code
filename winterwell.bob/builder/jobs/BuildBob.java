@@ -53,6 +53,13 @@ public class BuildBob extends BuildWinterwellProject {
 		FileUtils.copy(bobjar, new File(projectDir, "winterwell.bob.jar"));
 		
 		// bob-all.jar is what you want to run Bob
+		
+		// Update the readme version
+		if (isTopLocalBuild) {
+			String readme = FileUtils.read(new File(projectDir, "README.md"));
+			String readme2 = readme.replaceFirst("Latest version:\\s*[0-9.]+", "Latest version: "+BobConfig.VERSION_NUMBER);
+			FileUtils.write(new File(projectDir, "README.md"), readme2);
+		}
 	}
 
 	@Override
