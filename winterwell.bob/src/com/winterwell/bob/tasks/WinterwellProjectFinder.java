@@ -79,7 +79,7 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 
 	/**
 	 * HACK for deploying WW libs
-	 * {project-name: "repo_url repo_folder"}
+	 * {project-name: "repo_url repo_folder sub_folder"}
 	 */
 	private static final Map<String,String> KNOWN_PROJECTS = new ArrayMap(
 		"winterwell.utils", 
@@ -108,6 +108,8 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 			"https://github.com/winterstein/JTwitter.git",
 		"flexi-gson", 
 			"https://github.com/winterstein/flexi-gson.git"
+//		"dataloader", private code repos??
+//			"git@git.winterwell.com:winterwell-code winterwell-code dataloader"
 	);
 	
 	public static GitBobProjectTask getKnownProject(String pname) {
