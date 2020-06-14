@@ -146,8 +146,9 @@ public class ConfigFactory {
 		Object[] options = new Object[] {
 				thingy,
 				appName,
-				// live, local, test? This is null unless set!
+				// live, local, test? This is null unless set! See KServerType
 				serverType,
+				appName+"."+serverType, // this will resolve to e.g. config/sogive.production.properties
 				// or in a logins file (which should not be in the git repo!), for passwords?
 				"logins", 
 				machine
