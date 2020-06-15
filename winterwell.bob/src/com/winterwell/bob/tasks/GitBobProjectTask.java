@@ -99,8 +99,4 @@ public class GitBobProjectTask extends BuildTask {
 		return this;
 	}
 
-	public static File getGitBobDir() {
-		return new File(FileUtils.getWinterwellDir(),"bobwarehouse");
-	}
-
 }

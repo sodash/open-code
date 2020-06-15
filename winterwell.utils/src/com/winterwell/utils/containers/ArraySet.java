@@ -172,6 +172,7 @@ public final class ArraySet<T> extends AbstractSet<T>
 		 * This method does NOT implement set's no-duplicates check! Using this can
 		 * allow duplicate entries.
 		 */
+	@Override
 		@Deprecated
 		public T set(int index, T element) {
 			T old = backing.set(index, element);

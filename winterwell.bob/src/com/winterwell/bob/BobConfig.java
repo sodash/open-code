@@ -1,13 +1,16 @@
 package com.winterwell.bob;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.winterwell.bob.tasks.GitBobProjectTask;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
+import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
 
 /**
@@ -21,7 +24,7 @@ public class BobConfig {
 
 	public static final Key<Boolean> VERBOSE = new Key<Boolean>("verbose");
 
-	public final static String VERSION_NUMBER = "1.1.9";
+	public final static String VERSION_NUMBER = "1.1.10";
 	
 	@Option(tokens="-cp,-classpath", description="Classpath used for dynamically compiling build scripts. Uses the file1:file2 format of Java")
 	// NB: This is not the classpath used for CompileTasks which are part of a build script run.
@@ -67,9 +70,39 @@ public class BobConfig {
 	@Option(description="Set by Bob when making recursive child Bob. 0 for top-level")
 	public int depth;
 
-	@Option(description="Save call dependency graph in dot format")
-	public File dotFile = new File(GitBobProjectTask.getGitBobDir(), "calls.dot");
+	// NB: non an option 'cos its (currently) a system-wide setting 
+	File bobwarehouse;
+	
+	@Option(description="Save call dependency graph in dot format. Normally in bobwarehouse.")
+	public File dotFile;
 
+	public BobConfig() {
+		try {
+			bobwarehouse = new File(FileUtils.getWinterwellDir(),"bobwarehouse");
+		} catch(Exception ex) {
+			try {
+				File tf = File.createTempFile("blah", ".temp");
+				File tempDir = tf.getParentFile();
+				bobwarehouse = new File(tempDir, "bobwarehouse");
+				Log.w("BobConfig", "Using temp dir "+bobwarehouse+". It would be better to set WINTERWELL_HOME");
+			} catch (IOException e) {
+				Log.e("BobConfig", "No winterwell or temp dir - Cannot make a reliable bobwarehouse. Using .bob as a fallback!");
+				bobwarehouse = new File(".bob", "bobwarehouse");
+			}
+		}
+		dotFile = new File(bobwarehouse, "calls.dot");		
+	}
+	
+	
+
+	/**
+	 * 
+	 * @return winterwell/bobwarehouse or temp/bobwarehouse
+	 */
+	public File getGitBobDir() {
+		return bobwarehouse;
+	}
+	
 	// @Option(tokens = "-p,-properties", description =
 	// "Java properties file to load")
 	// public File properties = new File("bob.properties");

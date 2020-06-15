@@ -196,9 +196,11 @@ public class Bob {
 			cf.setArgs(args);
 			// ...system-wide Bob settings
 			ConfigBuilder cb = cf.getConfigBuilder(BobConfig.class);
-			File warehouse = GitBobProjectTask.getGitBobDir();
+			File warehouse = new BobConfig().bobwarehouse;
 			File bcf = new File(warehouse, "bob.properties");
-			if (bcf.isFile()) cb.set(bcf);
+			if (bcf.isFile()) {
+				cb.set(bcf);
+			}
 			// ...load
 			BobConfig _settings = cb.get();
 			if ( ! Utils.isBlank(_settings.label)) {

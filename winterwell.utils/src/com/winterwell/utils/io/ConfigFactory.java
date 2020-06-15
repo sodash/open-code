@@ -147,7 +147,7 @@ public class ConfigFactory {
 				thingy,
 				appName,
 				// live, local, test? This is null unless set! See KServerType
-				serverType,
+				serverType, // e.g. local.properties
 				appName+"."+serverType, // this will resolve to e.g. config/sogive.production.properties
 				// or in a logins file (which should not be in the git repo!), for passwords?
 				"logins", 
@@ -158,7 +158,7 @@ public class ConfigFactory {
 		try {
 			files.add(new File(FileUtils.getWinterwellDir(), "logins/logins."+appName+".properties"));
 			files.add(new File(FileUtils.getWinterwellDir(), "logins/"+thingy+".properties"));
-		} catch(FailureException fex) {			
+		} catch(Exception fex) {			
 			// oh well - no WW home - log and carry on
 			Log.w(LOGTAG, fex.toString());
 		}

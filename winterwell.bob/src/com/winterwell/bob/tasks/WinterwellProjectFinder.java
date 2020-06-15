@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.winterwell.bob.BobConfig;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.IFn;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.FileUtils;
@@ -122,13 +124,17 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 		if (g_s==null) return null;
 		String[] gs = g_s.split(" ");
 		boolean isSubdir = gs.length > 1; 
-		File bobdir = GitBobProjectTask.getGitBobDir();
+		File bobdir = getConfig().getGitBobDir();
 		File dir = new File(bobdir, isSubdir? gs[1] : pname);
 		GitBobProjectTask gb = new GitBobProjectTask(gs[0], dir);
 		if (isSubdir) {
 			gb.setSubDir(gs[2]);
 		}
 		return gb;
+	}
+
+	private static BobConfig getConfig() {
+		return Dep.getWithDefault(BobConfig.class, new BobConfig());
 	}
 
 }

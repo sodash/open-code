@@ -90,21 +90,7 @@ public class BuildWinterwellProject extends BuildTask {
 				continue;
 			}
 			
-			BuildTask bt;
-			if (false) {
-				// Try a git pull (fail quietly)
-				GitTask gt = new GitTask(GitTask.PULL, pdir);
-				gt.setErrorHandler(IGNORE_EXCEPTIONS);
-				deps.add(gt);
-				
-				// NB: We'd prefer to use the "local" builder class over GitBob
-				// But the GitBob version is wanted for deployment
-				// ... and best to have local & deployment behave the same
-				bt = getDependencies2a_builderClass(pname, pdir);
-			} else {
-			
-				bt = getDependencies2b_gitBob(pdir);
-			}
+			BuildTask bt = getDependencies2b_gitBob(pdir);							
 			
 			if (bt!=null) deps.add(bt);
 		}
@@ -118,7 +104,7 @@ public class BuildWinterwellProject extends BuildTask {
 			return null;
 		}
 		
-		File bobdir = GitBobProjectTask.getGitBobDir();
+		File bobdir = getConfig().getGitBobDir();
 		File dir = new File(bobdir, pdir.getName());
 		
 		// Git repo

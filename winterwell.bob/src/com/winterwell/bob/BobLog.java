@@ -15,7 +15,7 @@ public class BobLog {
 
 	
 	public static File getHistoryFile() {
-		File bobwarehouse = GitBobProjectTask.getGitBobDir();
+		File bobwarehouse = getSettings().bobwarehouse;
 		if ( ! bobwarehouse.exists()) {
 			doMakeBobWarehouse();
 		}
@@ -24,7 +24,7 @@ public class BobLog {
 	}
 
 	private static void doMakeBobWarehouse() {
-		File bobwarehouse = GitBobProjectTask.getGitBobDir();
+		File bobwarehouse = getSettings().bobwarehouse;
 		if (bobwarehouse.exists()) return;
 		Log.d("Bob", "Make bobwarehouse folder");
 		bobwarehouse.mkdirs();
