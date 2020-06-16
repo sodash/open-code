@@ -26,6 +26,23 @@ public class AThing implements IInit {
 	 */
 	Time created = new Time();
 	
+	/**
+	 * TODO How can we auto set this?
+	 */
+	Time modified; 
+	
+	/**
+	 * TODO set this
+	 * @return
+	 */
+	public Time getModified() {
+		return modified;
+	}
+	
+	public void setModified(Time modified) {
+		this.modified = modified;
+	}
+	
 	public Time getCreated() {
 		return created;
 	}

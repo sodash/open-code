@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import com.winterwell.data.AThing;
+import com.winterwell.depot.IInit;
 import com.winterwell.es.ESType;
 import com.winterwell.gson.StandardAdapters.LenientLongAdapter;
 import com.winterwell.utils.MathUtils;
@@ -17,8 +18,8 @@ import com.winterwell.utils.web.IHasJson;
  * (i.e. £0.10 CPM is the lowest value)
  */
 public class Money 
-extends AThing // dubious -- no id, no url
-implements Comparable<Money>, IHasJson {
+//extends AThing // dubious -- no id, no url, and we dont store these as top-level data objects TODO dont extend this
+implements Comparable<Money>, IHasJson, IInit {
 	
 	public static final ESType ESTYPE = new ESType().object()
 			// core
@@ -127,6 +128,15 @@ implements Comparable<Money>, IHasJson {
 		this(copyMe.getCurrency(), copyMe.getValue());
 		this.name = copyMe.getName();
 	}
+	
+	String name;
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	/**
 	 * 
@@ -209,7 +219,7 @@ implements Comparable<Money>, IHasJson {
 	 */
 	@Override
 	public void init() {
-		super.init();
+//		super.init();
 		// value
 		if (value100p==0 && value!=null && ! "0".equals(value)) {
 			value100p = new BigDecimal(value).multiply(P100).longValue();
