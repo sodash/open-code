@@ -564,7 +564,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		SearchResponse sr = doList2(q, prefix, status, sort, size, state);
 		
-		Map<String, Object> jobj = sr.getParsedJson();
+//		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();
 
 		// TODO dedupe can cause the total reported to be off
