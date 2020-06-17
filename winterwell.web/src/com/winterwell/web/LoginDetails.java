@@ -32,6 +32,9 @@ public class LoginDetails implements IProperties, Serializable {
 	public final String loginName;
 
 	public final String password;
+	
+	public String apiKey;
+	public String apiSecret;
 
 	/**
 	 * 0 for unset (use the service default)

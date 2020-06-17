@@ -6,7 +6,16 @@ import com.winterwell.utils.containers.Cache;
 //import com.winterwell.json.JSONObject;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.LoginDetails;
+import com.winterwell.web.app.Logins;
 
+/**
+ * Out of date??
+ * 
+ * @testedby GoogleTranslateTest
+ * @author daniel
+ *
+ */
 public class GoogleTranslate {
 
 	Cache<String, String> cache = new Cache(100).setStats("GoogleTranslate");
@@ -33,9 +42,10 @@ public class GoogleTranslate {
 		if (trans != null)
 			return trans;
 		FakeBrowser fb = new FakeBrowser();
+		LoginDetails ld = Logins.get("google_com_language_translate");
 		String json = fb.getPage(
 				"https://www.googleapis.com/language/translate/v2",
-				new ArrayMap("key", "AIzaSyDeERymCiTES4Dc22qx7P2KisTXQXb-xB4",
+				new ArrayMap("key", ld.apiKey,
 						"source", src, "target", target, "q", text));
 		try {
 			Object jo = new SimpleJson().fromJson(json);

@@ -35,3 +35,5 @@ winterwell.datalog/dependencies
 winterwell.bob/test-out
 winterwell.bob/test/test.classpath.after
 winterwell.datalog/datalog.log*
+winterwell.utils/test/winterwell
+winterwell.datalog/logs

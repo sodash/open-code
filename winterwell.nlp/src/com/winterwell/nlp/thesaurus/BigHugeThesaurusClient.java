@@ -5,6 +5,8 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.LoginDetails;
+import com.winterwell.web.app.Logins;
 
 /**
  * 
@@ -16,18 +18,14 @@ import com.winterwell.web.FakeBrowser;
  */
 public class BigHugeThesaurusClient {
 
-	// API details:
-	// u: info@winterwell.com
-	// p: Boog1eWoog1e	
-	//You can access your admin page here: http://words.bighugelabs.com/admin/16f53732df3b21487f3da8b21095fc92
-	String API_KEY = "16f53732df3b21487f3da8b21095fc92";
 	
-	
-	public ThesuarusLookup get(String word) {
+	public ThesuarusLookup get(String word) {		
+		LoginDetails ld = Logins.get("words.bighugelabs.com");
+		
 		assert ! Utils.isBlank(word);
 		word = StrUtils.normalise(word, KErrorPolicy.ACCEPT);
 		FakeBrowser fb = new FakeBrowser();
-		String json = fb.getPage("http://words.bighugelabs.com/api/2/"+API_KEY+"/"+word+"/json");
+		String json = fb.getPage("http://words.bighugelabs.com/api/2/"+ld.apiKey+"/"+word+"/json");
 		JSONObject jobj = new JSONObject(json);
 		return new ThesuarusLookup(word, jobj);
 	}
