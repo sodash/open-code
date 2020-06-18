@@ -122,7 +122,7 @@ function use_bob {
             printf "\n$server is building JARs...\n"
             ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && bob $BOB_ARGS $BOB_BUILD_PROJECT_NAME"
             printf "\nchecking bob.log for failures on $server\n"
-            if [[ $(ssh winterwell@$server "grep -i 'Compile task failed' $PROJECT_ROOT_ON_SERVER") = '' ]]; then
+            if [[ $(ssh winterwell@$server "grep -i 'Compile task failed' $PROJECT_ROOT_ON_SERVER/bob.log") = '' ]]; then
                 printf "\nNo failures recorded in bob.log on $server.  JARs should be fine.\n"
             else
                 printf "\nFailure or failures detected in latest bob.log. Sending Alert Emails and Breaking Operation\n"
