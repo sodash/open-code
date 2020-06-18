@@ -71,7 +71,12 @@ public class TrackingPixelServlet implements IServlet {
 			// still set it (so repeated calls to this method within one server call return the same id)
 			state.setCookie(trkid, uid, new Dt(0,TUnit.MILLISECOND), dls.COOKIE_DOMAIN);			
 		} else {
-			state.setCookie(trkid, uid, TUnit.YEAR.dt, dls.COOKIE_DOMAIN);
+			Dt expiry = TUnit.MONTH.dt;
+			// Do we have explicit consent? -- see WebRequest.isDoNotTrack() as called above
+			if ("C".equals(state.getResponse().getHeader("Tk"))) {
+				expiry = TUnit.YEAR.dt;
+			}
+			state.setCookie(trkid, uid, expiry, dls.COOKIE_DOMAIN);
 		}
 		return uid;
 	}
