@@ -18,17 +18,10 @@ import com.winterwell.utils.log.Log;
  */
 public final class Dep {
 
-	// ah, just look in the logs
-//	static boolean debug;
-//	
-//	/**
-//	 * If true, Dep will record the source for each object
-//	 * @param debug
-//	 */
-//	public static void setDebug(boolean debug) {
-//		Dep.debug = debug;
-//	}
-	
+	/**
+	 * TODO clean up after a DepContext close 
+	 *  -- probably by having stash on DepContext with a cross-thread root DepContext 
+	 */
 	static ConcurrentHashMap<DKey, Object> stash = new ConcurrentHashMap<>();
 	
 	static ConcurrentHashMap<DKey, Supplier> factory = new ConcurrentHashMap<>();
