@@ -226,4 +226,8 @@ public abstract class Parser<PT> {
 		return name + "-Parser"+(desc==null? "" : " "+desc);
 	}
 
+	protected PT sample() throws UnsupportedOperationException {
+		throw new UnsupportedOperationException(""+getClass());
+	}
+
 }

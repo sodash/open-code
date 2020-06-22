@@ -1,5 +1,6 @@
 package com.winterwell.nlp.simpleparser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.winterwell.utils.Printer;
@@ -15,6 +16,16 @@ class SeqnParser extends Parser<Object> {
 		assert !Arrays.asList(subs).contains(null);
 	}
 
+	@Override
+	protected Object sample() throws UnsupportedOperationException {		
+		ArrayList list = new ArrayList();
+		for(Parser p : subs) {
+			Object s = p.sample();
+			list.add(s);
+		}
+		return list;
+	}
+	
 	public SeqnParser(Parser[] parsers) {
 		super(parsers);
 		canBeZeroLength = true;

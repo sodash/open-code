@@ -18,6 +18,14 @@ public class First<PT> extends Parser<PT> {
 	}
 
 	@Override
+	protected PT sample() {
+		int n = subs.length;
+		int i = Utils.getRandom().nextInt(n);
+		Parser p = subs[i];
+		return (PT) p.sample();
+	}
+	
+	@Override
 	protected ParseResult doParse(ParseState state) {
 		boolean len0 = state.unparsed().length() == 0;
 		for (Parser p : subs) {

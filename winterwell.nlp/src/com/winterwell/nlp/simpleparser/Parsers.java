@@ -10,6 +10,9 @@ import com.winterwell.utils.containers.Slice;
 /**
  * Parse a fixed bit of text. Sets the parsed word as the AST.getX() value.
  * 
+ * Use
+ * import static com.winterwell.nlp.simpleparser.Parsers.*;
+ * 
  * @author daniel
  * 
  */
@@ -21,6 +24,13 @@ class Lit extends Parser<String> {
 		super();
 		this.word = word;
 		canBeZeroLength = word.length() == 0;
+	}
+	
+
+
+	@Override
+	protected String sample() {
+		return word;
 	}
 
 	@Override
@@ -76,7 +86,7 @@ public class Parsers {
 		@Override
 		public String toString() {
 			return Utils.isBlank(name) ? subs[0] + "?" : name;
-		}
+		}		
 	}
 
 	static final class Word extends Parser<String> {
@@ -108,6 +118,11 @@ public class Parsers {
 		@Override
 		public String toString() {
 			return word; // '"'+word+'"';
+		}
+		
+		@Override
+		protected String sample() {
+			return word;
 		}
 	}
 	/**
