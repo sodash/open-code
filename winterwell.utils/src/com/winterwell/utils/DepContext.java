@@ -45,6 +45,9 @@ public final class DepContext implements Closeable {
 		return "DepContext [closed=" + closed + ", parent=" + parent + ", ckey=" + ckey + "]";
 	}
 
+	/**
+	 * Close the context - and remove the settings made within this context from Dep.
+	 */
 	@Override
 	public void close() {
 		if (parent==null) throw new IllegalStateException("Cannot close top-level context");
