@@ -2,8 +2,8 @@
 
 # TeamCity Continuous Integration Builder Template
 
-#Version 0.2 alpha
-# Meaning - Script has been written, but not fully tested
+#Version 1.1
+# Meaning - Script has been written and tested
 
 #####  GENERAL SETTINGS
 ## This section should be the most widely edited part of this script
@@ -17,7 +17,6 @@ NAME_OF_SERVICE='lg' # This can be blank, but if your service uses a JVM, then y
 PROJECT_USES_NPM='no' # yes or no
 PROJECT_USES_WEBPACK='no' #yes or no
 PROJECT_USES_JERBIL='no' #yes or no
-PROJECT_USES_AUTOMATED_TESTING='no' #yes or no
 PROJECT_USES_WWAPPBASE_SYMLINK='no'
 
 
@@ -27,30 +26,30 @@ PROJECT_USES_WWAPPBASE_SYMLINK='no'
 #####
 TARGET_SERVERS=(baker.good-loop.com)
 PROJECT_ROOT_ON_SERVER="/home/winterwell/$PROJECT_NAME/winterwell.datalog"
-#AUTOMATED_TESTS_COMMAND="bash $PROJECT_ROOT_ON_SERVER/run-tests.sh test"
 
 
 
 ##### UNDENIABLY ESOTERIC SETTINGS
 ## This is the space where your project's settings make it completely non-standard
 #####
-#EMAIL_RECIPIENTS=(sysadmin@good-loop.com daniel@good-loop.com roscoe@good-loop.com)
-#BOB_ARGS='' #you can set bob arguments here, but they will run each and every time that the project is auto-built
-#BOB_BUILD_PROJECT_NAME='' #If the project name isn't automatically sensed by bob, you can set it explicitly here
-#NPM_CLEANOUT='no' #yes/no , will nuke the node_modules directory if 'yes', and then get brand-new packages.
-
+EMAIL_RECIPIENTS=(sysadmin@good-loop.com daniel@good-loop.com roscoe@good-loop.com)
+BOB_ARGS='' #you can set bob arguments here, but they will run each and every time that the project is auto-built
+BOB_BUILD_PROJECT_NAME='' #If the project name isn't automatically sensed by bob, you can set it explicitly here
+NPM_CLEANOUT='no' #yes/no , will nuke the node_modules directory if 'yes', and then get brand-new packages.
+NPM_I_LOGFILE="/home/winterwell/.npm/_logs/npm.i.for.$PROJECT_NAME.log"
+NPM_RUN_COMPILE_LOGFILE="/home/winterwell/.npm/_logs/npm.run.compile.for.$PROJECT_NAME.log"
 
 ##### FUNCTIONS
 ## Do not edit these unless you know what you are doing
 #####
-
+ATTACHMENTS=()
 function send_alert_email {
     for email in ${EMAIL_RECIPIENTS[@]}; do
         TIME=$(date +%Y-%m-%dT%H:%M:%S-%Z)
-	    message="AutoBuild Detected a Failure with $BUILD_PROCESS_NAME"
+	    message="AutoBuild Detected a Failure Building $PROJECT_NAME during $BUILD_PROCESS_NAME"
 	    body="Hi,\nThe AutoPublisher detected a failure when $BUILD_STEP"
-	    title="[$HOSTNAME] $message"
-	    printf "$body" | mutt -s "$title" -- $email
+	    title="TeamCity $message"
+	    printf "$body" | mutt -s "$title" ${ATTACHMENTS[@]} -- $email
     done
 }
 
@@ -173,15 +172,21 @@ function use_npm {
                 printf "\nDeleting the existing node_modules...\n"
                 ssh winterwell@$server "rm -rf $PROJECT_ROOT_ON_SERVER/node_modules"
             fi
+            # Ensuring that there are no residual npm error/debug logs in place
+            ssh winterwell@$server "rm -rf /home/winterwell/.npm/_logs/*.log"
             printf "\nEnsuring all NPM Packages are in place on $server ...\n"
-            ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && npm i"
+            ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && npm i &> $NPM_I_LOGFILE"
             printf "\nChecking for errors while npm was attempting to get packages on $server ...\n"
-            if [[ $(ssh winterwell@$server "grep -i 'error' /home/winterwell/.npm/_logs/$NPM_LOG_DATE*-debug.log") = '' ]]; then
+            if [[ $(ssh winterwell@$server "grep -i 'error' $NPM_I_LOGFILE") = '' ]]; then
                 printf "\nNo NPM errors detected\n"
             else
-                printf "\nNPM encountered one or more errors while attempting to get node packages. Sending Alert Emails, and Breaking Operation\n"
+                printf "\nNPM encountered one or more errors while attempting to get node packages. Sending Alert Emails, but Continuing Operation\n"
+                # Get the NPM_I_LOGFILE
+                scp winterwell@$server:$NPM_I_LOGFILE .
+                # Add it to the Attachments
+                ATTACHMENTS+=("-a npm.i.for.$PROJECT_NAME.log")
+                # Send the email
                 send_alert_email
-                exit 0
             fi
         done
     fi
@@ -195,14 +200,18 @@ function use_webpack {
         NPM_LOG_DATE=$(date +%Y-%m-%d)
         for server in ${TARGET_SERVERS[@]}; do
             printf "\nNPM is now running a Webpack process on $server\n"
-            ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && npm run compile"
+            ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && npm run compile &> $NPM_RUN_COMPILE_LOGFILE"
             printf "\nChecking for errors that occurred during Webpacking process on $server ...\n"
-            if [[ $(ssh winterwell@$server "grep -i 'error' /home/winterwell/.npm/_logs/$NPM_LOG_DATE*-debug.log") = '' ]]; then
+            if [[ $(ssh winterwell@$server "cat $NPM_RUN_COMPILE_LOGFILE | grep -i 'error' | grep -iv 'ErrorAlert.jsx'") = '' ]]; then
                 printf "\nNo Webpacking errors detected on $server\n"
             else
-                printf "\nOne or more errors were recorded during the webpacking process. Sending Alert Emails, and Breaking Operation\n"
+                printf "\nOne or more errors were recorded during the webpacking process. Sending Alert Emails, but Continuing Operation\n"
+                # Get the NPM_RUN_COMPILE_LOGFILE
+                scp winterwell@$server:$NPM_RUN_COMPILE_LOGFILE .
+                # Add it to the Attachments
+                ATTACHMENTS+=("-a npm.run.compile.for.$PROJECT_NAME.log")
+                # Send the email
                 send_alert_email
-                exit 0
             fi
         done
     fi
@@ -234,24 +243,6 @@ function start_service {
 }
 
 
-# Automated Testing -- Evaluate and Use
-function use_automated_tests {
-    if [[ $PROJECT_USES_AUTOMATED_TESTING = 'yes' ]]; then
-        BUILD_PROCESS_NAME='automated testing'
-        BUILD_STEP='automated tests were running'
-        for server in ${TARGET_SERVERS[@]}; do
-            printf "\nEnding old automated testing session on $server...\n"
-            ssh winterwell@$server "tmux kill-session -t $PROJECT_NAME-automated-tests"
-            printf "\n$server is starting automated tests...\n"
-            ssh winterwell@$server "tmux new-session -d -s $PROJECT_NAME-automated-tests -n panel01"
-            ssh winterwell@$server "tmux send-keys -t $PROJECT_NAME-automated-tests 'cd $PROJECT_ROOT_ON_SERVER && npm run tests' C-m"
-            printf "\n$server is running automated tests in a tmux session\n"
-            printf "\tto check the progress, use ssh winterwell@$server and then use tmux attach-sessiont -t $PROJECT_NAME-automated-tests\n"
-        done
-    fi
-}
-
-
 ################
 ### Run the Functions in Order
 ################
@@ -267,4 +258,3 @@ use_npm
 use_webpack
 use_jerbil
 start_service
-use_automated_tests
