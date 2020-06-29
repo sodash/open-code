@@ -866,15 +866,6 @@ public abstract class CrudServlet<T> implements IServlet {
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
 		T thing = getThing(state);
 		assert thing != null : "null thing?! "+state;
-		// HACK set modified = true on maps
-		if (thing instanceof Map) {
-			((Map) thing).put("modified", true);	
-		} else {
-			// should we have an interface for this??
-//			ReflectionUtils.setPrivateField(thing, fieldName, value);
-			// NB: avoiding jthing.put() as that re-makes the java object, which is wasteful and confusing
-//			jthing.put("modified", true);
-		}
 		
 		// This has probably been done already in getThing(), but harmless to repeat
 		// run the object through Java, to trigger IInit
