@@ -60,7 +60,7 @@ public class BuildNLP extends BuildWinterwellProject {
 		req.setIncludeSource(true);
 		req.run();
 
-		File lib = getBuildJarsDir();
+		File lib = new File(projectDir, "build-lib"); // TODO getBuildJarsDir(); but have to release a Bob update for this
 		File jar = new File(lib, "iso639.jar");
 
 		FileUtils.delete(jar);
