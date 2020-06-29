@@ -379,7 +379,7 @@ public class BuildWinterwellProject extends BuildTask {
 		}
 		
 		// collect jars
-		collectJars(new File(projectDir, "build-lib"));
+		collectJars(getBuildJarsDir());
 		
 		// version.properties
 		MakeVersionPropertiesTask mvpt = new MakeVersionPropertiesTask().setAppDir(projectDir);
@@ -399,6 +399,10 @@ public class BuildWinterwellProject extends BuildTask {
 		// update classpath? HACK (we could prob run this more but safer to do less often)
 		List<MavenDependencyTask> mdts = Containers.filterByClass(getDependencies(), MavenDependencyTask.class);
 		doUpdateClasspath(mdts);		
+	}
+
+	File getBuildJarsDir() {
+		return new File(projectDir, "build-lib");
 	}
 
 	private void doUpdateClasspath(List<MavenDependencyTask> mdts) {
