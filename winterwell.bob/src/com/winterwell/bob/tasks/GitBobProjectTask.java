@@ -41,6 +41,7 @@ public class GitBobProjectTask extends BuildTask {
 		this.dir = dir;
 		// dependencies shouldnt need rebuilding all the time
 		setSkipGap(TUnit.DAY.dt);
+		resetLocalChanges = BuildHacks.getServerType() != KServerType.LOCAL;
 	}
 	
 	/**
@@ -49,6 +50,11 @@ public class GitBobProjectTask extends BuildTask {
 	File projectSubDir;
 
 	boolean stashLocalChanges;
+	/**
+	 * This is set true for non-local. It helps ensure the git pull will work.
+	 * It does delete local edits!
+	 */
+	boolean resetLocalChanges;
 	
 	@Override
 	protected void doTask() throws Exception {
@@ -63,8 +69,8 @@ public class GitBobProjectTask extends BuildTask {
 				gt0.close();
 			}
 			// reset first? a harder version of stash!
-			if (BuildHacks.getServerType() != KServerType.LOCAL) {
-				Log.d(LOGTAG, "git reset --hard because not a local dev box");
+			if (resetLocalChanges) {
+				Log.d(LOGTAG, "git reset --hard (because not a local dev box)");
 				GitTask gr = new GitTask(GitTask.RESET, dir);
 				gr.addArg("--hard FETCH_HEAD");
 				gr.run();
