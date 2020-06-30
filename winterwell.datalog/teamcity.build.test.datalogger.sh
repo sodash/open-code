@@ -5,7 +5,7 @@
 # Versions of this script are usually run by TeamCity, in response to a git commit.
 # The script uses ssh remote commands to target a server -- it does not affect the local machine.
 # For testing, the script can also be run from your local computer.
-#Version 1.2
+#Version 1.2.1
 # Latest Change -- one more error sniffing task for the 'use_npm' function
 
 #####  GENERAL SETTINGS
