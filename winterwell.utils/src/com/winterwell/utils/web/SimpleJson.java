@@ -6,13 +6,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Mutable;
 import com.winterwell.utils.Printer.IPrinter;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.containers.AbstractMap2;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.containers.IntRange;
 
 /**
  * A simple but friendly JSON import/export class.
@@ -330,12 +334,19 @@ public class SimpleJson {
 	 * @return
 	 */
 	public static Map<String, Object> getCreate(Map<String, Object> jobj, String key) {
-		Map m = (Map) jobj.get(key);
+		Object m = jobj.get(key);
 		if (m==null) {
 			m = new ArrayMap(); // hm... good for small map,s bad for larger ones. But this is a convenience method.
 			jobj.put(key, m);
 		}
-		return m;
+		if (m instanceof Map) {
+			return (Map<String, Object>) m;
+		}
+		// probably an array!
+		List<Object> list = Containers.asList(m);
+		// make up a new map??
+		Map map = new ListAsMap(list);
+		return map;
 	}
 
 	/**
@@ -344,7 +355,7 @@ public class SimpleJson {
 	 * Uses getCreate to access/build intermediate objects.
 	 * @param jobj
 	 * @param value
-	 * @param key
+	 * @param key 
 	 */
 	public static void set(Map<String, ?> jobj, Object value, String... key) {
 		Map obj = jobj;
@@ -369,4 +380,47 @@ public class SimpleJson {
 	}
 
 
+}
+
+/**
+ * Helpful for some json methods, to let arrays be maps
+ * @author daniel
+ *
+ * @param <V>
+ */
+class ListAsMap<V> extends AbstractMap2<String, V> {
+
+	@Override
+	public Set<String> keySet() throws UnsupportedOperationException {
+		IntRange keys = new IntRange(0, list.size()-1);
+		return new ArraySet(Containers.apply(keys, k -> Integer.toString(k)));
+	}
+	
+	List<V> list;
+	
+	public ListAsMap(List<V> list) {
+		this.list = list;
+	}
+
+	@Override
+	public V get(Object i) {
+		Integer ni = i instanceof Integer? (Integer) i : Integer.valueOf((String)i);
+		return list.get(ni);
+	}
+
+	@Override
+	public V put(String i, V v) {
+		Integer ni = Integer.valueOf((String)i);
+		if (ni >= list.size()) {
+			// pad the list
+			while (ni > list.size()) {
+				list.add(null); 
+			}
+			// add
+			list.add(v);
+			return null;
+		}
+		return list.set(ni, v);		
+	}
+	
 }
