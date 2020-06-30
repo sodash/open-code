@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.wwjobs.BuildHacks;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
+import com.winterwell.web.app.KServerType;
 /**
  * @tested {@link GitBobProjectTaskTest}
  * @author daniel
@@ -60,11 +62,19 @@ public class GitBobProjectTask extends BuildTask {
 				gt0.run();
 				gt0.close();
 			}
+			// reset first? a harder version of stash!
+			if (BuildHacks.getServerType() != KServerType.LOCAL) {
+				Log.d(LOGTAG, "git reset --hard because not a local dev box");
+				GitTask gr = new GitTask(GitTask.RESET, dir);
+				gr.addArg("--hard FETCH_HEAD");
+				gr.run();
+				gr.close();
+			}
 			// pull
 			GitTask gt = new GitTask(GitTask.PULL, dir);
 			gt.setDepth(getDepth()+1);
 			gt.run();
-			gt.close();
+			gt.close();						
 		} else {
 			assert ! dir.isFile() : dir;
 			// clone

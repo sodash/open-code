@@ -145,6 +145,7 @@ public class GitTask extends ProcessTask {
 	public static final String PUSH = "push";
 	public static final String ADD = "add";
 	public static final String CLONE = "clone";
+	public static final String RESET = "reset";
 
 	private final String action;
 
