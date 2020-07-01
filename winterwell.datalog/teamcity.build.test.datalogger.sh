@@ -5,8 +5,8 @@
 # Versions of this script are usually run by TeamCity, in response to a git commit.
 # The script uses ssh remote commands to target a server -- it does not affect the local machine.
 # For testing, the script can also be run from your local computer.
-#Version 1.2.1
-# Latest Change -- one more error sniffing task for the 'use_npm' function
+#Version 1.2.3
+# Latest Change -- removed a piped command which prevented any and all webpacking errors to be detected
 
 #####  GENERAL SETTINGS
 ## This section should be the most widely edited part of this script
@@ -212,12 +212,11 @@ function use_webpack {
     if [[ $PROJECT_USES_WEBPACK = 'yes' ]]; then
         BUILD_PROCESS_NAME='webpack'
         BUILD_STEP='npm was running a weback process'
-        NPM_LOG_DATE=$(date +%Y-%m-%d)
         for server in ${TARGET_SERVERS[@]}; do
             printf "\nNPM is now running a Webpack process on $server\n"
             ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && npm run compile &> $NPM_RUN_COMPILE_LOGFILE"
             printf "\nChecking for errors that occurred during Webpacking process on $server ...\n"
-            if [[ $(ssh winterwell@$server "cat $NPM_RUN_COMPILE_LOGFILE | grep -i 'error' | grep -v '[webpack.Progress]' | grep -iv 'ErrorAlert.jsx'") = '' ]]; then
+            if [[ $(ssh winterwell@$server "cat $NPM_RUN_COMPILE_LOGFILE | grep -i 'error' | grep -iv 'ErrorAlert.jsx'") = '' ]]; then
                 printf "\nNo Webpacking errors detected on $server\n"
             else
                 printf "\nOne or more errors were recorded during the webpacking process. Sending Alert Emails, but Continuing Operation\n"
