@@ -103,7 +103,7 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 		"youagain-java-client", 
 			"https://github.com/sodash/open-code open-code youagain-java-client",
 		"elasticsearch-java-client",
-			"https://github.com/winterstein/elasticsearch-java-client.git",
+			"https://github.com/good-loop/elasticsearch-java-client.git",
 		"juice",
 			"https://github.com/good-loop/juice", 
 		"jtwitter",
