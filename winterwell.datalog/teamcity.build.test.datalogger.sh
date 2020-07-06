@@ -5,8 +5,8 @@
 # Versions of this script are usually run by TeamCity, in response to a git commit.
 # The script uses ssh remote commands to target a server -- it does not affect the local machine.
 # For testing, the script can also be run from your local computer.
-#Version 1.2.3
-# Latest Change -- removed a piped command which prevented any and all webpacking errors to be detected
+#Version 1.3.9
+# Latest Change -- Adding new dependency checks -- Attempting to create parity with production publisher template script
 
 #####  GENERAL SETTINGS
 ## This section should be the most widely edited part of this script
@@ -42,11 +42,16 @@ BOB_BUILD_PROJECT_NAME='' #If the project name isn't automatically sensed by bob
 NPM_CLEANOUT='no' #yes/no , will nuke the node_modules directory if 'yes', and then get brand-new packages.
 NPM_I_LOGFILE="/home/winterwell/.npm/_logs/npm.i.for.$PROJECT_NAME.log"
 NPM_RUN_COMPILE_LOGFILE="/home/winterwell/.npm/_logs/npm.run.compile.for.$PROJECT_NAME.log"
+BOBWAREHOUSE_PATH='/home/winterwell/bobwarehouse'
 
 ##### FUNCTIONS
 ## Do not edit these unless you know what you are doing
 #####
+
+# Set empty array of attachments
 ATTACHMENTS=()
+
+# Email Function.  Sends emails to email addresses in $EMAIL_RECIPIENTS
 function send_alert_email {
     for email in ${EMAIL_RECIPIENTS[@]}; do
         TIME=$(date +%Y-%m-%dT%H:%M:%S-%Z)
@@ -57,14 +62,23 @@ function send_alert_email {
     done
 }
 
-# First-Run-check for repository : Check if repo exists on the server('s) disk(s)
+
+# Git Cleanup Function -- More of a classic 'I type this too much, it should be a function', Function.
+function git_hard_set_to_master {
+    ssh winterwell@$server "cd $1 && git gc --prune=now"
+    ssh winterwell@$server "cd $1 && git pull origin master"
+    ssh winterwell@$server "cd $1 && git reset --hard FETCH_HEAD"
+}
+
+
+# Dependency Check Function : Check if repo exists on the server('s) disk(s) - This Function's Version is 0.01
 function check_repo_exists {
     for server in ${TARGET_SERVERS[@]}; do
         ssh winterwell@$server "if [[ ! -d $PROJECT_ROOT_ON_SERVER ]]; then printf '\ncloning the repo...\n'; git clone git@$GIT_REPO_URL; fi"
     done
 }
 
-# First-Run-check for bob : Check if any of the target servers already have npm's bob
+# Dependency Check Function - 'bob' is globally available - This Function's Version is 0.01
 function check_bob_exists {
     BUILD_PROCESS_NAME='checking for bob'
     BUILD_STEP='checking for a global installation of "bob"'
@@ -79,7 +93,7 @@ function check_bob_exists {
     fi
 }
 
-# First-Run-check for Jerbil : Check if any of the target servers already have npm's jerbil
+# Dependency Check Function - 'jerbil' is globally available - This Function's Version is 0.01
 function check_jerbil_exists {
     BUILD_PROCESS_NAME='checking for jerbil'
     BUILD_STEP='checking for a global installation of "jerbil"'
@@ -94,7 +108,38 @@ function check_jerbil_exists {
     fi
 }
 
-function check_wwappbasejs_exists {
+# Dependency Check Function - 'mvn' is globally available - This Function's Version is 0.01
+function check_maven_exists {
+    BUILD_PROCESS_NAME='checking for maven'
+    BUILD_STEP='looking for globally available "mvn" from the command line interface'
+    if [[ $PROJECT_USES_BOB = 'yes' ]]; then
+        for server in ${TARGET_SERVERS[@]}; do
+            if [[ $(ssh winterwell@$server "which mvn") = '' ]]; then
+                printf "\nNo global installation of maven was found. As 'root' please:\n\tapt-get install maven\nAnd then retry this script\n"
+                send_alert_email
+                exit 0
+            fi
+        done
+    fi
+}
+
+# Dependency Check Function - nodejs is at version 12.x - This Function's Version is 0.01
+function check_nodejs_version {
+    BUILD_PROCESS_NAME='verifying nodejs version'
+    BUILD_STEP='verifying that nodejs is at version 12.x.x'
+    if [[ $PROJECT_USES_NPM = 'yes' ]]; then
+        for server in ${TARGET_SERVERS[@]}; do
+            if [[ $(ssh winterwell@$server 'node -v | grep "v12"') = '' ]]; then
+                printf "Either nodejs is not installed, or it is not at version 12.x.x\n"
+                send_alert_email
+                exit 0
+            fi
+        done
+    fi
+}
+
+# Dependency Check Function - wwappbase.js is verified on disk - This Function's Version is 0.01
+function check_for_wwappbasejs_location {
     BUILD_PROCESS_NAME='checking for wwappbase.js'
     BUILD_STEP='checking the path for the wwappbase.js repository on the servers disk'
     if [[ $PROJECT_USES_WWAPPBASE_SYMLINK = 'yes' ]]; then
@@ -108,30 +153,48 @@ function check_wwappbasejs_exists {
     fi
 }
 
-
-# Cleanup Git -- Ensure a clean and predictable git repo for building
-function cleanup_repo {
-    for server in ${TARGET_SERVERS[@]}; do
-        printf "\nCleaning $server 's local repository...\n"
-        ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && git gc --prune=now"
-        ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && git pull origin master"
-        ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && git reset --hard FETCH_HEAD"
-    done
-}
-
-# Cleanup wwappbase.js 's repo -- Ensure that this repository is up to date and clean
-function cleanup_wwappbasejs_repo {
-    if [[ $PROJECT_USES_WWAPPBASE_SYMLINK = 'yes' ]]; then
+# Dependency Check Function - bobwarehouse directory has discrete 'code' repository nested inside of it. - This Function's Version is 1.01
+function check_for_code_repo_in_bobwarehouse {
+    if [[ $PROJECT_USES_BOB = 'yes' ]]; then
         for server in ${TARGET_SERVERS[@]}; do
-            printf "\nCleaning $server 's local wwappbase.js repository\n"
-            ssh winterwell@$server "cd $WWAPPBASE_REPO_PATH_ON_SERVER_DISK && git gc --prune=now"
-            ssh winterwell@$server "cd $WWAPPBASE_REPO_PATH_ON_SERVER_DISK && git pull origin master"
-            ssh winterwell@$server "cd $WWAPPBASE_REPO_PATH_ON_SERVER_DISK && git reset --hard FETCH_HEAD"
+            if ssh winterwell@$server "[ ! -d $BOBWAREHOUSE_PATH/code ]"; then
+                printf "\n\nNo 'code' repo found in $BOBWAREHOUSE_PATH on $server.  Cloning now ...\n"
+                ssh winterwell@$server "cd $BOBWAREHOUSE_PATH && git clone git@git.winterwell.com:/winterwell-code code"
+                printf "\nContinuing without verifying successful cloning of the winterwell-code repo...\n"
+            fi
         done
     fi
 }
 
-# Stopping the JVM Backend (if applicable)
+# Cleanup Git -- Ensure a clean and predictable git repo for building - This Function's Version is 1.00
+function cleanup_repo {
+    for server in ${TARGET_SERVERS[@]}; do
+        printf "\nCleaning $server 's local repository...\n"
+        git_hard_set_to_master $PROJECT_ROOT_ON_SERVER
+    done
+}
+
+# Cleanup wwappbase.js 's repo -- Ensure that this repository is up to date and clean - This Function's Version is 1.00
+function cleanup_wwappbasejs_repo {
+    if [[ $PROJECT_USES_WWAPPBASE_SYMLINK = 'yes' ]]; then
+        for server in ${TARGET_SERVERS[@]}; do
+            printf "\nCleaning $server 's local wwappbase.js repository\n"
+            git_hard_set_to_master $WWAPPBASE_REPO_PATH_ON_SERVER_DISK
+        done
+    fi
+}
+
+# Cleanup the repos nested inside of bobwarehouse  - This Function's Version is 1.00
+function cleanup_bobwarehouse_repos {
+    if [[ $PROJECT_USES_BOB = 'yes' ]]; then
+	    for server in ${TARGET_SERVERS[@]}; do
+		    printf "\nEnsuring that the repos inside of bobwarehouse are up-to-date...\n"
+        	ssh winterwell@$server "for repo in $BOBWAREHOUSE_PATH/*/; do cd \$repo; git gc --prune=now; git pull origin master; git reset --hard FETCH_HEAD; done"
+        done
+    fi
+}
+
+# Stopping the JVM Backend (if applicable) - This Function's Version is 0.01
 function stop_service {
     if [[ $PROJECT_USES_BOB = 'yes' ]]; then
         for server in ${TARGET_SERVERS[@]}; do
@@ -141,7 +204,7 @@ function stop_service {
     fi
 }
 
-# Bob -- Evaluate and Use
+# Bob -- Evaluate and Use - This Function's Version is 0.01
 function use_bob {
     if [[ $PROJECT_USES_BOB = 'yes' ]]; then
         BUILD_PROCESS_NAME='bob'
@@ -165,7 +228,7 @@ function use_bob {
     fi
 }
 
-# NPM -- Evaluate and Use
+# NPM -- Evaluate and Use - This Function's Version is 0.01
 function use_npm {
     if [[ $PROJECT_USES_NPM = 'yes' ]]; then
         BUILD_PROCESS_NAME='npm'
@@ -207,7 +270,7 @@ function use_npm {
     fi
 }
 
-# Webpack -- Evaluate and Use
+# Webpack -- Evaluate and Use - This Function's Version is 0.01
 function use_webpack {
     if [[ $PROJECT_USES_WEBPACK = 'yes' ]]; then
         BUILD_PROCESS_NAME='webpack'
@@ -231,7 +294,7 @@ function use_webpack {
     fi
 }
 
-# Jerbil -- Evaluate and Use
+# Jerbil -- Evaluate and Use - This Function's Version is 0.01
 function use_jerbil {
     if [[ $PROJECT_USES_JERBIL = 'yes' ]]; then
         BUILD_PROCESS_NAME='jerbil'
@@ -246,7 +309,7 @@ function use_jerbil {
     fi
 }
 
-# Starting the JVM Backend (if applicable)
+# Starting the JVM Backend (if applicable) - This Function's Version is 0.01
 function start_service {
     if [[ $PROJECT_USES_BOB = 'yes' ]]; then
         for server in ${TARGET_SERVERS[@]}; do
@@ -263,9 +326,13 @@ function start_service {
 check_repo_exists
 check_bob_exists
 check_jerbil_exists
-check_wwappbasejs_exists
+check_maven_exists
+check_nodejs_version
+check_for_wwappbasejs_location
+check_for_code_repo_in_bobwarehouse
 cleanup_repo
 cleanup_wwappbasejs_repo
+cleanup_bobwarehouse_repos
 stop_service
 use_bob
 use_npm
