@@ -5,7 +5,7 @@
 # Versions of this script are usually run by TeamCity, in response to a git commit.
 # The script uses ssh remote commands to target a server -- it does not affect the local machine.
 # For testing, the script can also be run from your local computer.
-#Version 1.3.9
+#Version 1.4.0
 # Latest Change -- Adding new dependency checks -- Attempting to create parity with production publisher template script
 
 #####  GENERAL SETTINGS
@@ -204,7 +204,7 @@ function stop_service {
     fi
 }
 
-# Bob -- Evaluate and Use - This Function's Version is 0.01
+# Bob -- Evaluate and Use - This Function's Version is 0.02
 function use_bob {
     if [[ $PROJECT_USES_BOB = 'yes' ]]; then
         BUILD_PROCESS_NAME='bob'
@@ -218,7 +218,14 @@ function use_bob {
             ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && bob $BOB_ARGS $BOB_BUILD_PROJECT_NAME"
             printf "\nchecking bob.log for failures on $server\n"
             if [[ $(ssh winterwell@$server "grep -i 'Compile task failed' $PROJECT_ROOT_ON_SERVER/bob.log") = '' ]]; then
-                printf "\nNo failures recorded in bob.log on $server.  JARs should be fine.\n"
+                printf "\nNo failures recorded in bob.log on $server in first bob.log sweep.\n"
+            else
+                printf "\nFailure or failures detected in latest bob.log. Sending Alert Emails and Breaking Operation\n"
+                send_alert_email
+                exit 0
+            fi
+            if [[ $(ssh winterwell@$server "grep -i 'ERROR EXIT' $PROJECT_ROOT_ON_SERVER/bob.log") = '' ]]; then
+                printf "\nBob reported a clean exit from it's process.  Continuing to next task.\n"
             else
                 printf "\nFailure or failures detected in latest bob.log. Sending Alert Emails and Breaking Operation\n"
                 send_alert_email
