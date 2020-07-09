@@ -543,8 +543,8 @@ public class BuildWinterwellProject extends BuildTask {
 				EclipseClasspath ec = new EclipseClasspath(projectDir);
 				ec.setIncludeProjectJars(true);
 				Set<File> libs = ec.getCollectedLibs();
-				compile.setClasspath(libs);		
-	//			compile.setSrcJavaVersion("1.9");
+				compile.setClasspath(libs);
+				compile.setSrcJavaVersion("11");
 				compile.setOutputJavaVersion("11"); // Java 11 jars
 				compile.setDebug(true);
 				compile.run();

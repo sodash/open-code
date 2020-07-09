@@ -121,6 +121,7 @@ public class FileUtils {
 	 * lowercase
 	 */
 	public static final List<String> IMAGE_TYPES = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp", "tiff", "svg");
+	private static File wwdir;
 
 	/**
 	 * Append a string to a file. Creates the file if necessary (the parent
@@ -944,6 +945,13 @@ public class FileUtils {
 	 * @see WinterwellProjectFinder
 	 */
 	public static File getWinterwellDir() throws FailureException {
+		if (wwdir!=null) return wwdir;
+		wwdir = getWinterwellDir2();
+		Log.d("init", "WINTERWELL_HOME = "+wwdir);
+		return wwdir;
+	}	
+	
+	private static File getWinterwellDir2() throws FailureException {
 		try {
 			// Explicitly set?
 			String dd = System.getenv("WINTERWELL_HOME");
@@ -968,6 +976,11 @@ public class FileUtils {
 			if (Utils.isBlank(home)) {
 				home = "/home";
 			}
+			// home = winterwell? (server setup)
+			if ("winterwell".equals(new File(home).getName())) {
+				return new File(home).getCanonicalFile();
+			}
+			
 			File ddf = new File(home, "winterwell").getCanonicalFile();
 			if (ddf.exists() && ddf.isDirectory()) {
 				return ddf;

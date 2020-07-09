@@ -120,14 +120,19 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 			"https://github.com/sodash/open-code open-code winterwell.bob",
 		"youagain-java-client", 
 			"https://github.com/sodash/open-code open-code youagain-java-client",
+			
 		"elasticsearch-java-client",
 			"https://github.com/good-loop/elasticsearch-java-client.git",
 		"juice",
-			"https://github.com/good-loop/juice", 
+			"https://github.com/good-loop/juice",
+		"play.good-loop.com",
+			"https://github.com/good-loop/play.good-loop.com.git",
+			
 		"jtwitter",
 			"https://github.com/winterstein/JTwitter.git",
 		"flexi-gson", 
 			"https://github.com/winterstein/flexi-gson.git",
+			
 		"dataloader",
 			"git@git.winterwell.com:winterwell-code winterwell-code dataloader",
 		"youagain-server",
