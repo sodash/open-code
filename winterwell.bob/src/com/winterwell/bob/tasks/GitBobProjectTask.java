@@ -115,4 +115,18 @@ public class GitBobProjectTask extends BuildTask {
 		return this;
 	}
 
+	public static GitBobProjectTask getKnownProject(String pname) {
+		String g_s = WinterwellProjectFinder.KNOWN_PROJECTS.get(pname);
+		if (g_s==null) return null;
+		String[] gs = g_s.split(" ");
+		boolean isSubdir = gs.length > 1; 
+		File bobdir = getConfig().getGitBobDir();
+		File dir = new File(bobdir, isSubdir? gs[1] : pname);
+		GitBobProjectTask gb = new GitBobProjectTask(gs[0], dir);
+		if (isSubdir) {
+			gb.setSubDir(gs[2]);
+		}
+		return gb;
+	}
+
 }

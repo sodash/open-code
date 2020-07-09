@@ -945,8 +945,9 @@ public class FileUtils {
 	 */
 	public static File getWinterwellDir() throws FailureException {
 		try {
+			// Explicitly set?
 			String dd = System.getenv("WINTERWELL_HOME");
-			if (!Utils.isBlank(dd)) {
+			if ( ! Utils.isBlank(dd)) {
 				if (dd.startsWith("~")) {
 					// ~ goes awry in Windows at least
 					String home = System.getProperty("user.home");
@@ -955,7 +956,7 @@ public class FileUtils {
 					}
 				}
 				File f = new File(dd).getCanonicalFile();
-				if (!f.exists())
+				if ( ! f.exists())
 					throw new FailureException(
 							"Path does not exist: WINTERWELL_HOME = " + f);
 				return f;
@@ -963,14 +964,15 @@ public class FileUtils {
 
 			// (home)/winterwell?
 			String home = System.getProperty("user.home");
-			// No home? try /home/winterwell?
+			// ...No home? try /home
 			if (Utils.isBlank(home)) {
 				home = "/home";
 			}
 			File ddf = new File(home, "winterwell").getCanonicalFile();
-			if (ddf.exists() && ddf.isDirectory())
+			if (ddf.exists() && ddf.isDirectory()) {
 				return ddf;
-
+			}
+			
 			File hardcoded = new File("/home/winterwell").getCanonicalFile();
 			if (hardcoded.exists() && hardcoded.isDirectory())
 				return hardcoded;

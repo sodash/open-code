@@ -21,6 +21,25 @@ import com.winterwell.utils.log.Log;
  */
 public class WinterwellProjectFinder implements IFn<String, File> {
 
+
+	private static volatile boolean initFlag;
+
+	public WinterwellProjectFinder() {
+		init();
+	}
+
+	/**
+	 * Just spit out some debug info (once)
+	 */
+	private void init() {
+		if (initFlag) return;
+		initFlag = true;
+		// Where are we looking?
+		File wdir = FileUtils.getWinterwellDir();
+		Log.d("ProjectFinder", "WINTERWELL_HOME: "+wdir);		
+		Log.d("ProjectFinder", "bobwarehouse: "+new File(wdir, "bobwarehouse"));
+	}
+
 	/**
 	 * @return null on failure
 	 */
@@ -35,6 +54,7 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 		if (FileUtils.getWorkingDirectory().getName().equals(_projectName)) {
 			possDirs.add(FileUtils.getWorkingDirectory());
 		}
+		// ...also check the Eclipse project file
 		try {
 			// This will likely fail on a "strange" computer as it uses winterwell-home :(
 			EclipseClasspath ec = new EclipseClasspath(FileUtils.getWorkingDirectory());
@@ -45,6 +65,7 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 		} catch(Exception ex) {
 			// oh well
 		}
+		
 		try {
 			File wdir = FileUtils.getWinterwellDir();
 			// prefer the warehouse
@@ -71,19 +92,16 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 				}
 			}
 		}
-//		File pdir = FileUtils.or(possDirs);
-//		if (pdir==null) {
+		// failed
 		Log.e("BuildWinterwellProject", "Could not find project directory for "+_projectName+" Tried "+possDirs);
 		return null;
-//		}
-//		return pdir;
 	}
 
 	/**
 	 * HACK for deploying WW libs
 	 * {project-name: "repo_url repo_folder sub_folder"}
 	 */
-	private static final Map<String,String> KNOWN_PROJECTS = new ArrayMap(
+	static final Map<String,String> KNOWN_PROJECTS = new ArrayMap(
 		"winterwell.utils", 
 			"https://github.com/sodash/open-code open-code winterwell.utils",
 		"winterwell.web", 
@@ -119,22 +137,5 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 
 	);
 	
-	public static GitBobProjectTask getKnownProject(String pname) {
-		String g_s = KNOWN_PROJECTS.get(pname);
-		if (g_s==null) return null;
-		String[] gs = g_s.split(" ");
-		boolean isSubdir = gs.length > 1; 
-		File bobdir = getConfig().getGitBobDir();
-		File dir = new File(bobdir, isSubdir? gs[1] : pname);
-		GitBobProjectTask gb = new GitBobProjectTask(gs[0], dir);
-		if (isSubdir) {
-			gb.setSubDir(gs[2]);
-		}
-		return gb;
-	}
-
-	private static BobConfig getConfig() {
-		return Dep.getWithDefault(BobConfig.class, new BobConfig());
-	}
 
 }

@@ -83,7 +83,7 @@ public class BuildWinterwellProject extends BuildTask {
 			// no local project? maybe GitBob can get it
 			if (pdir==null || ! pdir.isDirectory()) {
 				// known GitBob project?
-				BuildTask bt = WinterwellProjectFinder.getKnownProject(pname);
+				BuildTask bt = GitBobProjectTask.getKnownProject(pname);
 				if (bt!=null) {
 					deps.add(bt);				
 				}
