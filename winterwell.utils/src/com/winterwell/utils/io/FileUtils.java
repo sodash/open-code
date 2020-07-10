@@ -967,6 +967,7 @@ public class FileUtils {
 				if ( ! f.exists())
 					throw new FailureException(
 							"Path does not exist: WINTERWELL_HOME = " + f);
+				Log.d("init", "environment variable WINTERWELL_HOME set to "+f);
 				return f;
 			}
 
@@ -977,7 +978,9 @@ public class FileUtils {
 				home = "/home";
 			}
 			// home = winterwell? (server setup)
-			if ("winterwell".equals(new File(home).getName())) {
+			String homeName = new File(home).getName();
+			Log.d("init", "Try to find WINTERWELL_HOME from "+homeName+" = "+home+" ...");
+			if ("winterwell".equals(homeName)) {
 				return new File(home).getCanonicalFile();
 			}
 			
@@ -987,8 +990,9 @@ public class FileUtils {
 			}
 			
 			File hardcoded = new File("/home/winterwell").getCanonicalFile();
-			if (hardcoded.exists() && hardcoded.isDirectory())
+			if (hardcoded.exists() && hardcoded.isDirectory()) {
 				return hardcoded;
+			}
 			
 			// Does the local folder or its parent or grandparent look OK? 
 			// Let's test for the presence of the open-code repo.
