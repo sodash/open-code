@@ -231,6 +231,7 @@ public class GA<X> implements IOptimize<X> {
 			startCandidates.add(candidate);
 			if (timer.getTime() > timeHintMillisecs) break; // oh well
 		}
+		// evaluate the starting candidates
 		List<Candidate<X>> scs = evaluate(startCandidates);
 		current.population.addAll(scs);		
 		Collections.sort(current.population);
