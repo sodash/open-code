@@ -40,6 +40,8 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.ICallable;
+import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
@@ -561,8 +563,9 @@ public abstract class CrudServlet<T> implements IServlet {
 		String prefix = state.get("prefix");
 		String sort = state.get(SORT, defaultSort);		
 		int size = state.get(SIZE, 1000);
+		Period period = CommonFields.getPeriod(state);
 		
-		SearchResponse sr = doList2(q, prefix, status, sort, size, state);
+		SearchResponse sr = doList2(q, prefix, status, sort, size, period, state);
 		
 //		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();
@@ -607,7 +610,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param prefix 
 	 * @param num 
 	 */
-	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, WebRequest stateOrNull) {
+	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, Period period, WebRequest stateOrNull) {
 		// copied from SoGive SearchServlet
 		// TODO refactor to use makeESFilterFromSearchQuery
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
@@ -638,7 +641,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		// query
-		ESQueryBuilder qb = doList3_ESquery(q, prefix, stateOrNull);
+		ESQueryBuilder qb = doList3_ESquery(q, prefix, period, stateOrNull);
 
 		if (qb!=null) s.setQuery(qb);
 				
@@ -666,7 +669,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 
-	protected ESQueryBuilder doList3_ESquery(String q, String prefix, WebRequest stateOrNull) {
+	protected ESQueryBuilder doList3_ESquery(String q, String prefix, Period period, WebRequest stateOrNull) {
 		ESQueryBuilder qb = null;
 		if ( q != null) {
 			// convert "me" to specific IDs
@@ -709,6 +712,14 @@ public abstract class CrudServlet<T> implements IServlet {
 			// prefix is on a field -- we use name
 			ESQueryBuilder qp = ESQueryBuilders.prefixQuery("name", prefix);
 			qb = ESQueryBuilders.must(qb, qp);
+		}
+		
+		if (period != null) {
+			// option for modified or another date field?
+			String timeField = stateOrNull==null? null : stateOrNull.get("period");
+			if (timeField==null) timeField = "created";
+			ESQueryBuilder qperiod = ESQueryBuilders.dateRangeQuery(timeField, period.first, period.second);
+			qb = ESQueryBuilders.must(qb, qperiod);
 		}
 		
 		// NB: exq can be null for ALL

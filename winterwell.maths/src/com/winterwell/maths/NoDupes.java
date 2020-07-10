@@ -23,6 +23,10 @@ public class NoDupes<Key> {
 	private transient Map seen;
 	private int memorySize;
 
+	public NoDupes() {
+		this(10000);
+	}
+	
 	/**
 	 * 
 	 * @param memorySize e.g. 10000

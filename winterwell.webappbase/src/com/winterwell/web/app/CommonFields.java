@@ -1,6 +1,9 @@
 package com.winterwell.web.app;
 
 import com.winterwell.data.KStatus;
+import com.winterwell.utils.threads.ICallable;
+import com.winterwell.utils.time.Period;
+import com.winterwell.utils.time.Time;
 import com.winterwell.web.data.XId;
 import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.EmailField;
@@ -31,6 +34,23 @@ public class CommonFields {
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
 	public static final SField DESC = new SField("desc");
 	public static final SField Q = new SField("q");
+	/**
+	 * convenience for using start/end
+	 * @param state Can be null
+	 * @return period if start or end are set, or null.
+	 * NB: Period will use WELL_OLD / WELL_FUTURE to fill in a single null start/end
+	 */
+	public static Period getPeriod(WebRequest state) {
+		if (state==null) {
+			return null;
+		}
+		ICallable<Time> _start = state.get(CommonFields.START);
+		ICallable<Time> _end = state.get(CommonFields.END);
+		if (_start==null && _end==null) return null;
+		Time start = _start==null? null : _start.call();
+		Time end = _end==null? null : _end.call();
+		return new Period(start, end);
+	}
 		
 
 }
