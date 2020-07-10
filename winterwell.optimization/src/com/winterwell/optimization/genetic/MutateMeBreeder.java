@@ -35,7 +35,9 @@ public class MutateMeBreeder<T> implements IBreeder<T> {
 		return original;
 	}
 
-	
+	/**
+	 * Probability for each field of mutating
+	 */
 	private double mutation;
 
 	@Override
