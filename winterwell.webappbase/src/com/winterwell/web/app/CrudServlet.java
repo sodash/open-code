@@ -137,7 +137,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		// return blank / messages
 		if (state.getAction()==null) {
 			// no thing?
-			throw new WebEx.E404(state.getRequestUrl());
+			throw new WebEx.E404("No ID found in (un)RESTful url. "+state.getRequestUrl());
 		}
 		JsonResponse output = new JsonResponse(state);
 		WebUtils2.sendJson(output, state);
