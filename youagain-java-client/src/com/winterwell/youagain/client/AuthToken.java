@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.IProperties;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
@@ -113,10 +114,17 @@ public class AuthToken implements IHasXId, IProperties {
 
 	public XId getXId() {
 		if (xid==null) {
-			// get from token
-			DecodedJWT decd = new JWTDecoder(app).decryptJWT(getToken());
-			String subj = decd.getSubject();
-			xid = new XId(subj, false);
+			try {
+				// get from token
+				YouAgainClient yac = Dep.get(YouAgainClient.class);
+	//			new JWTDecoder(app) objecting to no PublicKey
+				JWTDecoder decoder = yac.getDecoder();
+				DecodedJWT decd = decoder.decryptJWT(getToken());
+				String subj = decd.getSubject();
+				xid = new XId(subj, false);
+			} catch(Exception ex) {
+				throw Utils.runtime(ex);
+			}
 		}
 		return xid;
 	}
