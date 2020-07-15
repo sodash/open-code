@@ -671,6 +671,21 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected ESQueryBuilder doList3_ESquery(String q, String prefix, Period period, WebRequest stateOrNull) {
 		ESQueryBuilder qb = null;
+		if (prefix != null) {
+			// Hack: convert punctuation into spaces, as ES would otherwise say query:"P&G" !~ name:"P&G"
+			String cprefix = StrUtils.toCanonical(prefix);
+			// Hack: Prefix should be one word. If 2 are sent -- turn it into a query + prefix
+			int spi = cprefix.lastIndexOf(' ');
+			if (spi != -1) {
+				assert cprefix.equals(cprefix.trim()) : "untrimmed?! "+cprefix;
+				q = StrUtils.space(q, cprefix.substring(0, spi));
+				cprefix = cprefix.substring(spi+1);
+			}
+			// prefix is on a field -- we use name
+			ESQueryBuilder qp = ESQueryBuilders.prefixQuery("name", cprefix);
+			qb = ESQueryBuilders.must(qb, qp);
+		}
+		
 		if ( q != null) {
 			// convert "me" to specific IDs
 			if (Pattern.compile("\\bme\\b").matcher(q).find()) {
@@ -707,12 +722,7 @@ public abstract class CrudServlet<T> implements IServlet {
 //				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
 				qb = ESQueryBuilders.must(qb, esq);
 			}
-		} // ./q
-		if (prefix != null) {			
-			// prefix is on a field -- we use name
-			ESQueryBuilder qp = ESQueryBuilders.prefixQuery("name", prefix);
-			qb = ESQueryBuilders.must(qb, qp);
-		}
+		} // ./q		
 		
 		if (period != null) {
 			// option for modified or another date field?
