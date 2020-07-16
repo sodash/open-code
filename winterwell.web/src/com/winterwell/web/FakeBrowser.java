@@ -606,12 +606,14 @@ public class FakeBrowser {
 			return;
 		// Make a file...
 		String fileType = FileUtils.getType(getLocation());
+		// assume html if no e.g. .jpg ending 
+		if (fileType.isEmpty()) fileType = "html";
 		// Chop out url vars
 		int i = fileType.indexOf('?');
 		if (i != -1) {
 			fileType = fileType.substring(0, i);
 		}
-		// Make safe
+		// Make safe		
 		fileType = FileUtils.safeFilename(fileType, false);
 		// Shorten if long
 		if (fileType.length() > 4) {
@@ -626,7 +628,9 @@ public class FakeBrowser {
 		// Create (or use the previous/set value)
 		downloadFile = userDownloadFile; 
 		if (downloadFile==null) {
-			downloadFile = File.createTempFile("download", fileType);
+			downloadFile = File.createTempFile(
+					"download-"+StrUtils.substring(FileUtils.safeFilename(getLocation(), false), 7, 60), 
+					fileType);
 		}
 		// Copy into file
 		FileUtils.copy(inStream, downloadFile);

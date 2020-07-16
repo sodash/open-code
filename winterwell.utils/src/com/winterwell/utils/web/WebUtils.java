@@ -1277,14 +1277,20 @@ public class WebUtils {
 
 	public static void pngFromPdf(File pdfIn, File pngOut) throws IOException {
 		if ( ! pdfIn.exists()) throw new FileNotFoundException("missing pdf input file: "+pdfIn);
-		Proc p2 = new Proc("convert -trim -antialias -density 300 "
-				+ pdfIn.getAbsolutePath() + " " + pngOut.getAbsolutePath());
-		p2.run();
-		p2.waitFor(TUnit.MINUTE.getMillisecs());
-
-		if ( ! pngOut.exists())
-			throw new IOException("Failed to create " + pngOut + "\t"
-					+ p2.getError());
+//		String crop = "-crop 500x500 +repage "; // crop in case its giant?? Not working as yet :(
+		String cmd = "convert -trim -antialias -density 300 "
+//				+ crop
+				+ pdfIn.getAbsolutePath() + " " + pngOut.getAbsolutePath();
+		Log.d(cmd);
+		try (Proc p2 = new Proc(cmd)) {
+			p2.start();
+			p2.waitFor(TUnit.MINUTE.getMillisecs());		
+		
+			if ( ! pngOut.exists()) {
+				throw new IOException("Failed to create " + pngOut + "\t"
+						+ p2.getError());
+			}
+		}
 	}
 
 	/**
@@ -1714,6 +1720,30 @@ public class WebUtils {
 		} catch (XPathExpressionException e) {
 			throw Utils.runtime(e);
 		}
+	}
+
+	/**
+	 * TODO standardise on chrome-headeless-render-pdf or phantomjs or chromium??
+	 * 
+	 * NB: This does not seem to be reliable here, though it does work for Jerbil?!
+	 * 
+	 * Render to pdf (using chrome-headeless-render-pdf)
+	 * @param out
+	 * @param pdf
+	 * @return Proc This has NOT finished! Use proc.waitFor() to wait.
+	 * e.g.
+	 * <pre><code>
+	try (Proc proc = WebUtils.renderToPdf(htmlFile, pdfFile)) {
+		proc.waitFor();	
+	}
+	</code></pre>
+	 */
+	public static Proc renderToPdf(File out, File pdf) {
+		// works in Jerbil?? But can spit out raw html??
+		Proc proc = new Proc(
+				"chrome-headless-render-pdf --url=file://"+out.getAbsolutePath()+" --pdf="+pdf.getAbsolutePath());
+		proc.start();
+		return proc;
 	}
 
 
