@@ -65,7 +65,7 @@ public class MutateMeBreeder<T> implements IBreeder<T> {
 		if (type == Boolean.class || type == boolean.class) {
 			return random.nextBoolean();
 		}
-		
+ 
 		// Set?
 		MutateMe mm = f.getAnnotation(MutateMe.class);
 		if ( ! mm.choices().isEmpty()) {
