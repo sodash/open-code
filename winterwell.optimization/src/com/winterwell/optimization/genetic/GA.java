@@ -74,6 +74,8 @@ public class GA<X> implements IOptimize<X> {
 	
 	/**
 	 * How long to run for (only 1 hour by default)
+	 * 
+	 * This will not interrupt during a generation, hence it is a "hint".
 	 */
 	private long timeHintMillisecs = TUnit.HOUR.getMillisecs();
 	private int maxGenerations = 100;
@@ -153,6 +155,7 @@ public class GA<X> implements IOptimize<X> {
 	}
 	
 	/**
+	 * Run! until 
 	 * @see com.winterwell.optimization.IOptimize#optimize(com.winterwell.optimization.IEvaluate)
 	 */
 	@Override
@@ -256,6 +259,11 @@ public class GA<X> implements IOptimize<X> {
 		return current.population.get(0).candidate;
 	}
 
+	/**
+	 * SHould we stop? Time out or no improvement.
+	 * @param current
+	 * @return true if it is time to stop
+	 */
 	protected boolean converged(Generation<X> current) {
 		if (current.generation >= maxGenerations) {
 			Log.i("ga", "Stopping GA - reached max generation "+maxGenerations);
