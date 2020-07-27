@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
@@ -205,8 +206,8 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			pool.shutdown();
 			pool.awaitTermination(10, TimeUnit.SECONDS);			
 		} catch(Throwable ex) {
-			Log.e(ex);
-			manifestFromJar.put("error", ex);
+			Log.w(ex);
+			manifestFromJar.put("error", Printer.toString(ex, true));
 		}
 		return manifestFromJar;
 	}
