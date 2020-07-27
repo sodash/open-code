@@ -205,6 +205,7 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			pool.shutdown();
 			pool.awaitTermination(10, TimeUnit.SECONDS);			
 		} catch(Throwable ex) {
+			Log.e(ex);
 			manifestFromJar.put("error", ex);
 		}
 		return manifestFromJar;
