@@ -672,6 +672,7 @@ public class FakeBrowser {
 		// Redirect
 		if (code >= 300 && code < 400) {
 			List<String> locns = headers.get("Location");
+			if (locns == null) locns = headers.get("location");
 			if (locns!=null && locns.size() != 0 && locns.get(0)!=null)
 				throw new WebEx.Redirect(code, location, locns.get(0));
 			throw new IOException(code + " (redirect) "
