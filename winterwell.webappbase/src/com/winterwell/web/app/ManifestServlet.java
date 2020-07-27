@@ -187,7 +187,7 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 	private Map<String, Object> getJarManifests() {
 		ConcurrentMap<String, Object> manifestFromJar = new ConcurrentHashMap();
 		try {		
-			File dir = new File(FileUtils.getWorkingDirectory(), "lib");
+			File dir = new File(FileUtils.getWorkingDirectory(), "build-lib");
 			ExecutorService pool = Executors.newFixedThreadPool(10);
 			File[] files = dir.listFiles();
 			for (File file : files) {
