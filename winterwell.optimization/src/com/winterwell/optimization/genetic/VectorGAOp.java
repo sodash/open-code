@@ -70,6 +70,7 @@ public class VectorGAOp implements IBreeder<Vector>
 	}
 
 	/**
+	 * The mutation size is relative to x (except when x is zero).
 	 * @param x
 	 * @return mutated x
 	 */
