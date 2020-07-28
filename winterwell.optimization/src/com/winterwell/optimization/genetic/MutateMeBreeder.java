@@ -1,8 +1,11 @@
 package com.winterwell.optimization.genetic;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import com.winterwell.maths.stats.distributions.GaussianBall;
 import com.winterwell.maths.stats.distributions.d1.UniformDistribution1D;
@@ -12,6 +15,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Range;
+import com.winterwell.utils.log.Log;
 
 /**
  * Use with {@link MutateMe} annotated classes.
@@ -67,25 +71,40 @@ public class MutateMeBreeder<T> implements IBreeder<T> {
 		// Set?
 		MutateMe mm = f.getAnnotation(MutateMe.class);
 		if ( ! mm.choices().isEmpty()) {
-			assert type == String.class : type;
-			List<String> options = StrUtils.split(mm.choices());
-			// TODO deserialise for other types
-			return Utils.getRandomMember(options);
+			if (type == String.class) {
+				List<String> options = StrUtils.split(mm.choices());
+				// TODO deserialise for other types
+				return Utils.getRandomMember(options);
+			}else if (type == List.class) {
+				List<String> options = StrUtils.split(mm.choices());
+				Set<String> mutatedSet = (Set<String>) Utils.getRandomSelection(Utils.getRandom().nextInt(options.size())+1, options);
+				List<String> list = new ArrayList<String>();
+				list.addAll(mutatedSet);
+				return list;
+			}
 		}
 		
 		// Number?
 		if (ReflectionUtils.isaNumber(type)) {
 			double mod;
 			Range range = new Range(mm.high(), mm.low());
-			if (value==null) {
-				mod = new UniformDistribution1D(range).sample();
-			} else {
-				double x = ((Number)value).doubleValue();
-				mod = vectorOp.mutate2(x);
-				if (range.size() != 0) {
-					mod = range.cap(mod);
-				}
-			}			
+			
+			// always sample from a uniform distribution
+			mod = new UniformDistribution1D(range).sample();
+			
+			/*
+			 * old code that would mutate to a value close to the original using vectorOp
+			 */
+//			if (value==null) {
+//				mod = new UniformDistribution1D(range).sample();
+//			} else {
+//				double x = ((Number)value).doubleValue();
+//				mod = vectorOp.mutate2(x);
+//				if (range.size() != 0) {
+//					mod = range.cap(mod);
+//				}
+//			}
+			
 			if (type == Integer.class || type==int.class) {
 				return (int) Math.round(mod);
 			}
@@ -130,6 +149,10 @@ public class MutateMeBreeder<T> implements IBreeder<T> {
 
 	public void mutateOriginal() {
 		this.original = mutate(original);		
+	}
+	
+	public void setMutation(double m) {
+		this.mutation = m;
 	}
 
 }
