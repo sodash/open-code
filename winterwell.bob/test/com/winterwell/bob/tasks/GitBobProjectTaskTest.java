@@ -20,13 +20,13 @@ public class GitBobProjectTaskTest {
 
 	@Test
 	public void testRunWithDeps() throws IOException {
-		GitBobProjectTask gbt = WinterwellProjectFinder.getKnownProject("winterwell.web");
+		GitBobProjectTask gbt = GitBobProjectTask.getKnownProject("winterwell.web");
 		gbt.run();
 	}
 
 	@Test
 	public void testRunWithDeps_stashOn() throws IOException {
-		GitBobProjectTask gbt = WinterwellProjectFinder.getKnownProject("winterwell.web");
+		GitBobProjectTask gbt = GitBobProjectTask.getKnownProject("winterwell.web");
 		gbt.stashLocalChanges = true;
 		gbt.run();
 	}

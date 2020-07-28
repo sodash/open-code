@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.bob.tasks.JarTask;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
@@ -187,7 +188,7 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 	private Map<String, Object> getJarManifests() {
 		ConcurrentMap<String, Object> manifestFromJar = new ConcurrentHashMap();
 		try {		
-			File dir = new File(FileUtils.getWorkingDirectory(), "lib");
+			File dir = new File(FileUtils.getWorkingDirectory(), "build-lib");
 			ExecutorService pool = Executors.newFixedThreadPool(10);
 			File[] files = dir.listFiles();
 			for (File file : files) {
@@ -205,7 +206,8 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			pool.shutdown();
 			pool.awaitTermination(10, TimeUnit.SECONDS);			
 		} catch(Throwable ex) {
-			manifestFromJar.put("error", ex);
+			Log.w(ex);
+			manifestFromJar.put("error", Printer.toString(ex, true));
 		}
 		return manifestFromJar;
 	}

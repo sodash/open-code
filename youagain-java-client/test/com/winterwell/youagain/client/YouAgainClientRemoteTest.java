@@ -25,7 +25,7 @@ public class YouAgainClientRemoteTest {
 		HttpServletResponse resp = new TestHttpServletResponse();
 		WebRequest state = new WebRequest(req,resp);
 		List<AuthToken> tokens = yac.getAuthTokens(state);
-		assert tokens == null;
+		assert tokens.isEmpty() : tokens;
 	}
 
 	

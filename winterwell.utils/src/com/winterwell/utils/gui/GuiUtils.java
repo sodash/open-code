@@ -109,13 +109,6 @@ public class GuiUtils {
 		return image;
 	}
 
-
-	/** Winterwell's less corporate blue **/
-	public static Color WINTERWELL_BLUE = getColor("#0096bb");
-
-	/** Winterwell's corporate pink **/
-	public static Color WINTERWELL_PINK = getColor("#e14184");
-
 	/**
 	 * Mnenomic for {@link JOptionPane#showInputDialog(Object)}
 	 * 

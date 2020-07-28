@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 
 import com.winterwell.bob.BuildTask;
+import com.winterwell.bob.wwjobs.BuildHacks;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
+import com.winterwell.web.app.KServerType;
 /**
  * @tested {@link GitBobProjectTaskTest}
  * @author daniel
@@ -39,6 +41,7 @@ public class GitBobProjectTask extends BuildTask {
 		this.dir = dir;
 		// dependencies shouldnt need rebuilding all the time
 		setSkipGap(TUnit.DAY.dt);
+		resetLocalChanges = BuildHacks.getServerType() != KServerType.LOCAL;
 	}
 	
 	/**
@@ -47,6 +50,11 @@ public class GitBobProjectTask extends BuildTask {
 	File projectSubDir;
 
 	boolean stashLocalChanges;
+	/**
+	 * This is set true for non-local. It helps ensure the git pull will work.
+	 * It does delete local edits!
+	 */
+	boolean resetLocalChanges;
 	
 	@Override
 	protected void doTask() throws Exception {
@@ -60,11 +68,19 @@ public class GitBobProjectTask extends BuildTask {
 				gt0.run();
 				gt0.close();
 			}
+			// reset first? a harder version of stash!
+			if (resetLocalChanges) {
+				Log.d(LOGTAG, "git reset --hard (because not a local dev box)");
+				GitTask gr = new GitTask(GitTask.RESET, dir);
+				gr.addArg("--hard FETCH_HEAD");
+				gr.run();
+				gr.close();
+			}
 			// pull
 			GitTask gt = new GitTask(GitTask.PULL, dir);
 			gt.setDepth(getDepth()+1);
 			gt.run();
-			gt.close();
+			gt.close();						
 		} else {
 			assert ! dir.isFile() : dir;
 			// clone
@@ -97,6 +113,20 @@ public class GitBobProjectTask extends BuildTask {
 	public GitBobProjectTask setSubDir(String subdir) {
 		projectSubDir = new File(dir, subdir.toString());
 		return this;
+	}
+
+	public static GitBobProjectTask getKnownProject(String pname) {
+		String g_s = WinterwellProjectFinder.KNOWN_PROJECTS.get(pname);
+		if (g_s==null) return null;
+		String[] gs = g_s.split(" ");
+		boolean isSubdir = gs.length > 1; 
+		File bobdir = getConfig().getGitBobDir();
+		File dir = new File(bobdir, isSubdir? gs[1] : pname);
+		GitBobProjectTask gb = new GitBobProjectTask(gs[0], dir);
+		if (isSubdir) {
+			gb.setSubDir(gs[2]);
+		}
+		return gb;
 	}
 
 }

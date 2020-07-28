@@ -40,6 +40,8 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.ICallable;
+import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
@@ -135,7 +137,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		// return blank / messages
 		if (state.getAction()==null) {
 			// no thing?
-			throw new WebEx.E404(state.getRequestUrl());
+			throw new WebEx.E404("No ID found in (un)RESTful url. "+state.getRequestUrl());
 		}
 		JsonResponse output = new JsonResponse(state);
 		WebUtils2.sendJson(output, state);
@@ -561,8 +563,9 @@ public abstract class CrudServlet<T> implements IServlet {
 		String prefix = state.get("prefix");
 		String sort = state.get(SORT, defaultSort);		
 		int size = state.get(SIZE, 1000);
+		Period period = CommonFields.getPeriod(state);
 		
-		SearchResponse sr = doList2(q, prefix, status, sort, size, state);
+		SearchResponse sr = doList2(q, prefix, status, sort, size, period, state);
 		
 //		Map<String, Object> jobj = sr.getParsedJson();
 		List<Map> hits = sr.getHits();
@@ -607,7 +610,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param prefix 
 	 * @param num 
 	 */
-	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, WebRequest stateOrNull) {
+	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, Period period, WebRequest stateOrNull) {
 		// copied from SoGive SearchServlet
 		// TODO refactor to use makeESFilterFromSearchQuery
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
@@ -638,7 +641,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		// query
-		ESQueryBuilder qb = doList3_ESquery(q, prefix, stateOrNull);
+		ESQueryBuilder qb = doList3_ESquery(q, prefix, period, stateOrNull);
 
 		if (qb!=null) s.setQuery(qb);
 				
@@ -666,8 +669,23 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 
-	protected ESQueryBuilder doList3_ESquery(String q, String prefix, WebRequest stateOrNull) {
+	protected ESQueryBuilder doList3_ESquery(String q, String prefix, Period period, WebRequest stateOrNull) {
 		ESQueryBuilder qb = null;
+		if (prefix != null) {
+			// Hack: convert punctuation into spaces, as ES would otherwise say query:"P&G" !~ name:"P&G"
+			String cprefix = StrUtils.toCanonical(prefix);
+			// Hack: Prefix should be one word. If 2 are sent -- turn it into a query + prefix
+			int spi = cprefix.lastIndexOf(' ');
+			if (spi != -1) {
+				assert cprefix.equals(cprefix.trim()) : "untrimmed?! "+cprefix;
+				q = StrUtils.space(q, cprefix.substring(0, spi));
+				cprefix = cprefix.substring(spi+1);
+			}
+			// prefix is on a field -- we use name
+			ESQueryBuilder qp = ESQueryBuilders.prefixQuery("name", cprefix);
+			qb = ESQueryBuilders.must(qb, qp);
+		}
+		
 		if ( q != null) {
 			// convert "me" to specific IDs
 			if (Pattern.compile("\\bme\\b").matcher(q).find()) {
@@ -704,11 +722,14 @@ public abstract class CrudServlet<T> implements IServlet {
 //				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
 				qb = ESQueryBuilders.must(qb, esq);
 			}
-		} // ./q
-		if (prefix != null) {			
-			// prefix is on a field -- we use name
-			ESQueryBuilder qp = ESQueryBuilders.prefixQuery("name", prefix);
-			qb = ESQueryBuilders.must(qb, qp);
+		} // ./q		
+		
+		if (period != null) {
+			// option for modified or another date field?
+			String timeField = stateOrNull==null? null : stateOrNull.get("period");
+			if (timeField==null) timeField = "created";
+			ESQueryBuilder qperiod = ESQueryBuilders.dateRangeQuery(timeField, period.first, period.second);
+			qb = ESQueryBuilders.must(qb, qperiod);
 		}
 		
 		// NB: exq can be null for ALL
@@ -866,15 +887,6 @@ public abstract class CrudServlet<T> implements IServlet {
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
 		T thing = getThing(state);
 		assert thing != null : "null thing?! "+state;
-		// HACK set modified = true on maps
-		if (thing instanceof Map) {
-			((Map) thing).put("modified", true);	
-		} else {
-			// should we have an interface for this??
-//			ReflectionUtils.setPrivateField(thing, fieldName, value);
-			// NB: avoiding jthing.put() as that re-makes the java object, which is wasteful and confusing
-//			jthing.put("modified", true);
-		}
 		
 		// This has probably been done already in getThing(), but harmless to repeat
 		// run the object through Java, to trigger IInit

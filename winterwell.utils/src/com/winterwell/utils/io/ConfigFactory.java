@@ -137,7 +137,21 @@ public class ConfigFactory {
 	}
 	
 	/**
-	 * This is the core bit, which determines what files to look at (and in what order)
+	 * This is the core bit, which determines what files to look at (and in what order).
+	 * 
+	 * E.g. for StripeConfig in SoGive, we'd check for the following config/X.properties files:
+<pre>
+config/
+   stripe.properties
+   sogive.properties
+   serverType i.e. production / test / local .properties
+   appName.serverType.properties, e.g. this would resolve to config/sogive.production.properties
+   logins.properties
+   machine e.g. baker.properties
+winterwell/logins/logins.appName.properties
+winterwell/logins/stripe.properties
+</pre>
+	 * 
 	 * @param configClass
 	 * @return
 	 */

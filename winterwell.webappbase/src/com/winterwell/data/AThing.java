@@ -28,19 +28,20 @@ public class AThing implements IInit {
 	
 	/**
 	 * TODO How can we auto set this?
+	 * Currently autoset by {@link com.winterwell.web.app.AppUtils#doSaveEdit(com.winterwell.es.ESPath, com.winterwell.web.ajax.JThing, com.winterwell.web.app.WebRequest)}
 	 */
-	Time modified; 
+	Time lastModified; 
 	
 	/**
-	 * TODO set this
+	 * 
 	 * @return
 	 */
-	public Time getModified() {
-		return modified;
+	public Time getLastModified() {
+		return lastModified;
 	}
 	
-	public void setModified(Time modified) {
-		this.modified = modified;
+	public void setLastModified(Time lastModified) {
+		this.lastModified = lastModified;
 	}
 	
 	public Time getCreated() {

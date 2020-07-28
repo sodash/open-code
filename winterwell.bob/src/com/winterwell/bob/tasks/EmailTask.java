@@ -7,6 +7,7 @@ import javax.mail.PasswordAuthentication;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.log.Log;
 import com.winterwell.web.LoginDetails;
 import com.winterwell.web.email.SMTPClient;
 import com.winterwell.web.email.SimpleMessage;
@@ -60,7 +61,7 @@ public class EmailTask extends BuildTask {
 			// -- Send the message --
 			smtp.send(msg);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Log.w(LOGTAG, ex);
 		}
 	}
 

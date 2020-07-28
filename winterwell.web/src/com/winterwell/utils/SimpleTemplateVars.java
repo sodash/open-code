@@ -1,6 +1,8 @@
 package com.winterwell.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -70,9 +72,10 @@ public final class SimpleTemplateVars {
 		
 		// process $vars
 		Pattern p = Pattern.compile("\\$([a-zA-Z0-9_]+)(\\.[a-zA-Z0-9_]+)?");
+		List unsets = new ArrayList();
 		String txt3 = StrUtils.replace(txt2, p, (StringBuilder sb, Matcher m) -> {
 //				// Is it in a url?
-			boolean inUrl = false;
+			boolean inUrl = false; // minor TODO
 //				for(Slice url : urls) {
 //					if (url.start <= m.start() && url.end >= m.end()) {
 //						inUrl=true; break;
@@ -86,7 +89,7 @@ public final class SimpleTemplateVars {
 				if (inUrl) {
 					v = "";
 				} else {
-					Log.report("Ignoring unset variable: $"+k, Level.WARNING);
+					unsets.add(k);
 					sb.append(m.group());
 					return;
 				}
@@ -116,7 +119,12 @@ public final class SimpleTemplateVars {
 			sb.append(vs);
 			if (extra!=null) sb.append(extra);	
 		});
-	    
+		
+		// log unset
+		if ( ! unsets.isEmpty()) {
+			Log.i("template", "Ignoring unset variables: $"+StrUtils.join(unsets,", $"));
+		}
+		// done
 		return txt3;
 	}
 

@@ -121,6 +121,7 @@ public class FileUtils {
 	 * lowercase
 	 */
 	public static final List<String> IMAGE_TYPES = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp", "tiff", "svg");
+	private static File wwdir;
 
 	/**
 	 * Append a string to a file. Creates the file if necessary (the parent
@@ -944,9 +945,17 @@ public class FileUtils {
 	 * @see WinterwellProjectFinder
 	 */
 	public static File getWinterwellDir() throws FailureException {
+		if (wwdir!=null) return wwdir;
+		wwdir = getWinterwellDir2();
+		Log.d("init", "WINTERWELL_HOME = "+wwdir);
+		return wwdir;
+	}	
+	
+	private static File getWinterwellDir2() throws FailureException {
 		try {
+			// Explicitly set?
 			String dd = System.getenv("WINTERWELL_HOME");
-			if (!Utils.isBlank(dd)) {
+			if ( ! Utils.isBlank(dd)) {
 				if (dd.startsWith("~")) {
 					// ~ goes awry in Windows at least
 					String home = System.getProperty("user.home");
@@ -955,25 +964,35 @@ public class FileUtils {
 					}
 				}
 				File f = new File(dd).getCanonicalFile();
-				if (!f.exists())
+				if ( ! f.exists())
 					throw new FailureException(
 							"Path does not exist: WINTERWELL_HOME = " + f);
+				Log.d("init", "environment variable WINTERWELL_HOME set to "+f);
 				return f;
 			}
 
 			// (home)/winterwell?
 			String home = System.getProperty("user.home");
-			// No home? try /home/winterwell?
+			// ...No home? try /home
 			if (Utils.isBlank(home)) {
 				home = "/home";
 			}
+			// home = winterwell? (server setup)
+			String homeName = new File(home).getName();
+			Log.d("init", "Try to find WINTERWELL_HOME from "+homeName+" = "+home+" ...");
+			if ("winterwell".equals(homeName)) {
+				return new File(home).getCanonicalFile();
+			}
+			
 			File ddf = new File(home, "winterwell").getCanonicalFile();
-			if (ddf.exists() && ddf.isDirectory())
+			if (ddf.exists() && ddf.isDirectory()) {
 				return ddf;
-
+			}
+			
 			File hardcoded = new File("/home/winterwell").getCanonicalFile();
-			if (hardcoded.exists() && hardcoded.isDirectory())
+			if (hardcoded.exists() && hardcoded.isDirectory()) {
 				return hardcoded;
+			}
 			
 			// Does the local folder or its parent or grandparent look OK? 
 			// Let's test for the presence of the open-code repo.

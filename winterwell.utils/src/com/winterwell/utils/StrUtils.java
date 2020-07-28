@@ -1828,6 +1828,28 @@ public class StrUtils {
 		return clean.toString();
 	}
 
+	/**
+	 * Easy join by " " which handles null/empty objects by skipping them.
+	 * @param bits 
+	 * @return e.g. "a b c". Never null, can be "".
+	 */
+	public static String space(String... bits) {
+		if (bits.length == 0)
+			return "";
+		StringBuilder sb = new StringBuilder();
+		for (String string : bits) {
+			if (string == null || string.isEmpty()) {
+				continue;
+			}
+			sb.append(string);
+			sb.append(" ");
+		}
+		if (sb.length() != 0) {
+			pop(sb, 1);
+		}
+		return sb.toString();
+	}
+
 }
 
 /**

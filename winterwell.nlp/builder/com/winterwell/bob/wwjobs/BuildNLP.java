@@ -14,6 +14,8 @@ import com.winterwell.utils.io.FileUtils;
 
 public class BuildNLP extends BuildWinterwellProject {
 
+	boolean isBuildIso639jar;
+
 	public BuildNLP() {
 		super("winterwell.nlp");
 		incSrc = false;
@@ -38,7 +40,8 @@ public class BuildNLP extends BuildWinterwellProject {
 	public void doTask() throws Exception {
 		super.doTask();
 		
-		// Also build an ISO639 only one
+		// Also build an ISO639 only one?
+		if ( ! isBuildIso639jar) return;
 		File f1 = new File(projectDir, "src/com/winterwell/nlp/languages/ISO639.java");
 		List<File> target = Arrays.asList(f1);
 		
@@ -57,7 +60,7 @@ public class BuildNLP extends BuildWinterwellProject {
 		req.setIncludeSource(true);
 		req.run();
 
-		File lib = new File(FileUtils.getWinterwellDir(), "code/lib");
+		File lib = new File(projectDir, "build-lib"); // TODO getBuildJarsDir(); but have to release a Bob update for this
 		File jar = new File(lib, "iso639.jar");
 
 		FileUtils.delete(jar);

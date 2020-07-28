@@ -83,7 +83,7 @@ public class BuildWinterwellProject extends BuildTask {
 			// no local project? maybe GitBob can get it
 			if (pdir==null || ! pdir.isDirectory()) {
 				// known GitBob project?
-				BuildTask bt = WinterwellProjectFinder.getKnownProject(pname);
+				BuildTask bt = GitBobProjectTask.getKnownProject(pname);
 				if (bt!=null) {
 					deps.add(bt);				
 				}
@@ -379,7 +379,7 @@ public class BuildWinterwellProject extends BuildTask {
 		}
 		
 		// collect jars
-		collectJars(new File(projectDir, "build-lib"));
+		collectJars(getBuildJarsDir());
 		
 		// version.properties
 		MakeVersionPropertiesTask mvpt = new MakeVersionPropertiesTask().setAppDir(projectDir);
@@ -399,6 +399,10 @@ public class BuildWinterwellProject extends BuildTask {
 		// update classpath? HACK (we could prob run this more but safer to do less often)
 		List<MavenDependencyTask> mdts = Containers.filterByClass(getDependencies(), MavenDependencyTask.class);
 		doUpdateClasspath(mdts);		
+	}
+
+	File getBuildJarsDir() {
+		return new File(projectDir, "build-lib");
 	}
 
 	private void doUpdateClasspath(List<MavenDependencyTask> mdts) {
@@ -539,8 +543,8 @@ public class BuildWinterwellProject extends BuildTask {
 				EclipseClasspath ec = new EclipseClasspath(projectDir);
 				ec.setIncludeProjectJars(true);
 				Set<File> libs = ec.getCollectedLibs();
-				compile.setClasspath(libs);		
-	//			compile.setSrcJavaVersion("1.9");
+				compile.setClasspath(libs);
+				compile.setSrcJavaVersion("11");
 				compile.setOutputJavaVersion("11"); // Java 11 jars
 				compile.setDebug(true);
 				compile.run();

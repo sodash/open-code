@@ -59,9 +59,9 @@ public class TimeUtils {
 	public static final Time WELL_OLD = new Time(1900, 1, 1);
 	
 	/**
-	 * 1000 years from now. A lenient date to compare against for far-future.
+	 * 3000 AD (ie almost 1000 years from now). A lenient date to compare against for far-future.
 	 */
-	public static final Time WELL_FUTURE = new Time().plus(1000, TUnit.YEAR);
+	public static final Time WELL_FUTURE = new Time(3000,1,1);
 
 	/**
 	 * Create a Time stamp that can act as a sort of null or "zero". Uses 1

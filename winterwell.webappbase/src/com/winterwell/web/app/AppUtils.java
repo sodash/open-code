@@ -178,10 +178,6 @@ public class AppUtils {
 			thing = new JThing().setMap(draftMap);
 		}
 		assert thing != null : draftPath;
-		// remove modified flag
-		if (thing.map().containsKey("modified")) {
-			thing.put("modified", false);
-		}
 		// set status
 		thing = setStatus(thing, newStatus);		
 		// update draft // TODO just an update script to set status
@@ -245,10 +241,6 @@ public class AppUtils {
 			draft = new JThing().setMap(draftMap);
 		}
 		assert draft != null : draftPath;
-		// remove modified flag
-		if (draft.map().containsKey("modified")) {
-			draft.put("modified", false);
-		}
 		// set status
 		draft = setStatus(draft, KStatus.PUBLISHED);
 		// publish
@@ -315,6 +307,8 @@ public class AppUtils {
 		} else if (!Utils.streq(s, KStatus.ARCHIVED)) {
 			AppUtils.setStatus(item, KStatus.DRAFT);
 		}
+		// Update last-modified timestamp
+		item.put("lastModified", new Time().toISOString());
 		// talk to ES
 		return doSaveEdit2(path, item, state);
 	}

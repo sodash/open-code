@@ -39,7 +39,9 @@ public class MutateMeBreeder<T> implements IBreeder<T> {
 		return original;
 	}
 
-	
+	/**
+	 * Probability for each field of mutating
+	 */
 	private double mutation;
 
 	@Override
@@ -67,7 +69,7 @@ public class MutateMeBreeder<T> implements IBreeder<T> {
 		if (type == Boolean.class || type == boolean.class) {
 			return random.nextBoolean();
 		}
-		
+ 
 		// Set?
 		MutateMe mm = f.getAnnotation(MutateMe.class);
 		if ( ! mm.choices().isEmpty()) {
@@ -86,6 +88,9 @@ public class MutateMeBreeder<T> implements IBreeder<T> {
 		
 		// Number?
 		if (ReflectionUtils.isaNumber(type)) {
+			// Initialise with a uniform distribution across the range
+			// Then mutate with a gaussian distribution.
+			// ??This allows tuning across scales -- but maybe not always best??
 			double mod;
 			Range range = new Range(mm.high(), mm.low());
 			
@@ -99,12 +104,13 @@ public class MutateMeBreeder<T> implements IBreeder<T> {
 //				mod = new UniformDistribution1D(range).sample();
 //			} else {
 //				double x = ((Number)value).doubleValue();
+          // NB: the mutation size is relative to the size of x 
 //				mod = vectorOp.mutate2(x);
 //				if (range.size() != 0) {
 //					mod = range.cap(mod);
 //				}
 //			}
-			
+
 			if (type == Integer.class || type==int.class) {
 				return (int) Math.round(mod);
 			}
