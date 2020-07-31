@@ -58,6 +58,8 @@ import com.winterwell.utils.time.TimeUtils;
  * }
  * </code></pre>
  * @author daniel
+ * 
+ * @testedby {@link ConfigBuilderTest}
  */
 public class ConfigBuilder {
 
@@ -163,6 +165,11 @@ public class ConfigBuilder {
 			// class
 			if (type== Class.class) {
 				return Class.forName(string);
+			}
+			// enum
+			if (type.isEnum()) {				
+				Object ev = Enum.valueOf((Class)type, string);
+				return ev;
 			}
 			throw new IllegalArgumentException("Unrecognised type: " + type+" Odd? "+recognisedTypes.contains(type));
 		} catch (Exception e) {

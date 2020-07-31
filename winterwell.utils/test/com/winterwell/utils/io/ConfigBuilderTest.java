@@ -76,6 +76,16 @@ public class ConfigBuilderTest extends TestCase {
 		assert settings.ts.n == 3;
 	}
 	
+
+	@Test
+	public void testStretchTestSettings() throws IOException {
+		StretchTestSettings _settings = new StretchTestSettings();
+		ConfigBuilder parser = new ConfigBuilder(_settings);
+		parser.setFromMain(new String[] {"-thingy", "foo"});
+		StretchTestSettings settings = parser.get();
+		assert settings.thingy == KEnumVal.foo;
+	}
+	
 	@Test
 	public void testOptionsMessage() throws IOException {
 		TestSettings settings = new TestSettings();
@@ -136,4 +146,20 @@ class NestedTestSettings {
 	@Option
 	int n = 5;
 	
+}
+
+enum KEnumVal {
+	foo, bar
+}
+
+/**
+ * Test some less vanilla / primitive options
+ * @author daniel
+ *
+ */
+class StretchTestSettings {
+
+	@Option
+	public KEnumVal thingy;
+
 }
