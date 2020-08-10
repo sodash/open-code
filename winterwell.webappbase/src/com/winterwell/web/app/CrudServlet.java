@@ -123,10 +123,14 @@ public abstract class CrudServlet<T> implements IServlet {
 			// do it
 			doAction(state);
 		}						
-		
-		// return json?
+
+		// Get the Item
 		getThing(state);
-		if (jthing==null) jthing = getThingFromDB(state); 
+		if (jthing==null) {
+			jthing = getThingFromDB(state);
+		}
+
+		// return json?		
 		if (jthing != null) {						
 			String json = jthing.string();
 			// TODO privacy: potentially filter some stuff from the json!
@@ -136,8 +140,9 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		// return blank / messages
 		if (state.getAction()==null) {
-			// no thing?
-			throw new WebEx.E404("No ID found in (un)RESTful url. "+state.getRequestUrl());
+			// no thing? return a 404
+			ESPath path = getPath(state);
+			throw new WebEx.E404(state.getRequestUrl(), "Not found: "+path);
 		}
 		JsonResponse output = new JsonResponse(state);
 		WebUtils2.sendJson(output, state);
