@@ -719,7 +719,7 @@ public class WebRequest implements IProperties, Closeable {
 	/**
 	 * Returns a parameter map without the garbled empty stuff which can occur, and converting values into
 	 * a single String value. If a parameter has several non-null String values, only the first is returned. 
-	 * @return {parameter: String} This is a new map which does not share state with the request.
+	 * @return {parameter: String} This is a new map which does not share state with the request. Can be edited without side-effects.
 	 */
 	public final Map<String,String> getMap() {
 		Map<String, Object> map = getParameterMap();

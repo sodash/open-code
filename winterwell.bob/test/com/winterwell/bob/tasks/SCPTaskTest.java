@@ -2,6 +2,7 @@ package com.winterwell.bob.tasks;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
 
 import org.junit.Test;
 
@@ -10,6 +11,15 @@ import com.winterwell.utils.io.FileUtils;
 
 public class SCPTaskTest {
 
+
+//	@Test// not that good - Linux Mint 2020
+//	public void testWhoIs() throws SocketException, IOException {
+//		WhoisClient whois = new WhoisClient();
+//      whois.connect(WhoisClient.DEFAULT_HOST);
+//      System.out.println(whois.query("82.37.168.255"));
+//      whois.disconnect();
+//	}
+	
 	@Test
 	public void testBadRun() throws IOException {
 		{

@@ -54,6 +54,7 @@ import com.winterwell.utils.IProperties;
 import com.winterwell.utils.IReplace;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Mutable;
+import com.winterwell.utils.Proc;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
@@ -65,6 +66,7 @@ import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.WebPage;
@@ -90,6 +92,29 @@ import eu.medsea.mimeutil.MimeUtil;
  */
 public class WebUtils2 extends WebUtils {
 
+
+	public static Map whois(String ip) {
+		if ( ! IP4_ADDRESS.matcher(ip).matches()) {
+			throw new IllegalArgumentException("Not an IP4 address: "+ip);
+		}
+		Proc proc = new Proc("whois "+ip);
+		proc.start();
+		proc.waitFor(new Dt(5, TUnit.SECOND));
+		String out = proc.getOutput();
+//		System.out.println(out);
+		Pattern keyval = Pattern.compile("^([a-zA-Z0-9\\-]+):\\w*(.+)$");
+		Map vals = new HashMap();
+		for(String line : StrUtils.splitLines(out)) {
+			Matcher m = keyval.matcher(line);
+			if (m.find()) {
+				String g1 = m.group(1);
+				String g2 = m.group(2).trim();
+				vals.putIfAbsent(g1,g2);
+			}
+		}
+		return vals;
+	}
+	
 	/**
 	 * See Content-Transfer-Encoding: quoted-printable
 	 */

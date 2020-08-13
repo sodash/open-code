@@ -3,7 +3,10 @@ package com.winterwell.utils.web;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,9 +17,11 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.Proc;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebPage;
@@ -27,6 +32,37 @@ import eu.medsea.mimeutil.MimeUtil;
 
 public class WebUtils2Test {
 
+
+	@Test
+	public void testWhoIs() throws Exception {
+	// WhoisClient whois = new WhoisClient(); commons-net -- not good, tested Linux 2020
+		String ip = "82.37.168.255";
+		Map vals = whois(ip);
+		System.out.println(vals);
+		assert vals.get("country").equals("GB");
+	}
+
+
+	private Map whois(String ip) {
+		Proc proc = new Proc("whois "+ip);
+		proc.start();
+		proc.waitFor(new Dt(5, TUnit.SECOND));
+		String out = proc.getOutput();
+//		System.out.println(out);
+		Pattern keyval = Pattern.compile("^([a-zA-Z0-9\\-]+):\\w*(.+)$");
+		Map vals = new HashMap();
+		for(String line : StrUtils.splitLines(out)) {
+			Matcher m = keyval.matcher(line);
+			if (m.find()) {
+				String g1 = m.group(1);
+				String g2 = m.group(2).trim();
+				vals.putIfAbsent(g1,g2);
+			}
+		}
+		return vals;
+	}
+	
+	
 	@Test
 	public void testResolveRedirectsGoogle() {
 		String gu = "https://www.google.com/url?rct=j&sa=t&url=https://www.weareumi.co.uk/news/sectors/creative-media/good-loop-secures-soap-glory-campaign-against-hygiene-poverty&ct=ga&cd=CAEYAioUMTQ4MzAwMjk0NzczNDc4MTk5NDUyGjQ4ZmEyZmZhY2M4OTUyZGU6Y29tOmVuOlVT&usg=AFQjCNFFs6KqQS9eWjEW_mLxZClfiKostg;";
