@@ -43,24 +43,6 @@ public class WebUtils2Test {
 	}
 
 
-	private Map whois(String ip) {
-		Proc proc = new Proc("whois "+ip);
-		proc.start();
-		proc.waitFor(new Dt(5, TUnit.SECOND));
-		String out = proc.getOutput();
-//		System.out.println(out);
-		Pattern keyval = Pattern.compile("^([a-zA-Z0-9\\-]+):\\w*(.+)$");
-		Map vals = new HashMap();
-		for(String line : StrUtils.splitLines(out)) {
-			Matcher m = keyval.matcher(line);
-			if (m.find()) {
-				String g1 = m.group(1);
-				String g2 = m.group(2).trim();
-				vals.putIfAbsent(g1,g2);
-			}
-		}
-		return vals;
-	}
 	
 	
 	@Test

@@ -15,10 +15,21 @@ import com.winterwell.web.test.TestHttpServletResponse;
  */
 public class TestWebRequest extends WebRequest {
 
+	private String remoteAddr;
+	
+	public void setRemoteAddr(String remoteAddr) {
+		this.remoteAddr = remoteAddr;
+	}
+
 	public TestWebRequest() {
 		this(new TestHttpServletRequest(), new TestHttpServletResponse());
 	}
 
+	@Override
+	public String getRemoteAddr() {
+		return Utils.or(remoteAddr, super.getRemoteAddr());
+	}
+	
 	public TestWebRequest(TestHttpServletRequest req, TestHttpServletResponse resp) {
 		super(req,resp);
 	}

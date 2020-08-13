@@ -93,13 +93,20 @@ import eu.medsea.mimeutil.MimeUtil;
 public class WebUtils2 extends WebUtils {
 
 
-	public static Map whois(String ip) {
+	/**
+	 * whois info from an IP address. Linux only. Uses a command-line call to `whois`
+	 * @param ip Must be a valid IPv4
+	 * @return
+	 */
+	public static Map<String,String> whois(String ip) throws IllegalArgumentException {
+		if (ip==null) throw new NullPointerException("No IP");
 		if ( ! IP4_ADDRESS.matcher(ip).matches()) {
 			throw new IllegalArgumentException("Not an IP4 address: "+ip);
 		}
 		Proc proc = new Proc("whois "+ip);
 		proc.start();
 		proc.waitFor(new Dt(5, TUnit.SECOND));
+		proc.close();
 		String out = proc.getOutput();
 //		System.out.println(out);
 		Pattern keyval = Pattern.compile("^([a-zA-Z0-9\\-]+):\\w*(.+)$");
