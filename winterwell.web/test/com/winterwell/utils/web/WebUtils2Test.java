@@ -37,7 +37,7 @@ public class WebUtils2Test {
 	public void testWhoIs() throws Exception {
 	// WhoisClient whois = new WhoisClient(); commons-net -- not good, tested Linux 2020
 		String ip = "82.37.168.255";
-		Map vals = whois(ip);
+		Map vals = WebUtils2.whois(ip);
 		System.out.println(vals);
 		assert vals.get("country").equals("GB");
 	}

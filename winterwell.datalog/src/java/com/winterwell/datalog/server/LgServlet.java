@@ -119,11 +119,12 @@ public class LgServlet {
 		assert params != null;
 		
 		// Google Analytics UTM parameters?
+		// - No, we can confuse foreign utm codes with our own (e.g. campaign)
 		// NB: these are also removed from the url later -- look for WebUtils2.cleanUp()
-		String ref = state.getReferer();
-		if (ref != null) {
-			readGoogleAnalyticsTokens(ref, params);
-		}
+//		String ref = state.getReferer();
+//		if (ref != null) {
+//			readGoogleAnalyticsTokens(ref, params);
+//		}
 						
 		// group by
 		String gby = state.get(GBY);
@@ -169,7 +170,6 @@ public class LgServlet {
 		WebUtils2.sendJson(jr, state);				
 	}
 
-	TODO
 	/**
 	 * add utm_X=v to params as X=v -- but only if X=v is not already present
 	 * @param ref
