@@ -174,6 +174,7 @@ public class MathUtils {
 	}
 
 	/**
+	 * Flexible human-friendly convertor
 	 * @param num
 	 *            Can be null. Can be a Number or a String. 
 	 *            Strings can include an optional leading symbol and

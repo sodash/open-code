@@ -18,7 +18,7 @@ import com.winterwell.utils.web.IHasJson;
  * @author daniel
  *
  */
-public final class JThing<T> 
+public class JThing<T> 
 implements INotSerializable, IHasJson // serialize the json not this wrapper 
 {
 

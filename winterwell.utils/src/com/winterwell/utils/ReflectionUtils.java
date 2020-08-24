@@ -474,11 +474,11 @@ public class ReflectionUtils {
 		if (f==null) {
 			throw Utils.runtime(new NoSuchFieldException(fieldName));
 		}
-		checkCanSetField(f);
+//		checkCanSetField(f);
 		f.setAccessible(true);
 		try {
 			// Do it!
-			f.set(obj, value);
+			setPrivateField2(obj, f, value);
 			return;
 			
 		} catch(IllegalArgumentException ex) {
@@ -534,6 +534,40 @@ public class ReflectionUtils {
 		} catch (Exception e) {
 			throw Utils.runtime(e);
 		}
+	}
+
+	private static void setPrivateField2(Object obj, Field f, Object value) throws IllegalArgumentException, IllegalAccessException {
+		// special cases
+		Class<?> typ = f.getType();
+		if ( ! typ.isPrimitive()) {
+			f.set(obj, value);
+			return;
+		}		
+		if (isaNumber(typ)) {
+			double v = MathUtils.toNum(value);
+			if (typ==double.class) {				
+				f.setDouble(obj, v);
+			} else if (typ==long.class) {
+				Long lv = value instanceof Long? (Long) value : (long) v;
+				f.setLong(obj, lv);
+			} else if (typ==float.class) {				
+				f.setFloat(obj, (float) v);			
+			} else if (typ==int.class) {				
+				f.setInt(obj, (int) v);			
+			} else if (typ==short.class) {				
+				f.setShort(obj, (short) v);			
+			} else {
+				throw new IllegalArgumentException("TODO support "+typ+" field:"+f);
+			}
+			return;
+		}
+		if (typ==boolean.class) {
+			boolean v = Utils.yes(value);
+			f.setBoolean(obj, v);
+			return;
+		}
+		// try anyway
+		f.set(obj, value);
 	}
 
 	/**
@@ -774,7 +808,7 @@ public class ReflectionUtils {
 			// Poke the field
 			Field f = getField(klass, propertyName);
 			checkCanSetField(f);
-			f.set(obj, value);
+			setPrivateField2(obj, f, value);
 		} catch(Exception ex) {
 			throw Utils.runtime(ex);
 		}

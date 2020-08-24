@@ -1,6 +1,7 @@
 package com.goodloop.data;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 import com.winterwell.data.AThing;
@@ -141,10 +142,11 @@ implements Comparable<Money>, IHasJson, IInit {
 	/**
 	 * 
 	 * @param x
-	 * @return a new MA for this + x, or this if x=0
+	 * @return a new MA for this + x, or this/x if x/this = 0
 	 */
 	public Money plus(Money x) {
 		if (x.isZero()) return this;
+		if (isZero()) return x;
 		if (x.currency==KCurrency.MULTIPLY) {
 			// HACK
 			return multiply(x.getValue());
@@ -274,6 +276,14 @@ implements Comparable<Money>, IHasJson, IInit {
 		Utils.check4null(v100p);
 		BigDecimal bd = MathUtils.cast(BigDecimal.class, v100p);
 		return new Money(c, bd.divide(P100));
+	}
+
+	public static Money total(List<Money> costs) {
+		Money total = new Money();
+		for (Money money : costs) {
+			total = total.plus(money);
+		}
+		return total;
 	}
 
 	

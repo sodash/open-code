@@ -18,6 +18,7 @@ import com.winterwell.depot.IInit;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.IESRouter;
 import com.winterwell.es.client.DeleteRequestBuilder;
+import com.winterwell.es.client.ESHit;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.KRefresh;
@@ -132,12 +133,18 @@ public abstract class CrudServlet<T> implements IServlet {
 
 		// return json?		
 		if (jthing != null) {						
+			// privacy: potentially filter some stuff from the json!
+			cleanse(jthing, state);
+			// augment?
+			if (augmentFlag) {
+				augment(jthing, state);				
+			}
 			String json = jthing.string();
-			// TODO privacy: potentially filter some stuff from the json!
 			JsonResponse output = new JsonResponse(state).setCargoJson(json);			
 			WebUtils2.sendJson(output, state);
 			return;
 		}
+		// no object...
 		// return blank / messages
 		if (state.getAction()==null) {
 			// no thing? return a 404
@@ -419,6 +426,10 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * suggested: date-desc
 	 */
 	protected String defaultSort;
+	/**
+	 * If true, run all items through {@link #augment(JThing, WebRequest)}
+	 */
+	protected boolean augmentFlag;
 	
 	public static final SField SORT = new SField("sort");
 	public static final String LIST_SLUG =  "_list";
@@ -573,38 +584,60 @@ public abstract class CrudServlet<T> implements IServlet {
 		SearchResponse sr = doList2(q, prefix, status, sort, size, period, state);
 		
 //		Map<String, Object> jobj = sr.getParsedJson();
-		List<Map> hits = sr.getHits();
+		// Let's deal with ESHit and JThings
+		List<ESHit<T>> _hits = sr.getHits(type);
 
 		// TODO dedupe can cause the total reported to be off
-		List hits2 = doList3_source_dedupe(status, hits);
+		List<ESHit<T>> hits2 = doList3_source_dedupe(status, _hits);
 		
-		// sanitise for privacy
-		hits2 = cleanse(hits2, state);
-
 		// HACK: avoid created = during load just now
-		for(Object hit : hits2) {
-			if ( ! (hit instanceof AThing)) continue;
-			AThing at = (AThing) hit;
+		for(ESHit<T> hit : hits2) {
+			if ( ! (hit.getJThing().java() instanceof AThing)) continue;
+			AThing at = (AThing) hit.getJThing().java();
 			if (at.getCreated()!=null && at.getCreated().isAfter(now)) {
 				at.setCreated(null);
 			}
 		}
+		
+		// sanitise for privacy
+		for (ESHit<T> esHit : hits2) {
+			cleanse(esHit.getJThing(), state);
+		}		
 		
 		// HACK: send back csv?
 		if (state.getResponseType() == KResponseType.csv) {
 			doSendCsv(state, hits2);
 			return hits2;
 		}
-			
+		
+		// augment?
+		if (augmentFlag) {
+			for (ESHit<T> h : hits2) {
+				augment(h.getJThing(), state);
+			}
+		}
+		// put together the json response	
 		long total = sr.getTotal();
+		List<Map> items = Containers.apply(hits2, h -> h.getJThing().map());
 		String json = gson().toJson(
 				new ArrayMap(
-					"hits", hits2, 
+					"hits", items, 
 					"total", total
 				));
 		JsonResponse output = new JsonResponse(state).setCargoJson(json);
+		// ...send
 		WebUtils2.sendJson(output, state);
 		return hits2;
+	}
+	
+	/**
+	 * Override to do anything. 
+	 * @param jThing Modify this if you want
+	 * @param state
+	 * @see #augmentFlag
+	 */
+	protected void augment(JThing<T> jThing, WebRequest state) {
+		// no-op by default
 	}
 
 
@@ -752,48 +785,49 @@ public abstract class CrudServlet<T> implements IServlet {
  * @param hits
  * @return unique hits, source
  */
-	private List doList3_source_dedupe(KStatus status, List<Map> hits) {
-		if (!KStatus.isMultiIndex(status)) {
+	private List<ESHit<T>> doList3_source_dedupe(KStatus status, List<ESHit<T>> hits) {
+		if ( ! KStatus.isMultiIndex(status)) {
 			// One index = no deduping necessary.
-			ArrayList<Object> hits2 = Containers.apply(hits, h -> h.get("_source"));
-			return hits2;
+//			ArrayList<Object> hits2 = Containers.apply(hits, h -> h.get("_source"));
+			return hits;
 		}
-		List hits2 = new ArrayList<Map>();
+		List<ESHit<T>> hits2 = new ArrayList<>();
 		// de-dupe
 //		KStatus preferredStatus = status==KStatus.ALL_BAR_TRASH? KStatus.DRAFT : KStatus.PUB_OR_ARC;
 		List<Object> idOrder = new ArrayList<Object>(); // original ordering
-		Map<Object, Object> things = new HashMap<Object, Object>(); // to hold "expected" version of each hit
+		Map<Object, ESHit<T>> things = new HashMap<>(); // to hold "expected" version of each hit
 		
-		for (Map h : hits) {
+		for (ESHit<T> h : hits) {
 			// pull out the actual object from the hit (NB: may be Map or AThing)
-			Object hit = h.get("_source");
-			if (hit == null) continue;
-			Object id = getIdFromHit(hit);			
+//			Object hit = h.getSource();
+			Object id = getIdFromHit(h);			
 			// First time we've seen this object? Save it.
 			if ( ! things.containsKey(id)) {
 				idOrder.add(id);
-				things.put(id, hit);
+				things.put(id, h);
 				continue;
 			}
 			// Which copy to keep?
 			// Is this an object from .draft with non-published status? Overwrite the previous entry.
-			Object index = h.get("_index");
-			KStatus hitStatus = KStatus.valueOf(getStatus(hit));
+			Object index = h.getIndex();
+			KStatus hitStatus = KStatus.valueOf(getStatus(h.getJThing()));
 			if (status == KStatus.ALL_BAR_TRASH) {
 				// prefer draft
 				if (index != null && index.toString().contains(".draft")) {
-					things.put(id, hit);	
+					things.put(id, h);	
 				}
 			} else {
 				// prefer published over archived
 				if (KStatus.PUBLISHED == hitStatus) {
-					things.put(id, hit);	
+					things.put(id, h);	
 				}										
 			}
 		}
 		// Put the deduped hits in the list in their original order.
 		for (Object id : idOrder) {
-			if (things.containsKey(id)) hits2.add(things.get(id));
+			if (things.containsKey(id)) {
+				hits2.add(things.get(id));
+			}
 		}
 		return hits2;
 	}
@@ -819,16 +853,17 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param state
 	 * @return hits
 	 */
-	protected List<Map> cleanse(List<Map> hits, WebRequest state) {
-		return hits;
+	protected void cleanse(JThing<T> thing, WebRequest state) {
 	}
 
 
-
-	private String getStatus(Object h) {
+	private String getStatus(JThing h) {
 		Object s;
-		if (h instanceof Map) s = ((Map)h).get("status");
-		else s = ((AThing)h).getStatus();
+		if (h.java() instanceof AThing) {
+			s = ((AThing) h.java()).getStatus();
+		} else {
+			s = h.map().get("status");
+		}
 		return String.valueOf(s);
 	}
 
@@ -839,21 +874,20 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param hit Map from ES, or AThing
 	 * @return
 	 */
-	private Object getIdFromHit(Object hit) {
-		Object id;
-		if (hit instanceof Map) id = ((Map)hit).get("id");
-		else id = ((AThing)hit).getId();
+	private Object getIdFromHit(ESHit<T> hit) {
+		Object id = hit.getJThing().map().get("id");
 		return id;
 	}
 
 
 
-	protected void doSendCsv(WebRequest state, List<Map> hits2) {
+	protected void doSendCsv(WebRequest state, List<ESHit<T>> hits2) {
 		StringWriter sout = new StringWriter();
 		CSVWriter w = new CSVWriter(sout, new CSVSpec());
 		
 		Json2Csv j2c = new Json2Csv(w);		
-
+		// TODO!
+		
 		// send
 		String csv = sout.toString();
 		state.getResponse().setContentType(WebUtils.MIME_TYPE_CSV); // + utf8??
