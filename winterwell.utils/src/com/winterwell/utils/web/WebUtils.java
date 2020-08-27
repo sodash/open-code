@@ -15,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -1212,15 +1213,23 @@ public class WebUtils {
 		url.append(urlString);
 	}
 
-	public static void renderToPdf(String html, File file) {
-		renderToPdf(html, file, true);
+	public static Proc renderToPdf(String html, File file) {
+		try {
+			File temp = File.createTempFile("html2pdf", ".html");
+			FileUtils.write(temp, html);
+			return renderToPdf(temp, file);
+		} catch(Exception ex) {
+			throw Utils.runtime(ex);
+		}
 	}
 
+	@Deprecated
 	public static void renderToPdf(String html, File file, boolean printStyle) {
 		renderToPdf(html, file, printStyle, null);
 	}
 
 	/**
+	 * @deprecated
 	 * This relies on: linux, and PhantomJS and render-webpage.js (see config/bin) being installed and on the path.
 	 * 
 	 * @param html
@@ -1260,7 +1269,7 @@ public class WebUtils {
 		File temp1 = null;
 		try {
 			temp1 = File.createTempFile("chart", ".pdf");
-			renderToPdf(html, temp1, false); // FIXME
+			renderToPdf(html, temp1);
 			assert temp1.exists() && temp1.length() > 0;
 
 			// 2. Render, trim and convert to PNG with convert
@@ -1274,7 +1283,27 @@ public class WebUtils {
 			}
 		}
 	}
+	
+	public static void renderUrlToPng(String url, File file) {
+		File temp1 = null;
+		try {
+			temp1 = File.createTempFile("chart", ".pdf");
+			Proc p1 = renderUrlToPdf_usingChrome(url, temp1, "--include-background");
+			p1.waitFor(TUnit.MINUTE.dt);
+			assert temp1.exists() && temp1.length() > 0;
 
+			// 2. Render, trim and convert to PNG with convert
+			pngFromPdf(temp1, file);			
+		} catch (Exception e) {
+			throw Utils.runtime(e);
+		} finally {
+			// clean up
+			if (temp1 != null) {
+				FileUtils.delete(temp1);
+			}
+		}
+	}
+	
 	public static void pngFromPdf(File pdfIn, File pngOut) throws IOException {
 		if ( ! pdfIn.exists()) throw new FileNotFoundException("missing pdf input file: "+pdfIn);
 //		String crop = "-crop 500x500 +repage "; // crop in case its giant?? Not working as yet :(
@@ -1294,6 +1323,7 @@ public class WebUtils {
 	}
 
 	/**
+	 * @deprecated
 	 * This uses headless chrome and relies on: chromium-browser being installed and on the path.
 	 * 
 	 * TODO puppeteer provides more control over headless chrome
@@ -1728,7 +1758,7 @@ public class WebUtils {
 	 * NB: This does not seem to be reliable here, though it does work for Jerbil?!
 	 * 
 	 * Render to pdf (using chrome-headeless-render-pdf)
-	 * @param out
+	 * @param html
 	 * @param pdf
 	 * @return Proc This has NOT finished! Use proc.waitFor() to wait.
 	 * e.g.
@@ -1738,10 +1768,37 @@ public class WebUtils {
 	}
 	</code></pre>
 	 */
-	public static Proc renderToPdf(File out, File pdf) {
+	public static Proc renderToPdf(File html, File pdf) {
+		return renderToPdf_usingChrome(html, pdf, null);
+	}
+	
+	public static Proc renderToPdf_usingChrome(File html, File pdf, String options) {
 		// works in Jerbil?? But can spit out raw html??
 		Proc proc = new Proc(
-				"chrome-headless-render-pdf --url=file://"+out.getAbsolutePath()+" --pdf="+pdf.getAbsolutePath());
+				"chrome-headless-render-pdf"
+				+ (options==null? "" : " "+options)				
+				+ " --url=file://"+html.getAbsolutePath()+" --pdf="+pdf.getAbsolutePath());
+		Log.d("pdf", proc.getCommand());
+		proc.start();
+		return proc;
+	}
+	
+	/**
+	 * 
+	 * @param url
+	 * @param pdf
+	 * @param options e.g. for an A5 certificate "--no-margins --include-background --page-ranges 1 --scale 0.87 --landscape --paper-width 5.8 --paper-height 8.3"
+	 * @return
+	 * @throws MalformedURLException
+	 */
+	public static Proc renderUrlToPdf_usingChrome(String url, File pdf, String options) throws MalformedURLException {
+		// works in Jerbil?? But can spit out raw html??
+		URL u = new URL(url);
+		Proc proc = new Proc(
+				"chrome-headless-render-pdf"
+				+ (options==null? "" : " "+options)				
+				+ " --url="+u+" --pdf="+pdf.getAbsolutePath());
+		Log.d("pdf", proc.getCommand());
 		proc.start();
 		return proc;
 	}

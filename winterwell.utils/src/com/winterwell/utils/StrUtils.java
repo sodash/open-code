@@ -474,8 +474,11 @@ public class StrUtils {
 	public static boolean isNumber(String x) {
 		if (x == null)
 			return false;
-		try {
-			// should we use a regex instead? \\d+(\\.\\d+)?
+		// prefer an unexceptional test to try-catch 
+		if ( ! fastNumTest.matcher(x).matches()) {
+			return false;
+		}
+		try {			
 			Double.valueOf(x);
 			// Reject the Java its-a-double or its-a-float syntax
 			if (x.endsWith("d") || x.endsWith("f")) {
@@ -487,6 +490,11 @@ public class StrUtils {
 		}
 	}
 
+	/**
+	 * test for valid number characters
+	 */
+	private static final Pattern fastNumTest = Pattern.compile("[0-9\\.ex\\-]+");
+	
 	/**
 	 * 
 	 * @param txt
@@ -1274,7 +1282,7 @@ public class StrUtils {
 				return s;
 		}
 		double vt = keepMe * tens / keeper;
-		String num = Printer.toStringNumber(vt);
+		String num = Printer.toStringNumber(vt).replaceAll(",", "");
 		return sign + num;
 	}
 

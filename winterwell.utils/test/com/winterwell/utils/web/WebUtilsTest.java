@@ -45,7 +45,7 @@ public class WebUtilsTest extends TestCase {
 		File file = File.createTempFile("test", ".pdf");
 		boolean printStyle = true;
 		String footer = null;
-		WebUtils.renderToPdf(html, file, printStyle, footer);
+		WebUtils.renderToPdf(html, file);
 		WebUtils.display(file);
 	}
 
@@ -315,14 +315,6 @@ public class WebUtilsTest extends TestCase {
 		// XMLNode node = kids.get(0);
 	}
 
-	
-	public void offtestRenderReportToPdf() throws IOException {
-		String url = "http://local.soda.sh/reports.html?iobj=stross_80988%40soda.sh%3AReport&urisig=4f780f0b9c8d48ed7513c40ab95454e8&as=daniel%40winterwellassociates.com%40soda.sh";
-//		String url = "http://local.soda.sh/reports";
-		File pdf = File.createTempFile("testreport", ".pdf");
-		WebUtils.renderUrlToPdf(url, pdf, true, "By SoDash", TUnit.MINUTE.dt);
-		openWindow(pdf);
-	}
 	
 	public void offtestRenderToPdf() {
 		{

@@ -100,16 +100,10 @@ public class ShareServlet implements IServlet {
 	 */
 	String doScreenshot(String link) throws IOException {
 		File html = new FakeBrowser().getFile(link);
-		File pdf = FileUtils.changeType(html, ".chromium.pdf");
 		File png = FileUtils.changeType(html, "png");
-		// html -> pdf
-		WebUtils.renderUrlToPdf(link, pdf, true, null, TUnit.MINUTE.dt);
-//		try (Proc proc = WebUtils.renderToPdf(html, pdf)) {
-//			proc.waitFor();
-//		}
-		Log.d("screenshot", "...Made "+pdf+" from "+link);
-		// pdf -> png
-		WebUtils.pngFromPdf(pdf, png);
+
+		WebUtils.renderUrlToPng(link, png);
+
 		Log.d("screenshot", "Made "+png+" from "+link);
 		// upload & link
 		Uploader uploader = Dep.get(Uploader.class);

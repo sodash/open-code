@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 import com.winterwell.datalog.Rate;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.time.TUnit;
 
 public class LogTest {
@@ -13,10 +14,11 @@ public class LogTest {
 	public void testThrottle() {
 		LogConfig config = new LogConfig();
 		ArrayList<Report> reports = new ArrayList();
+		final String ttag = "test"+Utils.getRandomString(4);
 		ILogListener listener = new ILogListener() {			
 			@Override
 			public void listen(Report report) {
-				if ("test".equals(report.tag)) {
+				if (ttag.equals(report.tag)) {
 					reports.add(report);
 				}
 			}
@@ -25,13 +27,13 @@ public class LogTest {
 		config.throttleAt = new Rate(2, TUnit.MINUTE);
 		Log.setConfig(config);
 		
-		Log.i("test", "Smoke test");
+		Log.i(ttag, "Smoke test");
 		
-		Log.i("test", "Smoke test2");
+		Log.i(ttag, "Smoke test2");
 		
-		Log.i("test", "Smoke test3 - throttle?");
-		Log.i("test", "Smoke test4 - throttle?");
-		Log.i("test", "Smoke test5 - throttle?");
+		Log.i(ttag, "Smoke test3 - throttle?");
+		Log.i(ttag, "Smoke test4 - throttle?");
+		Log.i(ttag, "Smoke test5 - throttle?");
 		
 		assert ! reports.isEmpty();
 		assert reports.size() < 4;

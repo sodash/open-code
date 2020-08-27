@@ -345,8 +345,9 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 			nextRecord = getNextGoodRecord();
 			nextRowNumber++;
 			// If record is good return it...
-			if (isGoodRecord(record))
+			if (isGoodRecord(record)) {
 				return record;
+			}
 			// ...otherwise someone has poked something, so let's try looking
 			// again
 			return next();

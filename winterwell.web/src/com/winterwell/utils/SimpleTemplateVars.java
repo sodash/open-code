@@ -1,5 +1,6 @@
 package com.winterwell.utils;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,16 +65,37 @@ public final class SimpleTemplateVars {
 		if (Utils.isBlank(txtWithVars)) {
 			return txtWithVars; // blank = no-op
 		}
+		String txt1 = txtWithVars;
+
+		// TODO process ${name} 
+		String txt2 = process2_dollarBracket(txt1);
+
+		// process $vars
+		String txt3 = process2_vars(txt2);
+		
 		// process js
-		String txt2 = txtWithVars;
 		if (useJS) {
 			txt2 = process2_js(txtWithVars, txt2);
 		}
 		
-		// process $vars
-		Pattern p = Pattern.compile("\\$([a-zA-Z0-9_]+)(\\.[a-zA-Z0-9_]+)?");
+		// done
+		return txt3;
+	}
+
+	/**
+	 * TODO replace ${var}
+	 * @param txt2
+	 * @return
+	 */
+	private String process2_dollarBracket(String txt2) {
+		return txt2; // TODO
+	}
+
+	static final Pattern p = Pattern.compile("\\$([a-zA-Z0-9_]+)(\\.[a-zA-Z0-9_]+)?");
+	
+	private String process2_vars(String txt) {		
 		List unsets = new ArrayList();
-		String txt3 = StrUtils.replace(txt2, p, (StringBuilder sb, Matcher m) -> {
+		String txtOut = StrUtils.replace(txt, p, (StringBuilder sb, Matcher m) -> {
 //				// Is it in a url?
 			boolean inUrl = false; // minor TODO
 //				for(Slice url : urls) {
@@ -110,7 +132,11 @@ public final class SimpleTemplateVars {
 					extra = m.group(2);
 				}				
 			}
-			String vs = Printer.toString(v);			
+			// convert v to string
+			String vs = Printer.toString(v);
+			if (numberFormat!=null && MathUtils.isNumber(v)) {
+				vs = numberFormat.format(MathUtils.toNum(v));
+			}
 			if (inUrl) {
 				// escape
 				vs = WebUtils.urlEncode(vs);
@@ -119,14 +145,18 @@ public final class SimpleTemplateVars {
 			sb.append(vs);
 			if (extra!=null) sb.append(extra);	
 		});
-		
 		// log unset
 		if ( ! unsets.isEmpty()) {
 			Log.i("template", "Ignoring unset variables: $"+StrUtils.join(unsets,", $"));
 		}
-		// done
-		return txt3;
+		return txtOut;
 	}
+	
+	public void setNumberFormat(DecimalFormat numberFormat) {
+		this.numberFormat = numberFormat;
+	}
+	
+	DecimalFormat numberFormat;
 
 	private String process2_js(String txtWithVars, String txt2) {
 		ScriptEngineManager manager = new ScriptEngineManager();

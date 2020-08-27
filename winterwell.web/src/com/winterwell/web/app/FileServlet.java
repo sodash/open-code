@@ -166,18 +166,17 @@ public class FileServlet extends HttpServlet implements IServlet {
 		}
 		if (pi.isEmpty()) pi = "/";
 		// security check -- no hacking with .. or ;
-		if ( ! FileUtils.isSafe(pi))
+		if ( ! FileUtils.isSafe(pi)) {
 			throw new SecurityException("Illegal filename: " + pi);
+		}
 		File file = new File(baseDir, pi);
 		// Handle a directory: send index.html if it exists
 		if (!file.isDirectory())
 			return file;
 		File index = new File(file, "index.html");
-		if (index.exists())
-			return index;
+		if (index.exists()) return index;
 		index = new File(file, "index.htm");
-		if (index.exists())
-			return index;
+		if (index.exists()) return index;		
 		// oh well
 		return file;
 	}

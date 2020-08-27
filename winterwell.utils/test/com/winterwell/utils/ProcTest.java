@@ -129,12 +129,14 @@ public class ProcTest {
 			p.close();
 		}
 		{ // bad (will not exit)
-			Proc p = new Proc("python");
+			Proc p = new Proc("grep waitForInput");
 			p.run();
 			try {
 				p.waitFor(1000);
+				// NB: should not finish
 				assert false : p.getOutput();
 			} catch (Exception e) {
+				// yeh :)
 				System.out.println(p.getOutput());
 			} finally {
 				p.close();

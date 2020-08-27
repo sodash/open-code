@@ -29,8 +29,11 @@ public class PrinterTest extends TestCase {
 			Printer.out(seven + " " + third + " " + sevenAndAThird);
 		}
 		{
-			Printer.out(100012.704);
-			Printer.out(0.78765);
+			assertEquals("2100817", Printer.toStringNumber(2100817));
+			assertEquals("2,100,000", Printer.prettyNumber(2100817));
+			assertEquals("100012.7", Printer.toStringNumber(100012.704));
+//			assertEquals("0.784", Printer.toStringNumber(0.78388)); This fails! cos the method doesnt do rounding
+			Printer.out(0.78388);
 			Printer.out(0.000001234);
 		}
 	}

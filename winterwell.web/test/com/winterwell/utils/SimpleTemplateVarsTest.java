@@ -2,6 +2,7 @@ package com.winterwell.utils;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.DecimalFormat;
 import java.util.Map;
 
 import org.junit.Test;
@@ -17,6 +18,17 @@ public class SimpleTemplateVarsTest {
 			SimpleTemplateVars props = new SimpleTemplateVars(src);
 			String s = props.process("Hello $name! Leave $namething alone.");
 			assertEquals("Hello Daniel! Leave $namething alone.", s);
+		}
+	}
+	
+	@Test
+	public void testProcessNumberFormat() {
+		{
+			Map src = new ArrayMap("name", "Daniel", "age", 1207);
+			SimpleTemplateVars props = new SimpleTemplateVars(src);
+			props.setNumberFormat(new DecimalFormat("#,###"));
+			String s = props.process("Hello $name aged $age");
+			assert "Hello Daniel aged 1,207".equals(s) : s;
 		}
 	}
 	

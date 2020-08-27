@@ -341,7 +341,9 @@ public class Log {
 		// first time? Or first time today?
 		Time tat = throttledAt.get(tag);
 		if (tat==null || tat.isBefore(new Time().minus(TUnit.DAY))) {
-			Log.i("throttle", "Throttle (skip) log reports for tag #"+tag+" which is running at "+rc);
+			if ( ! "throttle".equals(tag)) {
+				Log.i("throttle", "Throttle (skip) log reports for tag #"+tag+" which is running at "+rc);
+			}
 			throttledAt.put(tag, new Time());
 		}
 		return true;

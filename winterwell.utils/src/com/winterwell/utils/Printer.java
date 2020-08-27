@@ -49,10 +49,6 @@ public class Printer {
 	 */
 	private static final Class ArraysListType = Arrays.asList().getClass();
 
-	// TODO ! round to two/three significant figures
-	// TODO add in ,s for 1,000
-	private static final DecimalFormat df = new DecimalFormat("#.##");
-
 	// /**
 	// * An indent to be applied to the beginning of each line.
 	// */
@@ -346,8 +342,8 @@ public class Printer {
 	 * @testedby {@link PrinterTest#testPrettyNumber()}
 	 */
 	public static String prettyNumber(double x, int sigFigs) {
-		// millions?
-		if (x >= 1000000)
+		// 10 millions?
+		if (x >= 10000000)
 			return StrUtils.toNSigFigs(x / 1000000, sigFigs) + " million";
 		if (x >= 1000) {
 			String s = StrUtils.toNSigFigs(x, sigFigs);
@@ -483,25 +479,36 @@ public class Printer {
 	}
 
 	/**
-	 * Shrinks down to a float and will round to two decimal places if >= 1.
+	 * e.g. 2100.17
+	 */
+	private static final DecimalFormat df = new DecimalFormat("#.##");
+
+	/**
+	 * Shrinks down to a float, add in thousands commas and will round to two decimal places if >= 1.
+	 * Does not apply sig figs.
 	 * Trailing zeros are removed. Do NOT use this for accurate storage of
 	 * doubles!
+	 * 
+	 * TODO proper handling of rounding
 	 * 
 	 * @param x
 	 * @return string rep for x
 	 * @see StrUtils#toNSigFigs(double, int)
+	 * @see #prettyNumber(double)
 	 */
 	public static String toStringNumber(Number x) {
 		float f = x.floatValue();
-		if (f == Math.round(f))
+		if (f == Math.round(f)) {
 			return Integer.toString((int) f);
-		if (Math.abs(f) >= 1)
+		}
+		if (Math.abs(f) >= 1) {
 			return df.format(f);
+		}		
 		// it's a decimal
 		String fs = Float.toString(f);
 		if (fs.contains("E"))
 			return fs;
-		// WTF?? -- DBW (yeah I wrote this, I know)
+		// Crude chop to 3 decimal places 0.abc -- Does not round!		
 		String fss = StrUtils.substring(fs, 0, 5);
 		if (n.matcher(fss).find())
 			return fss;
