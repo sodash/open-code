@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -32,6 +33,13 @@ import eu.medsea.mimeutil.MimeUtil;
 
 public class WebUtils2Test {
 
+	@Test
+	public void testAddToList() {
+		String json0 = "{\"a\":[]}";
+		Map jobj0 = (Map) JSON.parse(json0);
+		SimpleJson.set(jobj0, "apple", "a", "1");
+		assert "apple".equals(SimpleJson.get(jobj0, "a", 1));
+	}
 
 	@Test
 	public void testWhoIs() throws Exception {

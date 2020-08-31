@@ -2,6 +2,7 @@ package com.winterwell.utils.web;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -364,7 +365,23 @@ public class SimpleJson {
 			obj = getCreate(obj, k);
 			assert obj != null : jobj+" "+k;
 		}
-		obj.put(key[key.length-1], value);
+		// set it
+		String k = key[key.length-1];
+		try {				
+			obj.put(k, value);
+			
+		} catch (UnsupportedOperationException ex) {
+			// add to an array failed? replace the array
+			if (obj instanceof ListAsMap && key.length > 1) {
+				ArrayList obj2 = new ArrayList(((ListAsMap) obj).list);
+				new ListAsMap(obj2).put(k, value);
+				String[] pathToArray = Arrays.copyOf(key, key.length-1);
+				set(jobj, obj2, pathToArray);
+				return;
+			}
+			// can't fix
+			throw ex;
+		}
 	}
 
 	/**
