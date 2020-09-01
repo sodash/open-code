@@ -332,7 +332,6 @@ public class AppUtils {
 		// prep object via IInit? (IInit is checked within JThing)
 		// e.g. set the suggest field for NGO 
 		Object jobj = item.java();
-
 		
 		// sanity check id matches path
 		String id = (String) item.map().get("@id"); //mod.getId();
@@ -353,8 +352,10 @@ public class AppUtils {
 		up.setDocAsUpsert(true);
 		// force an instant refresh?
 		if (instant) up.setRefresh("true");
+		
 		// TODO delete stuff?? fields or items from a list
 //		up.setScript(script)
+		
 		// NB: this doesn't return the merged item :(
 		IESResponse resp = up.get().check();
 //		Map<String, Object> item2 = resp.getParsedJson();
