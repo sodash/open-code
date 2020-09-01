@@ -29,10 +29,9 @@ public class WrappedException extends RuntimeException {
 	@Override
 	public String getMessage() {
 		String sm = super.getMessage();
-		String sm2 = getCause().getMessage();
-		if (sm==null) return sm2; // paranoia
-		if (sm==sm2) return sm;
-		return sm+" (wraps) "+sm2;
+		Throwable c = getCause();
+		if (c==this) return sm;
+		return sm+" (wraps) "+c.getMessage();
 	}
 
 	/**
@@ -72,7 +71,7 @@ public class WrappedException extends RuntimeException {
 	@Override
 	public String toString() {
 		Throwable e = getCause();
-		if (e==null) return super.toString(); // paranoia
+		if (e==null || e==this) return super.toString(); // paranoia
 		if (super.getMessage() != e.getMessage()) {
 			return super.getMessage() + " (wraps) " + e.toString();
 		}
