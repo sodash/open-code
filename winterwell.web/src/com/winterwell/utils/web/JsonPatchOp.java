@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.sun.tools.javac.code.Attribute.Array;
 import com.winterwell.utils.containers.ArrayMap;
 
 /**
