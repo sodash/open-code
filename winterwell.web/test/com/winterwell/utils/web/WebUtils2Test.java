@@ -3,10 +3,7 @@ package com.winterwell.utils.web;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,11 +15,9 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.Proc;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebPage;

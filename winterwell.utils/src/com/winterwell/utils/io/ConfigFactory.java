@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.utils.Dep;
-import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;

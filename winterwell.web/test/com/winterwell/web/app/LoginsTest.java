@@ -1,7 +1,5 @@
 package com.winterwell.web.app;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import com.winterwell.web.LoginDetails;
