@@ -546,9 +546,19 @@ public class GuiUtils {
 		JFileChooser fc = new JFileChooser();
 		fc.setCurrentDirectory(dir);
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-		// fc.setAcceptAllFileFilterUsed(true);
-		// if (regexFilter!=null)
-		// fc.setFileFilter(FileUtils.getRegexFilter(regexFilter));
+		if (filterOrNull!=null) {
+			javax.swing.filechooser.FileFilter ff = new javax.swing.filechooser.FileFilter() {			
+				@Override
+				public String getDescription() {
+					return filterOrNull.toString();
+				}			
+				@Override
+				public boolean accept(File arg0) {
+					return filterOrNull.accept(arg0);
+				}
+			};
+			fc.setFileFilter(ff);
+		}
 		int ok = fc.showDialog(null, msg);
 		if (ok == JFileChooser.APPROVE_OPTION) {
 			File f = fc.getSelectedFile();

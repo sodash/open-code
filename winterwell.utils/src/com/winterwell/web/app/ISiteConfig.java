@@ -15,7 +15,8 @@ public interface ISiteConfig {
 	/**
 	 * Allows the server to verify itself with You-Again.
 	 * 
-	 * ??How to get this
+	 * NB: appAuthJwt can be set in a .properties file. 
+	 * Or this can return null, and AppUtils#initAppAuth() will call YouAgainClient.loadLocal()
 	 */
 	default String getAppAuthJWT() {
 		return null;

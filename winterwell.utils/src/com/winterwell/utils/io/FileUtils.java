@@ -1818,4 +1818,9 @@ final class RegexFileFilter implements IFilter<File>, FileFilter {
 		return regex.matcher(name).matches();
 	}
 
+	@Override
+	public String toString() {
+		return regex.pattern();
+	}
+
 }

@@ -47,6 +47,11 @@ import com.winterwell.web.fields.XIdField;
  * 
  * It loads a {@link YouAgainClientConfig} config via {@link ConfigFactory}
  * 
+ * It handles 2 use-cases:
+ *
+ * 1. a java web-service wants to verify an incoming user request.
+ * 2. a java app wants to authenticate _itself_ for connecting with a 2nd app. 
+ * 
  * @testedyb {@link YouAgainClientTest}
  * @author daniel
  */
@@ -110,8 +115,13 @@ public final class YouAgainClient {
 	YouAgainClientConfig yac;
 	private boolean initFlag;
 	
+	/**
+	 * 
+	 * @param app e.g. `profiler.good-loop.com` -- not an XId
+	 */
 	public YouAgainClient(String app) {
 		assert ! Utils.isBlank(app);
+		assert ! app.endsWith("@app") : "not an xid "+app;
 		this.app = app;
 		init();
 		setDebug(true); // FIXME
@@ -511,6 +521,11 @@ public final class YouAgainClient {
 		this.debug = b;
 	}
 
+	/**
+	 * @deprecated Only called by YA server's LoginPlugin
+	 * @param state
+	 * @param authToken
+	 */
 	public void addAuthToken(WebRequest state, AuthToken authToken) {
 		List<AuthToken> auths = getAuthTokens(state);
 		auths.remove(authToken);
@@ -538,6 +553,12 @@ public final class YouAgainClient {
 		);
 	}
 
+	/**
+	 * 
+	 * @param xid
+	 * @return
+	 * @see #storeLocal(AuthToken)
+	 */
 	public AuthToken loadLocal(XId xid) {
 		File out = storeLocal2(xid);		
 		if ( ! out.isFile()) return null;

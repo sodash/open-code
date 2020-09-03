@@ -4,12 +4,14 @@ import java.util.regex.Pattern;
 
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.data.XId;
 
 
 /**
+ * This is backed by {@link YouAgainClient}
  * 
  * Sketch code for app-to-app auth
  * NB: auth covers authentication and authorisation!
@@ -68,13 +70,18 @@ public class App2AppAuthClient {
 		return auth;
 	}
 	
+	 /** 
+	 * @param appAuthName e.g. "foo.example.com" SHOULD use a valid domain name. MUST contain a . (although older app names might not)
+	 * @param appAuthPassword
+	 * @return can be null
+	 */
 	public AuthToken registerIdentityTokenWithYA(String appAuthName, String appAuthPassword) {
-		if (appAuthName==null || appAuthPassword==null) {
-			Log.w(LOGTAG, "missing appAuthName / appAuthPassword "+ReflectionUtils.getSomeStack(8));
-			return null;
+		if (Utils.isBlank(appAuthName) || Utils.isBlank(appAuthPassword)) {
+			throw new NullPointerException("missing appAuthName / appAuthPassword "+appAuthName);
 		}
 		if ( ! appAuthName.contains(".")) {
-			throw new IllegalArgumentException("Rejecting name: "+appAuthName+" Apps should use a valid domain name, managed by the app-owner. E.g. myapp.good-loop.com");
+			throw new IllegalArgumentException("Rejecting name: "+appAuthName
+					+" Apps should use a valid domain name, managed by the app-owner. E.g. myapp.good-loop.com");
 		}
 		XId appXid = getAppXId(appAuthName);
 		AuthToken auth = yac.register(appXid, appAuthPassword);

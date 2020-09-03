@@ -9,6 +9,7 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JSend;
 import com.winterwell.web.ajax.JThing;
 
@@ -42,6 +43,8 @@ public class CrudClient<T> {
 	 * "I, Bob, give app A permission to manage T" (permission)
 	 */
 	private String jwt;
+	
+	protected boolean authNeeded;
 
 	/**
 	 * Set authentication! Without this, expect an auth error.
@@ -109,6 +112,8 @@ public class CrudClient<T> {
 		// You really should set auth!
 		if (jwt != null) {
 			fb.setAuthenticationByJWT(jwt);
+		} else {
+			if (authNeeded) throw new WebEx.E401("No authentication set for "+this+" - call setJwt()");
 		}
 		return fb;
 	}
