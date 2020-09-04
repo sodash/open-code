@@ -306,6 +306,12 @@ public class JarTask extends BuildTask {
 		manifestProps.put(key, value);
 	}
 
+	/**
+	 * check manifests for Implementation-Version: x.y.z, or falls back to date
+	 * @param jara
+	 * @param jarb
+	 * @return
+	 */
 	public static File pickNewerVersion(File jara, File jarb) {
 		// odd no-such-file bug (maybe a race condition?) seen june 2020
 		if ( ! jara.exists()) return jarb;

@@ -68,7 +68,7 @@ public class MakeVersionPropertiesTask extends BuildTask {
 			}
 		} catch(Throwable ex) {
 			// oh well;
-			Log.d("git.info.error", ex);
+			Log.d("git.info.error", "(oh well) "+ex);
 		}
 		
 		// Who did the push?

@@ -251,7 +251,7 @@ public class PublishProjectTask extends BuildTask {
 			FileUtils.copy(jar, localLib);
 		}
 		
-		System.out.println("Jars: "+Printer.toString(Arrays.asList(localLib.list()), "\n"));
+//		System.out.println("Jars: "+Printer.toString(Arrays.asList(localLib.list()), "\n"));
 	}
 	
 	protected void doSendEmail(String tos) {
