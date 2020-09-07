@@ -11,6 +11,8 @@ import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.web.IHasJson;
 
 /**
@@ -124,18 +126,26 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 	
 	public T java() {
 		if (java!=null) return java;
+		// convert from json?
 		String sjson = string();
-		if (sjson != null) {
-			assert type != null : "Call setType() first "+this;
-			Gson gson = gson();			
-			T pojo = gson.fromJson(sjson, type);
-			if (pojo instanceof IInit) {
-				((IInit) pojo).init();				
-			}
-			// this will null out the json/map
-			// ...which is good, as extra json from the front-end can cause bugs with ES mappings.
-			setJava(pojo);		
+		if (sjson == null) {
+			return null; // nope, its really null
 		}
+		assert type != null : "Call setType() first "+this;
+		Gson gson = gson();			
+		T pojo = gson.fromJson(sjson, type);
+		// init?
+		if (pojo instanceof IInit) {
+			try {
+				((IInit) pojo).init();
+			} catch (Throwable ex) {
+				// add in extra info
+				throw new WrappedException("Cause POJO: "+pojo,ex);
+			}
+		}
+		// this will null out the json/map
+		// ...which is good, as extra json from the front-end can cause bugs with ES mappings.
+		setJava(pojo);		
 		return java;
 	}
 	
