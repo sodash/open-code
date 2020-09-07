@@ -51,6 +51,8 @@ public class ShareServlet implements IServlet {
 		}
 		
 		String desc = state.get("desc"); // 155 chars??
+		String tweep = state.get("tweep");
+		
 		page.setTitle(title);		
 //		<meta name="description" content="Page description. No longer than 155 characters." />
 		page.appendToHeader("<meta property=\"og:title\" content=\""+title+"\" />\n" + 
@@ -65,15 +67,15 @@ public class ShareServlet implements IServlet {
 //		    <meta property="article:author" content="CNN Karla Cripps" />
 
 		page.appendToHeader("<meta name='twitter:card' value='"+WebUtils2.attributeEncode(desc)+"'>");
-		page.appendToHeader("<meta name='twitter:site' content='@sogivecharity'>");
+		page.appendToHeader("<meta name='twitter:site' content='"+WebUtils2.attributeEncode(tweep)+"'>");
 		page.appendToHeader("<meta name='twitter:title' content='"+WebUtils2.attributeEncode(title)+"'>");
 		page.appendToHeader("<meta name='twitter:description' content='"+WebUtils2.attributeEncode(desc)+"'>");
 		page.appendToHeader("<meta name='twitter:image' content='"+WebUtils2.attributeEncode(image)+"'>");
-		page.appendToHeader("<meta name='twitter:creator' content='@winterstein'>");
+		page.appendToHeader("<meta name='twitter:creator' content='"+WebUtils2.attributeEncode(tweep)+"'>");
 //		<meta name="twitter:title" content="Page Title">
 //		<meta name="twitter:description" content="Page description less than 200 characters">
 //		<meta name="twitter:creator" content="@author_handle">
-//		<-- Twitter Summary card images must be at least 120x120px -->
+//		<-- T)witter Summary card images must be at least 120x120px -->
 //		<meta name="twitter:image" content="http://www.example.com/image.jpg">
 //		// G+
 //		<!-- Schema.org markup for Google+ -->
