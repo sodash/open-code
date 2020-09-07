@@ -132,21 +132,21 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 			return null; // nope, its really null
 		}
 		assert type != null : "Call setType() first "+this;
-		Gson gson = gson();			
-		T pojo = gson.fromJson(sjson, type);
-		// init?
-		if (pojo instanceof IInit) {
-			try {
+		try {
+			Gson gson = gson();			
+			T pojo = gson.fromJson(sjson, type);
+			// init?
+			if (pojo instanceof IInit) {
 				((IInit) pojo).init();
-			} catch (Throwable ex) {
-				// add in extra info
-				throw new WrappedException("Cause POJO: "+pojo,ex);
 			}
+			// this will null out the json/map
+			// ...which is good, as extra json from the front-end can cause bugs with ES mappings.
+			setJava(pojo);		
+			return java;
+		} catch (Throwable ex) {
+			// add in extra info
+			throw new WrappedException("Cause POJO: "+sjson, ex);
 		}
-		// this will null out the json/map
-		// ...which is good, as extra json from the front-end can cause bugs with ES mappings.
-		setJava(pojo);		
-		return java;
 	}
 	
 	/**
