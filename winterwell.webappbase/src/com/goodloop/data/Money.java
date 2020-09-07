@@ -222,19 +222,24 @@ implements Comparable<Money>, IHasJson, IInit {
 	@Override
 	public void init() {
 //		super.init();
-		// value
-		if (value100p==0 && value!=null && ! "0".equals(value)) {
-			value100p = new BigDecimal(value).multiply(P100).longValue();
+		try {
+			// value
+			if (value100p==0 && value!=null && ! "0".equals(value)) {
+				value100p = new BigDecimal(value).multiply(P100).longValue();
+			}
+			// HACK old format (this code added Apr 2018)
+			if (value100p==0 && value==null && value100!=null) {
+				value100p = new BigDecimal(value100.toString()).multiply(new BigDecimal(100)).longValue();
+			}
+			value100 = null;
+			// end hack
+			if (value==null) {
+				value = new BigDecimal(value100p).divide(P100).toPlainString();
+			}
+		} catch(NumberFormatException ex) {
+			// add info
+			throw new NumberFormatException(ex+" from "+toJson2());
 		}
-		// HACK old format (this code added Apr 2018)
-		if (value100p==0 && value==null && value100!=null) {
-			value100p = new BigDecimal(value100.toString()).multiply(new BigDecimal(100)).longValue();
-		}
-		value100 = null;
-		// end hack
-		if (value==null) {
-			value = new BigDecimal(value100p).divide(P100).toPlainString();
-		}		
 	}
 
 
