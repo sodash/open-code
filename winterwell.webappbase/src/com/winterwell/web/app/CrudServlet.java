@@ -36,6 +36,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVSpec;
@@ -587,12 +588,15 @@ public abstract class CrudServlet<T> implements IServlet {
 		// Let's deal with ESHit and JThings
 		List<ESHit<T>> _hits = sr.getHits(type);
 
+		// init java objects (this acts as a safety check on bad data)
+		_hits = init(_hits);
+		
 		// TODO dedupe can cause the total reported to be off
 		List<ESHit<T>> hits2 = doList3_source_dedupe(status, _hits);
 		
 		// HACK: avoid created = during load just now
 		for(ESHit<T> hit : hits2) {
-			if ( ! (hit.getJThing().java() instanceof AThing)) continue;
+			if ( ! hit.getJThing().isa(AThing.class)) continue;
 			AThing at = (AThing) hit.getJThing().java();
 			if (at.getCreated()!=null && at.getCreated().isAfter(now)) {
 				at.setCreated(null);
@@ -630,6 +634,32 @@ public abstract class CrudServlet<T> implements IServlet {
 		return hits2;
 	}
 	
+	/**
+	 * Run results through deserialisation to catch any bugs.
+	 * Bugs are logged, but they do _not_ disrupt returning the rest of the list.
+	 * This is so one bad data item can't block an API service.
+	 * 
+	 * @param _hits
+	 * @return hits (filtered for no-exceptions)
+	 */
+	private List<ESHit<T>> init(List<ESHit<T>> _hits) {
+		List<ESHit<T>> hits = new ArrayList(_hits.size());
+		for (ESHit<T> h : _hits) {
+			try {
+				T pojo = h.getJThing().java();
+				if (pojo instanceof IInit) {
+					((IInit) pojo).init();
+				}
+				hits.add(h);
+			} catch(Throwable ex) {
+				// log, swallow, and carry on
+				Log.e("crud", new WrappedException("cause: "+h, ex));
+			}
+		}
+		return hits;		
+	}
+
+
 	/**
 	 * Override to do anything. 
 	 * @param jThing Modify this if you want
