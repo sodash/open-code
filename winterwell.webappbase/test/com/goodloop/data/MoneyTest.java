@@ -2,13 +2,28 @@ package com.goodloop.data;
 
 import org.junit.Test;
 
+import com.winterwell.gson.Gson;
+
 /**
  * @tested {@link Money}
  * @author daniel
  *
  */
 public class MoneyTest {
-
+	
+	@Test
+	public void testInitBugSept2020_blankValue() {
+		{
+			String json = "{'currency':'GBP', 'value':'', 'value100p':0}".replace('\'', '"');
+			Money money = new Gson().fromJson(json, Money.class);
+			money.init();
+			System.out.println(money);
+		}
+		{
+			Money money = new Money(KCurrency.GBP, "");
+			money.init();
+		}
+	}
 
 	@Test
 	public void testPlusMoney() {
