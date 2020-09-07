@@ -200,4 +200,17 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 		setJson(djson);
 		return this;
 	}
+
+	/**
+	 * @param klass
+	 * @return true if the thing (which might be null) is an instance of klass
+	 */
+	public boolean isa(Class klass) {
+		if (ReflectionUtils.isa(getType(), klass)) {
+			return true;
+		}
+		// check the object itself
+		return java() != null && ReflectionUtils.isa(java().getClass(), klass);		
+	}
+	
 }
