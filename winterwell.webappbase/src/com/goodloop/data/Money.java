@@ -17,6 +17,7 @@ import com.winterwell.utils.web.IHasJson;
 /**
  * Support values down to 0.01p (a hundredth of a pence)
  * (i.e. £0.10 CPM is the lowest value)
+ * @testedby MoneyTest
  */
 public class Money 
 //extends AThing // dubious -- no id, no url, and we dont store these as top-level data objects TODO dont extend this
@@ -118,7 +119,8 @@ implements Comparable<Money>, IHasJson, IInit {
 	}
 
 	public Money(KCurrency currency, String value) {
-		this(currency, new BigDecimal(value));
+		// paranoia re ""
+		this(currency, Utils.isBlank(value)? BigDecimal.ZERO : new BigDecimal(value));
 	}
 
 	/**
@@ -224,7 +226,7 @@ implements Comparable<Money>, IHasJson, IInit {
 //		super.init();
 		try {
 			// value
-			if (value100p==0 && value!=null && ! "0".equals(value)) {
+			if (value100p==0 && ! Utils.isBlank(value) && ! "0".equals(value)) {
 				value100p = new BigDecimal(value).multiply(P100).longValue();
 			}
 			// HACK old format (this code added Apr 2018)
