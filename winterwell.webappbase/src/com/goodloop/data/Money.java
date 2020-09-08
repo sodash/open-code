@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.winterwell.data.AThing;
 import com.winterwell.depot.IInit;
+import com.winterwell.es.ESNoIndex;
 import com.winterwell.es.ESType;
 import com.winterwell.gson.StandardAdapters.LenientLongAdapter;
 import com.winterwell.utils.MathUtils;
@@ -42,6 +43,9 @@ implements Comparable<Money>, IHasJson, IInit {
 	// FIXME are these used??
 	private Time start;
 	private Time end;
+	/**
+	 * use case?? Is this for SoGive??
+	 */
 	private int year;
 	
 	
@@ -76,6 +80,7 @@ implements Comparable<Money>, IHasJson, IInit {
 	/**
 	 * best store as a string too, as otherwise json conversion would likely be a source of bugs
 	 */
+	@ESNoIndex
 	private String value;
 	
 	// The client uses raw to hold an interim value whilst the user is typing. I don't think we need to store it. ^DW June 2019
