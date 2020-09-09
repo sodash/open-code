@@ -747,18 +747,21 @@ public abstract class CrudServlet<T> implements IServlet {
 			int spi = cprefix.lastIndexOf(' ');
 			if (spi != -1) {
 				assert cprefix.equals(cprefix.trim()) : "untrimmed?! "+cprefix;
-				q = StrUtils.space(q, cprefix.substring(0, spi));
+				String qbit = cprefix.substring(0, spi);
+				if (q==null) q = qbit;
+				else q = "("+q+") AND "+qbit;
 				cprefix = cprefix.substring(spi+1);
 			}
-			// prefix is on a field(s) -- we use name
+			// prefix is on a field(s) -- we use name by default
 			BoolQueryBuilder prefixESQ = ESQueryBuilders.boolQuery();
 			for(String field : prefixFields) {
 				prefixESQ.should(ESQueryBuilders.prefixQuery(field, cprefix));
 			}
 			// also allow general search on the prefix word -- so that prefix is not more restrictive than q
+			ESQueryBuilder searchForPrefix = ESQueryBuilders.simpleQueryStringQuery(cprefix);
+			prefixESQ.should(searchForPrefix);
 			
 			prefixESQ.minimumNumberShouldMatch(1);
-			
 			assert qb == null;
 			qb = prefixESQ;
 		}
@@ -793,10 +796,10 @@ public abstract class CrudServlet<T> implements IServlet {
 				ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
 				qb = ESQueryBuilders.boolQuery().mustNot(setFilter);
 			}	
+			// Add the Query!
 			if ( ! Utils.isBlank(q) && ! ALL.equalsIgnoreCase(q)) { // ??make all case-sensitive??
 				SearchQuery sq = new SearchQuery(q);
-				BoolQueryBuilder esq = AppUtils.makeESFilterFromSearchQuery(sq, null, null);
-//				QueryStringQueryBuilder qsq = new QueryStringQueryBuilder(q); // QueryBuilders.queryStringQuery(q); // version incompatabilities in ES code :(			
+				BoolQueryBuilder esq = AppUtils.makeESFilterFromSearchQuery(sq, null, null);			
 				qb = ESQueryBuilders.must(qb, esq);
 			}
 		} // ./q		
