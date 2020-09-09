@@ -68,7 +68,8 @@ import com.winterwell.youagain.client.YouAgainClient;
  */
 public abstract class CrudServlet<T> implements IServlet {
 
-
+	protected String[] prefixFields = new String[] {"name"};
+	
 	protected boolean dataspaceFromPath;
 	public static final String ACTION_PUBLISH = "publish";
 	public static final String ACTION_NEW = "new";
@@ -749,9 +750,17 @@ public abstract class CrudServlet<T> implements IServlet {
 				q = StrUtils.space(q, cprefix.substring(0, spi));
 				cprefix = cprefix.substring(spi+1);
 			}
-			// prefix is on a field -- we use name
-			ESQueryBuilder qp = ESQueryBuilders.prefixQuery("name", cprefix);
-			qb = ESQueryBuilders.must(qb, qp);
+			// prefix is on a field(s) -- we use name
+			BoolQueryBuilder prefixESQ = ESQueryBuilders.boolQuery();
+			for(String field : prefixFields) {
+				prefixESQ.should(ESQueryBuilders.prefixQuery(field, cprefix));
+			}
+			// also allow general search on the prefix word -- so that prefix is not more restrictive than q
+			
+			prefixESQ.minimumNumberShouldMatch(1);
+			
+			assert qb == null;
+			qb = prefixESQ;
 		}
 		
 		if ( q != null) {
