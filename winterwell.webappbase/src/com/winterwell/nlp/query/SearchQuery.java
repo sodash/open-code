@@ -482,7 +482,7 @@ public class SearchQuery implements Serializable, IHasJson {
 		}
 	}
 	
-	static Pattern kv = Pattern.compile("([a-zA-Z]+):(.+)");
+	static final Pattern kv = Pattern.compile("([a-zA-Z]+):(.+)");
 
 	/**
 	 * Modify output - Convert "k:v" into {k:v}. Filters nulls
@@ -491,6 +491,7 @@ public class SearchQuery implements Serializable, IHasJson {
 	private void parse2_keyvalue(List output) {
 		for(int i=0; i<output.size(); i++) {
 			Object bit = output.get(i);
+			// recurse?
 			if (bit instanceof List) {
 				parse2_keyvalue((List) bit);
 				continue;
@@ -498,22 +499,26 @@ public class SearchQuery implements Serializable, IHasJson {
 			// k:v?
 			String sbit = (String) bit;
 			Matcher m = kv.matcher(sbit);
-			if (m.matches()) {
-				// avoid breaking up urls, which will also match k:v
-				if (m.group(1).startsWith("http") || m.group(2).startsWith("//")) {
-					continue;
-				}
-				String k = m.group(1);
-				String v = m.group(2);
-				if ("null".equals(v) || "undefined".equals(v)) {
-					output.remove(i);
-					i--;
-					continue;
-				}
-				// ??Is list the right thing here?? Would Map be more clear??
-				// output.set(i, Arrays.asList(k, v));
-				output.set(i, Collections.singletonMap(k, v));
+			if ( ! m.matches()) continue;
+			// avoid breaking up urls, which will also match k:v
+			if (m.group(1).startsWith("http") || m.group(2).startsWith("//")) {
+				continue;
 			}
+			String k = m.group(1);
+			String v = m.group(2);
+			if ("null".equals(v) || "undefined".equals(v)) {
+				output.remove(i);
+				i--;
+				continue;
+			}
+			Object v2 = v;
+			// HACK 2-level k:v:v e.g. "due:before:today"
+			Matcher m2 = kv.matcher(v);
+			if (m2.matches()) {
+				v2 = Collections.singletonMap(m2.group(1), m2.group(2));
+			}
+			// done
+			output.set(i, Collections.singletonMap(k, v2));
 		}
 	}
 

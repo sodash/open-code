@@ -35,6 +35,19 @@ import com.winterwell.web.data.XId;
 public class AppUtilsTest {
 
 	@Test
+	public void testMakeESFilterFromSearchQuery_dueBefore() {
+		String q = "due:before:2020-01-01";
+		SearchQuery sq = new SearchQuery(q);
+		List ptre = sq.getParseTree();
+		assert ptre.toString().equals("[and, {due={before=2020-01-01}}]") : ptre;
+		BoolQueryBuilder esf = AppUtils.makeESFilterFromSearchQuery(sq, null, null);
+		Map esmap = (Map) esf.getUnderlyingMap().get("bool");
+		System.out.println(esmap);
+		System.out.println(esf);
+		assert esmap.toString().equals("TODO");
+	}
+	
+	@Test
 	public void testMakeESFilterFromSearchQuery() {		
 		{
 			String q = "(cid:nestle-cocoa-plan-vegetable-growing-kit OR cid:tchc OR cid:unset) AND (evt:spend OR evt:spendadjust OR evt:donation)";

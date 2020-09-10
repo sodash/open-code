@@ -35,6 +35,7 @@ import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.ArrayMap;
@@ -740,7 +741,14 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected ESQueryBuilder doList3_ESquery(String q, String prefix, Period period, WebRequest stateOrNull) {
 		ESQueryBuilder qb = null;
+		// HACK no key:value in a prefix query
+		if (prefix!=null && prefix.indexOf(':') != -1) {
+			if (q==null) q = prefix;
+			else q = "("+q+") AND "+prefix;
+			prefix = null;
+		}
 		if (prefix != null) {
+			// NB: not factored into its own method as it edits a few variables			
 			// Hack: convert punctuation into spaces, as ES would otherwise say query:"P&G" !~ name:"P&G"
 			String cprefix = StrUtils.toCanonical(prefix);
 			// Hack: Prefix should be one word. If 2 are sent -- turn it into a query + prefix
@@ -764,7 +772,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			prefixESQ.minimumNumberShouldMatch(1);
 			assert qb == null;
 			qb = prefixESQ;
-		}
+		} //./prefix
 		
 		if ( q != null) {
 			// convert "me" to specific IDs

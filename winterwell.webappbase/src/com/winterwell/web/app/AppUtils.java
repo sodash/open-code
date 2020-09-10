@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.winterwell.bob.wwjobs.BuildHacks;
@@ -40,11 +41,13 @@ import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.AString;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.time.TimeUtils;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JThing;
@@ -818,10 +821,10 @@ public class AppUtils {
 	 * @param end
 	 * @return
 	 */
-	public static com.winterwell.es.client.query.BoolQueryBuilder makeESFilterFromSearchQuery(SearchQuery sq, Time start, Time end) {
+	public static BoolQueryBuilder makeESFilterFromSearchQuery(SearchQuery sq, Time start, Time end) {
 		assert sq != null;
 		
-		com.winterwell.es.client.query.BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
+		BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
 		
 		if (start != null || end != null) {
 			if (start !=null && end !=null && ! end.isAfter(start)) {
@@ -858,35 +861,16 @@ public class AppUtils {
 		}
 		if ( ! (rawClause instanceof List) && ! (rawClause instanceof Map)) {
 			throw new IllegalArgumentException("clause is not list or map: " + rawClause);
-		}		
-		
-		com.winterwell.es.client.query.BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
+		}						
 		
 		// Map means propname=value constraint.
 		if (rawClause instanceof Map) {
 			Map<String, Object> clause = (Map<String, Object>) rawClause;
-			// We expect only one pair per clause, but no reason not to tolerate multiples.
-			for (String prop : clause.keySet()) {
-				String val = (String) clause.get(prop);
-				// handle special "unset" value
-				if (ESQueryBuilders.UNSET.equals(val)) {
-					ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
-					filter = filter.mustNot(setFilter);
-				} else {
-					// normal key=value case
-					ESQueryBuilder kvFilter = ESQueryBuilders.termQuery(prop, val);
-					// just one?
-					if (clause.size() == 1) {
-						return kvFilter; // no extra wrapping
-					}
-					filter = filter.must(kvFilter);
-				}	
-			}
-			// return must/musnt key(s)=value(s)
-			return filter;
-		}			
+			return parseTreeToQuery2_keyVal(clause);
+		}					
 		
 		List clause = (List) rawClause;
+		BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
 		assert (! clause.isEmpty()) : "empty clause";
 		
 		// Only one element?
@@ -933,6 +917,55 @@ public class AppUtils {
 		return filter;
 	}
 	
+	/**
+	 * @param clause key:value
+	 * @return
+	 */
+	private static ESQueryBuilder parseTreeToQuery2_keyVal(Map<String, Object> clause) {
+		// We expect only one pair per clause, but no reason not to tolerate multiples.
+		BoolQueryBuilder filter = ESQueryBuilders.boolQuery();
+		for (String prop : clause.keySet()) {
+			Object val = clause.get(prop);
+			// handle special "unset" value
+			if (ESQueryBuilders.UNSET.equals(val)) {
+				ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);				
+				filter = filter.mustNot(setFilter);
+				continue; // NB no "just one?" streamlining for mustNot
+			}
+			ESQueryBuilder kvFilter;
+			// HACK due:before:
+			if (val instanceof Map) {
+				// HACK before/after?
+				assert ((Map) val).size() == 1 : val;
+				Map.Entry<String, String> kv = (Entry<String, String>) Containers.first(((Map) val).entrySet());
+				String val2 = kv.getValue();
+				switch(kv.getKey()) {
+				case "before":					
+					Time end = TimeUtils.parseExperimental(val2);
+					kvFilter = ESQueryBuilders.dateRangeQuery(prop, null, end);
+					break;
+				case "after":
+					Time start = TimeUtils.parseExperimental(val2);
+					kvFilter = ESQueryBuilders.dateRangeQuery(prop, start, null);
+					break;
+				default:
+					throw new TodoException(clause);
+				}
+			} else {
+				// normal key=value case
+				kvFilter = ESQueryBuilders.termQuery(prop, val);
+			}
+			// just one?
+			if (clause.size() == 1) {
+				return kvFilter; // no extra wrapping
+			}
+			filter = filter.must(kvFilter);				
+		}
+		// return must/musnt key(s)=value(s)
+		return filter;
+	}
+
+
 	@Deprecated
 	public static <X> X getConfig(String appName, X config, String[] args) {
 		return (X) getConfig(appName, config.getClass(), args);

@@ -16,7 +16,8 @@ public class EmailerTest {
 
 	@Test
 	public void testSendAnEmail() throws AddressException {
-		EmailConfig ec = AppUtils.getConfig("test", new EmailConfig(), null);		
+		EmailConfig ec = AppUtils.getConfig("test", new EmailConfig(), null);
+		assert ec.getLoginDetails() != null : ec;		
 		Emailer e = new Emailer(ec);		
 		InternetAddress to = new InternetAddress("daniel@winterwell.com");
 		SimpleMessage email = new SimpleMessage(new InternetAddress(ec.emailFrom), to, "Test hello from Emailer", 
