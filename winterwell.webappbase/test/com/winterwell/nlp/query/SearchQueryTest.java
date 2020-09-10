@@ -3,6 +3,9 @@ package com.winterwell.nlp.query;
 import java.util.List;
 
 import org.junit.Test;
+
+import com.winterwell.utils.Mutable;
+import com.winterwell.utils.Mutable.Int;
 /**
  * NB in webappbase project cos so is searchquery
  * @author mark
@@ -10,7 +13,68 @@ import org.junit.Test;
  */
 public class SearchQueryTest {
 
+	@Test
+	public void testParse3_nextWord() {
+		if (false) {
+			String s = "some words here";
+			SearchQuery sq = new SearchQuery(s);
+			Int index = new Mutable.Int();
+			String next = sq.parse3_nextWord(s, index);
+			String next2 = sq.parse3_nextWord(s, index);
+			String next3 = sq.parse3_nextWord(s, index);
+			String next4 = sq.parse3_nextWord(s, index);
+			assert next.equals("some") : next;
+			assert next2.equals("words") : next;
+			assert next4.isEmpty() : next4;
+		}
+		if (false) {
+			String s = "(blue OR green)";
+			SearchQuery sq = new SearchQuery(s);
+			Int index = new Mutable.Int();
+			String next1 = sq.parse3_nextWord(s, index);
+			String next2 = sq.parse3_nextWord(s, index);
+			String next3 = sq.parse3_nextWord(s, index);
+			assert next1.equals("(") : next1;
+			assert next2.equals("blue") : next1;
+		}
+		if (false) {	// hack handling of :s  
+			String s = "name:dan";
+			SearchQuery sq = new SearchQuery(s);
+			Int index = new Mutable.Int();
+			String next = sq.parse3_nextWord(s, index);
+			assert next.equals(s) : next;
+		}
+		if (false) {	// hack handling of :s and "s 
+			String s = "name:\"Dan W\"";
+			SearchQuery sq = new SearchQuery(s);
+			Int index = new Mutable.Int();
+			String next = sq.parse3_nextWord(s, index);
+			String next2 = sq.parse3_nextWord(s, index);
+			String next3 = sq.parse3_nextWord(s, index);
+			assert next.equals(s) : next;
+		}
+		{
+			String s = "due:before:2020-01-01";
+			SearchQuery sq = new SearchQuery(s);
+			Int index = new Mutable.Int();
+			String next = sq.parse3_nextWord(s, index);
+			String next2 = sq.parse3_nextWord(s, index);
+			String next3 = sq.parse3_nextWord(s, index);
+			assert next.equals(s) : next;
+		}	
+	}
 
+	@Test
+	public void testDueBefore() {
+		{
+			String s = "due:before:2020-01-01";
+			SearchQuery sq = new SearchQuery(s);
+			List pt = sq.getParseTree();
+			String pts = pt.toString();
+			assert pts.equals("[and, {due=before:2020-01-01}]") : pts;
+		}
+	}
+	
 	@Test
 	public void testParseTreeAndOr() {
 		{

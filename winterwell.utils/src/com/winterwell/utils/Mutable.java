@@ -12,6 +12,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class Mutable {
 
 	/**
+	 * Don't make these
+	 */
+	private Mutable() {}
+	
+	/**
 	 * Mis-spelled Double to avoid name-clashes
 	 */
 	public static final class Dble {

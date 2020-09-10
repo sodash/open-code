@@ -618,6 +618,9 @@ public class SearchQuery implements Serializable, IHasJson {
 	 * @return next token (can be empty, though index must always advance)
 	 */
 	String parse3_nextWord(String searchTerm, Mutable.Int index) {
+		// NB: ":" is not a special character, so name:alice and name:"Alice Smith" parse as one word.
+		// though name: Alice doesn't work.
+		// Arguably we should change that.
 		boolean escaped = false;
 		boolean quoted = false;
 		StringBuilder word = new StringBuilder();
@@ -635,7 +638,9 @@ public class SearchQuery implements Serializable, IHasJson {
 				// solves several problems
 				if (Character.isWhitespace(c)) continue;
 
-				if (c == '(') return "(";
+				if (c == '(') {
+					return "(";
+				}
 				if (c == ')') return ")";
 				if (c == '-') return KEYWORD_NOT;
 //				// (some) Smilies TODO
@@ -667,7 +672,9 @@ public class SearchQuery implements Serializable, IHasJson {
 			}
 
 			// end of non-quoted word?
-			if (!quoted && Character.isWhitespace(c)) { return word.toString(); }
+			if (!quoted && Character.isWhitespace(c)) { 
+				return word.toString(); 
+			}
 			word.append(c);
 		}
 		if (strict) {
