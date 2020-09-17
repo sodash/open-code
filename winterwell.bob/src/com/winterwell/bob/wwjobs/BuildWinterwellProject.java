@@ -633,7 +633,7 @@ public class BuildWinterwellProject extends BuildTask {
 			FileUtils.copy(getJar(), libBuild);	
 		}		
 		
-		System.out.println("Jars: "+Printer.toString(Arrays.asList(libBuild.list()), "\n"));
+//		System.out.println("Jars: "+Printer.toString(Arrays.asList(libBuild.list()), "\n"));
 	}
 
 }
