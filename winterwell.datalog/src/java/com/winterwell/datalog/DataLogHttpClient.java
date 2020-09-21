@@ -41,6 +41,8 @@ public class DataLogHttpClient {
 	 * TODO this is a limited hack which only supports one top-level summary  
 	 */
 	private transient Map<String,Double> overview;
+	/** TODO this is normally present but how does it overlap with overview? */
+	private transient Map<String,Double> all;
 
 	private List<Map> examples;
 
@@ -184,6 +186,7 @@ public class DataLogHttpClient {
 		}		
 		// stash extra info in fields
 		overview = SimpleJson.get(jobjMap, breakdown.field); // present if breakdown included by=""
+		all = SimpleJson.get(jobjMap, "all");
 		examples = Containers.asList((Object)SimpleJson.get(jobjMap, "examples"));
 		
 		return byX;
@@ -238,11 +241,19 @@ public class DataLogHttpClient {
 	}
 
 	/**
-	 * stached from the previous {@link #getBreakdown(SearchQuery, Breakdown)}
+	 * Stashed from the previous {@link #getBreakdown(SearchQuery, Breakdown)}
 	 * @return
 	 */
 	public Map<String, Double> getOverview() {
 		return overview;
+	}
+	
+	/**
+	 * As {@link #getOverview()}
+	 * @return
+	 */
+	public Map<String, Double> getAll() {
+		return all;
 	}
 
 	public String getLastCall() {
