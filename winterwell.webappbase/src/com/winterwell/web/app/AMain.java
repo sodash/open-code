@@ -138,8 +138,10 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		}
 		init(args);
 		launchJetty();
-		doMain2();
-		// loop?
+		// do Main once
+		doMain2();		
+		// loop? (does nothing but stay alive by default)
+		if (pleaseStop) return;
 		mainLoopThread = new Thread(getClass().getSimpleName()+".doMainLoop") {
 			@Override
 			public void run() {

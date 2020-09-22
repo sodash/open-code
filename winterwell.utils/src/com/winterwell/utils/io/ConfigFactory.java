@@ -57,8 +57,7 @@ public class ConfigFactory {
 	/**
 	 * Access via Dep! This constructor is for over-riding.
 	 * 
-	 * @param appName
-	 * @param args
+	 * Guesses the app-name from the folder
 	 */
 	protected ConfigFactory() {
 		appName = FileUtils.getWorkingDirectory().getName(); // guess!
@@ -233,6 +232,9 @@ winterwell/logins/stripe.properties
 				}
 			}
 			// args
+			if (args==null) {
+				Log.w(LOGTAG, "ConfigFactory without main args - please call setArgs()");
+			}
 			cb.setFromMain(args);
 			if (debug) {
 				history.add(cb);

@@ -98,6 +98,9 @@ public class AppUtils {
 	 */
 	public static <X> X getConfig(String appName, Class<X> config, String[] args) {
 		ConfigFactory cf = ConfigFactory.get();
+		if (args!=null) {
+			cf.setArgs(args);
+		}
 		X c = cf.getConfig(config);
 		// set them for manifest
 		ManifestServlet.addConfig(c);
