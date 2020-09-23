@@ -479,7 +479,7 @@ public final class IMAPClient implements Closeable {
 					}
 				}
 				// pull down the whole message
-				Log.d(LOGTAG, user+" getEmails create SimpleMessage (may fetch data) "+message);
+//				Log.d(LOGTAG, user+" getEmails create SimpleMessage (may fetch data) "+message);
 				SimpleMessage sm = SimpleMessage.create(message);
 				// Check it matches the search term -- the remote server can ignore them!
 				if (searchTerm!=null && ! searchTerm.match(sm)) {

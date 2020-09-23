@@ -12,6 +12,7 @@ import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JSend;
 import com.winterwell.web.ajax.JThing;
+import com.winterwell.web.ajax.KAjaxStatus;
 
 /**
  * Status: WIP 
@@ -69,6 +70,17 @@ public class CrudClient<T> {
 		return jsend;
 	}
 	
+
+	public JThing<T> get(String id) throws WebEx.E404 {
+		FakeBrowser fb = fb();
+		String response = fb.getPage(endpoint+"/"+WebUtils.urlEncode(id));
+		
+		JSend jsend = jsend(fb, response);
+		JThing<T> jt = jsend.getData();
+		jt.setType(type);
+		return jt;
+	}
+	
 	public JSend publish(T item) {
 		FakeBrowser fb = fb();
 		
@@ -96,11 +108,7 @@ public class CrudClient<T> {
 		Gson gson = gson();
 		Map data = gson.fromJson(response);
 		JSend jsend = JSend.parse2_create(data);
-		
-		// give a type
-		JThing jt = jsend.getData();		
-//		.setType(Map.class);
-		
+				
 		jsend.setCode(fb.getStatus());
 		return jsend;
 	}

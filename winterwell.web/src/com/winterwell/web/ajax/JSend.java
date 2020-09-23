@@ -7,6 +7,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.MathUtils;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
@@ -224,8 +225,18 @@ public class JSend implements IHasJson {
 		if (_data==null) {
 			_data = jobj.get("cargo");		
 		}
-		if (_data != null) {						
-			jsend.setData(new JThing().setJsonObject(_data));
+		if (_data != null) {	
+			JThing thing = new JThing();
+			// the incoming json-object might already have been converted into a POJO!
+			if (_data instanceof String || _data instanceof Map || _data instanceof List || _data.getClass().isArray()
+					|| ReflectionUtils.isaNumber(_data.getClass())) 
+			{
+				// normal case: its a json object still
+				thing.setJsonObject(_data);
+			} else {
+				thing.setJava(_data);
+			}
+			jsend.setData(thing);
 		}
 		return jsend;
 	}
