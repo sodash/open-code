@@ -238,8 +238,7 @@ public class Bob {
 						+ "Default usage (looks for a BuildX.java file in the builder directory):"+ StrUtils.LINEEND
 						+ "	java -jar bob-all.jar"+ StrUtils.LINEEND
 						+ StrUtils.LINEEND
-						+ "Usage: java -jar bob-all.jar [options] [TargetBuildTasks...]"
-						+ StrUtils.LINEEND + cb.getOptionsMessage());
+						+ StrUtils.LINEEND + cb.getOptionsMessage("[TargetBuildTasks...] Bob will look for matching .java files by absolute path or a search in the local `builder` sub-directory."));
 				System.exit(1);
 			}		
 			Log.d(LOGTAG, "Bob version: "+BobConfig.VERSION_NUMBER+" building "+argsLeft+"...");

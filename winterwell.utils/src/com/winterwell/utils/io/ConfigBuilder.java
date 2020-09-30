@@ -254,10 +254,14 @@ public class ConfigBuilder {
 	}
 
 	/**
+	 * @param helpForPostOptionsArguments e.g. "[file...] These will be processed. Default: loop over the current directory"
 	 * @return a message describing the available options.
 	 */
-	public String getOptionsMessage() {
+	public String getOptionsMessage(String helpForPostOptionsArguments) {
 		StringBuilder msg = new StringBuilder();
+		if ( ! Utils.isBlank(helpForPostOptionsArguments)) {
+			msg.append("usage: [options...] "+helpForPostOptionsArguments + StrUtils.LINEEND);
+		}
 		msg.append("Options:" + StrUtils.LINEEND);
 		HashSet<Field> options = new HashSet<Field>(token2field.values());
 		for (Field f : options) {
@@ -637,7 +641,7 @@ public class ConfigBuilder {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + '\n' + getOptionsMessage();
+		return getClass().getSimpleName() + '\n' + getOptionsMessage(null);
 	}
 
 	

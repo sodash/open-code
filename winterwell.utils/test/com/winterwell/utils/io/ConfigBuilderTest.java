@@ -90,7 +90,7 @@ public class ConfigBuilderTest extends TestCase {
 	public void testOptionsMessage() throws IOException {
 		TestSettings settings = new TestSettings();
 		ConfigBuilder parser = new ConfigBuilder(settings);
-		String om = parser.getOptionsMessage();
+		String om = parser.getOptionsMessage(null);
 		System.out.println(om);
 	}
 	
