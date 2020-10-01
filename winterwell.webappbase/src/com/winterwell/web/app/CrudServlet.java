@@ -1011,6 +1011,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * Get from field or state. Does NOT call the database.
 	 * @param state
 	 * @return
+	 * @see #getThingFromDB(WebRequest)
 	 */
 	protected T getThing(WebRequest state) {
 		if (jthing!=null) {
