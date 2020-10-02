@@ -194,7 +194,7 @@ public class WebUtils {
 	/**
 	 * Matches urls. Note: Excludes any trailing .	<br>
 	 * Group 1: the host/domain (including subdomain)	<br>
-	 * Urls must contain the http(s) or ftp protocol (compare with Twitter's regex which doesn't rrequire a protocol).
+	 * Urls must contain the http(s) or ftp protocol (compare with Twitter's regex which doesn't require a protocol).
 	 * 
 	 * E.g. "https://twitter.com/foo"
 	 * 
