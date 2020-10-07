@@ -117,6 +117,9 @@ public class MeanVar1D extends ADistribution1D implements
 		this.lossFactor = lossFactor;
 	}
 
+	/**
+	 * @return mean +- standard-deviation (so _if_ the data is normal ~60% would be within this range)
+	 */
 	@Override
 	public String toString() {
 		String aString = StrUtils.toNSigFigs(getMean(), 2) + " ± "
