@@ -440,8 +440,8 @@ public abstract class CrudServlet<T> implements IServlet {
 	public static final String ALL = "all";
 
 	protected final JThing<T> doPublish(WebRequest state) {
-		// wait 1 second??
-		return doPublish(state, KRefresh.WAIT_FOR, false);
+		// For publish, let's force the update.
+		return doPublish(state, KRefresh.TRUE, false);
 	}
 	
 	protected JThing<T> doPublish(WebRequest state, KRefresh forceRefresh, boolean deleteDraft) {		
