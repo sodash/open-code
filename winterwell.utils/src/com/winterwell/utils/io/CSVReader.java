@@ -28,6 +28,8 @@ import com.winterwell.utils.log.Log;
  * "standards" compliant as per
  * http://en.wikipedia.org/wiki/Comma-separated_values
  *
+ * It does not trim whitespace.
+ *
  * Policy for handling incorrectly sized records is defined by
  * {@link #reportBadRecord(int, String[])}
  *

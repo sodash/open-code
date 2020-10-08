@@ -20,8 +20,11 @@ public class MathUtils {
 
 	private static double MACH_EPS = -1;
 
+	/**
+	 * Allows for e.g. "-£ 10,000" or "100px"
+	 */
 	private static Pattern NUMBER = Pattern
-			.compile("[^0-9\\-]?([0-9\\.\\-]+)[^0-9]{0,3}");
+			.compile("-? *[^0-9a-zA-Z]? *([0-9\\.,]+)[^0-9]{0,3}");
 
 	public static final double ROOT_TWO = Math.sqrt(2);
 
@@ -196,14 +199,12 @@ public class MathUtils {
 	}
 	
 	private static Double getNumber2(Object _num) {
-		if (_num == null)
-			return null;
+		if (_num == null) return null;
 		if (_num instanceof Number) {
 			return ((Number) _num).doubleValue();
 		}
-		String num = _num.toString();
-		if (num.isEmpty()) 
-			return null;
+		String num = _num.toString().trim();
+		if (num.isEmpty()) return null;
 		// percentage?
 		if (num.endsWith("%")) {
 			String n = num.substring(0, num.length()-1);
@@ -222,20 +223,18 @@ public class MathUtils {
 					// oh well
 				}
 			}
-			// HACK commas TODO handle French use of , instead of . for decimal point
-			String num2 = num.replace(",", "");
-			m = NUMBER.matcher(num2);
-			ok = m.matches();
-			if ( ! ok) {
-				return null;
-			}
+			return null;
 		}
 		
 		try {
-			if (m.start(1) != 0 || m.end(1) != num.length()) {
-				num = m.group(1);
+			String snum = m.group(1);			
+			// HACK commas 
+			snum = snum.replace(",", "");
+			double x = Double.valueOf(snum);
+			if (num.charAt(0) == '-') {
+				x = - x;
 			}
-			return Double.valueOf(num);
+			return x;
 		} catch (NumberFormatException e) {
 			// quiet fail
 			return null;
