@@ -9,7 +9,7 @@ import com.winterwell.utils.containers.AbstractIterator;
  * stemming, assuming each incoming token is a single word.
  * 
  * 
- * @testedby {@link StemmerFilterTest}
+ * @testedby  StemmerFilterTest}
  * @author daniel
  */
 public class StemmerFilter extends ATokenStream {

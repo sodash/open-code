@@ -8,7 +8,7 @@ import com.winterwell.maths.stats.distributions.discrete.ObjectDistribution;
 
 /**
  * Use with SitnStream and CommonFeatureFactory
- * @testedby {@link WordMarkovChainTest}
+ * @testedby  WordMarkovChainTest}
  * 
  * @param <Token> typically ww.nlp's Tkn class, which wraps a String word.
  * @author daniel

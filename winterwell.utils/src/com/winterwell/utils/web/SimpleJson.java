@@ -25,7 +25,7 @@ import com.winterwell.utils.containers.IntRange;
  * Why? To avoid external dependencies and crockford's org.json jar. Advice: Use
  * Jetty's JSON class instead. Or Gson.
  * 
- * @testedby {@link SimpleJsonTest}
+ * @testedby  SimpleJsonTest}
  * @author daniel
  */
 public class SimpleJson {

@@ -54,7 +54,7 @@ import com.winterwell.utils.time.TimeUtils;
  *
  * TODO calculate correlations & other stats for the top 100 tags??
  *
- * @testedby {@link StatImplTest}
+ * @testedby  StatImplTest}
  * @author daniel
  * @see DataLog
  */

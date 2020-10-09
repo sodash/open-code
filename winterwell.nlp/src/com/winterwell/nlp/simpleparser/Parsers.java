@@ -65,7 +65,7 @@ class Lit extends Parser<String> {
  * 
  * TODO back-tracking
  * 
- * @testedby {@link ParserTest}
+ * @testedby  ParserTest}
  * @author daniel
  */
 public class Parsers {
@@ -146,7 +146,7 @@ public class Parsers {
 	 * @param body
 	 * @param close
 	 * @return
-	 * @testedby {@link ParserTest#testBracketed()}
+	 * @testedby  ParserTest#testBracketed()}
 	 */
 	public static <PT> Parser<PT> bracketed(String open, Parser<PT> body,
 			String close) {

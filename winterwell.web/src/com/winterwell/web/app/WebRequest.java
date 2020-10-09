@@ -46,7 +46,7 @@ import com.winterwell.web.test.TestHttpSession;
 /**
  * The state of this request. Has properties and some special fields.
  * 
- * @testedby {@link WebRequestTest}
+ * @testedby  WebRequestTest}
  * @author daniel
  * 
  */

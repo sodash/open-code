@@ -45,7 +45,7 @@ import com.winterwell.utils.log.Log;
  * {@link StrUtils#normalise()} to ignore umlauts, etc. as well. To change this,
  * override {@link #toCanonical(String)}.
  * 
- * @testedby {@link DictionaryTest}
+ * @testedby  DictionaryTest}
  * @author daniel
  * 
  */

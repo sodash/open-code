@@ -17,7 +17,7 @@ import com.winterwell.web.email.SimpleMessage;
 
 /**
  * Send emails by SMTP, using a bot/admin email account.
- * @testedby {@link EmailerTest}
+ * @testedby  EmailerTest}
  * @author daniel
  *
  */

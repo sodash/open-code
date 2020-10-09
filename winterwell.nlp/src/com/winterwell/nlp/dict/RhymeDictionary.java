@@ -10,7 +10,7 @@ Also, our defn of rhyme is not perfect -- see https://en.wikipedia.org/wiki/Rhym
 we're doing syllabic rhymes.
  * 
  * @author daniel
- * @testedby {@link RhymeDictionaryTest}
+ * @testedby  RhymeDictionaryTest}
  * @see CMUDict
  */
 public class RhymeDictionary implements IDictionary {

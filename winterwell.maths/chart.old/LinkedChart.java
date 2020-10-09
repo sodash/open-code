@@ -13,7 +13,7 @@ import no.uib.cipr.matrix.Vector;
  * 
  * @author Steven
  * @see LinkedChartDemo
- * @testedby {@link LinkedChartTest}
+ * @testedby  LinkedChartTest}
  */
 public class LinkedChart extends AChart {
 	protected List<AChart> charts;

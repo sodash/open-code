@@ -38,7 +38,7 @@ import com.winterwell.utils.log.Log;
  * 
  * @see CacheFile
  * @author daniel
- * @testedby {@link NLPWorkshopTest}
+ * @testedby  NLPWorkshopTest}
  */
 public class NLPWorkshop {
 
@@ -123,7 +123,7 @@ public class NLPWorkshop {
 	}
 
 	/**
-	 * @testedby {@link NLPWorkshopTest#getDictionary()}
+	 * @testedby  NLPWorkshopTest#getDictionary()}
 	 * @return
 	 */
 	public Set<String> getDictionary() {

@@ -14,7 +14,7 @@ import com.winterwell.utils.gui.GuiUtils;
  * See WebUtils#color2html(Color) for conversion to html.
  * 
  * @author daniel
- * @testedby {@link RainbowTest}
+ * @testedby  RainbowTest}
  */
 public class Rainbow<X> {
 

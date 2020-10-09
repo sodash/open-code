@@ -19,7 +19,7 @@ dataStream.get(bucketer.getBucket(time)).add(0, 1);
 </pre></code> to count time-stamped entries.
  * 
  * @author daniel
- * @testedby {@link TimeSlicerTest}
+ * @testedby  TimeSlicerTest}
  */
 public final class TimeSlicer extends VariableGridInfo implements
 		Iterable<Period>,ITimeGrid {

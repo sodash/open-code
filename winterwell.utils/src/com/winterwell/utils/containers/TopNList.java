@@ -16,7 +16,7 @@ import com.winterwell.utils.Utils;
  * 
  * TODO support using in unbounded mode as a general-purpose sorted list.
  * 
- * @testedby {@link TopNListTest}
+ * @testedby  TopNListTest}
  * @author daniel
  * 
  */

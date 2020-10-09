@@ -20,7 +20,7 @@ import no.uib.cipr.matrix.Vector;
  * {@link #setTrueLabel(Object)}.
  * 
  * @author Daniel
- * @testedby {@link PerceptronTest}
+ * @testedby  PerceptronTest}
  */
 public class Perceptron extends AClassifier<Boolean> implements
 		IClassifier<Boolean>, ITrainable.Supervised<Vector, Boolean> {

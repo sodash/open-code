@@ -57,7 +57,7 @@ final class SMTPAuthenticator extends javax.mail.Authenticator {
  * currently works but is a bit slow. TODO Caching that works would be nice
  * 
  * @author daniel. Uses free code supplied by Sudhir Ancha
- * @testedby {@link SMTPClientTestRemote}
+ * @testedby  SMTPClientTestRemote}
  */
 public class SMTPClient implements Closeable {
 

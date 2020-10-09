@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 /**
  * TODO test blocking behaviour!
  * 
- * @testedby {@link PipedDataStreamTestTest}
+ * @testedby  PipedDataStreamTestTest}
  * @author daniel
  */
 public class PipedDataStreamTest extends TestCase {

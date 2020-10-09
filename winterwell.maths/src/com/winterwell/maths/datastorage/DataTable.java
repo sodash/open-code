@@ -33,7 +33,7 @@ import com.winterwell.web.HtmlTable;
  * @author daniel
  * @param <C1>
  *            type of the 1st column
- * @testedby {@link DataTableTest}
+ * @testedby  DataTableTest}
  */
 public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml {
 	static KErrorPolicy exceptionPolicy = KErrorPolicy.THROW_EXCEPTION;

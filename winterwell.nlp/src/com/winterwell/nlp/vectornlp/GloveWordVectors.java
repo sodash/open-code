@@ -25,7 +25,7 @@ import no.uib.cipr.matrix.Vector;
  * Use the GLOVE pre-computed word vectors.
  * Warning: Make ONE instance and cache it globally! This is a big object and slow to load.
  * @author daniel
- * @testedby {@link GloveWordVectorsTest}
+ * @testedby  GloveWordVectorsTest}
  */
 public class GloveWordVectors {
 	private static final String LOGTAG = "glove";

@@ -8,7 +8,7 @@ package com.winterwell.web;
  * This is so that Utils.getRootCause() will return the ConfigException. 
  * 
  * @see AuthException which extends (and largely replaces) this.
- * @testedby {@link ConfigExceptionTest}
+ * @testedby  ConfigExceptionTest}
  * @author daniel
  */
 public class ConfigException extends RuntimeException {

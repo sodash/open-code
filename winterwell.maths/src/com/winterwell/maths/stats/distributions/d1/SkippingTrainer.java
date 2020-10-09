@@ -25,7 +25,7 @@ import com.winterwell.utils.Utils;
  * 10,000 items = ~500 trained.
  * 
  * @author daniel
- * @testedby {@link SkippingTrainerTest}
+ * @testedby  SkippingTrainerTest}
  */
 public class SkippingTrainer<X> implements
 ITrainable.Unsupervised.Weighted<X>  

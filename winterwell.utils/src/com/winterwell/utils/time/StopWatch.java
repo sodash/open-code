@@ -6,7 +6,7 @@ import com.winterwell.utils.StrUtils;
  * Simple timer utility. Can be paused and restarted.
  * 
  * @author daniel
- * @testedby {@link StopWatchTest}
+ * @testedby  StopWatchTest}
  */
 public final class StopWatch {
 

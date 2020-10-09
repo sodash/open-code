@@ -29,7 +29,7 @@ Applies the rules:
 
 NOTE: This IS case-sensitive.
 
-@testedby {@link InternationaliserTest}
+@testedby  InternationaliserTest}
  */
 public class Internationaliser extends Dictionary {
 	

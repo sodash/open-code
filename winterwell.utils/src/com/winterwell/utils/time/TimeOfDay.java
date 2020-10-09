@@ -17,7 +17,7 @@ import com.winterwell.utils.Utils;
  * 
  * @see TimeUtils#getStartOfDay(Time)
  * @author daniel
- * @testedby {@link TimeOfDayTest}
+ * @testedby  TimeOfDayTest}
  */
 public class TimeOfDay implements Serializable {
 	private static final long serialVersionUID = 1L;

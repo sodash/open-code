@@ -56,7 +56,7 @@ import com.winterwell.web.LoginDetails;
  * Ref: https://javamail.java.net/nonav/docs/api/com/sun/mail/imap/package-summary.html
  * 
  * @author daniel
- * @testedby {@link IMAPClientTest}
+ * @testedby  IMAPClientTest}
  */
 public final class IMAPClient implements Closeable {
 

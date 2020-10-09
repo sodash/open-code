@@ -21,7 +21,7 @@ import no.uib.cipr.matrix.Vector;
  * 
  * @see HistogramChart which plots density functions.
  * @author Joe Halliwell <joe@winterwell.com>
- * @testedby {@link RenderWithFlotTest} and {@link FiniteDistributionChartTest}
+ * @testedby  RenderWithFlotTest} and {@link FiniteDistributionChartTest}
  */
 public class FiniteDistributionChart extends XYChart {
 

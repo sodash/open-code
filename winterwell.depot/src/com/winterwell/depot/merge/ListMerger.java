@@ -8,7 +8,7 @@ import com.winterwell.utils.Utils;
 
 /**
  * Diff and merge for lists.
- * @testedby {@link ListMergerTest}
+ * @testedby  ListMergerTest}
  * @author daniel
  */
 public class ListMerger<X> extends AMerger<List<X>> {

@@ -19,7 +19,7 @@ import no.uib.cipr.matrix.Vector;
  * 
  * TODO or falls in [0,1] TODO or falls in [-1,1]
  * 
- * @testedby {@link NormalisedTest}
+ * @testedby  NormalisedTest}
  * 
  * @author daniel
  * @deprecated 

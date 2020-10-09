@@ -160,7 +160,7 @@ public class StatsUtils extends MathUtils {
 	 *            at the end of the run.
 	 * @return covariance matrix If the calculation failed for a given cell,
 	 *         this will be set to Double.NaN.
-	 * @testedby {@link StatsUtilsTest#testCovar()}
+	 * @testedby  StatsUtilsTest#testCovar()}
 	 */
 	public static Matrix covar(IDataSet dataset, KMatchPolicy matchingPolicy,
 			File tempStorage) {
@@ -537,7 +537,7 @@ public class StatsUtils extends MathUtils {
 	 * @param pts
 	 *            Must not be empty
 	 * @return mean of points
-	 * @testedby {@link StatsUtilsTest#testMean()}
+	 * @testedby  StatsUtilsTest#testMean()}
 	 */
 	public static Vector mean(List<? extends Vector> pts) {
 		int dim = pts.get(0).size();
@@ -657,7 +657,7 @@ public class StatsUtils extends MathUtils {
 	 *         Jakarta's {@link Variance} for details.
 	 * 
 	 * 
-	 * @testedby {@link StatsUtilsTest#testVar()}
+	 * @testedby  StatsUtilsTest#testVar()}
 	 */
 	public static double var(double[] xs) {
 		if (xs.length == 0)
@@ -692,7 +692,7 @@ public class StatsUtils extends MathUtils {
 	 * @param pts
 	 *            Must not be empty
 	 * @return the variance in each dimension.
-	 * @testedby {@link StatsUtilsTest#testVar()}
+	 * @testedby  StatsUtilsTest#testVar()}
 	 */
 	public static Vector var(List<? extends Vector> pts) {
 		int dim = pts.get(0).size();

@@ -15,7 +15,7 @@ import com.winterwell.utils.containers.AbstractIterator;
  * preserve state. That can be expensive in terms of memory if the pullers get
  * majorly out of sync.
  * 
- * @testedby {@link SharedDataStreamTest}
+ * @testedby  SharedDataStreamTest}
  * 
  * @author daniel
  */

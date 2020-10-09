@@ -12,7 +12,7 @@ import com.winterwell.utils.time.Time;
  * @see TimeField which is more flexible (but re-uses {@link #toString2(Time)} from here)
  * @see DateField which is more flexible
  * @author daniel
- * @testedby {@link DateFieldTest}
+ * @testedby  DateFieldTest}
  */
 public class DateFormatField extends AField<Time> {	
 	private static final long serialVersionUID = 1L;

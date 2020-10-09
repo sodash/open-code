@@ -29,7 +29,7 @@
 // * @deprecated Use Google's code instead -- there's an open-source project
 // * for this. {@link CompactLanguageDetector}
 // * 
-// * @testedby {@link LangClassifierTest}
+// * @testedby  LangClassifierTest}
 // * @author daniel
 // *
 // */

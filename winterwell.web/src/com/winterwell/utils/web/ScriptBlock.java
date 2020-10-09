@@ -24,7 +24,7 @@ import com.winterwell.utils.containers.ArraySet;
  * E.g. &lt;script src='myfile.js' data-compile-to='target-file'&gt; 
  * 
  * @author Steven King <steven@winterwell.com>
- * @testedby {@link ScriptBlockTest}
+ * @testedby  ScriptBlockTest}
  */
 public final class ScriptBlock {
 	private static final Pattern BLOCK = Pattern.compile("\\Q<!--[<compile to=\"\\E(\\S+)\\Q\">]-->\\E.*?\\Q<!--[</compile>]-->\\E", Pattern.DOTALL);

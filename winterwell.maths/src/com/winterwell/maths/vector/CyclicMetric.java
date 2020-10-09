@@ -5,7 +5,7 @@ import no.uib.cipr.matrix.Vector;
 /**
  * A metric which loops, so 24 hours = 0 hours for example.
  * 
- * @testedby {@link CyclicMetricTest}
+ * @testedby  CyclicMetricTest}
  * @author daniel
  * 
  */

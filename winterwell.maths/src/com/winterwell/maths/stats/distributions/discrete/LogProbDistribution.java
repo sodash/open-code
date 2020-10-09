@@ -10,7 +10,7 @@ import com.winterwell.utils.MathUtils;
 /**
  * Store log-probabilities to help avoid zeroes
  * @author daniel
- * @testedby {@link LogProbDistributionTest}
+ * @testedby  LogProbDistributionTest}
  * @param <T>
  */
 public class LogProbDistribution<T> extends AFiniteDistribution<T> {

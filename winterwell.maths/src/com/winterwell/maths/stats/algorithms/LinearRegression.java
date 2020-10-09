@@ -49,7 +49,7 @@ import no.uib.cipr.matrix.VectorEntry;
  * Should we have an AConditionalDistribution class to be the base for this?
  * 
  * @author daniel
- * @testedby {@link LinearRegressionTest}
+ * @testedby  LinearRegressionTest}
  */
 public class LinearRegression implements IPredictor,
 		ITrainable.Supervised<Vector, Double> {

@@ -22,7 +22,7 @@ import no.uib.cipr.matrix.sparse.SparseVector;
  * vector-based work should be quite efficient.
  * 
  * @author daniel
- * @testedby {@link IndexedDistributionTest} TODO speed tests versus
+ * @testedby  IndexedDistributionTest} TODO speed tests versus
  *           {@link ObjectDistribution}
  * @param <T>
  */
@@ -109,7 +109,7 @@ public final class IndexedDistribution<T> extends AFiniteDistribution<T>
 	 * @param n
 	 * @return The n most likely elements in this distribution. Excludes zeroes
 	 *         (if that's all there is).
-	 * @testedby {@link IndexedDistributionTest#testGetMostLikely()}
+	 * @testedby  IndexedDistributionTest#testGetMostLikely()}
 	 */
 	@Override
 	public List<T> getMostLikely(int n) {
@@ -156,7 +156,7 @@ public final class IndexedDistribution<T> extends AFiniteDistribution<T>
 	}
 
 	/**
-	 * @testedby {@link IndexedDistributionTest#testIterator()}
+	 * @testedby  IndexedDistributionTest#testIterator()}
 	 */
 	@Override
 	public final Iterator<T> iterator() {

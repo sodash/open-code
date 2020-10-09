@@ -35,7 +35,7 @@ import com.winterwell.utils.web.WebUtils;
  * TODO keep * in words, e.g. "b*llocks"
  * 
  * @author Daniel
- * @testedby {@link WordAndPunctuationTokeniserTest}
+ * @testedby  WordAndPunctuationTokeniserTest}
  */
 public class WordAndPunctuationTokeniser extends ATokenStream 
 implements ModularXML // inherited from ITokenStream
@@ -162,7 +162,7 @@ implements ModularXML // inherited from ITokenStream
 	 * <p>
 	 * Sub-classes should override and call {@link #factory2(String)}, to
 	 * avoid the deep-copy which this class will otherwise do for safety. 
-	 * @testedby {@link WordAndPunctuationTokeniserTest#testInstantiate()}
+	 * @testedby  WordAndPunctuationTokeniserTest#testInstantiate()}
 	 */
 	@Override
 	public WordAndPunctuationTokeniser factory(String newInput) {
@@ -463,7 +463,7 @@ implements ModularXML // inherited from ITokenStream
 	 * get split out, but "won't" won't?
 	 * 
 	 * @param doSplit
-	 * @testedby {@link WordAndPunctuationTokeniserTest#testApostrophe()}
+	 * @testedby  WordAndPunctuationTokeniserTest#testApostrophe()}
 	 */
 	public void setSplitOnApostrophe(boolean doSplit) {
 		this.splitOnApostrophe = doSplit;

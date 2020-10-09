@@ -80,7 +80,7 @@ import com.winterwell.utils.time.TUnit;
  * Web and xml-related utils.
  *
  * @author daniel
- * @testedby {@link WebUtilsTest}
+ * @testedby  WebUtilsTest}
  * @see WebUtils2
  */
 public class WebUtils {
@@ -457,7 +457,7 @@ public class WebUtils {
 	 *            If true, return an IPv4 address. If false, look for a
 	 *            server-name.
 	 * @return IP or server name. Never null (exception on failure)
-	 * @testedby {@link WebUtilsTest#testGetIPof()} WARNING: this can fail
+	 * @testedby  WebUtilsTest#testGetIPof()} WARNING: this can fail
 	 *           sometimes for no good reason that I can see. Retrying usually
 	 *           succeeds.
 	 */
@@ -819,7 +819,7 @@ public class WebUtils {
 	 * Try to get the IP address(es) of the local machine. Unix only at present.
 	 *
 	 * @return
-	 * @testedby {@link WebUtilsTest#testGetMyIP()}
+	 * @testedby  WebUtilsTest#testGetMyIP()}
 	 */
 	public static List<String> getMyIP() {
 		if (Utils.OSisUnix()) {
@@ -884,7 +884,7 @@ public class WebUtils {
 	 * @return an XMLReader. Tries to construct a fault-tolerant fast xml reader
 	 *         (e.g. switches off DTD loading). This has implications for
 	 *         entities! Which might not get properly supported!
-	 * @testedby {@link WebUtilsTest#testGetXMLReader()}
+	 * @testedby  WebUtilsTest#testGetXMLReader()}
 	 */
 	public static XMLReader getXMLReader() {
 		if (saxParserFactory == null) {
@@ -1004,7 +1004,7 @@ public class WebUtils {
 	 * @param xml
 	 * @param namespaceAware
 	 * @return
-	 * @testedby {@link WebUtilsTest#testParseXml()}
+	 * @testedby  WebUtilsTest#testParseXml()}
 	 * @see JSoup for html parsing
 	 */
 	public static Document parseXml(String xml) {
@@ -1160,7 +1160,7 @@ public class WebUtils {
 	 * @param path
 	 * @param params If they are not present, no problem, no edits are made.
 	 * @return path without params
-	 * @testedby {@link WebUtils2Test#testRemoveQueryParameter()}
+	 * @testedby  WebUtils2Test#testRemoveQueryParameter()}
 	 */
 	public static String removeQueryParameter(final String path, String... params) {
 		// Patterns	
@@ -1237,7 +1237,7 @@ public class WebUtils {
 	 *            target pdf file
 	 * @param printStyle true to use print media styling, false for WYSIWYG browser-styling.
 	 *
-	 * @testedby {@link WebUtilsTest#testRenderToPdf()}
+	 * @testedby  WebUtilsTest#testRenderToPdf()}
 	 */
 	public static void renderToPdf(String html, File file, boolean printStyle, String footer) {
 		// insert no-Google-header-footer
@@ -1334,7 +1334,7 @@ public class WebUtils {
 	 * @param printStyle TODO true to use print media styling, false for WYSIWYG browser-styling.
 	 * @param footer Optional footer html (can be null for no-footer)
 	 *
-	 * @testedby {@link WebUtilsTest#testRenderToPdf()}
+	 * @testedby  WebUtilsTest#testRenderToPdf()}
 	 */
 	public static void renderUrlToPdf(String url, File file, boolean printStyle, String footer, Dt waitFor) {
 		Proc p = null;
@@ -1501,7 +1501,7 @@ public class WebUtils {
 	 * @param xml
 	 *            can be null, in which case null will be returned
 	 * @return the text contents - ie input with all tags removed
-	 * @testedby {@link WebUtilsTest#testStripTags()}
+	 * @testedby  WebUtilsTest#testStripTags()}
 	 */
 	public static String stripTags(String xml) {
 		if (xml == null)
@@ -1608,7 +1608,7 @@ public class WebUtils {
 	 * @param x
 	 *            can be null (returns ""). Will be turned into a String using
 	 *            String.valueOf()
-	 * @testedby {@link WebUtilsTest#testUrlEncode()}
+	 * @testedby  WebUtilsTest#testUrlEncode()}
 	 */
 	public static String urlEncode(Object x) {
 		if (x == null)

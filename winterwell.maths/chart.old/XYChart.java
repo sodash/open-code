@@ -13,7 +13,7 @@ import no.uib.cipr.matrix.Vector;
  * barcharts.
  * 
  * TODO handle distributions: confidence intervals & min/max
- * @testedby {@link XYChartTest}
+ * @testedby  XYChartTest}
  * @author daniel
  */
 public class XYChart extends Chart {

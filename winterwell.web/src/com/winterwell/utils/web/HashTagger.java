@@ -16,7 +16,7 @@ import com.winterwell.utils.containers.Slice;
  * Utility methods for working with #tags and @you tags.
  * 
  * @author daniel
- * @testedby {@link HashTaggerTest}
+ * @testedby  HashTaggerTest}
  */
 public class HashTagger {
 	

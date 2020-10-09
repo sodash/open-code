@@ -68,7 +68,7 @@ import com.winterwell.utils.web.XStreamUtils;
 /**
  * ElasticSearch backed storage for DataLog
  * 
- * @testedby {@link ESStorageTest}
+ * @testedby  ESStorageTest}
  * @author daniel
  *
  */

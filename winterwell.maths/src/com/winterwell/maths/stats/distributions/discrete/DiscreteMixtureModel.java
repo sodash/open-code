@@ -12,7 +12,7 @@ import com.winterwell.utils.Printer;
  * A additive (OR) mixture of discrete models (ie this is "OrDist").
  * 
  * @author Joe Halliwell <joe@winterwell.com>, Daniel
- * @testedby {@link DiscreteMixtureModelTest}
+ * @testedby  DiscreteMixtureModelTest}
  * 
  */
 public class DiscreteMixtureModel<X>

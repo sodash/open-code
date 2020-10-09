@@ -26,7 +26,7 @@ import no.uib.cipr.matrix.Vector;
 /**
  * Miscellaneous static functions
  * 
- * @testedby {@link MatrixUtilsTest}
+ * @testedby  MatrixUtilsTest}
  */
 public class MatrixUtils {
 

@@ -22,7 +22,7 @@ import com.winterwell.utils.time.Dt;
  * An HMM where the states might be continuous and the timesteps variable.
  * 
  * @author Daniel
- * @testedby {@link FlexiHMMTest}
+ * @testedby  FlexiHMMTest}
  */
 public class FlexiHMM<Observed, Hidden> extends
 		ACondDistribution<Observed, Hidden> implements

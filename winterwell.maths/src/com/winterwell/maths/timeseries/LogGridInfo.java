@@ -7,7 +7,7 @@ import com.winterwell.maths.IGridInfo;
  * base class with TimeSlicer
  * 
  * @author daniel
- * @testedby {@link LogGridInfoTest}
+ * @testedby  LogGridInfoTest}
  */
 public final class LogGridInfo extends VariableGridInfo implements IGridInfo {
 

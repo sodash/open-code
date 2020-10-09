@@ -20,7 +20,7 @@ import com.winterwell.utils.log.Log;
  * for better project modularity, separating 
  * winterwell.base & winterwell.depot.
  * 
- * @testedby {@link DescCacheTest}
+ * @testedby  DescCacheTest}
  * @author daniel
  */
 class DescCache implements IDescCache {

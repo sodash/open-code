@@ -19,7 +19,7 @@ import com.winterwell.utils.log.Log;
  * 
  * @param PT
  *            the type of object produced and set as {@link AST#getX()}
- * @testedby {@link ParserTest}
+ * @testedby  ParserTest}
  * @author daniel
  */
 public abstract class Parser<PT> {

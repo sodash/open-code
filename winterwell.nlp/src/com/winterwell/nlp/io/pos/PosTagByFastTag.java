@@ -16,7 +16,7 @@ import com.winterwell.utils.containers.AbstractIterator;
  * Add POS tags into a stream. Uses Mark Watson's FastTag BrillTagger,
  * which is a simple rules based (a lexicon of common words + 8 rules) tagger.
  * @author daniel
- * @testedby {@link PosTagByFastTagTest}
+ * @testedby  PosTagByFastTagTest}
  */
 public class PosTagByFastTag extends ATokenStream {
 

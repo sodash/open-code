@@ -23,7 +23,7 @@ import com.winterwell.utils.log.Log;
  * Use via {@link #train1(Double)}
  * 
  * @author daniel
- * @testedby {@link MeanVar1DTest}
+ * @testedby  MeanVar1DTest}
  */
 public class MeanVar1D extends ADistribution1D implements
 		ITrainable.Unsupervised.Weighted<Double>, Serializable

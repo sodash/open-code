@@ -25,7 +25,7 @@
 // * @see SqlUtils This is separate to avoid the JPA dependency if not needed.
 // * 
 // * @author daniel
-// * @testedby {@link SqlUtilsTest}
+// * @testedby  SqlUtilsTest}
 // */
 //public class JpaUtils {
 //

@@ -653,7 +653,7 @@ public final class Containers  {
 	 * @param data
 	 * @param pieces
 	 * @return
-	 * @testedby {@link ContainersTest#testChop()}
+	 * @testedby  ContainersTest#testChop()}
 	 */
 	public static <X> List<List<X>> chop(List<X> data, int pieces) {
 		assert !data.isEmpty();
@@ -1270,7 +1270,7 @@ public final class Containers  {
 	 *            -1 for all
 	 * @return an ArrayMap with keys, sorted by value
 	 * @NotThreadSafe
-	 * @testedby {@link ContainersTest#testGetValueSortedMap()} Note: builds on
+	 * @testedby  ContainersTest#testGetValueSortedMap()} Note: builds on
 	 *           {@link #getSortedKeys(Map)}
 	 */
 	public static <K, V> Map<K, V> getValueSortedMap(final Map<K, V> map,
@@ -1744,7 +1744,7 @@ public final class Containers  {
 	 *         Can be safely edited without affecting the original list.
 	 * 
 	 * 
-	 * @testedby {@link ContainersTest#testSubList()}
+	 * @testedby  ContainersTest#testSubList()}
 	 */
 	public static <X> List<X> subList(List<X> list, int start, int end) {
 		if (list == null)
@@ -1792,7 +1792,7 @@ public final class Containers  {
 	 * 
 	 * @return A copied out subarray. Can be empty.
 	 * 
-	 * @testedby {@link ContainersTest#testSubList()}
+	 * @testedby  ContainersTest#testSubList()}
 	 */
 	public static long[] subList(long[] list, int start, int end) {
 		// start from end?

@@ -16,7 +16,7 @@ import no.uib.cipr.matrix.Vector.Norm;
  * Powers (take a random vector & twat it). Based on the exposition at
  * http://distance-ed.math.tamu.edu/Math640/chapter6/node4.html
  * 
- * @testedby {@link MOPTest}
+ * @testedby  MOPTest}
  */
 public class MOP implements IEigenVectorFinder {
 

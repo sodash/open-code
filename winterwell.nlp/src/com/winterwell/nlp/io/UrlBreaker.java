@@ -20,7 +20,7 @@ import com.winterwell.utils.containers.AbstractIterator;
  * TODO unclear how much this helps
  * 
  * @author daniel
- * @testedby {@link UrlBreakerTest}
+ * @testedby  UrlBreakerTest}
  */
 public class UrlBreaker extends ATokenStream {
 

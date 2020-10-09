@@ -13,7 +13,7 @@ import com.winterwell.utils.io.FileUtils;
 /**
  * 
  * @author daniel
- * @testedby {@link GutenbergCorpusTest}
+ * @testedby  GutenbergCorpusTest}
  */
 public class GutenbergCorpus implements ICorpus {
 

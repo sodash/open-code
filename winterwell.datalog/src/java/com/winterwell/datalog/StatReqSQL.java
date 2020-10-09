@@ -19,7 +19,7 @@ import com.winterwell.utils.time.Time;
 /**
  * An SQL implementation of the StatReq.
  *
- * @testedby {@link StatReqSQLTest}
+ * @testedby  StatReqSQLTest}
  * @author Agis Chartsias <agis@winterwell.com>
  *
  * @param <X>

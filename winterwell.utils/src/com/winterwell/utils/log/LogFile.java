@@ -26,7 +26,7 @@ import com.winterwell.utils.web.WebUtils;
  * this LogFile from the log listeners.
  * 
  * @author daniel
- * @testedby {@link LogFileTest}
+ * @testedby  LogFileTest}
  */
 public class LogFile implements ILogListener, Closeable {
 
@@ -216,7 +216,7 @@ public class LogFile implements ILogListener, Closeable {
 	 *            How often to rotate
 	 * @param history
 	 *            How many old log files to keep. 0 means just the current one.
-	 * @testedby {@link LogFileTest#testRotation()}
+	 * @testedby  LogFileTest#testRotation()}
 	 */
 	public LogFile setLogRotation(Dt interval, int history) {
 		this.rotationInterval = interval;

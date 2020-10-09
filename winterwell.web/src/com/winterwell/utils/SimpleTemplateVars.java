@@ -29,7 +29,7 @@ import com.winterwell.utils.web.WebUtils;
  * There is also a {@link #process(String)} method which does Perl style variable
  * interpolation.
  * @author daniel
- * @testedby {@link SimpleTemplateVarsTest}
+ * @testedby  SimpleTemplateVarsTest}
  */
 public final class SimpleTemplateVars {
 

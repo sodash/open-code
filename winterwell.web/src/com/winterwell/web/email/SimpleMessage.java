@@ -50,7 +50,7 @@ import com.winterwell.web.ExternalServiceException;
  * This is designed to be used with {@link SMTPClient} and {@link IMAPClient}.
  * 
  * @author daniel
- * @testedby {@link SimpleMessageTest}
+ * @testedby  SimpleMessageTest}
  */
 public class SimpleMessage extends MimeMessage {
 
@@ -557,10 +557,10 @@ public class SimpleMessage extends MimeMessage {
 	 * Get a list of attachments to the message
 	 * 
 	 * @return a list of the attachments. May be empty, never null.
-	 * @testedby {@link SimpleMessageTest#testGetAttachments1()}
-	 * @testedby {@link SimpleMessageTest#testGetAttachments2()}
-	 * @testedby {@link SimpleMessageTest#testGetAttachments3()}
-	 * @testedby {@link SimpleMessageTest#testGetAttachments4()}
+	 * @testedby  SimpleMessageTest#testGetAttachments1()}
+	 * @testedby  SimpleMessageTest#testGetAttachments2()}
+	 * @testedby  SimpleMessageTest#testGetAttachments3()}
+	 * @testedby  SimpleMessageTest#testGetAttachments4()}
 	 */
 	public List<Part> getAttachments() {
 		List<Part> parts = new ArrayList<Part>();

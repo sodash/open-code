@@ -12,7 +12,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.web.XStreamUtils;
 
 /**
- * @testedby {@link MathUtilsTest}
+ * @testedby  MathUtilsTest}
  * @author daniel
  * 
  */
@@ -191,7 +191,7 @@ public class MathUtils {
 	 * @see #num(Object)
 	 * @see StrUtils#isNumber(String)
 	 * @see #toNum(Object)
-	 * @testedby {@link MathUtilsTest#testGetNumber()}
+	 * @testedby  MathUtilsTest#testGetNumber()}
 	 */
 	public static double getNumber(Object _num) {
 		Double d = getNumber2(_num);
@@ -282,7 +282,7 @@ public class MathUtils {
 	/**
 	 * @param x
 	 * @return true if not infinite and not NaN
-	 * @testedby {@link MathUtilsTest#testIsFinite()}
+	 * @testedby  MathUtilsTest#testIsFinite()}
 	 */
 	public static boolean isFinite(double x) {
 		return ! (Double.isNaN(x) || Double.isInfinite(x));

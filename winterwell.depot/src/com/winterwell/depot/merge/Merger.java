@@ -11,7 +11,7 @@ import com.winterwell.utils.log.Log;
 /**
  * Collect together all the standard mergers.
  * @author daniel
- * @testedby {@link MergerTest}
+ * @testedby  MergerTest}
  */
 public class Merger implements IMerger<Object> {
 

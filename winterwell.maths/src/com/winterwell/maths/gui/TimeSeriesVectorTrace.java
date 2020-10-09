@@ -28,7 +28,7 @@ import no.uib.cipr.matrix.Vector;
  * TODO currently only works well with [0,1] valued data
  * 
  * @author Daniel
- * @testedby {@link TimeSeriesVectorTraceTest}
+ * @testedby  TimeSeriesVectorTraceTest}
  */
 public class TimeSeriesVectorTrace extends JComponent {
 	private static final long serialVersionUID = 1L;

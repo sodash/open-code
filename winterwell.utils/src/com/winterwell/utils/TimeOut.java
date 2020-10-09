@@ -30,7 +30,7 @@ import com.winterwell.utils.time.Dt;
  * Also, it is possible for a thread to catch and ignore an interrupt.
  * 
  * @see DoFast
- * @testedby {@link TimeOutTest}
+ * @testedby  TimeOutTest}
  * @author daniel
  */
 public final class TimeOut implements Closeable {

@@ -17,7 +17,7 @@ import com.winterwell.utils.web.WebUtils;
  * Plot several things on one set of axes
  * 
  * @author daniel
- * @testedby {@link GetAxisTest}
+ * @testedby  GetAxisTest}
  */
 public class CombinationChart extends Chart {
 

@@ -17,7 +17,7 @@ import com.winterwell.utils.web.IHasJson;
  * Iteration lets you step through ALL the nodes.
  * 
  * @author daniel
- * @testedby {@link TreeTest}
+ * @testedby  TreeTest}
  */
 public class Tree<X> 
 implements Iterable<Tree<X>>, ITree<X>, IHasJson 

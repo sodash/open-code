@@ -23,7 +23,7 @@ import com.winterwell.utils.threads.ATask;
  * TODO use Google's n-grams??
  * 
  * @see WikipediaCorpus
- * @testedby {@link CreateWikipediaStopwordsTest}
+ * @testedby  CreateWikipediaStopwordsTest}
  * @author daniel
  * 
  */

@@ -11,7 +11,7 @@ import com.winterwell.utils.containers.AbstractIterator;
 /**
  * 
  * @author daniel
- * @testedby {@link ListSitnStreamTest}
+ * @testedby  ListSitnStreamTest}
  * @param <X>
  */
 public class ListSitnStream<X> implements ISitnStream<X> {

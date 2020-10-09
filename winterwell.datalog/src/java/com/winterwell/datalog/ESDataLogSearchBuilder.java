@@ -27,7 +27,7 @@ import com.winterwell.web.WebEx;
 import com.winterwell.web.app.AppUtils;
 
 /**
- * @testedby {@link ESDataLogSearchBuilderTest}
+ * @testedby  ESDataLogSearchBuilderTest}
  * @author daniel
  *
  */

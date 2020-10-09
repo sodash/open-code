@@ -36,7 +36,7 @@ import com.winterwell.web.app.KServerType;
  * TODO Remote server storage for DataLog
  * So the adserver can log stuff into lg.
  * @author daniel
- * @testedby {@link DataLogRemoteStorageTest}
+ * @testedby  DataLogRemoteStorageTest}
  */
 public class DataLogRemoteStorage implements IDataLogStorage
 {

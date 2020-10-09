@@ -54,7 +54,7 @@ import com.winterwell.youagain.client.YouAgainClient;
 
  * 
  * @author daniel
- * @testedby {@link DataServletTest}
+ * @testedby  DataServletTest}
  */
 public class DataServlet implements IServlet {
 

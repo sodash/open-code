@@ -27,7 +27,7 @@ import com.winterwell.utils.log.Log;
  * Size can be as large as 2 * idealSize (see {@link #add(Object)})
  * 
  * @author daniel
- * @testedby {@link HalfLifeIndexTest}
+ * @testedby  HalfLifeIndexTest}
  * @param <T>
  */
 @BinaryXML

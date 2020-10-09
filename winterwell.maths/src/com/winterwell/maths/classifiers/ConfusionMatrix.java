@@ -23,7 +23,7 @@ import com.winterwell.utils.containers.Containers;
  * @author daniel
  * 
  * @param <X>
- * @testedby {@link ConfusionMatrixTest}
+ * @testedby  ConfusionMatrixTest}
  */
 public class ConfusionMatrix<X> extends ObjectMatrix<X, X> {
 

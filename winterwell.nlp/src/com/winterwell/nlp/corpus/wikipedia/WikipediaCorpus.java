@@ -29,7 +29,7 @@ import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
 
 /**
- * @testedby {@link WikipediaCorpusTest}
+ * @testedby  WikipediaCorpusTest}
  * @author daniel
  * 
  */

@@ -11,7 +11,7 @@ import com.winterwell.utils.log.KErrorPolicy;
  * This is syntax similarity - NOT semantic similarity.
  * 
  * @author daniel
- * @testedby {@link LenientSimilarityTest}
+ * @testedby  LenientSimilarityTest}
  */
 public class LenientSimilarity implements ICompareWords {
 

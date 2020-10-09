@@ -530,7 +530,7 @@ final class HtmlTestReport implements TestListener {
  * @author Jacob Dreyer, released as public with permission to edit and use on
  *         http://www.velocityreviews.com/forums/t149403-junit-html-report.html
  * @author Daniel Winterstein - modifications to Jacob's code
- * @testedby {@link JUnitTaskTest}
+ * @testedby  JUnitTaskTest}
  */
 public class JUnitTask extends BuildTask {
 

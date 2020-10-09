@@ -27,7 +27,7 @@ import com.winterwell.youagain.client.AuthToken;
 /**
  * Get data via the DataLog web service (i.e. call DataServlet)
  * @author daniel
- * @testedby {@link DataLogHttpClientTest}
+ * @testedby  DataLogHttpClientTest}
  */
 public class DataLogHttpClient {
 

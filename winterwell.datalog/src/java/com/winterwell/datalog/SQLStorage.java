@@ -33,7 +33,7 @@ import com.winterwell.utils.time.Time;
  *
  * FIXME This should use the database details from config, if they are set -- currently it only does this in save()
  * 
- * @testedby {@link SQLStorageTest}
+ * @testedby  SQLStorageTest}
  * @author Agis Chartsias <agis@winterwell.com>
  */
 public class SQLStorage implements IDataLogStorage {

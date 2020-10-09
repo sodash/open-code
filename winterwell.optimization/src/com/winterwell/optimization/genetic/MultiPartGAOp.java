@@ -13,7 +13,7 @@ import winterwell.optimization.genetic.MultiPartGAOpTest;
  * A mutator for things made up of several smaller mutatable things.
  * Example Use: in a GA where a candidate consists of a few vectors + some strings. 
  * 
- * @testedby {@link MultiPartGAOpTest}
+ * @testedby  MultiPartGAOpTest}
  * @author daniel
  */
 public class MultiPartGAOp implements IBreeder<List> {

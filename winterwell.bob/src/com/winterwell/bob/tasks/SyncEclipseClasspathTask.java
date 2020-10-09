@@ -22,7 +22,7 @@ import com.winterwell.web.app.KServerType;
  * 
  * Use this after {@link MavenDependencyTask} as a convenient way to maintain the classpath.
  * 
- * @testedby {@link SyncEclipseClasspathTaskTest}
+ * @testedby  SyncEclipseClasspathTaskTest}
  * @author daniel
  *
  */

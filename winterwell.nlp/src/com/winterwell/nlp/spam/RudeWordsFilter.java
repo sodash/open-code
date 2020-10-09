@@ -17,7 +17,7 @@ import com.winterwell.utils.log.Log;
  * 
  * TODO support stemming -- perhaps via support for specifying a tokeniser
  * 
- * @testedby {@link RudeWordsFilterTest}
+ * @testedby  RudeWordsFilterTest}
  * @author daniel
  */
 public class RudeWordsFilter implements IFilter<String> {

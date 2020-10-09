@@ -18,7 +18,7 @@ import com.winterwell.utils.MathUtils;
  * @see BayesModelSelection
  * @author daniel
  * 
- * @testedby {@link BayesDocModelClassifierTest}
+ * @testedby  BayesDocModelClassifierTest}
  * @param <T>
  *            e.g. String for String tags
  * @deprecated Use {@link StreamClassifier} for preference

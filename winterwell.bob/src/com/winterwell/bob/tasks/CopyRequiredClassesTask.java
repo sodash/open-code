@@ -24,7 +24,7 @@ import com.winterwell.utils.log.Log;
  * 
  * TODO refactor to have a "getRequiredClasses" method
  * 
- * @testedby {@link CopyRequiredClassesTaskTest}
+ * @testedby  CopyRequiredClassesTaskTest}
  * @author daniel
  *
  */

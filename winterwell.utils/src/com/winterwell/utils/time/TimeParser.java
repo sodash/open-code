@@ -126,7 +126,7 @@ public class TimeParser {
 	 *            e.g. 10 minutes. Ignores +/- indicators such as "ago" or
 	 *            "hence".
 	 * @return always positive
-	 * @testedby {@link TimeUnitTest#testParseDt()}
+	 * @testedby  TimeUnitTest#testParseDt()}
 	 */
 	public Dt parseDt(String dt) throws IllegalArgumentException {
 		// trim and lower case
@@ -164,7 +164,7 @@ public class TimeParser {
 	 * 
 	 * @param s
 	 * @return
-	 * @testedby {@link TimeUtilsTest#testParseExperimental()}
+	 * @testedby  TimeUtilsTest#testParseExperimental()}
 	 */
 	public Time parseExperimental(String s) throws IllegalArgumentException {
 		return parseExperimental(s, null);

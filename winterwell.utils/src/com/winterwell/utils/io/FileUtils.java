@@ -58,7 +58,7 @@ import com.winterwell.utils.web.XStreamUtils;
  * Static file-related utility functions.
  *
  * @author Daniel Winterstein
- * @testedby {@link FileUtilsTest}
+ * @testedby  FileUtilsTest}
  */
 public class FileUtils {
 
@@ -755,7 +755,7 @@ public class FileUtils {
 	 * @return e.g. "mybase" from "mybase.html", but
 	 *         "winterwell.utils.FileUtils" will be unchanged!
 	 *
-	 * @testedby {@link FileUtilsTest#testGetBasenameCautious()}
+	 * @testedby  FileUtilsTest#testGetBasenameCautious()}
 	 */
 	public static String getBasenameCautious(String filename) {
 		int i = filename.lastIndexOf('.');
@@ -888,7 +888,7 @@ public class FileUtils {
 	 *         "/a" is "b/c.txt" This method uses absolute paths.
 	 * @throws IllegalArgumentException
 	 *             if f is not a sub path of base
-	 * @testedby {@link FileUtilsTest#testGetRelativePath()}
+	 * @testedby  FileUtilsTest#testGetRelativePath()}
 	 */
 	public static String getRelativePath(File f, File base) throws IllegalArgumentException
 	{
@@ -1166,7 +1166,7 @@ public class FileUtils {
 	 * @param f
 	 * @return true if f is a sym-link. Note: returns false if f is not itself a
 	 *         sym-link, but has a sym-linked directory in it's path.
-	 * @testedby {@link FileUtilsTest#testIsSymLink()}
+	 * @testedby  FileUtilsTest#testIsSymLink()}
 	 */
 	public static boolean isSymLink(File f) {
 		try {
@@ -1264,7 +1264,7 @@ public class FileUtils {
 	 *            the symlink itself
 	 * @throws IORException
 	 *             if overwrite is false and out already exists
-	 * @testedby {@link FileUtilsTest#testMakeSymLink()}
+	 * @testedby  FileUtilsTest#testMakeSymLink()}
 	 */
 	// TODO? Java 7 has sym-link support via Path
 	public static void makeSymLink(File original, File out, boolean overwrite) {
@@ -1322,7 +1322,7 @@ public class FileUtils {
 	 * @param src
 	 * @param dest
 	 * @throws IORException
-	 * @return dest TODO @testedby {@link FileUtilsTest#testMove()} TODO test
+	 * @return dest TODO @testedby  FileUtilsTest#testMove()} TODO test
 	 *         this works properly with relative Files
 	 */
 	public static File move(File src, File dest) {
