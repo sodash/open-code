@@ -87,8 +87,9 @@ public class DataServlet implements IServlet {
 		// num examples
 		int size = state.get(SIZE, 10);
 		// ONLY give examples for logged in users
-		if ( ! isLoggedIn(state)) {			
+		if ( ! isLoggedIn(state) && size > 0) {			
 			size = 0;
+			state.addMessage("Not logged in => no examples");
 		}
 		
 		// time window
