@@ -2,49 +2,23 @@ package com.winterwell.datalog.server;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import static org.junit.Assert.*;
-import org.junit.Test;
+import org.junit.Test; 
+import org.eclipse.jetty.util.ajax.JSON;
 
-import com.winterwell.datalog.DataLog;
-import com.winterwell.datalog.DataLogEvent;
-import com.winterwell.datalog.DataLogImpl;
-import com.winterwell.datalog.DataLogRemoteStorage;
-import com.winterwell.datalog.DataLogSecurity;
+import com.winterwell.gson.JsonParser;
+import com.winterwell.gson.JsonElement;
+import com.winterwell.gson.JsonObject;
+import com.winterwell.gson.JsonArray;
 import com.winterwell.datalog.Dataspace;
-import com.winterwell.datalog.ESDataLogSearchBuilder;
-import com.winterwell.datalog.ESStorage;
-import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.SearchRequestBuilder;
-import com.winterwell.es.client.SearchResponse;
-import com.winterwell.nlp.query.SearchQuery;
-import com.winterwell.nlp.query.SearchQuery.SearchFormatException;
-import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
-import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.io.CSVSpec;
-import com.winterwell.utils.io.CSVWriter;
-import com.winterwell.utils.io.FileUtils;
-import com.winterwell.utils.log.Log;
-import com.winterwell.utils.threads.ICallable;
-import com.winterwell.utils.time.Dt;
-import com.winterwell.utils.time.TUnit;
-import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
-import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JSend;
-import com.winterwell.web.ajax.JsonResponse;
-import com.winterwell.web.app.IServlet;
-import com.winterwell.web.app.Json2Csv;
-import com.winterwell.web.app.WebRequest;
-import com.winterwell.web.fields.DtField;
-import com.winterwell.web.fields.IntField;
-import com.winterwell.web.fields.ListField;
-import com.winterwell.web.fields.SField;
-import com.winterwell.youagain.client.AuthToken;
-import com.winterwell.youagain.client.YouAgainClient;
+import com.winterwell.web.ajax.JThing;
 
 public class AggregationTest {
 	
@@ -74,6 +48,67 @@ public class AggregationTest {
 		String data = resp.getData().string();
 		Printer.out(data);
 		assert ! data.contains("no0");
+	}
+	
+	@Test
+	public void testCreateNewIndexData() {
+		initDataTest();
+		FakeBrowser fb = fb();
+		// create breakdown that does aggregation based on time interval of domains
+		String json = fb.getPage(ENDPOINT+"/data", new ArrayMap(
+				"name","test-1",
+				"dataspace", DATASPACE,
+				"breakdown", "domain/time"
+				));
+		JSend resp = JSend.parse(json);
+		String data = resp.getData().string();
+		Printer.out(data);
+		
+		JsonElement jelement = new JsonParser().parse(data);
+	    JsonObject  jobject = jelement.getAsJsonObject();
+	    jobject = jobject.getAsJsonObject("by_domain_time");
+	    JsonArray jarray = jobject.getAsJsonArray("buckets");
+	    JsonArray child_jarray;
+	    for (JsonElement j : jarray) {
+	    	jobject = j.getAsJsonObject();
+	    	String domain_name = jobject.get("key").getAsString();
+	    	jobject = jobject.getAsJsonObject("by_time");
+	    	child_jarray = jobject.getAsJsonArray("buckets");
+	    	for (JsonElement child : child_jarray) {
+	    		JsonObject compressed_json = new JsonObject();
+	    		compressed_json.addProperty("domain", domain_name);
+	    		compressed_json.addProperty("time", child.getAsJsonObject().get("key_as_string").getAsString());
+	    		compressed_json.addProperty("count", child.getAsJsonObject().get("doc_count").getAsDouble());
+	    		System.out.println("The domain is: " + domain_name);
+	    		System.out.println("The time is: " + child.getAsJsonObject().get("key_as_string").getAsString());
+	    		System.out.println("The count is: " + child.getAsJsonObject().get("doc_count").getAsDouble());
+	    		System.out.println(compressed_json.toString());
+	    		break;
+	    	}
+	    	break;
+	    }
+		
+	    /*
+		resp = parseJSON(data, "by_domain_time");
+		data = resp.getData().string();
+		Printer.out(data);
+		resp = parseJSON(data, "buckets");
+		data = resp.getData().string();
+		// data is a list with multiple buckets, each bucket corresponds to a domain
+		Printer.out(data);
+		*/
+	
+	}
+	
+	private JSend parseJSON(String data, String keyname) {
+		Map jobj = (Map) JSON.parse(data);
+		System.out.println(jobj.keySet());
+		Object _data = jobj.get(keyname); //need to check if keyname is correct
+		JThing thing = new JThing();
+		JSend jsend = new JSend();
+		thing.setJsonObject(_data);
+		JSend resp = jsend.setData(thing);
+		return resp;
 	}
 	
 	private FakeBrowser fb() {
