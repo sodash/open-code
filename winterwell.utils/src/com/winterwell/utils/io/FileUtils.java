@@ -553,7 +553,7 @@ public class FileUtils {
 		for (String bit : bits) {
 			if (bit.length() == 0) {
 				// TODO
-				System.out.println(path);
+				Log.w("filenameEncode odd", path);
 			}
 			for (int i = 0; i < bit.length(); i += MAX_FILENAME_LENGTH) {
 				int e = Math.min(bit.length(), i + MAX_FILENAME_LENGTH);
