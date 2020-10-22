@@ -35,7 +35,7 @@ public class AggregationTest {
 	private static DataLogServer server;
 	private static String ENDPOINT;
 	private static final CharSequence DATASPACE = new Dataspace("gl"); //query from the local ES index
-	public final static String INDEX = "datalog.compressed"; //bulk into newly created local ES index
+	public final static String INDEX = "datalog.compressed_oct20"; //bulk into newly created local ES index
 	
 	public void initDataTest() {
 		if (ENDPOINT!=null) return;
@@ -62,6 +62,7 @@ public class AggregationTest {
 	}
 	
 	@Test
+	// this will create a new index named datalog.compressed_oct20 
 	public void testBulkNewIndexData() {
 		initDataTest();
 		FakeBrowser fb = fb();
@@ -101,6 +102,7 @@ public class AggregationTest {
 	    		double doc_count = child.getAsJsonObject().get("doc_count").getAsDouble();
 	    		IndexRequestBuilder pi = esc.prepareIndex(INDEX, "compressed_"+i);
 	    		i = i + 1; //increment document id
+	    		//create new document - with only three fields domain, time and count for now
 				pi.setBodyMap(new ArrayMap("domain", domain_name, "time", time, "count", doc_count));
 				bulk.add(pi);
 	    	}
@@ -111,7 +113,7 @@ public class AggregationTest {
 		assert ! br.hasErrors() : br.getError();
 		
 		// sanity check if data is written to local ES
-		Map<String, Object> got = esc.get(INDEX, "simple", "compressed_30");
+		Map<String, Object> got = esc.get(INDEX, "simple", "compressed_20");
 		System.out.println(got);
 	}
 	/* 
