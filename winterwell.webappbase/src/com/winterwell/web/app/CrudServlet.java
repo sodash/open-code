@@ -467,10 +467,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	protected JThing<T> doPublish2(CharSequence dataspace, JThing<T> _jthing, 
 			KRefresh forceRefresh, boolean deleteDraft, String id, WebRequest stateIgnored) 
-	{
-		ESPath draftPath = esRouter.getPath(dataspace, type, id, KStatus.DRAFT);
-		ESPath publishPath = esRouter.getPath(dataspace, type, id, KStatus.PUBLISHED);
-		ESPath archivedPath = esRouter.getPath(dataspace,type, id, KStatus.ARCHIVED);
+	{		
+		doBeforeSaveOrPublish(_jthing, stateIgnored);
+		
 		// id must match
 		if (_jthing.java() instanceof AThing) {
 			String thingId = ((AThing) _jthing.java()).getId();
@@ -479,10 +478,12 @@ public abstract class CrudServlet<T> implements IServlet {
 			} else if ( ! thingId.equals(id)) {
 				throw new IllegalStateException("ID mismatch remote: "+thingId+" vs local: "+id);
 			}
-		}
-		
-		doBeforeSaveOrPublish(_jthing, stateIgnored);
-				
+		}		
+		// ES paths
+		ESPath draftPath = esRouter.getPath(dataspace, type, id, KStatus.DRAFT);
+		ESPath publishPath = esRouter.getPath(dataspace, type, id, KStatus.PUBLISHED);
+		ESPath archivedPath = esRouter.getPath(dataspace,type, id, KStatus.ARCHIVED);
+		// do it
 		JThing obj = AppUtils.doPublish(_jthing, draftPath, publishPath, archivedPath, forceRefresh, deleteDraft);
 		return obj.setType(type);
 	}
