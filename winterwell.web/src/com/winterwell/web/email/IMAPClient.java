@@ -91,6 +91,7 @@ public final class IMAPClient implements Closeable {
 	 * false (the default);
 	 */
 	private boolean useRemoteSearch;
+	
 	public void setUseRemoteSearch(boolean useRemoteSearch) {
 		this.useRemoteSearch = useRemoteSearch;
 	}
