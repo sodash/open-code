@@ -67,7 +67,7 @@ public class AggregationTest {
 		Printer.out(data);
 		assert ! data.contains("no0");
 	}
-	/*
+	
 	@Test
 	// this will create a new index named datalog.compressed_oct20 
 	public void testBulkNewIndexData() {
@@ -155,7 +155,7 @@ public class AggregationTest {
 		// sanity check if data is written to local ES
 		Map<String, Object> got = esc.get(INDEX, "simple", "compressed_20");
 		System.out.println(got);
-	}*/
+	}
 	
 	// take index name as input argument
 	private ESHttpClient CreateIndexWithPropertiesMapping(String idx) {
