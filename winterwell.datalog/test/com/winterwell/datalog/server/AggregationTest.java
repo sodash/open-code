@@ -14,15 +14,21 @@ import com.winterwell.gson.JsonObject;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.gson.JsonArray;
 import com.winterwell.datalog.Dataspace;
+import com.winterwell.es.ESType;
 import com.winterwell.es.UtilsForESTests;
 import com.winterwell.es.client.BulkRequestBuilder;
 import com.winterwell.es.client.BulkResponse;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
+import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.IndexRequestBuilder;
 import com.winterwell.es.client.KRefresh;
+import com.winterwell.es.client.admin.CreateIndexRequest;
+import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.fail.ESIndexAlreadyExistsException;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.web.WebUtils;
@@ -36,7 +42,7 @@ public class AggregationTest {
 	private static DataLogServer server;
 	private static String ENDPOINT;
 	private static final CharSequence DATASPACE = new Dataspace("gl"); //query from the local ES index
-	public final static String INDEX = "datalog.compressed_oct20"; //bulk into newly created local ES index
+	public final static String INDEX = "datalog.compressed_oct20"; //bulk into new local ES index
 	
 	public void initDataTest() {
 		if (ENDPOINT!=null) return;
@@ -54,75 +60,17 @@ public class AggregationTest {
 		String json = fb.getPage(ENDPOINT+"/data", new ArrayMap(
 				"name","test-1",
 				"dataspace", DATASPACE,
-				"breakdown", "domain/time, evt/campaign/domain/pub/vert/browser/time"
+				"breakdown", "domain/time"
 				));
 		JSend resp = JSend.parse(json);
 		String data = resp.getData().string();
 		Printer.out(data);
 		assert ! data.contains("no0");
 	}
-	
 	/*
 	@Test
 	// this will create a new index named datalog.compressed_oct20 
 	public void testBulkNewIndexData() {
-		initDataTest();
-		FakeBrowser fb = fb();
-		// create breakdown that does aggregation based on time interval of domains
-		String json = fb.getPage(ENDPOINT+"/data", new ArrayMap(
-				"name","test-1",
-				"dataspace", DATASPACE,
-				"breakdown", "domain/time"
-				));
-		JSend resp = JSend.parse(json);
-		String data = resp.getData().string();
-		Printer.out(data);
-		
-		// prepare to bulk aggregated data
-		Dep.setIfAbsent(FlexiGson.class, new FlexiGson());
-		Dep.setIfAbsent(ESConfig.class, new ESConfig());
-		ESConfig esconfig = Dep.get(ESConfig.class);
-		if ( ! Dep.has(ESHttpClient.class)) Dep.setSupplier(ESHttpClient.class, false, ESHttpClient::new);
-		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		BulkRequestBuilder bulk = esc.prepareBulk();
-		
-		// parse aggregated data 
-		JsonElement jelement = new JsonParser().parse(data);
-	    JsonObject  jobject = jelement.getAsJsonObject();
-	    jobject = jobject.getAsJsonObject("by_domain_time");
-	    JsonArray jarray = jobject.getAsJsonArray("buckets");
-	    JsonArray child_jarray;
-	    // each j is a different domain
-	    int i = 0;
-	    for (JsonElement j : jarray) {
-	    	jobject = j.getAsJsonObject();
-	    	String domain_name = jobject.get("key").getAsString();
-	    	jobject = jobject.getAsJsonObject("by_time");
-	    	child_jarray = jobject.getAsJsonArray("buckets");
-	    	for (JsonElement child : child_jarray) {
-	    		String time = child.getAsJsonObject().get("key_as_string").getAsString();
-	    		double doc_count = child.getAsJsonObject().get("doc_count").getAsDouble();
-	    		IndexRequestBuilder pi = esc.prepareIndex(INDEX, "compressed_"+i);
-	    		i = i + 1; //increment document id
-	    		//create new document - with only three fields domain, time and count for now
-				pi.setBodyMap(new ArrayMap("domain", domain_name, "time", time, "count", doc_count));
-				bulk.add(pi);
-	    	}
-	    }
-	    bulk.setRefresh(KRefresh.WAIT_FOR);
-		bulk.setDebug(true);
-		BulkResponse br = bulk.get();
-		assert ! br.hasErrors() : br.getError();
-		
-		// sanity check if data is written to local ES
-		Map<String, Object> got = esc.get(INDEX, "simple", "compressed_20");
-		System.out.println(got);
-	}*/
-
-	
-	@Test
-	// this will create a new index named datalog.compressed_oct20 
-	public void testBulkNewIndexData2() {
 		initDataTest();
 		FakeBrowser fb = fb();
 		// create breakdown that does aggregation based specified fields
@@ -136,11 +84,8 @@ public class AggregationTest {
 		Printer.out(data);
 		
 		// prepare to bulk aggregated data
-		Dep.setIfAbsent(FlexiGson.class, new FlexiGson());
-		Dep.setIfAbsent(ESConfig.class, new ESConfig());
-		ESConfig esconfig = Dep.get(ESConfig.class);
-		if ( ! Dep.has(ESHttpClient.class)) Dep.setSupplier(ESHttpClient.class, false, ESHttpClient::new);
-		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		// check to see if index already exists, if not, create one
+		ESHttpClient esc = CreateIndexWithPropertiesMapping(INDEX);
 		BulkRequestBuilder bulk = esc.prepareBulk();
 		
 		// parse aggregated data 
@@ -149,7 +94,7 @@ public class AggregationTest {
 	    jobject = jobject.getAsJsonObject("by_evt_campaign_domain_pub_vert_browser_os_time");
 	    JsonArray jarray1 = jobject.getAsJsonArray("buckets");
 	    // each j1 is a different evt
-	    int i = 0;
+	    int i = 0; // document id
 	    for (JsonElement j1 : jarray1) {
 	    	Pair2<String,JsonArray> evt = parseAggregations(j1, "by_campaign_domain_pub_vert_browser_os_time");
 	    	String evt_name = evt.getFirst();
@@ -180,7 +125,7 @@ public class AggregationTest {
 							    	JsonArray jarray8 = os.getSecond();
 							    	for (JsonElement j8 : jarray8) { // each j8 is a time interval of one day
 							    		String time = j8.getAsJsonObject().get("key_as_string").getAsString();
-							    		double doc_count = j7.getAsJsonObject().get("doc_count").getAsDouble();
+							    		double doc_count = j8.getAsJsonObject().get("doc_count").getAsDouble();
 							    		IndexRequestBuilder pi = esc.prepareIndex(INDEX, "compressed_"+i);
 							    		i = i + 1; //increment document id
 							    		pi.setBodyMap(new ArrayMap(
@@ -210,6 +155,38 @@ public class AggregationTest {
 		// sanity check if data is written to local ES
 		Map<String, Object> got = esc.get(INDEX, "simple", "compressed_20");
 		System.out.println(got);
+	}*/
+	
+	// take index name as input argument
+	private ESHttpClient CreateIndexWithPropertiesMapping(String idx) {
+		Dep.setIfAbsent(FlexiGson.class, new FlexiGson());
+		Dep.setIfAbsent(ESConfig.class, new ESConfig());
+		if ( ! Dep.has(ESHttpClient.class)) Dep.setSupplier(ESHttpClient.class, false, ESHttpClient::new);
+		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		try {
+			CreateIndexRequest cir = esc.admin().indices().prepareCreate(idx).setAlias("datalog.compressed.all");
+			cir.get().check();
+			Utils.sleep(100);
+			// set properties mapping
+			PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(idx);
+			ESType mytype = new ESType()
+					.property("domain", ESType.keyword)
+					.property("browser", ESType.keyword)
+					.property("campaign", ESType.keyword)
+					.property("evt", ESType.keyword)
+					.property("os", ESType.keyword)
+					.property("pub", ESType.keyword)
+					.property("vert", ESType.keyword)
+					.property("time", new ESType().date())
+					.property("count", new ESType(double.class));
+			pm.setMapping(mytype);
+			pm.setDebug(true);
+			IESResponse resp = pm.get().check();
+			Printer.out(resp.getJson());
+		} catch (ESIndexAlreadyExistsException ex) {
+			Printer.out("Index already exists, proceeding...");
+		}
+		return esc;
 	}
 	
 	private Pair2<String, JsonArray> parseAggregations(JsonElement j, String term) {
