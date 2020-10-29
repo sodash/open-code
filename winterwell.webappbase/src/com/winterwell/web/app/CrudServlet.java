@@ -685,30 +685,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		// TODO refactor to use makeESFilterFromSearchQuery
 		SearchRequestBuilder s = new SearchRequestBuilder(es);
 		/// which index? draft (which should include copies of published) by default
-		switch(status) {
-		case ALL_BAR_TRASH:
-			s.setIndices(
-					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
-					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index(),
-					esRouter.getPath(dataspace, type, null, KStatus.ARCHIVED).index()
-				);
-			break;
-		case PUB_OR_ARC:
-			s.setIndices(
-					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
-					esRouter.getPath(dataspace, type, null, KStatus.ARCHIVED).index()
-				);
-			break;
-		case PUB_OR_DRAFT:
-			s.setIndices(
-					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
-					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index()
-				);
-			break;
-		default:
-			// normal
-			s.setIndex(esRouter.getPath(dataspace, type, null, status).index());
-		}
+		doList3_setIndex(status, s);
 		
 		// query
 		ESQueryBuilder qb = doList3_ESquery(q, prefix, period, stateOrNull);
@@ -736,6 +713,34 @@ public abstract class CrudServlet<T> implements IServlet {
 		// Call the DB
 		SearchResponse sr = s.get();		
 		return sr;
+	}
+
+
+	protected void doList3_setIndex(KStatus status, SearchRequestBuilder s) {
+		switch(status) {
+		case ALL_BAR_TRASH:
+			s.setIndices(
+					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
+					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index(),
+					esRouter.getPath(dataspace, type, null, KStatus.ARCHIVED).index()
+				);
+			break;
+		case PUB_OR_ARC:
+			s.setIndices(
+					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
+					esRouter.getPath(dataspace, type, null, KStatus.ARCHIVED).index()
+				);
+			break;
+		case PUB_OR_DRAFT:
+			s.setIndices(
+					esRouter.getPath(dataspace, type, null, KStatus.PUBLISHED).index(),
+					esRouter.getPath(dataspace, type, null, KStatus.DRAFT).index()
+				);
+			break;
+		default:
+			// normal
+			s.setIndex(esRouter.getPath(dataspace, type, null, status).index());
+		}
 	}
 
 
