@@ -470,7 +470,7 @@ public final class IMAPClient implements Closeable {
 					msgs.length);
 			// Wrap as SimpleMessage -- and check they do fit the filter (remote filtering is unreliable).
 			for (Message message : msgs) {
-				Log.d(LOGTAG, user+" getEmails check "+message.getSubject()+" "+message.getSentDate()+"...");
+//				Log.d(LOGTAG, user+" getEmails check "+message.getSubject()+" "+message.getSentDate()+"...");
 				// fast check the date before we fetch any data
 				if (receivedAfter!=null && message.getReceivedDate()!=null) {
 					Time rd = new Time(message.getReceivedDate());
@@ -484,7 +484,7 @@ public final class IMAPClient implements Closeable {
 				SimpleMessage sm = SimpleMessage.create(message);
 				// Check it matches the search term -- the remote server can ignore them!
 				if (searchTerm!=null && ! searchTerm.match(sm)) {
-					Log.d(LOGTAG, user+" getEmails Skip "+sm.getMessageID()+" "+sm.getSubject()+" !~ "+searchTerm);
+//					Log.d(LOGTAG, user+" getEmails Skip "+sm.getMessageID()+" "+sm.getSubject()+" !~ "+searchTerm);
 					continue;
 				}
 				mails.add(sm);
