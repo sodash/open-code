@@ -34,6 +34,18 @@ public class HashTaggerTest {
 			HashTagger ht = new HashTagger("Look: #a\r\n #b	 foo");
 			assert Containers.same(ht.getTags(), Arrays.asList("a", "b"));
 		}	
+		{	// punctuation?
+			HashTagger ht = new HashTagger("Look: -#a. .#b,#c");
+			assert Containers.same(ht.getTags(), Arrays.asList("a", "b", "c")) : ht.getTags();
+		}
+	}
+	
+	@Test
+	public void testAvoidUrlHash() {
+		{
+			HashTagger ht = new HashTagger("http://good-loop.com/#about");
+			assert ht.getTags().isEmpty();
+		}
 	}
 	
 

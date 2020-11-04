@@ -48,7 +48,10 @@ public class HashTagger {
 	 * @return never null, can be empty. No duplicates. Lower-cased if {@link #setLowerCase(boolean)} is set -- as-is by default.
 	 */
 	public List<String> getTags() {
-		Matcher m = HASHTAG.matcher(text);
+		// hack: remove urls to avoid #s in them
+		String noUrlText = WebUtils.URL_REGEX.matcher(text).replaceAll("");
+		
+		Matcher m = HASHTAG.matcher(noUrlText);
 		ArraySet<String> tags = new ArraySet();
 		while(m.find()) {
 			String tag = m.group(1);
