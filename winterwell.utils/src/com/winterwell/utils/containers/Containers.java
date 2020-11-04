@@ -26,6 +26,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.winterwell.utils.BestOne;
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.IFn;
 import com.winterwell.utils.IProperties;
@@ -34,6 +35,7 @@ import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.NotUniqueException;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
@@ -1959,6 +1961,44 @@ public final class Containers  {
 		}		
 		// wrap a solo object as a 1-item list
 		return (List<X>) Collections.singletonList(itemOrListOrArray);
+	}
+
+
+	public static <X> X getLenient(Map<String, X> map, String key) {
+		// normal key?
+		X v = map.get(key);
+		if (v != null) return v;
+		// a few canonical forms
+		v = map.get(key.trim());
+		if (v != null) return v;
+		v = map.get(key.trim().toLowerCase());
+		if (v != null) return v;
+		v = map.get(key.trim().toUpperCase());
+		if (v != null) return v;
+		String ck = StrUtils.toCanonical(key);
+		v = map.get(ck);
+		if (v != null) return v;
+		v = map.get(ck.replaceAll(" ", "-"));
+		if (v != null) return v;
+		// search the keys
+		Set<String> keys = map.keySet();
+		BestOne<String> bestKey = new BestOne();		
+		for (String string : keys) {
+			String cs = StrUtils.toCanonical(string);
+			if (cs.startsWith(ck)) {
+				bestKey.maybeSet(string, 2);
+				continue;
+			}
+			if (cs.contains(ck)) {
+				bestKey.maybeSet(string, 1);
+				continue;
+			}
+		}
+		String k = bestKey.getBest(); // can be null
+		if (k==null) {
+			return null;
+		}
+		return map.get(k);
 	}
 
 
