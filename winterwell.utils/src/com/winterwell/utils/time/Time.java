@@ -37,7 +37,7 @@ import com.winterwell.utils.log.Log;
  * @author daniel
  * 
  */
-public class Time implements Serializable, Comparable<Time> {
+public final class Time implements Serializable, Comparable<Time> {
 	private static final long serialVersionUID = 1L;
 
 	private static GregorianCalendar getCal(int year, int month, int day,

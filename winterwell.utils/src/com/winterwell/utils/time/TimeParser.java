@@ -183,6 +183,12 @@ public class TimeParser {
 		return period.first;
 	}
 	
+	Time now = new Time();
+	
+	public void setNow(Time now) {
+		this.now = now;
+	}
+	
 	/**
 	 * yyyy-MM-dd -- be careful to sanity check values
 	 */
@@ -304,7 +310,7 @@ public class TimeParser {
 		
 		// put together a date
 		if (month != null) {
-			if (year==-1) year = new Time().getYear();
+			if (year==-1) year = now.getYear();
 			String formatPattern = "dd MMM yyyy";
 			if (day != null) formatPattern = "EEE " + formatPattern;
 			DateFormat df = new SimpleDateFormat(formatPattern);
@@ -338,11 +344,11 @@ public class TimeParser {
 		// special strings
 		if (s.equals("now")) {
 			if (isRelative!=null) isRelative.set(true);
-			return new Period(new Time());
+			return new Period(now);
 		}
 		if (s.equals("today")) {
 			if (isRelative!=null) isRelative.set(true);
-			return new Period(TimeUtils.getStartOfDay(new Time()), TimeUtils.getEndOfDay(new Time()));
+			return new Period(TimeUtils.getStartOfDay(now), TimeUtils.getEndOfDay(now));
 		}
 		if (s.equals("yesterday")) {
 			if (isRelative!=null) isRelative.set(true);
@@ -354,18 +360,19 @@ public class TimeParser {
 		}
 		
 		// HACK "start/end"
-		Pattern p = Pattern.compile("^(start|end)?( of )?");
+		Pattern p = Pattern.compile("^(start|end)?([\\- ]of[\\- ])?");
 		Matcher m = p.matcher(s);
 		String startEnd = null;
 		if (m.find()) {
 			startEnd = m.group(1);
 			s = s.substring(m.end());
 		}
-		
+		s = s.trim(); //paranoia
+		// HACK last next
 		if (s.startsWith("last")) {
 			if (isRelative!=null) isRelative.set(true);
 			if (day!=null) {
-				Time lastDay = new Time();
+				Time lastDay = now;
 				for(int i=0; i<7; i++) {
 					lastDay = lastDay.minus(TUnit.DAY);
 					String lday = lastDay.format("EEE");
@@ -375,10 +382,11 @@ public class TimeParser {
 				}				
 				return new Period(TimeUtils.getStartOfDay(lastDay), TimeUtils.getEndOfDay(lastDay));
 			}
-			s = s.replace("last", "1") + " ago";
+			// NB this handles "last week" and "last-week"
+			s = "1 "+s.substring(5)+" ago";
 		}
 		if (s.startsWith("next")) {
-			s = s.replace("next", "1") + " from now";
+			s = "1 "+s.substring(5)+" from now";
 		}
 		// a step spec, e.g. 1 week ago?
 		try {
@@ -386,15 +394,25 @@ public class TimeParser {
 			if (isRelative!=null) isRelative.set(true);
 			Time t;
 			if (s.contains("ago")) {				
-				t = new Time().minus(dt);
-			} else if (s.contains("this")) {
-				// HACK test for "this month"
+				t = now.minus(dt);
+			} else if (s.contains("this") || s.equals("month")) {
+				// HACK test for "this month" or "end-of-week"
 				// no-op
-				t = new Time();
-			} else if (s.trim().equals("month")) {
-				t = new Time();
+				t = now;
+			} else if (s.equals("week")) {
+				// HACK
+				t = now;
+				KDay dow = TimeUtils.getDayOfWeek(t);
+				int dn = dow.ordinal();
+				Time t2;
+				if ("start".equals(startEnd)) {
+					t2 = TimeUtils.getStartOfDay(t.minus(dn, TUnit.DAY));
+				} else {
+					t2 = TimeUtils.getEndOfDay(t.plus(7 - dn, TUnit.DAY));			
+				}
+				return new Period(t2);
 			} else {
-				t = new Time().plus(dt);
+				t = now.plus(dt);
 			}
 			if (startEnd==null) return new Period(t);
 			// TODO don't assume month -- also handle "start of last week"
