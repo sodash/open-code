@@ -59,7 +59,7 @@ public class MasterHttpServlet extends HttpServlet {
 	
 			// cors on
 			if (DataLogServer.settings.CORS) {
-				WebUtils2.CORS(request, true);
+				WebUtils2.CORS(request, true); // forceSet=true
 			}
 			
 			Log.d(request);

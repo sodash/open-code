@@ -664,7 +664,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	/**
-	 * Override to do anything. 
+	 * Called on outgoing json to add extra info IF augmentFlag is set. Override to do anything. 
 	 * @param jThing Modify this if you want
 	 * @param state
 	 * @see #augmentFlag
