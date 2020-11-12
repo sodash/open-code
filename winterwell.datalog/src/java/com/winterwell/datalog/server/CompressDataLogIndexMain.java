@@ -107,7 +107,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		Printer.out(response2);
 		
 		//stop the transform job after 5 seconds
-		Utils.sleep(5000);
+		Utils.sleep(10000);
 		TransformRequestBuilder trb3 = esc.prepareTransformStop("transform_job"); 
 		trb3.setDebug(true);
 		IESResponse response3 = trb3.get();
