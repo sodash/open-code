@@ -19,6 +19,7 @@ import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.utils.web.SimpleJson;
@@ -167,6 +168,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 			"os", String.class,
 			// no-index (object)
 			"xtra", Null.class, // FIXME this was causing bugs :(
+			"nonce", Null.class, 
 			"socialShareId", String.class // unique ID to identify where ad has been requested via link shared on social media
 			// mailing list / CRM??
 		));
@@ -281,7 +283,11 @@ public final class DataLogEvent implements Serializable, IHasJson
 
 	/**
 	 * Unique based on dataspace and (groupById OR eventType and properties). 
+	 * 
 	 * Does NOT include time though! So its NOT guaranteed unique!
+	 * The storage layer should bucket identical IDs within the same time-bucket.
+	 * If you need more fine-grained saving - then add a nonce / timestamp.
+	 * 
 	 * @param groupById Can be null 
 	 * @param dataLogEvent
 	 * @return ID -- if groupById is given, this is returned as-is (and time will not later be added).
@@ -307,7 +313,7 @@ public final class DataLogEvent implements Serializable, IHasJson
 			sb.append(v);
 			sb.append('&');
 		}
-		String txt = sb.toString();
+		String txt = sb.toString();						
 		return dataspace+"_"+getEventType()[0]+"_"+StrUtils.md5(txt);
 	}
 

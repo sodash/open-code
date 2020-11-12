@@ -365,10 +365,15 @@ public class ESStorage implements IDataLogStorage {
 					est = new ESType().geo_point();
 				}
 			} else if (cp.getValue()==Null.class) {
-				est = new ESType().object().noIndex();
+				// HACK primitive or object?
+				if ("nonce".equals(cp.getKey())) {
+					est = new ESType().keyword().noIndex();
+				} else {
+					est = new ESType().object().noIndex();
+				}
 			}
 			simpleEvent.property(cp.getKey(), est);
-		}
+		}		
 				
 		pm.setMapping(simpleEvent);
 		IESResponse res = pm.get();
