@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jetty.util.ajax.JSON;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.winterwell.data.AThing;
@@ -46,6 +48,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
@@ -980,6 +983,16 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	protected void doSave(WebRequest state) {		
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
+		
+		String diff = state.get("diff");
+		if (diff!=null) {
+			// TODO Instead of applying the diff here, why not save the diff directly using an ES update? That would allow for multiple editors
+			Object jdiff = JSON.parse(diff);
+			List<Map> diffs = Containers.asList(jdiff);
+			JThing<T> oldThing = getThingFromDB(state);
+			applyDiff(oldThing, diffs);
+		}
+		
 		T thing = getThing(state);
 		assert thing != null : "null thing?! "+state;
 		
@@ -1001,6 +1014,29 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 	}
 	
+
+	/**
+	 * 
+	 * @param room
+	 * @param diffs Each diff is {op:replace, path:/foo/bar, value:v}
+	 * TODO other ops 
+	 * @return
+	 */
+	void applyDiff(JThing<T> room, List<Map> diffs) {			
+		if (diffs.isEmpty()) {
+			return;
+		}
+		Map<String, Object> thingMap = room.map();
+		for (Map diff : diffs) {
+			String op = (String) diff.get("op"); // replace
+			String path = (String) diff.get("path");
+			Object value = diff.get("value");
+			// NB: drop the leading / on path
+			String[] bits = path.substring(1).split("/");
+			SimpleJson.set(thingMap, value, bits);
+		}
+		room.setMap(thingMap);
+	}
 
 	/**
 	 * Override to implement!
