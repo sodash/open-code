@@ -991,6 +991,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			List<Map> diffs = Containers.asList(jdiff);
 			JThing<T> oldThing = getThingFromDB(state);
 			applyDiff(oldThing, diffs);
+			jthing = oldThing; // NB: getThing(state) below will now return the diff-modified oldThing
 		}
 		
 		T thing = getThing(state);
@@ -1026,7 +1027,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (diffs.isEmpty()) {
 			return;
 		}
-		Map<String, Object> thingMap = room.map();
+		Map<String, Object> thingMap = new HashMap(room.map());
 		for (Map diff : diffs) {
 			String op = (String) diff.get("op"); // replace
 			String path = (String) diff.get("path");

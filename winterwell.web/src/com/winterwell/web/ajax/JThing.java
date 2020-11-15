@@ -94,6 +94,7 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 
 	/**
 	 * @return An unmodifiable map view.
+	 * This is unmodifiable for protection against careless edits. If you do want to edit this, do a new HashMap() copy.
 	 * @see #put(String, Object)
 	 */
 	public Map<String, Object> map() {
