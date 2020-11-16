@@ -18,6 +18,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/youagain-java-client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client"/>
 	<classpathentry kind="lib" path="lib/ua_parser.jar" sourcepath="lib/ua_parser.src.zip"/>
-	<classpathentry kind="lib" path="dependencies/snakeyaml.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
