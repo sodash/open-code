@@ -26,7 +26,7 @@ import com.winterwell.utils.containers.Range;
  * 
  * 
  * @author daniel
- * @testedby {@link Gaussian1DTest}
+ * @testedby  Gaussian1DTest}
  */
 public final class Gaussian1D extends ADistribution1D implements
 		IDistribution1D, IScalarArithmetic {

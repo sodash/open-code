@@ -3,7 +3,7 @@ package com.winterwell.maths.datastorage;
 /**
  * A true/false valued attribute. I.e. maps between true/false and doubles.
  * 
- * @testedby {@link BooleanAttributeTest}
+ * @testedby  BooleanAttributeTest}
  * @author daniel
  */
 public class BooleanColumn extends ColumnInfo<Boolean> {

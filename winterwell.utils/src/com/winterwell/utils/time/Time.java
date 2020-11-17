@@ -33,11 +33,11 @@ import com.winterwell.utils.log.Log;
  * Perfect date:
  * https://i2.wp.com/www.metdaan.com/wp-content/uploads/2018/01/25-44.jpg?w=700&ssl=1
  * 
- * @testedby {@link TimeTest}
+ * @testedby  TimeTest}
  * @author daniel
  * 
  */
-public class Time implements Serializable, Comparable<Time> {
+public final class Time implements Serializable, Comparable<Time> {
 	private static final long serialVersionUID = 1L;
 
 	private static GregorianCalendar getCal(int year, int month, int day,
@@ -152,7 +152,7 @@ public class Time implements Serializable, Comparable<Time> {
 	 * {@link TimeUtils#parse(String, String)} for other patterns. 
 	 * 
 	 * @param date Can be a UTC timecode, or something Date can parse, or a ISO 8601 format dateTtime. Cannot be null
-	 * @testedby {@link TimeTest#testTime()}
+	 * @testedby  TimeTest#testTime()}
 	 */
 	public Time(String date) {
 		if (date==null) throw new NullPointerException();

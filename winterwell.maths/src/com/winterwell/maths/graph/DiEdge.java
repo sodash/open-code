@@ -3,7 +3,7 @@ package com.winterwell.maths.graph;
 /**
  * An edge in a directed graph
  * 
- * @testedby {@link DiEdgeTest}
+ * @testedby  DiEdgeTest}
  * @author daniel
  */
 public class DiEdge<X> extends AEdge<DiNode<X>> implements

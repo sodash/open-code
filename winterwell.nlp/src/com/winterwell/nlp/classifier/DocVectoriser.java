@@ -14,7 +14,7 @@ import com.winterwell.nlp.io.Tkn;
  * uses a tokeniser to break up the doc.
  * 
  * @author daniel
- * @testedby {@link DocVectoriserTest}
+ * @testedby  DocVectoriserTest}
  */
 public class DocVectoriser extends Vectoriser<String, IDocument> {
 

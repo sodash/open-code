@@ -23,7 +23,7 @@ import com.winterwell.web.WebInputException;
  * TODO support for Set rules
  * 
  * @author daniel
- * @testedby {@link ListFieldTest}
+ * @testedby  ListFieldTest}
  */
 public class ListField<X> extends AField<List<X>> {
 

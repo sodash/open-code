@@ -303,7 +303,7 @@ public abstract class AFiniteDistribution<T> extends ADistributionBase<T>
 	 * distributions.
 	 * 
 	 * @return an x selected by random weight
-	 * @testedby {@link AFiniteDistributionTest#testSample()}
+	 * @testedby  AFiniteDistributionTest#testSample()}
 	 */
 	@Override
 	public T sample() {

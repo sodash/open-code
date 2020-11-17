@@ -31,7 +31,7 @@ import com.winterwell.utils.io.FileUtils;
  * Do NOT use this for serialisation! The format may change according to
  * aesthetic judgement. Numbers may be rounded off.
  * 
- * @testedby {@link PrinterTest}
+ * @testedby  PrinterTest}
  * @author daniel
  * 
  */
@@ -330,7 +330,7 @@ public class Printer {
 	/**
 	 * @param x
 	 * @return e.g. 1201.01 converts to 1,200
-	 * @testedby {@link PrinterTest#testPrettyNumber()}
+	 * @testedby  PrinterTest#testPrettyNumber()}
 	 */
 	public static String prettyNumber(double x) {
 		return prettyNumber(x, 3);
@@ -339,7 +339,7 @@ public class Printer {
 	/**
 	 * @param x
 	 * @return e.g. 1201.01 converts to 1,200
-	 * @testedby {@link PrinterTest#testPrettyNumber()}
+	 * @testedby  PrinterTest#testPrettyNumber()}
 	 */
 	public static String prettyNumber(double x, int sigFigs) {
 		// 10 millions?

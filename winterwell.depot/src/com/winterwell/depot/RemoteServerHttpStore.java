@@ -17,7 +17,7 @@ import com.winterwell.web.FakeBrowser;
  * 
  * Status: NOT used yet
  * @author daniel
- * @testedby {@link RemoteServerHttpStoreTest}
+ * @testedby  RemoteServerHttpStoreTest}
  */
 public class RemoteServerHttpStore extends AStore {
 	

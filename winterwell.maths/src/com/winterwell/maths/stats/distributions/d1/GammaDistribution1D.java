@@ -21,7 +21,7 @@ import com.winterwell.utils.Utils;
  * Useful as a prior for Bayesian work with normally distributed variables.
  * 
  * @author daniel
- * @testedby {@link GammaDistribution1DTest}
+ * @testedby  GammaDistribution1DTest}
  */
 public final class GammaDistribution1D extends ADistribution1D {
 

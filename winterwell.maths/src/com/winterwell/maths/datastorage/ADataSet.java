@@ -30,7 +30,7 @@ import no.uib.cipr.matrix.Vector;
  * TODO fetch columns by property bag, and sum-over-columns with a
  * {@link KMatchPolicy}
  * 
- * @testedby {@link DataSetTest}
+ * @testedby  DataSetTest}
  * @author daniel
  */
 public abstract class ADataSet implements IDataSet {

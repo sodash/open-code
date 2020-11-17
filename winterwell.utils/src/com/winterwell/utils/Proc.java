@@ -27,7 +27,7 @@ import com.winterwell.utils.time.Dt;
  * @author daniel
  *
  *         NB - named Proc to make it easy to distinguish from java.lang.Process
- * @testedby {@link ProcTest}
+ * @testedby  ProcTest}
  */
 public class Proc implements Closeable {
 	

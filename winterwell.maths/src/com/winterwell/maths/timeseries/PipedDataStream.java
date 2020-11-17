@@ -10,7 +10,7 @@ import com.winterwell.utils.containers.IOneShot;
  * A data stream which pipes out its data. A call to {@link #next()} will block
  * until either more data is available or the end of the stream is confirmed.
  * 
- * @testedby {@link PipedDataStreamTest}
+ * @testedby  PipedDataStreamTest}
  * 
  * @author daniel
  */

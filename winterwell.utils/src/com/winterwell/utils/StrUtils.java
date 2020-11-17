@@ -28,7 +28,7 @@ import com.winterwell.utils.web.WebUtils;
 
 /**
  * @see WebUtils for XML-related String handling
- * @testedby {@link StrUtilsTest}
+ * @testedby  StrUtilsTest}
  */
 public class StrUtils {
 
@@ -188,7 +188,7 @@ public class StrUtils {
 	 * @param input
 	 *            Can be null (returns null)
 	 * @return a string which is maxLength chars or less
-	 * @testedby {@link StrUtilsTest#testEllipsize()}
+	 * @testedby  StrUtilsTest#testEllipsize()}
 	 */
 	public static String ellipsize(String input, int maxLength) {
 		if (input == null)
@@ -445,7 +445,7 @@ public class StrUtils {
 	 * 
 	 * @param possNumber
 	 * @return true for e.g. "123" or "-2"
-	 * @testedby {@link StrUtilsTest#testIsInteger()}
+	 * @testedby  StrUtilsTest#testIsInteger()}
 	 */
 	public static boolean isInteger(String possNumber) {
 		if (possNumber==null || possNumber.isEmpty()) {
@@ -517,7 +517,7 @@ public class StrUtils {
 	 * @return true if txt is a none-empty single alphanumeric string (with no
 	 *         whitespace). Just a convenience for using the \w regex i.e.
 	 *         [A-Za-z0-9_]
-	 * @testedby {@link StrUtilsTest#testIsWord()}
+	 * @testedby  StrUtilsTest#testIsWord()}
 	 */
 	public static boolean isWord(String txt) {
 		if (txt==null) return false;
@@ -533,7 +533,7 @@ public class StrUtils {
 	 * @param txt
 	 * @return true if txt is a non-empty single alphanumeric string possibly
 	 *         containing period, underscore and hyphen. e.g. "foo.bar" but not "foo bar;"
-	 * @testedby {@link StrUtilsTest#testIsWordlike()}
+	 * @testedby  StrUtilsTest#testIsWordlike()}
 	 */
 	public static boolean isWordlike(String txt) {
 		if (txt==null) return false;
@@ -743,7 +743,7 @@ public class StrUtils {
 	 *            KErrorPolicy.RETURN_NULL will substitute ? for unrecognised
 	 *            chars.
 	 * @return ascii text
-	 * @testedby {@link StrUtilsTest#testNormalise()}
+	 * @testedby  StrUtilsTest#testNormalise()}
 	 */
 	public static String normalise(String unicode, KErrorPolicy onUnrecognisableChar) 
 			throws IllegalArgumentException 
@@ -962,7 +962,7 @@ public class StrUtils {
 	 * @return May be empty if the input is blank
 	 * 
 	 * @see
-	 * @testedby {@link StrUtilsTest#split()}
+	 * @testedby  StrUtilsTest#split()}
 	 */
 	public static List<String> split(String line) {
 		if (line == null || line.length() == 0)
@@ -1067,7 +1067,7 @@ public class StrUtils {
 	 * 
 	 * @param message
 	 * @return
-	 * @testedby {@link StrUtilsTest#testSplitBlocks()}
+	 * @testedby  StrUtilsTest#testSplitBlocks()}
 	 */
 	public static String[] splitBlocks(String message) {
 		return message.split("\\s*\r?\n\\s*\r?\n"); // TODO a better regex
@@ -1184,7 +1184,7 @@ public class StrUtils {
 	 *         whitespace & trim, normalised (no accents if recognised), and all punctuation
 	 *         is converted into spaces. Never null.
 	 * 
-	 * @testedby {@link StrUtilsTest#testToCanonical()}
+	 * @testedby  StrUtilsTest#testToCanonical()}
 	 */
 	public static String toCanonical(String string) {
 		if (string == null)
@@ -1265,7 +1265,7 @@ public class StrUtils {
 	 * @param x
 	 * @param n
 	 * @return
-	 * @testedby {@link StrUtilsTest#testToNSigFigs()}
+	 * @testedby  StrUtilsTest#testToNSigFigs()}
 	 */
 	public static String toNSigFigs(double x, int n) {
 		assert n > 0;
@@ -1315,7 +1315,7 @@ public class StrUtils {
 	 * letter only E.g. daniel to Daniel, the monkeys to The Monkeys, BOB to
 	 * Bob. Allows apostrophes to be in words. Handles multiple words.
 	 * 
-	 * @testedby {@link StrUtilsTest#testToTitleCase1()}
+	 * @testedby  StrUtilsTest#testToTitleCase1()}
 	 */
 	public static String toTitleCase(String title) {
 		if (title.length() < 2)
@@ -1348,7 +1348,7 @@ public class StrUtils {
 	 *         from "spoon mcguffin" Hm... could move to NLP where it could also
 	 *         know about stop words
 	 * 
-	 * @testedby {@link StrUtilsTest#testToTitleCasePlus}
+	 * @testedby  StrUtilsTest#testToTitleCasePlus}
 	 */
 	public static String toTitleCasePlus(String wouldBeTitle) {
 		String[] words = wouldBeTitle.split("(_|\\s+)");
@@ -1856,6 +1856,22 @@ public class StrUtils {
 			pop(sb, 1);
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Pop any quotes - remove optional wrapping "s or 's
+	 * @param "s" Can be null (returns null)
+	 * @return unwrapped s, or just s
+	 */
+	public static String unquote(String s) {
+		if (s==null) return null;
+		if (s.startsWith("\"") && s.endsWith("\"")) {
+			s = s.substring(1, s.length()-1);
+		}
+		if (s.startsWith("'") && s.endsWith("'")) {
+			s = s.substring(1, s.length()-1);
+		}
+		return s;
 	}
 
 }

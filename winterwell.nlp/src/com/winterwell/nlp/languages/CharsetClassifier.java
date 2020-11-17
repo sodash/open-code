@@ -22,7 +22,7 @@ import com.winterwell.utils.containers.IntRange;
  * 
  * 
  * @author daniel
- * @testedby {@link CharsetClassifierTest}
+ * @testedby  CharsetClassifierTest}
  */
 public class CharsetClassifier implements ITextClassifier<String> {
 

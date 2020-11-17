@@ -11,6 +11,15 @@ import com.winterwell.web.data.XId;
 public class WebEx extends RuntimeException {
 	
 	/**
+	 * @return Can be empty, never null.
+	 */
+	@Override
+	public String getMessage() {	
+		String m = super.getMessage();		
+		return m == null? "" : m;
+	}
+	
+	/**
 	 * Loop detected
 	 */
 	public static class E508Loop extends WebEx.E50X {

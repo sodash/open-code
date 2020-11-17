@@ -15,7 +15,7 @@ import com.winterwell.utils.containers.Cache;
  * 
  * Uses the datastore/winterwell.nlp file for "short-names.txt" 
  * 
- * @testedby {@link ShortNameDictionaryTest}
+ * @testedby  ShortNameDictionaryTest}
  * @author daniel
  */
 public class ShortNameDictionary extends Dictionary {

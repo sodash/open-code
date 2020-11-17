@@ -110,7 +110,7 @@ class RSIterator implements Iterator<Object[]> {
  *
  * @see JpaUtils
  * @author daniel
- * @testedby {@link SqlUtilsTest}
+ * @testedby  SqlUtilsTest}
  */
 public class SqlUtils {
 

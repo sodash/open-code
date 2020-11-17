@@ -12,7 +12,7 @@ import com.winterwell.utils.containers.AbstractIterator;
  * form of resampling-to-alter-class-distribution. Can cope with infinite data
  * streams, but does not shuffle the data.
  * 
- * @testedby {@link ResampledDataStreamTest}
+ * @testedby  ResampledDataStreamTest}
  * 
  * @author daniel
  * 

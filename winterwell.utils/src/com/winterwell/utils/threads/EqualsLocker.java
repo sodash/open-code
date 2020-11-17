@@ -26,7 +26,7 @@ import com.winterwell.utils.log.Log;
  * @param <X>
  *            The type of thing you want to lock (not really important).
  * @author daniel
- * @testedby {@link EqualsLockerTest}
+ * @testedby  EqualsLockerTest}
  */
 public final class EqualsLocker<X> {
 

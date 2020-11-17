@@ -31,7 +31,7 @@ import com.winterwell.utils.web.SimpleJson;
  * TODO should we add substring searching? E.g. *?
  * 
  * @author daniel, Alex
- * @testedby {@link SearchQueryTest}
+ * @testedby  SearchQueryTest}
  */
 public class SearchQuery implements Serializable, IHasJson {
 
@@ -324,7 +324,7 @@ public class SearchQuery implements Serializable, IHasJson {
 	 * @return true if this search term (ignoring service, language and
 	 *         location) matches this text. I.e. the search term is contained in the text. 
 	 *         
-	 * @testedby {@link SearchSpecTest#testMatches()}
+	 * @testedby  SearchSpecTest#testMatches()}
 	 */
 	public boolean matches(String text) {
 		if (canonicalise) {

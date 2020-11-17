@@ -8,7 +8,7 @@ import java.io.PrintWriter;
  * The stacktrace will be that of the original exception.
  * 
  * @author daniel
- * @testedby {@link WrappedExceptionTest}
+ * @testedby  WrappedExceptionTest}
  */
 public class WrappedException extends RuntimeException {
 	private static final long serialVersionUID = 1L;

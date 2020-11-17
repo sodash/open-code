@@ -9,7 +9,7 @@ import com.winterwell.utils.containers.Pair;
  * A specific time-period - this is just a pair of Times with some convenience
  * methods. immutable
  * 
- * @testedby {@link PeriodTest}
+ * @testedby  PeriodTest}
  * @author daniel
  */
 public final class Period extends Pair<Time> {

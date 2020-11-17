@@ -98,7 +98,7 @@ final class TimestampConverter implements SingleValueConverter {
  * Separated out to isolate the XStream dependency.
  * 
  * @author daniel
- * @testedby {@link XStreamUtilsTest}
+ * @testedby  XStreamUtilsTest}
  */
 public class XStreamUtils {
 

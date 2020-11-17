@@ -6,7 +6,7 @@ import no.uib.cipr.matrix.Matrix;
  * Apply a matrix to all vectors.
  * 
  * @author daniel
- * @testedby {@link MatrixStreamTest}
+ * @testedby  MatrixStreamTest}
  */
 public class MatrixStream extends FilteredDataStream {
 

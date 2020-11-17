@@ -260,7 +260,7 @@ public class WebUtilsTest extends TestCase {
 	public void testParseXmlToTreeSnippet() {
 		Tree<XMLNode> tree = WebUtils
 				.parseXmlToTree("<test><foo a='1'>bar</foo></test>");
-		assert tree.getDepth() == 4 : tree;
+		assert tree.getMaxDepthToLeaf() == 4 : tree;
 		assert tree.getValue() == null;
 		assert tree.getOnlyChild().getValue().getTag().equals("test");
 		XMLNode textNode = tree.getNode(0, 0, 0).getValue();

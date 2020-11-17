@@ -16,7 +16,7 @@ import com.winterwell.web.FakeBrowser;
  * FIXME this won't download the dependencies though :(
  * 
  * @author daniel
- * @testedby {@link WWDependencyTaskTest}
+ * @testedby  WWDependencyTaskTest}
  */
 public class WWDependencyTask extends BuildWinterwellProject {
 

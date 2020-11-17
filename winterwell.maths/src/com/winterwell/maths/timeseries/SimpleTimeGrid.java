@@ -13,7 +13,7 @@ import com.winterwell.utils.time.TimeUtils;
  * WARNING: uses millisecond arithmetic -- not calendar arithmetic! 
  * So it cannot handle eg a 1 month grid
  * @author daniel
- * @testedby {@link SimpleTimeGridTest}
+ * @testedby  SimpleTimeGridTest}
  */
 public class SimpleTimeGrid implements ITimeGrid {
 

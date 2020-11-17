@@ -7,7 +7,7 @@ package com.winterwell.web.fields;
  * A text-entry field whose values are interpreted as doubles.
  * 
  * @author daniel TODO javascript validater
- * @testedby {@link DoubleFieldTest}
+ * @testedby  DoubleFieldTest}
  */
 public class DoubleField extends AField<Double> {
 

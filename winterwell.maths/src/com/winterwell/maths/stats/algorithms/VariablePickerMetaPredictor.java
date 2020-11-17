@@ -23,7 +23,7 @@ import no.uib.cipr.matrix.Vector;
 
 /**
  * Too many inputs? Use greedy hill-climbing to select which variables to use.
- * @testedby {@link VariablePickerMetaPredictorTest}
+ * @testedby  VariablePickerMetaPredictorTest}
  * @author daniel
  *
  */

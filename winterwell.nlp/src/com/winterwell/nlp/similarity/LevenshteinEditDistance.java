@@ -7,7 +7,7 @@ import java.util.List;
  * Damerau-Levenshtein edit distance, as copied from Wikipedia
  * 
  * @author daniel
- * @testedby {@link LevenshteinEditDistanceTest}
+ * @testedby  LevenshteinEditDistanceTest}
  */
 public class LevenshteinEditDistance implements ICompareWords {
 

@@ -24,7 +24,7 @@ import com.winterwell.utils.time.TimeUtils;
 public class DatalogTestCase {
 
 	public DatalogTestCase() {
-		initSQL();
+//		initSQL(); not by default
 	}
 	
 	/**

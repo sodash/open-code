@@ -39,7 +39,7 @@ import no.uib.cipr.matrix.Vector.Norm;
 /**
  * Why don't the usual Java suspects have a KalmanFilter that implements learning?
  * @author daniel
- * @testedby {@link KalmanFilterTest}
+ * @testedby  KalmanFilterTest}
  */
 public class KalmanFilter implements ITrainable.Unsupervised<Vector>, ITimeSeriesFilter {
 

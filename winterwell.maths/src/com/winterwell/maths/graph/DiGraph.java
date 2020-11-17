@@ -16,7 +16,7 @@ import com.winterwell.utils.containers.Containers;
  * 
  * @param <N>
  *            values stored at nodes
- * @testedby {@link DiGraphTest}
+ * @testedby  DiGraphTest}
  */
 public class DiGraph<N> implements IGraph.Directed<DiNode<N>> {
 

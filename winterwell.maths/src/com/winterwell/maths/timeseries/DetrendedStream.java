@@ -13,7 +13,7 @@ import no.uib.cipr.matrix.Vector;
  * Obviously, if there is a non-linear trend then this won't (fully) remove it.
  * 
  * @author daniel
- * @testedby {@link DetrendedStreamTest}
+ * @testedby  DetrendedStreamTest}
  */
 public class DetrendedStream extends ADataStream {
 	private static final long serialVersionUID = 1L;

@@ -11,7 +11,7 @@ import com.winterwell.utils.web.WebUtils;
  * the author of the item.
  * 
  * 
- * @testedby {@link RSSWriterTest}
+ * @testedby  RSSWriterTest}
  * @author daniel
  */
 public class RSSWriter {

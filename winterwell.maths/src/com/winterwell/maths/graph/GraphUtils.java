@@ -10,7 +10,7 @@ import no.uib.cipr.matrix.Matrix;
 /**
  * 
  * @author Daniel
- * @testedby {@link GraphUtilsTest}
+ * @testedby  GraphUtilsTest}
  */
 public final class GraphUtils {
 

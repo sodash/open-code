@@ -12,7 +12,7 @@ import com.winterwell.utils.web.WebUtils;
  * command-line or SQL hacks!
  * 
  * @author daniel
- * @testedby {@link SafeStringTest}
+ * @testedby  SafeStringTest}
  */
 public class SafeString extends AField<String> {
 

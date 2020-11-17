@@ -3,7 +3,7 @@ package com.winterwell.maths;
 /**
  * Info on a 1D grid. This is a "bucket selector". It uses uniformly sized buckets.
  * 
- * @testedby {@link GridInfoTest}
+ * @testedby  GridInfoTest}
  * @author daniel
  * 
  */

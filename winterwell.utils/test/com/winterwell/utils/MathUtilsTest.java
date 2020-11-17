@@ -145,7 +145,7 @@ public class MathUtilsTest extends TestCase {
 		assert MathUtils.getNumber(null) == 0;
 		assert MathUtils.getNumber("") == 0;
 		assert MathUtils.getNumber("0") == 0;
-		assert MathUtils.getNumber("-1") == -1;
+		assert MathUtils.getNumber("-1") == -1 : MathUtils.getNumber("-1");
 		assert MathUtils.getNumber("-1-2") == 0;
 		assert MathUtils.getNumber("-99") == -99;
 		assert MathUtils.getNumber("1") == 1;
@@ -161,9 +161,18 @@ public class MathUtilsTest extends TestCase {
 
 		assert MathUtils.getNumber("1,002") == 1002 : MathUtils.getNumber("1,002");
 		
+		assert MathUtils.getNumber("-2,011,002") == -2011002;
+		
 		assert MathUtils.getNumber("2nite") == 0;
 	}
 
+	public void testGetNumberOddSpacing() {
+		// bug seen Oct 2020 with a g-sheet
+		String s = " £ 95,958 ";
+		double n = MathUtils.getNumber(s);
+		assert n == 95958 : n;
+	}
+	
 	public void testIsFinite() {
 		assert MathUtils.isFinite(1);
 		assert MathUtils.isFinite(Double.NEGATIVE_INFINITY) == false;

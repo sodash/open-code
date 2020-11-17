@@ -8,7 +8,7 @@ import com.winterwell.utils.containers.ArraySet;
  * A node in a directed graph.
  * 
  * @param <X>
- * @testedby {@link DiNodeTest}
+ * @testedby  DiNodeTest}
  * @author daniel
  */
 public class DiNode<X> implements IHasValue<X> {

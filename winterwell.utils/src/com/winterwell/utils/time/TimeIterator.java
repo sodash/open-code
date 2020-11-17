@@ -9,7 +9,7 @@ import com.winterwell.utils.containers.Containers;
 /**
  * Iterate through a range of dates.
  * 
- * @testedby {@link TimeIteratorTest}
+ * @testedby  TimeIteratorTest}
  * @author Daniel
  */
 public final class TimeIterator implements Iterable<Time> {

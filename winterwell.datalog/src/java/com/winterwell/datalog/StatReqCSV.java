@@ -21,7 +21,7 @@ import com.winterwell.utils.time.TimeUtils;
 
 /**
  * An CSV implementation of the StatReq.
- * @testedby {@link StatReqCSVTest}
+ * @testedby  StatReqCSVTest}
  * @author daniel
  * @param <X>
  */

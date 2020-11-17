@@ -41,7 +41,7 @@ import com.winterwell.utils.Utils;
  *          exception!
  * 
  * @author daniel
- * @testedby {@link XStreamBinaryConverterTest}
+ * @testedby  XStreamBinaryConverterTest}
  */
 public class XStreamBinaryConverter implements SingleValueConverter {
 

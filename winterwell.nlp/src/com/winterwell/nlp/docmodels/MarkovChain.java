@@ -41,7 +41,7 @@ import no.uib.cipr.matrix.sparse.SparseVector;
  * 
  * @see MultiResolutionDocModel
  * 
- * @testedby {@link MarkovChainTest}
+ * @testedby  MarkovChainTest}
  * @author daniel
  * 
  */

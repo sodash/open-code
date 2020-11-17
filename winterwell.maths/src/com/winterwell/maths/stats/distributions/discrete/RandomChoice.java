@@ -16,7 +16,7 @@ import com.winterwell.utils.containers.ArraySet;
 /**
  * A true/false distribution.
  * 
- * @testedby {@link RandomChoiceTest}
+ * @testedby  RandomChoiceTest}
  * @author daniel
  * @see Random01
  */

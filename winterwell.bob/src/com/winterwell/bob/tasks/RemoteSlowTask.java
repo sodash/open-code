@@ -4,7 +4,7 @@ package com.winterwell.bob.tasks;
 /**
  * Use nohup to start a remote task which may take some time.
  * @author daniel
- * @testedby {@link RemoteSlowTaskTest}
+ * @testedby  RemoteSlowTaskTest}
  */
 public class RemoteSlowTask extends ProcessTask {
 

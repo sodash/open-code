@@ -61,7 +61,7 @@ try {
 </pre></code>
 Note: Locks will get broken if thread-death occurs.
  *
- * @testedby {@link LockTest}
+ * @testedby  LockTest}
  * @author Daniel
  */
 public final class Lock implements AutoCloseable {

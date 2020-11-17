@@ -6,7 +6,7 @@ import com.winterwell.utils.containers.Containers;
 
 /**
  * Diff and merge for arrays. Just wraps {@link ListMerger}
- * @testedby {@link ListMergerTest}
+ * @testedby  ListMergerTest}
  * @author daniel
  */
 public class ArrayMerger extends AMerger<Object> {

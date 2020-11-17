@@ -33,7 +33,7 @@ import com.winterwell.utils.web.WebUtils2;
  * This would be better/easier if it could do several passes over the data.
  *
  * @author daniel
- * @testedby {@link PhraseFinderOnlineTest}
+ * @testedby  PhraseFinderOnlineTest}
  */
 public class PhraseFinderOnline extends ATrainableBase<IDocument, Object> implements
 ITrainable.Unsupervised.Weighted<IDocument>, IPhraseFinder {

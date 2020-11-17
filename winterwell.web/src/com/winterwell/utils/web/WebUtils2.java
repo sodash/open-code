@@ -88,7 +88,7 @@ import eu.medsea.mimeutil.MimeUtil;
  * 
  * @author daniel
  * 
- * @testedby {@link WebUtils2Test}
+ * @testedby  WebUtils2Test}
  */
 public class WebUtils2 extends WebUtils {
 
@@ -644,7 +644,7 @@ public class WebUtils2 extends WebUtils {
 	
 	/**
 	 * Unescape entities. E.g. "&amp;" becomes just "&"
-	 * @testedby {@link WebUtils2Test#testHtmlDecode()}
+	 * @testedby  WebUtils2Test#testHtmlDecode()}
 	 */
 	public static String htmlDecode(final String plain) {
 		// Apache turned out to be a bottleneck!
@@ -693,7 +693,7 @@ public class WebUtils2 extends WebUtils {
 	 * 
 	 * @param url
 	 * @return
-	 * @testedby {@link CGIUtilsTest#testGetQueryParameters()}
+	 * @testedby  CGIUtilsTest#testGetQueryParameters()}
 	 */
 	public static Map<String, String> getQueryParameters(String url) {
 		int i = url.indexOf('?');
@@ -834,7 +834,7 @@ public class WebUtils2 extends WebUtils {
 	 * @param v
 	 *            String to encode. Can be null (returns null)
 	 * @see #htmlDecode(String)
-	 * @testedby {@link CGIUtilsTest#testHtmlEncode()}
+	 * @testedby  CGIUtilsTest#testHtmlEncode()}
 	 */
 	public static String htmlEncode(String v) {
 		if (v == null)
@@ -921,7 +921,7 @@ public class WebUtils2 extends WebUtils {
 	 * @param email
 	 * @return true if this is a valid email address. Accepts addresses with or
 	 *         without names, e.g. "Bob &lt;bob@bobserver.com&gt;" is OK
-	 * @testedby {@link CGIUtilsTest#testIsValidEmail()}
+	 * @testedby  CGIUtilsTest#testIsValidEmail()}
 	 */
 	public static boolean isValidEmail(String email) {
 		if (email == null)
@@ -1126,7 +1126,7 @@ public class WebUtils2 extends WebUtils {
 	 * @param output
 	 * @param response
 	 * @throws IOException
-	 * @testedby {@link CGIUtilsTest#testSendJson}
+	 * @testedby  CGIUtilsTest#testSendJson}
 	 */
 	public static void sendJson(JsonResponse output, HttpServletResponse response) throws IOException {
 		// HACK
@@ -1148,7 +1148,7 @@ public class WebUtils2 extends WebUtils {
 	 * @param output
 	 * @param response
 	 * @throws IOException
-	 * @testedby {@link CGIUtilsTest#testSendJson}
+	 * @testedby  CGIUtilsTest#testSendJson}
 	 */
 	public static void sendJson(JsonResponse output, WebRequest req) throws IOException {		
 		// convert to JSON

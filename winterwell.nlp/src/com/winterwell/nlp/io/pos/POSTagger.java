@@ -19,7 +19,7 @@ import com.winterwell.nlp.io.ITokenStream;
 import com.winterwell.nlp.io.Tkn;
 
 /**
- * @testedby {@link POSTaggerTest}
+ * @testedby  POSTaggerTest}
  * @author daniel
  * 
  */

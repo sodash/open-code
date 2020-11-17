@@ -34,7 +34,7 @@ import com.winterwell.utils.time.Time;
  * 
  * See also Bob's Classpath
  * 
- * @testedby {@link ReflectionUtilsTest}
+ * @testedby  ReflectionUtilsTest}
  */
 public class ReflectionUtils {
 		
@@ -165,7 +165,7 @@ public class ReflectionUtils {
 	 *            The search will start from here. It recursively explores all
 	 *            sub-packages.
 	 * @return classes implementing implementMe
-	 * @testedby {@link ReflectionUtilsTest#testFindClasses()}
+	 * @testedby  ReflectionUtilsTest#testFindClasses()}
 	 */
 	public static List<Class> findClasses(Class implementMe,
 			Class packageIndicator) {

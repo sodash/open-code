@@ -23,7 +23,7 @@
 // * A crude thing that relies on stopword lists.
 // * 
 // * @author daniel
-// * @testedby {@link LanguageClassifierTest}
+// * @testedby  LanguageClassifierTest}
 // */
 //public class LanguageClassifier implements ITextClassifier<String> {
 //

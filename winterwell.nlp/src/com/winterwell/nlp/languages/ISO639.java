@@ -16,7 +16,7 @@ import com.winterwell.utils.StrUtils;
  * E.g. English is "en"
  * 
  * @author daniel
- * @testedby {@link ISO639Test}
+ * @testedby  ISO639Test}
  * @see ISO3166
  */
 public final class ISO639 {

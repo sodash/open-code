@@ -17,7 +17,7 @@ import no.uib.cipr.matrix.Vector;
  * A data stream from sampling a distribution
  * 
  * @author daniel
- * @testedby {@link RandomDataStreamTest}
+ * @testedby  RandomDataStreamTest}
  */
 public class RandomDataStream extends ADataStream {
 	private static final long serialVersionUID = 1L;

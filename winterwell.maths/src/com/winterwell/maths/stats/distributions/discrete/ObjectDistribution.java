@@ -33,7 +33,7 @@ import com.winterwell.utils.web.SimpleJson;
  *
  * @author daniel
  *
- * @testedby {@link ObjectDistributionTest}
+ * @testedby  ObjectDistributionTest}
  * @param <X>
  */
 public class ObjectDistribution<X> extends AFiniteDistribution<X> implements

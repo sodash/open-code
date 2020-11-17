@@ -8,7 +8,7 @@ import java.io.Serializable;
  * 
  * Very limited at present!
  * 
- * @testedby {@link HTMLColorTest}
+ * @testedby  HTMLColorTest}
  * @author daniel
  */
 public class HTMLColor implements Serializable {

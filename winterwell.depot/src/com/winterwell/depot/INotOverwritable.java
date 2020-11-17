@@ -9,7 +9,7 @@ package com.winterwell.depot;
  * Note: You ARE allowed to overwrite if you use {@link Desc#markForMerge()}.
  * 
  * @author daniel
- * @testedby {@link INotOverwritableTest}
+ * @testedby  INotOverwritableTest}
  */
 public interface INotOverwritable {
 

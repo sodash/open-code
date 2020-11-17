@@ -26,7 +26,7 @@ import no.uib.cipr.matrix.Vector;
  * Use with {@link TimeSlicer} to build histograms over time. See
  * {@link #ListDataStream(int, TimeSlicer)}
  * 
- * @testedby {@link ListDataStreamTest}
+ * @testedby  ListDataStreamTest}
  * @author Daniel
  */
 @BinaryXML

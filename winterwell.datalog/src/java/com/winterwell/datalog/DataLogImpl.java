@@ -54,7 +54,7 @@ import com.winterwell.utils.time.TimeUtils;
  *
  * TODO calculate correlations & other stats for the top 100 tags??
  *
- * @testedby {@link StatImplTest}
+ * @testedby  StatImplTest}
  * @author daniel
  * @see DataLog
  */
@@ -474,6 +474,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 	@Override
 	public final void flush() {
 		doSave();
+		storage.flush();
 	}
 
 	@Deprecated
@@ -622,22 +623,10 @@ public class DataLogImpl implements Closeable, IDataLog {
 			cbman.send(event);		
 			return;
 		}
+		
 		// turn it into a plain stag
 		String stag = event2tag(event.dataspace, event.toJson2());
 		count(event.count, stag);
-//		// bucket??
-//		DataLogEvent oldValue = id2event.putIfAbsent(event.getId(), event);		
-//		if (oldValue==null) return;
-//		// TODO merge non-ID props, when we have non-ID props
-//		DataLogEvent sum = new DataLogEvent(event.dataspace, event.count+oldValue.count, event.eventType, event.props);
-//		assert sum.getId().equals(event.getId());
-//		for(int i=0; i<10; i++) {			
-//			boolean done = id2event.replace(event.getId(), oldValue, sum);
-//			if (done) return;
-//		}		
-//		// drop it :(
-//		Log.e("datalog", "Could not count "+event);
-		
 		// callback
 		CallbackManager cbman = Dep.get(CallbackManager.class);
 		cbman.send(event);		

@@ -9,7 +9,7 @@ import com.winterwell.utils.containers.AbstractIterator;
 /**
  * Chop text into sentences.
  * 
- * @testedby {@link SentenceStreamTest}
+ * @testedby  SentenceStreamTest}
  * @author daniel
  * 
  */

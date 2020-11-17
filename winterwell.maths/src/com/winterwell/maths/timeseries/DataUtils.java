@@ -358,7 +358,7 @@ public class DataUtils extends StatsUtils {
 	 * Lazily read contents of a file created by save. Closes the file when
 	 * done.
 	 * 
-	 * @testedby {@link DataUtilsTest#testSaveRead1D()}
+	 * @testedby  DataUtilsTest#testSaveRead1D()}
 	 */
 	public static IDataStream read(final File streamData) {
 		// Find out the dimensions
@@ -1013,7 +1013,7 @@ public class DataUtils extends StatsUtils {
 	 * @param x
 	 * @param y
 	 * @return x append y, which has dimennsions dim(x)+dimm(y)
-	 * @testedby {@link VectorUtilsTest#testAppend()}
+	 * @testedby  VectorUtilsTest#testAppend()}
 	 */
 	public static Vector append(Vector x, Vector y) {
 		// if (x instanceof DenseVector && y instanceof DenseVector) {
@@ -1291,7 +1291,7 @@ public class DataUtils extends StatsUtils {
 	 * @param vector
 	 * @param num
 	 * @return Can return less than n if the vector is small.
-	 * @testedby {@link VectorUtilsTest#testGetSortedIndices()}
+	 * @testedby  VectorUtilsTest#testGetSortedIndices()}
 	 */
 	public static List<Integer> getSortedIndices(final Vector vector, int num) {
 		TopNList<Integer> topn = new TopNList<Integer>(num,

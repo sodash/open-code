@@ -28,6 +28,8 @@ import com.winterwell.utils.log.Log;
  * "standards" compliant as per
  * http://en.wikipedia.org/wiki/Comma-separated_values
  *
+ * It does not trim whitespace.
+ *
  * Policy for handling incorrectly sized records is defined by
  * {@link #reportBadRecord(int, String[])}
  *
@@ -36,7 +38,7 @@ import com.winterwell.utils.log.Log;
  *
  * TODO refactor to use AbstractIterator TODO add skipTo(Time)
  *
- * @testedby {@link CSVReaderTest}
+ * @testedby  CSVReaderTest}
  * @author Daniel, Joe Halliwell <joe@winterwell.com>
  *
  */

@@ -18,7 +18,7 @@ import com.winterwell.utils.web.SimpleJson;
  * http://thejit.org/static/v20/Docs/files/Options/Options-Node-js.html
  * 
  * @author daniel
- * @testedby {@link RenderGraph_InfoVisJsTest}
+ * @testedby  RenderGraph_InfoVisJsTest}
  */
 public class RenderGraph_InfoVisJs {
 

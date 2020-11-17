@@ -158,6 +158,9 @@ public class AThing implements IInit {
 				+ "]";
 	}
 
+	/**
+	 * class + id
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

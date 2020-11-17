@@ -33,7 +33,7 @@ import com.winterwell.utils.web.XStreamUtils;
  * A simple file-based depot.
  * 
  * @author daniel
- * @testedby {@link FileStoreTest}
+ * @testedby  FileStoreTest}
  */
 public class FileStore implements IStore {
 

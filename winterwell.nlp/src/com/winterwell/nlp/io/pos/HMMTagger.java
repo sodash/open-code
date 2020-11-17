@@ -14,7 +14,7 @@ import com.winterwell.utils.containers.AbstractIterator;
  * Use a Hidden Markov Model to apply tags
  * 
  * @author daniel
- * @testedby {@link HMMTaggerTest}
+ * @testedby  HMMTaggerTest}
  */
 public class HMMTagger<X> extends ATokenStream {
 

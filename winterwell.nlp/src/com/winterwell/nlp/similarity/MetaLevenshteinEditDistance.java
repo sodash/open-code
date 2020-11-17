@@ -13,7 +13,7 @@ import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
  * Applies {@link LevenshteinEditDistance} at both the word and character level.
  * 
  * @author daniel
- * @testedby {@link MetaLevenshteinEditDistanceTest}
+ * @testedby  MetaLevenshteinEditDistanceTest}
  */
 public class MetaLevenshteinEditDistance extends LevenshteinEditDistance {
 

@@ -11,6 +11,8 @@ import java.util.Set;
 
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Mutable;
+import com.winterwell.utils.Printer;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Printer.IPrinter;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.AbstractMap2;
@@ -25,7 +27,7 @@ import com.winterwell.utils.containers.IntRange;
  * Why? To avoid external dependencies and crockford's org.json jar. Advice: Use
  * Jetty's JSON class instead. Or Gson.
  * 
- * @testedby {@link SimpleJsonTest}
+ * @testedby  SimpleJsonTest}
  * @author daniel
  */
 public class SimpleJson {
@@ -54,20 +56,29 @@ public class SimpleJson {
 		for (int i = 0; i < fields.length; i++) {
 			// object property
 			Object fi = fields[i];
-			if (fi instanceof String && jsonObj instanceof Map) {
-				String f = (String) fi;
-				Object jsonObj2 = ((Map) jsonObj).get(f);
-				if (jsonObj2 == null) {
-//					throw new NullPointerException(jsonObj + ".." + f);
-					return null;
-				}
-				jsonObj = jsonObj2;
-				continue;
-			}
-			// array
 			if (fi instanceof String) {
-				fi = Integer.valueOf((String)fi);
-			}
+				String f = (String) fi;
+				if (jsonObj instanceof Map) {					
+					Object jsonObj2 = ((Map) jsonObj).get(f);
+					if (jsonObj2 == null) {
+	//					throw new NullPointerException(jsonObj + ".." + f);
+						return null;
+					}
+					jsonObj = jsonObj2;
+					continue;
+				}
+				// array index?
+				if (StrUtils.isInteger(f)) {
+					fi = Integer.valueOf(f);
+					// cary on below...
+				} else {
+					// try POJO access?
+					Object v = ReflectionUtils.getPrivateField(jsonObj, f);
+					jsonObj = v;
+					continue;
+//					throw new IllegalArgumentException("Cannot parse "+Printer.str(fields));
+				}
+			} // ./ isa String
 			int f = ((Number) fi).intValue();			
 			if (jsonObj.getClass().isArray()) {
 				jsonObj = Array.getLength(jsonObj) > f? Array.get(jsonObj, f) : null;

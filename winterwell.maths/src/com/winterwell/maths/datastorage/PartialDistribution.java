@@ -17,7 +17,7 @@ import com.winterwell.utils.log.KErrorPolicy;
  * Use-case: e.g. distributed distributions across a cluster.
  *  
  * @author daniel
- * @testedby {@link PartialDistributionTest}
+ * @testedby  PartialDistributionTest}
  * @param <K>
  * @param <V>
  */

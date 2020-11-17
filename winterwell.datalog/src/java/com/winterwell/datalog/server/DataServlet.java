@@ -54,7 +54,7 @@ import com.winterwell.youagain.client.YouAgainClient;
 
  * 
  * @author daniel
- * @testedby {@link DataServletTest}
+ * @testedby  DataServletTest}
  */
 public class DataServlet implements IServlet {
 
@@ -87,8 +87,9 @@ public class DataServlet implements IServlet {
 		// num examples
 		int size = state.get(SIZE, 10);
 		// ONLY give examples for logged in users
-		if ( ! isLoggedIn(state)) {			
+		if ( ! isLoggedIn(state) && size > 0) {			
 			size = 0;
+			state.addMessage("Not logged in => no examples");
 		}
 		
 		// time window
@@ -102,7 +103,8 @@ public class DataServlet implements IServlet {
 		
 		// query e.g. host:thetimes.com
 		String q = state.get("q");
-		SearchQuery filter = makeQueryFilter(q, start, end);
+		if (q==null) q = "";
+		SearchQuery filter = new SearchQuery(q);				
 
 		DataLogImpl dl = (DataLogImpl) DataLog.getImplementation();
 		ESStorage ess = (ESStorage) dl.getStorage();
@@ -186,20 +188,5 @@ public class DataServlet implements IServlet {
 		}
 	}
 
-	/**
-	 * @param state
-	 * @param start
-	 * @param end
-	 * @return
-	 */
-	private SearchQuery makeQueryFilter(String q, Time start, Time end) {
-		try {
-			if (q==null) q = "";
-			SearchQuery sq = new SearchQuery(q);		
-			return sq;
-		} catch(SearchFormatException ex) {
-			throw new WebEx.BadParameterException("q", q, ex);
-		}
-	}
 
 }

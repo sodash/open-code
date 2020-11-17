@@ -19,7 +19,7 @@ import com.winterwell.utils.io.LineReader;
  * Wrapper for the CMU pronunciation dictionary, which can be used for syllable-counting and rhyming.
  * See https://en.wikipedia.org/wiki/CMU_Pronouncing_Dictionary
  * @author daniel
- * @testedby {@link CMUDictTest}
+ * @testedby  CMUDictTest}
  * @see SyllableCounter
  */
 public class CMUDict {

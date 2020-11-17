@@ -11,7 +11,7 @@ import com.winterwell.utils.Utils;
  * It just picks members by sampling. Mutate picks from scratch.
  * Crossover just picks one of its inputs with a 50/50 probability.
  * 
- * @testedby {@link DistributionGAOpTest}
+ * @testedby  DistributionGAOpTest}
  * @author daniel
  */
 public class DistributionGAOp<T> implements IBreeder<T> {

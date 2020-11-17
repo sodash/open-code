@@ -15,7 +15,7 @@ import com.winterwell.utils.io.FileUtils;
  * Regexes are fragile!
  * 
  * @author Steven
- * @testedby {@link ScriptExtractorTest}
+ * @testedby  ScriptExtractorTest}
  */
 public class ScriptExtractor {
 	

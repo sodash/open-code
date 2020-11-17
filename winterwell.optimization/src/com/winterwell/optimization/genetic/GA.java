@@ -47,7 +47,7 @@ import winterwell.optimization.genetic.GATest;
  * for this to implement equals() & hashcode(), as that will make the system
  * more efficient around equivalent instances.
  * 
- * @testedby {@link GATest}
+ * @testedby  GATest}
  * 
  * @author Joe Halliwell <joe@winterwell.com>
  */

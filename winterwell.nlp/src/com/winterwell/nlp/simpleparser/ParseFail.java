@@ -36,7 +36,7 @@ public class ParseFail extends RuntimeException implements IHasJson {
 		return false;
 	}
 
-	private ParseState input;
+//	private ParseState input;
 	public int lineNum;
 
 	private String message;
@@ -47,9 +47,7 @@ public class ParseFail extends RuntimeException implements IHasJson {
 	public final Slice slice;
 
 	public ParseFail(ParseResult<?> pr, String message) {
-		this.input = pr.input;
-		slice = pr.ast.getValue();
-		this.message = message;
+		this(pr.ast.getValue(), message);
 	}
 
 	/**
@@ -61,9 +59,8 @@ public class ParseFail extends RuntimeException implements IHasJson {
 	 * @param message
 	 */
 	public ParseFail(ParseState input, int failPosn, String message) {
-		this.input = input;
-		this.slice = new Slice(input.text, input.posn, failPosn);
-		this.message = message;
+		this(new Slice(input.text, input.posn, failPosn), message);
+//		this.input = input;
 	}
 
 	/**
@@ -74,7 +71,6 @@ public class ParseFail extends RuntimeException implements IHasJson {
 	 */
 	public ParseFail(Slice failedToParse, String message) {
 		this.slice = failedToParse;
-		input = null;
 		this.message = message;
 	}
 

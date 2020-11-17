@@ -17,7 +17,7 @@ import no.uib.cipr.matrix.Vector;
  * Multilayer feed forward neural net, trained by back-propagation.
  * 
  * @author daniel
- * @testedby {@link NeuralNetTest}
+ * @testedby  NeuralNetTest}
  */
 public class NeuralNet extends ATrainableBase<Vector, Vector> implements
 		ITrainable.Supervised<Vector, Vector> {

@@ -28,7 +28,7 @@ import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.XStreamUtils;
 
 /**
- * @testedby {@link UtilsTest}
+ * @testedby  UtilsTest}
  * @author daniel
  * 
  */
@@ -97,7 +97,7 @@ public final class Utils {
 	 * 
 	 * @param object
 	 * @return a copy of object, which should share no structure
-	 * @testedby {@link UtilsTest#testCopy()}
+	 * @testedby  UtilsTest#testCopy()}
 	 */
 	public static <X> X copy(X object) {
 		FastByteArrayOutputStream out = new FastByteArrayOutputStream();

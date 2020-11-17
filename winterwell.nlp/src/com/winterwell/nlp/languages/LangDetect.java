@@ -21,7 +21,7 @@ import com.winterwell.utils.log.Log;
  * but that was surprisingly rubbish)
  * 
  * @author daniel
- * @testedby {@link LangDetectTest} 
+ * @testedby  LangDetectTest} 
  */
 public class LangDetect implements ITextClassifier<String> {
 	

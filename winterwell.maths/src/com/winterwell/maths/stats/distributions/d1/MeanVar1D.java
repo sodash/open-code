@@ -23,7 +23,7 @@ import com.winterwell.utils.log.Log;
  * Use via {@link #train1(Double)}
  * 
  * @author daniel
- * @testedby {@link MeanVar1DTest}
+ * @testedby  MeanVar1DTest}
  */
 public class MeanVar1D extends ADistribution1D implements
 		ITrainable.Unsupervised.Weighted<Double>, Serializable
@@ -117,6 +117,9 @@ public class MeanVar1D extends ADistribution1D implements
 		this.lossFactor = lossFactor;
 	}
 
+	/**
+	 * @return mean +- standard-deviation (so _if_ the data is normal ~60% would be within this range)
+	 */
 	@Override
 	public String toString() {
 		String aString = StrUtils.toNSigFigs(getMean(), 2) + " ± "

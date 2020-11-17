@@ -61,7 +61,7 @@ import lgpl.haustein.Base64Encoder;
  * man-in-the-middle detection. At the very least this should be optional.
  * 
  * @author daniel
- * @testedby {@link FakeBrowserTest}
+ * @testedby  FakeBrowserTest}
  */
 public class FakeBrowser {
 

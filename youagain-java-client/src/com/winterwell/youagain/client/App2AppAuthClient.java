@@ -39,7 +39,7 @@ import com.winterwell.web.data.XId;
 	 * "I Alice certify that this is Bob"
 
  * @author daniel
- * @testedby {@link App2AppAuthClientTest}
+ * @testedby  App2AppAuthClientTest}
  *
  */
 public class App2AppAuthClient {

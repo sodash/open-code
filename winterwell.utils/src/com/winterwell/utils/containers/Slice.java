@@ -19,6 +19,14 @@ public class Slice implements CharSequence {
 
 	public final int start;
 
+	/**
+	 * Identical to the CharSequence constructor - this is needed for reflection eg gson
+	 * @param base
+	 */
+	public Slice(String base) {
+		this((CharSequence)base);
+	}
+	
 	public Slice(CharSequence base) {
 		this(base, 0, base.length());
 	}

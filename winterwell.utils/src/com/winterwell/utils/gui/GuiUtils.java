@@ -217,7 +217,7 @@ public class GuiUtils {
 	 * @param b
 	 * @return a colour partway between a and b
 	 * 
-	 * @testedby {@link GuiUtilsTest#testFade()}
+	 * @testedby  GuiUtilsTest#testFade()}
 	 */
 	public static Color fade(double fade, Color a, Color b) {
 		assert a != null && b != null;
@@ -248,7 +248,7 @@ public class GuiUtils {
 	 * optionally begin with a '#' character.
 	 * 
 	 * @see WebUtils#color2html(Color)
-	 * @testedby {@link GuiUtilsTest#testHexColor}
+	 * @testedby  GuiUtilsTest#testHexColor}
 	 */
 	public static Color getColor(String hex) {
 		if (hex.startsWith("#")) {

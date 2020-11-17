@@ -59,7 +59,7 @@ import com.winterwell.utils.time.TimeUtils;
  * </code></pre>
  * @author daniel
  * 
- * @testedby {@link ConfigBuilderTest}
+ * @testedby  ConfigBuilderTest}
  */
 public class ConfigBuilder {
 

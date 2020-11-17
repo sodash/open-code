@@ -11,7 +11,7 @@ import com.winterwell.utils.StrUtils;
  * http://latex2rtf.sourceforge.net/RTF-Spec-1.0.txt
  * 
  * @author daniel
- * @testedby {@link RTFHelperTest}
+ * @testedby  RTFHelperTest}
  */
 public class RTFHelper {
 

@@ -4,19 +4,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import org.junit.experimental.theories.PotentialAssignment.CouldNotGenerateValueException;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.web.IHasJson;
 
 /**
- * A simple tree data structure. 
+ * A simple double-linked tree data structure (the json output is single-linked, parent->children). 
  * Iteration lets you step through ALL the nodes.
  * 
  * @author daniel
- * @testedby {@link TreeTest}
+ * @testedby  TreeTest}
  */
 public class Tree<X> 
-implements Iterable<Tree<X>>, ITree<X> {
+implements Iterable<Tree<X>>, ITree<X>, IHasJson 
+{
 
 	private final List<ITree<X>> children = new ArrayList<ITree<X>>();
 
@@ -103,15 +108,6 @@ implements Iterable<Tree<X>>, ITree<X> {
 		return vs;
 	}
 
-	@Override
-	public int getDepth() {
-		int max = 0;
-		for (ITree k : children) {
-			max = Math.max(max, k.getDepth());
-		}
-		return max + 1;
-	}
-
 	public List<Tree<X>> getLeaves() {
 		// inefficient - a tree walker would be better
 		List<Tree<X>> all = flatten();
@@ -153,17 +149,6 @@ implements Iterable<Tree<X>>, ITree<X> {
 				return n;
 		}
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.winterwell.utils.containers.ITree#getOnlyChild()
-	 */
-	@Override
-	public ITree<X> getOnlyChild() {
-		assert children.size() == 1;
-		return children.get(0);
 	}
 
 	@Override
@@ -270,6 +255,36 @@ implements Iterable<Tree<X>>, ITree<X> {
 			return new DepthFirstIterator<X>(tree);
 		}
 	}
+
+
+
+	/**
+	 * A Map which is compatible with Tree.js
+	 */
+	@Override
+	public Map toJson2() throws UnsupportedOperationException {
+		return Tree.toJsonTree(this);
+	}
+
+	/**
+	 * A Map which is compatible with Tree.js
+	 */
+	private static Map toJsonTree(ITree<?> tree) {
+		Object value = tree.getValue(); // TODO json-ify maps etc
+		if (value instanceof IHasJson) {
+			value = ((IHasJson) value).toJson2();
+		}
+		if (tree.isLeaf()) {
+			return new ArrayMap("value", value);
+		}
+		// recurse
+		ArrayList jsonkids = Containers.apply(tree.getChildren(), kid -> toJsonTree(kid));
+		return new ArrayMap(
+			"value", value,
+			"children", jsonkids
+		);
+	}
+	
 	
 }
 

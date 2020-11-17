@@ -31,7 +31,7 @@ import com.winterwell.utils.log.Log;
  * 
  * @author daniel
  * @param <Tok> The type of stream token -- probably Tkn or String
- * @testedby {@link StreamClassifierTest}
+ * @testedby  StreamClassifierTest}
  */
 public class StreamClassifier<Tok> implements ITextClassifier<String>, IStreamClassifier<Tok> {
 

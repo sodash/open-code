@@ -24,7 +24,7 @@ import com.winterwell.utils.time.TimeUtils;
  * 
  * @see DateFormatField which is more rigid / predictable
  * @author daniel
- * @testedby {@link DateFieldTest}
+ * @testedby  DateFieldTest}
  */
 public class DateField extends AField<Time> {	
 	

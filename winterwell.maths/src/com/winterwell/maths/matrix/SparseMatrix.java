@@ -18,7 +18,7 @@ import no.uib.cipr.matrix.sparse.SparseVector;
  * WARNING: this is probably not thread safe. It back-ends onto a Trove
  * hash-map.
  * 
- * @testedby {@link SparseMatrixTest}
+ * @testedby  SparseMatrixTest}
  * @author daniel
  * 
  */

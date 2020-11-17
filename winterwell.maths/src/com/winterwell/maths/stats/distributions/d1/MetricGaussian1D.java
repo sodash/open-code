@@ -23,7 +23,7 @@ import no.uib.cipr.matrix.Vector;
  *          - E.g.2 if we use a CyclicMetric and integrate over values outside
  *          the range, it could sum to much greater than 1.<br>
  * 
- * @testedby {@link MetricGaussian1DTest}
+ * @testedby  MetricGaussian1DTest}
  * 
  * @author daniel
  * 

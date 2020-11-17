@@ -34,7 +34,7 @@ import com.winterwell.utils.time.Time;
  * It's not that this is better than log4j / slf4j / java logging / etc., it's that it's small, simple and
  * never breaks.
  *
- * @testedby {@link LogFileTest}
+ * @testedby  LogFileTest}
  * @author daniel
  */
 public class Log {

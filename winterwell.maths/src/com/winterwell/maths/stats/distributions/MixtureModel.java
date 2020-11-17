@@ -24,7 +24,7 @@ import no.uib.cipr.matrix.Vector;
  * @see DiscreteMixtureModel
  * @see ProductModel?? for the AND equivalent
  * @author daniel
- * @testedby {@link MixtureModelTest}
+ * @testedby  MixtureModelTest}
  */
 public class MixtureModel<D extends IDistribution> extends
 		MixtureModelBase<Vector, D> implements ITrainable.Unsupervised<Vector>,

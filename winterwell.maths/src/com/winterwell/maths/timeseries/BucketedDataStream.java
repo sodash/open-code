@@ -26,7 +26,7 @@ import com.winterwell.utils.time.TimeUtils;
  * 
  * TODO worry about overflow. use rolling averages?
  * 
- * @testedby {@link BucketedDataStreamTest}
+ * @testedby  BucketedDataStreamTest}
  * 
  * @author Daniel
  */

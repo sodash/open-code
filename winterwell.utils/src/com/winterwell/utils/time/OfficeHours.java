@@ -18,7 +18,7 @@ import com.winterwell.utils.Utils;
  * Time at work
  * 
  * @author daniel
- * @testedby {@link OfficeHoursTest}
+ * @testedby  OfficeHoursTest}
  */
 public class OfficeHours implements IShift {
 
@@ -140,7 +140,7 @@ public class OfficeHours implements IShift {
  * Time at work
  * 
  * @author daniel
- * @testedby {@link OfficeHoursTest}
+ * @testedby  OfficeHoursTest}
  */
 class SimpleOfficeHours implements IShift {	
 	

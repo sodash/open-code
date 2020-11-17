@@ -20,7 +20,7 @@ import com.winterwell.utils.log.Log;
  * Use {@link #getOutputBufferContents()} to see what got "sent" out.
  * 
  * @author Joe Halliwell <joe@winterwell.com>
- * @testedby {@link TestHttpServletResponseTest}
+ * @testedby  TestHttpServletResponseTest}
  */
 public class TestHttpServletResponse implements HttpServletResponse {
 

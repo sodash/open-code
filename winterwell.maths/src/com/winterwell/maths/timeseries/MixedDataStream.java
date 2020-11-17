@@ -26,7 +26,7 @@ import no.uib.cipr.matrix.Vector;
  * @see ExtraDimensionsDataStream which adds streams together so they run side
  *      by side.
  * 
- * @testedby {@link MixedDataStreamTest}
+ * @testedby  MixedDataStreamTest}
  * @author daniel
  */
 public class MixedDataStream extends ADataStream {

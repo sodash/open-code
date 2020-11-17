@@ -2,6 +2,8 @@ package com.winterwell.utils.containers;
 
 import java.util.List;
 
+import com.winterwell.utils.Utils;
+
 /**
  * A generic tree data structure. See the default implementation: {@link Tree}.
  * 
@@ -28,19 +30,31 @@ public interface ITree<X> {
 	 *         node. 1 if this is a leaf node. Will get stuck if some numpty has
 	 *         made a loop.
 	 */
-	int getDepth();
+	public default int getMaxDepthToLeaf() {
+		int max = 0;
+		for (ITree k : getChildren()) {
+			max = Math.max(max, k.getMaxDepthToLeaf());
+		}
+		return max + 1;
+	}
 
 	/**
 	 * Convenience for getting the child node if there is one and only one. It
 	 * is an error to call this is there are multiple child nodes.
 	 */
-	public abstract ITree<X> getOnlyChild();
+	public default ITree<X> getOnlyChild() {
+		List<? extends ITree<X>> kids = getChildren();
+		if (kids.size() != 1) throw new IllegalStateException("Multiple kids "+this);
+		return kids.get(0);	
+	}
 
 	public abstract ITree<X> getParent();
 
 	public abstract X getValue();
 
-	public abstract boolean isLeaf();
+	public default boolean isLeaf() {
+		return Utils.isEmpty(getChildren());
+	}
 
 	/**
 	 * Remove a child node.

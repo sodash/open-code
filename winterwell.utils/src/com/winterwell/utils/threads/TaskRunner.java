@@ -38,7 +38,7 @@ import com.winterwell.utils.time.StopWatch;
  * and {@link #trySubmit(ATask)}
  * 
  * @author daniel
- * @testedby {@link TaskRunnerTest}
+ * @testedby  TaskRunnerTest}
  * @see SafeExecutor
  */
 public class TaskRunner {

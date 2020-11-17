@@ -32,7 +32,7 @@ import no.uib.cipr.matrix.Vector;
  * (must be added separately)
  * 
  * @author daniel
- * @testedby {@link RenderWithFlotTest}
+ * @testedby  RenderWithFlotTest}
  * 
  * @deprecated Use subclasses of {@link Renderer} instead. Probably {@link HighchartsRenderer}
  */
@@ -117,7 +117,7 @@ public class RenderWithFlot extends ARender {
 	 * @param achart
 	 *            Can be a {@link CombinationChart} or a single chart
 	 * @return
-	 * @testedby {@link RenderWithFlotTest#testGetJSONPayload()}
+	 * @testedby  RenderWithFlotTest#testGetJSONPayload()}
 	 */
 	public Map<String, Object> getJSONPayload(AChart achart) {
 		List<AChart> charts;

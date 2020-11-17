@@ -28,7 +28,7 @@ import com.winterwell.utils.web.IHasJson;
  * TODO: Numerical stability? (Unit tests!)
  * 
  * @author daniel
- * @testedby {@link AccuracyScoreTest}
+ * @testedby  AccuracyScoreTest}
  */
 public class AccuracyScore<Tag> implements IHasJson  {
 	

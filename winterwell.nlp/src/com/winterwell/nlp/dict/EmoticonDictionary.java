@@ -9,7 +9,7 @@ import com.winterwell.utils.log.Log;
 /**
  * A simple emoticon filter based on a list.
  * 
- * @testedby {@link EmoticonDictionaryTest}
+ * @testedby  EmoticonDictionaryTest}
  * @author daniel
  */
 public class EmoticonDictionary extends Dictionary {

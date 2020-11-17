@@ -28,7 +28,7 @@ import com.winterwell.web.IWidget;
  * @Dependency RenderWithFlot's js dependencies
  * 
  * @author daniel
- * @testedby {@link StreamClassifierWidgetTest} 
+ * @testedby  StreamClassifierWidgetTest} 
  */
 public class StreamClassifierWidget implements IWidget {
 

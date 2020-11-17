@@ -18,7 +18,7 @@ import no.uib.cipr.matrix.Vector;
  * 
  * @see FiniteDistributionChart which is a bar chart
  * @author daniel
- * @testedby {@link HistgramChartTest}
+ * @testedby  HistgramChartTest}
  */
 public class HistogramChart extends XYChart {
 

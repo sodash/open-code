@@ -26,7 +26,7 @@ import no.uib.cipr.matrix.Matrix;
  * Not thread safe (uses HashMap)
  * 
  * @author Daniel
- * @testedby {@link ObjectMatrixTest}
+ * @testedby  ObjectMatrixTest}
  */
 public class ObjectMatrix<Row, Col> implements Serializable, IHasJson {
 

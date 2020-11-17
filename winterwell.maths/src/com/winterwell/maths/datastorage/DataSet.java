@@ -12,7 +12,7 @@ import com.winterwell.utils.Utils;
  * {@link IDataSet}
  * 
  * 
- * @testedby {@link DataSetTest}
+ * @testedby  DataSetTest}
  * @author daniel
  */
 public class DataSet extends ADataSet {

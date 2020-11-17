@@ -23,13 +23,13 @@ public class TreeTest extends TestCase {
 
 	public void testGetDepth1() {
 		Tree<String> tree = new Tree<String>(null);
-		assert tree.getDepth() == 1;
+		assert tree.getMaxDepthToLeaf() == 1;
 	}
 
 	public void testGetDepth2() {
 		Tree<String> parent = new Tree<String>("parent");
 		Tree<String> child1 = new Tree<String>(parent, "child1");
-		assert parent.getDepth() == 2;
+		assert parent.getMaxDepthToLeaf() == 2;
 	}
 
 	public void testGetDepth3() {
@@ -42,7 +42,7 @@ public class TreeTest extends TestCase {
 		// level0
 		Tree<String> finalLeaf1 = new Tree<String>(rightNode, "final leaf 1");
 		Tree<String> finalLeaf2 = new Tree<String>(rightNode, "final leaf 2");
-		assert root.getDepth() == 3;
+		assert root.getMaxDepthToLeaf() == 3;
 	}
 
 	public void testGetParent1() {

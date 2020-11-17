@@ -18,7 +18,7 @@ import com.winterwell.utils.containers.Pair;
  * over-engineered.
  * 
  * @author Daniel
- * @testedby {@link TimeUtilsTest}
+ * @testedby  TimeUtilsTest}
  */
 public class TimeUtils {
 	
@@ -380,7 +380,7 @@ public class TimeUtils {
 	 *            e.g. 10 minutes. Ignores +/- indicators such as "ago" or
 	 *            "hence".
 	 * @return always positive
-	 * @testedby {@link TimeUnitTest#testParseDt()}
+	 * @testedby  TimeUnitTest#testParseDt()}
 	 */
 	public static Dt parseDt(String dt) throws IllegalArgumentException {
 		return new TimeParser().parseDt(dt);
@@ -391,7 +391,7 @@ public class TimeUtils {
 	 * 
 	 * @param s
 	 * @return
-	 * @testedby {@link TimeUtilsTest#testParseExperimental()}
+	 * @testedby  TimeUtilsTest#testParseExperimental()}
 	 */
 	public static Time parseExperimental(String s) throws IllegalArgumentException {
 		return new TimeParser().parseExperimental(s, null);
@@ -458,7 +458,7 @@ public class TimeUtils {
 	 * @param period
 	 * @param minimumUnit
 	 * @return english
-	 * @testedby {@link TimeUtilsTest#testToStringTime()}
+	 * @testedby  TimeUtilsTest#testToStringTime()}
 	 */
 	public static String toString(Dt period, TUnit minimumUnit) {
 		assert period != null;

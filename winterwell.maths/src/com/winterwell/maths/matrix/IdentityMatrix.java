@@ -11,7 +11,7 @@ import no.uib.cipr.matrix.Vector;
  * Actually this is a scaled identity matrix. TODO override more methods
  * 
  * @author Daniel
- * @testedby {@link IdentityMatrixTest}
+ * @testedby  IdentityMatrixTest}
  */
 public final class IdentityMatrix extends AbstractMatrix {
 

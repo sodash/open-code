@@ -17,7 +17,7 @@ import no.uib.cipr.matrix.VectorEntry;
  * A crude projection matrix, which keeps some dimensions & discards others.
  * 
  * @author daniel
- * @testedby {@link ProjectionMatrixTest}
+ * @testedby  ProjectionMatrixTest}
  */
 public class ProjectionMatrix extends AbstractMatrix {
 

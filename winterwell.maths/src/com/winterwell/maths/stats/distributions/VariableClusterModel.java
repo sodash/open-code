@@ -25,7 +25,7 @@ import no.uib.cipr.matrix.Vector;
  * TODO a more general version using a {@link MixtureModelBase}??
  * 
  * @author Joe, Daniel
- * @testedby {@link VariableClusterModelTest}
+ * @testedby  VariableClusterModelTest}
  */
 public class VariableClusterModel extends ADistribution implements
 		ITrainable.Unsupervised<Vector> {

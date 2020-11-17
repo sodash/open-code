@@ -1,6 +1,7 @@
 package com.winterwell.datalog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
+import com.winterwell.maths.timeseries.TimeSlicer;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
@@ -27,7 +29,7 @@ import com.winterwell.web.WebEx;
 import com.winterwell.web.app.AppUtils;
 
 /**
- * @testedby {@link ESDataLogSearchBuilderTest}
+ * @testedby  ESDataLogSearchBuilderTest}
  * @author daniel
  *
  */
@@ -155,6 +157,14 @@ public class ESDataLogSearchBuilder {
 			}
 			if (field.equals("time")) {
 				leaf = Aggregations.dateHistogram("by_"+s_bucketBy, "time", interval);
+			} else if (field.equals("dateRange")) {
+				// A slightly hacky option. Use-case: return stats for the 
+				// 	last week, the week before (to allow "+25%" comparisons), and older
+				Time now = end;
+				Time prev = now.minus(interval);
+				Time prev2 = prev.minus(interval);
+				List<Time> times = Arrays.asList(start, prev2, prev, now);
+				leaf = Aggregations.dateRange("by_"+s_bucketBy, "time", times);
 			} else {
 				leaf = Aggregations.terms("by_"+s_bucketBy, field);
 				if (numResults>0) leaf.setSize(numResults);

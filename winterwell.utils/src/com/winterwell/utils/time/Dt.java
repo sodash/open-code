@@ -13,7 +13,7 @@ import com.winterwell.utils.web.SimpleJson;
  * An amount of time, e.g. 5 minutes. This class is immutable. Dts can be
  * positive or negative (positive is more common).
  * 
- * @testedby {@link DtTest}
+ * @testedby  DtTest}
  * @author Daniel
  * 
  */

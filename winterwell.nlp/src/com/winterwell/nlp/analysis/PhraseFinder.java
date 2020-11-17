@@ -22,7 +22,7 @@ import com.winterwell.utils.containers.ArrayMap;
  * A simple common phrase finder.
  *  * 
  * @author daniel
- * @testedby {@link PhraseFinderTest}
+ * @testedby  PhraseFinderTest}
  */
 public class PhraseFinder extends ATrainableBase<IDocument, Object> implements
 		ITrainable.Unsupervised<IDocument> , IPhraseFinder

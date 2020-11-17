@@ -15,7 +15,7 @@ import com.winterwell.nlp.corpus.IDocument;
  * The converse is not true: having a question marker does not mean this
  * text must be a question. E.g. rhetorical questions, or using words in a non-questioning manner, "When I get home, I'll..."
  * @author daniel
- * @testedby {@link IsNotQuestionRuleTest}
+ * @testedby  IsNotQuestionRuleTest}
  */
 public class IsNotQuestionRule extends HardCodedRule<String> {
 

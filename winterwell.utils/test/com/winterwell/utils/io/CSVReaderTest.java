@@ -45,6 +45,22 @@ public class CSVReaderTest extends TestCase {
 			assert row2.length == 3;
 		}
 	}
+	
+	public void testBlanksAreEmptyStrings() {		
+		CSVReader r = new CSVReader(new StringReader("a,,c\n , b , "), new CSVSpec());
+		assert r.hasNext();
+		String[] row1 = r.next();
+		String[] row2 = r.next();
+		assert ! r.hasNext();		
+		assert row1[0].equals("a"); 
+		assert row1[1].equals(""); 
+		assert row1[2].equals("c");
+		assert row1.length == 3;
+		assert row2[0].isBlank(); 
+		assert row2[1].trim().equals("b"); 
+		assert row2[2].trim().equals("");
+		assert row2.length == 3;
+	}
 
 	public void testEscapes() {
 		{

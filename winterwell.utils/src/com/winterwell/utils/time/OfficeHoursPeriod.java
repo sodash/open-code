@@ -5,7 +5,7 @@ import com.winterwell.utils.containers.AbstractIterator;
 /**
  * Iterable over "on" periods (e.g. working days).
  * @author daniel
- * @testedby {@link OfficeHoursPeriodTest}
+ * @testedby  OfficeHoursPeriodTest}
  */
 public class OfficeHoursPeriod implements Iterable<Period> {
 

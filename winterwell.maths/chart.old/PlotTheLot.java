@@ -17,7 +17,7 @@
 //
 ///**
 // * Eyeball it -- Given a data-stream, plot every x_i x_j scatter plot, one colour per label
-// * @testedby {@link PlotTheLotTest}
+// * @testedby  PlotTheLotTest}
 // * @author daniel
 // *
 // */

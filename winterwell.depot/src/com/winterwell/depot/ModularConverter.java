@@ -40,7 +40,7 @@ import com.winterwell.utils.web.XStreamUtils;
  * {@link XStreamUtils#setupXStream()} will try to set this up within its XStream.
  * 
  * @author daniel
- * @testedby {@link ModularConverterTest}
+ * @testedby  ModularConverterTest}
  */
 public class ModularConverter implements Converter {
 

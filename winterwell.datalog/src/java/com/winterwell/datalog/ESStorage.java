@@ -68,7 +68,7 @@ import com.winterwell.utils.web.XStreamUtils;
 /**
  * ElasticSearch backed storage for DataLog
  * 
- * @testedby {@link ESStorageTest}
+ * @testedby  ESStorageTest}
  * @author daniel
  *
  */
@@ -365,10 +365,15 @@ public class ESStorage implements IDataLogStorage {
 					est = new ESType().geo_point();
 				}
 			} else if (cp.getValue()==Null.class) {
-				est = new ESType().object().noIndex();
+				// HACK primitive or object?
+				if ("nonce".equals(cp.getKey())) {
+					est = new ESType().keyword().noIndex();
+				} else {
+					est = new ESType().object().noIndex();
+				}
 			}
 			simpleEvent.property(cp.getKey(), est);
-		}
+		}		
 				
 		pm.setMapping(simpleEvent);
 		IESResponse res = pm.get();
@@ -483,6 +488,12 @@ public class ESStorage implements IDataLogStorage {
 		}
 		
 		return f;
+	}
+	
+	@Override
+	public void flush() {
+		// wait a second
+		Utils.sleep(1000);
 	}
 
 	@Override
