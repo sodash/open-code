@@ -20,10 +20,11 @@ public class BuildDataLog extends BuildWinterwellProject {
 		
 		MavenDependencyTask mdt = new MavenDependencyTask();
 //		mdt.addDependency("org.postgresql", "postgresql", "42.2.11");
+		
 //		mdt.addDependency("ua_parser", "ua-parser", "1.3.0"); // causes an error from Maven??
-		// https://mvnrepository.com/artifact/org.yaml/snakeyaml
+		// snakeyaml is needed by ua_parser -- see LGServletTest.testBrowserType()
+		// https://mvnrepository.com/artifact/org.yaml/snakeyaml 
 		mdt.addDependency("org.yaml", "snakeyaml", "1.26");
-
 		deps.add(mdt);
 		
 		return deps;

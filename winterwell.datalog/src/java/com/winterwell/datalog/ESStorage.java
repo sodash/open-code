@@ -489,6 +489,12 @@ public class ESStorage implements IDataLogStorage {
 		
 		return f;
 	}
+	
+	@Override
+	public void flush() {
+		// wait a second
+		Utils.sleep(1000);
+	}
 
 	@Override
 	public String toString() {

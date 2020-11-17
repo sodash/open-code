@@ -474,6 +474,7 @@ public class DataLogImpl implements Closeable, IDataLog {
 	@Override
 	public final void flush() {
 		doSave();
+		storage.flush();
 	}
 
 	@Deprecated
