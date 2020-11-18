@@ -111,6 +111,7 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 	private File file;
 	private CSVSpec spec;
 	private String[] headers;
+	private int badRecords;
 
 	/**
 	 * @return the file we're looking at. Can be null if this was created using
@@ -195,6 +196,14 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 	 */
 	public int getLineNumber() {
 		return currentLineNumber;
+	}
+	
+	/**
+	 * 
+	 * @return count of bad records - compare this with {@link #getRowNumber()} which is the number of good records
+	 */
+	public int getBadRecordCount() {
+		return badRecords;
 	}
 
 	/**
@@ -379,6 +388,7 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 				&& Utils.isBlank(record[0])) {
 			return;
 		}
+		badRecords++;
 		Log.w("csv",
 				"Bad record at line " + lineNumber + ": "
 						+ StrUtils.ellipsize(Printer.toString(record), 36)
