@@ -1,6 +1,7 @@
 package com.winterwell.web.app;
 
 import java.io.File;
+import java.util.List;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.es.IESRouter;
@@ -14,6 +15,8 @@ import com.winterwell.gson.KLoopPolicy;
 import com.winterwell.gson.StandardAdapters;
 import com.winterwell.utils.AString;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Mutable;
+import com.winterwell.utils.Mutable.Ref;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -83,6 +86,11 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	private Thread mainLoopThread;
 	
 	private volatile boolean readyFlag;
+
+	/**
+	 * Unconsumed main args, after initConfig()
+	 */
+	protected List<String> configRemainderArgs;
 
 
 	public static AMain main;
@@ -366,8 +374,20 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			ct = BasicSiteConfig.class;
 			Log.w(getAppNameLocal(), "No ConfigType given - using "+ct.getSimpleName());
 		}
-		return (ConfigType) AppUtils.getConfig(getAppNameLocal(), ct, args);
+		// make it
+		ConfigFactory cf = ConfigFactory.get();
+		if (args!=null) {
+			cf.setArgs(args);
+		}
+		Ref<List> rremainderArgs = new Mutable.Ref();
+		ConfigType c = (ConfigType) cf.getConfig(ct, rremainderArgs);		
+		// set them for manifest
+		ManifestServlet.addConfig(c);
+		assert c != null;
+		configRemainderArgs = rremainderArgs.value;
+		return c;		
 	}
+	
 
 	private void launchJetty() {
 		try {

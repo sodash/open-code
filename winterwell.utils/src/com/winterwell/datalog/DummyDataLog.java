@@ -183,7 +183,7 @@ class DummyDataLog implements IDataLog {
 }
 
 class DummyDataLogAdmin implements IDataLogAdmin {
-	@Override
+//	@Override
 	public void registerEventType(CharSequence dataspace, String eventType) {		
 	}
 
