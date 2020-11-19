@@ -25,6 +25,7 @@ import com.winterwell.es.client.IndexRequestBuilder;
 import com.winterwell.es.client.KRefresh;
 import com.winterwell.es.client.TransformRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
+import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
 import com.winterwell.gson.FlexiGson;
@@ -149,6 +150,13 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		trb3.setDebug(true);
 		IESResponse response3 = trb3.get();
 		Log.d("compress", response3);
+		
+		//add datalog.gl.all alias into the newly created index and remove it from original index
+		IndicesAliasesRequest iar = esc.admin().indices().prepareAliases();
+		iar.addAlias(index, "datalog.gl.all");
+		iar.removeAlias(source, "datalog.gl.all");
+		IESResponse response4 = iar.get();
+		Printer.out(response4);
 	}
 	
 	
