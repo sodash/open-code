@@ -113,11 +113,13 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		// specify some terms that we want to keep
 		// See DataLogEvent#COMMON_PROPS
 		// TODO increase this list as our usage changes
+		
 		List<String> terms = Arrays.asList(
 				("evt domain host country pub vert vertiser campaign lineitem "
 				+"cid via invalid dt amount dntn mbl browser os"
 				).split(" ")
 		);
+
 		// create index and mapping
 		createIndexWithPropertiesMapping(index, ALIAS, terms);
 		
@@ -139,12 +141,14 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		trb2.setDebug(true);
 		IESResponse response2 = trb2.get().check();
 		Log.d("compress", response2);
-				
+		
+		
+		Utils.sleep(10000); //allow transform job to be completed before deleting it
 		//delete the transform job
-		TransformRequestBuilder trb4 = esc.prepareTransformDelete(jobId); 
-		trb4.setDebug(true);
-		IESResponse response4 = trb4.get();
-		Log.d("compress", response4);
+		TransformRequestBuilder trb3 = esc.prepareTransformDelete(jobId); 
+		trb3.setDebug(true);
+		IESResponse response3 = trb3.get();
+		Log.d("compress", response3);
 	}
 	
 	
