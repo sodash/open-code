@@ -492,13 +492,17 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 	
 	/**
-	 * Does nothing by default - override to add custom logic.
+	 * Sets lastModified by default - override to add custom logic.
 	 * This is called by both {@link #doSave(WebRequest)} and {@link #doPublish(WebRequest)}
 	 * @param _jthing
 	 * @param stateIgnored
 	 */
 	protected void doBeforeSaveOrPublish(JThing<T> _jthing, WebRequest stateIgnored) {
-		
+		// set last modified
+		if (_jthing.java() instanceof AThing) {
+			AThing ting = (AThing) _jthing.java();
+			ting.setLastModified(new Time());
+		}
 	}
 
 
@@ -520,15 +524,9 @@ public abstract class CrudServlet<T> implements IServlet {
 
 		ESPath draftPath = esRouter.getPath(dataspace,type, id, status);
 		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
-
-		// set state to draft (NB: archived is now handled by an action=archive flag)
-//		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
-		AppUtils.setStatus(jthing, status);
 		
-		AppUtils.doSaveEdit(draftPath, jthing, state);
-		Log.d("crud", "unpublish "+status+" doSave "+draftPath+" by "+state.getUserId()+" "+state+" "+jthing.string());
-
-		AppUtils.doDelete(publishPath);
+		AppUtils.doUnPublish(jthing, draftPath, publishPath, status);
+		
 		state.addMessage(id+" has been moved to "+status.toString().toLowerCase());
 		return jthing;
 	}
