@@ -58,6 +58,31 @@ public class TimeSlicerTest {
 		}
 	}
 	
+	@Test
+	public void test1YearEndIncluded() {
+		{
+			TimeSlicer bucketer = new TimeSlicer(new Time(2013, 1, 1), new Time(2013, 1, 1).plus(TUnit.YEAR), TUnit.MONTH.dt);
+			for(double t : bucketer.times) {
+				System.out.println(new Time(t));
+			}
+			int jan = bucketer.getBucket(new Time(2013,1,1));
+			int dec = bucketer.getBucket(new Time(2013,12,1));
+			assert jan == 0;
+			assert dec == 11;
+		}
+		System.out.println("");
+		{
+			TimeSlicer bucketer = new TimeSlicer(new Time(2013, 1, 1), new Time(2013, 12, 31), TUnit.MONTH.dt);
+			for(double t : bucketer.times) {
+				System.out.println(new Time(t));
+			}
+			int jan = bucketer.getBucket(new Time(2013,1,1));
+			int dec = bucketer.getBucket(new Time(2013,12,1));
+			assert jan == 0;
+			assert dec == 11;
+		}
+	}
+	
 
 	@Test
 	public void testOneSmallBucket() {
