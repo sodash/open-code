@@ -27,6 +27,7 @@ import com.winterwell.es.client.TransformRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.fail.ESDocNotFoundException;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.gson.JsonArray;
@@ -110,14 +111,15 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		String monthYear = t.format("MMMyy").toLowerCase();
 		String index = "datalog."+dataspace+"_transformed_" + monthYear;
 		String source = "datalog."+dataspace+"_" + monthYear;
-	
+
 		// specify some terms that we want to keep
 		// See DataLogEvent#COMMON_PROPS
 		// TODO increase this list as our usage changes
 		
+		List<String> aggs = Arrays.asList(("amount dntn").split(" "));
 		List<String> terms = Arrays.asList(
 				("evt domain host country pub vert vertiser campaign lineitem "
-				+"cid via invalid dt amount dntn mbl browser os"
+				 +"cid via invalid mbl browser os"
 				).split(" ")
 		);
 
@@ -126,15 +128,23 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		// aggregate data
-		String jobId = "transform_"+dataspace+"_"+monthYear;		
-		TransformRequestBuilder trb = esc.prepareTransform(jobId);
-			
+		String jobId = "transform_"+dataspace+"_"+monthYear;
+		
+		//safety mechanism -- make sure that the jobID doens't exist, if it does, delete it
+		try {
+			TransformRequestBuilder trb_safety = esc.prepareTransformDelete(jobId); 
+			trb_safety.setDebug(true);
+			trb_safety.get();
+		} catch (ESDocNotFoundException e) {
+			Printer.out("Safe to continue...");
+		}
 		
 		// create transform job
 		// specify source and destination and time interval
-		trb.setBody(source, index, terms, "24h");
+		TransformRequestBuilder trb = esc.prepareTransform(jobId);
+		trb.setBodyWithPainless(source, index, aggs, terms, "24h");
 		trb.setDebug(true);
-		IESResponse response = trb.get().check();
+		IESResponse response = trb.get().check(); //might take a long time for complex body
 		Log.d("compress", response);
 		
 		//after creating transform job, start it 
@@ -153,10 +163,9 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		
 		//add datalog.gl.all alias into the newly created index and remove it from original index
 		IndicesAliasesRequest iar = esc.admin().indices().prepareAliases();
-		iar.addAlias(index, "datalog.gl.all");
-		iar.removeAlias(source, "datalog.gl.all");
-		IESResponse response4 = iar.get();
-		Printer.out(response4);
+		iar.addAlias(index, "datalog."+dataspace+".all");
+		iar.removeAlias(source, "datalog."+dataspace+".all");
+		iar.get().check();
 	}
 	
 	
