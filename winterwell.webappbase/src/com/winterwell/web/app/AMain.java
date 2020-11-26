@@ -56,6 +56,8 @@ import com.winterwell.youagain.client.YouAgainClient;
  */
 public abstract class AMain<ConfigType extends ISiteConfig> {
 	
+	public static final String copyright = "(C) Good-Loop Ltd";
+	
 	protected JettyLauncher jl;
 	
 	/**
