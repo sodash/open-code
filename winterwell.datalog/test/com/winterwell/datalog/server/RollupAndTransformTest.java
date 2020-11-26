@@ -29,6 +29,7 @@ import com.winterwell.web.ajax.JSend;
 public class RollupAndTransformTest {
 	
 	public final static String SOURCE = "datalog.gl_sep20"; 
+	//public static String SOURCE = "scrubbed.datalog.gl_dec19_mapfix";
 	public final static String INDEX = "datalog.transformed_sep20"; //bulk into new local ES index
 	public final static String ALIAS = "datalog.transformed.all"; //alias to the new ES index
 
@@ -54,7 +55,7 @@ public class RollupAndTransformTest {
 		
 		// create transform job
 		// specify source and destination and time interval
-		trb.setBody(SOURCE, INDEX, terms, "24h");
+		trb.setBodyWithPainless(SOURCE, INDEX, terms, "24h");
 		trb.setDebug(true);
 		IESResponse response = trb.get();
 		Printer.out(response);
@@ -65,8 +66,8 @@ public class RollupAndTransformTest {
 		IESResponse response2 = trb2.get();
 		Printer.out(response2);
 		
-		//stop the transform job after 5 seconds
-		Utils.sleep(5000);
+		//stop the transform job after 10 seconds
+		Utils.sleep(10000);
 		TransformRequestBuilder trb3 = esc.prepareTransformStop("transform_job"); 
 		trb3.setDebug(true);
 		IESResponse response3 = trb3.get();
