@@ -117,7 +117,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		
 		List<String> terms = Arrays.asList(
 				("evt domain host country pub vert vertiser campaign lineitem "
-				+"cid via invalid dt amount dntn mbl browser os"
+				 +"cid via invalid dt amount dntn mbl browser os"
 				).split(" ")
 		);
 
@@ -129,10 +129,9 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		String jobId = "transform_"+dataspace+"_"+monthYear;		
 		TransformRequestBuilder trb = esc.prepareTransform(jobId);
 			
-		
 		// create transform job
 		// specify source and destination and time interval
-		trb.setBody(source, index, terms, "24h");
+		trb.setBodyWithPainless(source, index, terms, "24h");
 		trb.setDebug(true);
 		IESResponse response = trb.get().check();
 		Log.d("compress", response);
@@ -153,10 +152,9 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		
 		//add datalog.gl.all alias into the newly created index and remove it from original index
 		IndicesAliasesRequest iar = esc.admin().indices().prepareAliases();
-		iar.addAlias(index, "datalog.gl.all");
-		iar.removeAlias(source, "datalog.gl.all");
-		IESResponse response4 = iar.get();
-		Printer.out(response4);
+		iar.addAlias(index, "datalog."+dataspace+".all");
+		iar.removeAlias(source, "datalog."+dataspace+".all");
+		iar.get().check();
 	}
 	
 	
