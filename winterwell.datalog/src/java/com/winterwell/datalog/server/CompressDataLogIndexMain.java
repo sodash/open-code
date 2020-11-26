@@ -111,14 +111,15 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		String monthYear = t.format("MMMyy").toLowerCase();
 		String index = "datalog."+dataspace+"_transformed_" + monthYear;
 		String source = "datalog."+dataspace+"_" + monthYear;
-	
+
 		// specify some terms that we want to keep
 		// See DataLogEvent#COMMON_PROPS
 		// TODO increase this list as our usage changes
 		
+		List<String> aggs = Arrays.asList(("amount dntn").split(" "));
 		List<String> terms = Arrays.asList(
 				("evt domain host country pub vert vertiser campaign lineitem "
-				 +"cid via invalid dt amount dntn mbl browser os"
+				 +"cid via invalid mbl browser os"
 				).split(" ")
 		);
 
@@ -141,9 +142,9 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		// create transform job
 		// specify source and destination and time interval
 		TransformRequestBuilder trb = esc.prepareTransform(jobId);
-		trb.setBodyWithPainless(source, index, terms, "24h");
+		trb.setBodyWithPainless(source, index, aggs, terms, "24h");
 		trb.setDebug(true);
-		IESResponse response = trb.get().check();
+		IESResponse response = trb.get().check(); //might take a long time for complex body
 		Log.d("compress", response);
 		
 		//after creating transform job, start it 

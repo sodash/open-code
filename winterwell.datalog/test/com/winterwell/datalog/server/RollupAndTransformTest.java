@@ -55,7 +55,7 @@ public class RollupAndTransformTest {
 		
 		// create transform job
 		// specify source and destination and time interval
-		trb.setBodyWithPainless(SOURCE, INDEX, terms, "24h");
+		trb.setBody(SOURCE, INDEX, terms, "24h");
 		trb.setDebug(true);
 		IESResponse response = trb.get();
 		Printer.out(response);
