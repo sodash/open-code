@@ -27,6 +27,7 @@ import com.winterwell.es.client.TransformRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.fail.ESDocNotFoundException;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.gson.JsonArray;
@@ -126,11 +127,20 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		// aggregate data
-		String jobId = "transform_"+dataspace+"_"+monthYear;		
-		TransformRequestBuilder trb = esc.prepareTransform(jobId);
-			
+		String jobId = "transform_"+dataspace+"_"+monthYear;
+		
+		//safety mechanism -- make sure that the jobID doens't exist, if it does, delete it
+		try {
+			TransformRequestBuilder trb_safety = esc.prepareTransformDelete(jobId); 
+			trb_safety.setDebug(true);
+			trb_safety.get();
+		} catch (ESDocNotFoundException e) {
+			Printer.out("Safe to continue...");
+		}
+		
 		// create transform job
 		// specify source and destination and time interval
+		TransformRequestBuilder trb = esc.prepareTransform(jobId);
 		trb.setBodyWithPainless(source, index, terms, "24h");
 		trb.setDebug(true);
 		IESResponse response = trb.get().check();
