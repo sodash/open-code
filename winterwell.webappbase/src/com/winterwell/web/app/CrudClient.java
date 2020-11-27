@@ -12,7 +12,6 @@ import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JSend;
 import com.winterwell.web.ajax.JThing;
-import com.winterwell.web.ajax.KAjaxStatus;
 
 /**
  * Status: WIP 

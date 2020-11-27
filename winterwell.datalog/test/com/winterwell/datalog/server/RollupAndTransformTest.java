@@ -1,18 +1,14 @@
 package com.winterwell.datalog.server;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
 
-import com.winterwell.datalog.Dataspace;
 import com.winterwell.es.ESType;
-import com.winterwell.es.client.BulkRequestBuilder;
-import com.winterwell.es.client.BulkResponse;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.ESHttpRequest;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.TransformRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
@@ -22,9 +18,6 @@ import com.winterwell.gson.FlexiGson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.web.FakeBrowser;
-import com.winterwell.web.ajax.JSend;
 
 public class RollupAndTransformTest {
 	

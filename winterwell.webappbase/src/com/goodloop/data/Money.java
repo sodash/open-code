@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import com.winterwell.data.AThing;
 import com.winterwell.depot.IInit;
 import com.winterwell.es.ESNoIndex;
 import com.winterwell.es.ESType;

@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Slice;
-import com.winterwell.utils.web.WebUtils;
 
 /**
  * Parse a fixed bit of text. Sets the parsed word as the AST.getX() value.
