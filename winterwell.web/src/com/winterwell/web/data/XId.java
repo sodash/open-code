@@ -285,7 +285,7 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	
 	/**
 	 * Convenience for ensuring a List contains XId objects. Uses {@link #xid(Object, boolean)}
-	 * @param xids May be Strings or XIds (or a mix).
+	 * @param xids May be Strings or XIds (or a mix). Can contain nulls
 	 * @return a copy of xids, can be modified 
 	 */
 	public static ArrayList<XId> xids(Collection xids, boolean canonicalise) {
