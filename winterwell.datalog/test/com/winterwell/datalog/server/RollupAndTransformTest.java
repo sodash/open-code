@@ -53,9 +53,12 @@ public class RollupAndTransformTest {
 		terms.add("evt");
 		terms.add("os");
 		
+		// specify some terms that we want to sum
+		ArrayList<String> aggs = new ArrayList<String>();
+		
 		// create transform job
 		// specify source and destination and time interval
-		trb.setBody(SOURCE, INDEX, terms, "24h");
+		trb.setBody(SOURCE, INDEX, aggs, terms, "24h");
 		trb.setDebug(true);
 		IESResponse response = trb.get();
 		Printer.out(response);

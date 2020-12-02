@@ -142,9 +142,10 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		// create transform job
 		// specify source and destination and time interval
 		TransformRequestBuilder trb = esc.prepareTransform(jobId);
-		trb.setBodyWithPainless(source, index, aggs, terms, "24h");
+		trb.setBody(source, index, aggs, terms, "24h");
+		//trb.setBodyWithPainless(source, index, aggs, terms, "24h"); //for ES version < 7.10.0
 		trb.setDebug(true);
-		IESResponse response = trb.get().check(); //might take a long time for complex body
+		IESResponse response = trb.get(); //might take a long time for complex body
 		Log.d("compress", response);
 		
 		//after creating transform job, start it 
@@ -152,9 +153,9 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		trb2.setDebug(true);
 		IESResponse response2 = trb2.get().check();
 		Log.d("compress", response2);
+		System.out.println("Transforming data, please wait...");
 		
-		
-		Utils.sleep(10000); //allow transform job to be completed before deleting it
+		Utils.sleep(36000000); //allow transform job to be completed before deleting it, a safe estimate would be one hour
 		//delete the transform job
 		TransformRequestBuilder trb3 = esc.prepareTransformDelete(jobId); 
 		trb3.setDebug(true);
