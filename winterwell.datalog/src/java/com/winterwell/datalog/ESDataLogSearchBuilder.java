@@ -13,7 +13,6 @@ import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
-import com.winterwell.maths.timeseries.TimeSlicer;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;

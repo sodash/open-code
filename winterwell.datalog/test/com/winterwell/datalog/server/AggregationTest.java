@@ -1,21 +1,11 @@
 package com.winterwell.datalog.server;
 
-import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.HashMap;
-import static org.junit.Assert.*;
-import org.junit.Test; 
-import org.eclipse.jetty.util.ajax.JSON;
 
-import com.winterwell.gson.JsonParser;
-import com.winterwell.gson.JsonElement;
-import com.winterwell.gson.JsonObject;
-import com.winterwell.gson.FlexiGson;
-import com.winterwell.gson.JsonArray;
+import org.junit.Test;
+
 import com.winterwell.datalog.Dataspace;
 import com.winterwell.es.ESType;
-import com.winterwell.es.UtilsForESTests;
 import com.winterwell.es.client.BulkRequestBuilder;
 import com.winterwell.es.client.BulkResponse;
 import com.winterwell.es.client.ESConfig;
@@ -26,16 +16,18 @@ import com.winterwell.es.client.KRefresh;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
+import com.winterwell.gson.FlexiGson;
+import com.winterwell.gson.JsonArray;
+import com.winterwell.gson.JsonElement;
+import com.winterwell.gson.JsonObject;
+import com.winterwell.gson.JsonParser;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Pair2;
-import com.winterwell.utils.web.WebUtils;
-import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.ajax.JSend;
-import com.winterwell.web.ajax.JThing;
 
 public class AggregationTest {
 	

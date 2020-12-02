@@ -11,9 +11,8 @@ import java.util.Set;
 
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Mutable;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Printer.IPrinter;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.AbstractMap2;
 import com.winterwell.utils.containers.ArrayMap;

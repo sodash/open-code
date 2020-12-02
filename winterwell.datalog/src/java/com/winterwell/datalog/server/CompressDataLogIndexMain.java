@@ -1,56 +1,31 @@
 package com.winterwell.datalog.server;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.junit.Test;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.DataLogEvent;
-import com.winterwell.datalog.Dataspace;
 import com.winterwell.datalog.ESStorage;
-import com.winterwell.datalog.IDataLogAdmin;
 import com.winterwell.es.ESType;
-import com.winterwell.es.client.BulkRequestBuilder;
-import com.winterwell.es.client.BulkResponse;
-import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
-import com.winterwell.es.client.IndexRequestBuilder;
-import com.winterwell.es.client.KRefresh;
 import com.winterwell.es.client.TransformRequestBuilder;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.fail.ESDocNotFoundException;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
-import com.winterwell.gson.FlexiGson;
-import com.winterwell.gson.JsonArray;
-import com.winterwell.gson.JsonElement;
-import com.winterwell.gson.JsonObject;
-import com.winterwell.gson.JsonParser;
 import com.winterwell.utils.Dep;
-import com.winterwell.utils.Null;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
-import com.winterwell.utils.containers.ArrayMap;
-import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
-import com.winterwell.web.FakeBrowser;
-import com.winterwell.web.ajax.JSend;
 import com.winterwell.web.app.AMain;
-import com.winterwell.web.app.AppUtils;
-import com.winterwell.web.app.KServerType;
 
 /**
  * 

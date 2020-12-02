@@ -2,7 +2,6 @@ package com.winterwell.bob.tasks;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.SocketException;
 
 import org.junit.Test;
 

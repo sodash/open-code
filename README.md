@@ -11,7 +11,7 @@ We assume you're doing this in Eclipse.
 You'll also want to get a couple more repos:
 
 	git clone git@github.com:winterstein/flexi-gson.git
-	git clone git@github.com:winterstein/elasticsearch-java-client.git
+	git clone git@github.com:good-loop/elasticsearch-java-client.git
 
 Import projects into Eclipse -- everything in open-code, plus elasticsearch-java-client and flexi-gson
 

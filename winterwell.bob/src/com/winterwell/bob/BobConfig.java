@@ -3,7 +3,6 @@ package com.winterwell.bob;
 import java.io.File;
 import java.io.IOException;
 
-import com.winterwell.bob.tasks.GitBobProjectTask;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
