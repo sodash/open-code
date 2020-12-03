@@ -124,7 +124,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		// create transform job
 		// specify source and destination and time interval
 		TransformRequestBuilder trb = esc.prepareTransform(jobId);
-		if (getESVersion(config.esUrl) == "7.10.0") { // might have to change for future upgrades of ES
+		if (getESVersion(config.esUrl).equals("7.10.0")) { // might have to change for future upgrades of ES
 			Printer.out("Using latest version of ES: more efficient transform!");
 			trb.setBody(source, index, aggs, terms, "24h");
 		} else {
