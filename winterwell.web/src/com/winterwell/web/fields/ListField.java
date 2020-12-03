@@ -88,9 +88,10 @@ public class ListField<X> extends AField<List<X>> {
 					bits.set(i, bit);
 				}
 			}
-			return (List<X>) bits;
+			// copy to ArrayList as per javadoc so the list could be edited
+			return new ArrayList(bits);
 		}
-		List<X> conv = new ArrayList<X>(bits.size());
+		ArrayList<X> conv = new ArrayList<X>(bits.size());
 		for (String bit : bits) {
 			if (bit.length() == 0) {
 				continue;

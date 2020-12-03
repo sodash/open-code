@@ -2,8 +2,6 @@ import org.junit.Test;
 
 import com.winterwell.nlp.languages.GoogleTranslate;
 
-import junit.framework.TestCase;
-
 public class GoogleTranslateTest  {
 	
 	@Test

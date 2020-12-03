@@ -284,7 +284,7 @@ public class ESStorage implements IDataLogStorage {
 			cres.check();
 
 			// register some standard event types??
-			registerEventType2(_client, dataspace, now);
+			registerDataspace4_mapping(_client, dataspace, now);
 
 			// swap the write index over
 			IndicesAliasesRequest aliasSwap = _client.admin().indices().prepareAliases();
@@ -326,7 +326,7 @@ public class ESStorage implements IDataLogStorage {
 		return index+"_"+v;
 	}
 
-	private void registerEventType2(ESHttpClient _client, Dataspace dataspace, Time now) 
+	private void registerDataspace4_mapping(ESHttpClient _client, Dataspace dataspace, Time now) 
 	{
 		String esType = ESTYPE;
 //		String v = _client.getConfig().getIndexAliasVersion();
@@ -507,11 +507,11 @@ public class ESStorage implements IDataLogStorage {
 	 */
 	static final String ESTYPE = "evt";
 
-	@Override
-	public void registerEventType(Dataspace dataspace, String eventType) {		
-		ESHttpClient _client = client(dataspace);
-		registerEventType2(_client, dataspace, new Time());
-	}
+//	@Override
+//	public void registerEventType(Dataspace dataspace, String eventType) {		
+//		ESHttpClient _client = client(dataspace);
+//		registerEventType2(_client, dataspace, new Time());
+//	}
 	
 	public double getEventTotal(Time start, Time end, DataLogEvent spec) {
 		SearchResponse sr = getData2(spec, start, end, false);

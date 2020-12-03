@@ -184,9 +184,11 @@ public class AppUtils {
 			thing = new JThing().setMap(draftMap);
 		}
 		assert thing != null : draftPath;
-		// set status
-		thing = setStatus(thing, newStatus);		
+		// set state to draft (NB: archived is handled by an action=archive flag)
+		thing = setStatus(thing, newStatus);
+
 		// update draft // TODO just an update script to set status
+		Log.d("crud", "unpublish "+newStatus+" doSave "+draftPath);
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 		UpdateRequestBuilder up = client.prepareUpdate(draftPath);
 		up.setDoc(thing.map());
@@ -196,11 +198,9 @@ public class AppUtils {
 		
 		// delete the published version	
 		if ( ! draftPath.equals(pubPath)) {
-			Log.d("unpublish", "deleting published version "+pubPath);
-			DeleteRequestBuilder del = client.prepareDelete(pubPath.index(), pubPath.type, pubPath.id);
-			IESResponse ok = del.get().check();		
+			AppUtils.doDelete(pubPath);
 		}
-		
+		// done
 		return thing;
 	}
 
@@ -294,7 +294,7 @@ public class AppUtils {
 	}
 
 	/**
-	 * Save edits to *draft*
+	 * Save edits to *draft*. Modifies status.
 	 * @param path
 	 * @param item
 	 * @param state Can be null
@@ -313,8 +313,6 @@ public class AppUtils {
 		} else if (!Utils.streq(s, KStatus.ARCHIVED)) {
 			AppUtils.setStatus(item, KStatus.DRAFT);
 		}
-		// Update last-modified timestamp
-		item.put("lastModified", new Time().toISOString());
 		// talk to ES
 		return doSaveEdit2(path, item, state);
 	}

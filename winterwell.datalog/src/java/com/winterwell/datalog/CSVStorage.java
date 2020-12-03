@@ -229,7 +229,4 @@ public class CSVStorage implements IDataLogStorage {
 		
 	}
 
-	@Override
-	public void registerEventType(Dataspace dataspace, String eventType) {
-	}
 }

@@ -55,7 +55,9 @@ dataStream.get(bucketer.getBucket(time)).add(0, 1);
 </pre></code>
 
 	 * @param start The first bucket will be [start, start+step)
-	 * @param end The last bucket will be [?, end) 
+	 * @param end The last bucket will be [?, end).
+	 *  So end is excluded (as is normalish for these kind of slicings, and helps avoid overlaps).
+	 * 	If you want to include the end, add a bit of time to it. 
 	 * NB: All the buckets are created on construction, so don't use a far-future end!
 	 * @param step
 	 */

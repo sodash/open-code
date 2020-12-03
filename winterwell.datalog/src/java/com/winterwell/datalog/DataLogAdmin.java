@@ -8,10 +8,10 @@ public class DataLogAdmin implements IDataLogAdmin {
 		this.datalog = dataLogImpl;
 	}
 
-	@Override
-	public void registerEventType(CharSequence dataspace, String eventType) {
-		datalog.storage.registerEventType(new Dataspace(dataspace), eventType);		
-	}
+//	@Override
+//	public void registerEventType(CharSequence dataspace, String eventType) {
+//		datalog.storage.registerEventType(new Dataspace(dataspace), eventType);		
+//	}
 
 	@Override
 	public void registerDataspace(CharSequence dataspace) {

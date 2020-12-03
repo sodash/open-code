@@ -191,7 +191,7 @@ public class ESStorageTest {
 				));
 		
 		storage.registerDataspace(dataspace);
-		storage.registerEventType(dataspace, event.getEventType0());
+//		storage.registerEventType(dataspace, event.getEventType0());
 		
 		Period period = new Period(start, new Time());
 		// save it!

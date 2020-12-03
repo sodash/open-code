@@ -58,7 +58,7 @@ public class DataLogConfig extends DBOptions implements IInit, ISiteConfig {
 			new Dt(15, TUnit.MINUTE);
 
 	/**
-	 * Normally "default", This sets {@link DataLog#DEFAULT_DATASPACE}
+	 * Normally "default" or "gl", This sets {@link DataLog#DEFAULT_DATASPACE}
 	 */
 	@Option(description = "namespace: if set, use a separate namespace (to avoid race-condition overwriting of stats with another JVM).")
 	public String namespace = "default";

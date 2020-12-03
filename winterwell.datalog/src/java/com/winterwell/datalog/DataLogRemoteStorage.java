@@ -235,8 +235,4 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		}
 	}
 
-	@Override
-	public void registerEventType(Dataspace dataspace, String eventType) {
-		// no-op??
-	}
 }
