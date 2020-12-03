@@ -17,6 +17,7 @@ import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.fail.ESDocNotFoundException;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
+import com.winterwell.gson.JsonArray;
 import com.winterwell.gson.JsonElement;
 import com.winterwell.gson.JsonObject;
 import com.winterwell.gson.JsonParser;
@@ -142,8 +143,25 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		Log.d("compress", response2);
 		System.out.println("Transforming data, please wait...");
 		
-		Utils.sleep(36000000); //allow transform job to be completed before deleting it, a safe estimate would be one hour
+		//allow transform job to be completed before deleting it
+		FakeBrowser fb = new FakeBrowser();
+		boolean done = false;
+		while (!done) {
+			String stats = fb.getPage(config.esUrl+"/_transform/"+jobId+"/_stats");
+			JsonElement jelement = new JsonParser().parse(stats);
+		    JsonObject  jobject = jelement.getAsJsonObject();
+		    JsonArray jarray = jobject.getAsJsonArray("transforms");
+		    jelement = jarray.get(0);
+		    jobject = jelement.getAsJsonObject();
+		    if (jobject.get("state").getAsString().equals("stopped")) {
+		    	done = true;
+		    	break;
+		    }
+		    Utils.sleep(10000); //check state every 10 seconds
+		}
+		
 		//delete the transform job
+		System.out.println("Transform job done!");
 		TransformRequestBuilder trb3 = esc.prepareTransformDelete(jobId); 
 		trb3.setDebug(true);
 		IESResponse response3 = trb3.get();
