@@ -8,6 +8,7 @@ import com.winterwell.datalog.DataLogConfig;
 import com.winterwell.datalog.DataLogEvent;
 import com.winterwell.datalog.ESStorage;
 import com.winterwell.es.ESType;
+import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.TransformRequestBuilder;
@@ -16,6 +17,9 @@ import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
 import com.winterwell.es.fail.ESDocNotFoundException;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
+import com.winterwell.gson.JsonElement;
+import com.winterwell.gson.JsonObject;
+import com.winterwell.gson.JsonParser;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
@@ -25,6 +29,7 @@ import com.winterwell.utils.log.LogFile;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
+import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.app.AMain;
 
 /**
@@ -102,6 +107,8 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		createIndexWithPropertiesMapping(index, ALIAS, terms);
 		
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		ESConfig config = esc.getConfig();
+		
 		// aggregate data
 		String jobId = "transform_"+dataspace+"_"+monthYear;
 		
@@ -117,8 +124,13 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		// create transform job
 		// specify source and destination and time interval
 		TransformRequestBuilder trb = esc.prepareTransform(jobId);
-		trb.setBody(source, index, aggs, terms, "24h");
-		//trb.setBodyWithPainless(source, index, aggs, terms, "24h"); //for ES version < 7.10.0
+		if (getESVersion(config.esUrl) == "7.10.0") { // might have to change for future upgrades of ES
+			Printer.out("Using latest version of ES: more efficient transform!");
+			trb.setBody(source, index, aggs, terms, "24h");
+		} else {
+			Printer.out("Not using latest version of ES: painless script for transform...");
+			trb.setBodyWithPainless(source, index, aggs, terms, "24h");
+		}
 		trb.setDebug(true);
 		IESResponse response = trb.get(); //might take a long time for complex body
 		Log.d("compress", response);
@@ -197,6 +209,16 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		} catch (ESIndexAlreadyExistsException ex) {
 			Log.w("compress", "Index "+idx+" already exists, proceeding...");
 		}
+	}
+	
+	private String getESVersion(String esUrl) {
+		FakeBrowser fb = new FakeBrowser();
+		fb.setDebug(true);
+		String json = fb.getPage(esUrl);
+		JsonElement jelement = new JsonParser().parse(json);
+	    JsonObject  jobject = jelement.getAsJsonObject();
+	    jobject = jobject.getAsJsonObject("version");
+	    return jobject.get("number").getAsString();
 	}
 
 }
