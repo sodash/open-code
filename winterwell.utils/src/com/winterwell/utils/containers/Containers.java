@@ -1963,7 +1963,13 @@ public final class Containers  {
 		return (List<X>) Collections.singletonList(itemOrListOrArray);
 	}
 
-
+	/**
+	 * Case and whitespace insensitive get
+	 * @param <X>
+	 * @param map
+	 * @param key
+	 * @return
+	 */
 	public static <X> X getLenient(Map<String, X> map, String key) {
 		// normal key?
 		X v = map.get(key);
