@@ -34,8 +34,9 @@ import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.app.AMain;
 
 /**
+ * Use Transforms to compress datalog month data
  * 
- * Should we use RollUps?? - Nov 2020, rollups were not so easy to get started with
+ * NB: Should we use RollUps?? - Nov 2020, rollups were not so easy to get started with
  * 
  * https://www.elastic.co/guide/en/elasticsearch/reference/7.9/data-rollup-transform.html
  * 
@@ -47,7 +48,7 @@ import com.winterwell.web.app.AMain;
  */
 public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 	
-	public final static String ALIAS = "datalog.transformed.all";
+//	public final static String ALIAS = "datalog.transformed.all";
 	
 	
 	public static void main(String[] args) {
