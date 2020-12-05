@@ -24,6 +24,7 @@ import com.winterwell.gson.JsonParser;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.VersionString;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
@@ -106,7 +107,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		);
 
 		// create index and mapping
-		createIndexWithPropertiesMapping(index, ALIAS, terms);
+		createIndexWithPropertiesMapping(index, null, terms);
 		
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		ESConfig config = esc.getConfig();
@@ -126,11 +127,13 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		// create transform job
 		// specify source and destination and time interval
 		TransformRequestBuilder trb = esc.prepareTransform(jobId);
-		if (getESVersion(config.esUrl).equals("7.10.0")) { // might have to change for future upgrades of ES
-			Printer.out("Using latest version of ES: more efficient transform!");
+		String version = esc.getESVersion();
+		VersionString vs = new VersionString(version);
+		if (vs.geq("7.10.0")) { // might have to change for future upgrades of ES
+			Log.i("Using modern version of ES: more efficient transform!");
 			trb.setBody(source, index, aggs, terms, "24h");
 		} else {
-			Printer.out("Not using latest version of ES: painless script for transform...");
+			Log.w("Not using latest version of ES: painless script for transform...");
 			trb.setBodyWithPainless(source, index, aggs, terms, "24h");
 		}
 		trb.setDebug(true);
@@ -148,6 +151,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		FakeBrowser fb = new FakeBrowser();
 		boolean done = false;
 		while (!done) {
+			// TODO as client thing
 			String stats = fb.getPage(config.esUrl+"/_transform/"+jobId+"/_stats");
 			JsonElement jelement = new JsonParser().parse(stats);
 		    JsonObject  jobject = jelement.getAsJsonObject();
@@ -162,7 +166,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		}
 		
 		//delete the transform job
-		System.out.println("Transform job done!");
+		Log.i("Transform job done!");
 		TransformRequestBuilder trb3 = esc.prepareTransformDelete(jobId); 
 		trb3.setDebug(true);
 		IESResponse response3 = trb3.get();
@@ -182,7 +186,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 	 * (BUT that code is a bit messy)
 	 * 
 	 * @param idx
-	 * @param alias
+	 * @param alias Optional
 	 * @param terms 
 	 * @return
 	 */
@@ -194,7 +198,8 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		try {
 			// make the index
-			CreateIndexRequest cir = esc.admin().indices().prepareCreate(idx).setAlias(alias);
+			CreateIndexRequest cir = esc.admin().indices().prepareCreate(idx);
+			if ( ! Utils.isBlank(alias)) cir.setAlias(alias);
 			cir.get().check();
 			Utils.sleep(100);
 			// set properties mapping
@@ -230,14 +235,6 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		}
 	}
 	
-	private String getESVersion(String esUrl) {
-		FakeBrowser fb = new FakeBrowser();
-		fb.setDebug(true);
-		String json = fb.getPage(esUrl);
-		JsonElement jelement = new JsonParser().parse(json);
-	    JsonObject  jobject = jelement.getAsJsonObject();
-	    jobject = jobject.getAsJsonObject("version");
-	    return jobject.get("number").getAsString();
-	}
-
+	ESHttpClient esc = Dep.get(ESHttpClient.class);
+	
 }
