@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 
 public class ICalEvent {
@@ -81,5 +82,9 @@ public class ICalEvent {
 		this.repeat = repeater;
 		if (repeat.since==null) repeat.setSince(start);
 		assert repeat.since.equals(start) : repeat+" vs "+this;
+	}
+
+	public Period getPeriod() {
+		return new Period(start, end);
 	}
 }

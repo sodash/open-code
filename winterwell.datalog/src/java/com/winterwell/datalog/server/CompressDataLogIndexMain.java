@@ -22,7 +22,6 @@ import com.winterwell.gson.JsonElement;
 import com.winterwell.gson.JsonObject;
 import com.winterwell.gson.JsonParser;
 import com.winterwell.utils.Dep;
-import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.VersionString;
 import com.winterwell.utils.io.FileUtils;
@@ -89,6 +88,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		if ( ! Utils.isEmpty(configRemainderArgs)) {
 			t = TimeUtils.parseExperimental(configRemainderArgs.get(0));
 		} else {
+			// default to 2 months ago
 			t = new Time().minus(2, TUnit.MONTH);
 		}		
 		String monthYear = t.format("MMMyy").toLowerCase();
@@ -110,7 +110,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		createIndexWithPropertiesMapping(index, null, terms);
 		
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		ESConfig config = esc.getConfig();
+		ESConfig esConfig = esc.getConfig();
 		
 		// aggregate data
 		String jobId = "transform_"+dataspace+"_"+monthYear;
@@ -121,7 +121,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 			trb_safety.setDebug(true);
 			trb_safety.get();
 		} catch (ESDocNotFoundException e) {
-			Printer.out("Safe to continue...");
+			Log.d(LOGTAG, "Safe to continue...");
 		}
 		
 		// create transform job
@@ -129,7 +129,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		TransformRequestBuilder trb = esc.prepareTransform(jobId);
 		String version = esc.getESVersion();
 		VersionString vs = new VersionString(version);
-		if (vs.geq("7.10.0")) { // might have to change for future upgrades of ES
+		if (vs.geq("7.10.0")) {
 			Log.i("Using modern version of ES: more efficient transform!");
 			trb.setBody(source, index, aggs, terms, "24h");
 		} else {
@@ -144,15 +144,15 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		TransformRequestBuilder trb2 = esc.prepareTransformStart(jobId); 
 		trb2.setDebug(true);
 		IESResponse response2 = trb2.get().check();
-		Log.d("compress", response2);
-		System.out.println("Transforming data, please wait...");
+		Log.d(LOGTAG, response2);
+		Log.d(LOGTAG, "Transforming data, please wait...");
 		
 		//allow transform job to be completed before deleting it
 		FakeBrowser fb = new FakeBrowser();
 		boolean done = false;
 		while (!done) {
 			// TODO as client thing
-			String stats = fb.getPage(config.esUrl+"/_transform/"+jobId+"/_stats");
+			String stats = fb.getPage(esConfig.esUrl+"/_transform/"+jobId+"/_stats");
 			JsonElement jelement = new JsonParser().parse(stats);
 		    JsonObject  jobject = jelement.getAsJsonObject();
 		    JsonArray jarray = jobject.getAsJsonArray("transforms");
@@ -191,11 +191,12 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 	 * @return
 	 */
 	private void createIndexWithPropertiesMapping(String idx, String alias, List<String> terms) {
-//		Dep.setIfAbsent(FlexiGson.class, new FlexiGson());
-//		Dep.setIfAbsent(ESConfig.class, new ESConfig());
-//		if ( ! Dep.has(ESHttpClient.class)) Dep.setSupplier(ESHttpClient.class, false, ESHttpClient::new);
-		
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		// already exists?
+		boolean already = esc.admin().indices().indexExists(idx);
+		if (already) {
+			return;
+		}
 		try {
 			// make the index
 			CreateIndexRequest cir = esc.admin().indices().prepareCreate(idx);
@@ -233,8 +234,8 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		} catch (ESIndexAlreadyExistsException ex) {
 			Log.w("compress", "Index "+idx+" already exists, proceeding...");
 		}
-	}
+	}	
 	
-	ESHttpClient esc = Dep.get(ESHttpClient.class);
+	private static final String LOGTAG = "compress";
 	
 }

@@ -48,6 +48,7 @@ public class TaskRunner {
 	 */
 	public void shutdown() {
 		Log.i("TaskRunner." + getName(), "shutdown");
+		shutdownFlag = true;
 		exec.shutdown();
 	}
 
@@ -124,6 +125,8 @@ public class TaskRunner {
 
 	private String name = "?";
 
+	private boolean shutdownFlag;
+
 	/**
 	 * 
 	 * @param name
@@ -164,6 +167,7 @@ public class TaskRunner {
 	 * Convenience for {@link #awaitTermination(long, TimeUnit)} with a long timeout.
 	 */
 	public void awaitTermination() {
+		if ( ! shutdownFlag) throw new IllegalStateException("Call shutdown before awaitTermination");		
 		try {
 			exec.awaitTermination(10, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
@@ -171,6 +175,14 @@ public class TaskRunner {
 		}
 	}
 
+	/**
+	 * Wait for all queued tasks to clear. This does not shutdown the taskrunner, so fresh tasks could be submitted.
+	 */
+	public void waitFor() {
+		while(getQueueSize() > 0) {
+			Utils.sleep(100);
+		}
+	}
 
 	/**
 	 * Clean up any references to task. Called by the task on success, failure
@@ -299,6 +311,7 @@ public class TaskRunner {
      * @return list of tasks that never commenced execution
      */
 	public List<Runnable> shutdownNow() {
+		shutdownFlag = true;
 		return exec.shutdownNow();
 	}
 
