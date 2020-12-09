@@ -5,7 +5,7 @@
 # Versions of this script are usually run by TeamCity, in response to a git commit.
 # The script uses ssh remote commands to target a server -- it does not affect the local machine.
 # For testing, the script can also be run from your local computer.
-#Version 1.4.1
+#Version 1.4.4
 # Latest Change -- Adding new dependency checks -- Attempting to create parity with production publisher template script
 
 #####  GENERAL SETTINGS
@@ -21,6 +21,7 @@ PROJECT_USES_NPM='no' # yes or no
 PROJECT_USES_WEBPACK='no' #yes or no
 PROJECT_USES_JERBIL='no' #yes or no
 PROJECT_USES_WWAPPBASE_SYMLINK='no'
+BRANCH='master' # If changed -- you must also change the VCS settings for this project in teamcity
 
 # Where is the test server?
 TARGET_SERVERS=(baker.good-loop.com)
@@ -31,6 +32,7 @@ TARGET_SERVERS=(baker.good-loop.com)
 #####
 PROJECT_ROOT_ON_SERVER="/home/winterwell/$PROJECT_NAME/winterwell.datalog"
 WWAPPBASE_REPO_PATH_ON_SERVER_DISK="/home/winterwell/wwappbase.js"
+PROJECT_LOG_FILE="$PROJECT_ROOT_ON_SERVER/logs/$PROJECT_NAME.log"
 
 
 ##### UNDENIABLY ESOTERIC SETTINGS
@@ -63,10 +65,11 @@ function send_alert_email {
 }
 
 
-# Git Cleanup Function -- More of a classic 'I type this too much, it should be a function', Function.
+# Git Cleanup Function -- More of a classic 'I type this too much, it should be a function', Function. This Function's Version is 1.01
 function git_hard_set_to_master {
     ssh winterwell@$server "cd $1 && git gc --prune=now"
-    ssh winterwell@$server "cd $1 && git pull origin master"
+    ssh winterwell@$server "cd $1 && git checkout -f $BRANCH"
+    ssh winterwell@$server "cd $1 && git pull origin $BRANCH"
     ssh winterwell@$server "cd $1 && git reset --hard FETCH_HEAD"
 }
 
@@ -336,7 +339,34 @@ function start_service {
     fi
 }
 
-
+## Checking the immediate logged output for errors or warnings - This Function's Version is 0.01
+function catch_JVM_success_or_error {
+    if [[ $PROJECT_USES_BOB = 'yes' ]]; then
+        INITIAL_LOG_NUM_LINES=$(wc -l $PROJECT_LOG_FILE | awk '{print $1}')
+        while read -t 10 line; do
+            case "$line" in
+                *"AMain Running"* )
+                    printf "\n\t$PROJECT_NAME 's JVM reports a successful startup\n"
+                    exit
+                ;;
+                *"ES.init To reindex"* )
+                    printf "\n\t\e[30;41m$PROJECT_NAME reports that at least one ES index will need to be re-indexed and re-aliased\e[0m\n"
+                    printf "You'll need to read the logged output of the JVM in order to see what exactly needs to be changed\n"
+                    exit
+                ;;
+            esac
+        done < <(tail --lines=+$INITIAL_LOG_NUM_LINES -f $PROJECT_LOG_FILE)
+        RETVAL=$?
+        case $RETVAL in
+            0)
+                echo ""
+            ;;
+            *)
+                printf "The JVM was given 10 seconds to report either success or that an elasticsearch index requires a re-index and re-aliasing before it could start. No such indication was received and parsed.  Please check your service and the log file for this project\n"
+            ;;
+        esac
+    fi
+}
 ################
 ### Run the Functions in Order
 ################
@@ -356,3 +386,4 @@ use_npm
 use_webpack
 use_jerbil
 start_service
+catch_JVM_success_or_error
