@@ -50,6 +50,10 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 	
 //	public final static String ALIAS = "datalog.transformed.all";
 	
+	@Override
+	protected void launchJetty() {
+		Log.d(LOGTAG, "No Jetty launch - this app doesn't need or want a web server.");
+	}
 	
 	public static void main(String[] args) {
 		CompressDataLogIndexMain amain = new CompressDataLogIndexMain();

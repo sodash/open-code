@@ -391,7 +391,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 	
 
-	private void launchJetty() {
+	protected void launchJetty() {
 		try {
 			Log.i("Go!");
 			assert jl==null;
