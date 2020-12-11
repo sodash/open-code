@@ -31,9 +31,4 @@ public class BuildDataLog extends BuildWinterwellProject {
 		return deps;
 	}	
 
-	@Override
-	protected File getTestBinDir() {
-		return new File(projectDir, "bin.test");
-	}
-
 }

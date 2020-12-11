@@ -313,7 +313,7 @@ public class BuildWinterwellProject extends BuildTask {
 	 * @param _projectName
 	 * @return
 	 */
-	private static File guessProjectDir(String _projectName) {
+	protected static File guessProjectDir(String _projectName) {
 		WinterwellProjectFinder wpg = new WinterwellProjectFinder();
 		return wpg.apply(_projectName);
 	}
