@@ -96,8 +96,10 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 			t = new Time().minus(2, TUnit.MONTH);
 		}		
 		String monthYear = t.format("MMMyy").toLowerCase();
-		String index = "datalog."+dataspace+"_transformed_" + monthYear;
-		String source = "datalog."+dataspace+"_" + monthYear;
+		String index = "scrubbed.datalog."+dataspace+"_transformed_" + monthYear;
+		String source = "scrubbed.datalog."+dataspace+"_" + monthYear;
+//		String index = "scrubbed.datalog."+dataspace+"_transformed_dec19_mapfix"; // FOR USE ON BAKER
+//		String source = "scrubbed.datalog."+dataspace+"_dec19_mapfix"; // FOR USE ON BAKER
 
 		// specify some terms that we want to keep
 		// See DataLogEvent#COMMON_PROPS
