@@ -319,9 +319,10 @@ public class ConfigBuilder {
 				Field field = token2field.get(a);
 				if (field == null) {
 					Log.w(LOGTAG, config.getClass()+" Unrecognised option: "+a+" from main args "+Printer.toString(args));
-					// advance i anyway??
-					if (args.length > i+1 && ! args[i+1].startsWith("-")) i++;
-					continue;
+					break; // goes into the remainder
+//					// advance i anyway??
+//					if (args.length > i+1 && ! args[i+1].startsWith("-")) i++;
+//					continue;
 				}
 				// set field & advance i appropriately
 				i = parse2_1arg(args, i, field);

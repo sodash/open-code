@@ -2,7 +2,6 @@ package com.winterwell.web.app;
 
 import java.io.File;
 import java.util.List;
-
 import com.winterwell.datalog.DataLog;
 import com.winterwell.es.IESRouter;
 import com.winterwell.es.StdESRouter;
@@ -20,6 +19,7 @@ import com.winterwell.utils.Mutable.Ref;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -382,12 +382,28 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			cf.setArgs(args);
 		}
 		Ref<List> rremainderArgs = new Mutable.Ref();
-		ConfigType c = (ConfigType) cf.getConfig(ct, rremainderArgs);		
+		ConfigType c = (ConfigType) cf.getConfig(ct, rremainderArgs);
+		
+		Object r0 = Utils.isEmpty(rremainderArgs.value)? null : rremainderArgs.value.get(0); 
+		if ("--help".equals(r0) || "-help".equals("r0")) {
+			showHelp();
+			System.exit(1);
+		}
+		
 		// set them for manifest
 		ManifestServlet.addConfig(c);
 		assert c != null;
 		configRemainderArgs = rremainderArgs.value;
 		return c;		
+	}
+	
+	protected void showHelp() {
+		System.out.println("");
+		System.out.println(appName);
+		System.out.println("----------------------------------------");
+		System.out.println("");
+		ConfigBuilder cb = new ConfigBuilder(configType);
+		System.out.println(cb.getOptionsMessage(null));
 	}
 	
 
