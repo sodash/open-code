@@ -7,17 +7,16 @@ import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.WinterwellProjectFinder;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
 
-public class BuildCompressDataLogIndex extends BuildWinterwellProject {
+public class BuildCompressor extends BuildWinterwellProject {
 
-	public BuildCompressDataLogIndex() {
+	public static void main(String[] args) throws Exception {
+		BuildCompressor b = new BuildCompressor();
+		b.doTask();
+	}
+	
+	public BuildCompressor() {
 		super(new WinterwellProjectFinder().apply("winterwell.datalog"), "datalog.compressor");
 		setMainClass("com.winterwell.datalog.server.CompressDataLogIndexMain");
-	}	
-
-	@Override
-	public List<BuildTask> getDependencies() {
-		List<BuildTask> deps = super.getDependencies();		
-		return deps;
 	}	
 
 }
