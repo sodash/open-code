@@ -46,7 +46,7 @@ import com.winterwell.web.test.TestHttpSession;
 /**
  * The state of this request. Has properties and some special fields.
  * 
- * @testedby  WebRequestTest}
+ * @testedby  WebRequestTest
  * @author daniel
  * 
  */
@@ -1083,7 +1083,7 @@ public class WebRequest implements IProperties, Closeable {
 
 	/**
 	 * Send a redirect *if* one was specified either via
-	 * {@link Fields#REDIRECT_REQUEST2} or by {@link #setRedirect(String)}. A
+	 * `link` or by {@link #setRedirect(String)}. A
 	 * redirect location of "back" is interpreted as redirect-to-previous-page
 	 * using the referer http header.
 	 * 
@@ -1130,7 +1130,7 @@ public class WebRequest implements IProperties, Closeable {
 	/**
 	 * Set the desired redirect (does not cause a redirect until
 	 * {@link #sendRedirect()} is called). This will automatically have been set
-	 * from the request variable {@link Fields#REDIRECT_REQUEST2} if it was
+	 * from the request variable `link` if it was
 	 * present, but it can be overridden.
 	 * 
 	 * @param location
