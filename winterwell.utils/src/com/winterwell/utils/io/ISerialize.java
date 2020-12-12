@@ -48,7 +48,7 @@ public interface ISerialize<X> {
 	 *         default implementation just uses toString().<br>
 	 * @see convertString(String) which is the inverse of this
 	 */
-	String toString(X value) throws Exception;
+	String toString(X value);
 
 	/**
 	 * Must be the name of the Key / field.

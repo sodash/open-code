@@ -28,7 +28,7 @@ public class SerializeViaConstructor implements ISerialize {
 	}
 
 	@Override
-	public String toString(Object value) throws Exception {
+	public String toString(Object value) {
 		return value.toString();
 	}
 

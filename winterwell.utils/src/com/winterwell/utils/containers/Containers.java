@@ -26,6 +26,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.graalvm.compiler.nodes.java.NewMultiArrayNode;
+
 import com.winterwell.utils.BestOne;
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.IFn;
@@ -349,7 +351,8 @@ public final class Containers  {
 	 * @return {key: fn applied to each value}
 	 */
 	public static <K, I, O> Map<K,O> applyToMap(Map<? extends K, ? extends I> map, java.util.function.BiFunction<K, I, O> fn) {
-		HashMap after = new HashMap(map.size());
+		// HashMap is a good choice - but keep ArrayMap (with ordering) if that was the input
+		Map after = map instanceof ArrayMap? new ArrayMap(map.size()) : new HashMap(map.size());
 		for (K k : map.keySet()) {
 			try {
 				I v = map.get(k);				
@@ -2005,6 +2008,12 @@ public final class Containers  {
 			return null;
 		}
 		return map.get(k);
+	}
+
+
+	public static <K,V> Map<K, V> filterNulls(Map<K, V> map) {
+		Map<K, V> newMap = applyToValues(v -> v, map);
+		return newMap;
 	}
 
 

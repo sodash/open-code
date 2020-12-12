@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.winterwell.utils.StrUtils;
+import com.winterwell.utils.io.ISerialize;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.web.WebInputException;
 
@@ -38,7 +39,7 @@ public class ListField<X> extends AField<List<X>> {
 
 	private static final long serialVersionUID = 1L;
 
-	private AField<X> elementConverter;
+	private ISerialize<X> elementConverter;
 
 	KNullPolicy nullPolicy = KNullPolicy.KEEP;
 
@@ -51,12 +52,12 @@ public class ListField<X> extends AField<List<X>> {
 	 *            Can be null if the elements are Strings which need no
 	 *            converting
 	 */
-	public ListField(String name, AField<X> elementConverter) {
+	public ListField(String name, ISerialize<X> elementConverter) {
 		super(name);
 		this.elementConverter = elementConverter;
 	}
 
-	public ListField(String name, String type, AField<X> elementConverter) {
+	public ListField(String name, String type, ISerialize<X> elementConverter) {
 		super(name, type);
 		this.elementConverter = elementConverter;
 	}
@@ -139,8 +140,8 @@ public class ListField<X> extends AField<List<X>> {
 		StringBuilder sb = new StringBuilder();
 		for (X x : value) {
 			assert x != null : value;
-			String s = elementConverter == null ? (String) x : elementConverter
-					.toString(x);
+			String s = elementConverter == null ? (String) x 
+					: elementConverter.toString(x);
 			// Problem characters?
 			if (s.contains("\r") || s.contains("\n") || s.contains("\"")
 					|| s.contains(",")) {

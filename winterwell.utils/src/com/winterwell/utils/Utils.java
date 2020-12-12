@@ -716,5 +716,20 @@ public final class Utils {
 		return ex.getMessage();
 	}
 
+	public static String toString(Object obj) {
+		if (obj==null) return "null";
+		Map<String, Object> omap = Containers.objectAsMap(obj);
+		omap = Containers.filterNulls(omap);
+		String className = obj.getClass().getSimpleName();
+		if (omap.isEmpty()) {			
+			return className;
+		}
+		String s = Printer.toString(omap, ", ", "=");
+		if (s.length()<2) {
+			return className;
+		}
+		return className+"["+s.substring(1, s.length()-1)+"]";
+	}
+
 
 }
