@@ -1844,8 +1844,11 @@ public final class Containers  {
 	 */
 	public static <A,B> List<B> pluckNotNull(List<A> list, Function<A,B> fn) {
 		if (list==null) return Collections.EMPTY_LIST;
-		// Java 8 streams + lambdas for the win
-		return list.stream().filter(a -> a != null).map(fn).filter(b -> Utils.truthy(b)).collect(Collectors.toList());
+		// Java 8 streams + lambdas
+//		return list.stream().filter(a -> a != null).map(fn).filter(b -> Utils.truthy(b)).collect(Collectors.toList());
+		// Hm: w/o streams is actually cleaner and faster
+		List<B> bs = filterNulls(apply(list, a -> a==null? null : fn.apply(a)));
+		return bs;
 	}
 	
 
