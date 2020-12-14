@@ -137,6 +137,20 @@ public class TimeUtilsTest {
 	}
 
 	@Test
+	public void parseExperimental_UK() {
+		{
+			String s = "19/10/2020";
+			Time t = TimeUtils.parseExperimental(s);
+			assert t.getMonth() == 10 : t;
+		}
+		{
+			String s = "09/10/2020";
+			Time t = TimeUtils.parseExperimental(s);
+			assert t.getMonth() == 10 : t;
+		}
+	}
+	
+	@Test
 	public void parseExperimental_iso() {
 		{
 			Time f = TimeUtils.parseExperimental("2017-12-2");

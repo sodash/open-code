@@ -23,6 +23,25 @@ public class TimeTest {
 	public static void main(String[] args) {
 		System.out.println(new Time().minus(1, TUnit.MONTH).getTime());
 	}
+
+	@Test
+	public void parse_nonUS_US() {
+		{
+			String s = "19/10/2020";
+			Time t = new Time(s);
+			assert t.getMonth() == 10 : t;
+		}
+		{
+			String s = "09/10/2020";
+			Time t = new Time(s);
+			assert t.getMonth() == 10 : t;
+		}
+		{	// Must be US
+			String s = "03/14/2020";
+			Time t = new Time(s);
+			assert t.getMonth() == 3 : t;
+		}
+	}
 	
 	@Test
 	public void testISO8601Format() {

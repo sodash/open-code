@@ -647,7 +647,20 @@ public class WebUtilsTest extends TestCase {
 		}
 	}
 	
-	
+	public void testUrlRegex_file() {
+		{ 
+			Matcher m = WebUtils.URL_REGEX
+					.matcher("hello http://bbc.com/home/daniel/Downloads/Image38-11.jpg");
+			assert m.find();
+			assertEquals("http://bbc.com/home/daniel/Downloads/Image38-11.jpg", m.group());
+		}
+		{ 
+			Matcher m = WebUtils.URL_REGEX
+					.matcher("hello file:///home/daniel/Downloads/Image38-11.jpg");
+			assert m.find();
+			assertEquals("file:///home/daniel/Downloads/Image38-11.jpg", m.group());
+		}
+	}
 
 	public void testUrlOrDomainRegex() {
 		{ // chop trailing punctuation

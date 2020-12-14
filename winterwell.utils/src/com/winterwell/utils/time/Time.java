@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
@@ -159,6 +160,10 @@ public final class Time implements Serializable, Comparable<Time> {
 		ut = parse(date);
 	}	
 
+	
+	/**
+	 * An ISO format date
+	 */
 	private static final Pattern DATE_ONLY = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
 	
 	private static long parse(String date) {
@@ -199,15 +204,54 @@ public final class Time implements Serializable, Comparable<Time> {
 //				_ut = parsed.getTime();
 			return 1000*zes;
 		} catch(Exception ex2) {	
-			try {
-				// Try Date, which can handle Time.toString()
-				return Date.parse(date);
-			} catch(Exception ex3) {
-				// be more informative! _What_ failed to parse
-				throw new IllegalArgumentException(StrUtils.ellipsize(date, 100));
+			// oh well
+		}		
+		// sniff for dd/mm/yy with some UK/US smarts
+		// NB: Date.parse is not so smart, so we do this first
+		Pattern ddmmyy = Pattern.compile("(\\d{1,2})/(\\d{1,2})/(\\d{2,4})");
+		Matcher m2 = ddmmyy.matcher(date);
+		if (m2.matches()) {
+			int d = Integer.parseInt(m2.group(1));
+			int mon = Integer.parseInt(m2.group(2));
+			int y = Integer.parseInt(m2.group(3));
+			if (d==0 || mon==0 || y==0) {
+				throw new IllegalArgumentException(date);
 			}
-		}			
+			if (y<100) {	// short year, e.g. '20 =2020 or '89 = 1989
+				if (y< 50) y+= 2000; // guess the century!
+				else y += 1900;
+			}
+			if (m2.group(3).length()==3) {
+				throw new IllegalArgumentException("bad year "+date);
+			}
+			if (y <= 1000 || y > 4000) {
+				throw new IllegalArgumentException("Please use an explicit format for "+date);
+			}
+			// prefer non-US, then US
+			if (mon < 13) {
+				if (d > 31) throw new IllegalArgumentException(date);
+				// Emit a mild warning as this is common but risky practice 
+				Log.d("time", "Please use an explicit format for ambiguous probably-non-US date: "+date+" "+ReflectionUtils.getSomeStack(8));
+				// non-US is OK
+				return new Time(y,mon,d).getTime();
+			} else {
+				// swap d and mon
+				if (mon > 31) throw new IllegalArgumentException(date);
+				if (d > 12) throw new IllegalArgumentException(date);
+				Log.d("time", "Please use an explicit format for ambiguous probably-US date: "+date+" "+ReflectionUtils.getSomeStack(8));
+				return new Time(y,d,mon).getTime();
+			}			
+		} // ./dd/mm/yy
+		try {
+			// Try Date, which can handle Time.toString()
+			return Date.parse(date);
+		} catch(Exception ex3) {
+			// be more informative! _What_ failed to parse
+			throw new IllegalArgumentException(StrUtils.ellipsize(date, 100));
+		}
 	}
+	
+	
 
 	/**
 	 * zero pad to 2 digits
