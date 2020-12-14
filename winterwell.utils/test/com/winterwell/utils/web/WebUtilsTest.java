@@ -591,6 +591,12 @@ public class WebUtilsTest extends TestCase {
 	}
 	
 	public void testUrlRegex() {
+		{	// g-doc example
+			String googleDoc = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRy22C_2Q_DS_eC30Rsn3ycIf_DzwnTH-PrFa1S_WsH0/pub?output=csv";
+			Matcher m = WebUtils.URL_REGEX
+					.matcher(googleDoc);
+			assert m.matches();
+		}
 		{ // chop trailing punctuation
 			Matcher m = WebUtils.URL_REGEX
 					.matcher("hello http://whatever.com/?yes=no.");
