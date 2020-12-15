@@ -11,7 +11,9 @@ import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
+import com.winterwell.datalog.Rate;
 import com.winterwell.utils.containers.Pair;
+import com.winterwell.utils.log.Log;
 
 /**
  * Because Date and Calendar both have problems, but JodaTime is
@@ -102,7 +104,7 @@ public class TimeUtils {
 	 */
 	static final Pattern YEAR = Pattern
 			.compile("([123]\\d\\d\\d)|(\\d+) ?(a\\.?d\\.?|b\\.?c\\.?e?\\.?|c\\.?e\\.?)");
-
+	
 	/**
 	 * Add n dts to date, e.g. 3 days to 12th May = 15th May. Creates a new date
 	 * object.

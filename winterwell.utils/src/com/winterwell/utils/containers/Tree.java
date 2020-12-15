@@ -276,7 +276,7 @@ implements Iterable<Tree<X>>, ITree<X>, IHasJson
 			return new ArrayMap("value", value);
 		}
 		// recurse
-		ArrayList jsonkids = Containers.apply(tree.getChildren(), kid -> toJsonTree(kid));
+		List jsonkids = Containers.apply(tree.getChildren(), kid -> toJsonTree(kid));
 		return new ArrayMap(
 			"value", value,
 			"children", jsonkids

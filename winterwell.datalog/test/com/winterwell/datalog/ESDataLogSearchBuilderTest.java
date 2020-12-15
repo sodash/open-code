@@ -110,7 +110,7 @@ public class ESDataLogSearchBuilderTest {
 		List<Aggregation> aggs = esdsb.prepareSearch2_aggregations();
 		String s = Printer.toString(aggs, "\n");
 		Printer.out("evt:	"+s);
-		ArrayList<Object> names = Containers.apply(aggs,  agg -> agg.name);
+		List<Object> names = Containers.apply(aggs,  agg -> agg.name);
 		assert names.size() == new HashSet(names).size() : names;
 		assert aggs.size() == 3;
 	}

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -127,7 +128,8 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 		
 		addConfigInfo(cargo);
 		
-		Map<String,Object> manifests = getJarManifests();
+		Map<String,Object> manifests = getJarManifests();		
+		manifests = new TreeMap(manifests); // a-z sorting		
 		cargo.put(("jarManifests"), manifests);
 		
 		try {

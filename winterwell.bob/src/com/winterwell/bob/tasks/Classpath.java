@@ -81,7 +81,7 @@ public class Classpath {
 	}
 
 	public List<File> getFiles() {
-		ArrayList<File> fs = Containers.apply(files, File::new);
+		List<File> fs = Containers.apply(files, File::new);
 		return fs;
 	}
 	

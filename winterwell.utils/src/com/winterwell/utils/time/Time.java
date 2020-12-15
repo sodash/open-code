@@ -39,6 +39,7 @@ import com.winterwell.utils.log.Log;
  * 
  */
 public final class Time implements Serializable, Comparable<Time> {
+	public static final String LOGTAG = "Time";
 	private static final long serialVersionUID = 1L;
 
 	private static GregorianCalendar getCal(int year, int month, int day,
@@ -54,7 +55,7 @@ public final class Time implements Serializable, Comparable<Time> {
 		// }
 		// Allow overflow, as calendar handles it nicely. But log a warning, as it could be a bug symptom
 		if (month <= 0 || month > 12 || day <= 0 || day > 32) {
-			Log.i("Time.getCal", "Odd day or month "+day+" of "+month+" in "+cal);
+			Log.i(LOGTAG, "getCal() Odd day or month "+day+" of "+month+" in "+cal);
 		}
 //		assert day > 0 && day < 32 : day;
 		return cal;
@@ -231,14 +232,14 @@ public final class Time implements Serializable, Comparable<Time> {
 			if (mon < 13) {
 				if (d > 31) throw new IllegalArgumentException(date);
 				// Emit a mild warning as this is common but risky practice 
-				Log.d("time", "Please use an explicit format for ambiguous probably-non-US date: "+date+" "+ReflectionUtils.getSomeStack(8));
+				Log.d(LOGTAG, "Please use an explicit format for ambiguous probably-non-US date: "+date+" "+ReflectionUtils.getSomeStack(8));
 				// non-US is OK
 				return new Time(y,mon,d).getTime();
 			} else {
 				// swap d and mon
 				if (mon > 31) throw new IllegalArgumentException(date);
 				if (d > 12) throw new IllegalArgumentException(date);
-				Log.d("time", "Please use an explicit format for ambiguous probably-US date: "+date+" "+ReflectionUtils.getSomeStack(8));
+				Log.d(LOGTAG, "Please use an explicit format for ambiguous probably-US date: "+date+" "+ReflectionUtils.getSomeStack(8));
 				return new Time(y,d,mon).getTime();
 			}			
 		} // ./dd/mm/yy

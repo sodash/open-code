@@ -25,7 +25,7 @@ public class TimeTest {
 	}
 
 	@Test
-	public void parse_nonUS_US() {
+	public void testParse_nonUS_US() {
 		{
 			String s = "19/10/2020";
 			Time t = new Time(s);
@@ -40,6 +40,11 @@ public class TimeTest {
 			String s = "03/14/2020";
 			Time t = new Time(s);
 			assert t.getMonth() == 3 : t;
+		}
+		{	// Must be US
+			String s = "31/01/2019";
+			Time t = new Time(s);
+			assert t.getMonth() == 1 : t;
 		}
 	}
 	
@@ -332,6 +337,7 @@ public class TimeTest {
 
 		}
 	}
+
 
 
 

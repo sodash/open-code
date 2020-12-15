@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.winterwell.datalog.Rate;
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.IFn;
@@ -250,7 +251,7 @@ public class Log {
 		// stochastic (off by default)
 		if (config.keep > 0 && config.keep < 1) {
 			if ( ! Utils.getRandomChoice(config.keep)) return;
-		}
+		}		
 		// null tag? Put in the calling class.method
 		if (tag == null) {
 			StackTraceElement ste = ReflectionUtils.getCaller(Log.class
@@ -258,24 +259,12 @@ public class Log {
 			tag = ' ' + ste.toString(); // add a space from the # to make these
 										// clickable from the Eclipse console
 		}
-
+		// throttle?
+		if (throttle(tag)) {
+			return; // throttled!
+		}
+		
 		String smsg = Printer.toString(msg);
-		String msgText;
-		// Exception? Add in some stack
-		if (msg instanceof Throwable) {
-			msgText = Printer.toString((Throwable)msg, true);
-			if (ex==null) ex = (Throwable) msg;
-		} else {
-			msgText = Printer.toString(msg);			
-		}
-		// Guard against giant objects getting put into log, which is almost
-		// certainly a careless error
-		if (msgText.length() > MAX_LENGTH) {
-			msgText = msgText.substring(0, MAX_LENGTH - 100)
-					+ "... (message is too long for Log!)";
-//			System.err.println(new IllegalArgumentException(
-//					"Log message too long: " + msgText));
-		}
 		// exclude or downgrade?
 		if (excludeFilter!=null) {
 			// tag or message ??should this be report.toString()
@@ -293,9 +282,21 @@ public class Log {
 				error = Level.INFO;
 			}
 		}
-		// throttle?
-		if (throttle(tag)) {
-			return; // throttled!
+		
+		// Message
+		String msgText;
+		// Exception? Add in some stack
+		if (msg instanceof Throwable) {
+			msgText = Printer.toString((Throwable)msg, true);
+			if (ex==null) ex = (Throwable) msg;
+		} else {
+			msgText = Printer.toString(msg);			
+		}
+		// Guard against giant objects getting put into log, which is almost
+		// certainly a careless error
+		if (msgText.length() > MAX_LENGTH) {
+			msgText = msgText.substring(0, MAX_LENGTH - 100)
+					+ "... (message is too long for Log!)";
 		}
 		// make a Report
 		Report report = new Report(tag, smsg, error, msgText, ex);
@@ -323,9 +324,11 @@ public class Log {
 	 */
 	private static boolean throttle(String tag) {
 		if (config==null) return false;
-		if (config.throttleWindow==null || config.throttleAt==null) {
+		if (config.throttleWindow==null) {
 			return false;
 		}
+		Rate throttleAt = config.getThrottleAt(tag);
+		if (throttleAt==null) return false;
 		RateCounter rc = throttle.get(tag);
 		if (rc==null) {
 			rc = new RateCounter(config.throttleWindow);
@@ -335,7 +338,7 @@ public class Log {
 		}
 		// shall we?
 		rc.plus(1);
-		if (config.throttleAt.isGreaterThan(rc.rate())) {
+		if (throttleAt.isGreaterThan(rc.rate())) {
 			return false;
 		}
 		// first time? Or first time today?
