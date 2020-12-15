@@ -744,6 +744,14 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 
+	/**
+	 * 
+	 * @param q
+	 * @param prefix
+	 * @param period
+	 * @param stateOrNull
+	 * @return can this be null?? best to guard against nulls 
+	 */
 	protected ESQueryBuilder doList3_ESquery(String q, String prefix, Period period, WebRequest stateOrNull) {
 		ESQueryBuilder qb = null;
 		// HACK no key:value in a prefix query
