@@ -24,6 +24,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.winterwell.utils.BestOne;
@@ -1978,6 +1980,9 @@ public final class Containers  {
 		// normal key?
 		X v = map.get(key);
 		if (v != null) return v;
+		if (Utils.isBlank(key)) {
+			return null; // don't match "" against anything
+		}
 		// a few canonical forms
 		v = map.get(key.trim());
 		if (v != null) return v;
@@ -1992,14 +1997,20 @@ public final class Containers  {
 		if (v != null) return v;
 		// search the keys
 		Set<String> keys = map.keySet();
-		BestOne<String> bestKey = new BestOne();		
+		BestOne<String> bestKey = new BestOne();
+		Pattern p = Pattern.compile("\\b"+Pattern.quote(ck)+"\\b");
 		for (String string : keys) {
 			String cs = StrUtils.toCanonical(string);
+			if (Utils.isBlank(cs)) continue;
 			if (cs.startsWith(ck)) {
 				bestKey.maybeSet(string, 2);
 				continue;
 			}
-			if (cs.contains(ck)) {
+			// word match
+			// But avoid "row" ~ "growth"			
+			// TODO camel case support
+			Matcher m = p.matcher(cs);
+			if (m.find()) {
 				bestKey.maybeSet(string, 1);
 				continue;
 			}

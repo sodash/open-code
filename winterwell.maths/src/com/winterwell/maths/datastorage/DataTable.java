@@ -59,6 +59,13 @@ public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml {
 		return (C1) row[0];
 	}
 	
+	
+	@Override
+	public final Object[] getRow(int row) {
+		// NB this override is to give type even if C1 is not set
+		return super.getRow(row);
+	}
+	
 	/**
 	 * Loads the csv file, if given.
 	 * 
@@ -160,6 +167,16 @@ public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml {
 		return col;
 	}
 
+	public void removeColumn(int i) {		
+		for(int r=0; r<size(); r++) {
+			Object[] row = getRow(r);
+			Object[] row2 = Arrays.copyOf(row, row.length-1);
+			for(int j=i; j<row.length; j++) {
+				row2[j] = row[j+1];
+			}
+			throw new TodoException();
+		}
+	}
 
 	/**
 	 * Status: sketch!

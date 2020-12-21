@@ -108,7 +108,7 @@ public class Merger implements IMerger<Object> {
 
 	@Override
 	public Diff diff(Object before, Object after) {
-		Class type = after.getClass();
+		Class type = after==null? Object.class : after.getClass();
 		IMerger m = mergers.get(type);
 		if (m==null) {
 			m = new SimpleMerger();

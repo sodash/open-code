@@ -65,6 +65,8 @@ import lgpl.haustein.Base64Encoder;
  */
 public class FakeBrowser {
 
+	public static final String CONTENT_TYPE_JSON = "application/json";
+
 	static final int DEFAULT_TIMEOUT = 60000;
 
 	private static SSLContext INSECURE_SSL_CONTEXT;
@@ -472,6 +474,7 @@ public class FakeBrowser {
 	
 
 	/**
+	 * Convenience for {@link #post(String, String, String)} with content-type url-form-encoded
 	 * @param uri
 	 *            The uri to post to.
 	 * @param body
@@ -509,9 +512,11 @@ public class FakeBrowser {
 			}), " ");
 			
 			String postBody = encodedPostBody;
-			if( !contentType.equals("application/json") ) postBody = WebUtils2.urlDecode(encodedPostBody);
+			if( !contentType.equals(CONTENT_TYPE_JSON) ) {
+				postBody = WebUtils2.urlDecode(encodedPostBody);
+			}
 			
-			String curl = StrUtils.compactWhitespace("curl -XPOST -d '"+postBody+"'"+sheaders+" '"+uri+"'");
+			String curl = StrUtils.compactWhitespace("curl -X"+Utils.or(requestMethod,"POST")+" -d '"+postBody+"'"+sheaders+" '"+uri+"'");
 			Log.d(LOGTAG, curl);
 			if (debugVars==null) debugVars = new ArrayMap("encodedBody", encodedPostBody);
 		}
