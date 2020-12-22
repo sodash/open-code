@@ -16,7 +16,7 @@ public class TimeFragment {
 	 * Calendar field-index to value (String or Integer)
 	 */
 
-	private Map<Integer, Object> values = new HashMap();
+	private Integer[] values = new Integer[Calendar.FIELD_COUNT];
 
 	@Override
 	public String toString() {
@@ -27,7 +27,11 @@ public class TimeFragment {
 	 * @return
 	 */
 	public int numset() {
-		return values.size();
+		int cnt = 0;
+		for(int i=0; i<values.length; i++) {
+			if (values[i] != null) cnt++;
+		}
+		return cnt;
 	}
 	/**
 	 * Dangerous: this uses base (normally `now`) as a default to work from! 
@@ -36,18 +40,20 @@ public class TimeFragment {
 	 * @return null if base is unset, or day is unset 
 	 */
     public Time getTime() {
-    	if (base==null) {
-    		return null;
-    	}
+//    	if (base==null) {
+//    		return null;
+//    	}
     	// do we have a date?
 		if ( ! isDaySpecific()) {
 			return null;
 		}
-    	GregorianCalendar cal = (GregorianCalendar) base.clone();    	
-    	for(Map.Entry<Integer, Object> me : values.entrySet()) {    		    		
-    		Integer vi = getIntValue(me.getKey(), me.getValue());
+		GregorianCalendar cal = new Time().getCalendar();
+		cal.clear();
+		String s = cal.getTime().toString();
+		for(int i=0; i<values.length; i++) {
+    		Integer vi = values[i];
     		if (vi != null) {
-    			cal.set(me.getKey(), vi);
+    			cal.set(i, vi);
     		}
     	}
     	return new Time(cal);
@@ -62,17 +68,20 @@ public class TimeFragment {
 		return ((Number) value).intValue();		    
 	}
 
-	GregorianCalendar base = new Time().getCalendar();
+//    /**
+//     * Use a base of start-of-today, to allow interpreting e.g. "3pm"
+//     */
+//	GregorianCalendar base = TimeUtils.getStartOfDay(new Time()).getCalendar();
     
-	/**
-	 * 
-	 * @param base Can be null for "keep it vague"
-	 * @return
-	 */
-    public TimeFragment setBase(Time base) {
-		this.base = base==null? null : base.getCalendar();
-		return this;
-	}
+//	/**
+//	 * 
+//	 * @param base Can be null for "keep it vague"
+//	 * @return
+//	 */
+//    public TimeFragment setBase(Time base) {
+//		this.base = base==null? null : base.getCalendar();
+//		return this;
+//	}
     
     /**
      * TODO
@@ -117,14 +126,16 @@ public class TimeFragment {
     
     
     private Integer getValue(int calendarField) {
-    	Object v = values.get(calendarField);
-    	if (v == null) {
-    		if (base==null) return null;
-    		int vi = base.get(calendarField);
-    		return vi;
-    	}
-		if (v instanceof Number) return ((Number) v).intValue();
-		return convertToCalendarValue(calendarField, (String) v);
+    	Integer v = values[calendarField];
+    	return v;
+//    	if (v == null) {
+////    		if (base==null) 
+//    			return null;
+////    		int vi = base.get(calendarField);
+////    		return vi;
+//    	}
+//		if (v instanceof Number) return ((Number) v).intValue();
+//		return convertToCalendarValue(calendarField, (String) v);
 	}
 
 	protected Integer convertToCalendarValue(int calField, String v) {
@@ -138,41 +149,50 @@ public class TimeFragment {
      * Note: "3rd June" would return false, as it doesn't give the year.
      */
     public boolean isDaySpecific() {
-    	boolean year = values.containsKey(Calendar.YEAR);
+    	boolean year = values[Calendar.YEAR] != null;
     	if ( ! year) return false;
-    	boolean month = values.containsKey(Calendar.MONTH);
-    	boolean dom = values.containsKey(Calendar.DAY_OF_MONTH);
+    	boolean month = values[Calendar.MONTH]  != null;
+    	boolean dom = values[Calendar.DAY_OF_MONTH]  != null;
     	if (year && month && dom) return true;
-		boolean doy = values.containsKey(Calendar.DAY_OF_YEAR);
-		boolean dow = values.containsKey(Calendar.DAY_OF_WEEK);
-		boolean week = values.containsKey(Calendar.WEEK_OF_YEAR);
+		boolean doy = values[Calendar.DAY_OF_YEAR]  != null;
+		boolean dow = values[Calendar.DAY_OF_WEEK]  != null;
+		boolean week = values[Calendar.WEEK_OF_YEAR]  != null;
 		if (year && doy) return true;
 		if (year && week && dow) return true;
-		boolean wom = values.containsKey(Calendar.WEEK_OF_MONTH);
+		boolean wom = values[Calendar.WEEK_OF_MONTH]  != null;
 		if (year && month && wom && dow) return true;
 		return false;
 	}
 
     /**
+     * @deprecated
 	 * Calendar field-index to value (String or Integer)
 	 */
     public Map<Integer, Object> getValues() {
-		return values;
+//		return values;
+    	throw new UnsupportedOperationException();
 	}
     
 	public TimeFragment(){
     }
 	
 	public void putAll(TimeFragment fragments) {
-		values.putAll(fragments.values);
+		for (int i = 0; i < values.length; i++) {
+			values[i] = fragments.values[i];	
+		}		
 	}
 	
     public void put(TUnit field, int value) {
-        values.put(field.getCalendarField(), value);
+        put(field.getCalendarField(), value);
     }
 
+    /**
+     * @param calendarField e.g. Calendar.YEAR
+     * Warning: MONTH is 0-indexed!
+     * @param value
+     */
     public void put(int calendarField, int value) {
-        values.put(calendarField, value);
+        values[calendarField] = value;
     }
 
     /**
@@ -180,9 +200,9 @@ public class TimeFragment {
      * @param date
      */
 	public void setDate(Time date) {
-		put(Calendar.YEAR, date.getYear());
+		setYear(date.getYear());
 		// why is month zero-indexed when other fields aren't?
-		put(Calendar.MONTH, date.getMonth() - 1);
+		setMonth(date.getMonth());
 		put(Calendar.DAY_OF_MONTH, date.getDayOfMonth());
 	}
 
@@ -192,7 +212,16 @@ public class TimeFragment {
 	 */
 	public void setMonth(int i) {
 		assert i > 0 && i < 13 : i;
-		put(Calendar.MONTH, i);
+		put(Calendar.MONTH, i-1);
+	}
+	public void setYear(int year) {
+		put(Calendar.YEAR, year);
+	}
+	
+	public boolean hasTime() {
+		boolean hasHour = values[Calendar.HOUR] != null;
+		boolean hasHourOfDay = values[Calendar.HOUR_OF_DAY] != null;
+		return hasHour || hasHourOfDay;
 	}
     
 }

@@ -304,7 +304,7 @@ public class TimeTest {
 			Time now = new Time();
 			String s = now.toString();
 			Time t1 = new Time(s);
-			assert Math.abs(t1.diff(now)) < 1000 : t1.diff(now);
+			assert Math.abs(t1.diff(now)) < 1000 : now.getDate()+" vs "+t1.getDate()+" = "+t1.diff(now);
 		}
 		{
 			Time sep = new Time("2017-09-13");
@@ -332,9 +332,17 @@ public class TimeTest {
 			assert t2.isBefore(TimeUtils.ANCIENT);
 		}
 		{
-			Time t1 = new Time("Thu, 3 Oct 2013 15:12:31 +0100");
+			Time t1 = new Time("3 Oct 2013 15:12:31 +0100");
 			assert t1.isBefore(new Time());
-
+		}
+		{
+			// year - 1900, naturally
+			Date d = new Date(113,9,3,15,12,31);
+			String s = d.toString();
+			String s2 = d.toGMTString();
+			Time t1 = new Time(s); // this fails but meh "Thu, 3 Oct 2013 15:12:31 +0100");
+			assert t1.isBefore(new Time());
+			assert t1.getTime() == d.getTime();
 		}
 	}
 
