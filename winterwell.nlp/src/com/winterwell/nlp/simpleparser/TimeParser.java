@@ -15,7 +15,7 @@ import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
 
 /**
- * 
+ * @deprecated
  * @testedby TimeParserTest
  * @author daniel
  * 
