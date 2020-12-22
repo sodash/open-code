@@ -14,6 +14,15 @@ import com.winterwell.utils.time.TimeIterator;
 public class TimeSlicerTest {
 
 	@Test
+	public void testAprilOddity() {
+		TimeSlicer ts = new TimeSlicer(new Time(2020,1,1), new Time(2022,9,30), TUnit.MONTH.dt);		
+		int mi = ts.getBucket(new Time(2020,3,1));
+		int ai = ts.getBucket(new Time(2020,4,1));
+		assert mi == 2;
+		assert ai == 3;
+	}
+	
+	@Test
 	public void testGetBucket() {
 		TimeSlicer bucketer = new TimeSlicer(new TimeIterator(new Time(2011, 1,
 				1, 0, 0, 0), new Time(2011, 1, 1, 12, 0, 0), new Dt(3,

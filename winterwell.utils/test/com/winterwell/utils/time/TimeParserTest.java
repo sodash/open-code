@@ -22,4 +22,12 @@ public class TimeParserTest {
 		}
 	}
 
+
+	@Test
+	public void testParseApr2020() {
+		TimeParser tp = new TimeParser();
+		Time t = tp.parseExperimental("Apr 2020", null);
+		assert t.getMonth() == 4;
+		assert t.toISOString().equals("") : t.toISOString();
+	}
 }
