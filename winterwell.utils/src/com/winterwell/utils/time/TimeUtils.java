@@ -198,7 +198,7 @@ public class TimeUtils {
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);		
 		Time t = new Time(cal);
 		return t;
 	}
@@ -230,7 +230,7 @@ public class TimeUtils {
 	public static Time getEndOfMonth(Time time) {
 		GregorianCalendar cal = time.getCalendar();
 		// zero lots
-		cal.set(Calendar.DAY_OF_MONTH, 1);
+		TimeUtils.calset(cal, Calendar.DAY_OF_MONTH, 1);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
@@ -258,8 +258,8 @@ public class TimeUtils {
 
 	public static Time getStartOfMonth(Time time) {
 		GregorianCalendar cal = time.getCalendar();
+		TimeUtils.calset(cal, Calendar.DAY_OF_MONTH, 1);
 		// zero lots
-		cal.set(Calendar.DAY_OF_MONTH, 1);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
@@ -713,5 +713,23 @@ public class TimeUtils {
 		case "h": return TUnit.HOUR;	
 		}
 		return null;
+	}
+
+	/**
+	 * A slightly more sane wrapper for Calendar.set()
+	 *  
+	 * Beware of Calendar.set! It doesn't properly work, as other fields may interfere,
+	 * e.g. you set the month, but the week-of-year stays wrong, and - madness ensues.
+	 * 
+	 * Calendar.set() can be used if clear() is called first
+	 * 
+	 * @param cal
+	 * @param field
+	 * @param value
+	 */
+	public static void calset(Calendar cal, int field, int value) {
+		int old = cal.get(field);
+		int d = value - old;
+		cal.roll(field, d);
 	}
 }

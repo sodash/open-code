@@ -1,6 +1,7 @@
 package com.winterwell.utils.time;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
@@ -166,6 +167,12 @@ public final class Time implements Serializable, Comparable<Time> {
 	 * An ISO format date
 	 */
 	private static final Pattern DATE_ONLY = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
+	/**
+	 * The format used by Date, which preserves to the second.
+	 * <p>
+	 * NB: the Date class javadoc incorrectly describes this as "dow mon dd hh:mm:ss zzz yyyy"
+	 */
+	private static final String TO_STRING_FORMAT = "E MMM dd HH:mm:ss z yyyy";
 	
 	private static long parse(String date) {
 		// Is it a timecode?
@@ -207,6 +214,24 @@ public final class Time implements Serializable, Comparable<Time> {
 		} catch(Exception ex2) {	
 			// oh well
 		}		
+		// Date toString() format?
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat(TO_STRING_FORMAT);
+			sdf.setTimeZone(TimeUtils._GMT_TIMEZONE);
+			Date parsed = sdf.parse(date);
+			return parsed.getTime();
+		} catch (ParseException e) {
+			// oh well
+		}
+		// Our old format?
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z");
+			sdf.setTimeZone(TimeUtils._GMT_TIMEZONE);
+			Date parsed = sdf.parse(date);
+			return parsed.getTime();
+		} catch (ParseException e) {
+			// oh well
+		}		
 		// sniff for dd/mm/yy with some UK/US smarts
 		// NB: Date.parse is not so smart, so we do this first
 		Pattern ddmmyy = Pattern.compile("(\\d{1,2})/(\\d{1,2})/(\\d{2,4})");
@@ -243,13 +268,14 @@ public final class Time implements Serializable, Comparable<Time> {
 				return new Time(y,d,mon).getTime();
 			}			
 		} // ./dd/mm/yy
-		try {
-			// Try Date, which can handle Time.toString()
-			return Date.parse(date);
-		} catch(Exception ex3) {
+//		try {
+//			// Try Date, which can handle Time.toString()
+//			// Warning - this applies the local timezone!!
+//			return Date.parse(date);
+//		} catch(Exception ex3) {
 			// be more informative! _What_ failed to parse
-			throw new IllegalArgumentException(StrUtils.ellipsize(date, 100));
-		}
+		throw new IllegalArgumentException(StrUtils.ellipsize(date, 100));
+//		}
 	}
 	
 	
@@ -558,14 +584,9 @@ public final class Time implements Serializable, Comparable<Time> {
 	 * Human readable GMT time. This is NOT ISO8601
 	 * @see #toISOString()
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public String toString() {
-		// GregorianCalendar cal = getCalendar();
-		// if (cal.get(Calendar.ERA) == GregorianCalendar.BC) {
-		// // TODO do something sensible here
-		// }
-		return getDate().toGMTString();
+		return format(TO_STRING_FORMAT);
 	}
 
 	/**
