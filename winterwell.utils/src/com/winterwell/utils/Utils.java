@@ -716,10 +716,15 @@ public final class Utils {
 		return ex.getMessage();
 	}
 
+	/**
+	 * General purpose toString
+	 * @param obj Can be null (returns "null")
+	 * @return
+	 */
 	public static String toString(Object obj) {
 		if (obj==null) return "null";
 		Map<String, Object> omap = Containers.objectAsMap(obj);
-		omap = Containers.filterNulls(omap);
+		omap = Containers.filterFalsy(omap);
 		String className = obj.getClass().getSimpleName();
 		if (omap.isEmpty()) {			
 			return className;

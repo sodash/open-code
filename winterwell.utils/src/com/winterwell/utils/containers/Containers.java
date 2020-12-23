@@ -2023,8 +2023,15 @@ public final class Containers  {
 	}
 
 
-	public static <K,V> Map<K, V> filterNulls(Map<K, V> map) {
-		Map<K, V> newMap = applyToValues(v -> v, map);
+	/**
+	 * 
+	 * @param <K>
+	 * @param <V>
+	 * @param map
+	 * @return a new map, filtering out any null or other falsy values (see Utils.truthy() for details)
+	 */
+	public static <K,V> Map<K, V> filterFalsy(Map<K, V> map) {
+		Map<K, V> newMap = applyToValues(v -> Utils.truthy(v)? v : null, map);
 		return newMap;
 	}
 
