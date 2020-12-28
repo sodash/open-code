@@ -160,7 +160,7 @@ config/
    appName.serverType.properties, e.g. this would resolve to config/sogive.production.properties
    logins.properties
    machine e.g. baker.properties
-winterwell/logins/logins.appName.properties
+winterwell/logins/logins.appName.properties -- see also Logins.java
 winterwell/logins/stripe.properties
 </pre>
 	 * 
