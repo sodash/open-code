@@ -129,11 +129,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			doAction(state);
 		}						
 
-		// Get the Item
-		getThing(state);
-		if (jthing==null) {
-			jthing = getThingFromDB(state);
-		}
+		getThingStateOrDB(state);
 
 		// return json?		
 		if (jthing != null) {						
@@ -449,12 +445,27 @@ public abstract class CrudServlet<T> implements IServlet {
 		String id = getId(state);
 		Log.d("crud", "doPublish "+id+" by "+state.getUserId()+" "+state+" deleteDraft: "+deleteDraft);
 		Utils.check4null(id); 
-		// load (if not loaded)
+		getThingStateOrDB(state);
+		return doPublish2(dataspace, jthing, forceRefresh, deleteDraft, id, state);
+	}
+
+
+	/**
+	 * Idempotent -- sets the jthing field and reuses that. Get from state or DB
+	 * @param state
+	 * @return
+	 */
+	protected JThing<T> getThingStateOrDB(WebRequest state) {
+		if (jthing!=null) {
+			return jthing;
+		}		
+		// from request?
 		getThing(state);
+		// from DB?
 		if (jthing==null) {
 			jthing = getThingFromDB(state);
 		}
-		return doPublish2(dataspace, jthing, forceRefresh, deleteDraft, id, state);
+		return jthing;
 	}
 
 
@@ -514,11 +525,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		String id = getId(state);
 		Log.d("crud."+status, "doUnPublish "+id+" by "+state.getUserId()+" "+state);
 		Utils.check4null(id); 
-		// load (if not loaded)
-		getThing(state);
-		if (jthing==null) {
-			jthing = getThingFromDB(state);
-		}
+		getThingStateOrDB(state);
 
 		ESPath draftPath = esRouter.getPath(dataspace,type, id, status);
 		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);

@@ -8,6 +8,10 @@ public class ParseState {
 
 	final Stack<ParseState> agenda;
 
+	/**
+	 * The parser that is working down from here.
+	 * @deprecated Used for code state sanity checks.
+	 */
 	final Parser down;
 
 	final ParseState higher;
@@ -64,8 +68,10 @@ public class ParseState {
 	private boolean isLoopy(ParseState state) {
 		assert this != state;
 		if (this.down != null && this.down == state.down
-				&& this.text.equals(state.text) && this.posn == state.posn)
+				&& this.posn == state.posn && this.text.equals(state.text)) 
+		{
 			return true;
+		}
 		if (higher == null)
 			return false;
 		return higher.isLoopy(state);
