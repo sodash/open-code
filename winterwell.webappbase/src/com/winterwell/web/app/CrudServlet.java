@@ -436,12 +436,12 @@ public abstract class CrudServlet<T> implements IServlet {
 	private static final IntField SIZE = new IntField("size");
 	public static final String ALL = "all";
 
-	protected final JThing<T> doPublish(WebRequest state) {
+	protected final JThing<T> doPublish(WebRequest state) throws Exception {
 		// For publish, let's force the update.
 		return doPublish(state, KRefresh.TRUE, false);
 	}
 	
-	protected JThing<T> doPublish(WebRequest state, KRefresh forceRefresh, boolean deleteDraft) {		
+	protected JThing<T> doPublish(WebRequest state, KRefresh forceRefresh, boolean deleteDraft) throws Exception {		
 		String id = getId(state);
 		Log.d("crud", "doPublish "+id+" by "+state.getUserId()+" "+state+" deleteDraft: "+deleteDraft);
 		Utils.check4null(id); 
