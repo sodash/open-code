@@ -1,6 +1,6 @@
 import React from 'react';
 import { assert, assMatch } from 'sjtest';
-import Login from 'you-again';
+import Login from '../base/youagain';
 import _ from 'lodash';
 import { XId } from 'wwutils';
 import pivot from 'data-pivot';

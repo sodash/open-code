@@ -13,11 +13,11 @@
     "hashmap": "^2.3.0",
     "intl": "^1.2.5",
     "jquery": "^3.4.1",
-    "js-cookie": "^2.2.0",
+    "js-cookie": "^2.2.1",
     "lodash": "^4.17.14",
     "md5": "^2.2.1",
     "os" : "^0.1.1",
-    "promise-value": "^1.2.5",
+    "promise-value": "^1.2.10",
     "react": "^16.8.6",
     "react-autocomplete": "^1.8.1",
     "react-bootstrap": "^0.32.4",
@@ -25,10 +25,7 @@
     "react-dom": "^16.8.6",
     "react-dropzone": "^8.1.0",
     "react-markdown": "^4.1.0",
-    "react-scroll": "^1.7.11",
-    "sjtest": "^0.4.9",
-	 "wwutils": "^0.9.4",
-	 "you-again": "^0.8.6"
+    "sjtest": "^0.4.9"
   },
   "scripts": {
     "compile": "webpack --config $PWD/webpack.config.js --progress --colors",
