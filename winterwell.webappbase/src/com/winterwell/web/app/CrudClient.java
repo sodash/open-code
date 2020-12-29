@@ -18,12 +18,17 @@ import com.winterwell.web.ajax.JThing;
  * A java client for working with data managed by a {@link CrudServlet}
  * @author daniel
  *
- * @param <T>
+ * @param <T> the data-item managed
  */
 public class CrudClient<T> {
 
 	private Class<T> type;
 	private String endpoint;
+	private boolean debug;
+
+	public void setDebug(boolean b) {
+		debug = b;
+	}	
 	
 	/**
 	 * @deprecated Normally this is set from config.
@@ -114,7 +119,7 @@ public class CrudClient<T> {
 
 	private FakeBrowser fb() {
 		FakeBrowser fb = new FakeBrowser();
-		fb.setDebug(true);
+		fb.setDebug(debug);
 
 		// You really should set auth!
 		if (jwt != null) {
