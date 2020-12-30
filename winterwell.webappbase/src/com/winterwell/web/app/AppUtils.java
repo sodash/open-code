@@ -29,6 +29,8 @@ import com.winterwell.es.client.ReindexRequest;
 import com.winterwell.es.client.SearchRequestBuilder;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.UpdateRequestBuilder;
+import com.winterwell.es.client.admin.ClusterAdminClient;
+import com.winterwell.es.client.admin.ClusterOverridReadOnlyRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.IndicesAliasesRequest;
 import com.winterwell.es.client.admin.PutMappingRequestBuilder;
@@ -36,6 +38,7 @@ import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.es.fail.ESException;
+import com.winterwell.es.fail.ESIndexReadOnlyException;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.AString;
@@ -471,7 +474,19 @@ public class AppUtils {
 
 	public static void initESMappings(KStatus[] statuses, Class[] dbclasses, Map<Class,Map> mappingFromClass) 
 	{
-		initESMappings(statuses, dbclasses, mappingFromClass, null);
+		try {
+			initESMappings(statuses, dbclasses, mappingFromClass, null);
+		} catch (ESIndexReadOnlyException ex) {
+			// ES being fussy about memory -- if local, poke the index
+			if (AppUtils.getServerType() != KServerType.LOCAL) throw ex;
+			ESHttpClient esjc = Dep.get(ESHttpClient.class);
+			ClusterAdminClient cac = new ClusterAdminClient(esjc);
+			ClusterOverridReadOnlyRequest oro = cac.prepareOverrideReadOnly();
+			oro.setDebug(true);
+			IESResponse ok = oro.get().check();
+			// try again
+			initESMappings(statuses, dbclasses, mappingFromClass, null);
+		}
 	}
 
 	/**
