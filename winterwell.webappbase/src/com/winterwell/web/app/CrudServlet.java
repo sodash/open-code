@@ -700,17 +700,21 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (qb!=null) s.setQuery(qb);
 				
 		// Sort e.g. sort=date-desc for most recent first
-		if (sort!=null) {			
-			// HACK: order?
-			KSortOrder order = KSortOrder.asc;
-			if (sort.endsWith("-desc")) {
-				sort = sort.substring(0, sort.length()-5);
-				order = KSortOrder.desc;
-			} else if (sort.endsWith("-asc")) {
-				sort = sort.substring(0, sort.length()-4);
+		if (sort!=null) {
+			// split on comma to support hierarchical sorting, e.g. priority then date
+			String[] sorts = sort.split(",");
+			for (String sortBit : sorts) {
+				// split into field and up/down order
+				KSortOrder order = KSortOrder.asc;
+				if (sortBit.endsWith("-desc")) {
+					sortBit = sortBit.substring(0, sortBit.length()-5);
+					order = KSortOrder.desc;
+				} else if (sortBit.endsWith("-asc")) {
+					sortBit = sortBit.substring(0, sortBit.length()-4);
+				}
+				Sort _sort = new Sort().setField(sortBit).setOrder(order);			
+				s.addSort(_sort);				
 			}
-			Sort _sort = new Sort().setField(sort).setOrder(order);			
-			s.addSort(_sort);
 		}
 		
 		// TODO paging!
