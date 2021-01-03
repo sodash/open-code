@@ -6,15 +6,15 @@ import org.junit.Test;
 
 import com.winterwell.datalog.Dataspace;
 import com.winterwell.es.ESType;
-import com.winterwell.es.client.BulkRequestBuilder;
+import com.winterwell.es.client.BulkRequest;
 import com.winterwell.es.client.BulkResponse;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
-import com.winterwell.es.client.IndexRequestBuilder;
+import com.winterwell.es.client.IndexRequest;
 import com.winterwell.es.client.KRefresh;
 import com.winterwell.es.client.admin.CreateIndexRequest;
-import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.admin.PutMappingRequest;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.gson.JsonArray;
@@ -78,7 +78,7 @@ public class AggregationTest {
 		// prepare to bulk aggregated data
 		// check to see if index already exists, if not, create one
 		ESHttpClient esc = CreateIndexWithPropertiesMapping(INDEX);
-		BulkRequestBuilder bulk = esc.prepareBulk();
+		BulkRequest bulk = esc.prepareBulk();
 		
 		// parse aggregated data 
 		JsonElement jelement = new JsonParser().parse(data);
@@ -118,7 +118,7 @@ public class AggregationTest {
 							    	for (JsonElement j8 : jarray8) { // each j8 is a time interval of one day
 							    		String time = j8.getAsJsonObject().get("key_as_string").getAsString();
 							    		double doc_count = j8.getAsJsonObject().get("doc_count").getAsDouble();
-							    		IndexRequestBuilder pi = esc.prepareIndex(INDEX, "compressed_"+i);
+							    		IndexRequest pi = esc.prepareIndex(INDEX, "compressed_"+i);
 							    		i = i + 1; //increment document id
 							    		pi.setBodyMap(new ArrayMap(
 							    				"evt", evt_name,
@@ -160,7 +160,7 @@ public class AggregationTest {
 			cir.get().check();
 			Utils.sleep(100);
 			// set properties mapping
-			PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(idx);
+			PutMappingRequest pm = esc.admin().indices().preparePutMapping(idx);
 			ESType mytype = new ESType()
 					.property("domain", ESType.keyword)
 					.property("browser", ESType.keyword)

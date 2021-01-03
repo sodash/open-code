@@ -11,10 +11,10 @@ import com.winterwell.es.ESType;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
-import com.winterwell.es.client.TransformRequestBuilder;
+import com.winterwell.es.client.TransformRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.IndicesAliasesRequest;
-import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.admin.PutMappingRequest;
 import com.winterwell.es.fail.ESDocNotFoundException;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
 import com.winterwell.gson.JsonArray;
@@ -123,7 +123,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		
 		//safety mechanism -- make sure that the jobID doens't exist, if it does, delete it
 		try {
-			TransformRequestBuilder trb_safety = esc.prepareTransformDelete(jobId); 
+			TransformRequest trb_safety = esc.prepareTransformDelete(jobId); 
 			trb_safety.setDebug(true);
 			trb_safety.get();
 		} catch (ESDocNotFoundException e) {
@@ -132,7 +132,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		
 		// create transform job
 		// specify source and destination and time interval
-		TransformRequestBuilder trb = esc.prepareTransform(jobId);
+		TransformRequest trb = esc.prepareTransform(jobId);
 		String version = esc.getESVersion();
 		VersionString vs = new VersionString(version);
 		if (vs.geq("7.10.0")) {
@@ -147,7 +147,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		Log.d("compress", response);
 		
 		//after creating transform job, start it 
-		TransformRequestBuilder trb2 = esc.prepareTransformStart(jobId); 
+		TransformRequest trb2 = esc.prepareTransformStart(jobId); 
 		trb2.setDebug(true);
 		IESResponse response2 = trb2.get().check();
 		Log.d(LOGTAG, response2);
@@ -173,7 +173,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		
 		//delete the transform job
 		Log.i("Transform job done!");
-		TransformRequestBuilder trb3 = esc.prepareTransformDelete(jobId); 
+		TransformRequest trb3 = esc.prepareTransformDelete(jobId); 
 		trb3.setDebug(true);
 		IESResponse response3 = trb3.get();
 		Log.d("compress", response3);
@@ -210,7 +210,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 			cir.get().check();
 			Utils.sleep(100);
 			// set properties mapping
-			PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(idx);
+			PutMappingRequest pm = esc.admin().indices().preparePutMapping(idx);
 			ESType mytype = new ESType();
 			for(String term : terms) {
 				// HACK to turn Class into ESType

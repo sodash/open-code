@@ -8,7 +8,7 @@ import java.util.Map;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchRequest;
 import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.ESQueryBuilder;
@@ -68,14 +68,14 @@ public class ESDataLogSearchBuilder {
 		return this;
 	}
 	
-	public SearchRequestBuilder prepareSearch() {
+	public SearchRequest prepareSearch() {
 		doneFlag = true;
 		com.winterwell.es.client.query.BoolQueryBuilder filter 
 			= AppUtils.makeESFilterFromSearchQuery(query, start, end);
 		
 		String index = ESStorage.readIndexFromDataspace(dataspace);
 		
-		SearchRequestBuilder search = esc.prepareSearch(index);
+		SearchRequest search = esc.prepareSearch(index);
 	
 		// breakdown(s)
 		List<Aggregation> aggs = prepareSearch2_aggregations();

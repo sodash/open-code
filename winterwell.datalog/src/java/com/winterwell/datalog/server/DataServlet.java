@@ -15,7 +15,7 @@ import com.winterwell.datalog.Dataspace;
 import com.winterwell.datalog.ESDataLogSearchBuilder;
 import com.winterwell.datalog.ESStorage;
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchRequest;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
@@ -120,7 +120,7 @@ public class DataServlet implements IServlet {
 		Dt interval = state.get(new DtField("interval"), TUnit.DAY.dt);
 		essb.setInterval(interval);
 		
-		SearchRequestBuilder search = essb.prepareSearch();		
+		SearchRequest search = essb.prepareSearch();		
 		search.setDebug(true);
 //		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
 		search.setSize(size);

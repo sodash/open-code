@@ -22,17 +22,17 @@ import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.ESHttpResponse;
 import com.winterwell.es.client.IESResponse;
-import com.winterwell.es.client.IndexRequestBuilder;
+import com.winterwell.es.client.IndexRequest;
 import com.winterwell.es.client.PainlessScriptBuilder;
-import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchRequest;
 import com.winterwell.es.client.SearchResponse;
-import com.winterwell.es.client.UpdateRequestBuilder;
+import com.winterwell.es.client.UpdateRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest.Analyzer;
 import com.winterwell.es.client.admin.GetAliasesRequest;
 import com.winterwell.es.client.admin.IndicesAdminClient;
 import com.winterwell.es.client.admin.IndicesAliasesRequest;
-import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.admin.PutMappingRequest;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
@@ -331,7 +331,7 @@ public class ESStorage implements IDataLogStorage {
 		String esType = ESTYPE;
 //		String v = _client.getConfig().getIndexAliasVersion();
 		String index = baseIndexFromDataspace(dataspace, now);
-		PutMappingRequestBuilder pm = _client.admin().indices().preparePutMapping(index, esType);
+		PutMappingRequest pm = _client.admin().indices().preparePutMapping(index, esType);
 		// See DataLogEvent.COMMON_PROPS and toJson()
 		ESType keywordy = new ESType().keyword().norms(false).lock();
 		// Huh? Why were we using type text with keyword analyzer??
@@ -452,7 +452,7 @@ public class ESStorage implements IDataLogStorage {
 		ESPath path = new ESPath(index, type, id);
 		Future<ESHttpResponse> f;
 		if (grpById) {
-			UpdateRequestBuilder saveReq = client.prepareUpdate(path);
+			UpdateRequest saveReq = client.prepareUpdate(path);
 			saveReq.setDebug(true); // Debugging Sep 2018 (this will be noisy)
 			// try x3 before failing
 			saveReq.setRetries(2);
@@ -465,7 +465,7 @@ public class ESStorage implements IDataLogStorage {
 			saveReq.setDebug(true); 
 			f = saveReq.execute();
 		} else {
-			IndexRequestBuilder saveReq = client.prepareIndex(path);
+			IndexRequest saveReq = client.prepareIndex(path);
 			if (event.time==null) event.time = bucketPeriod.getEnd();
 			// set doc
 			Map<String, Object> doc = event.toJson2();			
@@ -543,7 +543,7 @@ public class ESStorage implements IDataLogStorage {
 		DataLogConfig config = Dep.get(DataLogConfig.class);		
 		final Dataspace dataspace = new Dataspace(spec.dataspace);
 		String index = readIndexFromDataspace(dataspace);
-		SearchRequestBuilder search = client(dataspace).prepareSearch(index);
+		SearchRequest search = client(dataspace).prepareSearch(index);
 		search.setType(ESTYPE);
 		search.setSize(config.maxDataPoints);
 		
@@ -691,7 +691,7 @@ public class ESStorage implements IDataLogStorage {
 			.setStart(start)
 			.setEnd(end);
 		
-		SearchRequestBuilder search = essb.prepareSearch();		
+		SearchRequest search = essb.prepareSearch();		
 		search.setDebug(true);
 //		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
 		// size controls

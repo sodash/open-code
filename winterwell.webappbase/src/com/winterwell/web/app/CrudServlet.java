@@ -19,12 +19,12 @@ import com.winterwell.data.KStatus;
 import com.winterwell.depot.IInit;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.IESRouter;
-import com.winterwell.es.client.DeleteRequestBuilder;
+import com.winterwell.es.client.DeleteRequest;
 import com.winterwell.es.client.ESHit;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.KRefresh;
-import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchRequest;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
@@ -94,7 +94,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected JThing<T> doDiscardEdits(WebRequest state) {
 		ESPath path = esRouter.getPath(dataspace, type, getId(state), KStatus.DRAFT);
-		DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
+		DeleteRequest del = es.prepareDelete(path.index(), path.type, path.id);
 		IESResponse ok = del.get().check();		
 		getThing(state);
 		return jthing;
@@ -300,7 +300,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		for(KStatus s : KStatus.main()) {
 			if (s==KStatus.TRASH) continue;
 			ESPath path = esRouter.getPath(dataspace,type, id, s);
-			DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
+			DeleteRequest del = es.prepareDelete(path.index(), path.type, path.id);
 			del.setRefresh("wait_for");
 			IESResponse ok = del.get().check();			
 		}
@@ -690,7 +690,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, Period period, WebRequest stateOrNull) {
 		// copied from SoGive SearchServlet
 		// TODO refactor to use makeESFilterFromSearchQuery
-		SearchRequestBuilder s = new SearchRequestBuilder(es);
+		SearchRequest s = new SearchRequest(es);
 		/// which index? draft (which should include copies of published) by default
 		doList3_setIndex(status, s);
 		
@@ -727,7 +727,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 
-	protected void doList3_setIndex(KStatus status, SearchRequestBuilder s) {
+	protected void doList3_setIndex(KStatus status, SearchRequest s) {
 		switch(status) {
 		case ALL_BAR_TRASH:
 			s.setIndices(

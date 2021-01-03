@@ -10,9 +10,9 @@ import com.winterwell.es.ESType;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
-import com.winterwell.es.client.TransformRequestBuilder;
+import com.winterwell.es.client.TransformRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest;
-import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.admin.PutMappingRequest;
 import com.winterwell.es.fail.ESIndexAlreadyExistsException;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.utils.Dep;
@@ -34,7 +34,7 @@ public class RollupAndTransformTest {
 	@Test
 	public void testTransform() {
 		ESHttpClient esc = CreateIndexWithPropertiesMapping(INDEX, ALIAS);
-		TransformRequestBuilder trb = esc.prepareTransform("transform_job");
+		TransformRequest trb = esc.prepareTransform("transform_job");
 		
 		// specify some terms that we want to keep
 		ArrayList<String> terms = new ArrayList<String>();
@@ -57,20 +57,20 @@ public class RollupAndTransformTest {
 		Printer.out(response);
 		
 		//after creating transform job, start it 
-		TransformRequestBuilder trb2 = esc.prepareTransformStart("transform_job"); 
+		TransformRequest trb2 = esc.prepareTransformStart("transform_job"); 
 		trb2.setDebug(true);
 		IESResponse response2 = trb2.get();
 		Printer.out(response2);
 		
 		//stop the transform job after 10 seconds
 		Utils.sleep(10000);
-		TransformRequestBuilder trb3 = esc.prepareTransformStop("transform_job"); 
+		TransformRequest trb3 = esc.prepareTransformStop("transform_job"); 
 		trb3.setDebug(true);
 		IESResponse response3 = trb3.get();
 		Printer.out(response3);
 		
 		//delete the transform job
-		TransformRequestBuilder trb4 = esc.prepareTransformDelete("transform_job"); 
+		TransformRequest trb4 = esc.prepareTransformDelete("transform_job"); 
 		trb4.setDebug(true);
 		IESResponse response4 = trb4.get();
 		Printer.out(response4);
@@ -86,7 +86,7 @@ public class RollupAndTransformTest {
 			cir.get().check();
 			Utils.sleep(100);
 			// set properties mapping
-			PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(idx);
+			PutMappingRequest pm = esc.admin().indices().preparePutMapping(idx);
 			ESType mytype = new ESType()
 					.property("domain", ESType.keyword)
 					.property("browser", ESType.keyword)

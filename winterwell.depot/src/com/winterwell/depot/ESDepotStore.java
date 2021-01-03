@@ -10,15 +10,15 @@ import com.winterwell.depot.IHasVersion.IHasBefore;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;
-import com.winterwell.es.client.BulkRequestBuilder;
-import com.winterwell.es.client.DeleteRequestBuilder;
+import com.winterwell.es.client.BulkRequest;
+import com.winterwell.es.client.DeleteRequest;
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.GetRequestBuilder;
+import com.winterwell.es.client.GetRequest;
 import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
-import com.winterwell.es.client.IndexRequestBuilder;
+import com.winterwell.es.client.IndexRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest;
-import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.admin.PutMappingRequest;
 import com.winterwell.gson.FlexiGson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.StrUtils;
@@ -58,17 +58,17 @@ public class ESDepotStore implements IStore {
 	@Override
 	public void storeBatch(List<Pair2<Desc, Object>> add, List<Desc> remove) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		BulkRequestBuilder bulk = esc.prepareBulk();
+		BulkRequest bulk = esc.prepareBulk();
 		// remove all
 		for (Desc desc : remove) {
 			ESPath path = getPath(desc);
-			DeleteRequestBuilder rm = esc.prepareDelete(path.index(), path.type, path.id);			
+			DeleteRequest rm = esc.prepareDelete(path.index(), path.type, path.id);			
 			bulk.add(rm);
 		}
 		// add all
 		for (Pair2<Desc, Object> desc_artifact : add) {
 			ESPath path = getPath(desc_artifact.first);
-			IndexRequestBuilder index = esc.prepareIndex(path);
+			IndexRequest index = esc.prepareIndex(path);
 			ESStoreWrapper doc = new ESStoreWrapper(desc_artifact.second);
 			index.setBodyDoc(doc);
 //			indexCache.put(key, value);
@@ -82,7 +82,7 @@ public class ESDepotStore implements IStore {
 	public String getRaw(Desc desc) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		ESPath path = getPath(desc);
-		GetRequestBuilder getter = new GetRequestBuilder(esc).setPath(path).setSourceOnly(true);
+		GetRequest getter = new GetRequest(esc).setPath(path).setSourceOnly(true);
 		GetResponse resp = getter.get();
 		String json = resp.getJson();
 		if (json==null) return null;
@@ -129,7 +129,7 @@ public class ESDepotStore implements IStore {
 		}
 		pc.get(); // this will fail if it already exists - oh well
 		// mapping
-		PutMappingRequestBuilder pm = esc.admin().indices().preparePutMapping(index, type);
+		PutMappingRequest pm = esc.admin().indices().preparePutMapping(index, type);
 		// ES5+ types
 		ESType mapping = new ESType()
 				.property("raw", new ESType().object().noIndex());
@@ -146,7 +146,7 @@ public class ESDepotStore implements IStore {
 	public void remove(Desc desc) {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		ESPath path = getPath(desc);
-		DeleteRequestBuilder del = esc.prepareDelete(path.index(), path.type, desc.getId());
+		DeleteRequest del = esc.prepareDelete(path.index(), path.type, desc.getId());
 		IESResponse resp = del.get();
 		// bark on failure??
 		if (resp.getError()!=null) {
@@ -170,7 +170,7 @@ public class ESDepotStore implements IStore {
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
 		ESPath path = getPath(desc);
 		initIndex(path.index(), path.type);
-		IndexRequestBuilder put = esc.prepareIndex(path);
+		IndexRequest put = esc.prepareIndex(path);
 		// ?? ESStoreWrapper uses XStream's xml encoding
 		// ?? Sometimes, json would be better -- is there an elegant way to switch between the two?
 		// ?? Would json be better here always? 

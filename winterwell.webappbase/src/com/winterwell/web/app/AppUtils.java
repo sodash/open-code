@@ -18,22 +18,22 @@ import com.winterwell.es.ESNoIndex;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;
-import com.winterwell.es.client.DeleteRequestBuilder;
+import com.winterwell.es.client.DeleteRequest;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.GetRequestBuilder;
+import com.winterwell.es.client.GetRequest;
 import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.KRefresh;
 import com.winterwell.es.client.ReindexRequest;
-import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchRequest;
 import com.winterwell.es.client.SearchResponse;
-import com.winterwell.es.client.UpdateRequestBuilder;
+import com.winterwell.es.client.UpdateRequest;
 import com.winterwell.es.client.admin.ClusterAdminClient;
 import com.winterwell.es.client.admin.ClusterOverridReadOnlyRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.IndicesAliasesRequest;
-import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.admin.PutMappingRequest;
 import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
@@ -72,7 +72,7 @@ public class AppUtils {
 
 	public static SearchResponse search(ESPath path, SearchQuery q) {
 		ESHttpClient esjc = Dep.get(ESHttpClient.class);
-		SearchRequestBuilder s = new SearchRequestBuilder(esjc);
+		SearchRequest s = new SearchRequest(esjc);
 		s.setPath(path);
 		com.winterwell.es.client.query.BoolQueryBuilder f = makeESFilterFromSearchQuery(q, null, null);
 		s.setQuery(f);
@@ -142,7 +142,7 @@ public class AppUtils {
 	public static <X> X get(ESPath path, Class<X> klass, AtomicLong version) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 
-		GetRequestBuilder s = new GetRequestBuilder(client);
+		GetRequest s = new GetRequest(client);
 		// Minor TODO both indices in one call
 		s.setIndices(path.indices[0]).setType(path.type).setId(path.id);
 		if (version==null) s.setSourceOnly(true);
@@ -193,7 +193,7 @@ public class AppUtils {
 		// update draft // TODO just an update script to set status
 		Log.d("crud", "unpublish "+newStatus+" doSave "+draftPath);
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-		UpdateRequestBuilder up = client.prepareUpdate(draftPath);
+		UpdateRequest up = client.prepareUpdate(draftPath);
 		up.setDoc(thing.map());
 		up.setDocAsUpsert(true);
 		// NB: this doesn't return the merged item :(
@@ -254,7 +254,7 @@ public class AppUtils {
 		draft = setStatus(draft, KStatus.PUBLISHED);
 		// publish
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-		UpdateRequestBuilder up = client.prepareUpdate(publishPath);
+		UpdateRequest up = client.prepareUpdate(publishPath);
 		up.setDoc(draft.map());
 		up.setRefresh(refresh);		
 		up.setDocAsUpsert(true);
@@ -268,7 +268,7 @@ public class AppUtils {
 				doDelete(draftPath);
 			} else {
 				Log.d("doPublish", "also update draft "+draftPath);
-				UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
+				UpdateRequest upd = client.prepareUpdate(draftPath);
 				upd.setDoc(draft.map());
 				upd.setDocAsUpsert(true);
 				upd.setRefresh(refresh);
@@ -288,7 +288,7 @@ public class AppUtils {
 		try {
 			Log.d("delete", path+" possible-state:"+WebRequest.getCurrent());
 			ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-			DeleteRequestBuilder del = client.prepareDelete(path.index(), path.type, path.id);
+			DeleteRequest del = client.prepareDelete(path.index(), path.type, path.id);
 			IESResponse ok = del.get().check();
 		} catch(WebEx.E404 ex) {
 			// oh well
@@ -351,7 +351,7 @@ public class AppUtils {
 		assert id.equals(path.id) : path+" vs "+id;
 				
 		// save to ES
-		UpdateRequestBuilder up = client.prepareUpdate(path);
+		UpdateRequest up = client.prepareUpdate(path);
 		if (DEBUG) up.setDebug(DEBUG); // NB: only set if its extra debugging??
 		// This should merge against what's in the DB
 		Map map = item.map();
@@ -624,7 +624,7 @@ public class AppUtils {
 			Class k,
 			ESPath path, String index) 
 	{
-		PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(
+		PutMappingRequest pm = es.admin().indices().preparePutMapping(
 				index, path.type);
 		
 		// ESType
@@ -923,12 +923,20 @@ public class AppUtils {
 				}
 				return filter;
 			}
+			
+			if (SearchQuery.KEYWORD_QUOTED.equals((String) maybeOperator)) {
+				assert clause.size() == 2 : clause;
+				String term = (String) clause.get(1);				
+				ESQueryBuilder mp = ESQueryBuilders.matchPhrase(term);
+				filter = filter.must(mp);
+				return filter;
+			}
 		}
 		
 		// Fall-through clause: 2+ elements, first isn't a Boolean operator
 		// Assume it's an implicit AND of all elements in list.
 		for (Object term : clause) {
-			filter = filter.must(parseTreeToQuery((List) term));
+			filter = filter.must(parseTreeToQuery(term));
 		}
 		return filter;
 	}
