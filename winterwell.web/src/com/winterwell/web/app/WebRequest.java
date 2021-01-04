@@ -145,6 +145,7 @@ public class WebRequest implements IProperties, Closeable {
 	/**
 	 * @return the referring page (if the header is given). Or null.
 	 * Never blank. 
+	 * NB: "referer" is a mis-spelling - but it is part of the standard! So let's use it.
 	 */
 	public String getReferer() {
 		HttpServletRequest req = getRequest();
