@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -946,10 +947,20 @@ public class SimpleMessage extends MimeMessage {
 		}
 		return map;
 	}
-
+	
 	/**
-	 * @return ID for the previous message in the email thread, or null. ?? is this
-	 *         ever not a single message ID??
+	 * @return ID for the previous messages in the email thread, oldest first, or null
+	 */
+	public List<String> getReferences() {
+		String refs = getHeader("References", " ");
+		if (refs==null) return null;
+		String[] refbits = refs.split("\\w+");
+		return Arrays.asList(refbits);
+	}
+	
+	/**
+	 * @return ID for the previous message in the email thread, or null.
+	 * @see #getReferences()
 	 */
 	public String getInReplyTo() {
 		String replyTo = getHeader("In-Reply-To", " ");
