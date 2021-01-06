@@ -8,6 +8,14 @@ import com.winterwell.bob.tasks.MavenDependencyTask;
 
 public class BuildWeb extends BuildWinterwellProject {
 
+	/**
+	 * Build winterwell.web
+	 */
+	public BuildWeb() {
+		super("winterwell.web");
+		setVersion("1.0.1");  // 6 Jan 2021
+	}	
+
 	@Override
 	public List<BuildTask> getDependencies() {
 		ArrayList deps = new ArrayList(super.getDependencies());
@@ -52,15 +60,4 @@ public class BuildWeb extends BuildWinterwellProject {
 		return deps;
 	}
 	
-	/**
-	 * Build winterwell.web
-	 */
-	public BuildWeb() {
-		super("winterwell.web");
-		
-//		setCompile(true);
-//		setIncSrc(true);
-//		setScpToWW(true);
-	}	
-
 }
