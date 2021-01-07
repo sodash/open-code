@@ -954,7 +954,7 @@ public class SimpleMessage extends MimeMessage {
 	public List<String> getReferences() {
 		String refs = getHeader("References", " ");
 		if (refs==null) return null;
-		String[] refbits = refs.split("\\w+");
+		String[] refbits = refs.split("\\s+");
 		return Arrays.asList(refbits);
 	}
 	
