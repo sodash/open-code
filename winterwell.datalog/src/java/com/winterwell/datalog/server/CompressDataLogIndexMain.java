@@ -96,6 +96,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 			t = new Time().minus(2, TUnit.MONTH);
 		}		
 		String monthYear = t.format("MMMyy").toLowerCase();
+		Log.i(LOGTAG, "RUN for "+monthYear);
 		String index = "scrubbed.datalog."+dataspace+"_transformed_" + monthYear;
 		String source = "scrubbed.datalog."+dataspace+"_" + monthYear;
 //		String index = "scrubbed.datalog."+dataspace+"_transformed_dec19_mapfix"; // FOR USE ON BAKER
@@ -152,6 +153,8 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		IESResponse response2 = trb2.get().check();
 		Log.d(LOGTAG, response2);
 		Log.d(LOGTAG, "Transforming data, please wait...");
+		Log.d(LOGTAG, "...transforming job ID: "+jobId);
+		Log.d(LOGTAG, esConfig.esUrl+"/_transform/"+jobId+"/_stats");
 		
 		//allow transform job to be completed before deleting it
 		FakeBrowser fb = new FakeBrowser();
