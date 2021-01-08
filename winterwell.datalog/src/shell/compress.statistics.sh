@@ -5,5 +5,5 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-cd ../
+cd ../../
 java -cp build-lib/winterwell.datalog.jar:build-lib/* com.winterwell.datalog.server.CompressDataLogIndexMain $1
