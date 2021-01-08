@@ -24,6 +24,7 @@ import com.winterwell.gson.JsonParser;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.VersionString;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.log.LogFile;
@@ -85,42 +86,42 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		super("CompressDataLogIndex", DataLogConfig.class);
 	}
 	
+
+	protected void showHelp() {
+		System.out.println("");
+		System.out.println(appName+" v"+version);
+		System.out.println("----------------------------------------");
+		System.out.println("");
+		ConfigBuilder cb = new ConfigBuilder(configType);
+		System.out.println(cb.getOptionsMessage("source index, e.g. scrubbed.datalog.gl_jan21"));
+	}	
+	
+	static String version = "0.1.0"; 
+	
 	@Override
-	protected void doMain2() {
-		// which month? (3 letter lowercase) and year (last 2 digits)		
-		Time t;
-		if ( ! Utils.isEmpty(configRemainderArgs)) {
-			t = TimeUtils.parseExperimental(configRemainderArgs.get(0));
-		} else {
-			// default to 2 months ago
-			t = new Time().minus(2, TUnit.MONTH);
-		}		
-		String monthYear = t.format("MMMyy").toLowerCase();
-		Log.i(LOGTAG, "RUN for "+monthYear);
-		String index = "scrubbed.datalog."+dataspace+"_transformed_" + monthYear;
-		String source = "scrubbed.datalog."+dataspace+"_" + monthYear;
-//		String index = "scrubbed.datalog."+dataspace+"_transformed_dec19_mapfix"; // FOR USE ON BAKER
-//		String source = "scrubbed.datalog."+dataspace+"_dec19_mapfix"; // FOR USE ON BAKER
+	protected void doMain2() {		
+		// e.g. "scrubbed.datalog."+dataspace+"_" + MMMyy;
+		String sourceIndex = configRemainderArgs.get(0);
+		if (Utils.isBlank(sourceIndex)) {
+			throw new IllegalArgumentException("Pass in a source index");
+		}
+		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		String destIndex = sourceIndex+"_compressed";
+		Log.i(LOGTAG, "Compress "+sourceIndex+" --> "+destIndex);
 
 		// specify some terms that we want to keep
 		// See DataLogEvent#COMMON_PROPS
-		// TODO increase this list as our usage changes
-		
+		// TODO increase this list as our usage changes		
 		List<String> aggs = Arrays.asList(("amount dntn").split(" "));
-		List<String> terms = Arrays.asList(
-				("evt domain host country pub vert vertiser campaign lineitem "
-				 +"cid via invalid mbl browser os"
-				).split(" ")
-		);
+		// TODO this list may need updating from time to time!!
+		List<String> terms = getConfig().longterms;
 
 		// create index and mapping
-		createIndexWithPropertiesMapping(index, null, terms);
-		
-		ESHttpClient esc = Dep.get(ESHttpClient.class);
+		createIndexWithPropertiesMapping(destIndex, null, terms);				
 		ESConfig esConfig = esc.getConfig();
 		
 		// aggregate data
-		String jobId = "transform_"+dataspace+"_"+monthYear;
+		String jobId = "transform_"+sourceIndex;
 		
 		//safety mechanism -- make sure that the jobID doens't exist, if it does, delete it
 		try {
@@ -138,10 +139,10 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		VersionString vs = new VersionString(version);
 		if (vs.geq("7.10.0")) {
 			Log.i("Using modern version of ES: more efficient transform!");
-			trb.setBody(source, index, aggs, terms, "24h");
+			trb.setBody(sourceIndex, destIndex, aggs, terms, "24h");
 		} else {
 			Log.w("Not using latest version of ES: painless script for transform...");
-			trb.setBodyWithPainless(source, index, aggs, terms, "24h");
+			trb.setBodyWithPainless(sourceIndex, destIndex, aggs, terms, "24h");
 		}
 		trb.setDebug(true);
 		IESResponse response = trb.get(); //might take a long time for complex body
@@ -183,8 +184,8 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		
 		//add datalog.gl.all alias into the newly created index and remove it from original index
 		IndicesAliasesRequest iar = esc.admin().indices().prepareAliases();
-		iar.addAlias(index, "datalog."+dataspace+".all");
-		iar.removeAlias(source, "datalog."+dataspace+".all");
+		iar.addAlias(destIndex, "datalog."+dataspace+".all");
+		iar.removeAlias(sourceIndex, "datalog."+dataspace+".all");
 		iar.get().check();
 	}
 	

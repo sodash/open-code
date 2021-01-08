@@ -150,5 +150,12 @@ public class DataLogConfig extends DBOptions implements IInit, ISiteConfig {
 	 */
 	@Option
 	public List<String> ourSkippedIPs;
+
+	@Option(description = "event properties which are kept after compression")
+	public List<String> longterms = Arrays.asList(
+			("evt domain host country pub vert vertiser campaign lineitem "
+					+"cid via invalid mbl browser os currency"
+					).split(" ")
+			);
 	
 }
