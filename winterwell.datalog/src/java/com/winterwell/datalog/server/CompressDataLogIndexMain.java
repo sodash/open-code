@@ -24,6 +24,7 @@ import com.winterwell.gson.JsonParser;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.VersionString;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -101,7 +102,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 	@Override
 	protected void doMain2() {		
 		// e.g. "scrubbed.datalog."+dataspace+"_" + MMMyy;
-		String sourceIndex = configRemainderArgs.get(0);
+		String sourceIndex = Containers.get(configRemainderArgs, 0);
 		if (Utils.isBlank(sourceIndex)) {
 			throw new IllegalArgumentException("Pass in a source index");
 		}
