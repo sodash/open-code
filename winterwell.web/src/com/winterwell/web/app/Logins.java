@@ -30,6 +30,10 @@ public class Logins {
 	
 	private static File loginsDir;
 	
+	public static File getLoginsDir() {
+		return loginsDir;
+	}
+	
 	static Logins init() {
 		ConfigBuilder cb = ConfigFactory.get().getConfigBuilder(Logins.class);
 		loginsDir = new File(FileUtils.getWinterwellDir(), "logins");
