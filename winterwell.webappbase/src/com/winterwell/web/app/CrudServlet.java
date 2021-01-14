@@ -463,11 +463,18 @@ public abstract class CrudServlet<T> implements IServlet {
 		getThing(state);
 		// from DB?
 		if (jthing==null) {
-			jthing = getThingFromDB(state);
+			setJthing(getThingFromDB(state));
 		}
 		return jthing;
 	}
 
+	/**
+	 * @deprecated Not a normal thing to use
+	 * @param jthing
+	 */
+	protected void setJthing(JThing<T> jthing) {
+		this.jthing = jthing;
+	}
 
 
 	/**
@@ -1079,7 +1086,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (json==null) {
 			return null;
 		}
-		jthing = new JThing(json).setType(type);
+		setJthing(new JThing(json).setType(type));
 		return jthing.java();
 	}
 
