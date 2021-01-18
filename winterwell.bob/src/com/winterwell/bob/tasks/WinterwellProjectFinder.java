@@ -132,11 +132,11 @@ public class WinterwellProjectFinder implements IFn<String, File> {
 			"https://github.com/winterstein/flexi-gson.git",
 			
 		"dataloader",
-			"git@git.winterwell.com:winterwell-code winterwell-code dataloader",
+			"git@github.com:/good-loop/code code dataloader",
 		"youagain-server",
-			"git@git.winterwell.com:winterwell-code winterwell-code youagain-server",
+			"git@github.com:/good-loop/code code youagain-server",
 		"winterwell.demographics",
-			"git@git.winterwell.com:winterwell-code winterwell-code winterwell.demographics"
+			"git@github.com:/good-loop/code code winterwell.demographics"
 
 	);
 	
