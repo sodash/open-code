@@ -85,7 +85,7 @@ public final class Dep {
 	 * NB: Very similar to {@link #setIfAbsent(Class, Object)} but does not set
 	 * @param <X>
 	 * @param klass
-	 * @param defaultValue
+	 * @param defaultValue Can be null if you want, for a version of get() that is lenient about unset.
 	 * @return the value held / the default
 	 */
 	public static <X> X getWithDefault(Class<X> klass, X defaultValue) {
