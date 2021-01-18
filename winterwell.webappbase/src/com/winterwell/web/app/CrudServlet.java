@@ -50,6 +50,7 @@ import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.ajax.AjaxMsg;
 import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.WebRequest.KResponseType;
@@ -495,7 +496,15 @@ public abstract class CrudServlet<T> implements IServlet {
 			if (thingId==null || ACTION_NEW.equals(thingId)) {
 				_jthing.put("id", id);
 			} else if ( ! thingId.equals(id)) {
-				throw new IllegalStateException("ID mismatch remote: "+thingId+" vs local: "+id);
+				// WTF?! Change the id
+				IllegalStateException ex = new IllegalStateException("ID mismatch remote: "+thingId+" vs local: "+id);				
+				if (stateIgnored != null) {
+					stateIgnored.addMessage(AjaxMsg.error(ex));
+				} else {
+					Log.e(LOGTAG(), ex);
+				}
+				Log.d(LOGTAG(), "Change ID (i.e. copy) from "+thingId+" to "+id);
+				_jthing.put("id", id);
 			}
 		}		
 		// ES paths
