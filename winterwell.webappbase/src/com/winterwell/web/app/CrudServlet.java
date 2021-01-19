@@ -496,17 +496,12 @@ public abstract class CrudServlet<T> implements IServlet {
 			if (thingId==null || ACTION_NEW.equals(thingId)) {
 				_jthing.put("id", id);
 			} else if ( ! thingId.equals(id)) {
-				// WTF?! Change the id
-				IllegalStateException ex = new IllegalStateException("ID mismatch remote: "+thingId+" vs local: "+id);				
-				if (stateIgnored != null) {
-					stateIgnored.addMessage(AjaxMsg.error(ex));
-				} else {
-					Log.e(LOGTAG(), ex);
-				}
-				Log.d(LOGTAG(), "Change ID (i.e. copy) from "+thingId+" to "+id);
-				_jthing.put("id", id);
+				// WTF?! NB: seen Jan 2021 with a badly setup internal call from one crudservlet to another. 
+				throw new IllegalStateException(
+						"ID mismatch "+_jthing.java().getClass().getSimpleName()+" java/json: "+thingId+" vs local: "+id);				
 			}
 		}		
+		
 		// ES paths
 		ESPath draftPath = esRouter.getPath(dataspace, type, id, KStatus.DRAFT);
 		ESPath publishPath = esRouter.getPath(dataspace, type, id, KStatus.PUBLISHED);
