@@ -124,8 +124,9 @@ public class DataServlet implements IServlet {
 		search.setDebug(true);
 //		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
 		search.setSize(size);
-				
-		SearchResponse sr = search.get();
+		
+		// Search!
+		SearchResponse sr = search.get();		
 		sr.check();
 		
 		Map aggregations = sr.getAggregations();
@@ -136,9 +137,13 @@ public class DataServlet implements IServlet {
 		// strip out no0 filter wrappers
 		aggregations = essb.cleanJson(aggregations);
 		// also send eg data
-		aggregations.put("examples", sr.getHits());
-		
-		JsonResponse jr = new JsonResponse(state, aggregations);
+		aggregations.put("examples", sr.getHits());		
+		// debug?
+		if (state.debug && isLoggedIn(state)) {
+			aggregations.put("debug", search.getCurl());
+		}
+		// done
+		JsonResponse jr = new JsonResponse(state, aggregations);		
 		WebUtils2.sendJson(jr, state);
 	}
 

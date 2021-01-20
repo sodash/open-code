@@ -132,10 +132,11 @@ public class ESDataLogSearchBuilder {
 	 * @return
 	 */
 	private Aggregation prepareSearch3_agg4breakdown(String bd) {
+
 		// ??Is there a use-case for recursive handling??
 		String[] breakdown_output = bd.split("\\{");
 		String[] bucketBy = breakdown_output[0].trim().split("/");
-		Map<String,String> reportSpec = null;
+		Map<String,String> reportSpec = new ArrayMap("count","sum"); // default to sum of `count`
 		if (breakdown_output.length > 1) {
 			String json = bd.substring(bd.indexOf("{"), bd.length());
 			try {
@@ -182,10 +183,10 @@ public class ESDataLogSearchBuilder {
 			}
 		}
 		
-		// add a count handler?
-		if (reportSpec==null) { // no - we're done - return terms
-			return root;
-		}
+		// add a count handler? old - with compression, doc_count alone is meaningless
+//		if (reportSpec==null) { // no - we're done - return terms
+//			return root;
+//		}
 		
 		// e.g. {"count": "avg"}
 		String[] rkeys = reportSpec.keySet().toArray(StrUtils.ARRAY);
@@ -196,12 +197,13 @@ public class ESDataLogSearchBuilder {
 				throw new IllegalArgumentException("Bad breakdown {field:op} parameter: "+bd);
 			}
 			// Note k should be a numeric field, e.g. count -- not a keyword field!
-			Class klass = DataLogEvent.COMMON_PROPS.get(k);
-			if ( ! ReflectionUtils.isa(klass, Number.class)) {
-				Log.w(LOGTAG, "Possible bug! numeric op on non-numeric field "+k+" in "+bd);
+			if ( ! ESStorage.count.equals(k)) {
+				Class klass = DataLogEvent.COMMON_PROPS.get(k);
+				if ( ! ReflectionUtils.isa(klass, Number.class)) {
+					Log.w(LOGTAG, "Possible bug! numeric op on non-numeric field "+k+" in "+bd);
+				}
 			}
-				
-			Aggregation myCount = Aggregations.stats(k, k);
+			Aggregation myCount = Aggregations.sum(k, k);
 			// filter 0s??
 			ESQueryBuilder no0 = ESQueryBuilders.rangeQuery(k, 0, null, false);
 			// NB: we could have multiple ops, so number the keys
@@ -244,10 +246,12 @@ public class ESDataLogSearchBuilder {
 	 * @return cleaned aggregations
 	 */
 	public Map cleanJson(Map<String,Object> aggregations) {
-		Printer.out(JSON.toString(aggregations));
+//		Printer.out(JSON.toString(aggregations));
 		Map aggs2 = Containers.applyToJsonObject(aggregations, ESDataLogSearchBuilder::cleanJson2);
 		// also top-level
 		Map aggs3 = (Map) cleanJson2(aggs2, null);
+		// 
+		
 		return aggs3;
 	}
 	
