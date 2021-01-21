@@ -117,7 +117,7 @@ public class ESDataLogSearchBuilder {
 		} // ./breakdown
 		
 		// add a total count as well for each top-level terms breakdown
-		Aggregation fCountStats = Aggregations.stats("all", ESStorage.count);
+		Aggregation fCountStats = Aggregations.sum("all", ESStorage.count);
 		aggs.add(fCountStats);			
 		
 		return aggs;
@@ -242,28 +242,33 @@ public class ESDataLogSearchBuilder {
 
 	/**
 	 * Remove the no0_ filtering wrappers 'cos they're an annoyance at the client level.
+	 * Also remove doc_count for safety.
 	 * @param aggregations 
 	 * @return cleaned aggregations
 	 */
 	public Map cleanJson(Map<String,Object> aggregations) {
-//		Printer.out(JSON.toString(aggregations));
+
 		Map aggs2 = Containers.applyToJsonObject(aggregations, ESDataLogSearchBuilder::cleanJson2);
 		// also top-level
 		Map aggs3 = (Map) cleanJson2(aggs2, null);
-		// 
-		
 		return aggs3;
-	}
+	}	
 	
 	static Object cleanJson2(Object old, List<String> __path) {
-		if ( ! (old instanceof Map)) return old;
+		if ( ! (old instanceof Map)) {
+			return old;
+		}
+		Map mold = (Map) old;
+		// no doc_count (its misleading with compression)
+		mold.remove("doc_count");
+		
 		Map newMap = null;
 		for(int i=0; i<MAX_OPS; i++) {
-			Map<String,?> wrapped = (Map) ((Map) old).get(no0_+i);
+			Map<String,?> wrapped = (Map) mold.get(no0_+i);
 			// no no0s to remove?
 			if (wrapped==null) break;
 			// copy and edit
-			if (newMap==null) newMap = new ArrayMap(old);
+			if (newMap==null) newMap = new ArrayMap(mold);
 			newMap.remove(no0_+i);
 			for(String k : wrapped.keySet()) {
 				Object v = wrapped.get(k);
@@ -276,7 +281,7 @@ public class ESDataLogSearchBuilder {
 				}
 			}
 		}
-		Object v = newMap==null? old : newMap;
+		Map v = newMap==null? mold : newMap;
 		return v;		
 	}
 	

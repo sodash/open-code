@@ -21,6 +21,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -879,6 +880,18 @@ public class FileUtils {
 	public static FileFilter getRegexFilter(String regex) {
 		return new RegexFileFilter(regex);
 	}
+	
+	/**
+	 * @param regex
+	 * @return A regex filter that must match <i>all of</i> the <i>absolute file
+	 *         path</i>. The regex must usually be happy accepting an initial .*
+	 *         portion!
+	 */
+	public static FileFilter getGlobFilter(String glob) {
+		Pattern regex = regexFromGlob(glob);
+		return new RegexFileFilter(regex.pattern());
+	}
+
 
 	/**
 	 *
@@ -1777,15 +1790,43 @@ public class FileUtils {
 	 * @param file Unless the glob starts "**", then only the filename is used (ie parent directories are ignored)
 	 */
 	public static boolean globMatch(String glob, File file) {
-//		File justTheName = new File(file.getName()); // otherwise PathMatcher behaves wierdly!
-		PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:"+glob);
-		boolean m = pathMatcher.matches(file.toPath());
-		if ( ! m && ! glob.startsWith("**/")) {
-			glob = "**/"+glob; // try again, allowing parent dirs (NB: "**/*.txt" would not match eg "foo.txt")
-			pathMatcher = FileSystems.getDefault().getPathMatcher("glob:"+glob);
-			m = pathMatcher.matches(file.toPath());
+		Pattern regex = regexFromGlob(glob);
+		boolean ok = regex.matcher(file.getName()).matches();
+		if (ok) return true;
+		ok = regex.matcher(file.getPath()).matches();
+		return ok;
+////		File justTheName = new File(file.getName()); // otherwise PathMatcher behaves wierdly!
+//		PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:"+glob);
+//		Path path = file.toPath();
+//		boolean m = pathMatcher.matches(path);
+//		if (m) {
+//			return true;
+//		}
+//		if ( ! glob.startsWith("**")) {
+//			glob = "**/"+glob; // try again, allowing parent dirs (NB: "**/*.txt" would not match eg "foo.txt")
+////			pathMatcher = FileSystems.getDefault().getPathMatcher("glob:"+glob);
+//			m = pathMatcher.matches(path);
+//		}
+//		return m;
+	}
+
+	private static Pattern regexFromGlob(String glob) {
+		if (glob.equals("*")) {
+			return Pattern.compile(".*"); // all
 		}
-		return m;
+		String[] bits = glob.split("\\*");
+		StringBuilder sb = new StringBuilder();
+		for (String string : bits) {
+			if (! string.isEmpty()) {
+				sb.append(Pattern.quote(string));			
+			}
+			sb.append(".*");
+		}
+		if ( ! glob.endsWith("*")) {
+			StrUtils.pop(sb, 2);
+		}
+		Pattern p = Pattern.compile(sb.toString());
+		return p;
 	}
 
 
