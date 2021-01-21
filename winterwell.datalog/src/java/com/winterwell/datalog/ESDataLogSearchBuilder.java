@@ -243,6 +243,7 @@ public class ESDataLogSearchBuilder {
 	/**
 	 * Remove the no0_ filtering wrappers 'cos they're an annoyance at the client level.
 	 * Also remove doc_count for safety.
+	 * Simplify count:value:5 to count:5
 	 * @param aggregations 
 	 * @return cleaned aggregations
 	 */
@@ -261,6 +262,15 @@ public class ESDataLogSearchBuilder {
 		Map mold = (Map) old;
 		// no doc_count (its misleading with compression)
 		mold.remove("doc_count");
+		
+		// simplify {value:5} to 5
+		if (mold.size() == 1) {
+			Object k = Containers.only(mold.keySet());
+			if ("value".equals(k)) {
+				Number v = (Number) mold.get(k);
+				return v;
+			}			
+		}
 		
 		Map newMap = null;
 		for(int i=0; i<MAX_OPS; i++) {
