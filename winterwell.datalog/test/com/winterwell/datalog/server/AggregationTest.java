@@ -117,7 +117,7 @@ public class AggregationTest {
 							    	JsonArray jarray8 = os.getSecond();
 							    	for (JsonElement j8 : jarray8) { // each j8 is a time interval of one day
 							    		String time = j8.getAsJsonObject().get("key_as_string").getAsString();
-							    		double doc_count = j8.getAsJsonObject().get("doc_count").getAsDouble();
+							    		double count = j8.getAsJsonObject().get("count").getAsDouble();
 							    		IndexRequest pi = esc.prepareIndex(INDEX, "compressed_"+i);
 							    		i = i + 1; //increment document id
 							    		pi.setBodyMap(new ArrayMap(
@@ -129,7 +129,7 @@ public class AggregationTest {
 							    				"browser", browser_name,
 							    				"os", os_name,
 							    				"time", time,
-							    				"count", doc_count));
+							    				"count", count));
 										bulk.add(pi);
 							    	}
 						    	}

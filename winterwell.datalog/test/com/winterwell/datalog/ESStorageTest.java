@@ -248,8 +248,8 @@ public class ESStorageTest {
 		Printer.out("---------");
 		Printer.out(aggs); // the event gets counted under both tags :)
 		Printer.out("---------");
-		Number c1 = SimpleJson.get(aggs, "by_evt", "buckets", 0, "doc_count");
-		Number c2 = SimpleJson.get(aggs, "by_evt", "buckets", 1, "doc_count");
+		Number c1 = SimpleJson.get(aggs, "by_evt", "buckets", 0, "count");
+		Number c2 = SimpleJson.get(aggs, "by_evt", "buckets", 1, "count");
 		assert c1.intValue() == 1 : aggs;
 		assert c2.intValue() == 1 : aggs;
 		
