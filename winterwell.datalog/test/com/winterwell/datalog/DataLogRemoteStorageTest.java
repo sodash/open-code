@@ -51,15 +51,15 @@ public class DataLogRemoteStorageTest {
 		DataLogConfig dc = new DataLogConfig();
 		dc.storageClass = DataLogRemoteStorage.class;
 		dc.logEndpoint = "https://testlg.good-loop.com/lg";
-		dc.getDataEndpoint = "https://testlg.good-loop.com/data";
+		dc.dataEndpoint = "https://testlg.good-loop.com/data";
 		dc.logEndpoint = "http://locallg.good-loop.com/lg";
-		dc.getDataEndpoint = "http://locallg.good-loop.com/data";
+		dc.dataEndpoint = "http://locallg.good-loop.com/data";
 		DataLog.init(dc);
 		
 		DataLog.count(1, "testsaveevent");
 		DataLog.flush();
 
-		DataLogHttpClient dlc = new DataLogHttpClient(dc.getDataEndpoint, new Dataspace(DataLog.getDataspace()));
+		DataLogHttpClient dlc = new DataLogHttpClient(dc.dataEndpoint, new Dataspace(DataLog.getDataspace()));
 		SearchQuery q = new SearchQuery("evt:testsaveevent");
 		//		DataLogRemoteStorage storage = (DataLogRemoteStorage) DataLog.getImplementation().getStorage();
 //		StatReq<IDataStream> data = storage.getData("testSaveEvent", new Time().minus(TUnit.MINUTE), new Time(), null, null);

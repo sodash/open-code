@@ -322,8 +322,20 @@ public class ReflectionUtils {
 		return null;
 	}
 
+	/**
+	 * 
+	
+	 * @param <X>
+	 * @param obj
+	 * @param fieldName
+	@return Field or null
+	 */
 	public static <X> X getPrivateField(Object obj, String fieldName) {
+		Utils.check4null(obj, fieldName);
 		Field f = ReflectionUtils.getField(obj.getClass(), fieldName);
+		if (f==null) {
+			return null;
+		}
 		f.setAccessible(true);
 		try {
 			return (X) f.get(obj);

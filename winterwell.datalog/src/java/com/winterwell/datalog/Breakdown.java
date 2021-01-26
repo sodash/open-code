@@ -9,20 +9,22 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 
 /**
- * Should this just be done via {@link Aggregation}??
  * 
  * e.g. pub{"count":"sum"}
  * @author daniel
  *
  */
-public class Breakdown {
+public final class Breakdown {
 
 	/**
 	 * String[]
 	 */
-	String[] by;
-	String field;
-	String op;
+	final String[] by;
+	final String field;
+	/**
+	 * Currently assumed to be sum and ignored??
+	 */
+	final String op;
 
 	public List<String> getBy() {
 		return Arrays.asList(by);
@@ -43,6 +45,7 @@ public class Breakdown {
 		this.by = by==null? new String[]{""} : by.split(",");
 		this.field =field;
 		this.op = operator;
+		assert op==null || op.equals("sum") : op+" TODO"; 
 	}
 
 	/**

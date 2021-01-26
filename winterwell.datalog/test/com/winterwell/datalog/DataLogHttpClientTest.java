@@ -3,9 +3,11 @@ package com.winterwell.datalog;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.winterwell.nlp.query.SearchQuery;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.TUnit;
@@ -13,6 +15,13 @@ import com.winterwell.utils.time.Time;
 
 public class DataLogHttpClientTest {
 
+	@BeforeClass
+	public static void beforeTests() {
+		DataLogConfig dlc = new DataLogConfig();
+		dlc.dataEndpoint = "https://testlg.good-loop.com/data";
+		Dep.set(DataLogConfig.class, dlc);
+	}
+	
 	@Test
 	public void testGetEvents() {
 		// get all
@@ -37,8 +46,8 @@ public class DataLogHttpClientTest {
 		DataLogHttpClient dlc = new DataLogHttpClient(new Dataspace("gl"));
 		SearchQuery sqd = new SearchQuery("evt:donation");
 		List<DataLogEvent> donEvents = dlc.getEvents(sqd, 10);
-		// NB: the count field is always present, the count stats property is a count of docs
-		Breakdown bd = new Breakdown("cid", "count", "count");
+		// NB: the count field is always present on DataLogEvents
+		Breakdown bd = new Breakdown("cid", "count", "sum");
 		Map<String, Double> dontnForAdvert = dlc.getBreakdown(sqd, bd);	
 		System.out.println(dontnForAdvert);
 	}

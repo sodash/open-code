@@ -106,7 +106,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	@Override
 	public IDataLogStorage init(DataLogConfig settings) {
 		logEndpoint = settings.logEndpoint;
-		getDataEndpoint = settings.getDataEndpoint;
+		getDataEndpoint = settings.dataEndpoint;
 		return this;
 	}
 

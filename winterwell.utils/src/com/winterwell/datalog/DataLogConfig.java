@@ -97,7 +97,7 @@ public class DataLogConfig extends DBOptions implements IInit, ISiteConfig {
 	public String logEndpoint;
 
 	@Option
-	public String getDataEndpoint="https://lg.good-loop.com/data";
+	public String dataEndpoint="https://lg.good-loop.com/data";
 
 	Map<String, Object> tagHandlers = new HashMap();
 
