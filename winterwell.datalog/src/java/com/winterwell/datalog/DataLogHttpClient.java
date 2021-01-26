@@ -182,12 +182,18 @@ public class DataLogHttpClient {
 		for (Map bucket : buckets) {
 			String k = (String) bucket.get("key");
 			Object ov = bucket.get(breakdown.field);
+			if (ov instanceof Map) {	// HACK old code, Jan 2021
+				ov = ((Map)ov).get(breakdown.op);
+			}
 			double v = MathUtils.toNum(ov);
 			byX.put(k, v);
 		}		
 		// stash extra info in fields
 		overview = SimpleJson.get(jobjMap, breakdown.field); // present if breakdown included by=""
 		Object _all = SimpleJson.get(jobjMap, "all");
+		if (_all instanceof Map) {	// HACK old code, Jan 2021
+			_all = ((Map)_all).get("count");
+		}
 		all = MathUtils.toNum(_all);
 		examples = Containers.asList((Object)SimpleJson.get(jobjMap, "examples"));
 		
