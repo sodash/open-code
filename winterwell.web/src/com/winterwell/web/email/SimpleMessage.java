@@ -202,7 +202,7 @@ public class SimpleMessage extends MimeMessage {
 	 * Converts to String. Is this needed?
 	 * 
 	 * @param message
-	 * @param rt
+	 * @param rt Can be null for "all types"
 	 * @return
 	 */
 	public static String getRecipients(Message message, Message.RecipientType rt) {
@@ -238,7 +238,7 @@ public class SimpleMessage extends MimeMessage {
 			throw new ExternalServiceException(e);
 		}
 	}
-
+		
 	public static String getTos(Message message) {
 		return getRecipients(message, javax.mail.Message.RecipientType.TO);
 	}
