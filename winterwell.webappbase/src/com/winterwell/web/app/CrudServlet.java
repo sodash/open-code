@@ -682,7 +682,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	/**
 	 * Override to do anything. 
-	 * @param jThing Modify this if you want
+	 * @param jThing Modify this if you want. Never null.
 	 * @param state
 	 * @see #augmentFlag
 	 */
