@@ -51,6 +51,7 @@ import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.AjaxMsg;
+import com.winterwell.web.ajax.AjaxMsg.KNoteType;
 import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.WebRequest.KResponseType;
@@ -708,7 +709,9 @@ public abstract class CrudServlet<T> implements IServlet {
 		// query
 		ESQueryBuilder qb = doList3_ESquery(q, prefix, period, stateOrNull);
 
-		if (qb!=null) s.setQuery(qb);
+		if (qb!=null) {
+			s.setQuery(qb);
+		}
 				
 		// Sort e.g. sort=date-desc for most recent first
 		if (sort!=null) {
@@ -733,7 +736,12 @@ public abstract class CrudServlet<T> implements IServlet {
 		s.setDebug(true);
 
 		// Call the DB
-		SearchResponse sr = s.get();		
+		SearchResponse sr = s.get();
+		
+//		if (stateOrNull!=null && stateOrNull.debug) { TODO debug is quiet on the front end
+//			stateOrNull.addMessage(new AjaxMsg(KNoteType.debug, "ES", s.getCurl()));
+//		}
+		
 		return sr;
 	}
 
@@ -783,35 +791,14 @@ public abstract class CrudServlet<T> implements IServlet {
 			prefix = null;
 		}
 		if (prefix != null) {
-			// NB: not factored into its own method as it edits a few variables			
-			// Hack: convert punctuation into spaces, as ES would otherwise say query:"P&G" !~ name:"P&G"
-			String cprefix = StrUtils.toCanonical(prefix);
-			// Hack: Prefix should be one word. If 2 are sent -- turn it into a query + prefix
-			int spi = cprefix.lastIndexOf(' ');
-			if (spi != -1) {
-				assert cprefix.equals(cprefix.trim()) : "untrimmed?! "+cprefix;
-				String qbit = cprefix.substring(0, spi);
-				if (q==null) q = qbit;
-				else q = "("+q+") AND "+qbit;
-				cprefix = cprefix.substring(spi+1);
-			}
-			// prefix is on a field(s) -- we use name by default
-			BoolQueryBuilder prefixESQ = ESQueryBuilders.boolQuery();
-			for(String field : prefixFields) {
-				prefixESQ.should(ESQueryBuilders.prefixQuery(field, cprefix));
-			}
-			// also allow general search on the prefix word -- so that prefix is not more restrictive than q
-			ESQueryBuilder searchForPrefix = ESQueryBuilders.simpleQueryStringQuery(cprefix);
-			prefixESQ.should(searchForPrefix);
-			
-			prefixESQ.minimumNumberShouldMatch(1);
-			assert qb == null;
-			qb = prefixESQ;
+			BoolQueryBuilder esPrefix = doList4_ESquery_prefix(prefix);
+			assert qb==null;
+			qb = esPrefix;
 		} //./prefix
 		
 		if ( q != null) {
-			// convert "me" to specific IDs
-			if (Pattern.compile("\\bme\\b").matcher(q).find()) {
+			// convert "me" to specific IDs	FIXME but what about e.g. "me and my girl"?
+			if (Pattern.compile(":me\\b").matcher(q).find()) {
 				if (stateOrNull==null) {
 					throw new NullPointerException("`me` requires webstate to resolve who: "+q);
 				}
@@ -826,7 +813,7 @@ public abstract class CrudServlet<T> implements IServlet {
 					mes.append("ANON OR " ); // fail - WTF? How come no logins?!
 				}
 				StrUtils.pop(mes, 4);
-				q = q.replaceAll("\\bme\\b", mes.toString());
+				q = q.replaceAll(":me\\b", ":"+mes.toString());
 			}
 			// TODO match on all?
 			// HACK strip out unset
@@ -859,6 +846,45 @@ public abstract class CrudServlet<T> implements IServlet {
 		ESQueryBuilder exq = doList4_ESquery_custom(stateOrNull);
 		qb = ESQueryBuilders.must(qb, exq);
 		return qb;
+	}
+
+
+	private BoolQueryBuilder doList4_ESquery_prefix(String prefix) {
+		assert prefix != null;
+		assert ! prefix.contains(":");
+
+		BoolQueryBuilder orESQ = ESQueryBuilders.boolQuery();
+		orESQ.minimumNumberShouldMatch(1);
+		// straight search -- not sure if this is needed
+		BoolQueryBuilder esSearch = AppUtils.makeESFilterFromSearchQuery(new SearchQuery(prefix), null, null);
+		orESQ.should(esSearch);
+		
+		// Hack: convert punctuation into spaces, as ES would otherwise say query:"P&G" !~ name:"P&G"
+		String cprefix = StrUtils.toCanonical(prefix);
+		// But also try without that!
+		// NB: avoid a duplicate query
+		String[] ps = prefix.equals(cprefix)? new String[]{prefix} : new String[]{prefix, cprefix};
+		for(String _prefix : ps){				
+			BoolQueryBuilder prefixESQ = ESQueryBuilders.boolQuery();
+			// Hack: Prefix should be one word. If 2 are sent -- turn it into a query + prefix
+			int spi = _prefix.lastIndexOf(' ');
+			if (spi != -1) {
+				assert _prefix.equals(_prefix.trim()) : "untrimmed?! "+_prefix;
+				String qbit = _prefix.substring(0, spi);
+				BoolQueryBuilder esBitSearch = AppUtils.makeESFilterFromSearchQuery(new SearchQuery(qbit), null, null);
+				prefixESQ.must(esBitSearch); // this should be an AND really
+				_prefix = _prefix.substring(spi+1);
+			}
+			// prefix is on a field(s) -- we use name by default			
+			for(String field : prefixFields) {
+				prefixESQ.should(ESQueryBuilders.prefixQuery(field, _prefix));
+			}		
+			orESQ.should(prefixESQ);
+		}
+		
+		// either by search, or prefix, or canonical prefix			
+		orESQ.minimumNumberShouldMatch(1);
+		return orESQ;
 	}
 
 
