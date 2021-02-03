@@ -75,6 +75,8 @@ public class DataServlet implements IServlet {
 			breakdown = new ArrayList();
 			breakdown.add("time");
 		}
+		// remove `none` if present (which is to block the default)
+		breakdown.remove("none");
 
 		// security: on the dataspace, and optionally on the breakdown
 		DataLogSecurity.check(state, dataspace, breakdown);
