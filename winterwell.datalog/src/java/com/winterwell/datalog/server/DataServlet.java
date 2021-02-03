@@ -71,7 +71,7 @@ public class DataServlet implements IServlet {
 		// Uses "paths" of breakdown1/breakdown2/... {field1:operation, field2}
 		List<String> breakdown = state.get(DataLogFields.breakdown);
 		if (breakdown==null) {
-			Log.w(LOGTAG, "You want data but no breakdown?! Default to time. "+state);
+//			Log.w(LOGTAG, "You want data but no breakdown?! Default to time. "+state);
 			breakdown = new ArrayList();
 			breakdown.add("time");
 		}
