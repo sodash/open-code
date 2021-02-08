@@ -43,6 +43,7 @@ import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.AString;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
@@ -501,7 +502,7 @@ public class AppUtils {
 	{
 		IESRouter esRouter = Dep.get(IESRouter.class);
 		ESHttpClient es = Dep.get(ESHttpClient.class);
-		Exception err = null;			
+		String errMsg = null;			
 		for(Class k : dbclasses) {
 			for(KStatus status : statuses) {
 				ESPath path = esRouter.getPath(dataspace, k, null, status);
@@ -510,16 +511,17 @@ public class AppUtils {
 					String index = path.index();
 					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
 				} catch(Exception ex) {
-					initESMappings2_error(mappingFromClass, es, k, path, ex);
-					if (ex!=null) err = ex; // carry on through all the mappings
+					// collect all the error messages
+					String exMsg = initESMappings2_error(mappingFromClass, es, k, path, ex);
+					errMsg = errMsg==null? exMsg : errMsg+"\n\n"+exMsg;
 				}
 			}
 		}		
 		// shout if we had an error
-		if (err != null) {	
+		if (errMsg != null) {	
 			// ??IF we add auto reindex, then wait for ES
 //			es.flush();
-			throw Utils.runtime(err);
+			throw new ESException(errMsg);
 		}
 	}
 
@@ -532,10 +534,11 @@ public class AppUtils {
 	 * @param ex
 	 * @return
 	 */
-	private static void initESMappings2_error(
+	private static String initESMappings2_error(
 			Map<Class, Map> mappingFromClass, ESHttpClient es, Class k,
 			ESPath path, final Exception ex) 
 	{
+		String msg = path.index()+" Mapping change?! "+ex;
 		Log.w("ES.init", path.index()+" Mapping change?! "+ex);
 		// map the base index (so we can do a reindex with the right mapping)
 		// NB: The default naming, {index}_{month}{year}, assumes we only do one mapping change per month.
@@ -569,8 +572,10 @@ public class AppUtils {
 			if (resp.isSuccess()) Log.d(resp); else Log.e("ES.init.reindex.fail", resp);
 		} else {
 			// dont auto reindex test or live
-			Log.i("ES.init", "To reindex:\n\n"+
-					"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}' -H 'Content-Type:application/json'\n\n");
+			String reindexMsg = "To reindex:\n"+
+					"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}' -H 'Content-Type:application/json'\n";
+			Log.i("ES.init", reindexMsg);
+			msg += "\n"+reindexMsg;
 		}
 		// and shout fail!
 		//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
@@ -612,12 +617,16 @@ public class AppUtils {
 					ar.getBodyJson();
 //								("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
 //								.replace('\'', '"');
-			Log.i("ES.init", "To switch old -> new:\n\n"
-					+"curl http://localhost:9200/_aliases -d '"+switchjson+"' -H 'Content-Type:application/json'\n\n");
+			String switchMsg = "To switch old -> new:\n\n"
+					+"curl http://localhost:9200/_aliases -d '"+switchjson+"' -H 'Content-Type:application/json'\n\n";
+			Log.i("ES.init", switchMsg);
+			msg += "\n"+switchMsg;
 		}
 		// record fail - but loop over the rest so we catch all the errors in one loop
 		Log.e("init", ex.toString());
+		return msg;
 	}
+	
 
 	private static void initESMappings2_putMapping(
 			Map<Class, Map> mappingFromClass, ESHttpClient es, 
