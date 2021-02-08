@@ -223,7 +223,9 @@ public abstract class CrudServlet<T> implements IServlet {
 		// publish?
 		if (state.actionIs(ACTION_PUBLISH)) {
 			jthing = doPublish(state);
-			assert jthing.string().contains(KStatus.PUBLISHED.toString()) : jthing;
+			if ( ! jthing.string().contains(KStatus.PUBLISHED.toString())) {
+				Log.e(LOGTAG(), "doPublish json doesnt contain 'PUBLISHED' "+state);
+			}
 			return;
 		}
 		if (state.actionIs("unpublish")) {

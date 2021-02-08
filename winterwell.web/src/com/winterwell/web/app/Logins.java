@@ -12,6 +12,7 @@ import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
+import com.winterwell.utils.log.Log;
 import com.winterwell.web.LoginDetails;
 
 /**
@@ -25,6 +26,8 @@ import com.winterwell.web.LoginDetails;
  *
  */
 public class Logins {
+
+	private static final String LOGTAG = "Logins";
 
 	static Logins dflt = init();
 	
@@ -54,6 +57,7 @@ public class Logins {
 	public static File getFile(String appName, String filename) {
 		File f = new File(loginsDir, appName+"/"+filename);
 		if (f.isFile()) return f;
+		Log.i(LOGTAG, "No credentials file: "+f);
 		return null;
 	}
 	
