@@ -4,13 +4,13 @@
 # A bash wrapper for a java process which summarises (or compresses) datalog indices
 ####
 
-USAGE="\n\n./summarise.datalog.data.sh full-name-of-target-index\n\n"
+USAGE="\n\nUSAGE:\n\n./summarise.datalog.data.sh full-name-of-target-index\n\n"
 
 ####
 # Check if name of index was passed in
 ###
 if [[ $# -eq 0 ]]; then
-	printf $USAGE
+	printf "$USAGE"
 	exit 0
 fi
 
