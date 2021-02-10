@@ -126,7 +126,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		// crud?
-		if (state.getAction() != null) {
+		if (state.getAction() != null && ! state.actionIs("get")) {
 			// do it
 			doAction(state);
 		}						
