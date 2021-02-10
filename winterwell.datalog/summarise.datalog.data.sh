@@ -9,8 +9,9 @@ USAGE="\n\n./summarise.datalog.data.sh full-name-of-target-index\n\n"
 ####
 # Check if name of index was passed in
 ###
-if [[ $1 = '' ]]; then
+if [[ $# -eq 0 ]]; then
 	printf $USAGE
+	exit 0
 fi
 
 ####
