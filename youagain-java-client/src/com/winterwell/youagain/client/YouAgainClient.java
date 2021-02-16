@@ -16,6 +16,7 @@ import javax.mail.internet.InternetAddress;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
@@ -134,8 +135,12 @@ public final class YouAgainClient {
 		if (initFlag) return;		
 		initFlag = true;
 		try {			
-			ConfigFactory cf = ConfigFactory.get();
-			yac = cf.getConfig(YouAgainClientConfig.class);
+			if (Dep.has(YouAgainClientConfig.class)) {
+				yac = Dep.get(YouAgainClientConfig.class);
+			} else {
+				ConfigFactory cf = ConfigFactory.get();
+				yac = cf.getConfig(YouAgainClientConfig.class);
+			}
 			assert ! Utils.isBlank(yac.endpoint) : yac;
 		} catch(Throwable ex) {
 			Log.e(LOGTAG, ex); // swallow

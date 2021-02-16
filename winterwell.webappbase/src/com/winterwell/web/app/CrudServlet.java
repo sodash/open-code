@@ -35,6 +35,7 @@ import com.winterwell.gson.FlexiGson;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -677,7 +678,7 @@ public abstract class CrudServlet<T> implements IServlet {
 				hits.add(h);
 			} catch(Throwable ex) {
 				// log, swallow, and carry on
-				Log.e("crud", new WrappedException("cause: "+h, ex));
+				Log.e("crud", "cause: "+h+" "+ex+" source: "+h.getSource()+" "+Printer.toString(ex, true));
 			}
 		}
 		return hits;		
