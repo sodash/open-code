@@ -147,6 +147,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		} catch(AssertionError e) {
 			// ok
 		}
+		Log.i(getAppNameLocal(), "doMain "+Printer.toString(args)+" ...Let's go :)");
 		init(args);
 		launchJetty();
 		// do Main once
@@ -410,7 +411,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 
 	protected void launchJetty() {
 		try {
-			Log.i("Go!");
+			Log.i("launchJetty - Go!");
 			assert jl==null;
 			jl = new JettyLauncher(getWebRootDir(), getPort());
 			jl.setup();		
