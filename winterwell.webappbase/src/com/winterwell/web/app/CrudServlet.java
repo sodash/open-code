@@ -82,6 +82,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	public static final String ACTION_GETORNEW = "getornew";
 	public static final String ACTION_SAVE = "save";
+	public static final String ACTION_DELETE = "delete";
 
 	public CrudServlet(Class<T> type) {
 		this(type, Dep.get(IESRouter.class));
@@ -216,7 +217,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			jthing = doDiscardEdits(state);
 			return;
 		}
-		if (state.actionIs("delete")) {
+		if (state.actionIs(ACTION_DELETE)) {
 			jthing = doDelete(state);
 			return;
 		}
@@ -285,9 +286,9 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	/**
-	 * Delete from draft and published!!
+	 * Delete from draft and published!! (copy into trash)
 	 * @param state
-	 * @return
+	 * @return null
 	 */
 	protected JThing<T> doDelete(WebRequest state) {
 		String id = getId(state);

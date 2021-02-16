@@ -429,6 +429,28 @@ public final class YouAgainClient {
 		AuthToken at = new AuthToken(user);
 		return at;
 	}
+	
+
+	public Object delete(XId user, AuthToken at) {
+		assert yac != null;
+		Utils.check4null(user, at);
+		FakeBrowser fb = fb(at);
+		fb.setDebug(true);
+		Log.d(LOGTAG, "Deleting "+user+" auth: "+at+"...");
+		String response = fb.getPage(yac.endpoint, new ArrayMap(
+				"app", app,
+				"action", "delete",
+				"person", user.toString())
+				);
+		Log.d(LOGTAG, "Deleted? "+user+" Response: "+response);
+		return response;
+	}
+
+	private FakeBrowser fb(AuthToken at) {
+		FakeBrowser fb = new FakeBrowser();
+		fb.setAuthenticationByJWT(at.getToken());
+		return fb;
+	}
 
 	private Map userFromResponse(String response) {
 		JSend jsend = JSend.parse(response);

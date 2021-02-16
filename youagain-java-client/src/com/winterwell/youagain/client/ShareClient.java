@@ -13,7 +13,7 @@ import com.winterwell.web.data.XId;
 public final class ShareClient {
 
 	public static final String ACTION_SHARE = "share";
-	public static final String ACTION_DELETE = "delete-share";
+	public static final String ACTION_DELETE_SHARE = "delete-share";
 	public static final String ACTION_CLAIM = "claim";
 
 	ShareClient(YouAgainClient youAgainClient) {
@@ -54,7 +54,7 @@ public final class ShareClient {
 				.setDebug(true);
 		fb.setAuthenticationByJWT(authToken.getToken());
 		Map<String, String> shareAction = new ArrayMap(
-			"action", ACTION_DELETE,
+			"action", ACTION_DELETE_SHARE,
 			"app", yac.app,
 			"shareWith", targetUser,
 			"entity", item
