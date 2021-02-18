@@ -255,6 +255,7 @@ public class XStreamUtils {
 	public static XStream setupXStream(XStream _xstream) {
 		try {
 			if (_xstream == null) _xstream = new XStream();
+			XStream.setupDefaultSecurity(_xstream); // Feb 2021 -- added this but not sure what it does.
 			// be robust & keep on truckin
 			_xstream.ignoreUnknownElements();
 			// prettier shorter xml
