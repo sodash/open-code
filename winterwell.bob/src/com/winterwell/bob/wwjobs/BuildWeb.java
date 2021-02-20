@@ -13,7 +13,7 @@ public class BuildWeb extends BuildWinterwellProject {
 	 */
 	public BuildWeb() {
 		super("winterwell.web");
-		setVersion("1.0.2");  // 2 Feb 2021
+		setVersion("1.0.3");  // 20 Feb 2021
 	}	
 
 	@Override
