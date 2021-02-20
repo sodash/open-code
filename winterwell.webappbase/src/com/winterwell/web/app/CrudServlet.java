@@ -143,7 +143,9 @@ public abstract class CrudServlet<T> implements IServlet {
 			JThing<T> cleansed = cleanse(jthing, state);			
 			// Editor safety
 			if (cleansed != null) {
-				cleanse2_dontConfuseEditors(cleansed, jthing, state);
+				cleanse2_dontConfuseEditors(cleansed, jthing, state);				
+			} else {
+				cleansed = jthing; // never null
 			}
 			// augment?
 			if (augmentFlag) {
@@ -169,6 +171,12 @@ public abstract class CrudServlet<T> implements IServlet {
 		WebUtils2.sendJson(output, state);
 	}
 	
+	/**
+	 * 
+	 * @param cleansed This may be modified
+	 * @param unclean
+	 * @param state
+	 */
 	private void cleanse2_dontConfuseEditors(JThing<T> cleansed, JThing<T> unclean, WebRequest state) {
 		if (cleansed==unclean) {
 			Log.e(LOGTAG(), "cleansed == unclean -- Should copy before cleaning");
