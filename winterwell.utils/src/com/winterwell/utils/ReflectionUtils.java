@@ -976,4 +976,18 @@ public class ReflectionUtils {
 //		}
 	}
 
+	/**
+	 * Like .isPrimitive() but covers String, Boolean, Number
+	 * @param obj null returns false
+	 * @return
+	 */
+	public static boolean isBasicType(Object obj) {
+		if (obj==null) {
+			return false;
+		}
+		// NB: if obj was primitive, it would be auto-boxed, so klass is never primitive here  
+		Class<? extends Object> klass = obj.getClass();		
+		return klass == String.class || klass==Boolean.class || isa(klass, Number.class);
+	}
+
 }

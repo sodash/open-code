@@ -47,6 +47,8 @@ import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.JsonPatch;
+import com.winterwell.utils.web.JsonPatchOp;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
@@ -138,16 +140,24 @@ public abstract class CrudServlet<T> implements IServlet {
 		// return json?		
 		if (jthing != null) {						
 			// privacy: potentially filter some stuff from the json!
-			cleanse(jthing, state);
+			JThing<T> cleansed = cleanse(jthing, state);			
+			// Editor safety
+			if (cleansed != null) {
+				cleanse2_dontConfuseEditors(cleansed, jthing, state);
+			}
 			// augment?
 			if (augmentFlag) {
-				augment(jthing, state);				
+				JThing<T> aug = augment(cleansed, state);
+				if (aug!=null) {
+					cleansed = aug;
+				}
 			}
-			String json = jthing.string();
+			String json = cleansed.string();
 			JsonResponse output = new JsonResponse(state).setCargoJson(json);			
 			WebUtils2.sendJson(output, state);
 			return;
 		}
+		
 		// no object...
 		// return blank / messages
 		if (state.getAction()==null) {
@@ -159,6 +169,38 @@ public abstract class CrudServlet<T> implements IServlet {
 		WebUtils2.sendJson(output, state);
 	}
 	
+	private void cleanse2_dontConfuseEditors(JThing<T> cleansed, JThing<T> unclean, WebRequest state) {
+		if (cleansed==unclean) {
+			Log.e(LOGTAG(), "cleansed == unclean -- Should copy before cleaning");
+			return;
+		}
+		// reinstate everything that was sent (to avoid confusing editors)
+		String json = getJson(state);
+		if (json == null) {
+			return;					
+		}		
+		// We don't want to cleanse data that was sent in during an edit -- as that could be misinterpreted
+		// by the client (who would then lose that data -- and maybe then save it)
+		Map uncleanMap = unclean.map();
+
+		Map sentMap = new JThing(json).map();
+		Map<String, Object> cleanMap = cleansed.map();
+		JsonPatch jpo = new JsonPatch(cleanMap, uncleanMap);			
+		if (jpo.getDiffs().isEmpty()) {
+			return;
+		}
+		JsonPatch jps = new JsonPatch(cleanMap, sentMap);
+		// which diffs are the same?
+		List<JsonPatchOp> sameDiffs = new ArrayList(jps.getDiffs());
+		sameDiffs.retainAll(jpo.getDiffs());
+		// apply
+		JsonPatch jp2 = new JsonPatch(sameDiffs);
+		HashMap safeMap = new HashMap(cleanMap);
+		jp2.apply(safeMap);
+		cleansed.setMap(safeMap);		
+	}
+
+
 	protected void doSecurityCheck(WebRequest state) throws SecurityException {
 		YouAgainClient ya = Dep.get(YouAgainClient.class);
 		ReflectionUtils.setPrivateField(state, "debug", true); // FIXME
@@ -629,9 +671,13 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		// sanitise for privacy
-		for (ESHit<T> esHit : hits2) {
-			cleanse(esHit.getJThing(), state);
-		}		
+		for(int i=0; i<hits2.size(); i++) {
+			ESHit<T> h = hits2.get(i);
+			JThing<T> cleansed = cleanse(h.getJThing(), state);
+			if (cleansed==null) continue;
+			ESHit ch = new ESHit(cleansed);
+			hits2.set(i, ch);
+		}	
 		
 		// HACK: send back csv?
 		if (state.getResponseType() == KResponseType.csv) {
@@ -641,8 +687,12 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		// augment?
 		if (augmentFlag) {
-			for (ESHit<T> h : hits2) {
-				augment(h.getJThing(), state);
+			for(int i=0; i<hits2.size(); i++) {
+				ESHit<T> h = hits2.get(i);
+				JThing<T> aug = augment(h.getJThing(), state);
+				if (aug==null) continue;
+				ESHit ah = new ESHit(aug);
+				hits2.set(i, ah);
 			}
 		}
 		// put together the json response	
@@ -687,12 +737,14 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	/**
 	 * Override to do anything. 
-	 * @param jThing Modify this if you want. Never null.
+	 * @param jThing Never null.
 	 * @param state
+	 * @return modified JThing or null
 	 * @see #augmentFlag
 	 */
-	protected void augment(JThing<T> jThing, WebRequest state) {
+	protected JThing<T> augment(JThing<T> jThing, WebRequest state) {
 		// no-op by default
+		return null;
 	}
 
 
@@ -964,11 +1016,12 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * This is (currently) only used with the _list endpoint!
 	 * TODO expand to get-by-id requests too -- but carefully, as there's more risk of breaking stuff.
 	 * 
-	 * @param hits
+	 * @param thing Best NOT to modify this directly. Make a copy.
 	 * @param state
-	 * @return hits
+	 * @return null if fine, or modified JThing if edits are wanted
 	 */
-	protected void cleanse(JThing<T> thing, WebRequest state) {
+	protected JThing<T> cleanse(JThing<T> thing, WebRequest state) {
+		return null;
 	}
 
 
@@ -1073,7 +1126,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 
 	/**
-	 * 
+	 * TODO refactor to use JsonPatch
 	 * @param room
 	 * @param diffs Each diff is {op:replace, path:/foo/bar, value:v}
 	 * TODO other ops 

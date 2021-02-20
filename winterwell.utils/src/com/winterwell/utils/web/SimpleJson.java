@@ -377,9 +377,12 @@ public class SimpleJson {
 		}
 		// set it
 		String k = key[key.length-1];
-		try {				
-			obj.put(k, value);
-			
+		try {		
+			if (value==null) {
+				obj.remove(k);
+			} else {
+				obj.put(k, value);
+			}
 		} catch (UnsupportedOperationException ex) {
 			// add to an array failed? replace the array
 			if (obj instanceof ListAsMap && key.length > 1) {

@@ -2,10 +2,26 @@ package com.winterwell.utils;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
 public class ReflectionUtilsTest {
+
+	@Test
+	public void testIsBasicType() throws IOException {
+		assert ReflectionUtils.isBasicType(true);
+		assert ReflectionUtils.isBasicType(false);
+		assert ReflectionUtils.isBasicType("foo");
+		assert ReflectionUtils.isBasicType("");
+		assert ReflectionUtils.isBasicType(1);
+		assert ReflectionUtils.isBasicType(1.2);
+		assert ReflectionUtils.isBasicType(1.2f);
+		assert ReflectionUtils.isBasicType(new Long(117));
+		
+		assert ! ReflectionUtils.isBasicType(new ArrayList());
+	}
+
 	
 	@Test
 	public void testGetClassInfo() throws IOException {
