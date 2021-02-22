@@ -5,8 +5,8 @@
 # Versions of this script are usually run by TeamCity, in response to a git commit.
 # The script uses ssh remote commands to target a server -- it does not affect the local machine.
 # For testing, the script can also be run from your local computer.
-#Version 1.4.6
-# Latest Change -- Adding new dependency checks -- Attempting to create parity with production publisher template script
+#Version 1.4.7
+# Latest Change -- if a package-lock.json file exists in the project directory, it gets deleted before attempting to get node modules
 
 #####  GENERAL SETTINGS
 ## This section should be the most widely edited part of this script
@@ -169,11 +169,23 @@ function check_for_code_repo_in_bobwarehouse {
     fi
 }
 
-# Cleanup Git -- Ensure a clean and predictable git repo for building - This Function's Version is 1.00
+# Cleanup Git -- Ensure a clean and predictable git repo for building - This Function's Version is 1.01
 function cleanup_repo {
     for server in ${TARGET_SERVERS[@]}; do
         printf "\nCleaning $server 's local repository...\n"
         git_hard_set_to_master $PROJECT_ROOT_ON_SERVER
+        # If this is a node relient project, kill any existing package-lock.json
+        if [[ $PROJECT_USES_NPM = 'yes' ]]; then
+            for server in ${TARGET_SERVERS[@]}; do
+                printf "\nGetting rid of any package-lock.json files\n"
+                # using reverse logic.  if package-lock.json does NOT exist, do nothing.  If it DOES exist, delete it.
+                if ssh winterwell@$server "[ ! -f $PROJECT_ROOT_ON_SERVER/package-lock.json ]"; then
+                    printf "\nno package-lock.json found.  No need to remove it.\n"
+                else
+                    ssh winterwell@$server "rm $PROJECT_ROOT_ON_SERVER/package-lock.json"
+                fi
+            done
+        fi
     done
 }
 
