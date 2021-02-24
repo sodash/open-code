@@ -789,9 +789,9 @@ public abstract class CrudServlet<T> implements IServlet {
 					order = KSortOrder.desc;
 				} else if (sortBit.endsWith("-asc")) {
 					sortBit = sortBit.substring(0, sortBit.length()-4);
-				}
-				Sort _sort = new Sort().setField(sortBit).setOrder(order);			
-				s.addSort(_sort);				
+				}				
+				Sort _sort = doList3_addSort(sortBit, order);
+				s.addSort(_sort);
 			}
 		}
 		
@@ -807,6 +807,19 @@ public abstract class CrudServlet<T> implements IServlet {
 //		}
 		
 		return sr;
+	}
+
+
+	/**
+	 * Add a sort. You can override this to specify e.g. {"missing" : "_first"}
+	 * See https://www.elastic.co/guide/en/elasticsearch/reference/7.9/sort-search-results.html
+	 * @param sortBit
+	 * @param order
+	 * @return 
+	 */
+	protected Sort doList3_addSort(String sortBit, KSortOrder order) {
+		Sort _sort = new Sort().setField(sortBit).setOrder(order);			
+		return _sort;
 	}
 
 
