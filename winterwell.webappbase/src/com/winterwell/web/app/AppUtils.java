@@ -633,8 +633,7 @@ public class AppUtils {
 			Class k,
 			ESPath path, String index) 
 	{
-		PutMappingRequest pm = es.admin().indices().preparePutMapping(
-				index, path.type);
+		PutMappingRequest pm = es.admin().indices().preparePutMapping(index);
 		
 		// ESType
 		// passed in
@@ -643,7 +642,7 @@ public class AppUtils {
 		
 		// Call ES...
 		pm.setMapping(dtype);
-		pm.setDebug(false); //DEBUG);
+		pm.setDebug(true); //false); //DEBUG);
 		IESResponse r2 = pm.get();
 		r2.check();
 	}
@@ -761,6 +760,10 @@ public class AppUtils {
 	
 	private static ESType estypeForClass3_reflection_field(Field field, Class<?> type) 
 	{			
+		// HACK bugfix
+		if ("_version".equals(field.getName())) {
+			return null;
+		}
 		// keyword annotation?
 		ESKeyword esk = field.getAnnotation(ESKeyword.class);
 		if (esk!=null) {
@@ -786,16 +789,24 @@ public class AppUtils {
 		if (type.equals(Time.class)) {
 			est = new ESType().date();
 		}
+		if (ReflectionUtils.isaNumber(type) || boolean.class.equals(type) || Boolean.class.equals(type)) {
+			try {
+				est = new ESType().setType(type);
+			} catch(Exception ex) {
+				// oh well
+				Log.d("AppUtils", "ES mapping: Oh well: ESType.setType(): "+ex);
+			}
+		}
 		// ??anything else ES is liable to guess wrong??		
 		ESNoIndex esno = field.getAnnotation(ESNoIndex.class);
-
-		// trust the defaults for some stuff
-		if (ReflectionUtils.isaNumber(type) || boolean.class.equals(type) || Boolean.class.equals(type)) {
-			if (esno==null) {
-				return null;			
-			}
-			return new ESType().setType(type).index(false);
-		}	
+//		// trust the defaults for some stuff 
+//		// BUT this breaks searching on a field before it has been indexed once
+//		if (ReflectionUtils.isaNumber(type) || boolean.class.equals(type) || Boolean.class.equals(type)) {
+//			if (esno==null) {
+//				return null;			
+//			}
+//			return new ESType().setType(type).index(false);
+//		}	
 		if (est==null) est = new ESType(); 
 		if (esno != null) {
 			est = est.copy().noIndex(); // NB: copy for keyword, which is locked against edits
