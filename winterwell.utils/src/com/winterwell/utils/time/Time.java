@@ -177,7 +177,19 @@ public final class Time implements Serializable, Comparable<Time> {
 	private static long parse(String date) {
 		// Is it a timecode?
 		if (date.length() > 8 && date.length() < 24 && StrUtils.isInteger(date)) {
-			return Long.valueOf(date);
+			return Long.parseLong(date);
+		}
+		// Hack: handle exponential format
+		if (Pattern.compile("\\d\\.\\d+e\\d+").matcher(date).matches()) {
+			double d = Double.parseDouble(date);
+			long l = (long) d;
+			// Is the long fairly close to the double, and within sane ranges?
+			if (Math.abs(l - d) < Math.abs(d)*0.0001) {
+				if (l > new Time(-5000,1,1).getTime() && l < new Time(5000,1,1).getTime()) {
+					return l;
+				}
+			}
+			throw new IllegalArgumentException("Cannot treat double "+date+" as an epoch time");
 		}
 		// One Special case short value
 		if ("0".equals(date)) {

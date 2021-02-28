@@ -5,6 +5,16 @@ import org.junit.Test;
 public class TimeParserTest {
 
 	@Test
+	public void testParseExponentialFormatEpochTime() {
+		String st = "1.611854108e12";
+		TimeParser tp = new TimeParser();
+		Time t = tp.parseExperimental(st);
+//		System.out.println(t.toISOString());
+//		System.out.println(t.getTime());
+		assert t.toISOString().equals("2021-01-28T17:15:08Z");
+	}
+	
+	@Test
 	public void testParsePeriodEndOf() {
 		TimeParser tp = new TimeParser();
 		tp.setNow(new Time(2020,11,5));
