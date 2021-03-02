@@ -53,7 +53,10 @@ public enum KStatus {
 	PUB_OR_ARC,
 	
 	/** Special value for use only in url parameters. For lists where we want to see active and WIP items but not past/trashed ones. */
-	PUB_OR_DRAFT;
+	PUB_OR_DRAFT,
+	
+	/** this thing does not exist */
+	ABSENT;
 	
 	/**
 	 * We only have three main ES indices, published and draft (which holds all the non-published)
