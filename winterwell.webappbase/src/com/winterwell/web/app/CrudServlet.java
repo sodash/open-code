@@ -209,6 +209,13 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 
+	/**
+	 * A very simple check! Are you logged in for e.g. publish?
+	 * 
+	 * Note: see also {@link #doList2_securityFilter(List, WebRequest)}
+	 * @param state
+	 * @throws SecurityException
+	 */
 	protected void doSecurityCheck(WebRequest state) throws SecurityException {
 		YouAgainClient ya = Dep.get(YouAgainClient.class);
 		ReflectionUtils.setPrivateField(state, "debug", true); // FIXME
@@ -678,6 +685,11 @@ public abstract class CrudServlet<T> implements IServlet {
 			}
 		}
 		
+		// security filter
+		YouAgainClient yac = Dep.get(YouAgainClient.class);
+		List<AuthToken> tokens = yac.getAuthTokens(state);
+		hits2 = doList2_securityFilter(hits2, state, tokens, yac);
+		
 		// sanitise for privacy
 		for(int i=0; i<hits2.size(); i++) {
 			ESHit<T> h = hits2.get(i);
@@ -717,6 +729,49 @@ public abstract class CrudServlet<T> implements IServlet {
 		return hits2;
 	}
 	
+	/**
+	 * Override to apply security filtering
+	 * @param hits2
+	 * @param state 
+	 * @param tokens 
+	 * @param yac 
+	 * @return
+	 */
+	protected List<ESHit<T>> doList2_securityFilter(List<ESHit<T>> hits2, WebRequest state, List<AuthToken> tokens, YouAgainClient yac) {
+		return hits2;
+	}
+
+
+	/**
+	 * Use this for "Team Good-Loop only" list security
+	 * @param hits2
+	 * @param state
+	 * @param tokens
+	 * @param yac
+	 * @return
+	 */
+	protected List<ESHit<T>> doList2_securityFilter2_teamGoodLoop(List<ESHit<T>> hits2, WebRequest state,
+				List<AuthToken> tokens, YouAgainClient yac) 
+	{
+		// HACK: are you a member of Team Good-Loop?
+		for (AuthToken authToken : tokens) {
+			String name = authToken.getXId().getName();
+			if ( ! WebUtils2.isValidEmail(name)) continue;
+			if (name.endsWith("@good-loop.com")) {
+				if ( ! authToken.isVerified()) {
+					// TODO verify
+					Log.w(LOGTAG(), "verify "+authToken);
+				}
+				// That will do for us for now
+				return hits2;
+			}
+		}
+		// TODO use YA shares to allow other emails through
+		// No - sod off
+		throw new WebEx.E401("This is for Team Good-Loop - Please ask for access");
+	}
+	
+
 	/**
 	 * Run results through deserialisation to catch any bugs.
 	 * Bugs are logged, but they do _not_ disrupt returning the rest of the list.

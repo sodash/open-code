@@ -106,6 +106,17 @@ public class AuthToken implements IHasXId, IProperties {
 	 * OPtional url for a profile image
 	 */
 	public String img;
+
+
+	transient boolean verified;
+	
+	/**
+	 * Has this been (locally) verified by decoding it? 
+	 * @return true means it should be OK. false -- maybe verify?
+	 */
+	public boolean isVerified() {
+		return verified;
+	}
 	
 	@Override
 	public String toString() {
