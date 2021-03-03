@@ -277,10 +277,12 @@ public final class YouAgainClient {
 					continue;
 				}
 				// TODO a better appraoch would be for the browser to make a proper JWT for @temp
+
 				// decode the token
 				JWTDecoder dec = getDecoder(); //"local".equals(state.get("login")));
 				DecodedJWT decd = dec.decryptJWT(jt);
 				token.xid = new XId(decd.getSubject(), false);
+				token.verified = true;
 				list.add(token);
 			} catch (Throwable e) {
 				Log.i(LOGTAG, e);
