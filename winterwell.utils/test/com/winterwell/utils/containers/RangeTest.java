@@ -7,6 +7,17 @@ import java.util.List;
 import junit.framework.TestCase;
 
 public class RangeTest extends TestCase {
+	
+	public void testMaxFinite() {
+		Range range = new Range(-Double.MAX_VALUE, Double.MAX_VALUE);
+//		System.out.println(range);
+		assert range.contains(10000000);
+		assert range.contains(-10000000);
+		assert range.contains(-10);
+		assert range.contains(10);
+	}
+
+	
 	public void testIsIn() {
 		Range range = new Range(0, 4);
 		assert range.contains(0);
