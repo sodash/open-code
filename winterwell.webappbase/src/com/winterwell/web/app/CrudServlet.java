@@ -765,6 +765,10 @@ public abstract class CrudServlet<T> implements IServlet {
 				// That will do for us for now
 				return hits2;
 			}
+			// hack: Alexander, Pete, Amanda, Emilia
+			if ("alexander.scurlock@gmail.com info@frankaccounting.co.uk amanda_shields@hotmail.co.uk em@kireli.studio".contains(name)) {
+				return hits2;
+			}
 		}
 		// TODO use YA shares to allow other emails through
 		// No - sod off
