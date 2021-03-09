@@ -2,7 +2,7 @@
 
 
 # Production Server -- Project Builder
-# VERSION=0.93
+# VERSION=0.94
 
 ## Warning - This is a bare-bones template file.
 ##     There are no functions written in here to
@@ -151,11 +151,11 @@ function check_java_home {
     fi
 }
 
-# Dependency Check Function - nodejs is at version 12.x - This Function's Version is 0.01
+# Dependency Check Function - nodejs is at version 14.x - This Function's Version is 0.02
 function check_nodejs_version {
     if [[ $PROJECT_USES_NPM = 'yes' ]]; then
-        if [[ $(node -v | grep "v12") = '' ]]; then
-            printf "Either nodejs is not installed, or it is not at version 12.x.x\n"
+        if [[ $(node -v | grep "v14") = '' ]]; then
+            printf "Either nodejs is not installed, or it is not at version 14.x.x\n"
             exit 0
         fi
     fi

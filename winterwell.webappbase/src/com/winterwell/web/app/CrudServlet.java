@@ -1,5 +1,6 @@
 package com.winterwell.web.app;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.depot.IInit;
@@ -44,6 +46,7 @@ import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
@@ -75,6 +78,28 @@ import com.winterwell.youagain.client.YouAgainClient;
  */
 public abstract class CrudServlet<T> implements IServlet {
 
+	/**
+	 * File path IF this is backed by a git repo (most servlets aren't)
+	 * @param item
+	 * @param status
+	 * @return
+	 */
+	protected File getGitFile(AThing item, KStatus status) {
+		// TODO a config setting
+		File dir = new File(FileUtils.getWinterwellDir(), AMain.appName+"-files");
+		if ( ! dir.isDirectory()) {
+			return null;
+		}
+		String wart = "";
+		if (status==KStatus.DRAFT || status==KStatus.MODIFIED) wart = "~";
+		File f = new File(dir, item.getClass().getSimpleName()+"/"+wart+item.getId());
+		if ( ! f.getParentFile().isDirectory()) {
+			f.getParentFile().mkdir(); // create the repo/Type folder if needed
+		}
+		return f;
+	}
+
+	
 	protected String[] prefixFields = new String[] {"name"};
 	
 	protected boolean dataspaceFromPath;
@@ -765,6 +790,10 @@ public abstract class CrudServlet<T> implements IServlet {
 				// That will do for us for now
 				return hits2;
 			}
+			// hack: Alexander, Pete, Amanda, Emilia
+			if ("alexander.scurlock@gmail.com info@frankaccounting.co.uk amanda_shields@hotmail.co.uk em@kireli.studio".contains(name)) {
+				return hits2;
+			}
 		}
 		// TODO use YA shares to allow other emails through
 		// No - sod off
@@ -773,6 +802,55 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 
 	/**
+<<<<<<< HEAD
+=======
+	 * Save text to file, and git (add)+commit+push.
+	 * E.g.
+	 * 
+<code><pre>
+	File fd = getGitFile(ad, KStatus.PUBLISHED);
+	if (fd != null) {
+		String json = prettyPrinter.toJson(ad);
+		doSave2_file_and_git(state, json, fd);
+	}
+	return _ad;
+</pre></code>
+	 * 
+	 * @param state
+	 * @param text
+	 * @param fd
+	 */
+	protected void doSave2_file_and_git(WebRequest state, String text, File fd) {
+		try {						
+			if (text==null) return; // paranoia
+			String old = fd.isFile()? FileUtils.read(fd) : "";
+			if (text.equals(old)) {
+				return;
+			}
+			Log.d(LOGTAG(), "doSave2_file_and_git "+fd);
+			FileUtils.write(fd, text);
+//			Git commit and push!
+			GitTask gt1 = new GitTask(GitTask.ADD, fd);
+			gt1.run();
+			Log.d(LOGTAG(), gt1.getOutput());
+			
+			GitTask gt2 = new GitTask(GitTask.COMMIT, fd);
+			gt2.setMessage(state.getUserId().name);
+			gt2.run();
+			Log.d(LOGTAG(), gt2.getOutput());
+			
+			GitTask gt3 = new GitTask(GitTask.PUSH, fd);
+			gt3.run();
+			Log.d(LOGTAG(), gt3.getOutput());
+			Log.d(LOGTAG(), "...doSave2_file_and_git "+fd+" done");
+		} catch(Throwable ex) {
+			state.addMessage(new AjaxMsg(KNoteType.warning, "Error while saving to Git", ex.getMessage()));
+		}
+	}
+
+	
+	/**
+>>>>>>> master
 	 * Run results through deserialisation to catch any bugs.
 	 * Bugs are logged, but they do _not_ disrupt returning the rest of the list.
 	 * This is so one bad data item can't block an API service.
