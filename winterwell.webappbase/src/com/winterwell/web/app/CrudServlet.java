@@ -78,6 +78,24 @@ import com.winterwell.youagain.client.YouAgainClient;
  */
 public abstract class CrudServlet<T> implements IServlet {
 
+	/**
+	 * File path IF this is backed by a git repo (most servlets aren't)
+	 * @param item
+	 * @param status
+	 * @return
+	 */
+	protected File getGitFile(AThing item, KStatus status) {
+		// TODO a config setting
+		File dir = new File(FileUtils.getWinterwellDir(), AMain.appName+"-files");
+		if ( ! dir.isDirectory()) {
+			return null;
+		}
+		String wart = "";
+		if (status==KStatus.DRAFT || status==KStatus.MODIFIED) wart = "~";
+		return new File(dir, item.getClass().getSimpleName()+"/"+wart+item.getId());
+	}
+
+	
 	protected String[] prefixFields = new String[] {"name"};
 	
 	protected boolean dataspaceFromPath;
@@ -780,7 +798,18 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 
 	/**
-	 * Save text to file, and git (add)+commit+push
+	 * Save text to file, and git (add)+commit+push.
+	 * E.g.
+	 * 
+<code><pre>
+	File fd = getGitFile(ad, KStatus.PUBLISHED);
+	if (fd != null) {
+		String json = prettyPrinter.toJson(ad);
+		doSave2_file_and_git(state, json, fd);
+	}
+	return _ad;
+</pre></code>
+	 * 
 	 * @param state
 	 * @param text
 	 * @param fd
