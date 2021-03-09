@@ -802,6 +802,8 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 
 	/**
+<<<<<<< HEAD
+=======
 	 * Save text to file, and git (add)+commit+push.
 	 * E.g.
 	 * 
@@ -848,6 +850,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	
 	/**
+>>>>>>> master
 	 * Run results through deserialisation to catch any bugs.
 	 * Bugs are logged, but they do _not_ disrupt returning the rest of the list.
 	 * This is so one bad data item can't block an API service.
