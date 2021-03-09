@@ -92,7 +92,11 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		String wart = "";
 		if (status==KStatus.DRAFT || status==KStatus.MODIFIED) wart = "~";
-		return new File(dir, item.getClass().getSimpleName()+"/"+wart+item.getId());
+		File f = new File(dir, item.getClass().getSimpleName()+"/"+wart+item.getId());
+		if ( ! f.getParentFile().isDirectory()) {
+			f.getParentFile().mkdir(); // create the repo/Type folder if needed
+		}
+		return f;
 	}
 
 	
