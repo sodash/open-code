@@ -23,6 +23,10 @@ import com.winterwell.web.app.KServerType;
  */
 public class DataLogServer extends AMain<DataLogConfig> {
 
+	/**
+	 * static ref to config
+	 * @deprecated why not use config?
+	 */
 	static DataLogConfig settings;
 
 	public DataLogServer() {

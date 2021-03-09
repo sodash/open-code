@@ -27,13 +27,13 @@ import com.winterwell.youagain.client.AuthToken;
 /**
  * Get data via the DataLog web service (i.e. call DataServlet)
  * @author daniel
- * @testedby  DataLogHttpClientTest}
+ * @testedby  DataLogHttpClientTest
  */
 public class DataLogHttpClient {
 
 	public final Dataspace dataspace;
 	
-	String ENDPOINT = Dep.get(DataLogConfig.class).getDataEndpoint;
+	String ENDPOINT = Dep.get(DataLogConfig.class).dataEndpoint;
 	
 	private List<AuthToken> auth;
 
@@ -41,8 +41,9 @@ public class DataLogHttpClient {
 	 * TODO this is a limited hack which only supports one top-level summary  
 	 */
 	private transient Map<String,Double> overview;
-	/** TODO this is normally present but how does it overlap with overview? */
-	private transient Map<String,Double> all;
+	
+	
+	private transient Double all;
 
 	private List<Map> examples;
 
@@ -180,13 +181,20 @@ public class DataLogHttpClient {
 		// convert it		
 		for (Map bucket : buckets) {
 			String k = (String) bucket.get("key");
-			Object ov = SimpleJson.get(bucket, breakdown.field, breakdown.op);
+			Object ov = bucket.get(breakdown.field);
+			if (ov instanceof Map) {	// HACK old code, Jan 2021
+				ov = ((Map)ov).get(breakdown.op);
+			}
 			double v = MathUtils.toNum(ov);
 			byX.put(k, v);
 		}		
 		// stash extra info in fields
 		overview = SimpleJson.get(jobjMap, breakdown.field); // present if breakdown included by=""
-		all = SimpleJson.get(jobjMap, "all");
+		Object _all = SimpleJson.get(jobjMap, "all");
+		if (_all instanceof Map) {	// HACK old code, Jan 2021
+			_all = ((Map)_all).get("count");
+		}
+		all = MathUtils.toNum(_all);
 		examples = Containers.asList((Object)SimpleJson.get(jobjMap, "examples"));
 		
 		return byX;
@@ -248,11 +256,7 @@ public class DataLogHttpClient {
 		return overview;
 	}
 	
-	/**
-	 * As {@link #getOverview()}
-	 * @return
-	 */
-	public Map<String, Double> getAll() {
+	public Double getAll() {
 		return all;
 	}
 

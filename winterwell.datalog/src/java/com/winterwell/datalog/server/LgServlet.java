@@ -57,7 +57,7 @@ import ua_parser.Parser;
  * <p>
  * TODO filter by time
  * @author daniel
- * @testedby  LgServletTest}
+ * @testedby  LgServletTest
  */
 public class LgServlet {
 

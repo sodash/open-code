@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -201,7 +202,7 @@ public class SimpleMessage extends MimeMessage {
 	 * Converts to String. Is this needed?
 	 * 
 	 * @param message
-	 * @param rt
+	 * @param rt Can be null for "all types"
 	 * @return
 	 */
 	public static String getRecipients(Message message, Message.RecipientType rt) {
@@ -237,7 +238,7 @@ public class SimpleMessage extends MimeMessage {
 			throw new ExternalServiceException(e);
 		}
 	}
-
+		
 	public static String getTos(Message message) {
 		return getRecipients(message, javax.mail.Message.RecipientType.TO);
 	}
@@ -946,10 +947,20 @@ public class SimpleMessage extends MimeMessage {
 		}
 		return map;
 	}
-
+	
 	/**
-	 * @return ID for the previous message in the email thread, or null. ?? is this
-	 *         ever not a single message ID??
+	 * @return ID for the previous messages in the email thread, oldest first, or null
+	 */
+	public List<String> getReferences() {
+		String refs = getHeader("References", " ");
+		if (refs==null) return null;
+		String[] refbits = refs.split("\\s+");
+		return Arrays.asList(refbits);
+	}
+	
+	/**
+	 * @return ID for the previous message in the email thread, or null.
+	 * @see #getReferences()
 	 */
 	public String getInReplyTo() {
 		String replyTo = getHeader("In-Reply-To", " ");

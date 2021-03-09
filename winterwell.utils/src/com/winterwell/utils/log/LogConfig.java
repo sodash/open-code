@@ -1,12 +1,16 @@
 package com.winterwell.utils.log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.winterwell.datalog.Rate;
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.io.Option;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 /**
  * Typically loaded from config/log.properties
@@ -39,6 +43,26 @@ public class LogConfig {
 	
 	@Option(description="How much is too much? Can be null for unlimited")
 	public Rate throttleAt = new Rate(1000, TUnit.MINUTE);
+	
+	public Rate getThrottleAt(String tag) {
+		if (throttleAtForTag!=null) {
+			Number taft = throttleAtForTag.get(tag);
+			if (taft!=null) return new Rate(taft.doubleValue(), throttleWindow);
+		}
+		return throttleAt;
+	}
+	
+	@Option
+	Map<String,Number> throttleAtForTag = new ArrayMap<>(
+		// let's make Time parsing less noisy
+		Time.LOGTAG, 2	
+	);	
+	
+	public void setThrottleAtForTag(String tag, Rate tagThrottleAt) {
+		if (throttleAtForTag == null) throttleAtForTag = new HashMap();
+		double n = tagThrottleAt.per(throttleWindow);
+		throttleAtForTag.put(tag, n);
+	}
 	
 	@Option(description="How big can an individual log file get? e.g. 1gb or 100mb. Setting this does have a minor performance hit. The first overflow report will generate a 'file too big' log message.")
 	public String fileMaxSize;

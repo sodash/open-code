@@ -120,9 +120,6 @@ public class SQLStorage implements IDataLogStorage {
 		SqlUtils.executeCommand("create index stats_tag_idx on stats (tag);", null, true);
 	}
 
-	@Override
-	public void registerEventType(Dataspace dataspace, String eventType) {
-	}
 	
 	@Override
 	public void save(Period period, Map<String, Double> tag2count, Map<String, IDistribution1D> tag2mean) {		

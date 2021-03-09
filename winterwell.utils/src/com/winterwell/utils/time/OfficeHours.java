@@ -179,7 +179,7 @@ class SimpleOfficeHours implements IShift {
 		Calendar gcal = Calendar.getInstance();
 		// SUNDAY = 1, MONDAY = 2
 		for (int i = 0; i < 7; i++) {
-			gcal.set(Calendar.DAY_OF_WEEK, i+1);
+			TimeUtils.calset(gcal, Calendar.DAY_OF_WEEK, i+1);
 			String day = gcal.getDisplayName(Calendar.DAY_OF_WEEK,
 					Calendar.SHORT, Locale.ENGLISH);
 			day = day.substring(0, 3).toLowerCase();
@@ -231,7 +231,7 @@ class SimpleOfficeHours implements IShift {
 		Calendar gcal = Calendar.getInstance();
 		// SUNDAY = 1, MONDAY = 2
 		for (int i = 0; i < 7; i++) {
-			gcal.set(Calendar.DAY_OF_WEEK, i+1);
+			TimeUtils.calset(gcal, Calendar.DAY_OF_WEEK, i+1);
 			String day = gcal.getDisplayName(Calendar.DAY_OF_WEEK,
 					Calendar.SHORT, Locale.ENGLISH);
 			day = day.substring(0, 3).toLowerCase();

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Mutable;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.WebUtils;
@@ -99,6 +100,17 @@ public class ConfigFactory {
 	}
 	
 	/**
+	 * Old convenience for {@link #getConfig(Class, com.winterwell.utils.Mutable.Ref)}
+	 * @param <X>
+	 * @param configClass
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public final <X> X getConfig(Class<X> configClass) throws IllegalStateException {
+		return getConfig(configClass, null);
+	}
+	
+	/**
 	 * Load a config from standard sources
 	 * AND set it in Dep, 
 	 * plus (if debug is on) keep the ConfigBuilder in history
@@ -106,8 +118,8 @@ public class ConfigFactory {
 	 * @param configClass
 	 * @return
 	 * @throws IllegalStateException if the config has already been created
-	 */
-	public final <X> X getConfig(Class<X> configClass) throws IllegalStateException {
+	 */	
+	public final <X> X getConfig(Class<X> configClass, Mutable.Ref<List> remainderArgs) throws IllegalStateException {
 		// try to avoid duplicate config loading
 		if (Dep.has(configClass)) {
 			String msg = "Duplicate call to ConfigFactory.getConfig() for "+configClass
@@ -127,7 +139,9 @@ public class ConfigFactory {
 			// keep them?
 			if (debug) {
 				history.add(cb);
-			}				
+			}
+			// remainders?
+			if (remainderArgs != null) remainderArgs.value = cb.getRemainderArgs();
 			return config;
 		} catch (Exception e) {
 			throw Utils.runtime(e);
@@ -146,7 +160,7 @@ config/
    appName.serverType.properties, e.g. this would resolve to config/sogive.production.properties
    logins.properties
    machine e.g. baker.properties
-winterwell/logins/logins.appName.properties
+winterwell/logins/logins.appName.properties -- see also Logins.java
 winterwell/logins/stripe.properties
 </pre>
 	 * 

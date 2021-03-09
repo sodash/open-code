@@ -12,7 +12,19 @@ import com.winterwell.utils.Mutable.Int;
  *
  */
 public class SearchQueryTest {
-
+	
+	@Test
+	public void testQuoteBug() {
+		{
+			String s = "\"against-malaria-foundation\"";
+			SearchQuery sq = new SearchQuery(s);
+			System.out.println(sq);
+			assert sq.matches("against-malaria-foundation");
+			assert ! sq.matches("foundation against malaria");
+		}
+	}
+	
+	
 	@Test
 	public void testParse3_nextWord() {
 		{

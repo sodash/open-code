@@ -11,9 +11,8 @@ import java.util.Set;
 
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Mutable;
-import com.winterwell.utils.Printer;
-import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Printer.IPrinter;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.containers.AbstractMap2;
 import com.winterwell.utils.containers.ArrayMap;
@@ -378,9 +377,12 @@ public class SimpleJson {
 		}
 		// set it
 		String k = key[key.length-1];
-		try {				
-			obj.put(k, value);
-			
+		try {		
+			if (value==null) {
+				obj.remove(k);
+			} else {
+				obj.put(k, value);
+			}
 		} catch (UnsupportedOperationException ex) {
 			// add to an array failed? replace the array
 			if (obj instanceof ListAsMap && key.length > 1) {

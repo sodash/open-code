@@ -12,6 +12,7 @@ import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.Option;
+import com.winterwell.utils.log.Log;
 import com.winterwell.web.LoginDetails;
 
 /**
@@ -26,18 +27,40 @@ import com.winterwell.web.LoginDetails;
  */
 public class Logins {
 
+	private static final String LOGTAG = "Logins";
+
 	static Logins dflt = init();
+	
+	private static File loginsDir;
+	
+	public static File getLoginsDir() {
+		return loginsDir;
+	}
 	
 	static Logins init() {
 		ConfigBuilder cb = ConfigFactory.get().getConfigBuilder(Logins.class);
-		File f = new File(FileUtils.getWinterwellDir(), "logins/logins.misc.properties");
-		if (f.isFile()) {
-			cb.set(f);
+		loginsDir = new File(FileUtils.getWinterwellDir(), "logins");
+		File f = new File(loginsDir, "logins.misc.properties");
+		if (loginsDir.isFile()) {
+			cb.set(loginsDir);
 		}
-		Logins logins = cb.get();
+		Logins logins = cb.get(); // This allows the logins map to be populated from the properties
 		return logins;
 	}	
 
+	/**
+	 * 
+	 * @param appName
+	 * @param filename
+	 * @return null if doesn't exist
+	 */
+	public static File getFile(String appName, String filename) {
+		File f = new File(loginsDir, appName+"/"+filename);
+		if (f.isFile()) return f;
+		Log.i(LOGTAG, "No credentials file: "+f);
+		return null;
+	}
+	
 	@Option
 	Map<String,String> logins = new HashMap();
 

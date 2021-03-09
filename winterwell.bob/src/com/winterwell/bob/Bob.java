@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import com.winterwell.bob.tasks.Classpath;
-import com.winterwell.bob.tasks.GitBobProjectTask;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;

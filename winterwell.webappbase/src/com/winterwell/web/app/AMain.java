@@ -1,6 +1,7 @@
 package com.winterwell.web.app;
 
 import java.io.File;
+import java.util.List;
 
 import com.winterwell.datalog.DataLog;
 import com.winterwell.es.IESRouter;
@@ -14,9 +15,12 @@ import com.winterwell.gson.KLoopPolicy;
 import com.winterwell.gson.StandardAdapters;
 import com.winterwell.utils.AString;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Mutable;
+import com.winterwell.utils.Mutable.Ref;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
+import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
@@ -53,6 +57,8 @@ import com.winterwell.youagain.client.YouAgainClient;
  */
 public abstract class AMain<ConfigType extends ISiteConfig> {
 	
+	public static final String copyright = "(C) Good-Loop Ltd";
+	
 	protected JettyLauncher jl;
 	
 	/**
@@ -83,6 +89,11 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	private Thread mainLoopThread;
 	
 	private volatile boolean readyFlag;
+
+	/**
+	 * Unconsumed main args, after initConfig()
+	 */
+	protected List<String> configRemainderArgs;
 
 
 	public static AMain main;
@@ -136,6 +147,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		} catch(AssertionError e) {
 			// ok
 		}
+		Log.i(getAppNameLocal(), "doMain "+Printer.toString(args)+" ...Let's go :)");
 		init(args);
 		launchJetty();
 		// do Main once
@@ -366,12 +378,40 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			ct = BasicSiteConfig.class;
 			Log.w(getAppNameLocal(), "No ConfigType given - using "+ct.getSimpleName());
 		}
-		return (ConfigType) AppUtils.getConfig(getAppNameLocal(), ct, args);
+		// make it
+		ConfigFactory cf = ConfigFactory.get();
+		if (args!=null) {
+			cf.setArgs(args);
+		}
+		Ref<List> rremainderArgs = new Mutable.Ref();
+		ConfigType c = (ConfigType) cf.getConfig(ct, rremainderArgs);
+		
+		Object r0 = Utils.isEmpty(rremainderArgs.value)? null : rremainderArgs.value.get(0); 
+		if ("--help".equals(r0) || "-help".equals("r0")) {
+			showHelp();
+			System.exit(1);
+		}
+		
+		// set them for manifest
+		ManifestServlet.addConfig(c);
+		assert c != null;
+		configRemainderArgs = rremainderArgs.value;
+		return c;		
 	}
+	
+	protected void showHelp() {
+		System.out.println("");
+		System.out.println(appName);
+		System.out.println("----------------------------------------");
+		System.out.println("");
+		ConfigBuilder cb = new ConfigBuilder(configType);
+		System.out.println(cb.getOptionsMessage(null));
+	}
+	
 
-	private void launchJetty() {
+	protected void launchJetty() {
 		try {
-			Log.i("Go!");
+			Log.i("launchJetty - Go!");
 			assert jl==null;
 			jl = new JettyLauncher(getWebRootDir(), getPort());
 			jl.setup();		
@@ -424,9 +464,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 */
 	protected void addJettyServlets(JettyLauncher jl) {
 		Log.d("AMain", "Base addJettyServlets() in "+getClass());
-		jl.addServlet("/manifest", new HttpServletWrapper(ManifestServlet::new));
+		jl.addServlet("/manifest", new HttpServletWrapper(ManifestServlet.class));
 		// NB: not "test" cos there's often a test directory, and nginx gets confused
-		jl.addServlet("/testme/*", new HttpServletWrapper(TestmeServlet::new));
+		jl.addServlet("/testme/*", new HttpServletWrapper(TestmeServlet.class));
 	}
 
 }

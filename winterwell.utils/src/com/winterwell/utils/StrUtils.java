@@ -1858,6 +1858,22 @@ public class StrUtils {
 		return sb.toString();
 	}
 
+	/**
+	 * Pop any quotes - remove optional wrapping "s or 's
+	 * @param "s" Can be null (returns null)
+	 * @return unwrapped s, or just s
+	 */
+	public static String unquote(String s) {
+		if (s==null) return null;
+		if (s.startsWith("\"") && s.endsWith("\"")) {
+			s = s.substring(1, s.length()-1);
+		}
+		if (s.startsWith("'") && s.endsWith("'")) {
+			s = s.substring(1, s.length()-1);
+		}
+		return s;
+	}
+
 }
 
 /**

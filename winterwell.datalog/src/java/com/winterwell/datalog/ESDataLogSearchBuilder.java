@@ -1,13 +1,14 @@
 package com.winterwell.datalog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchRequest;
 import com.winterwell.es.client.agg.Aggregation;
 import com.winterwell.es.client.agg.Aggregations;
 import com.winterwell.es.client.query.ESQueryBuilder;
@@ -67,14 +68,14 @@ public class ESDataLogSearchBuilder {
 		return this;
 	}
 	
-	public SearchRequestBuilder prepareSearch() {
+	public SearchRequest prepareSearch() {
 		doneFlag = true;
 		com.winterwell.es.client.query.BoolQueryBuilder filter 
 			= AppUtils.makeESFilterFromSearchQuery(query, start, end);
 		
 		String index = ESStorage.readIndexFromDataspace(dataspace);
 		
-		SearchRequestBuilder search = esc.prepareSearch(index);
+		SearchRequest search = esc.prepareSearch(index);
 	
 		// breakdown(s)
 		List<Aggregation> aggs = prepareSearch2_aggregations();
@@ -116,7 +117,7 @@ public class ESDataLogSearchBuilder {
 		} // ./breakdown
 		
 		// add a total count as well for each top-level terms breakdown
-		Aggregation fCountStats = Aggregations.stats("all", ESStorage.count);
+		Aggregation fCountStats = Aggregations.sum("all", ESStorage.count);
 		aggs.add(fCountStats);			
 		
 		return aggs;
@@ -131,10 +132,11 @@ public class ESDataLogSearchBuilder {
 	 * @return
 	 */
 	private Aggregation prepareSearch3_agg4breakdown(String bd) {
+
 		// ??Is there a use-case for recursive handling??
 		String[] breakdown_output = bd.split("\\{");
 		String[] bucketBy = breakdown_output[0].trim().split("/");
-		Map<String,String> reportSpec = null;
+		Map<String,String> reportSpec = new ArrayMap("count","sum"); // default to sum of `count`
 		if (breakdown_output.length > 1) {
 			String json = bd.substring(bd.indexOf("{"), bd.length());
 			try {
@@ -155,6 +157,14 @@ public class ESDataLogSearchBuilder {
 			}
 			if (field.equals("time")) {
 				leaf = Aggregations.dateHistogram("by_"+s_bucketBy, "time", interval);
+			} else if (field.equals("dateRange")) {
+				// A slightly hacky option. Use-case: return stats for the 
+				// 	last week, the week before (to allow "+25%" comparisons), and older
+				Time now = end;
+				Time prev = now.minus(interval);
+				Time prev2 = prev.minus(interval);
+				List<Time> times = Arrays.asList(start, prev2, prev, now);
+				leaf = Aggregations.dateRange("by_"+s_bucketBy, "time", times);
 			} else {
 				leaf = Aggregations.terms("by_"+s_bucketBy, field);
 				if (numResults>0) leaf.setSize(numResults);
@@ -173,10 +183,10 @@ public class ESDataLogSearchBuilder {
 			}
 		}
 		
-		// add a count handler?
-		if (reportSpec==null) { // no - we're done - return terms
-			return root;
-		}
+		// add a count handler? old - with compression, doc_count alone is meaningless
+//		if (reportSpec==null) { // no - we're done - return terms
+//			return root;
+//		}
 		
 		// e.g. {"count": "avg"}
 		String[] rkeys = reportSpec.keySet().toArray(StrUtils.ARRAY);
@@ -187,12 +197,13 @@ public class ESDataLogSearchBuilder {
 				throw new IllegalArgumentException("Bad breakdown {field:op} parameter: "+bd);
 			}
 			// Note k should be a numeric field, e.g. count -- not a keyword field!
-			Class klass = DataLogEvent.COMMON_PROPS.get(k);
-			if ( ! ReflectionUtils.isa(klass, Number.class)) {
-				Log.w(LOGTAG, "Possible bug! numeric op on non-numeric field "+k+" in "+bd);
+			if ( ! ESStorage.count.equals(k)) {
+				Class klass = DataLogEvent.COMMON_PROPS.get(k);
+				if ( ! ReflectionUtils.isa(klass, Number.class)) {
+					Log.w(LOGTAG, "Possible bug! numeric op on non-numeric field "+k+" in "+bd);
+				}
 			}
-				
-			Aggregation myCount = Aggregations.stats(k, k);
+			Aggregation myCount = Aggregations.sum(k, k);
 			// filter 0s??
 			ESQueryBuilder no0 = ESQueryBuilders.rangeQuery(k, 0, null, false);
 			// NB: we could have multiple ops, so number the keys
@@ -231,26 +242,43 @@ public class ESDataLogSearchBuilder {
 
 	/**
 	 * Remove the no0_ filtering wrappers 'cos they're an annoyance at the client level.
+	 * Also remove doc_count for safety.
+	 * Simplify count:value:5 to count:5
 	 * @param aggregations 
 	 * @return cleaned aggregations
 	 */
 	public Map cleanJson(Map<String,Object> aggregations) {
-		Printer.out(JSON.toString(aggregations));
+
 		Map aggs2 = Containers.applyToJsonObject(aggregations, ESDataLogSearchBuilder::cleanJson2);
 		// also top-level
 		Map aggs3 = (Map) cleanJson2(aggs2, null);
 		return aggs3;
-	}
+	}	
 	
 	static Object cleanJson2(Object old, List<String> __path) {
-		if ( ! (old instanceof Map)) return old;
+		if ( ! (old instanceof Map)) {
+			return old;
+		}
+		Map mold = (Map) old;
+		// no doc_count (its misleading with compression)
+		mold.remove("doc_count");
+		
+		// simplify {value:5} to 5
+		if (mold.size() == 1) {
+			Object k = Containers.only(mold.keySet());
+			if ("value".equals(k)) {
+				Number v = (Number) mold.get(k);
+				return v;
+			}			
+		}
+		
 		Map newMap = null;
 		for(int i=0; i<MAX_OPS; i++) {
-			Map<String,?> wrapped = (Map) ((Map) old).get(no0_+i);
+			Map<String,?> wrapped = (Map) mold.get(no0_+i);
 			// no no0s to remove?
 			if (wrapped==null) break;
 			// copy and edit
-			if (newMap==null) newMap = new ArrayMap(old);
+			if (newMap==null) newMap = new ArrayMap(mold);
 			newMap.remove(no0_+i);
 			for(String k : wrapped.keySet()) {
 				Object v = wrapped.get(k);
@@ -263,7 +291,7 @@ public class ESDataLogSearchBuilder {
 				}
 			}
 		}
-		Object v = newMap==null? old : newMap;
+		Map v = newMap==null? mold : newMap;
 		return v;		
 	}
 	

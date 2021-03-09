@@ -11,7 +11,6 @@ import com.winterwell.gson.Gson;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.web.IHasJson;
 
@@ -94,6 +93,7 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 
 	/**
 	 * @return An unmodifiable map view.
+	 * This is unmodifiable for protection against careless edits. If you do want to edit this, do a new HashMap() copy.
 	 * @see #put(String, Object)
 	 */
 	public Map<String, Object> map() {

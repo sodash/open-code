@@ -2,7 +2,6 @@ package com.winterwell.bob.wwjobs;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -314,7 +313,7 @@ public class BuildWinterwellProject extends BuildTask {
 	 * @param _projectName
 	 * @return
 	 */
-	private static File guessProjectDir(String _projectName) {
+	protected static File guessProjectDir(String _projectName) {
 		WinterwellProjectFinder wpg = new WinterwellProjectFinder();
 		return wpg.apply(_projectName);
 	}

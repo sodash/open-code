@@ -25,7 +25,7 @@ public class AjaxMsg extends AbstractMap2<String, Object> implements Serializabl
 	protected final ArrayMap jobj;
 
 	public static enum KNoteType {
-		success, info, warning, error, klaxon
+		success, info, debug, warning, error, klaxon
 	}
 
 	public AjaxMsg(String text) {

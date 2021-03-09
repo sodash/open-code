@@ -326,6 +326,7 @@ public class JarTask extends BuildTask {
 			// fallback to file date
 			return jara.lastModified() >= jarb.lastModified()? jara : jarb;
 		}
+		// TODO refactor to use VersionString
 		String[] vabits = va.split("\\.");
 		String[] vbbits = vb.split("\\.");
 		int n = Math.min(vabits.length, vbbits.length);

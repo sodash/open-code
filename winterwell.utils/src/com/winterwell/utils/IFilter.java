@@ -59,13 +59,16 @@ final class FalseFilter implements IFilter {
 	}	
 }
 
-
+/**
+ * A common case "remove the nulls"
+ */
 class NotNullFilter implements IFilter {
 	@Override
 	public boolean accept(Object x) {
 		return x!=null;
 	}	
 }
+
 
 final class ClassFilter implements IFilter {
 	private final Class klass;

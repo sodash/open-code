@@ -98,13 +98,13 @@ public class TimeUtilsTest {
 	
 	@Test
 	public void testTimezoneToDiff() {
-		{	Time t = new Time("1/1/2014 0:00 GMT+3");
+		{	Time t = new Time(new Date("1/1/2014 0:00 GMT+3"));
 			System.out.println(t);
 			System.out.println(t.getHour());
 			assert t.getHour() == 24 - 3;
 		}
 		{
-			Time t = new Time("1/1/2014 0:00 EST");
+			Time t = new Time(new Date("1/1/2014 0:00 EST"));
 			System.out.println(t);
 			System.out.println(t.getHour());
 			assert t.getHour() == 5;
@@ -136,6 +136,20 @@ public class TimeUtilsTest {
 		assert t.getYear() == 2020: t;		
 	}
 
+	@Test
+	public void parseExperimental_UK() {
+		{
+			String s = "19/10/2020";
+			Time t = TimeUtils.parseExperimental(s);
+			assert t.getMonth() == 10 : t;
+		}
+		{
+			String s = "09/10/2020";
+			Time t = TimeUtils.parseExperimental(s);
+			assert t.getMonth() == 10 : t;
+		}
+	}
+	
 	@Test
 	public void parseExperimental_iso() {
 		{
@@ -351,10 +365,25 @@ public class TimeUtilsTest {
 
 	@Test
 	public void testGetStartOfDay() {
-		Time t = new Time();
-		Time start = TimeUtils.getStartOfDay(t);
-		Time t2 = new Time(t.getYear(), t.getMonth(), t.getDayOfMonth());
-		assert start.equals(t2) : start.diff(t2);
+		{
+			Time t = new Time();
+			Time start = TimeUtils.getStartOfDay(t);
+			Time t2 = new Time(t.getYear(), t.getMonth(), t.getDayOfMonth());
+			assert start.equals(t2) : start.diff(t2);
+		}
+		{	// another month
+			Time t = new Time(2020,12,3,15,4,3);
+			Time start = TimeUtils.getStartOfDay(t);
+			GregorianCalendar cal = start.getCalendar();
+			cal.set(Calendar.MONTH, t.getMonth() - 1); // beware of this!
+			Time t2 = new Time(cal);
+			
+			GregorianCalendar calb = start.getCalendar();
+			calb.roll(Calendar.MONTH, -1);
+			Time tb = new Time(calb);
+			
+			assert tb.getMonth() == 11;
+		}
 	}
 
 	@Test

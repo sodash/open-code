@@ -591,6 +591,12 @@ public class WebUtilsTest extends TestCase {
 	}
 	
 	public void testUrlRegex() {
+		{	// g-doc example
+			String googleDoc = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRy22C_2Q_DS_eC30Rsn3ycIf_DzwnTH-PrFa1S_WsH0/pub?output=csv";
+			Matcher m = WebUtils.URL_REGEX
+					.matcher(googleDoc);
+			assert m.matches();
+		}
 		{ // chop trailing punctuation
 			Matcher m = WebUtils.URL_REGEX
 					.matcher("hello http://whatever.com/?yes=no.");
@@ -647,7 +653,20 @@ public class WebUtilsTest extends TestCase {
 		}
 	}
 	
-	
+	public void testUrlRegex_file() {
+		{ 
+			Matcher m = WebUtils.URL_REGEX
+					.matcher("hello http://bbc.com/home/daniel/Downloads/Image38-11.jpg");
+			assert m.find();
+			assertEquals("http://bbc.com/home/daniel/Downloads/Image38-11.jpg", m.group());
+		}
+		{ 
+			Matcher m = WebUtils.URL_REGEX
+					.matcher("hello file:///home/daniel/Downloads/Image38-11.jpg");
+			assert m.find();
+			assertEquals("file:///home/daniel/Downloads/Image38-11.jpg", m.group());
+		}
+	}
 
 	public void testUrlOrDomainRegex() {
 		{ // chop trailing punctuation

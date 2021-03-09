@@ -10,7 +10,6 @@ import com.winterwell.maths.stats.distributions.cond.Sitn;
 import com.winterwell.maths.stats.distributions.discrete.IFiniteDistribution;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.io.Tkn;
-import com.winterwell.utils.Dep;
 import com.winterwell.utils.IBuildStrings;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;

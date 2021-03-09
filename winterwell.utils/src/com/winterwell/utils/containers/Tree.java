@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.experimental.theories.PotentialAssignment.CouldNotGenerateValueException;
-
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.web.IHasJson;
@@ -278,7 +276,7 @@ implements Iterable<Tree<X>>, ITree<X>, IHasJson
 			return new ArrayMap("value", value);
 		}
 		// recurse
-		ArrayList jsonkids = Containers.apply(tree.getChildren(), kid -> toJsonTree(kid));
+		List jsonkids = Containers.apply(tree.getChildren(), kid -> toJsonTree(kid));
 		return new ArrayMap(
 			"value", value,
 			"children", jsonkids

@@ -604,6 +604,10 @@ public class StrUtilsTest extends TestCase {
 	}
 
 	public void testToNSigFigs() {
+		{	// too much detail
+			String s = StrUtils.toNSigFigs(20.1, 8);
+			assert s.equals("20.1") : s;
+		}
 		{
 			String s = StrUtils.toNSigFigs(2, 1);
 			assert s.equals("2") : s;

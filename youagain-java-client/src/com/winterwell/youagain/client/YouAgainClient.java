@@ -16,6 +16,7 @@ import javax.mail.internet.InternetAddress;
 import org.eclipse.jetty.util.ajax.JSON;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
 import com.winterwell.utils.Key;
 import com.winterwell.utils.StrUtils;
@@ -134,8 +135,12 @@ public final class YouAgainClient {
 		if (initFlag) return;		
 		initFlag = true;
 		try {			
-			ConfigFactory cf = ConfigFactory.get();
-			yac = cf.getConfig(YouAgainClientConfig.class);
+			if (Dep.has(YouAgainClientConfig.class)) {
+				yac = Dep.get(YouAgainClientConfig.class);
+			} else {
+				ConfigFactory cf = ConfigFactory.get();
+				yac = cf.getConfig(YouAgainClientConfig.class);
+			}
 			assert ! Utils.isBlank(yac.endpoint) : yac;
 		} catch(Throwable ex) {
 			Log.e(LOGTAG, ex); // swallow
@@ -272,10 +277,12 @@ public final class YouAgainClient {
 					continue;
 				}
 				// TODO a better appraoch would be for the browser to make a proper JWT for @temp
+
 				// decode the token
 				JWTDecoder dec = getDecoder(); //"local".equals(state.get("login")));
 				DecodedJWT decd = dec.decryptJWT(jt);
 				token.xid = new XId(decd.getSubject(), false);
+				token.verified = true;
 				list.add(token);
 			} catch (Throwable e) {
 				Log.i(LOGTAG, e);
@@ -428,6 +435,28 @@ public final class YouAgainClient {
 		Map user = userFromResponse(response);
 		AuthToken at = new AuthToken(user);
 		return at;
+	}
+	
+
+	public Object delete(XId user, AuthToken at) {
+		assert yac != null;
+		Utils.check4null(user, at);
+		FakeBrowser fb = fb(at);
+		fb.setDebug(true);
+		Log.d(LOGTAG, "Deleting "+user+" auth: "+at+"...");
+		String response = fb.getPage(yac.endpoint, new ArrayMap(
+				"app", app,
+				"action", "delete",
+				"person", user.toString())
+				);
+		Log.d(LOGTAG, "Deleted? "+user+" Response: "+response);
+		return response;
+	}
+
+	private FakeBrowser fb(AuthToken at) {
+		FakeBrowser fb = new FakeBrowser();
+		fb.setAuthenticationByJWT(at.getToken());
+		return fb;
 	}
 
 	private Map userFromResponse(String response) {

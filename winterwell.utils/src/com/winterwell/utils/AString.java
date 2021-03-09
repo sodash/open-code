@@ -1,6 +1,7 @@
 package com.winterwell.utils;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.IHasJson;
@@ -75,6 +76,14 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 		if (b==null) return false;
 		return toString().equals(b.toString());
 	}
+	
+	public static boolean equiv(CharSequence a, CharSequence b) {
+		if (b==null) {
+			return a==null;
+		}
+		if (a==null) return false;
+		return a.toString().equals(b.toString());
+	}
 
 	private static final long serialVersionUID = 1L;
 	public final String name;
@@ -102,6 +111,17 @@ public class AString implements IHasJson, Serializable, CharSequence  {
 	@Override
 	public final CharSequence subSequence(int start, int end) {
 		return name.subSequence(start, end);
+	}
+
+	public static boolean contains(CharSequence x, Collection<? extends CharSequence> collection) {
+		if (x==null) return false;
+		if (collection==null) return false;
+		for (CharSequence charSequence : collection) {
+			if (equiv(x, charSequence)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

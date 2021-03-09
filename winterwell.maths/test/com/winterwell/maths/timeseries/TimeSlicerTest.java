@@ -10,9 +10,40 @@ import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeIterator;
+import com.winterwell.utils.time.TimeParser;
 
 public class TimeSlicerTest {
 
+	
+	@Test
+	public void testMonths() {
+		if (false) {	// This applies the local timezone!
+			Time time = new Time("1 Jun 2020");
+			assert time.getMonth() == 6 : time;
+		}
+		{
+			String hi = "Jun 2020";
+			TimeParser tp = new TimeParser();
+			Time time = tp.parseExperimental(hi);
+			assert time.getMonth() == 6 : time;
+		}
+		TimeSlicer ts = new TimeSlicer(new Time(2020,1,1), new Time(2020,12,31), TUnit.MONTH.dt);
+		Time mar = new Time(2020,3,1);
+		int marb = ts.getBucket(mar);
+		Time apr = new Time(2020,4,1);
+		int b = ts.getBucket(apr);				
+		assert b==3 : b;
+	}
+	
+	@Test
+	public void testAprilOddity() {
+		TimeSlicer ts = new TimeSlicer(new Time(2020,1,1), new Time(2022,9,30), TUnit.MONTH.dt);		
+		int mi = ts.getBucket(new Time(2020,3,1));
+		int ai = ts.getBucket(new Time(2020,4,1));
+		assert mi == 2;
+		assert ai == 3;
+	}
+	
 	@Test
 	public void testGetBucket() {
 		TimeSlicer bucketer = new TimeSlicer(new TimeIterator(new Time(2011, 1,
@@ -55,6 +86,31 @@ public class TimeSlicerTest {
 		ListDataStream list = new ListDataStream(1, bucketer);
 		for (Datum datum : list) {
 			System.out.println(datum.time);
+		}
+	}
+	
+	@Test
+	public void test1YearEndIncluded() {
+		{
+			TimeSlicer bucketer = new TimeSlicer(new Time(2013, 1, 1), new Time(2013, 1, 1).plus(TUnit.YEAR), TUnit.MONTH.dt);
+			for(double t : bucketer.times) {
+				System.out.println(new Time(t));
+			}
+			int jan = bucketer.getBucket(new Time(2013,1,1));
+			int dec = bucketer.getBucket(new Time(2013,12,1));
+			assert jan == 0;
+			assert dec == 11;
+		}
+		System.out.println("");
+		{
+			TimeSlicer bucketer = new TimeSlicer(new Time(2013, 1, 1), new Time(2013, 12, 31), TUnit.MONTH.dt);
+			for(double t : bucketer.times) {
+				System.out.println(new Time(t));
+			}
+			int jan = bucketer.getBucket(new Time(2013,1,1));
+			int dec = bucketer.getBucket(new Time(2013,12,1));
+			assert jan == 0;
+			assert dec == 11;
 		}
 	}
 	

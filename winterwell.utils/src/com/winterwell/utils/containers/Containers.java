@@ -24,6 +24,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.winterwell.utils.BestOne;
@@ -282,7 +284,7 @@ public final class Containers  {
 	 * @return [fn applied to each member of list] 
 	 * This is a fresh ArrayList, and can be modified afterwards.
 	 */
-	public static <I, O> ArrayList<O> apply(Iterable<? extends I> list, IFn<I, O> fn) {
+	public static <I, O> List<O> apply(Iterable<? extends I> list, IFn<I, O> fn) {
 		ArrayList after = list instanceof Collection? new ArrayList(((Collection) list).size()) : new ArrayList();
 		try {
 			for (I object : list) {
@@ -349,7 +351,8 @@ public final class Containers  {
 	 * @return {key: fn applied to each value}
 	 */
 	public static <K, I, O> Map<K,O> applyToMap(Map<? extends K, ? extends I> map, java.util.function.BiFunction<K, I, O> fn) {
-		HashMap after = new HashMap(map.size());
+		// HashMap is a good choice - but keep ArrayMap (with ordering) if that was the input
+		Map after = map instanceof ArrayMap? new ArrayMap(map.size()) : new HashMap(map.size());
 		for (K k : map.keySet()) {
 			try {
 				I v = map.get(k);				
@@ -1843,8 +1846,11 @@ public final class Containers  {
 	 */
 	public static <A,B> List<B> pluckNotNull(List<A> list, Function<A,B> fn) {
 		if (list==null) return Collections.EMPTY_LIST;
-		// Java 8 streams + lambdas for the win
-		return list.stream().filter(a -> a != null).map(fn).filter(b -> Utils.truthy(b)).collect(Collectors.toList());
+		// Java 8 streams + lambdas
+//		return list.stream().filter(a -> a != null).map(fn).filter(b -> Utils.truthy(b)).collect(Collectors.toList());
+		// Hm: w/o streams is actually cleaner and faster
+		List<B> bs = filterNulls(apply(list, a -> a==null? null : fn.apply(a)));
+		return bs;
 	}
 	
 
@@ -1963,11 +1969,20 @@ public final class Containers  {
 		return (List<X>) Collections.singletonList(itemOrListOrArray);
 	}
 
-
+	/**
+	 * Case and whitespace insensitive get
+	 * @param <X>
+	 * @param map
+	 * @param key
+	 * @return
+	 */
 	public static <X> X getLenient(Map<String, X> map, String key) {
 		// normal key?
 		X v = map.get(key);
 		if (v != null) return v;
+		if (Utils.isBlank(key)) {
+			return null; // don't match "" against anything
+		}
 		// a few canonical forms
 		v = map.get(key.trim());
 		if (v != null) return v;
@@ -1982,14 +1997,20 @@ public final class Containers  {
 		if (v != null) return v;
 		// search the keys
 		Set<String> keys = map.keySet();
-		BestOne<String> bestKey = new BestOne();		
+		BestOne<String> bestKey = new BestOne();
+		Pattern p = Pattern.compile("\\b"+Pattern.quote(ck)+"\\b");
 		for (String string : keys) {
 			String cs = StrUtils.toCanonical(string);
+			if (Utils.isBlank(cs)) continue;
 			if (cs.startsWith(ck)) {
 				bestKey.maybeSet(string, 2);
 				continue;
 			}
-			if (cs.contains(ck)) {
+			// word match
+			// But avoid "row" ~ "growth"			
+			// TODO camel case support
+			Matcher m = p.matcher(cs);
+			if (m.find()) {
 				bestKey.maybeSet(string, 1);
 				continue;
 			}
@@ -1999,6 +2020,19 @@ public final class Containers  {
 			return null;
 		}
 		return map.get(k);
+	}
+
+
+	/**
+	 * 
+	 * @param <K>
+	 * @param <V>
+	 * @param map
+	 * @return a new map, filtering out any null or other falsy values (see Utils.truthy() for details)
+	 */
+	public static <K,V> Map<K, V> filterFalsy(Map<K, V> map) {
+		Map<K, V> newMap = applyToValues(v -> Utils.truthy(v)? v : null, map);
+		return newMap;
 	}
 
 

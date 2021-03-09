@@ -1,6 +1,7 @@
 package com.winterwell.utils.time;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
@@ -9,6 +10,7 @@ import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
@@ -38,6 +40,7 @@ import com.winterwell.utils.log.Log;
  * 
  */
 public final class Time implements Serializable, Comparable<Time> {
+	public static final String LOGTAG = "Time";
 	private static final long serialVersionUID = 1L;
 
 	private static GregorianCalendar getCal(int year, int month, int day,
@@ -53,7 +56,7 @@ public final class Time implements Serializable, Comparable<Time> {
 		// }
 		// Allow overflow, as calendar handles it nicely. But log a warning, as it could be a bug symptom
 		if (month <= 0 || month > 12 || day <= 0 || day > 32) {
-			Log.i("Time.getCal", "Odd day or month "+day+" of "+month+" in "+cal);
+			Log.i(LOGTAG, "getCal() Odd day or month "+day+" of "+month+" in "+cal);
 		}
 //		assert day > 0 && day < 32 : day;
 		return cal;
@@ -159,12 +162,34 @@ public final class Time implements Serializable, Comparable<Time> {
 		ut = parse(date);
 	}	
 
+	
+	/**
+	 * An ISO format date
+	 */
 	private static final Pattern DATE_ONLY = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
+	/**
+	 * The format used by Date, which preserves to the second.
+	 * <p>
+	 * NB: the Date class javadoc incorrectly describes this as "dow mon dd hh:mm:ss zzz yyyy"
+	 */
+	private static final String TO_STRING_FORMAT = "E MMM dd HH:mm:ss z yyyy";
 	
 	private static long parse(String date) {
 		// Is it a timecode?
 		if (date.length() > 8 && date.length() < 24 && StrUtils.isInteger(date)) {
-			return Long.valueOf(date);
+			return Long.parseLong(date);
+		}
+		// Hack: handle exponential format
+		if (Pattern.compile("\\d\\.\\d+e\\d+").matcher(date).matches()) {
+			double d = Double.parseDouble(date);
+			long l = (long) d;
+			// Is the long fairly close to the double, and within sane ranges?
+			if (Math.abs(l - d) < Math.abs(d)*0.0001) {
+				if (l > new Time(-5000,1,1).getTime() && l < new Time(5000,1,1).getTime()) {
+					return l;
+				}
+			}
+			throw new IllegalArgumentException("Cannot treat double "+date+" as an epoch time");
 		}
 		// One Special case short value
 		if ("0".equals(date)) {
@@ -199,15 +224,73 @@ public final class Time implements Serializable, Comparable<Time> {
 //				_ut = parsed.getTime();
 			return 1000*zes;
 		} catch(Exception ex2) {	
-			try {
-				// Try Date, which can handle Time.toString()
-				return Date.parse(date);
-			} catch(Exception ex3) {
-				// be more informative! _What_ failed to parse
-				throw new IllegalArgumentException(StrUtils.ellipsize(date, 100));
+			// oh well
+		}		
+		// Date toString() format?
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat(TO_STRING_FORMAT);
+			sdf.setTimeZone(TimeUtils._GMT_TIMEZONE);
+			Date parsed = sdf.parse(date);
+			return parsed.getTime();
+		} catch (ParseException e) {
+			// oh well
+		}
+		// Our old format?
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss z");
+			sdf.setTimeZone(TimeUtils._GMT_TIMEZONE);
+			Date parsed = sdf.parse(date);
+			return parsed.getTime();
+		} catch (ParseException e) {
+			// oh well
+		}		
+		// sniff for dd/mm/yy with some UK/US smarts
+		// NB: Date.parse is not so smart, so we do this first
+		Pattern ddmmyy = Pattern.compile("(\\d{1,2})/(\\d{1,2})/(\\d{2,4})");
+		Matcher m2 = ddmmyy.matcher(date);
+		if (m2.matches()) {
+			int d = Integer.parseInt(m2.group(1));
+			int mon = Integer.parseInt(m2.group(2));
+			int y = Integer.parseInt(m2.group(3));
+			if (d==0 || mon==0 || y==0) {
+				throw new IllegalArgumentException(date);
 			}
-		}			
+			if (y<100) {	// short year, e.g. '20 =2020 or '89 = 1989
+				if (y< 50) y+= 2000; // guess the century!
+				else y += 1900;
+			}
+			if (m2.group(3).length()==3) {
+				throw new IllegalArgumentException("bad year "+date);
+			}
+			if (y <= 1000 || y > 4000) {
+				throw new IllegalArgumentException("Please use an explicit format for "+date);
+			}
+			// prefer non-US, then US
+			if (mon < 13) {
+				if (d > 31) throw new IllegalArgumentException(date);
+				// Emit a mild warning as this is common but risky practice 
+				Log.d(LOGTAG, "Please use an explicit format for ambiguous probably-non-US date: "+date+" "+ReflectionUtils.getSomeStack(8));
+				// non-US is OK
+				return new Time(y,mon,d).getTime();
+			} else {
+				// swap d and mon
+				if (mon > 31) throw new IllegalArgumentException(date);
+				if (d > 12) throw new IllegalArgumentException(date);
+				Log.d(LOGTAG, "Please use an explicit format for ambiguous probably-US date: "+date+" "+ReflectionUtils.getSomeStack(8));
+				return new Time(y,d,mon).getTime();
+			}			
+		} // ./dd/mm/yy
+//		try {
+//			// Try Date, which can handle Time.toString()
+//			// Warning - this applies the local timezone!!
+//			return Date.parse(date);
+//		} catch(Exception ex3) {
+			// be more informative! _What_ failed to parse
+		throw new IllegalArgumentException(StrUtils.ellipsize(date, 100));
+//		}
 	}
+	
+	
 
 	/**
 	 * zero pad to 2 digits
@@ -513,14 +596,9 @@ public final class Time implements Serializable, Comparable<Time> {
 	 * Human readable GMT time. This is NOT ISO8601
 	 * @see #toISOString()
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public String toString() {
-		// GregorianCalendar cal = getCalendar();
-		// if (cal.get(Calendar.ERA) == GregorianCalendar.BC) {
-		// // TODO do something sensible here
-		// }
-		return getDate().toGMTString();
+		return format(TO_STRING_FORMAT);
 	}
 
 	/**

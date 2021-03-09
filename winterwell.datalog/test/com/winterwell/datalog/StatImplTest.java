@@ -60,7 +60,7 @@ public class StatImplTest extends DatalogTestCase {
 		IFuture<Double> fd = DataLog.getTotal(null, null, tagBits);
 		double total = fd.get();
 		System.out.println(total);
-		assert total >= 1000;		
+		assert total >= 1000 : total;
 	}
 	
 	@Test

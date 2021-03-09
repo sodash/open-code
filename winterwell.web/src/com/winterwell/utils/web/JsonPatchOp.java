@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.containers.ArrayMap;
 
 /**
@@ -91,7 +92,7 @@ public class JsonPatchOp implements Serializable, IHasJson {
 	 */
 	@Override
 	public Map<String,Object> toJson2() throws UnsupportedOperationException {		
-		assert value==null || value instanceof Map || value instanceof List || value.getClass().isArray() : value.getClass();
+		assert value==null || ReflectionUtils.isBasicType(value) || value instanceof Map || value instanceof List || value.getClass().isArray() : value.getClass();
 		return new ArrayMap(
 			"op", op.toString(),
 			"path", path,

@@ -68,7 +68,7 @@ public class MasterHttpServlet extends HttpServlet {
 			if (request.getSlug()==null) {
 				throw new WebEx.E404(request.getRequestUrl(), "You must specify a project");
 			}
-			String project = request.getSlugBits()[0];
+			String project = request.getSlugBits(0);
 			request.put(new Key("project"), project);
 			
 			// data/stats explorer

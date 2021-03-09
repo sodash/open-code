@@ -106,7 +106,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 	@Override
 	public IDataLogStorage init(DataLogConfig settings) {
 		logEndpoint = settings.logEndpoint;
-		getDataEndpoint = settings.getDataEndpoint;
+		getDataEndpoint = settings.dataEndpoint;
 		return this;
 	}
 
@@ -235,8 +235,4 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		}
 	}
 
-	@Override
-	public void registerEventType(Dataspace dataspace, String eventType) {
-		// no-op??
-	}
 }

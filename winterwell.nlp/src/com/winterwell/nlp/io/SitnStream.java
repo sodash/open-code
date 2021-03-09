@@ -16,6 +16,7 @@ import com.winterwell.maths.stats.distributions.cond.Sitn;
 import com.winterwell.nlp.corpus.IDocument;
 import com.winterwell.nlp.corpus.SimpleDocument;
 import com.winterwell.nlp.io.SitnStream.IFeature;
+import com.winterwell.nlp.io.pos.PosTagByFastTag;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.containers.AbstractIterator;
 import com.winterwell.utils.containers.Containers;

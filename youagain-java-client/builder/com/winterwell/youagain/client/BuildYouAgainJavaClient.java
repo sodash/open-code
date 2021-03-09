@@ -7,7 +7,6 @@ import java.util.List;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.MavenDependencyTask;
 import com.winterwell.bob.wwjobs.BuildWinterwellProject;
-import com.winterwell.utils.io.FileUtils;
 
 
 public class BuildYouAgainJavaClient extends BuildWinterwellProject {

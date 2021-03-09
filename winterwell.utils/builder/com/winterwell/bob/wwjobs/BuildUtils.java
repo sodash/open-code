@@ -21,6 +21,7 @@ public class BuildUtils extends BuildWinterwellProject {
 		super("winterwell.utils");		
 		incSrc = true;				
 		setCompile(true);
+		setVersion("1.0.2"); // Feb 28 2021
 	}
 	
 	@Override
@@ -29,15 +30,18 @@ public class BuildUtils extends BuildWinterwellProject {
 
 		// Maven
 		MavenDependencyTask mdt = new MavenDependencyTask();
-		mdt.setCleanOutputDirectory(true);
+		if (getConfig().clean || getConfig().cleanBefore != null) {
+			// NB: recklessly cleaning directories can upset Eclipse
+			mdt.setCleanOutputDirectory(true);
+		}
 		mdt.setProjectDir(projectDir);
 		if (outDir!=null) {
 			mdt.setOutputDirectory(outDir);
 		}
-		mdt.addDependency("com.thoughtworks.xstream","xstream", "1.4.12");
+		mdt.addDependency("com.thoughtworks.xstream","xstream", "1.4.15");
 		mdt.addDependency("junit","junit","4.12");
 		mdt.addDependency("dnsjava","dnsjava","2.1.9"); // Note: not usually used, unless you need DnsUtils
-
+		mdt.setIncSrc(true);
 		// DBs -- can we drop these?? If a project needs them they can add
 //		mdt.addDependency("org.postgresql", "postgresql", "42.2.13");
 //		mdt.addDependency("mysql", "mysql-connector-java", "8.0.19");

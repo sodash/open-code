@@ -189,12 +189,14 @@ public class TimeParser {
 		this.now = now;
 	}
 	
+	String timezone;
+	
 	/**
 	 * yyyy-MM-dd -- be careful to sanity check values
 	 */
 	static final Pattern pISODATE = Pattern.compile("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)");
 	static final Pattern pMONTH = Pattern.compile("jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec");
-	static final Pattern pDAY = Pattern.compile("mon|tue|wed|thu|fri|sat|sun");
+	static final Pattern pDAY = Pattern.compile("sun|mon|tue|wed|thu|fri|sat");
 	/**
 	 * TODO break this out into a TimeParser class so we can have language & timezone support.
 	 * WARNING: will return a point time (a 0-length period) for many cases
@@ -266,7 +268,7 @@ public class TimeParser {
 				month = m.group();
 				int mi = pMONTH.pattern().indexOf(month);
 				int mii = mi / 4;
-				tf.setMonth(mii+1);
+				tf.setMonth(mii+1); // 1=jan
 			}
 		}
 
@@ -286,12 +288,14 @@ public class TimeParser {
 				if (day!=null) {
 					int idow = pDAY.pattern().indexOf(day);
 					int dow = idow / 4;
-					tf.put(Calendar.DAY_OF_WEEK, dow);
+					// dow: sun = 0 
+					// cal: sunday = 1, saturday=7
+					tf.put(Calendar.DAY_OF_WEEK, dow+1);
 				}
 			}
 		}
 		
-		String hour = null;
+		Integer hour = null;
 		{ // TODO hour:minute
 			Pattern HOUR = Pattern.compile("(\\d\\d):(\\d\\d)|(\\d\\d?)am|(\\d\\d?)pm");
 			Matcher m = HOUR.matcher(s);
@@ -301,43 +305,44 @@ public class TimeParser {
 				String g2 = m.group(2);
 				String g3 = m.group(3);
 				String g4 = m.group(4);
-				hour = Utils.or(g1,g3,g4); // TODO pm!
-				if (g4!=null) {
-					hour = String.valueOf((int)MathUtils.toNum(g4)+12);
+				hour = Integer.valueOf(Utils.or(g1,g3,g4)); 
+				if (g4!=null) {	// pm?
+					hour += 12;					
 				}
+				tf.put(Calendar.HOUR_OF_DAY, hour);
 			}
 		}
 		
 		// put together a date
 		if (month != null) {
-			if (year==-1) year = now.getYear();
-			String formatPattern = "dd MMM yyyy";
-			if (day != null) formatPattern = "EEE " + formatPattern;
-			DateFormat df = new SimpleDateFormat(formatPattern);
-			df.setLenient(false);
+			if (year==-1) {
+				year = now.getYear();
+				tf.setYear(year);
+			}
 			// look for a day of month
 			Matcher m = Pattern.compile("\\d+").matcher(s);
-			Date date = null;
 			while (m.find()) {
 				int dayMonth = Integer.parseInt(m.group());
-				String formatted = (day==null? "" : day + " ") + dayMonth + " " + month + " " + year;
-				try {
-					date = df.parse(formatted);
-					break;
-				} catch (ParseException ex) {
+				if (dayMonth == 0 || dayMonth > 31) {
 					continue;
 				}
-			}			
-			if (date != null) return new Period(new Time(date));
-			if (day==null) {
-				String formatted = "1 " + month + " " + year;
-				try {
-					date = df.parse(formatted);
-				} catch (ParseException ex) {
-					// oh well
+				tf.put(Calendar.DAY_OF_MONTH, dayMonth);
+				Time hm = tf.getTime();
+				if (hm!=null) {
+					if (tf.hasTime()) {
+						return new Period(hm);
+					}
+					Time eod = TimeUtils.getEndOfDay(hm);
+					return new Period(hm, eod);
 				}
-				Time t = new Time(date);
-				return new Period(t, TimeUtils.getEndOfMonth(new Time(date).plus(TUnit.DAY)));
+			}			
+			if (day==null) {
+				tf.put(Calendar.DAY_OF_MONTH, 1);
+				Time t = tf.getTime();
+				if (t != null) {
+					Time eom = TimeUtils.getEndOfMonth(t.plus(TUnit.DAY));
+					return new Period(t, eom);
+				}
 			}
 		}
 

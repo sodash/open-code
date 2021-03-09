@@ -15,10 +15,9 @@ import com.winterwell.datalog.Dataspace;
 import com.winterwell.datalog.ESDataLogSearchBuilder;
 import com.winterwell.datalog.ESStorage;
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchRequest;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.nlp.query.SearchQuery;
-import com.winterwell.nlp.query.SearchQuery.SearchFormatException;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
@@ -32,7 +31,6 @@ import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
-import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.IServlet;
 import com.winterwell.web.app.Json2Csv;
@@ -73,10 +71,12 @@ public class DataServlet implements IServlet {
 		// Uses "paths" of breakdown1/breakdown2/... {field1:operation, field2}
 		List<String> breakdown = state.get(DataLogFields.breakdown);
 		if (breakdown==null) {
-			Log.w(LOGTAG, "You want data but no breakdown?! Default to time. "+state);
+//			Log.w(LOGTAG, "You want data but no breakdown?! Default to time. "+state);
 			breakdown = new ArrayList();
 			breakdown.add("time");
 		}
+		// remove `none` if present (which is to block the default)
+		breakdown.remove("none");
 
 		// security: on the dataspace, and optionally on the breakdown
 		DataLogSecurity.check(state, dataspace, breakdown);
@@ -103,7 +103,8 @@ public class DataServlet implements IServlet {
 		
 		// query e.g. host:thetimes.com
 		String q = state.get("q");
-		SearchQuery filter = makeQueryFilter(q, start, end);
+		if (q==null) q = "";
+		SearchQuery filter = new SearchQuery(q);				
 
 		DataLogImpl dl = (DataLogImpl) DataLog.getImplementation();
 		ESStorage ess = (ESStorage) dl.getStorage();
@@ -121,12 +122,13 @@ public class DataServlet implements IServlet {
 		Dt interval = state.get(new DtField("interval"), TUnit.DAY.dt);
 		essb.setInterval(interval);
 		
-		SearchRequestBuilder search = essb.prepareSearch();		
+		SearchRequest search = essb.prepareSearch();		
 		search.setDebug(true);
 //		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
 		search.setSize(size);
-				
-		SearchResponse sr = search.get();
+		
+		// Search!
+		SearchResponse sr = search.get();		
 		sr.check();
 		
 		Map aggregations = sr.getAggregations();
@@ -137,9 +139,13 @@ public class DataServlet implements IServlet {
 		// strip out no0 filter wrappers
 		aggregations = essb.cleanJson(aggregations);
 		// also send eg data
-		aggregations.put("examples", sr.getHits());
-		
-		JsonResponse jr = new JsonResponse(state, aggregations);
+		aggregations.put("examples", sr.getHits());		
+		// debug?
+		if (state.debug && isLoggedIn(state)) {
+			aggregations.put("debug", search.getCurl());
+		}
+		// done
+		JsonResponse jr = new JsonResponse(state, aggregations);		
 		WebUtils2.sendJson(jr, state);
 	}
 
@@ -187,20 +193,5 @@ public class DataServlet implements IServlet {
 		}
 	}
 
-	/**
-	 * @param state
-	 * @param start
-	 * @param end
-	 * @return
-	 */
-	private SearchQuery makeQueryFilter(String q, Time start, Time end) {
-		try {
-			if (q==null) q = "";
-			SearchQuery sq = new SearchQuery(q);		
-			return sq;
-		} catch(SearchFormatException ex) {
-			throw new WebEx.BadParameterException("q", q, ex);
-		}
-	}
 
 }

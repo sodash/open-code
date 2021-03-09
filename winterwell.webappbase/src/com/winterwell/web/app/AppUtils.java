@@ -18,28 +18,32 @@ import com.winterwell.es.ESNoIndex;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.ESType;
 import com.winterwell.es.IESRouter;
-import com.winterwell.es.client.DeleteRequestBuilder;
+import com.winterwell.es.client.DeleteRequest;
 import com.winterwell.es.client.ESConfig;
 import com.winterwell.es.client.ESHttpClient;
-import com.winterwell.es.client.GetRequestBuilder;
+import com.winterwell.es.client.GetRequest;
 import com.winterwell.es.client.GetResponse;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.KRefresh;
 import com.winterwell.es.client.ReindexRequest;
-import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchRequest;
 import com.winterwell.es.client.SearchResponse;
-import com.winterwell.es.client.UpdateRequestBuilder;
+import com.winterwell.es.client.UpdateRequest;
+import com.winterwell.es.client.admin.ClusterAdminClient;
+import com.winterwell.es.client.admin.ClusterOverridReadOnlyRequest;
 import com.winterwell.es.client.admin.CreateIndexRequest;
 import com.winterwell.es.client.admin.IndicesAliasesRequest;
-import com.winterwell.es.client.admin.PutMappingRequestBuilder;
+import com.winterwell.es.client.admin.PutMappingRequest;
 import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilders;
 import com.winterwell.es.fail.ESException;
+import com.winterwell.es.fail.ESIndexReadOnlyException;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.AString;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.FailureException;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
@@ -69,7 +73,7 @@ public class AppUtils {
 
 	public static SearchResponse search(ESPath path, SearchQuery q) {
 		ESHttpClient esjc = Dep.get(ESHttpClient.class);
-		SearchRequestBuilder s = new SearchRequestBuilder(esjc);
+		SearchRequest s = new SearchRequest(esjc);
 		s.setPath(path);
 		com.winterwell.es.client.query.BoolQueryBuilder f = makeESFilterFromSearchQuery(q, null, null);
 		s.setQuery(f);
@@ -139,7 +143,7 @@ public class AppUtils {
 	public static <X> X get(ESPath path, Class<X> klass, AtomicLong version) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
 
-		GetRequestBuilder s = new GetRequestBuilder(client);
+		GetRequest s = new GetRequest(client);
 		// Minor TODO both indices in one call
 		s.setIndices(path.indices[0]).setType(path.type).setId(path.id);
 		if (version==null) s.setSourceOnly(true);
@@ -184,11 +188,13 @@ public class AppUtils {
 			thing = new JThing().setMap(draftMap);
 		}
 		assert thing != null : draftPath;
-		// set status
-		thing = setStatus(thing, newStatus);		
+		// set state to draft (NB: archived is handled by an action=archive flag)
+		thing = setStatus(thing, newStatus);
+
 		// update draft // TODO just an update script to set status
+		Log.d("crud", "unpublish "+newStatus+" doSave "+draftPath);
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-		UpdateRequestBuilder up = client.prepareUpdate(draftPath);
+		UpdateRequest up = client.prepareUpdate(draftPath);
 		up.setDoc(thing.map());
 		up.setDocAsUpsert(true);
 		// NB: this doesn't return the merged item :(
@@ -196,11 +202,9 @@ public class AppUtils {
 		
 		// delete the published version	
 		if ( ! draftPath.equals(pubPath)) {
-			Log.d("unpublish", "deleting published version "+pubPath);
-			DeleteRequestBuilder del = client.prepareDelete(pubPath.index(), pubPath.type, pubPath.id);
-			IESResponse ok = del.get().check();		
+			AppUtils.doDelete(pubPath);
 		}
-		
+		// done
 		return thing;
 	}
 
@@ -251,7 +255,7 @@ public class AppUtils {
 		draft = setStatus(draft, KStatus.PUBLISHED);
 		// publish
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-		UpdateRequestBuilder up = client.prepareUpdate(publishPath);
+		UpdateRequest up = client.prepareUpdate(publishPath);
 		up.setDoc(draft.map());
 		up.setRefresh(refresh);		
 		up.setDocAsUpsert(true);
@@ -265,7 +269,7 @@ public class AppUtils {
 				doDelete(draftPath);
 			} else {
 				Log.d("doPublish", "also update draft "+draftPath);
-				UpdateRequestBuilder upd = client.prepareUpdate(draftPath);
+				UpdateRequest upd = client.prepareUpdate(draftPath);
 				upd.setDoc(draft.map());
 				upd.setDocAsUpsert(true);
 				upd.setRefresh(refresh);
@@ -285,7 +289,7 @@ public class AppUtils {
 		try {
 			Log.d("delete", path+" possible-state:"+WebRequest.getCurrent());
 			ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-			DeleteRequestBuilder del = client.prepareDelete(path.index(), path.type, path.id);
+			DeleteRequest del = client.prepareDelete(path.index(), path.type, path.id);
 			IESResponse ok = del.get().check();
 		} catch(WebEx.E404 ex) {
 			// oh well
@@ -294,7 +298,7 @@ public class AppUtils {
 	}
 
 	/**
-	 * Save edits to *draft*
+	 * Save edits to *draft*. Modifies status.
 	 * @param path
 	 * @param item
 	 * @param state Can be null
@@ -313,8 +317,6 @@ public class AppUtils {
 		} else if (!Utils.streq(s, KStatus.ARCHIVED)) {
 			AppUtils.setStatus(item, KStatus.DRAFT);
 		}
-		// Update last-modified timestamp
-		item.put("lastModified", new Time().toISOString());
 		// talk to ES
 		return doSaveEdit2(path, item, state);
 	}
@@ -350,7 +352,7 @@ public class AppUtils {
 		assert id.equals(path.id) : path+" vs "+id;
 				
 		// save to ES
-		UpdateRequestBuilder up = client.prepareUpdate(path);
+		UpdateRequest up = client.prepareUpdate(path);
 		if (DEBUG) up.setDebug(DEBUG); // NB: only set if its extra debugging??
 		// This should merge against what's in the DB
 		Map map = item.map();
@@ -473,7 +475,19 @@ public class AppUtils {
 
 	public static void initESMappings(KStatus[] statuses, Class[] dbclasses, Map<Class,Map> mappingFromClass) 
 	{
-		initESMappings(statuses, dbclasses, mappingFromClass, null);
+		try {
+			initESMappings(statuses, dbclasses, mappingFromClass, null);
+		} catch (ESIndexReadOnlyException ex) {
+			// ES being fussy about memory -- if local, poke the index
+			if (AppUtils.getServerType() != KServerType.LOCAL) throw ex;
+			ESHttpClient esjc = Dep.get(ESHttpClient.class);
+			ClusterAdminClient cac = new ClusterAdminClient(esjc);
+			ClusterOverridReadOnlyRequest oro = cac.prepareOverrideReadOnly();
+			oro.setDebug(true);
+			IESResponse ok = oro.get().check();
+			// try again
+			initESMappings(statuses, dbclasses, mappingFromClass, null);
+		}
 	}
 
 	/**
@@ -488,7 +502,7 @@ public class AppUtils {
 	{
 		IESRouter esRouter = Dep.get(IESRouter.class);
 		ESHttpClient es = Dep.get(ESHttpClient.class);
-		Exception err = null;			
+		String errMsg = null;			
 		for(Class k : dbclasses) {
 			for(KStatus status : statuses) {
 				ESPath path = esRouter.getPath(dataspace, k, null, status);
@@ -497,16 +511,17 @@ public class AppUtils {
 					String index = path.index();
 					initESMappings2_putMapping(mappingFromClass, es, k, path, index);
 				} catch(Exception ex) {
-					initESMappings2_error(mappingFromClass, es, k, path, ex);
-					if (ex!=null) err = ex; // carry on through all the mappings
+					// collect all the error messages
+					String exMsg = initESMappings2_error(mappingFromClass, es, k, path, ex);
+					errMsg = errMsg==null? exMsg : errMsg+"\n\n"+exMsg;
 				}
 			}
 		}		
 		// shout if we had an error
-		if (err != null) {	
+		if (errMsg != null) {	
 			// ??IF we add auto reindex, then wait for ES
 //			es.flush();
-			throw Utils.runtime(err);
+			throw new ESException(errMsg);
 		}
 	}
 
@@ -519,10 +534,11 @@ public class AppUtils {
 	 * @param ex
 	 * @return
 	 */
-	private static void initESMappings2_error(
+	private static String initESMappings2_error(
 			Map<Class, Map> mappingFromClass, ESHttpClient es, Class k,
 			ESPath path, final Exception ex) 
 	{
+		String msg = path.index()+" Mapping change?! "+ex;
 		Log.w("ES.init", path.index()+" Mapping change?! "+ex);
 		// map the base index (so we can do a reindex with the right mapping)
 		// NB: The default naming, {index}_{month}{year}, assumes we only do one mapping change per month.
@@ -556,8 +572,10 @@ public class AppUtils {
 			if (resp.isSuccess()) Log.d(resp); else Log.e("ES.init.reindex.fail", resp);
 		} else {
 			// dont auto reindex test or live
-			Log.i("ES.init", "To reindex:\n\n"+
-					"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}' -H 'Content-Type:application/json'\n\n");
+			String reindexMsg = "To reindex:\n"+
+					"curl -XPOST http://localhost:9200/_reindex -d '{\"source\":{\"index\":\""+path.index()+"\"},\"dest\":{\"index\":\""+index+"\"}}' -H 'Content-Type:application/json'\n";
+			Log.i("ES.init", reindexMsg);
+			msg += "\n"+reindexMsg;
 		}
 		// and shout fail!
 		//  -- but run through all the mappings first, so a sys-admin can update them all in one run.
@@ -599,20 +617,23 @@ public class AppUtils {
 					ar.getBodyJson();
 //								("{'actions':[{'remove':{'index':"+OLD+",'alias':'"+alias+"'}},{'add':{'index':'"+index+"','alias':'"+alias+"'}}]}")
 //								.replace('\'', '"');
-			Log.i("ES.init", "To switch old -> new:\n\n"
-					+"curl http://localhost:9200/_aliases -d '"+switchjson+"' -H 'Content-Type:application/json'\n\n");
+			String switchMsg = "To switch old -> new:\n\n"
+					+"curl http://localhost:9200/_aliases -d '"+switchjson+"' -H 'Content-Type:application/json'\n\n";
+			Log.i("ES.init", switchMsg);
+			msg += "\n"+switchMsg;
 		}
 		// record fail - but loop over the rest so we catch all the errors in one loop
 		Log.e("init", ex.toString());
+		return msg;
 	}
+	
 
 	private static void initESMappings2_putMapping(
 			Map<Class, Map> mappingFromClass, ESHttpClient es, 
 			Class k,
 			ESPath path, String index) 
 	{
-		PutMappingRequestBuilder pm = es.admin().indices().preparePutMapping(
-				index, path.type);
+		PutMappingRequest pm = es.admin().indices().preparePutMapping(index);
 		
 		// ESType
 		// passed in
@@ -621,7 +642,7 @@ public class AppUtils {
 		
 		// Call ES...
 		pm.setMapping(dtype);
-		pm.setDebug(false); //DEBUG);
+		pm.setDebug(true); //false); //DEBUG);
 		IESResponse r2 = pm.get();
 		r2.check();
 	}
@@ -739,6 +760,10 @@ public class AppUtils {
 	
 	private static ESType estypeForClass3_reflection_field(Field field, Class<?> type) 
 	{			
+		// HACK bugfix
+		if ("_version".equals(field.getName())) {
+			return null;
+		}
 		// keyword annotation?
 		ESKeyword esk = field.getAnnotation(ESKeyword.class);
 		if (esk!=null) {
@@ -764,16 +789,24 @@ public class AppUtils {
 		if (type.equals(Time.class)) {
 			est = new ESType().date();
 		}
+		if (ReflectionUtils.isaNumber(type) || boolean.class.equals(type) || Boolean.class.equals(type)) {
+			try {
+				est = new ESType().setType(type);
+			} catch(Exception ex) {
+				// oh well
+				Log.d("AppUtils", "ES mapping: Oh well: ESType.setType(): "+ex);
+			}
+		}
 		// ??anything else ES is liable to guess wrong??		
 		ESNoIndex esno = field.getAnnotation(ESNoIndex.class);
-
-		// trust the defaults for some stuff
-		if (ReflectionUtils.isaNumber(type) || boolean.class.equals(type) || Boolean.class.equals(type)) {
-			if (esno==null) {
-				return null;			
-			}
-			return new ESType().setType(type).index(false);
-		}	
+//		// trust the defaults for some stuff 
+//		// BUT this breaks searching on a field before it has been indexed once
+//		if (ReflectionUtils.isaNumber(type) || boolean.class.equals(type) || Boolean.class.equals(type)) {
+//			if (esno==null) {
+//				return null;			
+//			}
+//			return new ESType().setType(type).index(false);
+//		}	
 		if (est==null) est = new ESType(); 
 		if (esno != null) {
 			est = est.copy().noIndex(); // NB: copy for keyword, which is locked against edits
@@ -910,12 +943,20 @@ public class AppUtils {
 				}
 				return filter;
 			}
+			
+			if (SearchQuery.KEYWORD_QUOTED.equals((String) maybeOperator)) {
+				assert clause.size() == 2 : clause;
+				String term = (String) clause.get(1);				
+				ESQueryBuilder mp = ESQueryBuilders.matchPhrase(term);
+				filter = filter.must(mp);
+				return filter;
+			}
 		}
 		
 		// Fall-through clause: 2+ elements, first isn't a Boolean operator
 		// Assume it's an implicit AND of all elements in list.
 		for (Object term : clause) {
-			filter = filter.must(parseTreeToQuery((List) term));
+			filter = filter.must(parseTreeToQuery(term));
 		}
 		return filter;
 	}

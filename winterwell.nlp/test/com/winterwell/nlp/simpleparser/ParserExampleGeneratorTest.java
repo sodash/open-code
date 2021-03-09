@@ -1,10 +1,12 @@
 package com.winterwell.nlp.simpleparser;
 
-import static org.junit.Assert.*;
+import static com.winterwell.nlp.simpleparser.Parsers.lit;
+import static com.winterwell.nlp.simpleparser.Parsers.opt;
+import static com.winterwell.nlp.simpleparser.Parsers.seq;
+import static com.winterwell.nlp.simpleparser.Parsers.word;
 
 import java.util.List;
 
-import static com.winterwell.nlp.simpleparser.Parsers.*;
 import org.junit.Test;
 
 import com.winterwell.utils.Printer;

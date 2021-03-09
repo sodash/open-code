@@ -1,5 +1,6 @@
 package com.winterwell.web.app;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -10,19 +11,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jetty.util.ajax.JSON;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.winterwell.bob.tasks.GitTask;
 import com.winterwell.data.AThing;
 import com.winterwell.data.KStatus;
 import com.winterwell.depot.IInit;
 import com.winterwell.es.ESPath;
 import com.winterwell.es.IESRouter;
-import com.winterwell.es.client.DeleteRequestBuilder;
+import com.winterwell.es.client.DeleteRequest;
 import com.winterwell.es.client.ESHit;
 import com.winterwell.es.client.ESHttpClient;
 import com.winterwell.es.client.IESResponse;
 import com.winterwell.es.client.KRefresh;
-import com.winterwell.es.client.SearchRequestBuilder;
+import com.winterwell.es.client.SearchRequest;
 import com.winterwell.es.client.SearchResponse;
 import com.winterwell.es.client.query.BoolQueryBuilder;
 import com.winterwell.es.client.query.ESQueryBuilder;
@@ -33,22 +37,27 @@ import com.winterwell.gson.FlexiGson;
 import com.winterwell.gson.Gson;
 import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.Dep;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
-import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
-import com.winterwell.utils.threads.ICallable;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.JsonPatch;
+import com.winterwell.utils.web.JsonPatchOp;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
+import com.winterwell.web.ajax.AjaxMsg;
+import com.winterwell.web.ajax.AjaxMsg.KNoteType;
 import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.WebRequest.KResponseType;
@@ -69,6 +78,28 @@ import com.winterwell.youagain.client.YouAgainClient;
  */
 public abstract class CrudServlet<T> implements IServlet {
 
+	/**
+	 * File path IF this is backed by a git repo (most servlets aren't)
+	 * @param item
+	 * @param status
+	 * @return
+	 */
+	protected File getGitFile(AThing item, KStatus status) {
+		// TODO a config setting
+		File dir = new File(FileUtils.getWinterwellDir(), AMain.appName+"-files");
+		if ( ! dir.isDirectory()) {
+			return null;
+		}
+		String wart = "";
+		if (status==KStatus.DRAFT || status==KStatus.MODIFIED) wart = "~";
+		File f = new File(dir, item.getClass().getSimpleName()+"/"+wart+item.getId());
+		if ( ! f.getParentFile().isDirectory()) {
+			f.getParentFile().mkdir(); // create the repo/Type folder if needed
+		}
+		return f;
+	}
+
+	
 	protected String[] prefixFields = new String[] {"name"};
 	
 	protected boolean dataspaceFromPath;
@@ -79,6 +110,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	public static final String ACTION_GETORNEW = "getornew";
 	public static final String ACTION_SAVE = "save";
+	public static final String ACTION_DELETE = "delete";
 
 	public CrudServlet(Class<T> type) {
 		this(type, Dep.get(IESRouter.class));
@@ -93,7 +125,7 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	protected JThing<T> doDiscardEdits(WebRequest state) {
 		ESPath path = esRouter.getPath(dataspace, type, getId(state), KStatus.DRAFT);
-		DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
+		DeleteRequest del = es.prepareDelete(path.index(), path.type, path.id);
 		IESResponse ok = del.get().check();		
 		getThing(state);
 		return jthing;
@@ -123,30 +155,36 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		
 		// crud?
-		if (state.getAction() != null) {
+		if (state.getAction() != null && ! state.actionIs("get")) {
 			// do it
 			doAction(state);
 		}						
 
-		// Get the Item
-		getThing(state);
-		if (jthing==null) {
-			jthing = getThingFromDB(state);
-		}
+		getThingStateOrDB(state);
 
 		// return json?		
 		if (jthing != null) {						
 			// privacy: potentially filter some stuff from the json!
-			cleanse(jthing, state);
+			JThing<T> cleansed = cleanse(jthing, state);			
+			// Editor safety
+			if (cleansed != null) {
+				cleanse2_dontConfuseEditors(cleansed, jthing, state);				
+			} else {
+				cleansed = jthing; // never null
+			}
 			// augment?
 			if (augmentFlag) {
-				augment(jthing, state);				
+				JThing<T> aug = augment(cleansed, state);
+				if (aug!=null) {
+					cleansed = aug;
+				}
 			}
-			String json = jthing.string();
+			String json = cleansed.string();
 			JsonResponse output = new JsonResponse(state).setCargoJson(json);			
 			WebUtils2.sendJson(output, state);
 			return;
 		}
+		
 		// no object...
 		// return blank / messages
 		if (state.getAction()==null) {
@@ -158,6 +196,51 @@ public abstract class CrudServlet<T> implements IServlet {
 		WebUtils2.sendJson(output, state);
 	}
 	
+	/**
+	 * 
+	 * @param cleansed This may be modified
+	 * @param unclean
+	 * @param state
+	 */
+	private void cleanse2_dontConfuseEditors(JThing<T> cleansed, JThing<T> unclean, WebRequest state) {
+		if (cleansed==unclean) {
+			Log.e(LOGTAG(), "cleansed == unclean -- Should copy before cleaning");
+			return;
+		}
+		// reinstate everything that was sent (to avoid confusing editors)
+		String json = getJson(state);
+		if (json == null) {
+			return;					
+		}		
+		// We don't want to cleanse data that was sent in during an edit -- as that could be misinterpreted
+		// by the client (who would then lose that data -- and maybe then save it)
+		Map uncleanMap = unclean.map();
+
+		Map sentMap = new JThing(json).map();
+		Map<String, Object> cleanMap = cleansed.map();
+		JsonPatch jpo = new JsonPatch(cleanMap, uncleanMap);			
+		if (jpo.getDiffs().isEmpty()) {
+			return;
+		}
+		JsonPatch jps = new JsonPatch(cleanMap, sentMap);
+		// which diffs are the same?
+		List<JsonPatchOp> sameDiffs = new ArrayList(jps.getDiffs());
+		sameDiffs.retainAll(jpo.getDiffs());
+		// apply
+		JsonPatch jp2 = new JsonPatch(sameDiffs);
+		HashMap safeMap = new HashMap(cleanMap);
+		jp2.apply(safeMap);
+		cleansed.setMap(safeMap);		
+	}
+
+
+	/**
+	 * A very simple check! Are you logged in for e.g. publish?
+	 * 
+	 * Note: see also {@link #doList2_securityFilter(List, WebRequest)}
+	 * @param state
+	 * @throws SecurityException
+	 */
 	protected void doSecurityCheck(WebRequest state) throws SecurityException {
 		YouAgainClient ya = Dep.get(YouAgainClient.class);
 		ReflectionUtils.setPrivateField(state, "debug", true); // FIXME
@@ -217,14 +300,16 @@ public abstract class CrudServlet<T> implements IServlet {
 			jthing = doDiscardEdits(state);
 			return;
 		}
-		if (state.actionIs("delete")) {
+		if (state.actionIs(ACTION_DELETE)) {
 			jthing = doDelete(state);
 			return;
 		}
 		// publish?
 		if (state.actionIs(ACTION_PUBLISH)) {
 			jthing = doPublish(state);
-			assert jthing.string().contains(KStatus.PUBLISHED.toString()) : jthing;
+			if ( ! jthing.string().contains(KStatus.PUBLISHED.toString())) {
+				Log.e(LOGTAG(), "doPublish json doesnt contain 'PUBLISHED' "+state);
+			}
 			return;
 		}
 		if (state.actionIs("unpublish")) {
@@ -243,7 +328,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			return;
 		}
 		String ckey = doAction2_blockRepeats2_actionId(state);
-		Log.d(LOGTAG(), "Anti overlap key: "+ckey);
+		Log.d(LOGTAG(), "2 second Anti overlap key: "+ckey);
 		if (ANTI_OVERLAPPING_EDITS_CACHE.getIfPresent(ckey)!=null) {
 			throw new WebEx.E409Conflict("Duplicate request within 2 seconds. Blocked for edit safety. "+state
 					+" Note: this behaviour could be switched off via "+ALLOW_OVERLAPPING_EDITS);
@@ -284,9 +369,9 @@ public abstract class CrudServlet<T> implements IServlet {
 
 
 	/**
-	 * Delete from draft and published!!
+	 * Delete from draft and published!! (copy into trash)
 	 * @param state
-	 * @return
+	 * @return null
 	 */
 	protected JThing<T> doDelete(WebRequest state) {
 		String id = getId(state);
@@ -303,7 +388,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		for(KStatus s : KStatus.main()) {
 			if (s==KStatus.TRASH) continue;
 			ESPath path = esRouter.getPath(dataspace,type, id, s);
-			DeleteRequestBuilder del = es.prepareDelete(path.index(), path.type, path.id);
+			DeleteRequest del = es.prepareDelete(path.index(), path.type, path.id);
 			del.setRefresh("wait_for");
 			IESResponse ok = del.get().check();			
 		}
@@ -439,23 +524,45 @@ public abstract class CrudServlet<T> implements IServlet {
 	private static final IntField SIZE = new IntField("size");
 	public static final String ALL = "all";
 
-	protected final JThing<T> doPublish(WebRequest state) {
+	protected final JThing<T> doPublish(WebRequest state) throws Exception {
 		// For publish, let's force the update.
 		return doPublish(state, KRefresh.TRUE, false);
 	}
 	
-	protected JThing<T> doPublish(WebRequest state, KRefresh forceRefresh, boolean deleteDraft) {		
+	protected JThing<T> doPublish(WebRequest state, KRefresh forceRefresh, boolean deleteDraft) throws Exception {		
 		String id = getId(state);
 		Log.d("crud", "doPublish "+id+" by "+state.getUserId()+" "+state+" deleteDraft: "+deleteDraft);
 		Utils.check4null(id); 
-		// load (if not loaded)
-		getThing(state);
-		if (jthing==null) {
-			jthing = getThingFromDB(state);
-		}
+		getThingStateOrDB(state);
 		return doPublish2(dataspace, jthing, forceRefresh, deleteDraft, id, state);
 	}
 
+
+	/**
+	 * Idempotent -- sets the jthing field and reuses that. Get from state or DB
+	 * @param state
+	 * @return
+	 */
+	protected JThing<T> getThingStateOrDB(WebRequest state) {
+		if (jthing!=null) {
+			return jthing;
+		}		
+		// from request?
+		getThing(state);
+		// from DB?
+		if (jthing==null) {
+			setJthing(getThingFromDB(state));
+		}
+		return jthing;
+	}
+
+	/**
+	 * @deprecated Not a normal thing to use
+	 * @param jthing
+	 */
+	protected void setJthing(JThing<T> jthing) {
+		this.jthing = jthing;
+	}
 
 
 	/**
@@ -476,9 +583,12 @@ public abstract class CrudServlet<T> implements IServlet {
 			if (thingId==null || ACTION_NEW.equals(thingId)) {
 				_jthing.put("id", id);
 			} else if ( ! thingId.equals(id)) {
-				throw new IllegalStateException("ID mismatch remote: "+thingId+" vs local: "+id);
+				// WTF?! NB: seen Jan 2021 with a badly setup internal call from one crudservlet to another. 
+				throw new IllegalStateException(
+						"ID mismatch "+_jthing.java().getClass().getSimpleName()+" java/json: "+thingId+" vs local: "+id);				
 			}
 		}		
+		
 		// ES paths
 		ESPath draftPath = esRouter.getPath(dataspace, type, id, KStatus.DRAFT);
 		ESPath publishPath = esRouter.getPath(dataspace, type, id, KStatus.PUBLISHED);
@@ -489,13 +599,17 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 	
 	/**
-	 * Does nothing by default - override to add custom logic.
+	 * Sets lastModified by default - override to add custom logic.
 	 * This is called by both {@link #doSave(WebRequest)} and {@link #doPublish(WebRequest)}
 	 * @param _jthing
 	 * @param stateIgnored
 	 */
 	protected void doBeforeSaveOrPublish(JThing<T> _jthing, WebRequest stateIgnored) {
-		
+		// set last modified
+		if (_jthing.java() instanceof AThing) {
+			AThing ting = (AThing) _jthing.java();
+			ting.setLastModified(new Time());
+		}
 	}
 
 
@@ -509,23 +623,13 @@ public abstract class CrudServlet<T> implements IServlet {
 		String id = getId(state);
 		Log.d("crud."+status, "doUnPublish "+id+" by "+state.getUserId()+" "+state);
 		Utils.check4null(id); 
-		// load (if not loaded)
-		getThing(state);
-		if (jthing==null) {
-			jthing = getThingFromDB(state);
-		}
+		getThingStateOrDB(state);
 
 		ESPath draftPath = esRouter.getPath(dataspace,type, id, status);
 		ESPath publishPath = esRouter.getPath(dataspace,type, id, KStatus.PUBLISHED);
-
-		// set state to draft (NB: archived is now handled by an action=archive flag)
-//		KStatus status = state.get(AppUtils.STATUS, KStatus.DRAFT);
-		AppUtils.setStatus(jthing, status);
 		
-		AppUtils.doSaveEdit(draftPath, jthing, state);
-		Log.d("crud", "unpublish "+status+" doSave "+draftPath+" by "+state.getUserId()+" "+state+" "+jthing.string());
-
-		AppUtils.doDelete(publishPath);
+		AppUtils.doUnPublish(jthing, draftPath, publishPath, status);
+		
 		state.addMessage(id+" has been moved to "+status.toString().toLowerCase());
 		return jthing;
 	}
@@ -606,10 +710,19 @@ public abstract class CrudServlet<T> implements IServlet {
 			}
 		}
 		
+		// security filter
+		YouAgainClient yac = Dep.get(YouAgainClient.class);
+		List<AuthToken> tokens = yac.getAuthTokens(state);
+		hits2 = doList2_securityFilter(hits2, state, tokens, yac);
+		
 		// sanitise for privacy
-		for (ESHit<T> esHit : hits2) {
-			cleanse(esHit.getJThing(), state);
-		}		
+		for(int i=0; i<hits2.size(); i++) {
+			ESHit<T> h = hits2.get(i);
+			JThing<T> cleansed = cleanse(h.getJThing(), state);
+			if (cleansed==null) continue;
+			ESHit ch = new ESHit(cleansed);
+			hits2.set(i, ch);
+		}	
 		
 		// HACK: send back csv?
 		if (state.getResponseType() == KResponseType.csv) {
@@ -619,8 +732,12 @@ public abstract class CrudServlet<T> implements IServlet {
 		
 		// augment?
 		if (augmentFlag) {
-			for (ESHit<T> h : hits2) {
-				augment(h.getJThing(), state);
+			for(int i=0; i<hits2.size(); i++) {
+				ESHit<T> h = hits2.get(i);
+				JThing<T> aug = augment(h.getJThing(), state);
+				if (aug==null) continue;
+				ESHit ah = new ESHit(aug);
+				hits2.set(i, ah);
 			}
 		}
 		// put together the json response	
@@ -636,6 +753,99 @@ public abstract class CrudServlet<T> implements IServlet {
 		WebUtils2.sendJson(output, state);
 		return hits2;
 	}
+	
+	/**
+	 * Override to apply security filtering
+	 * @param hits2
+	 * @param state 
+	 * @param tokens 
+	 * @param yac 
+	 * @return
+	 */
+	protected List<ESHit<T>> doList2_securityFilter(List<ESHit<T>> hits2, WebRequest state, List<AuthToken> tokens, YouAgainClient yac) {
+		return hits2;
+	}
+
+
+	/**
+	 * Use this for "Team Good-Loop only" list security
+	 * @param hits2
+	 * @param state
+	 * @param tokens
+	 * @param yac
+	 * @return
+	 */
+	protected List<ESHit<T>> doList2_securityFilter2_teamGoodLoop(List<ESHit<T>> hits2, WebRequest state,
+				List<AuthToken> tokens, YouAgainClient yac) 
+	{
+		// HACK: are you a member of Team Good-Loop?
+		for (AuthToken authToken : tokens) {
+			String name = authToken.getXId().getName();
+			if ( ! WebUtils2.isValidEmail(name)) continue;
+			if (name.endsWith("@good-loop.com")) {
+				if ( ! authToken.isVerified()) {
+					// TODO verify
+					Log.w(LOGTAG(), "verify "+authToken);
+				}
+				// That will do for us for now
+				return hits2;
+			}
+			// hack: Alexander, Pete, Amanda, Emilia
+			if ("alexander.scurlock@gmail.com info@frankaccounting.co.uk amanda_shields@hotmail.co.uk em@kireli.studio".contains(name)) {
+				return hits2;
+			}
+		}
+		// TODO use YA shares to allow other emails through
+		// No - sod off
+		throw new WebEx.E401("This is for Team Good-Loop - Please ask for access");
+	}
+	
+
+	/**
+	 * Save text to file, and git (add)+commit+push.
+	 * E.g.
+	 * 
+<code><pre>
+	File fd = getGitFile(ad, KStatus.PUBLISHED);
+	if (fd != null) {
+		String json = prettyPrinter.toJson(ad);
+		doSave2_file_and_git(state, json, fd);
+	}
+	return _ad;
+</pre></code>
+	 * 
+	 * @param state
+	 * @param text
+	 * @param fd
+	 */
+	protected void doSave2_file_and_git(WebRequest state, String text, File fd) {
+		try {						
+			if (text==null) return; // paranoia
+			String old = fd.isFile()? FileUtils.read(fd) : "";
+			if (text.equals(old)) {
+				return;
+			}
+			Log.d(LOGTAG(), "doSave2_file_and_git "+fd);
+			FileUtils.write(fd, text);
+//			Git commit and push!
+			GitTask gt1 = new GitTask(GitTask.ADD, fd);
+			gt1.run();
+			Log.d(LOGTAG(), gt1.getOutput());
+			
+			GitTask gt2 = new GitTask(GitTask.COMMIT, fd);
+			gt2.setMessage(state.getUserId().name);
+			gt2.run();
+			Log.d(LOGTAG(), gt2.getOutput());
+			
+			GitTask gt3 = new GitTask(GitTask.PUSH, fd);
+			gt3.run();
+			Log.d(LOGTAG(), gt3.getOutput());
+			Log.d(LOGTAG(), "...doSave2_file_and_git "+fd+" done");
+		} catch(Throwable ex) {
+			state.addMessage(new AjaxMsg(KNoteType.warning, "Error while saving to Git", ex.getMessage()));
+		}
+	}
+
 	
 	/**
 	 * Run results through deserialisation to catch any bugs.
@@ -656,7 +866,7 @@ public abstract class CrudServlet<T> implements IServlet {
 				hits.add(h);
 			} catch(Throwable ex) {
 				// log, swallow, and carry on
-				Log.e("crud", new WrappedException("cause: "+h, ex));
+				Log.e("crud", "cause: "+h+" "+ex+" source: "+h.getSource()+" "+Printer.toString(ex, true));
 			}
 		}
 		return hits;		
@@ -665,12 +875,14 @@ public abstract class CrudServlet<T> implements IServlet {
 
 	/**
 	 * Called on outgoing json to add extra info IF augmentFlag is set. Override to do anything. 
-	 * @param jThing Modify this if you want
+	 * @param jThing Never null. Modify this if you want
 	 * @param state
+	 * @return modified JThing or null
 	 * @see #augmentFlag
 	 */
-	protected void augment(JThing<T> jThing, WebRequest state) {
+	protected JThing<T> augment(JThing<T> jThing, WebRequest state) {
 		// no-op by default
+		return null;
 	}
 
 
@@ -684,27 +896,33 @@ public abstract class CrudServlet<T> implements IServlet {
 	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, Period period, WebRequest stateOrNull) {
 		// copied from SoGive SearchServlet
 		// TODO refactor to use makeESFilterFromSearchQuery
-		SearchRequestBuilder s = new SearchRequestBuilder(es);
+		SearchRequest s = new SearchRequest(es);
 		/// which index? draft (which should include copies of published) by default
 		doList3_setIndex(status, s);
 		
 		// query
 		ESQueryBuilder qb = doList3_ESquery(q, prefix, period, stateOrNull);
 
-		if (qb!=null) s.setQuery(qb);
+		if (qb!=null) {
+			s.setQuery(qb);
+		}
 				
 		// Sort e.g. sort=date-desc for most recent first
-		if (sort!=null) {			
-			// HACK: order?
-			KSortOrder order = KSortOrder.asc;
-			if (sort.endsWith("-desc")) {
-				sort = sort.substring(0, sort.length()-5);
-				order = KSortOrder.desc;
-			} else if (sort.endsWith("-asc")) {
-				sort = sort.substring(0, sort.length()-4);
+		if (sort!=null) {
+			// split on comma to support hierarchical sorting, e.g. priority then date
+			String[] sorts = sort.split(",");
+			for (String sortBit : sorts) {
+				// split into field and up/down order
+				KSortOrder order = KSortOrder.asc;
+				if (sortBit.endsWith("-desc")) {
+					sortBit = sortBit.substring(0, sortBit.length()-5);
+					order = KSortOrder.desc;
+				} else if (sortBit.endsWith("-asc")) {
+					sortBit = sortBit.substring(0, sortBit.length()-4);
+				}				
+				Sort _sort = doList3_addSort(sortBit, order);
+				s.addSort(_sort);
 			}
-			Sort _sort = new Sort().setField(sort).setOrder(order);			
-			s.addSort(_sort);
 		}
 		
 		// TODO paging!
@@ -712,12 +930,30 @@ public abstract class CrudServlet<T> implements IServlet {
 		s.setDebug(true);
 
 		// Call the DB
-		SearchResponse sr = s.get();		
+		SearchResponse sr = s.get();
+		
+//		if (stateOrNull!=null && stateOrNull.debug) { TODO debug is quiet on the front end
+//			stateOrNull.addMessage(new AjaxMsg(KNoteType.debug, "ES", s.getCurl()));
+//		}
+		
 		return sr;
 	}
 
 
-	protected void doList3_setIndex(KStatus status, SearchRequestBuilder s) {
+	/**
+	 * Add a sort. You can override this to specify e.g. {"missing" : "_first"}
+	 * See https://www.elastic.co/guide/en/elasticsearch/reference/7.9/sort-search-results.html
+	 * @param sortBit
+	 * @param order
+	 * @return 
+	 */
+	protected Sort doList3_addSort(String sortBit, KSortOrder order) {
+		Sort _sort = new Sort().setField(sortBit).setOrder(order);			
+		return _sort;
+	}
+
+
+	protected void doList3_setIndex(KStatus status, SearchRequest s) {
 		switch(status) {
 		case ALL_BAR_TRASH:
 			s.setIndices(
@@ -745,6 +981,14 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 
+	/**
+	 * 
+	 * @param q
+	 * @param prefix
+	 * @param period
+	 * @param stateOrNull
+	 * @return can this be null?? best to guard against nulls 
+	 */
 	protected ESQueryBuilder doList3_ESquery(String q, String prefix, Period period, WebRequest stateOrNull) {
 		ESQueryBuilder qb = null;
 		// HACK no key:value in a prefix query
@@ -754,35 +998,14 @@ public abstract class CrudServlet<T> implements IServlet {
 			prefix = null;
 		}
 		if (prefix != null) {
-			// NB: not factored into its own method as it edits a few variables			
-			// Hack: convert punctuation into spaces, as ES would otherwise say query:"P&G" !~ name:"P&G"
-			String cprefix = StrUtils.toCanonical(prefix);
-			// Hack: Prefix should be one word. If 2 are sent -- turn it into a query + prefix
-			int spi = cprefix.lastIndexOf(' ');
-			if (spi != -1) {
-				assert cprefix.equals(cprefix.trim()) : "untrimmed?! "+cprefix;
-				String qbit = cprefix.substring(0, spi);
-				if (q==null) q = qbit;
-				else q = "("+q+") AND "+qbit;
-				cprefix = cprefix.substring(spi+1);
-			}
-			// prefix is on a field(s) -- we use name by default
-			BoolQueryBuilder prefixESQ = ESQueryBuilders.boolQuery();
-			for(String field : prefixFields) {
-				prefixESQ.should(ESQueryBuilders.prefixQuery(field, cprefix));
-			}
-			// also allow general search on the prefix word -- so that prefix is not more restrictive than q
-			ESQueryBuilder searchForPrefix = ESQueryBuilders.simpleQueryStringQuery(cprefix);
-			prefixESQ.should(searchForPrefix);
-			
-			prefixESQ.minimumNumberShouldMatch(1);
-			assert qb == null;
-			qb = prefixESQ;
+			BoolQueryBuilder esPrefix = doList4_ESquery_prefix(prefix);
+			assert qb==null;
+			qb = esPrefix;
 		} //./prefix
 		
 		if ( q != null) {
-			// convert "me" to specific IDs
-			if (Pattern.compile("\\bme\\b").matcher(q).find()) {
+			// convert "me" to specific IDs	FIXME but what about e.g. "me and my girl"?
+			if (Pattern.compile(":me\\b").matcher(q).find()) {
 				if (stateOrNull==null) {
 					throw new NullPointerException("`me` requires webstate to resolve who: "+q);
 				}
@@ -797,7 +1020,7 @@ public abstract class CrudServlet<T> implements IServlet {
 					mes.append("ANON OR " ); // fail - WTF? How come no logins?!
 				}
 				StrUtils.pop(mes, 4);
-				q = q.replaceAll("\\bme\\b", mes.toString());
+				q = q.replaceAll(":me\\b", ":"+mes.toString());
 			}
 			// TODO match on all?
 			// HACK strip out unset
@@ -830,6 +1053,45 @@ public abstract class CrudServlet<T> implements IServlet {
 		ESQueryBuilder exq = doList4_ESquery_custom(stateOrNull);
 		qb = ESQueryBuilders.must(qb, exq);
 		return qb;
+	}
+
+
+	private BoolQueryBuilder doList4_ESquery_prefix(String prefix) {
+		assert prefix != null;
+		assert ! prefix.contains(":");
+
+		BoolQueryBuilder orESQ = ESQueryBuilders.boolQuery();
+		orESQ.minimumNumberShouldMatch(1);
+		// straight search -- not sure if this is needed
+		BoolQueryBuilder esSearch = AppUtils.makeESFilterFromSearchQuery(new SearchQuery(prefix), null, null);
+		orESQ.should(esSearch);
+		
+		// Hack: convert punctuation into spaces, as ES would otherwise say query:"P&G" !~ name:"P&G"
+		String cprefix = StrUtils.toCanonical(prefix);
+		// But also try without that!
+		// NB: avoid a duplicate query
+		String[] ps = prefix.equals(cprefix)? new String[]{prefix} : new String[]{prefix, cprefix};
+		for(String _prefix : ps){				
+			BoolQueryBuilder prefixESQ = ESQueryBuilders.boolQuery();
+			// Hack: Prefix should be one word. If 2 are sent -- turn it into a query + prefix
+			int spi = _prefix.lastIndexOf(' ');
+			if (spi != -1) {
+				assert _prefix.equals(_prefix.trim()) : "untrimmed?! "+_prefix;
+				String qbit = _prefix.substring(0, spi);
+				BoolQueryBuilder esBitSearch = AppUtils.makeESFilterFromSearchQuery(new SearchQuery(qbit), null, null);
+				prefixESQ.must(esBitSearch); // this should be an AND really
+				_prefix = _prefix.substring(spi+1);
+			}
+			// prefix is on a field(s) -- we use name by default			
+			for(String field : prefixFields) {
+				prefixESQ.should(ESQueryBuilders.prefixQuery(field, _prefix));
+			}		
+			orESQ.should(prefixESQ);
+		}
+		
+		// either by search, or prefix, or canonical prefix			
+		orESQ.minimumNumberShouldMatch(1);
+		return orESQ;
 	}
 
 
@@ -905,11 +1167,12 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * This is (currently) only used with the _list endpoint!
 	 * TODO expand to get-by-id requests too -- but carefully, as there's more risk of breaking stuff.
 	 * 
-	 * @param hits
+	 * @param thing Best NOT to modify this directly. Make a copy.
 	 * @param state
-	 * @return hits
+	 * @return null if fine, or modified JThing if edits are wanted
 	 */
-	protected void cleanse(JThing<T> thing, WebRequest state) {
+	protected JThing<T> cleanse(JThing<T> thing, WebRequest state) {
+		return null;
 	}
 
 
@@ -980,6 +1243,17 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	protected void doSave(WebRequest state) {		
 		XId user = state.getUserId(); // TODO save who did the edit + audit trail
+		
+		String diff = state.get("diff");
+		if (diff!=null) {
+			// TODO Instead of applying the diff here, why not save the diff directly using an ES update? That would allow for multiple editors
+			Object jdiff = JSON.parse(diff);
+			List<Map> diffs = Containers.asList(jdiff);
+			JThing<T> oldThing = getThingFromDB(state);
+			applyDiff(oldThing, diffs);
+			jthing = oldThing; // NB: getThing(state) below will now return the diff-modified oldThing
+		}
+		
 		T thing = getThing(state);
 		assert thing != null : "null thing?! "+state;
 		
@@ -1001,6 +1275,29 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 	}
 	
+
+	/**
+	 * TODO refactor to use JsonPatch
+	 * @param room
+	 * @param diffs Each diff is {op:replace, path:/foo/bar, value:v}
+	 * TODO other ops 
+	 * @return
+	 */
+	void applyDiff(JThing<T> room, List<Map> diffs) {			
+		if (diffs.isEmpty()) {
+			return;
+		}
+		Map<String, Object> thingMap = new HashMap(room.map());
+		for (Map diff : diffs) {
+			String op = (String) diff.get("op"); // replace
+			String path = (String) diff.get("path");
+			Object value = diff.get("value");
+			// NB: drop the leading / on path
+			String[] bits = path.substring(1).split("/");
+			SimpleJson.set(thingMap, value, bits);
+		}
+		room.setMap(thingMap);
+	}
 
 	/**
 	 * Override to implement!
@@ -1027,7 +1324,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (json==null) {
 			return null;
 		}
-		jthing = new JThing(json).setType(type);
+		setJthing(new JThing(json).setType(type));
 		return jthing.java();
 	}
 

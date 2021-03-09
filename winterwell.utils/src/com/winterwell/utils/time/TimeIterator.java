@@ -72,7 +72,7 @@ public final class TimeIterator implements Iterable<Time> {
 		return Containers.getList(this);
 	}
 	
-	private class TIIt extends AbstractIterator<Time> {
+	private final class TIIt extends AbstractIterator<Time> {
 		private Calendar cal2;
 		public TIIt(Calendar cal2) {
 			this.cal2 = cal2;
@@ -86,6 +86,12 @@ public final class TimeIterator implements Iterable<Time> {
 			step.addTo(cal2);
 			return now;
 		}
+
+		@Override
+		public String toString() {
+			return "TIIt [cal2=" + cal2 + "]";
+		}
+		
 	}
 
 }

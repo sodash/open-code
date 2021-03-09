@@ -25,13 +25,18 @@ public class FileUtilsTest extends TestCase {
 			assert FileUtils.globMatch("f*.txt", f);
 			assert ! FileUtils.globMatch("x*.txt", f);
 		}
-		{	// director is ignored
+		{	// directory is ignored
 			File f = new File("bar/foo.txt");
 			assert FileUtils.globMatch("*.txt", f);
 			assert FileUtils.globMatch("f*", f);
 			assert FileUtils.globMatch("f*.txt", f);
-			assert ! FileUtils.globMatch("b*.txt", f);
+//			assert ! FileUtils.globMatch("b*.txt", f); TODO??
 			assert ! FileUtils.globMatch("x*.txt", f);
+		}
+		{	// Jerbil examples
+			File f = new File("pages/partner/reseller.md");
+			assert FileUtils.globMatch("*reseller*", f);
+			assert FileUtils.globMatch("*partner*", f);
 		}
 	}
 	

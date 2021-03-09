@@ -23,7 +23,7 @@ public final class Range implements Serializable, Comparable<Range> {
 	 * not need to be finite (but NaN is not allowed)
 	 */
 	public Range(double a, double b) {
-		assert !Double.isNaN(a) && !Double.isNaN(b) : a + ", " + b;
+		assert ! Double.isNaN(a) && ! Double.isNaN(b) : a + ", " + b;
 		if (a < b) {
 			low = a;
 			high = b;

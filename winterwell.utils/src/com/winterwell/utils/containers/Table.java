@@ -51,6 +51,10 @@ public class Table<C1, Row> implements Serializable, Iterable<Row> {
 	 */
 	final Map<C1, Integer> column1toRow = new HashMap();
 
+	public Map<C1, Integer> getColumn1toRow() {
+		return Collections.unmodifiableMap(column1toRow);
+	}
+	
 	final protected List<Row> rows = new ArrayList();
 
 	private Class<Row> rowClass;

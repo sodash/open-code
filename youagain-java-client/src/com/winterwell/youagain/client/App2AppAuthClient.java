@@ -2,7 +2,6 @@ package com.winterwell.youagain.client;
 
 import java.util.regex.Pattern;
 
-import com.winterwell.utils.Dep;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;

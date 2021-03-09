@@ -2,7 +2,6 @@ package com.winterwell.optimization.genetic;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -15,7 +14,6 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Range;
-import com.winterwell.utils.log.Log;
 
 /**
  * Use with {@link MutateMe} annotated classes.

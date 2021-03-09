@@ -21,13 +21,10 @@ public class UniformDistribution1D extends ADistribution1D implements
 
 	public UniformDistribution1D(Range range) {
 		this.range = range;
+		assert Double.isFinite(range.low) : range;
+		assert Double.isFinite(range.high) : range;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see winterwell.maths.stats.distributions.IDistribution1D#density(double)
-	 */
 	@Override
 	public double density(double x) {
 		return range.contains(x) ? 1 / range.size() : 0;
@@ -43,11 +40,6 @@ public class UniformDistribution1D extends ADistribution1D implements
 		return range.low + range.size() * totalWeight;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see winterwell.maths.stats.distributions.IDistribution1D#getMean()
-	 */
 	@Override
 	public double getMean() {
 		return (range.high + range.low) / 2;

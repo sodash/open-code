@@ -17,7 +17,6 @@ import com.winterwell.nlp.corpus.SimpleDocument;
 import com.winterwell.nlp.io.WordAndPunctuationTokeniser;
 import com.winterwell.utils.MathUtils;
 
-import gnu.trove.list.array.TIntArrayList;
 import no.uib.cipr.matrix.MatrixEntry;
 import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.Vector.Norm;

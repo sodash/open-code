@@ -90,5 +90,10 @@ public interface IDataLogStorage {
 
 	void saveEvents(Collection<DataLogEvent> values, Period period);
 
-	void registerEventType(Dataspace dataspace, String eventType);	
+//	void registerEventType(Dataspace dataspace, String eventType);
+
+	/**
+	 * NB: called after save - this is to do any storage-layer cleanup
+	 */
+	default void flush() {}	
 }

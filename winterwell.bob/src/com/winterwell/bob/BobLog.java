@@ -2,7 +2,6 @@ package com.winterwell.bob;
 
 import java.io.File;
 
-import com.winterwell.bob.tasks.GitBobProjectTask;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 

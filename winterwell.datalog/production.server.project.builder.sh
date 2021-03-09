@@ -2,8 +2,7 @@
 
 
 # Production Server -- Project Builder
-# VERSION=0.91
-# VERSION_MEANING=script has been written, but never used.
+# VERSION=0.94
 
 ## Warning - This is a bare-bones template file.
 ##     There are no functions written in here to
@@ -50,7 +49,7 @@ PROJECT_USES_WWAPPBASE_SYMLINK='no'
 #####
 PROJECT_ROOT_ON_SERVER="/home/winterwell/open-code/winterwell.datalog"
 WWAPPBASE_REPO_PATH_ON_SERVER_DISK="/home/winterwell/wwappbase.js"
-
+PROJECT_LOG_FILE="$PROJECT_ROOT_ON_SERVER/logs/datalog.log"
 
 ##### UNDENIABLY ESOTERIC SETTINGS
 ## This is the space where your project's settings make it completely non-standard
@@ -152,11 +151,11 @@ function check_java_home {
     fi
 }
 
-# Dependency Check Function - nodejs is at version 12.x - This Function's Version is 0.01
+# Dependency Check Function - nodejs is at version 14.x - This Function's Version is 0.02
 function check_nodejs_version {
     if [[ $PROJECT_USES_NPM = 'yes' ]]; then
-        if [[ $(node -v | grep "v12") = '' ]]; then
-            printf "Either nodejs is not installed, or it is not at version 12.x.x\n"
+        if [[ $(node -v | grep "v14") = '' ]]; then
+            printf "Either nodejs is not installed, or it is not at version 14.x.x\n"
             exit 0
         fi
     fi
@@ -183,10 +182,20 @@ function check_for_code_repo_in_bobwarehouse {
     fi
 }
 
-# Cleanup Git -- Ensure a clean and predictable git repo for building - This Function's Version is 0.01
+# Cleanup Git -- Ensure a clean and predictable git repo for building - This Function's Version is 1.01
 function cleanup_repo {
     printf "\nCleaning $HOSTNAME 's local repository...\n"
     git_hard_set_to_master $PROJECT_ROOT_ON_SERVER
+    # If this is a node relient project, kill any existing package-lock.json
+    if [[ $PROJECT_USES_NPM = 'yes' ]]; then
+        # using reverse logic.  if package-lock.json does NOT exist, do nothing.  If it DOES exist, delete it.
+        if [ ! -f $PROJECT_ROOT_ON_SERVER/package-lock.json ]; then
+            printf ""
+        else
+            printf "\nFound a package-lock.json file.  Auto-Removing .\n"
+            rm $PROJECT_ROOT_ON_SERVER/package-lock.json
+        fi
+    fi
 }
 
 # Cleanup wwappbase.js 's repo -- Ensure that this repository is up to date and clean - This Function's Version is 0.01
@@ -381,6 +390,35 @@ function get_branch_and_print_warning {
     esac
 }
 
+## Checking the immediate logged output for errors or warnings - This Function's Version is 0.02
+function catch_JVM_success_or_error {
+    if [[ $PROJECT_USES_BOB = 'yes' ]]; then
+        INITIAL_LOG_NUM_LINES=$(wc -l $PROJECT_LOG_FILE | awk '{print $1}')
+        while read -t 10 line; do
+            case "$line" in
+                *"AMain Running"* )
+                    printf "\n\t$PROJECT_NAME 's JVM reports a successful startup\n"
+                    exit
+                ;;
+                *"ES.init To reindex"* )
+                    printf "\n\t\e[30;41m$PROJECT_NAME reports that at least one ES index will need to be re-indexed and re-aliased\e[0m\n"
+                    printf "You'll need to read the logged output of the JVM in order to see what exactly needs to be changed\n"
+                    exit
+                ;;
+            esac
+        done < <(tail --lines=+$INITIAL_LOG_NUM_LINES -f $PROJECT_LOG_FILE)
+        RETVAL=$?
+        case $RETVAL in
+            0)
+                echo ""
+            ;;
+            *)
+                printf "The JVM was given 10 seconds to report either success or that an elasticsearch index requires a re-index and re-aliasing before it could start. No such indication was received and parsed.  Please check your service and the log file for this project\n"
+            ;;
+        esac
+    fi
+}
+
 
 
 ################
@@ -404,3 +442,4 @@ use_npm
 use_webpack
 use_jerbil
 start_service
+catch_JVM_success_or_error

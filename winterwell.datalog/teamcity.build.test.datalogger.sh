@@ -5,8 +5,8 @@
 # Versions of this script are usually run by TeamCity, in response to a git commit.
 # The script uses ssh remote commands to target a server -- it does not affect the local machine.
 # For testing, the script can also be run from your local computer.
-#Version 1.4.1
-# Latest Change -- Adding new dependency checks -- Attempting to create parity with production publisher template script
+#Version 1.4.8
+# Latest Change -- nodejs version checker now checks for version 14.x being present
 
 #####  GENERAL SETTINGS
 ## This section should be the most widely edited part of this script
@@ -21,6 +21,7 @@ PROJECT_USES_NPM='no' # yes or no
 PROJECT_USES_WEBPACK='no' #yes or no
 PROJECT_USES_JERBIL='no' #yes or no
 PROJECT_USES_WWAPPBASE_SYMLINK='no'
+BRANCH='master' # If changed -- you must also change the VCS settings for this project in teamcity
 
 # Where is the test server?
 TARGET_SERVERS=(baker.good-loop.com)
@@ -31,6 +32,7 @@ TARGET_SERVERS=(baker.good-loop.com)
 #####
 PROJECT_ROOT_ON_SERVER="/home/winterwell/$PROJECT_NAME/winterwell.datalog"
 WWAPPBASE_REPO_PATH_ON_SERVER_DISK="/home/winterwell/wwappbase.js"
+PROJECT_LOG_FILE="$PROJECT_ROOT_ON_SERVER/logs/$PROJECT_NAME.log"
 
 
 ##### UNDENIABLY ESOTERIC SETTINGS
@@ -63,10 +65,11 @@ function send_alert_email {
 }
 
 
-# Git Cleanup Function -- More of a classic 'I type this too much, it should be a function', Function.
+# Git Cleanup Function -- More of a classic 'I type this too much, it should be a function', Function. This Function's Version is 1.01
 function git_hard_set_to_master {
     ssh winterwell@$server "cd $1 && git gc --prune=now"
-    ssh winterwell@$server "cd $1 && git pull origin master"
+    ssh winterwell@$server "cd $1 && git checkout -f $BRANCH"
+    ssh winterwell@$server "cd $1 && git pull origin $BRANCH"
     ssh winterwell@$server "cd $1 && git reset --hard FETCH_HEAD"
 }
 
@@ -123,14 +126,14 @@ function check_maven_exists {
     fi
 }
 
-# Dependency Check Function - nodejs is at version 12.x - This Function's Version is 0.01
+# Dependency Check Function - nodejs is at version 14.x - This Function's Version is 0.02
 function check_nodejs_version {
     BUILD_PROCESS_NAME='verifying nodejs version'
-    BUILD_STEP='verifying that nodejs is at version 12.x.x'
+    BUILD_STEP='verifying that nodejs is at version 14.x.x'
     if [[ $PROJECT_USES_NPM = 'yes' ]]; then
         for server in ${TARGET_SERVERS[@]}; do
-            if [[ $(ssh winterwell@$server 'node -v | grep "v12"') = '' ]]; then
-                printf "Either nodejs is not installed, or it is not at version 12.x.x\n"
+            if [[ $(ssh winterwell@$server 'node -v | grep "v14"') = '' ]]; then
+                printf "Either nodejs is not installed, or it is not at version 14.x.x\n"
                 send_alert_email
                 exit 0
             fi
@@ -166,11 +169,23 @@ function check_for_code_repo_in_bobwarehouse {
     fi
 }
 
-# Cleanup Git -- Ensure a clean and predictable git repo for building - This Function's Version is 1.00
+# Cleanup Git -- Ensure a clean and predictable git repo for building - This Function's Version is 1.01
 function cleanup_repo {
     for server in ${TARGET_SERVERS[@]}; do
         printf "\nCleaning $server 's local repository...\n"
         git_hard_set_to_master $PROJECT_ROOT_ON_SERVER
+        # If this is a node relient project, kill any existing package-lock.json
+        if [[ $PROJECT_USES_NPM = 'yes' ]]; then
+            for server in ${TARGET_SERVERS[@]}; do
+                printf "\nGetting rid of any package-lock.json files\n"
+                # using reverse logic.  if package-lock.json does NOT exist, do nothing.  If it DOES exist, delete it.
+                if ssh winterwell@$server "[ ! -f $PROJECT_ROOT_ON_SERVER/package-lock.json ]"; then
+                    printf "\nno package-lock.json found.  No need to remove it.\n"
+                else
+                    ssh winterwell@$server "rm $PROJECT_ROOT_ON_SERVER/package-lock.json"
+                fi
+            done
+        fi
     done
 }
 
@@ -245,7 +260,7 @@ function use_bob {
     fi
 }
 
-# NPM -- Evaluate and Use - This Function's Version is 0.01
+# NPM -- Evaluate and Use - This Function's Version is 0.02
 function use_npm {
     if [[ $PROJECT_USES_NPM = 'yes' ]]; then
         BUILD_PROCESS_NAME='npm'
@@ -261,7 +276,7 @@ function use_npm {
             printf "\nEnsuring all NPM Packages are in place on $server ...\n"
             ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && npm i &> $NPM_I_LOGFILE"
             printf "\nChecking for errors while npm was attempting to get packages on $server ...\n"
-            if [[ $(ssh winterwell@$server "grep -i 'error' $NPM_I_LOGFILE") = '' ]]; then
+            if [[ $(ssh winterwell@$server "grep -i 'error ' $NPM_I_LOGFILE") = '' ]]; then
                 printf "\nNPM package installer check : No mention of 'error' in $NPM_I_LOGFILE on $server\n"
             else
                 printf "\nNPM encountered one or more errors while attempting to get node packages. Sending Alert Emails, but Continuing Operation\n"
@@ -287,7 +302,7 @@ function use_npm {
     fi
 }
 
-# Webpack -- Evaluate and Use - This Function's Version is 0.01
+# Webpack -- Evaluate and Use - This Function's Version is 0.02
 function use_webpack {
     if [[ $PROJECT_USES_WEBPACK = 'yes' ]]; then
         BUILD_PROCESS_NAME='webpack'
@@ -296,7 +311,7 @@ function use_webpack {
             printf "\nNPM is now running a Webpack process on $server\n"
             ssh winterwell@$server "cd $PROJECT_ROOT_ON_SERVER && npm run compile &> $NPM_RUN_COMPILE_LOGFILE"
             printf "\nChecking for errors that occurred during Webpacking process on $server ...\n"
-            if [[ $(ssh winterwell@$server "cat $NPM_RUN_COMPILE_LOGFILE | grep -i 'error' | grep -iv 'ErrorAlert.jsx'") = '' ]]; then
+            if [[ $(ssh winterwell@$server "cat $NPM_RUN_COMPILE_LOGFILE | grep -i 'error ' | grep -iv 'ErrorAlert.jsx'") = '' ]]; then
                 printf "\nNo Webpacking errors detected on $server\n"
             else
                 printf "\nOne or more errors were recorded during the webpacking process. Sending Alert Emails, but Continuing Operation\n"
@@ -336,7 +351,6 @@ function start_service {
     fi
 }
 
-
 ################
 ### Run the Functions in Order
 ################
@@ -356,3 +370,4 @@ use_npm
 use_webpack
 use_jerbil
 start_service
+

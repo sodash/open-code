@@ -1,11 +1,19 @@
 package com.winterwell.utils.time;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 public class TimeParserTest {
 
+	@Test
+	public void testParseExponentialFormatEpochTime() {
+		String st = "1.611854108e12";
+		TimeParser tp = new TimeParser();
+		Time t = tp.parseExperimental(st);
+//		System.out.println(t.toISOString());
+//		System.out.println(t.getTime());
+		assert t.toISOString().equals("2021-01-28T17:15:08Z");
+	}
+	
 	@Test
 	public void testParsePeriodEndOf() {
 		TimeParser tp = new TimeParser();
@@ -24,4 +32,12 @@ public class TimeParserTest {
 		}
 	}
 
+
+	@Test
+	public void testParseApr2020() {
+		TimeParser tp = new TimeParser();
+		Time t = tp.parseExperimental("Apr 2020", null);
+		assert t.getMonth() == 4;
+		assert t.toISOString().equals("") : t.toISOString();
+	}
 }

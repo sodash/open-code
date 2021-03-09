@@ -322,8 +322,20 @@ public class ReflectionUtils {
 		return null;
 	}
 
+	/**
+	 * 
+	
+	 * @param <X>
+	 * @param obj
+	 * @param fieldName
+	@return Field or null
+	 */
 	public static <X> X getPrivateField(Object obj, String fieldName) {
+		Utils.check4null(obj, fieldName);
 		Field f = ReflectionUtils.getField(obj.getClass(), fieldName);
+		if (f==null) {
+			return null;
+		}
 		f.setAccessible(true);
 		try {
 			return (X) f.get(obj);
@@ -962,6 +974,20 @@ public class ReflectionUtils {
 //				Printer.out(rs.nextElement());
 //			}
 //		}
+	}
+
+	/**
+	 * Like .isPrimitive() but covers String, Boolean, Number
+	 * @param obj null returns false
+	 * @return
+	 */
+	public static boolean isBasicType(Object obj) {
+		if (obj==null) {
+			return false;
+		}
+		// NB: if obj was primitive, it would be auto-boxed, so klass is never primitive here  
+		Class<? extends Object> klass = obj.getClass();		
+		return klass == String.class || klass==Boolean.class || isa(klass, Number.class);
 	}
 
 }
