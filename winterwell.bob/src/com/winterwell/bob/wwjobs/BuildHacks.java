@@ -75,7 +75,7 @@ public class BuildHacks {
 	}
 
 	private static final List<String> LOCAL_MACHINES = Arrays.asList(
-			"stross", "aardvark", "burgess", "kornbluth"
+			"stross", "aardvark", "burgess", "kornbluth", "butcher"
 			);
 	private static final List<String> TEST_MACHINES = Arrays.asList(
 			"hugh", "baker", "mail.soda.sh", "mail", "mail.sodash.net"
