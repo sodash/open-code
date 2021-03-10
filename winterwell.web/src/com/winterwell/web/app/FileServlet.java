@@ -59,7 +59,7 @@ public class FileServlet extends HttpServlet implements IServlet {
 				return;
 			}
 			// CORS? Assuming you've done security elsewhere
-			WebUtils2.CORS(state, true);
+			WebUtils2.CORS(state, true); // forceSet=true
 			in = new FileInputStream(file);
 			// Respond
 			String mime = WebUtils2.getMimeType(file);

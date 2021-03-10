@@ -1422,7 +1422,7 @@ public class WebUtils2 extends WebUtils {
 	 * even if we have no incoming Origin header ("*" will be used as a fallback).
 	 * Due to security restrictions this does NOT work for withCredentials (ie with cookies) requests!
 	 */
-	public static void CORS(WebRequest state, boolean forceSet) {
+	public static void CORS(WebRequest state, boolean forceSetIGNORED) {
 		if (state.getRequest()==null) { // huh?
 			return;
 		}
@@ -1454,24 +1454,24 @@ public class WebUtils2 extends WebUtils {
 			}
 		}
 		
-		// Force-set the ACAO header to *?
-		// when/where is this needed?? Logging added May 2020 to learn more
-		// Likely error: If we have a value Origin, we should probably stick with that.
-		// --possibly this is behind the Greek adomium.com bug seen 29th May 2020.
-		// (for now, I am making a safety-first hack ^DW)
-		if (forceSet && Utils.isBlank(state.getResponse().getHeader("Access-Control-Allow-Origin"))) {
-			if ( ! wc) {
-				// HACK fix for Greek campaign
-				if (origin!=null && origin.contains("platform.adomium.com")) {
-					Log.d("cors", "HACK override of forceSet! Leaving ACAO as Origin "+origin+" for "+state.getRequestUrl());
-				} else if (hasOrigin) {
-					Log.d("cors", "override of forceSet! Leaving ACAO as Origin "+origin+" for "+state.getRequestUrl());
-				} else {
-					Log.d("cors", "forceSet! Altering ACAO from Origin "+origin+" to * for "+state.getRequestUrl());
-					originOut = "*"; // Do we need this??
-				}
-			}
-		}
+//		// Force-set the ACAO header to *?
+//		// when/where is this needed?? Logging added May 2020 to learn more
+//		// Likely error: If we have a value Origin, we should probably stick with that.
+//		// --possibly this is behind the Greek adomium.com bug seen 29th May 2020.
+//		// (for now, I am making a safety-first hack ^DW)
+//		if (forceSet && Utils.isBlank(state.getResponse().getHeader("Access-Control-Allow-Origin"))) {
+//			if ( ! wc) {
+//				// HACK fix for Greek campaign
+//				if (origin!=null && origin.contains("platform.adomium.com")) {
+//					Log.d("cors", "HACK override of forceSet! Leaving ACAO as Origin "+origin+" for "+state.getRequestUrl());
+//				} else if (hasOrigin) {
+//					Log.d("cors", "override of forceSet! Leaving ACAO as Origin "+origin+" for "+state.getRequestUrl());
+//				} else {
+//					Log.d("cors", "forceSet! Altering ACAO from Origin "+origin+" to * for "+state.getRequestUrl());
+//					originOut = "*"; // Do we need this??
+//				}
+//			}
+//		}
 		
 		// see http://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i		
 		// See also Error seen by us:
