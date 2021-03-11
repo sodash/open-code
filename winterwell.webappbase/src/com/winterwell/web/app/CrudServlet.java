@@ -734,7 +734,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		if (augmentFlag) {
 			for(int i=0; i<hits2.size(); i++) {
 				ESHit<T> h = hits2.get(i);
-				JThing<T> aug = augment(h.getJThing(), state);
+				JThing<T> aug = augmentListItem(h.getJThing(), state);
 				if (aug==null) continue;
 				ESHit ah = new ESHit(aug);
 				hits2.set(i, ah);
@@ -885,6 +885,17 @@ public abstract class CrudServlet<T> implements IServlet {
 		return null;
 	}
 
+	/**
+	 * Called on outgoing json to add extra info IF augmentFlag is set. Override to do anything. 
+	 * @param jThing Never null. Modify this if you want
+	 * @param state
+	 * @return modified JThing or null (null => no-change)
+	 * @see #augmentFlag
+	 */
+	protected JThing<T> augmentListItem(JThing<T> jThing, WebRequest state) {
+		// no-op by default
+		return null;
+	}
 
 	/**
 	 * Do the search! 
