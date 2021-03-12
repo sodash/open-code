@@ -1146,5 +1146,18 @@ public class AppUtils {
 	}
 
 
+	public static String maybeLocalTestUrl(String url, KServerType st) {
+		if (st==null || st==KServerType.PRODUCTION) {
+			return url;
+		}
+		if (st==KServerType.LOCAL) {
+			url = url.replace("s://", "://local");
+		} else if (st==KServerType.TEST) {
+			url = url.replace("://", "://test");
+		}
+		return url;
+	}
+
+
 	
 }
