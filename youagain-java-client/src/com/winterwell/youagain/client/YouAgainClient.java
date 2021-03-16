@@ -550,17 +550,6 @@ public final class YouAgainClient {
 		this.debug = b;
 	}
 
-	/**
-	 * @deprecated Only called by YA server's LoginPlugin
-	 * @param state
-	 * @param authToken
-	 */
-	public void addAuthToken(WebRequest state, AuthToken authToken) {
-		List<AuthToken> auths = getAuthTokens(state);
-		auths.remove(authToken);
-		auths.add(authToken);
-		state.put(AUTHS, auths);
-	}
 
 	public AuthToken login(XId xid, String password) {
 		return login(xid.toString(), password);

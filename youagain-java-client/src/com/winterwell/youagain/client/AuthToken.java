@@ -111,7 +111,7 @@ public class AuthToken implements IHasXId, IProperties {
 	transient boolean verified;
 	
 	/**
-	 * Has this been (locally) verified by decoding it? 
+	 * Has this been (locally, transient) verified by decoding it? 
 	 * @return true means it should be OK. false -- maybe verify?
 	 */
 	public boolean isVerified() {
@@ -194,6 +194,10 @@ public class AuthToken implements IHasXId, IProperties {
 			return true;
 		}
 		return false;
+	}
+
+	public void setVerified(boolean verified) {
+		this.verified = verified;
 	}
 	
 }
