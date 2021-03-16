@@ -675,6 +675,8 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 
 	/**
+	 * Note: status defaults to DRAFT! This is on the assumption you want a list for editing.
+	 * ??should we switch to PUB_OR_DRAFT instead??
 	 * 
 	 * @param state
 	 * @return for debug purposes! The results are sent back in state
