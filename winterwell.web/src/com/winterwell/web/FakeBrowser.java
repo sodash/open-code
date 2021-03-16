@@ -1026,6 +1026,7 @@ public class FakeBrowser {
 	}
 
 	/**
+	 * Sets `-H Authorization: Bearer {token}` 
 	 * @param token
 	 * See https://en.wikipedia.org/wiki/JSON_Web_Token#Use
 	 * @return 

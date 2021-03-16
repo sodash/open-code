@@ -547,7 +547,7 @@ public class WebUtils {
 	}
 
 	/**
-	 * Open a URI in a system web browser.
+	 *  Open a URI in a system web browser.
 	 *
 	 * If {@link GuiUtils#isInteractive()} is false, this will return
 	 * immediately.
@@ -555,26 +555,34 @@ public class WebUtils {
 	 * WARNING (on Ubuntu), this leads to a daemon thread that can prevent
 	 * programs terminating until the browser closes!
 	 */
-	public static void display(URI uri) {
+	public static void browseOnDesktop(String url) {
 		if ( ! GuiUtils.isInteractive())
 			return;
 		try {
 			Desktop d = Desktop.getDesktop();
+			java.net.URI uri = URI(url);
 			d.browse(uri);
 		} catch (UnsupportedOperationException ex) {
 			// KDE isn't supported :(
 			if (Utils.getOperatingSystem().contains("linux")
 					|| Utils.getOperatingSystem().contains("unix")) {
-				Proc p = new Proc("xdg-open " + uri);
-				p.run();
+				Proc p = new Proc("xdg-open " + url);
+				p.start();
 			} else {
 				// try for Firefox!
-				Proc p = new Proc("firefox " + uri);
-				p.run();
+				Proc p = new Proc("firefox " + url);
+				p.start();
 			}
 		} catch (IOException e) {
 			throw new WrappedException(e);
 		}
+	}
+
+	/**
+	Convenience for {@link #browseOnDesktop(String)}
+	 */
+	public static void display(URI uri) {
+		browseOnDesktop(uri.toString());
 	}
 
 	/**

@@ -225,7 +225,8 @@ public class TimeUtils {
 	/**
 	 * 
 	 * @param time
-	 * @return midnight at the month / next-month boundary
+	 * @return midnight at the month / next-month boundary. 
+	 * If you display this as a date -- it will be the 1st of the new month!
 	 */
 	public static Time getEndOfMonth(Time time) {
 		GregorianCalendar cal = time.getCalendar();

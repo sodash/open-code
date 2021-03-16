@@ -49,7 +49,7 @@ public class Logins {
 	}	
 
 	/**
-	 * 
+	 * @deprecated Use {@link #getLoginFile(String, String)}
 	 * @param appName
 	 * @param filename
 	 * @return null if doesn't exist
@@ -59,6 +59,20 @@ public class Logins {
 		if (f.isFile()) return f;
 		Log.i(LOGTAG, "No credentials file: "+f);
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @param appName
+	 * @param filename
+	 * @return never null - might not exist
+	 */
+	public static File getLoginFile(String appName, String filename) {
+		File f = new File(loginsDir, appName+"/"+filename);
+		if ( ! f.isFile()) {
+			Log.i(LOGTAG, "No credentials file: "+f);
+		}
+		return f;
 	}
 	
 	@Option

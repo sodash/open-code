@@ -33,6 +33,7 @@ public class MasterServlet extends HttpServlet {
 	private boolean debug = true;
 
 	private Map<String,Class> classForPrefix = new HashMap();
+	private Map<String,IServlet> singletonForPrefix = new HashMap();
 
 	private FileServlet fileServlet;
 
@@ -49,14 +50,20 @@ public class MasterServlet extends HttpServlet {
 		doPost(req, resp);
 	}
 
-	private IServlet newServlet(String servletName) throws Exception {
+	private IServlet getMakeServlet(String servletName) throws Exception {
 		Class klass = classForPrefix.get(servletName);
-		if (klass==null) {
-			if (fileServlet!=null) return fileServlet;
-			throw new WebEx.E404(null, "No such servlet: "+servletName);
+		if (klass!=null) {
+			IServlet s = (IServlet) klass.newInstance();
+			return s;
 		}
-		IServlet s = (IServlet) klass.newInstance();
-		return s;
+		IServlet s = singletonForPrefix.get(servletName);
+		if (s != null) {
+			return s;
+		}
+		if (fileServlet!=null) {
+			return fileServlet;
+		}
+		throw new WebEx.E404(null, "No such servlet: "+servletName);
 	}
 
 	protected String servletNameFromPath(String path) {
@@ -81,7 +88,7 @@ public class MasterServlet extends HttpServlet {
 			String servletName = servletNameFromPath(path);		
 			Thread.currentThread().setName("servlet: "+servletName);
 			// make a servlet
-			IServlet s = newServlet(servletName);					
+			IServlet s = getMakeServlet(servletName);					
 			if (debug) {
 				Log.d(servletName, state);
 			}
@@ -122,6 +129,30 @@ public class MasterServlet extends HttpServlet {
 		assert ! path.contains("/") : path;
 		
 		classForPrefix.put(path, klass);
+	}
+	
+	/**
+	 * 
+	 * @param path e.g. "foo" or "/foo" or "/foo/*" 
+	 * 	Leading / and trailing /* are handled as equivalent
+	 * @param klass
+	 */
+	public void addServlet(String path, IServlet singletonServlet) {
+		Utils.check4null(path, singletonServlet);
+		// / * is an annoyingly fiddly part of the standard J2EE -- lets make it irrelevant
+		if (path.endsWith("*")) {
+			path = path.substring(0, path.length()-1);
+		} 
+		if (path.endsWith("/")) {
+			path = path.substring(0, path.length()-1);
+		}
+		// chop leading /
+		if (path.startsWith("/")) {
+			path = path.substring(1, path.length());
+		}
+		assert ! path.contains("/") : path;
+		
+		singletonForPrefix.put(path, singletonServlet);
 	}
 
 	@Override
