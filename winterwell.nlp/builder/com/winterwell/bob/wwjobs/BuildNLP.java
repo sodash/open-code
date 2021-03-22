@@ -19,6 +19,7 @@ public class BuildNLP extends BuildWinterwellProject {
 	public BuildNLP() {
 		super("winterwell.nlp");
 		incSrc = false;
+		setVersion("1.0.0"); // 22 Mar 2021
 	}
 
 	@Override
