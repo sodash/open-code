@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -58,8 +60,8 @@ import com.winterwell.web.fields.XIdField;
  */
 public final class YouAgainClient {
 
-	public String getApp() {
-		return app;
+	public String getIssuer() {
+		return iss;
 	}
 	
 	public static XId xidFromEmail(String email) {
@@ -83,7 +85,7 @@ public final class YouAgainClient {
 		fb.setDebug(debug);
 		String endpoint_AUTH = yac.endpoint.replace("youagain.json", "auth.json");
 		String response = fb.getPage(endpoint_AUTH, new ArrayMap(
-				"app", app,
+				"app", iss,
 				"txid", txid));
 		JSend jsend = JSend.parse(response);
 		if ( ! jsend.isSuccess()) {
@@ -106,26 +108,41 @@ public final class YouAgainClient {
 	public static final String MASTERAPP = "youagain";
 	
 	/**
-	 * What app are you using? e.g. "sogive" or "profiler".
+	 * What app are you using? e.g. "sogive" or "good-loop".
 	 * Each app has its own namespace for auth data.
 	 */
-	final String app;
+	final String iss;
 
 	private boolean debug;
 
 	YouAgainClientConfig yac;
 	private boolean initFlag;
+
+	/**
+	 * not used yet - distinguish between parts of a broader platform
+	 */
+	private String product;
 	
 	/**
 	 * 
+	 * @param issuer e.g. `good-loop`
+	 * @param iss e.g. `profiler.good-loop.com` -- not an XId
+	 */
+	public YouAgainClient(String issuer, String product) {
+		assert ! Utils.isBlank(issuer);
+		assert ! issuer.endsWith("@app") : "This should not be an xid "+issuer;
+		this.iss = issuer;
+		this.product = product;
+		init();
+		setDebug(true); // FIXME
+	}
+	
+	/**
+	 * @deprecated
 	 * @param app e.g. `profiler.good-loop.com` -- not an XId
 	 */
 	public YouAgainClient(String app) {
-		assert ! Utils.isBlank(app);
-		assert ! app.endsWith("@app") : "not an xid "+app;
-		this.app = app;
-		init();
-		setDebug(true); // FIXME
+		this(app, app);
 	}	
 	
 	/**
@@ -157,7 +174,7 @@ public final class YouAgainClient {
 	
 	@Override
 	public String toString() {
-		return "YouAgainClient [app=" + app + "]";
+		return "YouAgainClient [app=" + iss + "]";
 	}
 	
 	/**
@@ -244,12 +261,16 @@ public final class YouAgainClient {
 	}
 
 	private AuthToken verifyNamePassword(String email, String password) {
+		if (verifyOff) {
+			AuthToken at = new AuthToken(new ArrayMap("xid", email+"@email"));
+			return at;
+		}
 		Utils.check4null(email, password);
 		FakeBrowser fb = new FakeBrowser();
 		fb.setDebug(debug);
 		fb.setAuthentication(email, password);
 		String response = fb.getPage(yac.endpoint, new ArrayMap(
-				"app", app, 
+				"app", iss, 
 				"action", "login" 
 				));		
 		Map user = userFromResponse(response);
@@ -257,6 +278,12 @@ public final class YouAgainClient {
 		return at;
 	}
 
+	/**
+	 * Only for testing
+	 */
+	@Deprecated
+	private boolean verifyOff;	
+	
 	/**
 	 * 
 	 * @param jwt
@@ -273,6 +300,10 @@ public final class YouAgainClient {
 				// HACK include temp tokens!
 				if (isTempId(jt)) {
 					token.xid = new XId(jt, false);
+					list.add(token);
+					continue;
+				}
+				if (verifyOff) {
 					list.add(token);
 					continue;
 				}
@@ -310,7 +341,7 @@ public final class YouAgainClient {
 	
 	public JWTDecoder getDecoder() throws Exception {
 		if (dec!=null) return dec;		
-		dec = new JWTDecoder(app);
+		dec = new JWTDecoder(iss);
 		if (yaPubKey==null) {
 			String publickeyendpoint = yac.endpoint.replace("youagain.json", "publickey");
 			// load from the server, so we could change keys			
@@ -329,23 +360,25 @@ public final class YouAgainClient {
 	 * @return
 	 */
 	public List<String> getAllJWTTokens(WebRequest state) {		
-
 		Collection<String> all = new ArrayList();		
-		// Auth header
-		String authHeader = state.getRequest().getHeader("Authorization");
-		if (authHeader!=null) {
-			authHeader = authHeader.trim();
-			// split on comma (c.f. https://stackoverflow.com/questions/29282578/multiple-http-authorization-headers)
-			String[] authHeaders = authHeader.split(", ");
-			for (String ah : authHeaders) {
-				if (ah.startsWith("Bearer")) {
-					String jwt = ah.substring("Bearer".length(), ah.length()).trim();
-					if (state.debug) Log.d(LOGTAG, "JWT from auth-header Bearer: "+jwt);
-					all.add(jwt);
-				}				
+		// Auth header(s)-- multiple should be by comma, could be by multiple headers
+		Enumeration<String> authHeaders = state.getRequest().getHeaders("Authorization");
+		if (authHeaders!=null) {
+			List<String> _authHeaders = Containers.asList(authHeaders);
+			for (String authheader : _authHeaders) {
+				authheader = authheader.trim();
+				// split on comma (c.f. https://stackoverflow.com/questions/29282578/multiple-http-authorization-headers)
+				String[] authHeaders2 = authheader.split(", ");
+				for (String ah : authHeaders2) {
+					if (ah.startsWith("Bearer")) {
+						String jwt = ah.substring("Bearer".length(), ah.length()).trim();
+						if (state.debug) Log.d(LOGTAG, "JWT from auth-header Bearer: "+jwt);
+						all.add(jwt);
+					}				
+				}
 			}
 		}		
-		// NB: This isnt standard, this is our naming rule 
+		// NB: This isnt standard, this is our naming rule  blah.jwt
 		Pattern KEY = Pattern.compile("^([a-zA-Z0-9\\-_]+\\.)?jwt");
 		// cookies
 		Map<String, String> cookies = WebUtils2.getCookies(state.getRequest());
@@ -355,7 +388,7 @@ public final class YouAgainClient {
 			if (state.debug) Log.d(LOGTAG, "JWT from cookie "+c+": "+jwt);
 			all.add(jwt);
 		}				
-		// and parameters
+		// and parameters which match blah.jwt
 		Map<String, Object> pmap = state.getParameterMap();
 		for(String c : pmap.keySet()) {
 			if ( ! KEY.matcher(c).find()) continue;		
@@ -404,7 +437,7 @@ public final class YouAgainClient {
 			Utils.check4null(usernameUsuallyAnEmail, password);
 			FakeBrowser fb = new FakeBrowser();
 			String response = fb.getPage(yac.endpoint, new ArrayMap(
-					"app", app,
+					"app", iss,
 					"action", "login",
 					"person", usernameUsuallyAnEmail,
 					"password", password));
@@ -428,7 +461,7 @@ public final class YouAgainClient {
 		fb.setDebug(true); // TODO remove
 		
 		String response = fb.getPage(yac.endpoint, new ArrayMap(
-				"app", app,
+				"app", iss,
 				"action", "signup",
 				"person", usernameUsuallyAnEmail,
 				"password", password));
@@ -445,7 +478,7 @@ public final class YouAgainClient {
 		fb.setDebug(true);
 		Log.d(LOGTAG, "Deleting "+user+" auth: "+at+"...");
 		String response = fb.getPage(yac.endpoint, new ArrayMap(
-				"app", app,
+				"app", iss,
 				"action", "delete",
 				"person", user.toString())
 				);
@@ -505,43 +538,6 @@ public final class YouAgainClient {
 		return uxid;
 	}
 	
-	/**
-	 * 
-	 * @param authToken TODO manage this better
-	 * @return
-	 */
-	public List<String> getSharedWith(String authToken) {
-		FakeBrowser fb = new FakeBrowser();
-		fb.setAuthenticationByJWT(authToken);
-		String response = fb.getPage(yac.endpoint, new ArrayMap(
-				"app", app,
-				"action", "shared-with"));
-		
-		Map jobj = (Map) JSON.parse(response);
-		Object shares = SimpleJson.get(jobj, "cargo");
-		if (shares instanceof Object[]) {
-			return Arrays.stream((Object[]) shares).map(share -> (String) SimpleJson.get(share, "item")).collect(Collectors.toList());
-		}
-		return Collections.emptyList();
-	}
-	
-	/** List the users a particular entity is shared to */
-	public List<String> getShareList(String share) {
-		FakeBrowser fb = new FakeBrowser();
-//		 fb.setAuthenticationByJWT(authToken); // TODO Needed for this?
-		String response = fb.getPage(yac.endpoint, new ArrayMap(
-			"app", app,
-			"action", "share-list",
-			"entity", share));
-
-		Map jobj = (Map) JSON.parse(response);
-		Object shares = SimpleJson.get(jobj, "cargo");
-		if (shares instanceof Object[]) {
-			return Arrays.stream((Object[]) shares).map(s -> (String) SimpleJson.get(s, "_to")).collect(Collectors.toList());
-		}
-		return null;
-	}
-	
 	public ShareClient sharing () {
 		return new ShareClient(this);
 	}
@@ -588,6 +584,15 @@ public final class YouAgainClient {
 
 	public App2AppAuthClient appAuth() {
 		return new App2AppAuthClient(this);
+	}
+
+	public List<String> getRoles(List<AuthToken> auths) {
+		List<String> shares = sharing().getSharedWith(auths, "role:");		
+		List<String> roles = Containers.filterNulls(
+				Containers.apply(shares, s -> s.startsWith("role:")? s.substring(5) : null)
+				);
+		roles = new ArrayList(new HashSet(roles)); // de dupe		
+		return roles;
 	}
 
 }

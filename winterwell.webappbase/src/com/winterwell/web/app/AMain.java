@@ -297,8 +297,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 
 	/**
-	 * Not called by base class! Call in your apps overide, AFTER 
-	 * {@link #init3_youAgain()}
+	 * Not called by base class! Call in your apps overide, AFTER init3_youAgain()
 	 * 
 	 * Dep.set AuthToken, if we have login info
 	 * @param config2
@@ -362,7 +361,11 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 			return; // Dep.get(YouAgainClient.class);
 		}
 		// app=datalog for login
-		YouAgainClient yac = new YouAgainClient(getAppNameLocal());
+		String app = getAppNameLocal();
+		// HACK
+		String issuer = "good-loop"; // Have all of GL under one login??
+		if (app.contains("sogive")) issuer = app;
+		YouAgainClient yac = new YouAgainClient(issuer, app);
 		Dep.set(YouAgainClient.class, yac);				
 	}
 

@@ -1,11 +1,20 @@
 package com.winterwell.youagain.client;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.eclipse.jetty.util.ajax.JSON;
 
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.log.Log;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.web.FakeBrowser;
+import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JSend;
 import com.winterwell.web.ajax.JThing;
 import com.winterwell.web.data.XId;
@@ -24,6 +33,58 @@ public final class ShareClient {
 
 	/**
 	 * 
+	 * @param authToken TODO manage this better
+	 * @param prefix Optional
+	 * @return
+	 */
+	public List<String> getSharedWith(AuthToken at, String prefix) {
+		return getSharedWith(Collections.singletonList(at), prefix);
+	}
+	
+	public List<String> getSharedWith(List<AuthToken> auths, String prefix) {		
+		try {
+			FakeBrowser fb = new FakeBrowser();
+			List<String> jwts = Containers.apply(auths, AuthToken::getToken);
+			fb.setAuthenticationByJWTs(jwts);
+			fb.setDebug(true);
+			String response = fb.getPage(yac.yac.endpoint, new ArrayMap(
+					"app", yac.iss,
+					"action", "shared-with",
+					"prefix", prefix));
+			
+			Map jobj = (Map) JSON.parse(response);
+			Object shares = SimpleJson.get(jobj, "cargo");
+			if (shares instanceof Object[]) {
+				return Arrays.stream((Object[]) shares).map(share -> (String) SimpleJson.get(share, "item")).collect(Collectors.toList());
+			}
+		} catch (WebEx.E401 e401) {
+			Log.d("ShareClient.getSharedWith", e401);
+			return Collections.emptyList();	
+		}
+		return Collections.emptyList();
+	}
+	
+	/** List the users a particular entity is shared to */
+	public List<ShareToken> getShareList(CharSequence share) {
+		FakeBrowser fb = new FakeBrowser();
+//		 fb.setAuthenticationByJWT(authToken); // TODO Needed for this?
+		String response = fb.getPage(yac.yac.endpoint, new ArrayMap(
+			"app", yac.iss,
+			"action", "share-list",
+			"entity", share.toString()
+			));
+
+		JSend.parse(response).getData();
+		Map jobj = (Map) JSON.parse(response);
+		Object shares = SimpleJson.get(jobj, "cargo");
+		if (shares==null) return null;
+		List<Map> lshares = Containers.asList(shares);
+		List<ShareToken> sts = Containers.apply(lshares, sm -> new ShareToken((Map)sm));
+		return sts;
+	}
+	
+	/**
+	 * 
 	 * @param authToken Who authorises this share?
 	 * @param item ID of the thing being shared.
 	 * @param targetUser Who is it shared with?
@@ -34,7 +95,7 @@ public final class ShareClient {
 		fb.setAuthenticationByJWT(authToken.getToken());
 		Map<String, String> shareAction = new ArrayMap(
 			"action", ACTION_SHARE,
-			"app", yac.app,
+			"app", yac.iss,
 			"shareWith", targetUser,
 			"entity", item
 		);
@@ -55,7 +116,7 @@ public final class ShareClient {
 		fb.setAuthenticationByJWT(authToken.getToken());
 		Map<String, String> shareAction = new ArrayMap(
 			"action", ACTION_DELETE_SHARE,
-			"app", yac.app,
+			"app", yac.iss,
 			"shareWith", targetUser,
 			"entity", item
 		);
@@ -78,6 +139,16 @@ public final class ShareClient {
 			}
 		}
 		return false;
+	}
+
+	public List<ShareToken> getShareStatus(ShareTarget share, List<AuthToken> auths) {
+		if (auths.isEmpty()) {
+			return Collections.EMPTY_LIST;
+		}
+		List<ShareToken> list = getShareList(share);
+		List<XId> myXIds = Containers.apply(auths, AuthToken::getXId);
+		List<ShareToken> myShares = Containers.filter(list, st -> ! Collections.disjoint(st.getTo(), myXIds));
+		return myShares;
 	}
 	
 }

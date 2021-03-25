@@ -8,9 +8,12 @@ import java.util.regex.Pattern;
 import com.auth0.jwt.impl.PublicClaims;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.Containers;
+import com.winterwell.utils.containers.ObjectMap;
 import com.winterwell.utils.web.IHasJson;
 import com.winterwell.web.data.XId;
 
@@ -80,6 +83,21 @@ public class ShareToken implements IHasJson {
 	
 	@Deprecated // for deserialisation
 	public ShareToken() {	
+	}
+	
+	ShareToken(Map jobj) {
+		// NB: avoiding gson dependency here in YAC
+		_to = Containers.asList(jobj.get("_to"));
+		app = (String) jobj.get("app");
+		by = (String) jobj.get("by");
+		String _item = (String) jobj.get("item");
+		setItem(_item);
+		read = Utils.yes(jobj.get("read"));
+		Object s = jobj.get("status");
+		if (s instanceof Number) status = ((Number) s).intValue();
+		else if (s instanceof String) status = Integer.valueOf((String) s);
+		token = (String) jobj.get("token");
+		write = Utils.yes(jobj.get("write"));
 	}
 	
 	public ShareToken(String app, XId userId, String entity, XId shareWith) {
@@ -152,6 +170,9 @@ public class ShareToken implements IHasJson {
 	 */
 	List<String> _to;
 	
+	/**
+	 * ??
+	 */
 	Integer status;
 	
 	boolean read = true;

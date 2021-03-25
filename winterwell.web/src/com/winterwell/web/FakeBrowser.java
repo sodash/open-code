@@ -1040,6 +1040,22 @@ public class FakeBrowser {
 		this.retryOnError = retries;
 	}
 
+	/**
+	 * Sets `-H Authorization: Bearer {token1},Bearer {token2}` 
+	 * @param token
+	 * See https://en.wikipedia.org/wiki/JSON_Web_Token#Use
+	 * @return 
+	 */
+	public FakeBrowser setAuthenticationByJWTs(List<String> jwts) {
+		if (jwts==null || jwts.isEmpty()) {
+			Log.d(LOGTAG, "setAuthenticationByJWTs - no jwts provided");
+			return this;
+		}
+		String multiple = "Bearer "+StrUtils.join(jwts, ",Bearer ");
+		setRequestHeader("Authorization", multiple);
+		return this;
+	}
+
 	
 }
 
