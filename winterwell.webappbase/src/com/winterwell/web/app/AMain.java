@@ -372,11 +372,16 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * @param args
 	 * @return
 	 */
-	protected ConfigType init2_config(String[] args) {
+	protected ConfigType init2_config(String[] args) {		
 		Class ct = configType;
 		if (ct==null) {
 			ct = BasicSiteConfig.class;
 			Log.w(getAppNameLocal(), "No ConfigType given - using "+ct.getSimpleName());
+		}
+		// HACK for embedded testing -- check Dep
+		if (Dep.has(ct)) {
+			Log.w(getAppNameLocal(), "init2_config() Using preset config");
+			return (ConfigType) Dep.get(ct);
 		}
 		// make it
 		ConfigFactory cf = ConfigFactory.get();
