@@ -976,29 +976,7 @@ public class AppUtils {
 				filter = filter.mustNot(setFilter);
 				continue; // NB no "just one?" streamlining for mustNot
 			}
-			ESQueryBuilder kvFilter;
-			// HACK due:before:
-			if (val instanceof Map) {
-				// HACK before/after?
-				assert ((Map) val).size() == 1 : val;
-				Map.Entry<String, String> kv = (Entry<String, String>) Containers.first(((Map) val).entrySet());
-				String val2 = kv.getValue();
-				switch(kv.getKey()) {
-				case "before":					
-					Time end = TimeUtils.parseExperimental(val2);
-					kvFilter = ESQueryBuilders.dateRangeQuery(prop, null, end);
-					break;
-				case "after":
-					Time start = TimeUtils.parseExperimental(val2);
-					kvFilter = ESQueryBuilders.dateRangeQuery(prop, start, null);
-					break;
-				default:
-					throw new TodoException(clause);
-				}
-			} else {
-				// normal key=value case
-				kvFilter = ESQueryBuilders.termQuery(prop, val);
-			}
+			ESQueryBuilder kvFilter = parseTreeToQuery3_keyVal2(prop, val);
 			// just one?
 			if (clause.size() == 1) {
 				return kvFilter; // no extra wrapping
@@ -1007,6 +985,34 @@ public class AppUtils {
 		}
 		// return must/musnt key(s)=value(s)
 		return filter;
+	}
+
+
+	private static ESQueryBuilder parseTreeToQuery3_keyVal2(String prop, Object val) {		
+		ESQueryBuilder kvFilter;
+		// HACK due:before:
+		if (val instanceof Map) {
+			// HACK before/after?
+			assert ((Map) val).size() == 1 : val;
+			Map.Entry<String, String> kv = (Entry<String, String>) Containers.first(((Map) val).entrySet());
+			String val2 = kv.getValue();
+			switch(kv.getKey()) {
+			case "before":					
+				Time end = TimeUtils.parseExperimental(val2);
+				kvFilter = ESQueryBuilders.dateRangeQuery(prop, null, end);
+				break;
+			case "after":
+				Time start = TimeUtils.parseExperimental(val2);
+				kvFilter = ESQueryBuilders.dateRangeQuery(prop, start, null);
+				break;
+			default:
+				throw new TodoException(prop+": "+val);
+			}
+			return kvFilter;
+		}
+		// normal key=value case
+		kvFilter = ESQueryBuilders.termQuery(prop, val);
+		return kvFilter;		
 	}
 
 
