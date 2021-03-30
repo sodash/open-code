@@ -474,7 +474,7 @@ public final class YouAgainClient {
 	public Object delete(XId user, AuthToken at) {
 		assert yac != null;
 		Utils.check4null(user, at);
-		FakeBrowser fb = fb(at);
+		FakeBrowser fb = fb(Collections.singletonList(at));
 		fb.setDebug(true);
 		Log.d(LOGTAG, "Deleting "+user+" auth: "+at+"...");
 		String response = fb.getPage(yac.endpoint, new ArrayMap(
@@ -486,9 +486,10 @@ public final class YouAgainClient {
 		return response;
 	}
 
-	private FakeBrowser fb(AuthToken at) {
+	FakeBrowser fb(List<AuthToken> at) {
 		FakeBrowser fb = new FakeBrowser();
-		fb.setAuthenticationByJWT(at.getToken());
+		List<String> ats = Containers.apply(at, AuthToken::getToken);
+		fb.setAuthenticationByJWTs(ats);
 		return fb;
 	}
 
