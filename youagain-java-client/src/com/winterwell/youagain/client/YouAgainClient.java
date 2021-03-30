@@ -126,7 +126,7 @@ public final class YouAgainClient {
 	/**
 	 * 
 	 * @param issuer e.g. `good-loop`
-	 * @param iss e.g. `profiler.good-loop.com` -- not an XId
+	 * @param product e.g. `profiler.good-loop.com` -- not an XId. Can be null.
 	 */
 	public YouAgainClient(String issuer, String product) {
 		assert ! Utils.isBlank(issuer);
