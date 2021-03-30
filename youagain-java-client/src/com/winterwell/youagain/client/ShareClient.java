@@ -67,8 +67,10 @@ public final class ShareClient {
 	/** List the users a particular entity is shared to 
 	 * @param auths */
 	public List<ShareToken> getShareList(CharSequence share, List<AuthToken> auths) {
+		if (auths.isEmpty()) {
+			return Collections.EMPTY_LIST;
+		}
 		FakeBrowser fb = yac.fb(auths);
-//		 fb.setAuthenticationByJWT(authToken); // TODO Needed for this?
 		String response = fb.getPage(yac.yac.endpoint, new ArrayMap(
 			"app", yac.iss,
 			"action", "share-list",
