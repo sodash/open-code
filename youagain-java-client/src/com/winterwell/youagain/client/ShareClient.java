@@ -64,9 +64,10 @@ public final class ShareClient {
 		return Collections.emptyList();
 	}
 	
-	/** List the users a particular entity is shared to */
-	public List<ShareToken> getShareList(CharSequence share) {
-		FakeBrowser fb = new FakeBrowser();
+	/** List the users a particular entity is shared to 
+	 * @param auths */
+	public List<ShareToken> getShareList(CharSequence share, List<AuthToken> auths) {
+		FakeBrowser fb = yac.fb(auths);
 //		 fb.setAuthenticationByJWT(authToken); // TODO Needed for this?
 		String response = fb.getPage(yac.yac.endpoint, new ArrayMap(
 			"app", yac.iss,
@@ -145,7 +146,7 @@ public final class ShareClient {
 		if (auths.isEmpty()) {
 			return Collections.EMPTY_LIST;
 		}
-		List<ShareToken> list = getShareList(share);
+		List<ShareToken> list = getShareList(share, auths);
 		List<XId> myXIds = Containers.apply(auths, AuthToken::getXId);
 		List<ShareToken> myShares = Containers.filter(list, st -> ! Collections.disjoint(st.getTo(), myXIds));
 		return myShares;
