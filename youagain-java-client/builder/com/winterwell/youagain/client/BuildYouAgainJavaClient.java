@@ -14,7 +14,7 @@ public class BuildYouAgainJavaClient extends BuildWinterwellProject {
 	public BuildYouAgainJavaClient() {
 		super("youagain-java-client");
 		setIncSrc(true);
-		setVersion("0.3.1");
+		setVersion("0.3.2"); // Mar 30 2021
 	}
 
 	@Override
