@@ -5,7 +5,7 @@ See also: https://www.winterwell.com/software/bob/
 
 <img style='float:right; max-height:200px;' src='https://www.winterwell.com/res/images/bob-the-builder-edited-scaled.png' alt='Bob the Builder'>
 
-## Latest version: 1.2.2
+## Latest version: 1.2.3
 
 ## Can we build it?
 
