@@ -40,7 +40,7 @@ public class GitBobProjectTask extends BuildTask {
 		this.dir = dir;
 		// dependencies shouldnt need rebuilding all the time
 		setSkipGap(TUnit.DAY.dt);
-		resetLocalChanges = BuildHacks.getServerType() != KServerType.LOCAL;
+		resetLocalChanges = BuildHacks.getServerType() == KServerType.TEST;
 	}
 	
 	/**
