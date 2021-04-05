@@ -844,7 +844,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			Log.d(LOGTAG(), gt3.getOutput());
 			Log.d(LOGTAG(), "...doSave2_file_and_git "+fd+" done");
 		} catch(Throwable ex) {
-			state.addMessage(new AjaxMsg(KNoteType.warning, "Error while saving to Git", ex.getMessage()));
+			state.addMessage(new AjaxMsg(KNoteType.warning, "Error while saving to Git", ex.toString()));
 		}
 	}
 
