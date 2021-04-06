@@ -24,6 +24,7 @@ public final class ShareClient {
 	public static final String ACTION_SHARE = "share";
 	public static final String ACTION_DELETE_SHARE = "delete-share";
 	public static final String ACTION_CLAIM = "claim";
+	private static final String LOGTAG = "ShareClient";
 
 	ShareClient(YouAgainClient youAgainClient) {
 		this.yac = youAgainClient;
@@ -67,7 +68,10 @@ public final class ShareClient {
 	/** List the users a particular entity is shared to 
 	 * @param auths */
 	public List<ShareToken> getShareList(CharSequence share, List<AuthToken> auths) {
+		// share-list needs a login, and temp ids won't work 
+		auths = Containers.filter(auths, a -> a.isTemp());
 		if (auths.isEmpty()) {
+			Log.d(LOGTAG, "getShareList() aborted - No (non-temp) auths. "+share);
 			return Collections.EMPTY_LIST;
 		}
 		FakeBrowser fb = yac.fb(auths);
