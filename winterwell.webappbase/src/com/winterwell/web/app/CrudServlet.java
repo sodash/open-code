@@ -804,6 +804,8 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 
 	/**
+	 * This is NOT called by default, but sub-classes can choose to use it.
+	 * 
 	 * Save text to file, and git (add)+commit+push.
 	 * E.g.
 	 * 
@@ -829,7 +831,11 @@ public abstract class CrudServlet<T> implements IServlet {
 			}
 			Log.d(LOGTAG(), "doSave2_file_and_git "+fd);
 			FileUtils.write(fd, text);
-//			Git commit and push!
+//			Git pull, commit and push!
+			GitTask gt0 = new GitTask(GitTask.PULL_REBASE, fd);
+			gt0.run();
+			Log.d(LOGTAG(), gt0.getOutput());
+			
 			GitTask gt1 = new GitTask(GitTask.ADD, fd);
 			gt1.run();
 			Log.d(LOGTAG(), gt1.getOutput());
@@ -1290,25 +1296,17 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 
 	/**
-	 * TODO refactor to use JsonPatch
 	 * @param room
 	 * @param diffs Each diff is {op:replace, path:/foo/bar, value:v}
-	 * TODO other ops 
 	 * @return
 	 */
-	void applyDiff(JThing<T> room, List<Map> diffs) {			
+	void applyDiff(JThing<T> room, List<Map> diffs) {		
 		if (diffs.isEmpty()) {
 			return;
 		}
+		JsonPatch jp = JsonPatch.fromJson(diffs);
 		Map<String, Object> thingMap = new HashMap(room.map());
-		for (Map diff : diffs) {
-			String op = (String) diff.get("op"); // replace
-			String path = (String) diff.get("path");
-			Object value = diff.get("value");
-			// NB: drop the leading / on path
-			String[] bits = path.substring(1).split("/");
-			SimpleJson.set(thingMap, value, bits);
-		}
+		jp.apply(thingMap);
 		room.setMap(thingMap);
 	}
 

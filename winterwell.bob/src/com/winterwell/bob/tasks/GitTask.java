@@ -139,6 +139,10 @@ public class GitTask extends ProcessTask {
 	
 	public static final String COMMIT = "commit";
 	public static final String COMMIT_ALL = "commit -a";
+	/**
+	 * A slightly more robust version of pull, which can avoid some "artificial" conflicts
+	 * See https://gitolite.com/git-pull--rebase
+	 */
 	public static final String PULL_REBASE = "pull --rebase";
 	public static final String PULL = "pull";
 	public static final String STASH = "stash";

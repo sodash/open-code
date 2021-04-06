@@ -3,12 +3,14 @@ package com.winterwell.web.data;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Warning;
+import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.IHasJson;
@@ -281,6 +283,10 @@ public final class XId implements Serializable, IHasJson, CharSequence, Comparab
 	 */
 	public static ArrayList<XId> xids(Collection xids) {
 		return xids(xids, false);
+	}
+	
+	public static ArrayList<XId> xids(String[] xids) {
+		return xids(Arrays.asList(xids));
 	}
 	
 	/**

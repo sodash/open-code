@@ -42,6 +42,11 @@ public class JsonPatch implements IHasJson {
 		diffList("", before, after);		
 	}
 	
+	public static JsonPatch fromJson(List<Map> jsonDiffs) {
+		List<JsonPatchOp> jdiffs = Containers.apply(jsonDiffs, JsonPatchOp::new);
+		return new JsonPatch(jdiffs);
+	}
+
 	private void diffMap(String path, Map before, Map after) {
 		if (after==null) {
 			diffs.add(JsonPatchOp.remove(path));

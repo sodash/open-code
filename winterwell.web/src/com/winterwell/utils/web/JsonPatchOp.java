@@ -57,7 +57,20 @@ public class JsonPatchOp implements Serializable, IHasJson {
 		jpo.value=newValue;
 		return jpo;
 	}
-
+	
+	JsonPatchOp() {	
+	}
+	
+	/**
+	 * Make from incoming json
+	 * @param diffOp
+	 */
+	public JsonPatchOp(Map diffOp) {
+		op = KOp.valueOf((String) diffOp.get("op"));
+		path = (String) diffOp.get("path");
+		value = diffOp.get("value");
+		from = (String) diffOp.get("from");
+	}
 
 	@Override
 	public String toString() {
