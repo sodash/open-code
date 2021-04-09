@@ -52,6 +52,8 @@ import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.app.Logins;
 
+import com.google.api.services.sheets.v4.model.Spreadsheet;
+
 /**
  * @testedby GSheetsClientTest
  * 

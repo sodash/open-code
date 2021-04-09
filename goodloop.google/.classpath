@@ -18,7 +18,7 @@
 	<classpathentry kind="lib" path="dependencies/error_prone_annotations.jar"/>
 	<classpathentry kind="lib" path="dependencies/failureaccess.jar"/>
 	<classpathentry kind="lib" path="dependencies/google-api-client.jar"/>
-	<classpathentry kind="lib" path="dependencies/google-api-services-sheets.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/google-api-services-sheets.jar"/>
 	<classpathentry kind="lib" path="dependencies/google-http-client.jar"/>
 	<classpathentry kind="lib" path="dependencies/google-http-client-jackson2.jar"/>
 	<classpathentry kind="lib" path="dependencies/google-oauth-client.jar"/>
