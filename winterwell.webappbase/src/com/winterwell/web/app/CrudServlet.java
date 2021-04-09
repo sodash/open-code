@@ -832,7 +832,7 @@ public abstract class CrudServlet<T> implements IServlet {
 			Log.d(LOGTAG(), "doSave2_file_and_git "+fd);
 			FileUtils.write(fd, text);
 //			Git pull, commit and push!
-			GitTask gt0 = new GitTask(GitTask.PULL_REBASE, fd);
+			GitTask gt0 = new GitTask(GitTask.PULL, fd);
 			gt0.run();
 			Log.d(LOGTAG(), gt0.getOutput());
 			
