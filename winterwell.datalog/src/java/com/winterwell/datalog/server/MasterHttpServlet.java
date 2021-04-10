@@ -81,7 +81,12 @@ public class MasterHttpServlet extends HttpServlet {
 				new CallbackServlet().process(request);
 				return;
 			}
-
+			
+			if (path.startsWith("/csv")) {
+				new CsvServlet().process(request);
+				return;
+			}
+			
 			// TODO experiment reports table
 			
 			// TODO experiment reports details

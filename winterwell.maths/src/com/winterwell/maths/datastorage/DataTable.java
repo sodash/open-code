@@ -24,8 +24,9 @@ import com.winterwell.utils.web.IHasHtml;
 import com.winterwell.web.HtmlTable;
 
 /**
- * A simple data table, for when a List or HashMap isn't quite good enough. Has
- * an index on the first column. It is designed to be close to a drop-in
+ * A simple data table, for when a List or HashMap isn't quite good enough. 
+ * Basically a List of Object[].
+ * Has an index on the first column. It is designed to be close to a drop-in
  * replacement for HashMap and List.
  * 
  * Probably thread safe.
@@ -38,6 +39,7 @@ import com.winterwell.web.HtmlTable;
 public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml {
 	static KErrorPolicy exceptionPolicy = KErrorPolicy.THROW_EXCEPTION;
 
+	
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -97,11 +99,17 @@ public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml {
 		this(Collections.EMPTY_LIST, rowSerialisers);
 	}
 
-	public DataTable(List<Object[]> rows, ISerialize... rowSerialisers) {
+	/**
+	 * 
+	 * @param rows Object[] or List
+	 * @param rowSerialisers
+	 */
+	public DataTable(List rows, ISerialize... rowSerialisers) {
 		super(Object[].class);
 		this.rowSerialisers = rowSerialisers;
-		for (Object[] row : rows) {
-			add(row);
+		for (Object row : rows) {
+			List<Object> rowAsList = Containers.asList(row);
+			add(rowAsList);
 		}
 	}
 
