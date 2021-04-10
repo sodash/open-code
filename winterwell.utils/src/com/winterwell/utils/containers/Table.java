@@ -51,6 +51,10 @@ public class Table<C1, Row> implements Serializable, Iterable<Row> {
 	 */
 	final Map<C1, Integer> column1toRow = new HashMap();
 
+	/**
+	 * This is the index
+	 * @return
+	 */
 	public Map<C1, Integer> getColumn1toRow() {
 		return Collections.unmodifiableMap(column1toRow);
 	}
@@ -166,7 +170,15 @@ public class Table<C1, Row> implements Serializable, Iterable<Row> {
 	public String toString() {
 		StringBuilder sample = new StringBuilder();
 		for(int i=0, n=Math.min(6, size()); i<n; i++) {
-			sample.append(getRow(i));
+			Object ri = getRow(i);
+			if (ri == null) continue;
+			if (ri.getClass().isArray()) {
+				ri = Containers.asList(ri);
+			}
+			if (ri instanceof List) {
+				if (((List) ri).size() > 10) ri = ((List) ri).subList(0, 10);
+			}
+			sample.append(ri);
 			sample.append(", ");
 		}
 		StrUtils.pop(sample, 2);

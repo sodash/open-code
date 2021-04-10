@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.winterwell.utils.Key;
 import com.winterwell.utils.Printer;
@@ -20,6 +23,7 @@ import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.io.ISerialize;
 import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasHtml;
 import com.winterwell.web.HtmlTable;
 
@@ -109,6 +113,9 @@ public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml {
 		this.rowSerialisers = rowSerialisers;
 		for (Object row : rows) {
 			List<Object> rowAsList = Containers.asList(row);
+			if (rowAsList.isEmpty()) {
+				continue; // NB: Xero pads its csv style output with []s
+			}
 			add(rowAsList);
 		}
 	}
@@ -309,6 +316,80 @@ public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml {
 		}
 		return tbl.toHTML();
 	}
+
+
+	/**
+	 * Assumes row 0 is String headers
+	 * @param colName
+	 * @return
+	 */
+	public int getColumnIndex(String colName) {
+		Object[] hs = getRow(0);
+		int i = Containers.indexOf(colName, hs);
+		return i;
+	}
+
+
+/**
+ * Assumes the 1st 
+ * @param dt
+ * @param oldData
+ * @return
+ */
+	public static DataTable<String> merge(DataTable<String> dt, DataTable<String> oldData) {
+		Object[] oldHeaders = oldData.getRow(0);
+		Object[] freshHeaders = dt.getRow(0);
+		// sort the headers
+		Set allHeaders = new HashSet(Arrays.asList(oldHeaders));
+		allHeaders.addAll(Arrays.asList(freshHeaders));		
+		ArrayList<String> hlist = new ArrayList(allHeaders);
+		Object h0 = freshHeaders[0];
+		hlist.remove(h0);
+		hlist.remove(""); // paranoia
+		hlist.remove(null);
+		Collections.sort(hlist); //, (a,b) -> new Time(a).compareTo(new Time(b)));
+		// fill in the data
+		HashMap<String,Map> colForRow = new HashMap();
+		merge2(oldData, colForRow);
+		// fresh data last, so it can override
+		merge2(dt, colForRow);
+		// copy it out - preserving order
+		DataTable merged = new DataTable();
+		ArrayList hlist2 = new ArrayList();
+		hlist2.add(h0);
+		hlist2.addAll(hlist);
+		merged.add(hlist2);
+		List<String> rlist = dt.getColumn(0);
+		for(String r : rlist) {
+			if (Utils.isBlank(r)) {
+				continue;
+			}
+			Map col = colForRow.get(r);
+			ArrayList row = new ArrayList();
+			row.add(r);
+			for(String h : hlist) {
+				Object v = col.get(h);
+				row.add(v);
+			}
+			merged.add(row);
+		}
+		return merged;
+	}
+
+
+	private static void merge2(DataTable<String> data, HashMap<String, Map> colForRow) {
+		Object[] headers = data.getRow(0);
+		for(Object[] row : data) {
+			String rName = (String) row[0];
+			Map col = colForRow.computeIfAbsent(rName, n -> new HashMap());
+			for(int i=1; i<row.length; i++) {
+				Object v = row[i];
+				Object h = headers[i];
+				col.put(h, v);
+			}		
+		}
+	}	
+
 
 
 }

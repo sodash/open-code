@@ -9,6 +9,7 @@ public class BuildMaths2 extends BuildWinterwellProject {
 
 	public BuildMaths2() {
 		super("winterwell.maths");
+		setVersion("1.1.0"); // 10 Apr 2021
 		incSrc = true;
 	}
 

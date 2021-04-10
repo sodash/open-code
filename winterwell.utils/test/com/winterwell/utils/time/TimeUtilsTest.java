@@ -452,6 +452,12 @@ public class TimeUtilsTest {
 	}
 
 	@Test
+	public void testParseXeroDate() {
+		Time time0 = TimeUtils.parse("30 Nov 20", "dd MMM yy");
+		assert time0.equals(new Time(2020,11,30)) : time0;
+	}
+	
+	@Test
 	public void testParseAgainstTimeConstructor() {
 		// This could equally well go in TimeTest ....
 		String example_time = "2007-09-08 00:03:52";
