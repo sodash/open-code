@@ -535,19 +535,19 @@ public class BuildWinterwellProject extends BuildTask {
 		if (compile) {
 			try {
 				assert projectDir != null : this;
-				CompileTask compile = new CompileTask(srcDir, binDir);
-				compile.setCleanOutputDir(true);
-				compile.setDepth(getDepth()+1);
+				CompileTask compileTask = new CompileTask(srcDir, binDir);
+				compileTask.setCleanOutputDir(true);
+				compileTask.setDepth(getDepth()+1);
 				// classpath
 				EclipseClasspath ec = new EclipseClasspath(projectDir);
 				ec.setIncludeProjectJars(true);
 				Set<File> libs = ec.getCollectedLibs();
-				compile.setClasspath(libs);
-				compile.setSrcJavaVersion("11");
-				compile.setOutputJavaVersion("11"); // Java 11 jars
-				compile.setDebug(true);
-				compile.run();
-				compile.close();
+				compileTask.setClasspath(libs);
+				compileTask.setSrcJavaVersion("11");
+				compileTask.setOutputJavaVersion("11"); // Java 11 jars
+				compileTask.setDebug(true);
+				compileTask.run();
+				compileTask.close();
 			} catch(Exception ex) {
 				// HACK to allow ignoring via -ignore flag
 				if (getConfig().ignoreAllExceptions) {
@@ -615,7 +615,8 @@ public class BuildWinterwellProject extends BuildTask {
 		assert libBuild.isDirectory();
 		// Ensure desired jars are present
 		for (File jar : jars) {
-			File localJar = new File(libBuild, jar.getName()).getAbsoluteFile();
+			String jarName = jar.getName();
+			File localJar = new File(libBuild, jarName).getAbsoluteFile();
 			
 			// check versions and pick which one to keep?
 			if (localJar.isFile()) {

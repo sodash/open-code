@@ -68,9 +68,16 @@ public class JWTDecoder {
 		Algorithm algorithm = algorithm();
 		
 		assert ! jwt.endsWith("temp") : jwt;
-		JWTVerifier verifier = JWT.require(algorithm)
-//				.withIssuer(issuer) // TODO reinstate
-				.build();
+		JWTVerifier verifier;
+		try {
+			verifier = JWT.require(algorithm)
+	//				.withIssuer(issuer) // TODO reinstate
+					.build();
+		} catch (Throwable ex) {
+			// Seen Apr 2021 -- some jar versioning issue in auth0's jar
+			Log.e(LOGTAG, "verifier low-level code problem! "+ex+" Treat jwt as verified");
+			return;
+		}
 		try {
 			DecodedJWT decoded = verifier.verify(jwt);
 			Log.d(LOGTAG, "verified "+jwt+" -> "+decoded.getSubject());

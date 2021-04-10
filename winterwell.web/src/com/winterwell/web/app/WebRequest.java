@@ -968,8 +968,20 @@ public class WebRequest implements IProperties, Closeable {
 		HttpSession session = getSession();
 		List<AjaxMsg> alerts = WebUtils2.getAttribute(session, KEY_MESSAGES);
 		WebUtils2.setAttribute(session, KEY_MESSAGES, null);
-		return alerts;
+		return alerts==null? Collections.EMPTY_LIST : alerts;
 	}
+	
+	/**
+	 * Get the session messages for the user as set by {@link #addMessage(String)}.  
+	 * @return often empty, never null
+	 */
+	public List<AjaxMsg> getMessages() {
+		HttpSession session = getSession();
+		List<AjaxMsg> alerts = WebUtils2.getAttribute(session, KEY_MESSAGES);
+		return alerts==null? Collections.EMPTY_LIST : alerts;
+	}
+	
+	
 
 	public boolean containsMessageWithId(String id) {
 		HttpSession session = getSession();

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.log.Log;
@@ -89,7 +90,10 @@ public class HttpServletWrapper extends HttpServlet {
 	public static void doCatch(Throwable ex, HttpServletResponse resp, WebRequest state) {		
 		// include state info in the string
 		if (state!=null) {
-			ex = new WrappedException(state.toString(), ex);
+			String s = 
+					StrUtils.join(state.getMessages(), ", ")
+					+ state.toString();
+			ex = new WrappedException(s, ex);
 		}
 		String exs = Printer.toString(ex, true);
 		

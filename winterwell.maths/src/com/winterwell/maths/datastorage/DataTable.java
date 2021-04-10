@@ -25,6 +25,7 @@ import com.winterwell.utils.log.KErrorPolicy;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasHtml;
+import com.winterwell.utils.web.IHasJson;
 import com.winterwell.web.HtmlTable;
 
 /**
@@ -40,7 +41,7 @@ import com.winterwell.web.HtmlTable;
  *            type of the 1st column
  * @testedby  DataTableTest}
  */
-public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml {
+public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml, IHasJson {
 	static KErrorPolicy exceptionPolicy = KErrorPolicy.THROW_EXCEPTION;
 
 	
@@ -388,6 +389,16 @@ public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml {
 				col.put(h, v);
 			}		
 		}
+	}
+
+
+	@Override
+	public List<List<Object>> toJson2() throws UnsupportedOperationException {
+		ArrayList rows2 = new ArrayList();
+		for(Object[] row : this) {
+			rows2.add(new ArrayList(Arrays.asList(row)));
+		}
+		return rows2;
 	}	
 
 

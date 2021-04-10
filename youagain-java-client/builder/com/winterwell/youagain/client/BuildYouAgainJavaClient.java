@@ -14,7 +14,7 @@ public class BuildYouAgainJavaClient extends BuildWinterwellProject {
 	public BuildYouAgainJavaClient() {
 		super("youagain-java-client");
 		setIncSrc(true);
-		setVersion("0.3.3"); // Apr 6 2021
+		setVersion("0.3.4"); // Apr 10 2021
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class BuildYouAgainJavaClient extends BuildWinterwellProject {
 		List<BuildTask> deps = super.getDependencies();
 
 		MavenDependencyTask mdt = new MavenDependencyTask();		
-		mdt.addDependency("com.auth0", "java-jwt", "3.8.3");
+		mdt.addDependency("com.auth0", "java-jwt", "3.15.0");
 		mdt.setOutputDirectory(new File(projectDir, "dependencies"));
 		mdt.setIncSrc(true);
 //		mdt.setForceUpdate(true);

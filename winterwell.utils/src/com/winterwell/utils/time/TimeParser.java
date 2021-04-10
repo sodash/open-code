@@ -20,7 +20,7 @@ import com.winterwell.utils.Utils;
  * TODO refactor this, with options and stuff. Maybe even support other languages.
  * 
  * @author daniel
- *
+ * @testedby {@link TimeParserTest}
  */
 public class TimeParser {	
 	
@@ -258,6 +258,16 @@ public class TimeParser {
 					year = -year;
 				}
 				tf.put(Calendar.YEAR, year);
+			} else {
+				// maybe a short year?
+				Matcher sm = Pattern.compile("\\d\\d$").matcher(s);
+				if (sm.find()) {
+					year = 2000 + Integer.valueOf(sm.group());
+					if (year > new Time().getYear() + 15) {
+						year -= 1900; // 99 = 1999
+					}
+					tf.put(Calendar.YEAR, year);
+				}
 			}
 		}
 

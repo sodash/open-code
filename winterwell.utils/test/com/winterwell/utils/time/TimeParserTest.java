@@ -5,6 +5,15 @@ import org.junit.Test;
 public class TimeParserTest {
 
 	@Test
+	public void testXeroFormat() {
+		TimeParser tp = new TimeParser();
+		Time t = tp.parseExperimental("31 Dec 20");
+		Time t2 = tp.parseExperimental("30 Nov 20");
+		assert t.equals(new Time(2020,12,31)) : t;
+		assert t2.equals(new Time(2020,11,30)) : t2;
+	}
+	
+	@Test
 	public void testParseExponentialFormatEpochTime() {
 		String st = "1.611854108e12";
 		TimeParser tp = new TimeParser();
@@ -38,6 +47,6 @@ public class TimeParserTest {
 		TimeParser tp = new TimeParser();
 		Time t = tp.parseExperimental("Apr 2020", null);
 		assert t.getMonth() == 4;
-		assert t.toISOString().equals("") : t.toISOString();
+		assert t.toISOStringDateOnly().equals("2020-04-01") : t.toISOStringDateOnly();
 	}
 }
