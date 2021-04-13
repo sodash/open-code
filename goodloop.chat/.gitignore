@@ -12,3 +12,5 @@ package-lock.json
 bob.log
 dependencies
 logs
+*RSA*xml
+**RSA*xml

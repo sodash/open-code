@@ -3,6 +3,7 @@ package com.goodloop.chat.web;
 import java.util.Map;
 
 import com.goodloop.chat.data.Chat;
+import com.goodloop.chat.data.Chatscript;
 import com.winterwell.data.KStatus;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.web.app.AMain;
@@ -11,6 +12,11 @@ import com.winterwell.web.app.ISiteConfig;
 import com.winterwell.web.app.JettyLauncher;
 import com.winterwell.web.app.MasterServlet;
 
+/**
+ * Status NOT used 
+ * @author daniel
+ *
+ */
 public class ChatMain extends AMain {
 
 	public ChatMain() {
@@ -30,7 +36,7 @@ public class ChatMain extends AMain {
 		init3_gson();
 		init3_ES();
 		
-		Class[] dbclasses = new Class[] {Chat.class};
+		Class[] dbclasses = new Class[] {Chat.class,Chatscript.class};
 		AppUtils.initESIndices(KStatus.main(), dbclasses);
 		Map<Class, Map> mappingFromClass = new ArrayMap();
 		AppUtils.initESMappings(KStatus.main(), dbclasses, mappingFromClass);
@@ -41,5 +47,6 @@ public class ChatMain extends AMain {
 		super.addJettyServlets(jl);
 		MasterServlet ms = jl.addMasterServlet();
 		ms.addServlet("chat", ChatServlet.class);
+		ms.addServlet("chatscript", ChatscriptServlet.class);
 	}
 }

@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.winterwell.data.AThing;
 
-public class Chat extends AThing {
+public class Chatscript extends AThing {
 
-	public Chat() {
+	public Chatscript() {
 		
 	}	
 	
-	List<ChatLine> lines;
+	String notes;
 }

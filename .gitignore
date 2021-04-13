@@ -38,3 +38,4 @@ winterwell.datalog/datalog.log*
 winterwell.utils/test/winterwell
 winterwell.datalog/logs
 *.zip
+*RSA*xml
