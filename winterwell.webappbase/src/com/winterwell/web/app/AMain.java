@@ -474,7 +474,8 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		Log.d("AMain", "Base addJettyServlets() in "+getClass());
 		jl.addServlet("/manifest", new HttpServletWrapper(ManifestServlet.class));
 		// NB: not "test" cos there's often a test directory, and nginx gets confused
-		jl.addServlet("/testme/*", new HttpServletWrapper(TestmeServlet.class));
+		jl.addServlet("/testme/*", new HttpServletWrapper(TestmeServlet.class));		
 	}
+
 
 }

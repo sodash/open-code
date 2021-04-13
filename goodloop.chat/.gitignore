@@ -1,0 +1,14 @@
+node_modules/*
+bin/*
+npm-debug.log
+*.jar
+test/calstat-test-app/node_modules/*
+project/web/build
+test-base/babeled-res/*web/build
+web/build
+web/style/*.css
+test-base/*/utils
+package-lock.json
+bob.log
+dependencies
+logs

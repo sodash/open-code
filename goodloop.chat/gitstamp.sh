@@ -1,0 +1,1 @@
+../../wwappbase.js/project/gitstamp.sh
