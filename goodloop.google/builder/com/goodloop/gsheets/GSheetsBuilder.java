@@ -25,9 +25,7 @@ public class GSheetsBuilder extends BuildWinterwellProject {
 		mdt.addDependency("com.google.api-client:google-api-client:1.31.4");
 		mdt.addDependency("com.google.oauth-client:google-oauth-client-jetty:1.31.5");
 		mdt.addDependency("com.google.apis:google-api-services-sheets:v4-rev612-1.25.0");
-//		mdt.addDependency("com.google.api-client:google-api-client:1.30.4");
-//		mdt.addDependency("com.google.oauth-client:google-oauth-client-jetty:1.30.6");
-//		mdt.addDependency("com.google.apis:google-api-services-sheets:v4-rev581-1.25.0");
+		mdt.addDependency("com.google.http-client:google-http-client-jackson2:1.39.2");
 		mdt.setIncSrc(true);
 		deps.add(mdt);
 		
