@@ -11,7 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.web"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="dependencies/animal-sniffer-annotations.jar"/>
 	<classpathentry kind="lib" path="dependencies/checker-compat-qual.jar"/>
 	<classpathentry kind="lib" path="dependencies/commons-codec.jar"/>
 	<classpathentry kind="lib" path="dependencies/commons-logging.jar"/>
