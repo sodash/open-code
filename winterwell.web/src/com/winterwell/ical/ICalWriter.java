@@ -6,7 +6,14 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.time.FastDateFormat;
 
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.time.TimeUtils;
 
+/**
+ * ?? doc url
+ * 
+ * @author daniel
+ * @testedby {@link ICalWriterTest}
+ */
 public class ICalWriter {
 
 	StringBuilder ical = new StringBuilder();
@@ -15,11 +22,13 @@ public class ICalWriter {
 		this(null);
 	}
 	
+	String timezone = "UTC";
+	
 	public ICalWriter(String name) {
 		ical.append("BEGIN:VCALENDAR\r\n");
 		ical.append("VERSION:2.0\r\n");
-		ical.append("PRODID:-//sodash//NONSGML SoDashv0.1//EN\r\n");
-		ical.append("X-WR-TIMEZONE:UTC" + "\r\n");
+		ical.append("PRODID:-//good-loop//NONSGML Good-Loopv0.1//EN\r\n");		
+		ical.append("X-WR-TIMEZONE:"+timezone+ "\r\n");
 		if (name != null){
 			ical.append("X-WR-CALNAME;VALUE=TEXT:" + name + "\r\n");
 		}
@@ -120,8 +129,10 @@ public class ICalWriter {
 //	       19980119T070000Z		
 		return sdf.format(start.getDate());
 	}
-	
-	public static FastDateFormat sdf = FastDateFormat.getInstance("yyyyMMdd'T'HHmmss'Z'");	
+	/**
+	 * ical format using UTC timezone
+	 */
+	public static FastDateFormat sdf = FastDateFormat.getInstance("yyyyMMdd'T'HHmmss'Z'", TimeUtils._GMT_TIMEZONE);	
 
 	public String getICal() {
 		return ical+"END:VCALENDAR\r\n";

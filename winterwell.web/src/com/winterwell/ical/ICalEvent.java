@@ -4,9 +4,11 @@ package com.winterwell.ical;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.WebUtils2;
 
 public class ICalEvent {
 
@@ -17,6 +19,7 @@ public class ICalEvent {
 	 */
 	public Time end;
 	public String summary;
+	public String description;
 	public String uid;
 	public Time created;
 	public String location;
@@ -48,10 +51,23 @@ public class ICalEvent {
 			+(end!=null? "DTEND:"+ICalWriter.format(end)+"\r\n" : "")				
 			// TODO UID and others!
 			+(summary==null? "" : "SUMMARY:"+ICalWriter.formatText(summary)+"\r\n")
+			+(description==null? "" : "DESCRIPTION:"+ICalWriter.formatText(description)+"\r\n")
+			+(location==null? "" : "LOCATION:"+ICalWriter.formatText(location)+"\r\n")
 			+(repeat==null? "" : "RRULE:"+repeat.rrule+"\r\n")
 			+"END:VEVENT\r\n";
 	}
-
+	
+	public String getGoogleCalendarLink() {
+		return WebUtils2.addQueryParameters("https://www.google.com/calendar/render?action=TEMPLATE",
+				new ArrayMap("text",summary,
+						"dates", ICalWriter.format(start)+"/"+ICalWriter.format(end),
+						"details",description,
+						"location",location
+//						"sf",true,
+//						"output","xml"
+						));
+	}
+	
 	public boolean isRepeating() {
 		return repeat!=null;
 	}

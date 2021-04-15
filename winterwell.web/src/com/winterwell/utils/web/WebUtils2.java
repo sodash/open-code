@@ -281,6 +281,7 @@ public class WebUtils2 extends WebUtils {
 					"css", "text/css",
 					// csv is text/csv c.f. http://tools.ietf.org/html/rfc4180
 					"csv", "text/csv",
+					"ics", "text/calendar",
 					// video? (NB: copy-pasta from JTwitter Twitter.java) 
 					"mov", "video/quicktime",
 					"avi",	"video/x-msvideo",

@@ -521,7 +521,8 @@ public abstract class CrudServlet<T> implements IServlet {
 	
 	public static final SField SORT = new SField("sort");
 	public static final String LIST_SLUG =  "_list";
-	private static final IntField SIZE = new IntField("size");
+	public static final IntField SIZE = new IntField("size");
+	public static final IntField FROM = new IntField("from");
 	public static final String ALL = "all";
 
 	protected final JThing<T> doPublish(WebRequest state) throws Exception {
@@ -689,9 +690,10 @@ public abstract class CrudServlet<T> implements IServlet {
 		String prefix = state.get("prefix");
 		String sort = state.get(SORT, defaultSort);		
 		int size = state.get(SIZE, 1000);
+		int from = state.get(FROM, 0);
 		Period period = CommonFields.getPeriod(state);
 		
-		SearchResponse sr = doList2(q, prefix, status, sort, size, period, state);
+		SearchResponse sr = doList2(q, prefix, status, sort, size,from, period, state);
 		
 //		Map<String, Object> jobj = sr.getParsedJson();
 		// Let's deal with ESHit and JThings
@@ -910,9 +912,10 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * 
 	 * Does NOT dedupe (eg multiple copies with diff status) or security cleanse.
 	 * @param prefix 
+	 * @param from TODO
 	 * @param num 
 	 */
-	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, Period period, WebRequest stateOrNull) {
+	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, int from, Period period, WebRequest stateOrNull) {
 		// copied from SoGive SearchServlet
 		// TODO refactor to use makeESFilterFromSearchQuery
 		SearchRequest s = new SearchRequest(es);
@@ -944,9 +947,10 @@ public abstract class CrudServlet<T> implements IServlet {
 			}
 		}
 		
-		// TODO paging!
 		s.setSize(size);
+		s.setFrom(from); // allows for paging within 10k of results
 		s.setDebug(true);
+//		s.setScroll(null) TODO support for big +10k data
 
 		// Call the DB
 		SearchResponse sr = s.get();
