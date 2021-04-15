@@ -36,6 +36,7 @@ import com.google.api.services.sheets.v4.model.Color;
 import com.google.api.services.sheets.v4.model.ExtendedValue;
 import com.google.api.services.sheets.v4.model.GridCoordinate;
 import com.google.api.services.sheets.v4.model.GridProperties;
+import com.google.api.services.sheets.v4.model.GridRange;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Response;
 import com.google.api.services.sheets.v4.model.RowData;
@@ -238,6 +239,20 @@ public class GSheetsClient {
 		int low = w % 26;
 		int high = (w / 26) - 1; // -1 'cos this isnt true base 26 -- there's no proper 0 letter
 		return getBase26(high) + getBase26(low);
+	}
+	
+	public void clearSpreadsheet(String sid) throws IOException{
+		Sheets service = getService();
+		List<Request> requests = new ArrayList<>();
+
+		requests.add(new Request()
+				.setUpdateCells(new UpdateCellsRequest()
+						.setRange(new GridRange()
+								.setSheetId(0))
+						.setFields("*")));
+		
+		BatchUpdateSpreadsheetRequest body = new BatchUpdateSpreadsheetRequest().setRequests(requests);
+		BatchUpdateSpreadsheetResponse response = service.spreadsheets().batchUpdate(sid, body).execute();
 	}
 
 }
