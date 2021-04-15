@@ -39,7 +39,7 @@ import com.winterwell.web.HtmlTable;
  * @author daniel
  * @param <C1>
  *            type of the 1st column
- * @testedby  DataTableTest}
+ * @testedby  DataTableTest
  */
 public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml, IHasJson {
 	static KErrorPolicy exceptionPolicy = KErrorPolicy.THROW_EXCEPTION;
@@ -332,14 +332,18 @@ public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml, IHas
 
 
 /**
- * Assumes the 1st 
- * @param dt
+ * Merge in extra columns. Assumes the 1st row is headers, and the 1st column is labels.  
+ * The merged column headers are sorted, apart from the 1st labels column which stays 1st.
+ * <p> 
+ * Note: We don't have a function for merging extra rows, because that is easy - this is a row-based storage (similar to a csv file), so just add them!
+ * 
+ * @param newData
  * @param oldData
- * @return
+ * @return a new merged DataTable
  */
-	public static DataTable<String> merge(DataTable<String> dt, DataTable<String> oldData) {
+	public static DataTable<String> merge(DataTable<String> newData, DataTable<String> oldData) {
 		Object[] oldHeaders = oldData.getRow(0);
-		Object[] freshHeaders = dt.getRow(0);
+		Object[] freshHeaders = newData.getRow(0);
 		// sort the headers
 		Set allHeaders = new HashSet(Arrays.asList(oldHeaders));
 		allHeaders.addAll(Arrays.asList(freshHeaders));		
@@ -353,14 +357,15 @@ public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml, IHas
 		HashMap<String,Map> colForRow = new HashMap();
 		merge2(oldData, colForRow);
 		// fresh data last, so it can override
-		merge2(dt, colForRow);
+		merge2(newData, colForRow);
 		// copy it out - preserving order
 		DataTable merged = new DataTable();
 		ArrayList hlist2 = new ArrayList();
 		hlist2.add(h0);
 		hlist2.addAll(hlist);
 		merged.add(hlist2);
-		List<String> rlist = dt.getColumn(0);
+		// TODO merge row lists, perhaps using levenshtein to slot them in
+		List<String> rlist = newData.getColumn(0); // HACK just the newData rows
 		for(String r : rlist) {
 			if (Utils.isBlank(r)) {
 				continue;
@@ -374,6 +379,25 @@ public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml, IHas
 			}
 			merged.add(row);
 		}
+		
+		// HACK tack any missing oldData rows onto the bottom
+		List<String> rlist2 = oldData.getColumn(0); 
+		rlist2.removeAll(rlist);
+		for(String r : rlist2) {
+			if (Utils.isBlank(r)) {
+				continue;
+			}
+			Map col = colForRow.get(r);
+			if (col==null) continue; // paranoia
+			ArrayList row = new ArrayList();
+			row.add(r);
+			for(String h : hlist) {
+				Object v = col.get(h);
+				row.add(v);
+			}
+			merged.add(row);
+		}
+		
 		return merged;
 	}
 
