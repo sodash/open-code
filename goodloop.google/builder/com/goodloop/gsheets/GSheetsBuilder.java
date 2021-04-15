@@ -1,8 +1,5 @@
 package com.goodloop.gsheets;
-import java.io.File;
 import java.util.List;
-
-import org.junit.Test;
 
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.tasks.MavenDependencyTask;
