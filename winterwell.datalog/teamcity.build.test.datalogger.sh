@@ -5,7 +5,7 @@
 # Versions of this script are usually run by TeamCity, in response to a git commit.
 # The script uses ssh remote commands to target a server -- it does not affect the local machine.
 # For testing, the script can also be run from your local computer.
-#Version 1.4.8
+#Version 1.4.9
 # Latest Change -- nodejs version checker now checks for version 14.x being present
 
 #####  GENERAL SETTINGS
@@ -21,7 +21,8 @@ PROJECT_USES_NPM='no' # yes or no
 PROJECT_USES_WEBPACK='no' #yes or no
 PROJECT_USES_JERBIL='no' #yes or no
 PROJECT_USES_WWAPPBASE_SYMLINK='no'
-BRANCH='master' # If changed -- you must also change the VCS settings for this project in teamcity
+BRANCH='master' # If target machine is NOT defined in BuildHacks.java, then it is treated as a 'test' device and will be LOCKED TO THE MASTER BRANCH.  
+                # If changed -- you must also change the VCS settings for this project in teamcity
 
 # Where is the test server?
 TARGET_SERVERS=(baker.good-loop.com)
@@ -199,12 +200,12 @@ function cleanup_wwappbasejs_repo {
     fi
 }
 
-# Cleanup the repos nested inside of bobwarehouse  - This Function's Version is 1.00
+# Cleanup the repos nested inside of bobwarehouse  - This Function's Version is 1.10
 function cleanup_bobwarehouse_repos {
     if [[ $PROJECT_USES_BOB = 'yes' ]]; then
 	    for server in ${TARGET_SERVERS[@]}; do
 		    printf "\nEnsuring that the repos inside of bobwarehouse are up-to-date...\n"
-        	ssh winterwell@$server "for repo in $BOBWAREHOUSE_PATH/*/; do cd \$repo; git gc --prune=now; git pull origin master; git reset --hard FETCH_HEAD; done"
+        	ssh winterwell@$server "for repo in $BOBWAREHOUSE_PATH/*/; do cd \$repo; git gc --prune=now; git pull origin master; git reset --hard FETCH_HEAD; git checkout $BRANCH; done"
         done
     fi
 }
