@@ -61,6 +61,10 @@ public class GSheetsClient {
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 	private static final String TOKENS_DIRECTORY_PATH = "tokens";
 	private static final String LOGTAG = "GSheetsClient";
+	/**
+	 * The sheet tab within the overall (spread)sheet
+	 */
+	private int sheet = 0;
 
 	public Spreadsheet getSheet(String id) throws Exception {
 		Sheets service = getService();
@@ -151,7 +155,9 @@ public class GSheetsClient {
 		int w = values.get(0).size();
 		String c = getBase26(w - 1); // w base 26
 		String range = "A1:" + c + values.size();
-		UpdateValuesResponse result = service.spreadsheets().values().update(spreadsheetId, range, body)
+		// TODO sheet number 
+		UpdateValuesResponse result = service.spreadsheets().values()
+				.update(spreadsheetId, range, body)
 				.setValueInputOption(valueInputOption).execute();
 		String ps = result.toPrettyString();
 		Integer cnt = result.getUpdatedCells();
@@ -160,47 +166,6 @@ public class GSheetsClient {
 		return result.toPrettyString();
 	}
 	
-	void todoUpdateSheet(String spreadsheetId) throws IOException, GeneralSecurityException {
-		Sheets service = getService();
-		BatchUpdateSpreadsheetRequest bsr = new BatchUpdateSpreadsheetRequest();
-		List<Request> reqs = new ArrayList();
-		UpdateSheetPropertiesRequest usr = new UpdateSheetPropertiesRequest();
-		usr.setFields("*");
-		SheetProperties sps = new SheetProperties();
-		sps.setSheetId(0);
-		GridProperties gps = new GridProperties();
-		// freeze
-		gps.setFrozenRowCount(1);
-		gps.setFrozenColumnCount(1);
-		sps.setGridProperties(gps);
-		usr.setProperties(sps);
-		reqs.add(new Request().setUpdateSheetProperties(usr));
-		
-		UpdateCellsRequest ucs = new UpdateCellsRequest();
-		ucs.setStart(new GridCoordinate().setRowIndex(1).setColumnIndex(1));
-		List<RowData> rows = new ArrayList();
-		RowData rd = new RowData();
-		List<CellData> cells = new ArrayList();
-		CellData cd = new CellData();		
-		ExtendedValue ev = new ExtendedValue().setFormulaValue("=2+2");
-		cd.setEffectiveValue(ev);
-		TextFormat tf = new TextFormat();
-		tf.setBold(true);
-		tf.setItalic(true);
-		tf.setForegroundColor(new Color().setRed(0.75f).setGreen(0f).setBlue(0f));
-		CellFormat cf = new CellFormat().setTextFormat(tf);
-		cd.setEffectiveFormat(cf);
-		cells.add(cd);
-		rd.setValues(cells);
-		rows.add(rd);
-		ucs.setRows(rows);
-		reqs.add(new Request().setUpdateCells(ucs));
-		
-		bsr.setRequests(reqs);
-		BatchUpdateSpreadsheetResponse br = service.spreadsheets().batchUpdate(spreadsheetId, bsr).execute();		
-		List<Response> reps = br.getReplies();
-		System.out.println(reps);
-	}
 
 	public String getUrl(String spreadsheetId) {
 		return "https://docs.google.com/spreadsheets/d/"+spreadsheetId;
@@ -242,11 +207,28 @@ public class GSheetsClient {
 		requests.add(new Request()
 				.setUpdateCells(new UpdateCellsRequest()
 						.setRange(new GridRange()
-								.setSheetId(0))
+								.setSheetId(sheet))
 						.setFields("*")));
 		
 		BatchUpdateSpreadsheetRequest body = new BatchUpdateSpreadsheetRequest().setRequests(requests);
 		BatchUpdateSpreadsheetResponse response = service.spreadsheets().batchUpdate(sid, body).execute();
 	}
+
+	/**
+	 * GoogleSheets doesn't handle null values well, 
+	 * ??what happens??
+	 * change all null values to an empty space
+	 * @param values
+	 * @return cleaned values
+	 */
+	public List<List<Object>> replaceNulls(List<List<Object>> values) {
+		List<List<Object>> cleanedValues = new ArrayList();
+		for(List<Object> row : values) {
+			Collections.replaceAll(row, null, " ");
+//			Collections.replaceAll(row, "", " "); ??wanted??
+			cleanedValues.add(row);
+		}
+		return cleanedValues;
+	}	
 
 }

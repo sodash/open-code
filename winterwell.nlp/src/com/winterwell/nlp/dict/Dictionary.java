@@ -198,7 +198,9 @@ public class Dictionary implements IDictionary {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"["+file+"]";
+		return getClass().getSimpleName()+"["+
+				(file==null? dict.size() : file)
+	+"]";
 	}
 
 	@Override

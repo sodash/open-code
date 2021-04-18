@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.winterwell.utils.BestOne;
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
@@ -484,6 +485,29 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 				return rmap;
 			}
 		};
+	}
+
+	/**
+	 * Convenience method
+	 * @param csv
+	 * @return Number string values are converted into Numbers (but not if they contain special characters like £%,)
+	 */
+	public static List<List<Object>> toJsonArray(String csv) {
+		CSVReader r = new CSVReader(new StringReader(csv), new CSVSpec());
+		List<List<Object>> jarr = new ArrayList();
+		for (String[] row : r) {
+			ArrayList jrow = new ArrayList();
+			for (String v : row) {
+				if (StrUtils.isNumber(v)) {
+					jrow.add(Double.valueOf(v));
+				} else {
+					jrow.add(v);
+				}
+			}
+			jarr.add(jrow);
+		}
+		r.close(); // a harmless no-op
+		return jarr;
 	}
 	
 

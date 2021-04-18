@@ -466,9 +466,10 @@ public class StrUtils {
 	/**
 	 * @param x
 	 *            Can be null (returns false)
-	 * @return true if x is in fact a number
-	 * 
-	 *         ??Should we support non-standard formats such as "1,000", "10k"?
+	 * @return true if x is in fact a number. Only recognises "pure" number formats
+	 * which can be converted using `Double.valueOf()`
+	 * <p>
+	 *         Should we support non-standard formats such as "1,000", "10k"?
 	 *         Not here!
 	 */
 	public static boolean isNumber(String x) {
