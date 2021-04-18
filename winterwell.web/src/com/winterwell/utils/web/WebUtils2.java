@@ -73,6 +73,7 @@ import com.winterwell.web.WebPage;
 import com.winterwell.web.ajax.JsonResponse;
 import com.winterwell.web.app.BrowserType;
 import com.winterwell.web.app.WebRequest;
+import com.winterwell.web.app.WebRequest.KResponseType;
 import com.winterwell.web.email.SimpleMessage;
 import com.winterwell.web.fields.AField;
 import com.winterwell.web.fields.BoolField;
@@ -1181,21 +1182,18 @@ public class WebUtils2 extends WebUtils {
 		}
 	}
 
-	public static void sendJson(WebRequest req, String json) throws RuntimeException {		
+	public static void sendJson(WebRequest req, String json) throws RuntimeException { 
+		send2(KResponseType.json, req, json);
+	}
+
+	public static void send2(KResponseType rType, WebRequest req, String json) {
 		BufferedWriter out = null;
 		try {
 			HttpServletResponse response = req.getResponse();
 			// set mime and character encoding
-			// HACK: Is it an old IE?
-			BrowserType bt = req.getBrowserType();
-			if (bt.getBrowserMake()==BrowserType.MAKE_IE && bt.getVersion() < 10) {
-				response.setContentType(WebUtils.MIME_TYPE_TXT_UTF8);
-			} else {
-				response.setContentType(WebUtils.MIME_TYPE_JSON + "; charset=UTF-8");
-			}
-			// TODO use response.getWriter() instead? Does this affect encoding
-			// issues at all?
-			// PrintWriter pw = response.getWriter();
+			String contentType = rType.mimeType+ "; charset=UTF-8";
+			response.setContentType(contentType);
+			// write out
 			out = FileUtils.getWriter(response.getOutputStream());
 			out.append(json);	
 			FileUtils.close(out);

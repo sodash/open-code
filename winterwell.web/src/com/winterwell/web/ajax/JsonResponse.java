@@ -18,8 +18,7 @@ import com.winterwell.web.ajax.AjaxMsg.KNoteType;
 import com.winterwell.web.app.WebRequest;
 import com.winterwell.web.fields.SafeString;
 
-/**
- * TODO replace this with JSend 
+/** 
  *  
  * Use with
  * {@link WebUtils2#sendJson(JsonResponse, javax.servlet.http.HttpServletResponse)}.
@@ -28,6 +27,7 @@ import com.winterwell.web.fields.SafeString;
  * {"success":"true", "cargo":{}, "errors":[], "messages":[]}
  * </code>
  * 
+ * @deprecated replace this with JSend
  * @author daniel
  * 
  */
