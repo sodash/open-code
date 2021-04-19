@@ -121,8 +121,11 @@ public class GSheetsClient {
 				clientSecrets, SCOPES)
 						.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
 						.setAccessType("offline").build();
-		LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-		return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+		int receiverPort = 7149;
+		LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(receiverPort).build();
+		AuthorizationCodeInstalledApp acia = new AuthorizationCodeInstalledApp(flow, receiver);
+		Credential cred = acia.authorize("user");
+		return cred;
 	}
 
 	private static Sheets getService() {
