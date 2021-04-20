@@ -173,6 +173,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 				Log.w(appName, "...Ending mainLoopThread");
 			}
 		};
+		mainLoopThread.setDaemon(false);
 		mainLoopThread.start();
 		// ready
 		readyFlag = true;
