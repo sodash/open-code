@@ -157,8 +157,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		mainLoopThread = new Thread(getClass().getSimpleName()+".doMainLoop") {
 			@Override
 			public void run() {
-				while( ! pleaseStop) {
-					try {
+				Log.d(appName, "Starting mainLoopThread...");
+				while( ! pleaseStop) {					
+					try {						
 						doMainLoop();
 					} catch(Throwable ex) {
 						Log.e(appName, ex);
@@ -169,6 +170,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 						// NB: use stop() to stop
 					}
 				}
+				Log.w(appName, "...Ending mainLoopThread");
 			}
 		};
 		mainLoopThread.start();
@@ -192,7 +194,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	}
 	
 	/**
-	 * Overide to do a loop. Use {@link #stop()} to stop.
+	 * Overide to do a loop. This gets called repeatedly. Use {@link #stop()} to stop.
 	 * Any exceptions are caught, and the loop is restarted.
 	 */
 	protected void doMainLoop() throws Exception {
