@@ -269,6 +269,8 @@ public class WebRequest implements IProperties, Closeable {
 
 	static final String _LOOP_CHECK = REDIRECT_REQUEST + "="
 			+ REDIRECT_REQUEST_BACK;
+
+	private static final SField NONCE = new SField("nonce");
 	
 	private String action;
 	
@@ -1348,5 +1350,20 @@ public class WebRequest implements IProperties, Closeable {
 	public void setHeader(String header, String value) {
 //		?? encoding
 		getResponse().setHeader(header, value);
+	}
+
+	/**
+	 * @return a unique ID for this request. This can be provided by the request itself - or if not,
+	 * it will be generated and stored as a property (so repeated calls return the same nonce).
+	 * 
+	 * Note: Once getNonce() has been called, it should be included in {@link #getParameterMap()}.
+	 */
+	public final String getNonce() {
+		String nonce = get(NONCE);
+		if (nonce==null) {
+			nonce = Utils.getUID();
+			put(NONCE, nonce);
+		}
+		return nonce;
 	}
 }
