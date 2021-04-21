@@ -1357,6 +1357,8 @@ public class WebRequest implements IProperties, Closeable {
 	 * it will be generated and stored as a property (so repeated calls return the same nonce).
 	 * 
 	 * Note: Once getNonce() has been called, it should be included in {@link #getParameterMap()}.
+	 * 
+	 * Use-case: Track requests from browser through server-to-server comms.
 	 */
 	public final String getNonce() {
 		String nonce = get(NONCE);
