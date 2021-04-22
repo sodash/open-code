@@ -31,6 +31,8 @@ import com.winterwell.youagain.client.AuthToken;
  */
 public class DataLogHttpClient {
 
+	private static final String LOGTAG = "DataLogHttpClient";
+
 	public final Dataspace dataspace;
 	
 	String ENDPOINT = Dep.get(DataLogConfig.class).dataEndpoint;
@@ -42,8 +44,10 @@ public class DataLogHttpClient {
 	 */
 	private transient Map<String,Double> overview;
 	
-	
-	private transient Double all;
+	/**
+	 * @deprecated count of docs -- NOT the sum of values
+	 */
+	private transient Double allCount;
 
 	private List<Map> examples;
 
@@ -190,15 +194,29 @@ public class DataLogHttpClient {
 		}		
 		// stash extra info in fields
 		overview = SimpleJson.get(jobjMap, breakdown.field); // present if breakdown included by=""
-		Object _all = SimpleJson.get(jobjMap, "all");
-		if (_all instanceof Map) {	// HACK old code, Jan 2021
-			_all = ((Map)_all).get("count");
+		// ...count of docs
+		Object _allCount = SimpleJson.get(jobjMap, ESDataLogSearchBuilder.allCount);
+		if (_allCount instanceof Map) {	// HACK old code, Jan 2021
+			_allCount = ((Map)_allCount).get("count");
 		}
-		all = MathUtils.toNum(_all);
+		allCount = MathUtils.toNum(_allCount);
+		// ...total
+		for(String byi : breakdown.by) {
+			Object _btotal = SimpleJson.get(jobjMap, byi);
+			if (_btotal == null) {
+				Log.w(LOGTAG, "No top-by total?! "+b+" "+jobjMap);
+				continue;
+			}
+			double bttl = MathUtils.toNum(_btotal);
+			totalFor.put(byi, bttl);
+		}
+		// ...examples
 		examples = Containers.asList((Object)SimpleJson.get(jobjMap, "examples"));
 		
 		return byX;
 	}
+	
+	Map<String,Double> totalFor = new ArrayMap();
 
 	/**
 	 * Call DataLog!
@@ -256,8 +274,17 @@ public class DataLogHttpClient {
 		return overview;
 	}
 	
-	public Double getAll() {
-		return all;
+	/**
+	 * @deprecated This is usually NOT the number you want.
+	 * @return How many docs were included in the results?
+	 * @see #getTotalFor()
+	 */
+	public Double getAllCount() {
+		return allCount;
+	}
+	
+	public Map<String, Double> getTotalFor() {
+		return totalFor;
 	}
 
 	public String getLastCall() {

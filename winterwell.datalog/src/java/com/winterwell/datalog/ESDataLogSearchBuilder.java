@@ -117,11 +117,13 @@ public class ESDataLogSearchBuilder {
 		} // ./breakdown
 		
 		// add a total count as well for each top-level terms breakdown
-		Aggregation fCountStats = Aggregations.sum("all", ESStorage.count);
+		Aggregation fCountStats = Aggregations.sum(allCount, ESStorage.count);
 		aggs.add(fCountStats);			
 		
 		return aggs;
 	}
+	
+	public static final String allCount = "allCount";
 
 	/**
 	 * 

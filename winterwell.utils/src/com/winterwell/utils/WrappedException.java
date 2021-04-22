@@ -19,7 +19,7 @@ public class WrappedException extends RuntimeException {
 	 * @param e
 	 */
 	public WrappedException(String msg, Throwable e) {
-		super(msg, e);
+		super(msg, e instanceof WrappedException? e.getCause() : e);
 	}
 
 	public WrappedException(Throwable e) {
@@ -57,7 +57,12 @@ public class WrappedException extends RuntimeException {
 
 	@Override
 	public void printStackTrace(PrintStream s) {
-		getCause().printStackTrace();
+		Throwable c = getCause();
+		if (c==this) {
+			// no loops!
+			return;
+		}
+		c.printStackTrace();
 	}
 
 	@Override
