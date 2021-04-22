@@ -253,6 +253,7 @@ public class ESDataLogSearchBuilder {
 
 		Map aggs2 = Containers.applyToJsonObject(aggregations, ESDataLogSearchBuilder::cleanJson2);
 		// also top-level
+		System.out.println(aggs2);
 		Map aggs3 = (Map) cleanJson2(aggs2, null);
 		return aggs3;
 	}	
@@ -284,7 +285,7 @@ public class ESDataLogSearchBuilder {
 			newMap.remove(no0_+i);
 			for(String k : wrapped.keySet()) {
 				Object v = wrapped.get(k);
-				if (v instanceof Map) {
+				if (v instanceof Map || v instanceof Number) {
 					// its some aggregation results :)
 					Object oldk = newMap.put(k, v);
 					if (oldk!=null) {
