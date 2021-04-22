@@ -38,11 +38,6 @@ public class DataLogHttpClient {
 	String ENDPOINT = Dep.get(DataLogConfig.class).dataEndpoint;
 	
 	private List<AuthToken> auth;
-
-	/**
-	 * TODO this is a limited hack which only supports one top-level summary  
-	 */
-	private transient Map<String,Double> overview;
 	
 	/**
 	 * @deprecated count of docs -- NOT the sum of values
@@ -155,7 +150,7 @@ public class DataLogHttpClient {
 	 * 
 	 * TODO refactor for greater flex
 	 * 
-	 * Side effects: set overview (if breakdown requested it) and examples
+	 * Side effects: set examples
 	 * @param q
 	 * @param breakdown
 	 * @return {key e.g. "oxfam": value e.g. 100}
@@ -192,8 +187,6 @@ public class DataLogHttpClient {
 			double v = MathUtils.toNum(ov);
 			byX.put(k, v);
 		}		
-		// stash extra info in fields
-		overview = SimpleJson.get(jobjMap, breakdown.field); // present if breakdown included by=""
 		// ...count of docs
 		Object _allCount = SimpleJson.get(jobjMap, ESDataLogSearchBuilder.allCount);
 		if (_allCount instanceof Map) {	// HACK old code, Jan 2021
@@ -264,14 +257,6 @@ public class DataLogHttpClient {
 	public void setPeriod(Time start, Time end) {
 		this.start = start; 
 		this.end = end;
-	}
-
-	/**
-	 * Stashed from the previous {@link #getBreakdown(SearchQuery, Breakdown)}
-	 * @return
-	 */
-	public Map<String, Double> getOverview() {
-		return overview;
 	}
 	
 	/**
