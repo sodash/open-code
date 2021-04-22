@@ -477,6 +477,14 @@ public class MathUtils {
 		}
 		return total;
 	}
+	
+	public static double sum(Collection<? extends Number> values) {
+		double total = 0;
+		for (Number d : values) {
+			total += d.doubleValue();
+		}
+		return total;
+	}
 
 	/**
 	 * Copy numbers into an array.
