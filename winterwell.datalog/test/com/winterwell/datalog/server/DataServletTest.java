@@ -86,8 +86,8 @@ public class DataServletTest {
 		Printer.out(data);
 		assert ! data.contains("no0");
 		Map map = resp.getDataMap();
-		Map stats = (Map) map.get("dntn");
-		assert stats != null;
+		Object dntnSum = map.get("dntn");
+		assert dntnSum instanceof Number;
 	}
 	
 	@AfterClass

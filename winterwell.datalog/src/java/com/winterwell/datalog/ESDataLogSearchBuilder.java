@@ -117,11 +117,13 @@ public class ESDataLogSearchBuilder {
 		} // ./breakdown
 		
 		// add a total count as well for each top-level terms breakdown
-		Aggregation fCountStats = Aggregations.sum("all", ESStorage.count);
+		Aggregation fCountStats = Aggregations.sum(allCount, ESStorage.count);
 		aggs.add(fCountStats);			
 		
 		return aggs;
 	}
+	
+	public static final String allCount = "allCount";
 
 	/**
 	 * 
@@ -251,6 +253,7 @@ public class ESDataLogSearchBuilder {
 
 		Map aggs2 = Containers.applyToJsonObject(aggregations, ESDataLogSearchBuilder::cleanJson2);
 		// also top-level
+		System.out.println(aggs2);
 		Map aggs3 = (Map) cleanJson2(aggs2, null);
 		return aggs3;
 	}	
@@ -282,7 +285,7 @@ public class ESDataLogSearchBuilder {
 			newMap.remove(no0_+i);
 			for(String k : wrapped.keySet()) {
 				Object v = wrapped.get(k);
-				if (v instanceof Map) {
+				if (v instanceof Map || v instanceof Number) {
 					// its some aggregation results :)
 					Object oldk = newMap.put(k, v);
 					if (oldk!=null) {
