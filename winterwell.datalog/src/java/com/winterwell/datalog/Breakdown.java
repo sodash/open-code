@@ -17,9 +17,12 @@ import com.winterwell.utils.TodoException;
 public final class Breakdown {
 
 	/**
-	 * String[]
+	 * e.g. "pub" or ",pub" for top-level + breakdown-by-pub
 	 */
 	final String[] by;
+	/**
+	 * e.g. "count" or "price"
+	 */
 	final String field;
 	/**
 	 * Currently assumed to be sum and ignored??
