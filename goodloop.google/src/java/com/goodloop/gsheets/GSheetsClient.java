@@ -113,8 +113,9 @@ public class GSheetsClient {
 		if (credsFile == null) {
 			throw new FileNotFoundException(Logins.getLoginsDir()+"/"+APP+"/credentials.json");
 		}
+		Log.d(LOGTAG, "...read credentials.json "+credsFile);
 		InputStream in = new FileInputStream(credsFile);
-		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));		
 
 		// Build flow and trigger user authorization request.
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
@@ -123,8 +124,10 @@ public class GSheetsClient {
 						.setAccessType("offline").build();
 		int receiverPort = 7149;
 		LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(receiverPort).build();
+		Log.d(LOGTAG, "...get credentials AuthorizationCodeInstalledApp.authorize() with port "+receiverPort+"...");
 		AuthorizationCodeInstalledApp acia = new AuthorizationCodeInstalledApp(flow, receiver);
 		Credential cred = acia.authorize("user");
+		Log.i(LOGTAG, "...get credentials "+cred);
 		return cred;
 	}
 
