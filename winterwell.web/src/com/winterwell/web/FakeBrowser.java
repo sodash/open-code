@@ -689,7 +689,7 @@ public class FakeBrowser {
 			try {
 				errorPage = FileUtils.read(es);				
 				// allow for quite a bit of error 'cos it can be vital for debugging
-				errorMessage += StrUtils.ellipsize(WebUtils.stripTags(errorPage), 1500);
+				errorMessage += StrUtils.ellipsize(WebUtils.stripTags(errorPage), 1500);				
 			} catch(Exception ex) {
 				// ignore
 			}
