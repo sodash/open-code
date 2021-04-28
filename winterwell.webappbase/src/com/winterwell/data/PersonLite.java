@@ -13,6 +13,9 @@ import com.winterwell.web.data.XId;
  */
 public class PersonLite extends AThing {
 
+	/**
+	 * @see #getId() which is the XId, defined in AThing
+	 */
 	@ESKeyword // Hm: Twitter and email are case insensitive, but other sites eg LinkedIn are case sensitive :(
 	public String username;
 	
