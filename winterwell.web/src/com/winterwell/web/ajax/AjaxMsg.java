@@ -121,5 +121,8 @@ public class AjaxMsg extends AbstractMap2<String, Object> implements Serializabl
 		AjaxMsg am = new AjaxMsg(KNoteType.error, id, error);
 		return am;
 	}
-
+	public static AjaxMsg debug(String msg) {
+		AjaxMsg am = new AjaxMsg(KNoteType.debug, msg, msg);
+		return am;
+	}
 }

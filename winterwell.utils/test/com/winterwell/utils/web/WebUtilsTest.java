@@ -116,13 +116,13 @@ public class WebUtilsTest extends TestCase {
 		assert uri.toString().equals(expected) : base+" + "+extension+" = "+uri+" vs "+expected;
 	}
 
-	// This fails -- use CGIUtils.parseHtmlToTree() instead
-	public void devtestParseXmlToTreeGuardianPage() {
-		String url = "http://www.guardian.co.uk/technology/2012/feb/29/raspberry-pi-computer-sale-british";
-		String html = WebUtils.getPage(url);
-		Tree<XMLNode> tree = WebUtils.parseXmlToTree(html);
-		System.out.println(tree);
-	}
+//	// This fails -- use CGIUtils.parseHtmlToTree() instead
+//	public void devtestParseXmlToTreeGuardianPage() {
+//		String url = "http://www.guardian.co.uk/technology/2012/feb/29/raspberry-pi-computer-sale-british";
+//		String html = WebUtils.getPage(url);
+//		Tree<XMLNode> tree = WebUtils.parseXmlToTree(html);
+//		System.out.println(tree);
+//	}
 
 	public void testDig() {
 		{
@@ -220,22 +220,22 @@ public class WebUtilsTest extends TestCase {
 		}
 		assert false : ips;
 	}
-
-	public void testGetXMLReader() throws IOException, SAXException {
-		XMLReader r = WebUtils.getXMLReader();
-		XmlTreeBuilder xtb = new XmlTreeBuilder();
-		r.setContentHandler(xtb);
-		String xml = "<xml>foo &amp; bar</xml>";
-		r.parse(new InputSource(new StringReader(xml)));
-
-		Tree<XMLNode> tree = xtb.getTree();
-		ITree<XMLNode> xmlNode = tree.getNode(0);
-		ITree<XMLNode> textNode = tree.getNode(0, 0);
-		System.out.println(tree);
-		assert xmlNode.getValue().getTag().equals("xml");
-		assert textNode.getValue().isTextNode();
-		assert textNode.getValue().getText().equals("foo & bar");
-	}
+//
+//	public void testGetXMLReader() throws IOException, SAXException {
+//		XMLReader r = WebUtils.getXMLReader();
+//		XmlTreeBuilder xtb = new XmlTreeBuilder();
+//		r.setContentHandler(xtb);
+//		String xml = "<xml>foo &amp; bar</xml>";
+//		r.parse(new InputSource(new StringReader(xml)));
+//
+//		Tree<XMLNode> tree = xtb.getTree();
+//		ITree<XMLNode> xmlNode = tree.getNode(0);
+//		ITree<XMLNode> textNode = tree.getNode(0, 0);
+//		System.out.println(tree);
+//		assert xmlNode.getValue().getTag().equals("xml");
+//		assert textNode.getValue().isTextNode();
+//		assert textNode.getValue().getText().equals("foo & bar");
+//	}
 
 	/**
 	 * Even if there is a no-arg constructor, it doesn't get called by XStream.
@@ -256,65 +256,66 @@ public class WebUtilsTest extends TestCase {
 		Document doc = WebUtils.parseXml("<test>stuff</test>");
 		assert doc != null;
 	}
-
-	public void testParseXmlToTreeSnippet() {
-		Tree<XMLNode> tree = WebUtils
-				.parseXmlToTree("<test><foo a='1'>bar</foo></test>");
-		assert tree.getMaxDepthToLeaf() == 4 : tree;
-		assert tree.getValue() == null;
-		assert tree.getOnlyChild().getValue().getTag().equals("test");
-		XMLNode textNode = tree.getNode(0, 0, 0).getValue();
-		assert textNode.isTextNode();
-		assert textNode.getTag() == null;
-		assert textNode.getText().equals("bar");
-	}
-
-	// public void testSerializeToJSON() {
-	// HashMap map = new HashMap(new ArrayMap("a",1,"b","two"));
-	// String s = WebUtils.serialiseToJSON(map);
-	// This fails! assert s.equals("{\"a\": 1, \"b\": \"two\"}") : s;
-	// }
-
-	// public void testXStreamJson() {
-	// XStream xstream = new XStream(new JsonHierarchicalStreamDriver());
-	// String i = xstream.toXML(17);
-	// Object i2 = xstream.fromXML(i);
-	// assert Integer.valueOf((String) i2) == 17 : i2;
-	// }
-
-	public void testProblemXML() throws Exception {
-		// This url causes Xerces DOM reader a problem
-		XMLReader r = WebUtils.getXMLReader();
-		HttpURLConnection connection = (HttpURLConnection) new URL(
-				"http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/livestats/most_read/rss.xml")
-				.openConnection();
-		InputStream in = connection.getInputStream();
-		String xml = FileUtils.read(in);
-		File out = new File("test/winterwell/utils/web/bbc_rss.xml");
-		out.getParentFile().mkdirs();
-		FileUtils.write(out, xml);
-
-		// try {
-		r.parse(new InputSource(new StringReader(xml)));
-		Tree<XMLNode> tree = WebUtils.parseXmlToTree(xml);
-		List<XMLNode> kids = tree.getChildValues();
-		XMLNode node = kids.get(0);
-		// } catch (Exception e) {
-		// WTF?
-		// e.printStackTrace();
-		// }
-
-		// // removing the meta line seems to help
-		// String xml2 = xml.replaceFirst("<\\?.+?\\?>", "").trim();
-		// Printer.out(xml2);
-		//
-		// r.parse(new InputSource(new StringReader(xml2)));
-		// Tree<XMLNode> tree = WebUtils.parseXmlToTree(xml2);
-		// List<XMLNode> kids = tree.getChildValues();
-		// XMLNode node = kids.get(0);
-	}
-
-	
+//
+//	public void testParseXmlToTreeSnippet() {
+//		Tree<XMLNode> tree = WebUtils
+//				.parseXmlToTree("<test><foo a='1'>bar</foo></test>");
+//		assert tree.getMaxDepthToLeaf() == 4 : tree;
+//		assert tree.getValue() == null;
+//		assert tree.getOnlyChild().getValue().getTag().equals("test");
+//		XMLNode textNode = tree.getNode(0, 0, 0).getValue();
+//		assert textNode.isTextNode();
+//		assert textNode.getTag() == null;
+//		assert textNode.getText().equals("bar");
+//	}
+//
+//	// public void testSerializeToJSON() {
+//	// HashMap map = new HashMap(new ArrayMap("a",1,"b","two"));
+//	// String s = WebUtils.serialiseToJSON(map);
+//	// This fails! assert s.equals("{\"a\": 1, \"b\": \"two\"}") : s;
+//	// }
+//
+//	// public void testXStreamJson() {
+//	// XStream xstream = new XStream(new JsonHierarchicalStreamDriver());
+//	// String i = xstream.toXML(17);
+//	// Object i2 = xstream.fromXML(i);
+//	// assert Integer.valueOf((String) i2) == 17 : i2;
+//	// }
+//
+//	public void testProblemXML() throws Exception {
+//		// This url causes Xerces DOM reader a problem
+//		XMLReader r = WebUtils.getXMLReader();
+//		HttpURLConnection connection = (HttpURLConnection) new URL(
+//				"http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/livestats/most_read/rss.xml")
+//				.openConnection();
+//		InputStream in = connection.getInputStream();
+//		String xml = FileUtils.read(in);
+//		File out = new File("test/winterwell/utils/web/bbc_rss.xml");
+//		out.getParentFile().mkdirs();
+//		FileUtils.write(out, xml);
+//
+//		// try {
+//		r.parse(new InputSource(new StringReader(xml)));
+//		if (true) return;
+//		Tree<XMLNode> tree = new Tree(); //WebUtils.parseXmlToTree(xml);
+//		List<XMLNode> kids = tree.getChildValues();
+//		XMLNode node = kids.get(0);
+//		// } catch (Exception e) {
+//		// WTF?
+//		// e.printStackTrace();
+//		// }
+//
+//		// // removing the meta line seems to help
+//		// String xml2 = xml.replaceFirst("<\\?.+?\\?>", "").trim();
+//		// Printer.out(xml2);
+//		//
+//		// r.parse(new InputSource(new StringReader(xml2)));
+//		// Tree<XMLNode> tree = WebUtils.parseXmlToTree(xml2);
+//		// List<XMLNode> kids = tree.getChildValues();
+//		// XMLNode node = kids.get(0);
+//	}
+//
+//	
 	public void offtestRenderToPdf() {
 		{
 			String html = "<html><head></head><body><h1>PDF ROCKS</h1></body></html>";
@@ -547,7 +548,20 @@ public class WebUtilsTest extends TestCase {
 		}
 	}
 
+	
 	public void testGetDomain() {
+		{
+			String d1 = WebUtils.getDomain("good-loop.com");
+			String d2 = WebUtils.getDomain("my.good-loop.com");
+			String d3 = WebUtils.getDomain("t4g.good-loop.com");
+			String d4 = WebUtils.getDomain("www.good-loop.com");
+			String d5 = WebUtils.getDomain("good-loop.com.foobar.com");
+			assert d1.equals("good-loop.com") : d1;
+			assert d1.equals(d2) : d2;
+			assert d1.equals(d3) : d3;
+			assert d1.equals(d4) : d4;
+			assert ! d1.equals(d5) : d4;
+		}
 		{
 			String d = WebUtils.getDomain("good-loop-xmas.com");
 			assert d.equals("good-loop-xmas.com") : d;

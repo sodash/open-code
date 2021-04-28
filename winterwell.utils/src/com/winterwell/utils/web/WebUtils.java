@@ -52,7 +52,6 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
 
 import com.winterwell.utils.Environment;
 import com.winterwell.utils.FailureException;
@@ -1087,32 +1086,33 @@ public class WebUtils {
 		// factory.setXIncludeAware(false); unnecessary and causes errors
 		Log.i("init", "Using XML parser " + docBuilderFactory);
 	}
-	/**
-	 * A lighter-weight alternative to using Document and XPath
-	 *
-	 * @param xml
-	 * @return a tree. The root node has no XMLNode (it is the document
-	 *         super-node).
-	 *
-	 * @see CGIUtils#parseHtmlToTree(String)
-	 */
-	public static Tree<XMLNode> parseXmlToTree(String xml) {
-		XMLReader xmlReader = getXMLReader();
-		XmlTreeBuilder treeBuilder = new XmlTreeBuilder();
-		xmlReader.setContentHandler(treeBuilder);
-		try {
-			xmlReader.parse(new InputSource(new StringReader(xml)));
-			return treeBuilder.getTree();
-		} catch (Exception e) {
-			throw Utils.runtime(e);
-		}
-		// // Do it dirty
-		// treeBuilder = new XmlTreeBuilder();
-		// DirtyXmlReader xmlReader2 = new DirtyXmlReader();
-		// xmlReader2.setContentHandler(treeBuilder);
-		// xmlReader2.parse(new StringReader(xml));
-		// return treeBuilder.getTree();
-	}
+	
+//	/**
+//	 * A lighter-weight alternative to using Document and XPath
+//	 *
+//	 * @param xml
+//	 * @return a tree. The root node has no XMLNode (it is the document
+//	 *         super-node).
+//	 *
+//	 * @see CGIUtils#parseHtmlToTree(String)
+//	 */
+//	public static Tree<XMLNode> parseXmlToTree(String xml) {
+//		XMLReader xmlReader = getXMLReader();
+//		XmlTreeBuilder treeBuilder = new XmlTreeBuilder();
+//		xmlReader.setContentHandler(treeBuilder);
+//		try {
+//			xmlReader.parse(new InputSource(new StringReader(xml)));
+//			return treeBuilder.getTree();
+//		} catch (Exception e) {
+//			throw Utils.runtime(e);
+//		}
+//		// // Do it dirty
+//		// treeBuilder = new XmlTreeBuilder();
+//		// DirtyXmlReader xmlReader2 = new DirtyXmlReader();
+//		// xmlReader2.setContentHandler(treeBuilder);
+//		// xmlReader2.parse(new StringReader(xml));
+//		// return treeBuilder.getTree();
+//	}
 	
 	/**
 	 * Change the protocol prefix of a URL.
@@ -1811,98 +1811,6 @@ public class WebUtils {
 		return proc;
 	}
 
-
-}
-
-/**
- * Used by {@link WebUtils#parseXml(String)} to build DOM-like trees. Rationale:
- * Document & associated classes suck.
- *
- * <p>
- * TODO should we add a filter on nodes, to pre-ignore boring ones?
- *
- * @author daniel
- */
-final class XmlTreeBuilder extends DefaultHandler {
-
-	ITree<XMLNode> activeTree;
-
-	private boolean endFlag;
-
-	private Tree<XMLNode> root;
-
-	StringBuilder text = new StringBuilder();
-
-	public XmlTreeBuilder() {
-	}
-
-	@Override
-	public void characters(char[] ch, int start, int length)
-			throws SAXException {
-		text.append(ch, start, length);
-	}
-
-	@Override
-	public void endDocument() throws SAXException {
-		endFlag = true;
-	}
-
-	@Override
-	public void endElement(String uri, String localName, String name)
-			throws SAXException {
-		// Create a text node?
-		processTextBuffer();
-		// Pop node
-		activeTree = activeTree.getParent();
-	}
-
-	/**
-	 * The root node has no XMLNode (it is the document super-node).
-	 *
-	 * @return
-	 */
-	public Tree<XMLNode> getTree() {
-		assert endFlag;
-		return root;
-	}
-
-	private void processTextBuffer() {
-		if (text.length() == 0)
-			return;
-		XMLNode textNode = new XMLNode(text.toString(), true);
-		Tree<XMLNode> textTreeNode = new Tree<XMLNode>(activeTree, textNode);
-		text = new StringBuilder();
-	}
-
-	@Override
-	public void skippedEntity(String name) throws SAXException {
-		// do nothing
-	}
-
-	@Override
-	public void startDocument() throws SAXException {
-		root = new Tree<XMLNode>();
-		activeTree = root;
-	}
-
-	@Override
-	public void startElement(String uri, String localName, String name,
-			Attributes atts) throws SAXException {
-		// Create a text node?
-		processTextBuffer();
-		// Build node
-		String tag = Utils.isBlank(localName) ? name : localName;
-		XMLNode node = new XMLNode(tag);
-		for (int i = 0, n = atts.getLength(); i < n; i++) {
-			String aName = atts.getQName(i);
-			String value = atts.getValue(i);
-			node.getAttributes().put(aName, value);
-		}
-		// New active tree-node
-		Tree<XMLNode> tree = new Tree<XMLNode>(activeTree, node);
-		activeTree = tree;
-	}
-	
 
 }
 

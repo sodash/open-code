@@ -73,6 +73,10 @@ public class WebRequest implements IProperties, Closeable {
 		String p = request.getProtocol();
 		String ph = getRequestProtocolHost();
 		String sameSite = "None";
+		// HACK avoid sameSite on local 'cos it requires secure and we don't do secure on local
+		if ( ! request.isSecure() && ph.startsWith("http://local")) {
+			sameSite = null;	
+		}
 		Log.d("cookie", "set "+name+" with SameSite="+sameSite+" from protocol: "+p+" protocol-host: "+ph);		
 		return WebUtils2.addCookie(getResponse(), name, value, timeTolive, cookieDomain, sameSite);
 	}
@@ -1367,5 +1371,14 @@ public class WebRequest implements IProperties, Closeable {
 			put(NONCE, nonce);
 		}
 		return nonce;
+	}
+
+	public void sendError(int code, String output) {
+		// add messages
+		List<AjaxMsg> messages = getMessages();
+		if ( ! messages.isEmpty()) {
+			output+="\n\n"+StrUtils.join(Containers.apply(messages, AjaxMsg::getText), "\n");
+		}
+		WebUtils2.sendError(code, output, getResponse());
 	}
 }
