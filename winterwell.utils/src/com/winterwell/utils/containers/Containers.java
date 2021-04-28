@@ -957,7 +957,6 @@ public final class Containers  {
 	public static <X, X2 extends X> List<X2> filter(Iterable<X2> list,
 			IFilter<X> filter) {
 		if (list==null) return null;
-		assert filter != null : list;
 		ArrayList<X2> out = new ArrayList();
 		for (X2 x : list) {
 			if (filter.accept(x)) {
