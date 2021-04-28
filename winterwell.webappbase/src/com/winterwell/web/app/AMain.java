@@ -18,6 +18,7 @@ import com.winterwell.utils.Dep;
 import com.winterwell.utils.Mutable;
 import com.winterwell.utils.Mutable.Ref;
 import com.winterwell.utils.Printer;
+import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.io.ConfigBuilder;
@@ -124,6 +125,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * @param args
 	 */
 	public void doMain(String[] args) {
+		Thread.currentThread().setName(getClass().getSimpleName()+".doMain");
 		// logfile before log config??! Is that right?
 		// Try to use the "logs" subdirectory - but use the app root if that's impossible.
 		File logDir = new File("logs");
@@ -252,6 +254,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	 * Sets {@link #pleaseStop} to true, requests Jetty stop, and interrupts the {@link #mainLoopThread} if used.
 	 */
 	public void stop() {
+		Log.i("AMain", "stop called "+ReflectionUtils.getSomeStack(8));
 		pleaseStop = true;
 		if (jl != null) {
 			jl.stop();
