@@ -785,11 +785,19 @@ public abstract class CrudServlet<T> implements IServlet {
 		// HACK: are you a member of Team Good-Loop?
 		for (AuthToken authToken : tokens) {
 			String name = authToken.getXId().getName();
-			if ( ! WebUtils2.isValidEmail(name)) continue;
+			if ( ! WebUtils2.isValidEmail(name)) {
+				// app2app also, but nothing else (eg Twitter)
+				if (authToken.getXId().isService("app")) {
+					if (name.endsWith("good-loop.com")) {
+						return hits2;
+					}
+				}
+				continue;
+			}
 			if (name.endsWith("@good-loop.com")) {
 				if ( ! authToken.isVerified()) {
 					// TODO verify
-					Log.w(LOGTAG(), "verify "+authToken);
+					Log.w(LOGTAG(), "not verified "+authToken);
 				}
 				// That will do for us for now
 				return hits2;
