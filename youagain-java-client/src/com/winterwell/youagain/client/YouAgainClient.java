@@ -30,6 +30,7 @@ import com.winterwell.utils.containers.Pair;
 import com.winterwell.utils.io.ConfigFactory;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.log.WeirdException;
 import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.utils.web.XStreamUtils;
@@ -194,7 +195,12 @@ public final class YouAgainClient {
 	 */
 	public List<AuthToken> getAuthTokens(WebRequest state) {
 		// check cache
-		List<AuthToken> tokens = state.get(AUTHS);
+		Object _auths = state.get(AUTHS);
+		if (_auths instanceof String) { // paranoia - ClassCast bug seen Apr 2021
+			Log.e(LOGTAG, "String not list?! "+AUTHS+": "+_auths+" from "+state);
+			_auths = null; // skip the cache then			
+		}		
+		List<AuthToken> tokens = (List<AuthToken>) _auths;
 		if (tokens!=null) {
 			return new ArrayList(tokens);
 		}
