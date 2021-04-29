@@ -2,6 +2,7 @@ package com.winterwell.web;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.regex.Matcher;
 
 import com.winterwell.utils.Printer;
 import com.winterwell.utils.StrUtils;
@@ -61,13 +62,26 @@ public class WebEx extends RuntimeException {
 	public final int code;
 
 	public WebEx(int code, String msg) {
-		super(code+": "+msg);		
-		this.code = code;
+		this(code, msg, null);
 	}
 	
 	public WebEx(int code, String msg, Throwable e) {
-		super(code+": "+msg, e);		
+		super(code+": "+sanitise(msg), e);
 		this.code = code;
+	}
+
+	/**
+	 * There's a clever hack where you can craft a url,
+	 * where our error message shows the attackers content.
+	 * So let's guard against bad content.
+	 */
+	private static String sanitise(String msg) {
+		if (msg==null) return null;
+		String m2 = WebUtils2.stripTags(msg);
+		// href?
+		Matcher m = WebUtils2.URL_WEB_DOMAIN_REGEX.matcher(m2);
+		String m3 = m.replaceAll("(untrusted) $0");
+		return m3;
 	}
 
 	/**
