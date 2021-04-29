@@ -79,7 +79,7 @@ public class WebEx extends RuntimeException {
 		if (msg==null) return null;
 		String m2 = WebUtils2.stripTags(msg);
 		// href?
-		Matcher m = WebUtils2.URL_WEB_DOMAIN_REGEX.matcher(m2);
+		Matcher m = WebUtils2.URL_REGEX.matcher(m2);
 		String m3 = m.replaceAll("(untrusted) $0");
 		return m3;
 	}
