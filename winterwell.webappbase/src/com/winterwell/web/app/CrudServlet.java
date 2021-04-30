@@ -690,7 +690,14 @@ public abstract class CrudServlet<T> implements IServlet {
 		String prefix = state.get("prefix");
 		String sort = state.get(SORT, defaultSort);		
 		int size = state.get(SIZE, 1000);
-		int from = state.get(FROM, 0);
+		int from = 0;
+		try {
+			from = state.get(FROM);
+		} catch(WebEx ex) {
+			// from also gets used for e.g. "from Alice"
+			// so swallow exceptions 
+			Log.d(LOGTAG(), ex+" "+state);
+		}
 		Period period = CommonFields.getPeriod(state);
 		
 		SearchResponse sr = doList2(q, prefix, status, sort, size,from, period, state);
