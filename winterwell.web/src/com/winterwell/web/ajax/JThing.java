@@ -16,6 +16,9 @@ import com.winterwell.utils.web.IHasJson;
 
 /**
  * Wrapper for json objects
+ * 
+ * TODO should this recognise IHasJson??
+ * 
  * @author daniel
  *
  */
@@ -158,7 +161,7 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 		return "JThing"+StrUtils.ellipsize(string(), 100)+"";
 	}
 	/**
-	 * Modify the map() view, and force an update of the string() view + null the java() view
+	 * Modify the map() view, and null (i.e. force an update) of the string() view + null the java() view
 	 * @param k
 	 * @param v
 	 */

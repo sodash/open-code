@@ -692,8 +692,8 @@ public abstract class CrudServlet<T> implements IServlet {
 		int size = state.get(SIZE, 1000);
 		int from = 0;
 		try {
-			from = state.get(FROM);
-		} catch(WebEx ex) {
+			from = state.get(FROM, 0);
+		} catch(Exception ex) {
 			// from also gets used for e.g. "from Alice"
 			// so swallow exceptions 
 			Log.d(LOGTAG(), ex+" "+state);
