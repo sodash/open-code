@@ -776,6 +776,38 @@ public abstract class CrudServlet<T> implements IServlet {
 	protected List<ESHit<T>> doList2_securityFilter(List<ESHit<T>> hits2, WebRequest state, List<AuthToken> tokens, YouAgainClient yac) {
 		return hits2;
 	}
+	
+	protected void securityHack_teamGoodLoop(WebRequest state) {
+		YouAgainClient yac = Dep.get(YouAgainClient.class);
+		List<AuthToken> tokens = yac.getAuthTokens(state);
+		for (AuthToken authToken : tokens) {
+			String name = authToken.getXId().getName();
+			if ( ! WebUtils2.isValidEmail(name)) {
+				// app2app also, but nothing else (eg Twitter)
+				if (authToken.getXId().isService("app")) {
+					if (name.endsWith("good-loop.com")) {
+						return;
+					}
+				}
+				continue;
+			}
+			if (name.endsWith("@good-loop.com")) {
+				if ( ! authToken.isVerified()) {
+					// TODO verify
+					Log.w(LOGTAG(), "not verified "+authToken);
+				}
+				// That will do for us for now
+				return;
+			}
+			// hack: Alexander, Pete, Amanda, Emilia
+			if ("alexander.scurlock@gmail.com info@frankaccounting.co.uk amanda_shields@hotmail.co.uk em@kireli.studio".contains(name)) {
+				return;
+			}
+		}
+		// TODO use YA shares to allow other emails through
+		// No - sod off
+		throw new WebEx.E401("This is for Team Good-Loop - Please ask for access");
+	}
 
 
 	/**
@@ -790,33 +822,8 @@ public abstract class CrudServlet<T> implements IServlet {
 				List<AuthToken> tokens, YouAgainClient yac) 
 	{
 		// HACK: are you a member of Team Good-Loop?
-		for (AuthToken authToken : tokens) {
-			String name = authToken.getXId().getName();
-			if ( ! WebUtils2.isValidEmail(name)) {
-				// app2app also, but nothing else (eg Twitter)
-				if (authToken.getXId().isService("app")) {
-					if (name.endsWith("good-loop.com")) {
-						return hits2;
-					}
-				}
-				continue;
-			}
-			if (name.endsWith("@good-loop.com")) {
-				if ( ! authToken.isVerified()) {
-					// TODO verify
-					Log.w(LOGTAG(), "not verified "+authToken);
-				}
-				// That will do for us for now
-				return hits2;
-			}
-			// hack: Alexander, Pete, Amanda, Emilia
-			if ("alexander.scurlock@gmail.com info@frankaccounting.co.uk amanda_shields@hotmail.co.uk em@kireli.studio".contains(name)) {
-				return hits2;
-			}
-		}
-		// TODO use YA shares to allow other emails through
-		// No - sod off
-		throw new WebEx.E401("This is for Team Good-Loop - Please ask for access");
+		securityHack_teamGoodLoop(state);
+		return hits2;
 	}
 	
 

@@ -1312,6 +1312,12 @@ public class WebUtils {
 		}
 	}
 	
+	/**
+	 * Assumes: `convert` aka imagemagick is installed as a command line tool
+	 * @param pdfIn
+	 * @param pngOut
+	 * @throws IOException
+	 */
 	public static void pngFromPdf(File pdfIn, File pngOut) throws IOException {
 		if ( ! pdfIn.exists()) throw new FileNotFoundException("missing pdf input file: "+pdfIn);
 //		String crop = "-crop 500x500 +repage "; // crop in case its giant?? Not working as yet :(
