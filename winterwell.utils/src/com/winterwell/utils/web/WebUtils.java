@@ -1798,7 +1798,7 @@ public class WebUtils {
 	}
 	
 	/**
-	 * 
+	 * Dependency: npm -i -g chrome-headless-render-pdf
 	 * @param url
 	 * @param pdf
 	 * @param options e.g. for an A5 certificate "--no-margins --include-background --page-ranges 1 --scale 0.87 --landscape --paper-width 5.8 --paper-height 8.3"

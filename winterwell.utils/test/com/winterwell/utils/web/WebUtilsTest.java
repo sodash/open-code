@@ -26,6 +26,7 @@ import com.winterwell.utils.containers.ITree;
 import com.winterwell.utils.containers.Tree;
 import com.winterwell.utils.gui.GuiUtils;
 import com.winterwell.utils.io.FileUtils;
+import com.winterwell.utils.time.TUnit;
 
 import junit.framework.TestCase;
 
@@ -46,6 +47,18 @@ public class WebUtilsTest extends TestCase {
 		String footer = null;
 		WebUtils.renderToPdf(html, file);
 		WebUtils.display(file);
+	}
+	
+
+	public void testRenderUrlToPdf_usingChrome_ourReactPage() throws IOException {
+		String a = "http://my.good-loop.com/#campaign/merrick_k9s_for_heroes_q4_2020";
+		File pdfout = new File("temp/ihub-merrick.pdf");
+		pdfout.getParentFile().mkdir();
+		FileUtils.delete(pdfout);
+		String options =null;
+		Proc proc = WebUtils.renderUrlToPdf_usingChrome(a, pdfout, options);
+		proc.waitFor(TUnit.MINUTE.dt);
+		WebUtils.display(pdfout);
 	}
 
 	public void testGetHost() {
