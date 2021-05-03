@@ -627,6 +627,7 @@ public class WebRequest implements IProperties, Closeable {
 	/**
 	 * Convenience wrapper around {@link #get(Key)}. Returns defaultValue if no
 	 * value has been set.
+	 * @param defaultValue (can be null) This is returned here (but not stored) if the key is unset
 	 */
 	public final <T> T get(Key<T> key, T defaultValue) {
 		if (defaultValue == null) {
