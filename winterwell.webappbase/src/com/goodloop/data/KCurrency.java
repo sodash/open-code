@@ -9,7 +9,7 @@ package com.goodloop.data;
  */
 public enum KCurrency {
 
-	GBP("£"), USD("$"),
+	GBP("£"), USD("$"), AUD("A$"), EUR("€"), MXN("MX$"), JPY("￥"),
 	
 	/**
 	 * HACK: allow Money objects to also represent %s and other multipliers. 
