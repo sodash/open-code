@@ -3,14 +3,28 @@ package com.winterwell.utils;
 import static org.junit.Assert.assertEquals;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.web.WebUtils;
 
 public class SimpleTemplateVarsTest {
 
+
+	@Test
+	public void testEncodeURIFn() {
+		{
+			Map src = new ArrayMap("name", "Daniel Winterstein");
+			SimpleTemplateVars props = new SimpleTemplateVars(src);
+			props.addFn("encodeURI", WebUtils::urlEncode);
+			String s = props.process("Hello link://${encodeURI($name)}");
+			assertEquals("Hello link://Daniel%20Winterstein", s);
+		}
+	}
+	
 	@Test
 	public void testProcessNoJS() {
 		{

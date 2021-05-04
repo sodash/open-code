@@ -29,12 +29,13 @@ import com.winterwell.utils.web.WebUtils;
  * There is also a {@link #process(String)} method which does Perl style variable
  * interpolation.
  * @author daniel
- * @testedby  SimpleTemplateVarsTest}
+ * @testedby  SimpleTemplateVarsTest
  */
 public final class SimpleTemplateVars {
 
 	private Map<String, ?> vars;
 	private boolean useJS;
+	private Map<String,IFn> fns = new HashMap();
 	
 	public SimpleTemplateVars setUseJS(boolean useJS) {
 		this.useJS = useJS;
@@ -71,7 +72,7 @@ public final class SimpleTemplateVars {
 
 		// process $vars
 		String txt3 = process2_vars(txt2);
-		
+				
 		// process js
 		if (useJS) {
 			txt2 = process2_js(txtWithVars, txt2);
@@ -82,12 +83,32 @@ public final class SimpleTemplateVars {
 	}
 
 	/**
-	 * TODO replace ${var}
+	 * Replace ${var} or ${encodeURI($var)}
+	 * This is a simpler safer alternative to js. It only runs if useJS is false
 	 * @param txt2
 	 * @return
 	 */
-	private String process2_dollarBracket(String txt2) {
-		return txt2; // TODO
+	private String process2_dollarBracket(String txt) {
+		if (useJS) {
+			return txt; // this is a simpler safer alternative to js 
+		}
+		Pattern pdb = Pattern.compile("\\$\\{([^\\}]*)\\}");
+		Pattern pfn = Pattern.compile("^([a-zA-Z0-9_]+)\\((.*?)\\)$");
+		String txtOut = StrUtils.replace(txt, pdb, (StringBuilder sb, Matcher m) -> {
+			String innards = m.group(1);
+			String processedInnards = process2_vars(innards);
+			Matcher pfnm = pfn.matcher(processedInnards);
+			if (pfnm.matches()) {
+				String fname = pfnm.group(1);
+				String farg = pfnm.group(2);
+				IFn fn = fns.get(fname);
+				if (fn!=null) {
+					processedInnards = StrUtils.str(fn.apply(farg));
+				}
+			}
+			if (processedInnards != null) sb.append(processedInnards);
+		});
+		return txtOut;
 	}
 
 	static final Pattern p = Pattern.compile("\\$([a-zA-Z0-9_]+)(\\.[a-zA-Z0-9_]+)?");
@@ -188,6 +209,10 @@ public final class SimpleTemplateVars {
 			throw Utils.runtime(e); // TODO fail gracefully?
 		}
 		return txt2;
+	}
+
+	public void addFn(String fnName, IFn fn) {
+		fns.put(fnName, fn);
 	}
 
 
