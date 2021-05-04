@@ -45,21 +45,9 @@ public class Logins {
 			cb.set(loginsDir);
 		}
 		Logins logins = cb.get(); // This allows the logins map to be populated from the properties
+		Log.i(LOGTAG, "init credentials: "+logins.logins.keySet());
 		return logins;
 	}	
-
-	/**
-	 * @deprecated Use {@link #getLoginFile(String, String)}
-	 * @param appName
-	 * @param filename
-	 * @return null if doesn't exist
-	 */
-	public static File getFile(String appName, String filename) {
-		File f = new File(loginsDir, appName+"/"+filename);
-		if (f.isFile()) return f;
-		Log.i(LOGTAG, "No credentials file: "+f);
-		return null;
-	}
 	
 	/**
 	 * 
@@ -72,6 +60,7 @@ public class Logins {
 		if ( ! f.isFile()) {
 			Log.i(LOGTAG, "No credentials file: "+f);
 		}
+		Log.i(LOGTAG, "Found credentials file: "+f);
 		return f;
 	}
 	
@@ -83,7 +72,9 @@ public class Logins {
 		String _domain = domain.replace('.', '_');
 		// what do we have?
 		List<String> keys = Containers.filter(dflt.logins.keySet(), k -> k.startsWith(_domain));
-		if (keys.isEmpty()) return null;
+		if (keys.isEmpty()) {
+			return null;
+		}
 		LoginDetails ld = new LoginDetails(domain);
 		for (String k : keys) {
 			String f = k.substring(_domain.length()+1);

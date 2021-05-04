@@ -109,7 +109,7 @@ public class GSheetsClient {
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
 		Log.i(LOGTAG, "get credentials...");
 		// Load client secrets.
-		File credsFile = Logins.getFile(APP, "credentials.json");
+		File credsFile = Logins.getLoginFile(APP, "credentials.json");
 		if (credsFile == null) {
 			throw new FileNotFoundException(Logins.getLoginsDir()+"/"+APP+"/credentials.json");
 		}
