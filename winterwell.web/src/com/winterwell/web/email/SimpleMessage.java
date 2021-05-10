@@ -102,7 +102,7 @@ public class SimpleMessage extends MimeMessage {
 			Address[] recips = super.getAllRecipients();
 			return recips==null? new Address[0] : recips;
 		} catch (Exception ex) {
-			// TODO be more robust about bad formatting
+			// be more robust about bad formatting??
 			Log.w("SimpleMessage", ex);
 			try {
 				String[] hTo = getHeader("To");
