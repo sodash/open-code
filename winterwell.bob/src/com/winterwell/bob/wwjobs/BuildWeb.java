@@ -59,6 +59,9 @@ public class BuildWeb extends BuildWinterwellProject {
 		if (outDir!=null) {
 			mdt.setOutputDirectory(outDir);
 		}
+		
+		mdt.run(); // HACK
+		
 		deps.add(mdt);
 		
 		return deps;
