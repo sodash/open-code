@@ -3,8 +3,10 @@ package com.winterwell.bob.tasks;
 import java.io.File;
 import java.io.IOException;
 
+import com.winterwell.bob.BobConfig;
 import com.winterwell.bob.BuildTask;
 import com.winterwell.bob.wwjobs.BuildHacks;
+import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.web.app.KServerType;
@@ -40,7 +42,10 @@ public class GitBobProjectTask extends BuildTask {
 		this.dir = dir;
 		// dependencies shouldnt need rebuilding all the time
 		setSkipGap(TUnit.DAY.dt);
-		resetLocalChanges = BuildHacks.getServerType() == KServerType.TEST;
+		resetLocalChanges = BuildHacks.getServerType() != KServerType.LOCAL;
+		if (FileUtils.contains(getConfig().getGitBobDir(), dir)) {
+			resetLocalChanges = true;
+		}
 	}
 	
 	/**
@@ -50,7 +55,7 @@ public class GitBobProjectTask extends BuildTask {
 
 	boolean stashLocalChanges;
 	/**
-	 * This is set true for non-local. It helps ensure the git pull will work.
+	 * This is set true for non-local and bobwarehouse. It helps ensure the git pull will work.
 	 * It does delete local edits!
 	 */
 	boolean resetLocalChanges;
