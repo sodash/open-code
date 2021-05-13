@@ -90,7 +90,11 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 	public void process(WebRequest state) throws IOException {	
 		
 		ArrayMap cargo = new ArrayMap();
-		cargo.put("app", AMain.main==null? null : AMain.main.getAppNameFull());
+		if (AMain.main!=null) {
+			cargo.put("app", AMain.main.getAppNameFull());
+			cargo.put("jetty-version", AMain.main.jl.getServer().getVersion());
+		}
+		
 		// server type
 		cargo.put("serverType", AppUtils.getServerType(null));
 		
