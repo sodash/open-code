@@ -43,6 +43,9 @@ public class MavenDependencyTask extends BuildTask {
 		if ( ! getOutputDirectory().isDirectory()) {
 			return false; // run
 		}
+		if (getOutputDirectory().list().length == 0) {
+			return false; // no jars!
+		}
 		return null; // dont run too often. it is tedious
 	}
 	

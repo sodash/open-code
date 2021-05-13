@@ -190,7 +190,7 @@ public class JsonResponse implements IProperties {
 			}
 		}
 		
-		String json = JSON.toString(map);
+		String json = WebUtils2.generateJSON(map);
 		if (cargoJson==null) {
 			return json;
 		}

@@ -24,6 +24,7 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.app.AppUtils;
 
@@ -142,7 +143,7 @@ public class ESDataLogSearchBuilder {
 		if (breakdown_output.length > 1) {
 			String json = bd.substring(bd.indexOf("{"), bd.length());
 			try {
-				reportSpec = (Map) JSON.parse(json);
+				reportSpec = WebUtils2.parseJSON(json);
 			} catch(Exception pex) {
 				throw new WebEx.BadParameterException("breakdown", "invalid json: "+json, pex);
 			}

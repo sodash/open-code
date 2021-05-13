@@ -90,23 +90,11 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 	public void process(WebRequest state) throws IOException {	
 		
 		ArrayMap cargo = new ArrayMap();
-		
+		cargo.put("app", AMain.main==null? null : AMain.main.getAppNameFull());
 		// server type
 		cargo.put("serverType", AppUtils.getServerType(null));
 		
 		ArrayList repos = new ArrayList();
-//		// Extra Branch Info, if we have it
-		for(String repo : new String[]{"adserver","flexi-gson"}) {
-//			String rhash = props.getProperty(Creole.PROPERTY_GIT_COMMIT_ID+"."+repo);
-//			String rinfo = props.getProperty(Creole.PROPERTY_GIT_COMMIT_INFO+"."+repo);
-//			String rbranch = props.getProperty(Creole.PROPERTY_GIT_BRANCH+"."+repo);
-//			Map info = new ArrayMap("repo", repo, "hash", rhash, "branch", rbranch);
-//			if (rinfo!=null) {
-//				Map _info = XStreamUtils.serialiseFromXml(rinfo);
-//				info.putAll(_info);
-//			}		
-//			repos.add(info);
-		}
 		cargo.put("git-repos", repos);
 		
 		cargo.put("hostname", WebUtils2.hostname());
@@ -193,6 +181,14 @@ public class ManifestServlet extends HttpServlet implements IServlet {
 			File dir = new File(FileUtils.getWorkingDirectory(), "build-lib");
 			ExecutorService pool = Executors.newFixedThreadPool(10);
 			File[] files = dir.listFiles();
+			// hack - dev box?
+			if (files==null && KServerType.LOCAL == AppUtils.getServerType(null)) {
+				dir = new File(FileUtils.getWorkingDirectory(), "dependencies");
+				files = dir.listFiles();
+				if (files==null) {
+					return manifestFromJar; // odd, but oh well
+				}
+			}			
 			for (File file : files) {
 				pool.submit(() -> {
 					Map<String, Object> manifest = JarTask.getManifest(file);

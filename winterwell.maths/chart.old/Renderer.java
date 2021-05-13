@@ -105,7 +105,7 @@ public abstract class Renderer {
 	
 	private String createChartRenderingScript(AChart chart, String html) {
 		html += "<script>\n(function(){$(function(){"
-				+ "var chart=JSON.parse('" + chart.toJSONString() + "');Chart.render(chart);"
+				+ "var chart=WebUtils2.parseJSON('" + chart.toJSONString() + "');Chart.render(chart);"
 				+ "});}())\n</script>";
 		
 		return html;

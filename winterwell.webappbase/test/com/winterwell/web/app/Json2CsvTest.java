@@ -11,6 +11,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.web.SimpleJson;
+import com.winterwell.utils.web.WebUtils2;
 
 public class Json2CsvTest {
 
@@ -18,7 +19,7 @@ public class Json2CsvTest {
 	public void testForSanjay() {
 		File f = new File("data/sanjay.json");
 		String s = FileUtils.read(f);
-		Map jobj = (Map) JSON.parse(s);		
+		Map jobj = WebUtils2.parseJSON(s);		
 		File out = new File("artifacts/feelings.csv");
 		out.getParentFile().mkdirs();
 		CSVWriter w = new CSVWriter(out);

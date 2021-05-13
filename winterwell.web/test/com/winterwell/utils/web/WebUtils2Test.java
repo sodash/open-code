@@ -31,7 +31,7 @@ public class WebUtils2Test {
 	@Test
 	public void testAddToList() {
 		String json0 = "{\"a\":[]}";
-		Map jobj0 = (Map) JSON.parse(json0);
+		Map jobj0 = WebUtils2.parseJSON(json0);
 		SimpleJson.set(jobj0, "apple", "a", "1");
 		assert "apple".equals(SimpleJson.get(jobj0, "a", 1));
 	}

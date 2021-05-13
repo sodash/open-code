@@ -1292,7 +1292,7 @@ public abstract class CrudServlet<T> implements IServlet {
 		String diff = state.get("diff");
 		if (diff!=null) {
 			// TODO Instead of applying the diff here, why not save the diff directly using an ES update? That would allow for multiple editors
-			Object jdiff = JSON.parse(diff);
+			Object jdiff = WebUtils2.parseJSON(diff);
 			List<Map> diffs = Containers.asList(jdiff);
 			JThing<T> oldThing = getThingFromDB(state);
 			applyDiff(oldThing, diffs);

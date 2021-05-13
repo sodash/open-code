@@ -1,10 +1,11 @@
 package com.winterwell.depot;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.eclipse.jetty.util.ConcurrentHashSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import com.winterwell.depot.IHasVersion.IHasBefore;
 import com.winterwell.es.ESPath;
@@ -94,7 +95,7 @@ public class ESDepotStore implements IStore {
 	/**
 	 * Key = baseIndex_type
 	 */
-	final Set<String> knownIndexes = new ConcurrentHashSet<>();
+	final Set<String> knownIndexes = Collections.synchronizedSet(new HashSet()); // ?? new ConcurrentSkipListSet<>();
 	
 	/**
 	 * Supports the use of index = an alias -> base, which allows for easier mapping updates

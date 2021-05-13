@@ -24,6 +24,7 @@ import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.IHasJson;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.app.AppUtils;
 import com.winterwell.web.app.KServerType;
@@ -163,7 +164,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		vars.put("d", DataLog.getDataspace());
 		vars.put("t", DataLogEvent.simple); // type
 		String res = fb.getPage(getDataEndpoint, vars);
-		Object jobj = JSON.parse(res);
+		Object jobj = WebUtils2.parseJSON(res);
 		throw new TodoException(jobj);
 	}
 
@@ -219,7 +220,7 @@ public class DataLogRemoteStorage implements IDataLogStorage
 		vars.put("count", event.count);
 		vars.put("time", event.getTime());
 		// props
-		String p = JSON.toString(event.getProps());
+		String p = WebUtils2.generateJSON(event.getProps());
 		vars.put("p", p);		
 		// TODO String r = referer		
 		String res = fb.getPage(logEndpoint, (Map) vars);

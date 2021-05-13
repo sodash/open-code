@@ -415,7 +415,7 @@ public final class YouAgainClient {
 		for (String jwt : all) {
 			if (jwt.startsWith("[")) {
 				try {
-					List jwts = (List) JSON.parse(jwt);
+					List jwts = WebUtils2.parseJSON(jwt);
 					all2.addAll(jwts);
 				} catch (Exception ex) {
 					Log.w(LOGTAG, "JWT parse error: "+ex+" from "+jwt);

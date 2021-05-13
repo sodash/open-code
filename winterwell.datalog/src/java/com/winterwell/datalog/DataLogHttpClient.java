@@ -111,7 +111,7 @@ public class DataLogHttpClient {
 		// call
 		String json = fb.getPage(ENDPOINT, vars);
 		
-		Map jobj = (Map) JSON.parse(json);
+		Map jobj = WebUtils2.parseJSON(json);
 		
 		List<Map> egs = Containers.asList((Object)SimpleJson.get(jobj, "cargo", "examples"));
 		List<DataLogEvent> des = new ArrayList();

@@ -30,7 +30,9 @@ public class BuildWeb2 extends BuildWinterwellProject {
 		
 		// maven
 		MavenDependencyTask mdt = new MavenDependencyTask();
-		String jettyVersion = "9.4.24.v20191120"; // see https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server
+		// see https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server
+		String jettyVersion = "10.0.2";
+		//"9.4.24.v20191120"; 
 		mdt.addDependency("org.eclipse.jetty", "jetty-server", jettyVersion);
 		mdt.addDependency("org.eclipse.jetty","jetty-util",jettyVersion);
 		mdt.addDependency("org.eclipse.jetty","jetty-util-ajax",jettyVersion);

@@ -45,6 +45,7 @@ import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.jetty.http.Syntax;
+import org.eclipse.jetty.util.ajax.JSON;
 import org.w3c.dom.Document;
 
 import com.winterwell.json.JSONArray;
@@ -1610,6 +1611,24 @@ public class WebUtils2 extends WebUtils {
 		}
 	}
 
+	/**
+	 * Convenience for JSON.parse
+	 * @param <X>
+	 * @param json
+	 * @return e.g. Map
+	 */
+	public static <X> X parseJSON(String json) {
+		return (X) new JSON().parse(new JSON.StringSource(json));
+	}
+	/**
+	 * Convenience for JSON.parse
+	 * @param <X>
+	 * @param json
+	 * @return e.g. Map
+	 */
+	public static String generateJSON(Object pojo) {
+		return new JSON().toJSON(pojo);
+	}
 }
 
 

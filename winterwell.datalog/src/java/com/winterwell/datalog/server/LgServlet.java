@@ -282,7 +282,7 @@ public class LgServlet {
 			try {
 				//Right now, just set to point at local. TODO read in correct endpoint from state
 				String json= fb.getPage("https://portal.good-loop.com/botip/_list.json");
-				Map response = (Map) JSON.parse(json);
+				Map response = (Map) WebUtils2.parseJSON(json);
 				Map esres = (Map) response.get("cargo");
 				List<Map> hits = Containers.asList(esres.get("hits"));
 				

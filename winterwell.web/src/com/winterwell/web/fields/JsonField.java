@@ -7,6 +7,8 @@ import java.util.Arrays;
 
 import org.eclipse.jetty.util.ajax.JSON;
 
+import com.winterwell.utils.web.WebUtils2;
+
 
 /**
  * Handle a JSON-encoded parameter.
@@ -20,13 +22,13 @@ public class JsonField extends AField<Object> {
 	
 	@Override
 	public String toString(Object value) {
-		String json = JSON.toString(value);
+		String json = WebUtils2.generateJSON(value);
 		return json;
 	}
 	
 	@Override
 	public Object fromString(String v) throws Exception {
-		Object jobj = JSON.parse(v);
+		Object jobj = WebUtils2.generateJSON(v);
 		// prefer List to Object[]
 		if (jobj instanceof Object[]) {
 			Object[] jarr = (Object[]) jobj;

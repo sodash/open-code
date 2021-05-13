@@ -13,6 +13,7 @@ import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.SimpleJson;
+import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.FakeBrowser;
 import com.winterwell.web.WebEx;
 import com.winterwell.web.ajax.JSend;
@@ -53,7 +54,7 @@ public final class ShareClient {
 					"action", "shared-with",
 					"prefix", prefix));
 			
-			Map jobj = (Map) JSON.parse(response);
+			Map jobj = WebUtils2.parseJSON(response);
 			Object shares = SimpleJson.get(jobj, "cargo");
 			if (shares instanceof Object[]) {
 				return Arrays.stream((Object[]) shares).map(share -> (String) SimpleJson.get(share, "item")).collect(Collectors.toList());
@@ -82,7 +83,7 @@ public final class ShareClient {
 			));
 
 		JSend.parse(response).getData();
-		Map jobj = (Map) JSON.parse(response);
+		Map jobj = WebUtils2.parseJSON(response);
 		Object shares = SimpleJson.get(jobj, "cargo");
 		if (shares==null) return null;
 		List<Map> lshares = Containers.asList(shares);

@@ -13,6 +13,7 @@ import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.web.IHasJson;
+import com.winterwell.utils.web.WebUtils2;
 
 /**
  * Wrapper for json objects
@@ -101,7 +102,7 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 	 */
 	public Map<String, Object> map() {
 		if (map==null && string()!=null) {
-			map = (Map<String, Object>) JSON.parse(json);
+			map = WebUtils2.parseJSON(json);
 		}
 		if (map==null) {
 			//
@@ -185,7 +186,7 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 			return map();
 		}
 		if (string()==null) return null;
-		return JSON.parse(string());		
+		return WebUtils2.parseJSON(string());		
 	}
 
 	/**
@@ -199,7 +200,7 @@ implements INotSerializable, IHasJson // serialize the json not this wrapper
 			return this;
 		}
 		// play it safe -- set as a json string
-		String djson = JSON.toString(_data);
+		String djson = WebUtils2.generateJSON(_data);
 		setJson(djson);
 		return this;
 	}

@@ -175,7 +175,7 @@ public class JSend implements IHasJson {
 	 * @return
 	 */
 	public static JSend parse(String json) {
-		Map jobj = (Map) JSON.parse(json);
+		Map jobj = WebUtils2.parseJSON(json);
 		return parse2_create(jobj);
 	}
 
