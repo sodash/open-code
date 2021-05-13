@@ -29,6 +29,8 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/commons-lang3.jar"/>
 	<classpathentry kind="lib" path="dependencies/commons-io.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/javax.servlet-api.jar"/>
+	<classpathentry kind="lib" path="dependencies/jetty-servlet-api.jar"/>
+	<classpathentry kind="lib" path="dependencies/slf4j-api.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/flexi-gson"/>
