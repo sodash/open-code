@@ -59,7 +59,13 @@ public class BuildWeb extends BuildWinterwellProject {
 		if (outDir!=null) {
 			mdt.setOutputDirectory(outDir);
 		}
+<<<<<<< HEAD
 				
+=======
+		
+		mdt.run(); // HACK
+		
+>>>>>>> sysadmin/may-2021/jetty-upgrade
 		deps.add(mdt);
 		
 		return deps;
