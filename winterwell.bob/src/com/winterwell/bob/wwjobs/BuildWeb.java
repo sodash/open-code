@@ -13,7 +13,7 @@ public class BuildWeb extends BuildWinterwellProject {
 	 */
 	public BuildWeb() {
 		super("winterwell.web");
-		setVersion("1.0.5"); // 28 Apr 2021
+		setVersion("1.0.6"); // 28 Apr 2021
 	}	
 
 	@Override
@@ -26,9 +26,10 @@ public class BuildWeb extends BuildWinterwellProject {
 		// maven
 		MavenDependencyTask mdt = new MavenDependencyTask();
 		// see https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server
-		String jettyVersion = "10.0.2";
+		String jettyVersion = 
+//				"10.0.2";
 		// NB: v11 is the same as v10 but switches s/javax/jakarta/
-		//"9.4.24.v20191120"; 
+				"9.4.24.v20191120"; 
 		mdt.addDependency("org.eclipse.jetty", "jetty-server", jettyVersion);
 		mdt.addDependency("org.eclipse.jetty","jetty-util",jettyVersion);
 		mdt.addDependency("org.eclipse.jetty","jetty-util-ajax",jettyVersion);
