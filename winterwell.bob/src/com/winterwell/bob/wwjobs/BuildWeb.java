@@ -13,7 +13,7 @@ public class BuildWeb extends BuildWinterwellProject {
 	 */
 	public BuildWeb() {
 		super("winterwell.web");
-		setVersion("1.0.6"); // 28 Apr 2021
+		setVersion("1.1.0"); // 13 May 2021
 	}	
 
 	@Override
@@ -59,13 +59,6 @@ public class BuildWeb extends BuildWinterwellProject {
 		if (outDir!=null) {
 			mdt.setOutputDirectory(outDir);
 		}
-<<<<<<< HEAD
-				
-=======
-		
-		mdt.run(); // HACK
-		
->>>>>>> sysadmin/may-2021/jetty-upgrade
 		deps.add(mdt);
 		
 		return deps;
