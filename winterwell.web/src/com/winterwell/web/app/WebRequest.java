@@ -443,13 +443,12 @@ public class WebRequest implements IProperties, Closeable {
 	public HttpSession getSession() {
 		if (stateless) {
 			if (tempSession==null) {
-				Log.w("web", "Using a transient 'session' which will not persist across requests.");
 				// a disconnect dummy (to avoid initialising session management with a session cookie)
 				tempSession = new TestHttpSession();
 			}
 			return tempSession;
 		}
-		
+		// get the session
 		HttpSession s = request.getSession();
 		if (s!=null) {
 			if (tempSession!=null) {
@@ -458,7 +457,6 @@ public class WebRequest implements IProperties, Closeable {
 			return s;
 		}
 		// hack
-		Log.w("web", "Using a transient 'session' which will not persist across requests.");
 		tempSession = new TestHttpSession();
 		return tempSession;
 	}

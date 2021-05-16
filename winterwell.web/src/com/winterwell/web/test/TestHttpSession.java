@@ -130,6 +130,7 @@ public class TestHttpSession implements HttpSession {
 
 	@Override
 	public void setAttribute(String arg0, Object arg1) {
+		Log.w("web", "Session.setAttribute "+arg0+" used a transient 'session' which will not persist across requests.");
 		attributes.put(arg0, arg1);
 	}
 
