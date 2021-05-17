@@ -9,7 +9,7 @@ import com.winterwell.web.WebInputException;
 
 public class UrlField extends AField<String> {
 	
-	public UrlField() {
+	UrlField() {
 		this("dummy");
 	}
 	
