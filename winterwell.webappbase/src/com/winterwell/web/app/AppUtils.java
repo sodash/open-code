@@ -44,6 +44,7 @@ import com.winterwell.nlp.query.SearchQuery;
 import com.winterwell.utils.AString;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.FailureException;
+import com.winterwell.utils.MathUtils;
 import com.winterwell.utils.ReflectionUtils;
 import com.winterwell.utils.TodoException;
 import com.winterwell.utils.Utils;
@@ -996,6 +997,7 @@ public class AppUtils {
 			assert ((Map) val).size() == 1 : val;
 			Map.Entry<String, String> kv = (Entry<String, String>) Containers.first(((Map) val).entrySet());
 			String val2 = kv.getValue();
+			double n;
 			switch(kv.getKey()) {
 			case "before":					
 				Time end = TimeUtils.parseExperimental(val2);
@@ -1004,6 +1006,14 @@ public class AppUtils {
 			case "after":
 				Time start = TimeUtils.parseExperimental(val2);
 				kvFilter = ESQueryBuilders.dateRangeQuery(prop, start, null);
+				break;
+			case "above":
+				n = MathUtils.toNum(val2);
+				kvFilter = ESQueryBuilders.rangeQuery(prop, n, null, false);
+				break;
+			case "below":
+				n = MathUtils.toNum(val2);
+				kvFilter = ESQueryBuilders.rangeQuery(prop, null, n, false);
 				break;
 			default:
 				throw new TodoException(prop+": "+val);
