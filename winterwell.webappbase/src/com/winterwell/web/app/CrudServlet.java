@@ -48,6 +48,7 @@ import com.winterwell.utils.io.CSVSpec;
 import com.winterwell.utils.io.CSVWriter;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.threads.ATask;
 import com.winterwell.utils.time.Period;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.web.JsonPatch;
@@ -194,8 +195,23 @@ public abstract class CrudServlet<T> implements IServlet {
 		}
 		JsonResponse output = new JsonResponse(state);
 		WebUtils2.sendJson(output, state);
+
+		// post-return action? usually not
+		if (state.getAction() != null && ! state.actionIs("get")) {
+			postProcessAction(state);
+		}
 	}
 	
+	/**
+	 * Called after the servlet has returned a response. Usually does nothing.
+	 * Override to do slower tasks.
+	 * @param state
+	 */
+	protected void postProcessAction(WebRequest state) {
+		
+	}
+
+
 	/**
 	 * 
 	 * @param cleansed This may be modified

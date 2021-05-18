@@ -3,10 +3,14 @@ package com.winterwell.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.winterwell.utils.containers.TopNList;
+
 /**
- * Simple utility class to find the highest-scoring items.
+ * @deprecated Best and TopNList cover most use-cases
+ * Simple utility class to find the highest-scoring item(s).
  * 
  * @see BestOne which is faster but only returns the first best item
+ * @see TopNList which returns the top n
  * @author daniel
  */
 public final class Best<T> {
