@@ -2,6 +2,7 @@ package com.winterwell.utils.threads;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -32,6 +33,22 @@ public class Actor<Msg> {
 	 * @param <Msg>
 	 */
 	public static class Packet<Msg> implements Serializable {
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(from, msg);
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Packet other = (Packet) obj;
+			return Objects.equals(from, other.from) && Objects.equals(msg, other.msg);
+		}
 		private static final long serialVersionUID = 1L;
 
 		/**
@@ -68,6 +85,8 @@ public class Actor<Msg> {
 	 * one thread per actor. TODO multiple threads per actor, using possibly shared Executors
 	 */
 	Thread thread;
+
+	boolean noDuplicates;
 
 	protected Actor() {
 		this(new ConcurrentLinkedQueue());
@@ -230,9 +249,32 @@ public class Actor<Msg> {
 		if (maxq > 0 && q.size() > maxq) {
 			throw new QueueTooLongException("Could not add "+packet);
 		}
+		// filter dupes?
+		if (noDuplicates) {
+			if (q.contains(packet)) {
+				Log.d(getName(), "Skip duplicate "+packet);
+				return;
+			}
+		}
 		q.add(packet);
 	}
 
+	/**
+	 * If set, a packet is ignored if there is an equals packer (from + msg) 
+	 * in the queue.
+	 * For SlowActor, equals uses (from + msg + when) for equality.
+	 * 
+	 * This will NOT maintain a history of packets - it only filters
+	 * against what is in the queue.
+	 *   
+	 * @param noDuplicates
+	 * @return
+	 */
+	public Actor<Msg> setNoDuplicates(boolean noDuplicates) {
+		this.noDuplicates = noDuplicates;
+		return this;
+	}
+	
 	public Actor<Msg> setConsumer(IActorMsgConsumer<Msg> consumer) {
 		this.consumer = consumer;
 		return this;

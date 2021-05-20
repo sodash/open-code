@@ -43,6 +43,9 @@ public class ICalEvent {
 		if (start==null) throw new NullPointerException("null start not allowed for ICalEvent");
 	}
 
+	/**
+	 * @return the ical string
+	 */
 	@Override
 	public String toString() {
 		String s = ICalWriter.format(start);
@@ -86,6 +89,7 @@ public class ICalEvent {
 		for (Time t : repeatPeriods) {			
 			Time repEnd = dt==null? null : t.plus(dt);
 			ICalEvent e2 = new ICalEvent(t, repEnd, summary);
+			e2.description = description;
 			e2.location = location;
 			e2.parent = this;
 			repeatEvents.add(e2);

@@ -1,6 +1,7 @@
 package com.winterwell.utils.threads;
 
 import java.io.Flushable;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
@@ -65,6 +66,26 @@ public class SlowActor<Msg> extends Actor<Msg> implements Flushable {
 
 	static final class DPacket<Msg> extends Packet<Msg> implements Delayed {
 		private static final long serialVersionUID = 1L;
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result + Objects.hash(t);
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (!super.equals(obj))
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			DPacket other = (DPacket) obj;
+			return Objects.equals(t, other.t);
+		}
 
 		public DPacket(Msg msg, Actor sender, Time when) {
 			super(msg, sender);

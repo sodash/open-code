@@ -36,7 +36,7 @@ import junit.framework.TestCase;
  * 
  */
 public class WebUtilsTest extends TestCase {
-
+	
 	public void testRenderToPDF_HelloWorld() throws IOException {
 		// nope moznomarginboxes mozdisallowselectionprint
 		String html = "<html><head></head><body><h1>Hello World!</h1><p>Here is a paragraph.</p><ol><li>List item one</li><li>two</li></ol>"

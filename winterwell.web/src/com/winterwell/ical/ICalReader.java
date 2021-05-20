@@ -86,7 +86,7 @@ public class ICalReader {
 		e.raw = se;		
 		for (String line : lines) {
 			if (Utils.isBlank(line)) {
-				Log.d("ical", "Odd blank line in "+StrUtils.compactWhitespace(se));
+//				google does this Log.d("ical", "Odd blank line in "+StrUtils.compactWhitespace(se));
 				continue;
 			}
 			key = parseEvent2_line(e, line, key);
@@ -127,7 +127,11 @@ public class ICalReader {
 			e.end = parseTime(value, k[2]);
 			break;
 		case "SUMMARY":
-			e.summary = e.summary==null? value : e.summary+" "+value;
+			// + to handle multi-line properties
+			e.summary = e.summary==null? value : e.summary+value;
+			break;
+		case "DESCRIPTION":
+			e.description = e.description==null? value : e.description+value;
 			break;
 		case "LOCATION":
 			e.location = value;

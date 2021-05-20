@@ -29,6 +29,11 @@ import eu.medsea.mimeutil.MimeUtil;
 public class WebUtils2Test {
 
 	@Test
+	public void testOpenCalLink() {
+		WebUtils2.browseOnDesktop("https://meet.google.com/uri-pqhs-kzu");
+	}
+
+	@Test
 	public void testAddToList() {
 		String json0 = "{\"a\":[]}";
 		Map jobj0 = WebUtils2.parseJSON(json0);
