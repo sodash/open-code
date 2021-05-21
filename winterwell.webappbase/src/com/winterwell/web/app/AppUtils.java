@@ -143,8 +143,11 @@ public class AppUtils {
 	 */
 	public static <X> X get(ESPath path, Class<X> klass, AtomicLong version) {
 		ESHttpClient client = new ESHttpClient(Dep.get(ESConfig.class));
-
 		GetRequest s = new GetRequest(client);
+		return get2(path, klass, version, s);
+	}
+	
+	public static <X> X get2(ESPath path, Class<X> klass, AtomicLong version, GetRequest s) {
 		// Minor TODO both indices in one call
 		s.setIndices(path.indices[0]).setType(path.type).setId(path.id);
 		if (version==null) s.setSourceOnly(true);
