@@ -9,6 +9,7 @@ import java.util.logging.SimpleFormatter;
 import com.winterwell.utils.Dep;
 import com.winterwell.utils.IFilter;
 import com.winterwell.utils.ReflectionUtils;
+import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.io.ConfigBuilder;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.time.Dt;
@@ -54,6 +55,8 @@ public class LogFile implements ILogListener, Closeable {
 	 * See {@link LogConfig#fileMaxSize}
 	 */
 	private long fileMaxSize;
+
+	private int lineMaxChars = 2048;
 	
 	public LogFile setFilter(IFilter<Report> filter) {
 		this.filter = filter;
@@ -141,6 +144,8 @@ public class LogFile implements ILogListener, Closeable {
 		String lines = sf.format(lr);
 		// a single line for each report to make it easier to grep
 		String line = lines.replaceAll("[\r\n]", " ") + "\n";
+		// cap length
+		line = StrUtils.ellipsize(line, lineMaxChars);
 		return line;
 	}
 	
