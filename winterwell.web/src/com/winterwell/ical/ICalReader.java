@@ -63,7 +63,7 @@ public class ICalReader {
 			try {
 				ICalEvent e = parseEvent(se);
 				list.add(e);
-			} catch(Exception ex) {
+			} catch(Throwable ex) {
 				switch(errorPolicy) {
 				case REPORT:
 					Log.e("ical", ex+" from "+se);
@@ -143,9 +143,17 @@ public class ICalReader {
 			e.created = parseTime(value, k[2]);
 			break;
 		case "RRULE":
-			e.repeat = new Repeat(value);
+			if (e.repeat == null) {
+				e.repeat = new Repeat(value);	
+			} else {
+				// out of order or broken lines (google does this) 
+				e.repeat.add(value);
+			}
 			break;
 		case "EXDATE":
+			if (e.repeat == null) {
+				e.repeat = new Repeat(""); // out of order
+			}
 			// TODO what if this is given before the rrule?
 			String[] values = value.split(",");
 			for (String v : values) {

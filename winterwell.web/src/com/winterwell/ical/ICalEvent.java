@@ -56,7 +56,7 @@ public class ICalEvent {
 			+(summary==null? "" : "SUMMARY:"+ICalWriter.formatText(summary)+"\r\n")
 			+(description==null? "" : "DESCRIPTION:"+ICalWriter.formatText(description)+"\r\n")
 			+(location==null? "" : "LOCATION:"+ICalWriter.formatText(location)+"\r\n")
-			+(repeat==null? "" : "RRULE:"+repeat.rrule+"\r\n")
+			+(repeat==null? "" : "RRULE:"+repeat.getRrule()+"\r\n")
 			+"END:VEVENT\r\n";
 	}
 	

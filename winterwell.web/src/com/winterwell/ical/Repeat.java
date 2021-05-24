@@ -27,7 +27,7 @@ public class Repeat {
 		return "every "+(interval==1?"":interval+" ")+freq.toString().toLowerCase()+"(s)";
 	}
 
-	final String rrule;
+	private String rrule;
 	TUnit freq;
 	
 	/**
@@ -76,11 +76,23 @@ public class Repeat {
 			"YEARLY", TUnit.YEAR);
 	
 	/**
-	 * 
+	 * Has to handle out of order or broken lines (google does this)
 	 * @param rrule e.g. "every 3 months" is "FREQ=MONTHLY;INTERVAL=3;"
 	 */
 	public Repeat(String rrule) {
 		this.rrule= rrule;
+		try {
+			parse();
+		} catch (ParseException e) {
+			throw Utils.runtime(e);
+		}
+	}
+	
+	void add(String rrulebit) {
+		if (this.rrule==null) {
+			this.rrule = "";
+		}
+		this.rrule += rrulebit;
 		try {
 			parse();
 		} catch (ParseException e) {
@@ -216,6 +228,10 @@ public class Repeat {
 		}
 		// no more
 		return null;
+	}
+
+	public String getRrule() {
+		return rrule;
 	}
 
 }
