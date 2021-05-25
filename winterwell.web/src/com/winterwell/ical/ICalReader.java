@@ -151,7 +151,11 @@ public class ICalReader {
 			e.summary = e.summary==null? value : e.summary+value;
 			return key;
 		case "DESCRIPTION":
-			e.description = e.description==null? value : e.description+value;
+			if (e.description==null) {
+				e.description = value;
+			} else {
+				e.description += value;
+			}
 			return key;
 		case "LOCATION":
 			e.location = value;
