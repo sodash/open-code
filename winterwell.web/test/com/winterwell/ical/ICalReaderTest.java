@@ -14,6 +14,68 @@ import com.winterwell.utils.time.Time;
 
 public class ICalReaderTest {
 
+	@Test
+	public void testUID() throws ParseException {
+		String se = "BEGIN:VEVENT\n"
+				+ "DTSTART;TZID=Europe/London:20210525T150000\n"
+				+ "DTEND;TZID=Europe/London:20210525T160000\n"
+				+ "RRULE:FREQ=MONTHLY;BYDAY=-1TU\n"
+				+ "DTSTAMP:20210525T124107Z\n"
+				+ "ORGANIZER;CN=\"Good-Loop: General inc out-of-office\":mailto:92v2m458khm50ic0\n"
+				+ " 3rj3uu95f4@group.calendar.google.com\n"
+				+ "UID:5bv1aflj1glpq7rcu7553v8v2q@google.com\n"
+				+ "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=daniel\n"
+				+ " @good-loop.com;X-NUM-GUESTS=0:mailto:daniel@good-loop.com\n"
+				+ "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=ed\n"
+				+ " inburgh.team;X-NUM-GUESTS=0:mailto:edinburgh.team@good-loop.com\n"
+				+ "CREATED:20210524T085132Z\n"
+				+ "DESCRIPTION:This event has a video call.\\nJoin: https://meet.google.com/zjv\n"
+				+ " -spep-iwt\\n(GB) +44 20 3937 4227 PIN: 613451175#\\nView more phone numbers: \n"
+				+ " https://tel.meet/zjv-spep-iwt?pin=5780544693823&hs=7\n"
+				+ "LAST-MODIFIED:20210524T093439Z\n"
+				+ "LOCATION:\n"
+				+ "SEQUENCE:0\n"
+				+ "STATUS:CONFIRMED\n"
+				+ "SUMMARY:Release Freeze! - Submit all code & docs for QA. If it was part of \n"
+				+ " the sprint - submit it\\, then email Dan W and Dan A. Thank you!\n"
+				+ "TRANSP:OPAQUE\n"
+				+ "END:VEVENT";
+		ICalReader r = new ICalReader("");
+		ICalEvent e = r.parseEvent(se);
+		assert e.uid.equals("5bv1aflj1glpq7rcu7553v8v2q@google.com") : e.uid;
+	}
+
+	@Test
+	public void testTimeZoneBST() throws ParseException {
+		ICalReader r = new ICalReader("");
+		String se = "BEGIN:VEVENT\n"
+				+ "DTSTART;TZID=Europe/London:20210525T120000\n"
+				+ "DTEND;TZID=Europe/London:20210525T130000\n"
+				+ "DTSTAMP:20210525T101441Z\n"
+				+ "ORGANIZER;CN=daniel@good-loop.com:mailto:daniel@good-loop.com\n"
+				+ "UID:325i2q6mg67j5fasrha1aemc8k@google.com\n"
+				+ "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=daniel\n"
+				+ " @good-loop.com;X-NUM-GUESTS=0:mailto:daniel@good-loop.com\n"
+				+ "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=ev\n"
+				+ " e@good-loop.com;X-NUM-GUESTS=0:mailto:eve@good-loop.com\n"
+				+ "RECURRENCE-ID;TZID=Europe/London:20210525T120000\n"
+				+ "CREATED:20210221T204003Z\n"
+				+ "DESCRIPTION:<a href=\"https://trello.com/b/TQTgJQw5/good-loop-design-board\">\n"
+				+ " https://trello.com/b/TQTgJQw5/good-loop-design-board</a>\\n\\nThis event has \n"
+				+ " a video call.\\nJoin: https://meet.google.com/qbj-wymz-fmq\\n(GB) +44 20 3957\n"
+				+ "  1932 PIN: 868867985#\\nView more phone numbers: https://tel.meet/qbj-wymz-f\n"
+				+ " mq?pin=2889186823036&hs=7\n"
+				+ "LAST-MODIFIED:20210511T135440Z\n"
+				+ "LOCATION:\n"
+				+ "SEQUENCE:0\n"
+				+ "STATUS:CONFIRMED\n"
+				+ "SUMMARY:Eve <> Dan - How does the week look?\n"
+				+ "TRANSP:OPAQUE\n"
+				+ "END:VEVENT";
+		ICalEvent e = r.parseEvent(se);
+		assert e.start.equals(new Time(2021,05,25,11,0,0)) : e.start;
+		Time s = new Time(2021,05,25), end = new Time(2021,05,26);
+	}
 
 	@Test
 	public void testExDate() throws ParseException {

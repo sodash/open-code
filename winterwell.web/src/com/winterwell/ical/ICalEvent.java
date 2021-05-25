@@ -3,6 +3,7 @@ package com.winterwell.ical;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.Dt;
@@ -20,16 +21,52 @@ public class ICalEvent {
 	public Time end;
 	public String summary;
 	public String description;
+	/**
+	 * This can be shared by repeat events!
+	 * See https://www.kanzaki.com/docs/ical/uid.html
+	 */
 	public String uid;
 	public Time created;
 	public String location;
 	public String raw;
 	public Repeat repeat;
-	public ICalEvent parent;
+	/**
+	 * e.g. "RECURRENCE-ID;TZID=Europe/London:20210712T120000"
+	 * 
+	 * See https://www.kanzaki.com/docs/ical/recurrenceId.html
+	 */
+	public String recurrenceId;
+	/**
+	 * Used by locally-generated repeating events (can be null) 
+	 */
+	public ICalEvent parent;	
 	
 	public ICalEvent() {
 	}
 	
+	public void setSrc(String src) {
+		this.raw = src;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(recurrenceId, start, summary, uid);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ICalEvent other = (ICalEvent) obj;
+		boolean eq = Objects.equals(recurrenceId, other.recurrenceId) && Objects.equals(start, other.start)
+				&& Objects.equals(summary, other.summary) && Objects.equals(uid, other.uid);
+		return eq;
+	}
+
 	/**
 	 * 
 	 * @param start
@@ -92,6 +129,8 @@ public class ICalEvent {
 			e2.description = description;
 			e2.location = location;
 			e2.parent = this;
+			e2.recurrenceId = recurrenceId;
+			e2.uid = uid; // What? yes, uid is not unique across repeats
 			repeatEvents.add(e2);
 		}
 		return repeatEvents;

@@ -10,6 +10,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.Pair2;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
+import com.winterwell.utils.time.RateCounter;
+import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 /**
  * A simple pure-Java Actor implementation. Maintains a queue of messages.
@@ -26,6 +30,13 @@ import com.winterwell.utils.log.Log;
  */
 public class Actor<Msg> {
 
+	protected boolean debug;
+	
+	public Actor<Msg> setDebug(boolean debug) {
+		this.debug = debug;
+		return this;
+	}
+	
 	/**
 	 * Message + sending Actor.
 	 * @author daniel
@@ -137,10 +148,18 @@ public class Actor<Msg> {
 
 	final void loop() {
 		if (q instanceof BlockingQueue) {
+			// use drain instead of poll
 			loop2_batch();
 			return;
 		}
+		// non batched loop
+		Time nextDebug = debug? new Time() : null; 
 		while ( ! pleaseStop) {
+			// periodic q updates
+			if (debug && new Time().isAfter(nextDebug)) {
+				Log.d(getName(), "loop() Q: "+getQ().size()+" "+getQ());
+				nextDebug = new Time().plus(5, TUnit.MINUTE);
+			}
 			Packet<Msg> msg = null;
 			try {
 				// sleep based poll
@@ -181,7 +200,13 @@ public class Actor<Msg> {
 		ArrayList<Packet<Msg>> batch = new ArrayList();
 		int batchSize = 16;
 		BlockingQueue<Packet<Msg>> bq = (BlockingQueue<Packet<Msg>>) q;
+		Time nextDebug = debug? new Time() : null;
 		while ( ! pleaseStop) {
+			// periodic q updates
+			if (debug && new Time().isAfter(nextDebug)) {
+				Log.d(getName(), "loop() Q: "+getQ().size()+" "+getQ());
+				nextDebug = new Time().plus(5, TUnit.MINUTE);
+			}
 			try {
 				// drain the queue into batch
 				if (bq.drainTo(batch, batchSize) == 0) {
@@ -252,11 +277,12 @@ public class Actor<Msg> {
 		// filter dupes?
 		if (noDuplicates) {
 			if (q.contains(packet)) {
-				Log.d(getName(), "Skip duplicate "+packet);
+				if (debug) Log.d(getName(), "Skip duplicate "+packet);
 				return;
 			}
-		}
+		}		
 		q.add(packet);
+		if (debug) Log.d(getName(), "sent to queue: "+packet);
 	}
 
 	/**

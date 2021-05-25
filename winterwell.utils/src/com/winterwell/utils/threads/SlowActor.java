@@ -17,6 +17,7 @@ import com.winterwell.utils.time.Time;
  * <p>
  * Uses {@link DelayQueue} under the hood.
  * 
+ * @testedby {@link SlowActorTest}
  * @author daniel
  */
 public class SlowActor<Msg> extends Actor<Msg> implements Flushable {
@@ -66,6 +67,11 @@ public class SlowActor<Msg> extends Actor<Msg> implements Flushable {
 
 	static final class DPacket<Msg> extends Packet<Msg> implements Delayed {
 		private static final long serialVersionUID = 1L;
+
+		@Override
+		public String toString() {
+			return "DPacket [t=" + t + ", from=" + from + ", msg=" + msg + "]";
+		}
 
 		@Override
 		public int hashCode() {

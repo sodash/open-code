@@ -5,6 +5,7 @@ import java.text.Format;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -43,6 +44,11 @@ public class ICalReader {
 	}
 	
 	KErrorPolicy errorPolicy = KErrorPolicy.REPORT;
+	private boolean debug;
+	
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
 	
 	/**
 	 * NB repeating events are not unravelled -- they appear once here
@@ -52,6 +58,7 @@ public class ICalReader {
 		Pattern p = Pattern.compile("BEGIN:VEVENT.+?END:VEVENT", Pattern.DOTALL);
 		Matcher m = p.matcher(ical);
 		List<ICalEvent> list = new ArrayList();
+		HashSet noDupes = new HashSet(); // NB: NoDupes.java is in our maths project which isn't available here
 		while(m.find()) {				
 			String se = m.group();
 
@@ -62,6 +69,15 @@ public class ICalReader {
 			
 			try {
 				ICalEvent e = parseEvent(se);
+								
+				// Google can unravel repeats and create duplicates, May 2021
+				String dupeKey = e.uid+e.recurrenceId+e.start+e.summary;
+				if (noDupes.contains(dupeKey)) {
+					Log.d(LOGTAG, "skip dupe "+e);
+					continue;
+				}
+				noDupes.add(dupeKey);
+				
 				list.add(e);
 			} catch(Throwable ex) {
 				switch(errorPolicy) {
@@ -81,9 +97,9 @@ public class ICalReader {
 	
 	ICalEvent parseEvent(String se) throws ParseException {		
 		String[] lines = StrUtils.splitLines(se);
-		String key= null; // summary can be multi-line
+		String key= null; // summary and description can be multi-line
 		ICalEvent e = new ICalEvent();	
-		e.raw = se;		
+		e.setSrc(se);		
 		for (String line : lines) {
 			if (Utils.isBlank(line)) {
 //				google does this Log.d("ical", "Odd blank line in "+StrUtils.compactWhitespace(se));
@@ -108,11 +124,15 @@ public class ICalReader {
 			key = k[1];
 			value = k[3];
 		}
+		if (key==null) {
+			return null;
+		}
 		value = value.trim();
 		// no blank entries
 		if (value.isEmpty()) {
 			return key;
 		}
+		// return key if the key can be continued multi-line, null if not
 		switch(key) {
 		case "DTSTAMP":
 			// How does this differ from created??
@@ -129,10 +149,10 @@ public class ICalReader {
 		case "SUMMARY":
 			// + to handle multi-line properties
 			e.summary = e.summary==null? value : e.summary+value;
-			break;
+			return key;
 		case "DESCRIPTION":
 			e.description = e.description==null? value : e.description+value;
-			break;
+			return key;
 		case "LOCATION":
 			e.location = value;
 			break;
@@ -142,6 +162,9 @@ public class ICalReader {
 		case "CREATED":
 			e.created = parseTime(value, k[2]);
 			break;
+		case "RECURRENCE-ID":
+			e.recurrenceId = value;
+			break;
 		case "RRULE":
 			if (e.repeat == null) {
 				e.repeat = new Repeat(value);	
@@ -149,7 +172,7 @@ public class ICalReader {
 				// out of order or broken lines (google does this) 
 				e.repeat.add(value);
 			}
-			break;
+			return key;
 		case "EXDATE":
 			if (e.repeat == null) {
 				e.repeat = new Repeat(""); // out of order
@@ -161,9 +184,9 @@ public class ICalReader {
 				Time exdate = parseTime(v, k[2]);
 				e.repeat.addExclude(exdate);				
 			}
-			break;
+			return key;
 		}
-		return key;
+		return null;
 	}
 
 	static Format sdfNoTimeZone = format("yyyyMMdd'T'HHmmss");
