@@ -324,8 +324,9 @@ public class GuiUtils {
 	 */
 	public static boolean isInteractive() {
 		String envVar = System.getProperty("WINTERWELL_HEADLESS");
-		if (envVar == null)
-			return !GraphicsEnvironment.isHeadless();
+		if (envVar == null) {
+			return ! GraphicsEnvironment.isHeadless();
+		}
 		return Utils.yes(envVar);
 	}
 	
