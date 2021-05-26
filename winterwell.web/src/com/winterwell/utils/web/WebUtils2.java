@@ -1621,7 +1621,7 @@ public class WebUtils2 extends WebUtils {
 		return (X) new JSON().parse(new JSON.StringSource(json));
 	}
 	/**
-	 * Convenience for JSON.parse
+	 * Convenience for JSON.toJSON
 	 * @param <X>
 	 * @param json
 	 * @return e.g. Map

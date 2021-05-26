@@ -27,6 +27,8 @@ public interface IHasJson {
 	/**
 	 * @return An object suitable for conversion to JSON using a standard library (such as Jetty's JSON class).
 	 * Probably a Map, with nested Maps, Lists, and primitives/Strings. 
+	 * Can use `return Containers.objectAsMap(this);`
+	 * 
 	 * @throws UnsupportedOperationException
 	 */
 	Object toJson2() throws UnsupportedOperationException;

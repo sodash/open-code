@@ -28,7 +28,7 @@ public class JsonField extends AField<Object> {
 	
 	@Override
 	public Object fromString(String v) throws Exception {
-		Object jobj = WebUtils2.generateJSON(v);
+		Object jobj = WebUtils2.parseJSON(v);
 		// prefer List to Object[]
 		if (jobj instanceof Object[]) {
 			Object[] jarr = (Object[]) jobj;

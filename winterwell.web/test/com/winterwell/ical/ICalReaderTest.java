@@ -15,6 +15,35 @@ import com.winterwell.utils.time.Time;
 public class ICalReaderTest {
 
 	@Test
+	public void testMeetUrl() throws ParseException {
+	String se = "BEGIN:VEVENT\n"
+			+ "DTSTART:20210526T094500Z\n"
+			+ "DTEND:20210526T100000Z\n"
+			+ "DTSTAMP:20210526T094800Z\n"
+			+ "ORGANIZER;CN=georgia@good-loop.com:mailto:georgia@good-loop.com\n"
+			+ "UID:6hh1t3s1tlo7ho9itrlqpu96ag@google.com\n"
+			+ "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=daniel\n"
+			+ " @good-loop.com;X-NUM-GUESTS=0:mailto:daniel@good-loop.com\n"
+			+ "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=georgi\n"
+			+ " a@good-loop.com;X-NUM-GUESTS=0:mailto:georgia@good-loop.com\n"
+			+ "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=daniel\n"
+			+ " .winterstein@gmail.com;X-NUM-GUESTS=0:mailto:daniel.winterstein@gmail.com\n"
+			+ "CREATED:20210521T142436Z\n"
+			+ "DESCRIPTION:This event has a video call.\\nJoin: https://meet.google.com/ruf\n"
+			+ " -sfez-gmz\\n(GB) +44 20 3956 2248 PIN: 203833576#\\nView more phone numbers: \n"
+			+ " https://tel.meet/ruf-sfez-gmz?pin=3820063801776&hs=7\n"
+			+ "LAST-MODIFIED:20210522T082402Z\n"
+			+ "LOCATION:\n"
+			+ "SEQUENCE:0\n"
+			+ "STATUS:CONFIRMED\n"
+			+ "SUMMARY:Daniel / Georgia\n"
+			+ "TRANSP:OPAQUE\n"
+			+ "END:VEVENT";
+	ICalReader r = new ICalReader("");
+	ICalEvent e = r.parseEvent(se);
+	assert e.description.contains("https://meet.google.com/ruf-sfez-gmz") : e.description;
+}
+	@Test
 	public void testUID() throws ParseException {
 		String se = "BEGIN:VEVENT\n"
 				+ "DTSTART;TZID=Europe/London:20210525T150000\n"
