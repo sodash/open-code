@@ -156,26 +156,7 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		doMain2();		
 		// loop? (does nothing but stay alive by default)
 		if (pleaseStop) return;
-		mainLoopThread = new Thread(getClass().getSimpleName()+".doMainLoop") {
-			@Override
-			public void run() {
-				Log.d(appName, "Starting mainLoopThread...");
-				while( ! pleaseStop) {					
-					try {						
-						doMainLoop();
-					} catch(Throwable ex) {
-						Log.e(appName, ex);
-						if (pleaseStop) return;
-						// pause a moment
-						Utils.sleep(100);
-						// loop again... 
-						// NB: use stop() to stop
-					}
-				}
-				Log.w(appName, "...Ending mainLoopThread");
-			}
-		};
-		mainLoopThread.setDaemon(false);
+		mainLoopThread = new MainLoopThread(this);
 		mainLoopThread.start();
 		// ready
 		readyFlag = true;

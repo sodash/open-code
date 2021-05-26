@@ -38,6 +38,10 @@ public final class TimeOut implements Closeable {
 	private static Timer timer = newTimer();
 	private TimerTask task;
 	private final long timeout;
+	/**
+	 * paranoia - a flag to make sure cancelled TOs don't do anything
+	 */
+	private volatile boolean cancelled;
 
 	/**
 	 * Create <i>and start</i> an interrupter to interrupt the thread that
@@ -68,7 +72,8 @@ public final class TimeOut implements Closeable {
 	 * @see TimerTask#cancel() Can be called repeatedly without harm.
 	 */
 	public void cancel() {
-		task.cancel();
+		cancelled = true; // paranoia
+		task.cancel();		
 	}
 
 	/**
@@ -88,6 +93,10 @@ public final class TimeOut implements Closeable {
 		task = new TimerTask() {
 			@Override
 			public void run() {
+				if (cancelled) {
+					Log.w("TimeOut", "run but cancelled?! Leaving alone " + target.getName());
+					return;
+				}
 				// log that we did indeed timeout
 				Log.w("TimeOut", "Interrupting " + target.getName());
 				target.interrupt();
