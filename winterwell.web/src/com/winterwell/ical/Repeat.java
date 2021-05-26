@@ -110,6 +110,7 @@ public class Repeat {
 		// e.g. FREQ=WEEKLY;UNTIL=20160722T160000Z;INTERVAL=6;BYDAY=FR
 		String[] bits = rrule.split(";");
 		for (String bit : bits) {
+			if (Utils.isBlank(bit)) continue;
 			String[] kv = bit.split("=");
 			if (kv.length!=2) {
 				Log.e("ical", "odd rrule "+rrule);
