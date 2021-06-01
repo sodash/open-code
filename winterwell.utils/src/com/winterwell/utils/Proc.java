@@ -388,11 +388,15 @@ public class Proc implements Closeable {
 	 *
 	 * @param command
 	 * @return output from command
+	 * @throws FailureException if the command does not return 0
 	 */
 	public static String run(String command) {
 		Proc p = new Proc(command);
 		p.run();
 		int ok = p.waitFor();
+		if (ok != 0) {
+			throw new FailureException(p.getError());
+		}
 		return p.getOutput();
 	}
 
