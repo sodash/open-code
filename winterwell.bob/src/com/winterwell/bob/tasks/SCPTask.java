@@ -26,23 +26,28 @@ public class SCPTask extends ProcessTask {
 	private String remotePath;
 	private String tempPath;
 	private String userAtServer;
-	// hack to allow editing of the global static
+	
 	private boolean atomic = _atomic;
-
-
+	
 	/**
-	 * TODO EXPERIMENTAL If true, use a temp file to provide near-atomic behaviour.
-	 * TODO make non-static
+	 * If true, use a temp file to provide near-atomic behaviour.
+	 * 
+	 * static default for {@link #atomic}
 	 */
 	public static boolean _atomic = true;
 
-	/**
-	 * TODO EXPERIMENTAL If true, use a temp file to provide "near-atomic" behaviour.
-	 * TODO make non-static.
+	/** 
+	 * @deprecated Use the static {@link #_atomic} instead
+	 * 
+	 * If true, use a temp file to provide "near-atomic" behaviour.
+
 	 * The up/download is first sent to a temp file, then this is moved into place.
 	 */
 	public void setAtomic(boolean atomic) {
-		this.atomic = atomic;
+		if (this.atomic != atomic) {
+			throw new IllegalStateException(
+				"Sorry: the command is put together in the constructor, so this would be too late. Use `SCPTask._atomic =` instead.");
+		}
 	}
 	
 	public void setMkdirTask(boolean onOff) {
@@ -70,7 +75,9 @@ public class SCPTask extends ProcessTask {
 		this.userAtServer = userAtServer;		
 		
 		// Bug with directories ??which we should fix at some point
-		if (localFile.isDirectory()) atomic=false;
+		if (localFile.isDirectory()) {
+			atomic=false;
+		}
 		
 		if (atomic) tempPath = remotePath+".temp";
 		

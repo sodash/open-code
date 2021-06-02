@@ -131,7 +131,7 @@ public class WebEx extends RuntimeException {
 		}
 		public BadParameterException(String parameter, Object value, Throwable ex) {
 			super(400, "Bad parameter: "+parameter+(value==null? "" : "="+value), ex);
-		}
+		}		
 		private static final long serialVersionUID = 1L;		
 	}
 	

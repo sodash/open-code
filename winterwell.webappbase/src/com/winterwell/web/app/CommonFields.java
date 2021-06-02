@@ -10,6 +10,7 @@ import com.winterwell.web.fields.EmailField;
 import com.winterwell.web.fields.EnumField;
 import com.winterwell.web.fields.SField;
 import com.winterwell.web.fields.TimeField;
+import com.winterwell.web.fields.UrlField;
 import com.winterwell.web.fields.XIdField;
 
 public class CommonFields {
@@ -34,6 +35,7 @@ public class CommonFields {
 	public static final EnumField<KStatus> STATUS = new EnumField<>(KStatus.class, "status");
 	public static final SField DESC = new SField("desc");
 	public static final SField Q = new SField("q");
+	public static final UrlField URL = new UrlField("url");
 	/**
 	 * convenience for using start/end
 	 * @param state Can be null

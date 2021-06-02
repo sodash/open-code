@@ -111,6 +111,7 @@ public final class Dt implements Comparable<Dt>, Serializable, IHasJson {
 	 * @return
 	 */
 	public Dt convertTo(TUnit tunit) {
+		if (tunit==unit) return this; // no-op, and these are final objects
 		double n2 = divide(tunit.dt);
 		return new Dt(n2, tunit);
 	}
