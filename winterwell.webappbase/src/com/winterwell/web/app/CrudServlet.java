@@ -794,6 +794,7 @@ public abstract class CrudServlet<T> implements IServlet {
 	}
 	
 	protected void securityHack_teamGoodLoop(WebRequest state) {
+		if (true) return;
 		YouAgainClient yac = Dep.get(YouAgainClient.class);
 		List<AuthToken> tokens = yac.getAuthTokens(state);
 		for (AuthToken authToken : tokens) {
@@ -1084,16 +1085,16 @@ public abstract class CrudServlet<T> implements IServlet {
 				q = q.replaceAll(":me\\b", ":"+mes.toString());
 			}
 			// TODO match on all?
-			// HACK strip out unset
-			if (q.contains(":unset")) {
-				Matcher m = Pattern.compile("(\\w+):unset").matcher(q);
-				m.find();
-				String prop = m.group(1);
-				String q2 = m.replaceAll("").trim();
-				q = q2;
-				ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
-				qb = ESQueryBuilders.boolQuery().mustNot(setFilter);
-			}	
+//			// HACK strip out unset
+//			if (q.contains(":unset")) {
+//				Matcher m = Pattern.compile("(\\w+):unset").matcher(q);
+//				m.find();
+//				String prop = m.group(1);
+//				String q2 = m.replaceAll("").trim();
+//				q = q2;
+//				ESQueryBuilder setFilter = ESQueryBuilders.existsQuery(prop);
+//				qb = ESQueryBuilders.boolQuery().mustNot(setFilter);
+//			}	
 			// Add the Query!
 			if ( ! Utils.isBlank(q) && ! ALL.equalsIgnoreCase(q)) { // ??make all case-sensitive??
 				SearchQuery sq = new SearchQuery(q);
