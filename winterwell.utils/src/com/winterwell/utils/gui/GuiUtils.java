@@ -183,10 +183,9 @@ public class GuiUtils {
 		return opt == JOptionPane.OK_OPTION;
 	}
 	/**
-	 * Mnenomic for {@link JOptionPane#showConfirmDialog(Component, Object)}
+	 * Mnenomic for JOptionPane.showMessageDialog()
 	 * 
 	 * @param question
-	 * @return true if OK
 	 */
 	public static void alert(String msg) {
 		if ( ! isInteractive()) {

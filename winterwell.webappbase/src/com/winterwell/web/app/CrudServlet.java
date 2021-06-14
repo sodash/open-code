@@ -743,12 +743,25 @@ public abstract class CrudServlet<T> implements IServlet {
 		hits2 = doList2_securityFilter(hits2, state, tokens, yac);
 		
 		// sanitise for privacy
+		int errCnt = 0;
 		for(int i=0; i<hits2.size(); i++) {
-			ESHit<T> h = hits2.get(i);
-			JThing<T> cleansed = cleanse(h.getJThing(), state);
-			if (cleansed==null) continue;
-			ESHit ch = new ESHit(cleansed);
-			hits2.set(i, ch);
+			try {
+				ESHit<T> h = hits2.get(i);
+				JThing<T> cleansed = cleanse(h.getJThing(), state);
+				if (cleansed==null) {
+					continue;
+				}
+				ESHit ch = new ESHit(cleansed);
+				hits2.set(i, ch);
+			} catch (Throwable ex) {
+				// Swallow and keep on trucking for the odd data error
+				// Note: minor data privacy issue: this means the uncleansed data gets served up here!
+				// Which will be useful for dbugging and should not happen in the wild.
+				Log.e(LOGTAG(), ex);
+				// Though if too much is breaking, then give up
+				errCnt++;
+				if (errCnt > 100) break;
+			}
 		}	
 		
 		// HACK: send back csv?
