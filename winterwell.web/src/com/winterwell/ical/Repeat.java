@@ -5,10 +5,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.log.Log;
+import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
 import com.winterwell.utils.time.Time;
 import com.winterwell.utils.time.TimeUtils;
@@ -182,6 +184,8 @@ public class Repeat {
 		return getNext2(mark, windowStart, backstop, cnt);
 	}
 	
+	TimeZone timezone;
+	
 	/**
 	 * 
 	 * @param mark Can return this
@@ -225,7 +229,7 @@ public class Repeat {
 			
 			// step forward
 			// done late, so we get the event itself included
-			mark = mark.plus(interval, freq);
+			mark = mark.plus(new Dt(interval, freq), timezone);
 		}
 		// no more
 		return null;

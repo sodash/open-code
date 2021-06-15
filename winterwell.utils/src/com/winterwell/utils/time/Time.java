@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -554,7 +555,14 @@ public final class Time implements Serializable, Comparable<Time> {
 	 * @return A new object that is time+dt. Uses Calendar to step neatly.
 	 */
 	public Time plus(Dt dt) {
+		return plus(dt, null);
+	}
+	
+	public Time plus(Dt dt, TimeZone timezone) {	
 		GregorianCalendar cal = getCalendar();
+		if (timezone!=null) {
+			cal.setTimeZone(timezone);
+		}
 		dt.addTo(cal);
 		return new Time(cal);
 	}
@@ -569,10 +577,9 @@ public final class Time implements Serializable, Comparable<Time> {
 	 * @return a new Time object
 	 */
 	public Time plus(int n, TUnit unit) {
-		GregorianCalendar cal = getCalendar();
-		cal.add(unit.getCalendarField(), n);
-		return new Time(cal);
+		return plus(new Dt(n, unit));
 	}
+
 
 	/**
 	 * Convenience for {@link #plus(Dt)} where Dt = 1 unit

@@ -109,20 +109,24 @@ public class ICalReader {
 		}	
 		if (e.isRepeating()) {
 			e.repeat.setSince(e.start);
+			e.repeat.timezone = e.timezone;
 		}
 		return e;
 	}
 	
 	String parseEvent2_line(ICalEvent e, String line, String key) throws ParseException {
 		String value = line;
+		// doc - when does/doesnt the key change??
 		String[] k = StrUtils.find(pkey, line);
+		String keyValueBumpf = null;
 		if (k!=null) {
 			if (k.length < 3) {	
 				Log.e(LOGTAG, "weird ical line: "+line);
 				return key;
 			}
 			key = k[1];
-			value = k[3];
+			keyValueBumpf = k[2];
+			value = k[3];			
 		}
 		if (key==null) {
 			return null;
@@ -132,19 +136,20 @@ public class ICalReader {
 		if (value.isEmpty()) {
 			return key;
 		}
-		// return key if the key can be continued multi-line, null if not
+		// return key if the key can be continued multi-line, null if not		
 		switch(key) {
 		case "DTSTAMP":
 			// How does this differ from created??
 			if (e.created==null) {
-				e.created = parseTime(value, k[2]);
+				e.created = parseTime(value, keyValueBumpf);
 			}
 			break;
 		case "DTSTART":						
-			e.start = parseTime(value, k[2]);
+			e.start = parseTime(value, keyValueBumpf);
+			e.timezone = parseTimeZone(keyValueBumpf);
 			break;
 		case "DTEND":
-			e.end = parseTime(value, k[2]);
+			e.end = parseTime(value, keyValueBumpf);
 			break;
 		case "SUMMARY":
 			// + to handle multi-line properties
@@ -164,7 +169,7 @@ public class ICalReader {
 			e.uid = value;
 			break;
 		case "CREATED":
-			e.created = parseTime(value, k[2]);
+			e.created = parseTime(value, keyValueBumpf);
 			break;
 		case "RECURRENCE-ID":
 			e.recurrenceId = value;
@@ -185,7 +190,7 @@ public class ICalReader {
 			String[] values = value.split(",");
 			for (String v : values) {
 				if (Utils.isBlank(v)) continue;
-				Time exdate = parseTime(v, k[2]);
+				Time exdate = parseTime(v, keyValueBumpf);
 				e.repeat.addExclude(exdate);				
 			}
 			return key;
@@ -201,11 +206,8 @@ public class ICalReader {
 		Format tempsdf = null;
 		if ( ! Utils.isBlank(keyValueBumpf)) {
 			tempsdf = cloneFormat(sdfNoTimeZone);
-			if (keyValueBumpf.contains("TZID=")) {				
-				Matcher m = pkkv.matcher(keyValueBumpf);
-				m.find();
-				String tz = m.group(2);
-				TimeZone zone = TimeZone.getTimeZone(tz);
+			TimeZone zone = parseTimeZone(keyValueBumpf);
+			if (zone!=null) {				
 				tempsdf = setTimeZone(tempsdf, zone);				
 			} else if (keyValueBumpf.equals("VALUE=DATE")) {
 				tempsdf = cloneFormat(sdfDate);	
@@ -219,10 +221,21 @@ public class ICalReader {
 				tempsdf = cloneFormat(ICalWriter.sdf);
 			}
 		}				
-		// NB FDF does not implmenet Format.parseObject?!
+		// NB FDF does not implement Format.parseObject?!
 		FastDateFormat f = (FastDateFormat) tempsdf;
 		Date parse = f.parse(value); 
 		return new Time(parse);
+	}
+
+	private static TimeZone parseTimeZone(String keyValueBumpf) {
+		if (keyValueBumpf==null || ! keyValueBumpf.contains("TZID=")) {
+			return null;				
+		}
+		Matcher m = pkkv.matcher(keyValueBumpf);
+		m.find();
+		String tz = m.group(2);
+		TimeZone zone = TimeZone.getTimeZone(tz);
+		return zone;
 	}
 
 	/**

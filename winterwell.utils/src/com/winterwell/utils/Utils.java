@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -109,6 +110,8 @@ public final class Utils {
 	}
 
 	/**
+	 * @deprecated Use Objects.equals() for most cases.
+	 *  
 	 * Convenience for a==null? b==null : a.equals(b) 
 	 *  + special handling for arrays using List.equals() rules
 	 *  + special handling for Numbers, so that e.g. int 1 equals double 1.0 equals long 1L

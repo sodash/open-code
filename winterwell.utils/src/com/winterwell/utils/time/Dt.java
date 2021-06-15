@@ -69,8 +69,9 @@ public final class Dt implements Comparable<Dt>, Serializable, IHasJson {
 		int i = (int) n;
 		cal.add(unit.getCalendarField(), i);
 		double r = n - i;
-		if (r == 0)
+		if (r == 0) {
 			return;
+		}
 		// add fractional part using millisecs
 		int ms = (int) (r * unit.millisecs);
 		cal.add(TUnit.MILLISECOND.getCalendarField(), ms);

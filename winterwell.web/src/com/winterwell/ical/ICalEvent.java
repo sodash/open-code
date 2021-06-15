@@ -4,7 +4,9 @@ package com.winterwell.ical;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.TimeZone;
 
+import com.winterwell.utils.Utils;
 import com.winterwell.utils.containers.ArrayMap;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.Period;
@@ -13,6 +15,7 @@ import com.winterwell.utils.web.WebUtils2;
 
 public class ICalEvent {
 
+	TimeZone timezone;
 	public Time start;
 	/**
 	 * Can be null -- interpreted as one day.
@@ -29,7 +32,7 @@ public class ICalEvent {
 	public Time created;
 	public String location;
 	public String raw;
-	public Repeat repeat;
+	Repeat repeat;
 	/**
 	 * e.g. "RECURRENCE-ID;TZID=Europe/London:20210712T120000"
 	 * 
@@ -85,6 +88,7 @@ public class ICalEvent {
 	 */
 	@Override
 	public String toString() {
+		if (raw!=null) return raw;
 		String s = ICalWriter.format(start);
 		return "BEGIN:VEVENT\r\n"
 			+"DTSTART:"+s+"\r\n" // FIXME What is the format???
@@ -120,6 +124,7 @@ public class ICalEvent {
 	 */
 	public List<ICalEvent> getRepeats(Time rstart, Time rend) {
 		if (repeat==null) return null;
+		assert Objects.equals(repeat.timezone, timezone);
 		List<Time> repeatPeriods = repeat.getRepeats(rstart, rend);
 		List<ICalEvent> repeatEvents = new ArrayList();
 		Dt dt = end==null? null : start.dt(end);
@@ -145,5 +150,9 @@ public class ICalEvent {
 
 	public Period getPeriod() {
 		return new Period(start, end);
+	}
+	
+	public Repeat getRepeat() {
+		return repeat;
 	}
 }
