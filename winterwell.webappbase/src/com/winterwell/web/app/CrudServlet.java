@@ -515,6 +515,13 @@ public abstract class CrudServlet<T> implements IServlet {
 	private String _id;
 	
 	/**
+	 * Rarely used! Set the focal thing's ID.
+	 */
+	protected final void setId(String _id) {
+		this._id = _id;
+	}
+	
+	/**
 	 * Optional support for dataspace based data access.
 	 * Call {@link #setDataspace(CharSequence)} to use this
 	 */
@@ -661,7 +668,9 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @return 
 	 */
 	protected String getId(WebRequest state) {
-		if (_id!=null) return _id;
+		if (_id!=null) {
+			return _id;
+		}
 		// Beware if ID can have a / in it!
 		String slug = state.getSlug();
 		String[] slugBits = state.getSlugBits();
