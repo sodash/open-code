@@ -6,7 +6,7 @@ package com.winterwell.web.ajax;
  *
  */
 public enum KAjaxStatus {
-	success, 
+	success,	
 	/** There was a problem with the data submitted, or some pre-condition of the API call wasn't satisfied.
 	 *  Can return data.
 	 *  */

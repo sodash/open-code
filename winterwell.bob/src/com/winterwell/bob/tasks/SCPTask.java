@@ -46,7 +46,7 @@ public class SCPTask extends ProcessTask {
 	public void setAtomic(boolean atomic) {
 		if (this.atomic != atomic) {
 			throw new IllegalStateException(
-				"Sorry: the command is put together in the constructor, so this would be too late. Use `SCPTask._atomic =` instead.");
+				"Sorry: the command is put together in the constructor, so setAtomic() would be too late. Use `SCPTask._atomic =` instead.");
 		}
 	}
 	

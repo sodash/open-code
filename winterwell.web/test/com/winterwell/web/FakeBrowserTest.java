@@ -1,5 +1,8 @@
 package com.winterwell.web;
 
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Test;
 
 import com.winterwell.utils.containers.ArrayMap;
@@ -7,6 +10,20 @@ import com.winterwell.utils.log.Log;
 
 public class FakeBrowserTest {
 
+	@Test
+	public void testMethodHead() {
+		{
+			FakeBrowser fb = new FakeBrowser();
+			fb.setRequestMethod("HEAD");
+			String beeb = fb.getPage("https://www.bbc.co.uk");			
+			Map<String, List<String>> rh = fb.getResponseHeaders();
+			assert beeb.isEmpty();
+			assert ! rh.isEmpty();
+//			System.out.println(rh);
+		}
+	}
+
+		
 	@Test
 	public void testSetRetryOnError() {
 		{	// simple unset

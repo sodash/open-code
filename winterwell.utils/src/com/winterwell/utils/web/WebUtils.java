@@ -23,8 +23,11 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -74,6 +77,7 @@ import com.winterwell.utils.io.ISerialize;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
 import com.winterwell.utils.time.TUnit;
+import com.winterwell.utils.time.Time;
 
 /**
  * Web and xml-related utils.
@@ -1815,6 +1819,26 @@ public class WebUtils {
 		Log.d("pdf", proc.getCommand());
 		proc.start();
 		return proc;
+	}
+
+	/**
+	 * see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified
+	 * @param lmt
+	 * @return
+	 */
+	public static Time parseHeaderTime(String ht) {
+		if (ht==null) return null;
+		try {
+			// <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT
+			// e.g. "Wed, 21 Oct 2015 07:28:00 GMT"
+			SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
+			Date d = sdf.parse(ht);
+			return new Time(d);
+		} catch (ParseException e) {
+			// swallow
+			Log.w("WebUtils.parseHeaderTime", e);
+			return null;
+		}		
 	}
 
 
