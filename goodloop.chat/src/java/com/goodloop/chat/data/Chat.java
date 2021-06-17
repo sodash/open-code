@@ -5,6 +5,11 @@ import java.util.List;
 
 import com.winterwell.data.AThing;
 
+/**
+ * Status: Not used
+ * @author daniel
+ *
+ */
 public class Chat extends AThing {
 
 	public Chat() {

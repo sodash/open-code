@@ -1001,8 +1001,9 @@ public class DataUtils extends StatsUtils {
 		if (ab == 0)
 			throw new FailureException("zero length vector");
 		double aDotB = a.dot(b);
+		double cosm = aDotB / ab;
 		assert MathUtils.isFinite(aDotB);
-		double angle = Math.acos(aDotB / ab);
+		double angle = Math.acos(cosm);
 		assert angle >= 0 && angle <= Math.PI;
 		return angle;
 	}

@@ -64,8 +64,9 @@ public class ConfigFactory {
 		appName = FileUtils.getWorkingDirectory().getName(); // guess!
 	}
 	
-	public void setAppName(String appName) {
+	public ConfigFactory setAppName(String appName) {
 		this.appName = appName;
+		return this;
 	}
 	/**
 	 * e.g. local / test / production. See {@link KServerType}

@@ -43,6 +43,7 @@ import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.io.FileUtils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.web.Cooldown;
+import com.winterwell.utils.web.SimpleJson;
 import com.winterwell.utils.web.WebUtils;
 import com.winterwell.utils.web.WebUtils2;
 import com.winterwell.web.data.XId;
@@ -1054,6 +1055,16 @@ public class FakeBrowser {
 		String multiple = "Bearer "+StrUtils.join(jwts, ",Bearer ");
 		setRequestHeader("Authorization", multiple);
 		return this;
+	}
+
+	/**
+	 * See WebUtils2.generateJSON() and WebUtils2.parseJSON()
+	 * @param url
+	 * @param json
+	 * @return
+	 */
+	public String postJsonBody(String url, String json) {
+		return post(url, CONTENT_TYPE_JSON, json);
 	}
 
 	

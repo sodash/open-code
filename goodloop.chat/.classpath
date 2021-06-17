@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="builder"/>
+	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
 		<attributes>
 			<attribute name="module" value="true"/>
@@ -15,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/elasticsearch-java-client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/flexi-gson"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/winterwell.bob"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

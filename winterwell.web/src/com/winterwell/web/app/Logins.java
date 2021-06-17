@@ -40,9 +40,12 @@ public class Logins {
 	static Logins init() {
 		ConfigBuilder cb = ConfigFactory.get().getConfigBuilder(Logins.class);
 		loginsDir = new File(FileUtils.getWinterwellDir(), "logins");
-		File f = new File(loginsDir, "logins.misc.properties");
 		if (loginsDir.isFile()) {
 			cb.set(loginsDir);
+		}
+		File f = new File(loginsDir, "logins.misc.properties");
+		if (f.isFile()) {
+			cb.set(f);
 		}
 		Logins logins = cb.get(); // This allows the logins map to be populated from the properties
 		Log.i(LOGTAG, "init credentials: "+logins.logins.keySet());

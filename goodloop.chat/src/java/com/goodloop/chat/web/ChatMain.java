@@ -36,16 +36,17 @@ public class ChatMain extends AMain {
 		init3_gson();
 		init3_ES();
 		
-		Class[] dbclasses = new Class[] {Chat.class,Chatscript.class};
-		AppUtils.initESIndices(KStatus.main(), dbclasses);
-		Map<Class, Map> mappingFromClass = new ArrayMap();
-		AppUtils.initESMappings(KStatus.main(), dbclasses, mappingFromClass);
+//		Class[] dbclasses = new Class[] {Chat.class,Chatscript.class};
+//		AppUtils.initESIndices(KStatus.main(), dbclasses);
+//		Map<Class, Map> mappingFromClass = new ArrayMap();
+//		AppUtils.initESMappings(KStatus.main(), dbclasses, mappingFromClass);
 	}
 	
 	@Override
 	protected void addJettyServlets(JettyLauncher jl) {
 		super.addJettyServlets(jl);
 		MasterServlet ms = jl.addMasterServlet();
+		ms.addServlet("reply", ReplyServlet.class);
 		ms.addServlet("chat", ChatServlet.class);
 		ms.addServlet("chatscript", ChatscriptServlet.class);
 	}
