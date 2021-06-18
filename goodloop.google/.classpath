@@ -33,5 +33,8 @@
 	<classpathentry kind="lib" path="dependencies/listenablefuture.jar"/>
 	<classpathentry kind="lib" path="dependencies/opencensus-api.jar"/>
 	<classpathentry kind="lib" path="dependencies/opencensus-contrib-http-util.jar"/>
+	<classpathentry kind="lib" path="dependencies/google-api-services-calendar.jar" sourcepath="dependencies/google-api-services-calendar-v3-rev20210429-sources.jar"/>
+	<classpathentry kind="lib" path="dependencies/google-http-client-apache-v2.jar"/>
+	<classpathentry kind="lib" path="dependencies/google-http-client-gson.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

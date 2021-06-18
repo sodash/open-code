@@ -23,6 +23,11 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.Calendar.CalendarList;
+import com.google.api.services.calendar.Calendar.Calendars;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
@@ -50,43 +55,37 @@ import com.winterwell.utils.log.Log;
 import com.winterwell.web.app.Logins;
 
 /**
- * @testedby GSheetsClientTest
+ * @testedby GCalClientTest
  * 
  * @author Google, daniel
  *
  */
 public class GCalClient {
-	private static final String APP = "moneyscript.good-loop.com";
-	private static final String APPLICATION_NAME = "MoneyScript by Good-Loop";
+	private static final String APP = "google.good-loop.com";
+	private static final String APPLICATION_NAME = "Google Integration for Good-Loop";
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 	private static final String TOKENS_DIRECTORY_PATH = "tokens";
 	private static final String LOGTAG = "GCalClient";
 
-	/**
-	 * 
-	 * @param title optional
-	 * @return
-	 * @throws Exception
-	 */
-	public Spreadsheet createSheet(String title) throws Exception {
-		Sheets service = getService();
-		Spreadsheet ss = new Spreadsheet();	
-		if ( ! Utils.isBlank(title)) {
-			SpreadsheetProperties sps = new SpreadsheetProperties();
-			sps.setTitle(title);
-			ss.setProperties(sps);
-		}
-		Spreadsheet s2 = service.spreadsheets().create(ss).execute();
-		String sid = s2.getSpreadsheetId();
-		Log.i(LOGTAG, "created spreadsheet "+sid);
-		return s2;
-	}
 
+	public GCalClient() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public List getCalendarList() throws IOException {
+		Calendar service = getService();
+		CalendarList clist = service.calendarList();
+		com.google.api.services.calendar.Calendar.CalendarList.List lr = clist.list();
+		com.google.api.services.calendar.model.CalendarList clist2 = lr.execute();
+		List<CalendarListEntry> items = clist2.getItems();
+		return items;
+	}
+	
 	/**
 	 * Global instance of the scopes required by this quickstart. If modifying these
 	 * scopes, delete your previously saved tokens/ folder.
 	 */
-	private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
+	private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
 //	    private static final String CREDENTIALS_FILE_PATH = "config/credentials.json";
 
 	/**
@@ -121,12 +120,13 @@ public class GCalClient {
 		return cred;
 	}
 
-	private static Sheets getService() {
+	private static Calendar getService() {
 		Log.i(LOGTAG, "getService...");
 		try {
 			final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-			Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-					.setApplicationName(APPLICATION_NAME).build();
+			 Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+		                .setApplicationName(APPLICATION_NAME)
+		                .build();
 			return service;
 		} catch(Exception ex) {
 			Log.i(LOGTAG, "getService :( "+ex); // make sure its logged
@@ -134,51 +134,7 @@ public class GCalClient {
 		}
 	}
 
-	/**
-	 * See https://developers.google.com/sheets/api/guides/batchupdate#java
-	 * 
-	 * @throws IOException
-	 * @throws GeneralSecurityException
-	 */
-	public Object updateValues(String spreadsheetId, List<List<Object>> values)
-			throws GeneralSecurityException, IOException {
-		Log.i(LOGTAG, "updateValues... spreadsheet: "+spreadsheetId);
-		Sheets service = getService();
-		
-		ValueRange body = new ValueRange().setValues(values);
-
-		String valueInputOption = "USER_ENTERED";
-		int w = values.get(0).size();
-		String c = getBase26(w - 1); // w base 26
-		String range = "A1:" + c + values.size();
-		// TODO sheet number 
-		UpdateValuesResponse result = service.spreadsheets().values()
-				.update(spreadsheetId, range, body)
-				.setValueInputOption(valueInputOption).execute();
-		String ps = result.toPrettyString();
-		Integer cnt = result.getUpdatedCells();
-//			System.out.println(ps);
-		Log.i(LOGTAG, "updated spreadsheet: "+getUrl(spreadsheetId));
-		return result.toPrettyString();
-	}
 	
-
-	public String getUrl(String spreadsheetId) {
-		return "https://docs.google.com/spreadsheets/d/"+spreadsheetId;
-	}
-	
-	static Pattern gsu = Pattern.compile("^https://docs.google.com/spreadsheets/d/([^/]+)");
-	
-	static public String getSpreadsheetId(String url) {
-		// convert a normal url to a gviz
-		Matcher m = gsu.matcher(url);
-		if ( ! m.find()) {
-			return null;			
-		}
-		String docid = m.group(1);
-		return docid;
-	}
-
 	/**
 	 * 
 	 * @param w
@@ -196,35 +152,4 @@ public class GCalClient {
 		return getBase26(high) + getBase26(low);
 	}
 	
-	public void clearSpreadsheet(String sid) throws IOException{
-		Sheets service = getService();
-		List<Request> requests = new ArrayList<>();
-
-		requests.add(new Request()
-				.setUpdateCells(new UpdateCellsRequest()
-						.setRange(new GridRange()
-								.setSheetId(sheet))
-						.setFields("*")));
-		
-		BatchUpdateSpreadsheetRequest body = new BatchUpdateSpreadsheetRequest().setRequests(requests);
-		BatchUpdateSpreadsheetResponse response = service.spreadsheets().batchUpdate(sid, body).execute();
-	}
-
-	/**
-	 * GoogleSheets doesn't handle null values well, 
-	 * ??what happens??
-	 * change all null values to an empty space
-	 * @param values
-	 * @return cleaned values
-	 */
-	public List<List<Object>> replaceNulls(List<List<Object>> values) {
-		List<List<Object>> cleanedValues = new ArrayList();
-		for(List<Object> row : values) {
-			Collections.replaceAll(row, null, " ");
-//			Collections.replaceAll(row, "", " "); ??wanted??
-			cleanedValues.add(row);
-		}
-		return cleanedValues;
-	}	
-
 }
