@@ -114,7 +114,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		// See DataLogEvent#COMMON_PROPS
 		// TODO increase this list as our usage changes		
 		List<String> aggs = Arrays.asList(("amount dntn").split(" "));
-		// TODO this list may need updating from time to time!!
+		// This list may need updating from time to time!
 		List<String> terms = getConfig().longterms;
 
 		// create index and mapping
