@@ -110,7 +110,7 @@ public class DataServlet implements IServlet {
 		ESStorage ess = (ESStorage) dl.getStorage();
 //		ESStorage ess = Dep.get(ESStorage.class);
 		
-		ESHttpClient esc = ess.client(dataspace);
+		ESHttpClient esc = ess.client(dataspace);		
 
 		// collect all the info together
 		ESDataLogSearchBuilder essb = new ESDataLogSearchBuilder(esc, dataspace);		
@@ -118,12 +118,12 @@ public class DataServlet implements IServlet {
 			.setQuery(filter)
 			.setNumResults(numTerms)
 			.setStart(start)
-			.setEnd(end);
+			.setEnd(end);		
 		Dt interval = state.get(new DtField("interval"), TUnit.DAY.dt);
 		essb.setInterval(interval);
 		
 		SearchRequest search = essb.prepareSearch();		
-		search.setDebug(true);
+		search.setDebug(state.debug);
 //		search.setType(typeFromEventType(spec.eventType)); all types unless fixed
 		search.setSize(size);
 		
@@ -144,7 +144,7 @@ public class DataServlet implements IServlet {
 		if (state.debug && isLoggedIn(state)) {
 			aggregations.put("debug", search.getCurl());
 		}
-		// done
+		// done		
 		JsonResponse jr = new JsonResponse(state, aggregations);		
 		WebUtils2.sendJson(jr, state);
 	}
