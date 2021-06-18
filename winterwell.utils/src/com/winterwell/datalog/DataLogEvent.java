@@ -289,8 +289,6 @@ public final class DataLogEvent implements Serializable, IHasJson
 		if (user.endsWith("@trk") || user.endsWith("@temp") || StrUtils.isNumber(user)) {
 			props.putIfAbsent("trk", user);
 			props.remove("user");
-		} else if (user.contains("@")) {
-			props.putIfAbsent("uxid", user);
 		}		
 	}
 
