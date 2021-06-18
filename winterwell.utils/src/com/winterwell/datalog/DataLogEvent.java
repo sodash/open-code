@@ -68,7 +68,10 @@ public final class DataLogEvent implements Serializable, IHasJson
 			new HashMap(new ArrayMap(			
 			// tracking
 			"ip", String.class,
+			/** Before July 2021, can mix xids with temp and @trk ids. See `trk` */
 			"user", String.class,
+			/** temp and @trk ids */
+			"trk", String.class,
 			"url", String.class,
 			"domain", String.class,
 			"host", String.class,
@@ -272,6 +275,23 @@ public final class DataLogEvent implements Serializable, IHasJson
 				Log.w("DataLogEvent.time", t+" "+ex);
 			}
 		}
+		// HACK adjust user
+		initAdjustUserProp();
+	}
+
+	/**
+	 * HACK store temp ids separately from proper user logins.
+	 * So we can forget the temp ones, but keep the proper ones.
+	 */
+	private void initAdjustUserProp() {
+		String user = (String) props.get("user");
+		if (user ==null) return;
+		if (user.endsWith("@trk") || user.endsWith("@temp") || StrUtils.isNumber(user)) {
+			props.putIfAbsent("trk", user);
+			props.remove("user");
+		} else if (user.contains("@")) {
+			props.putIfAbsent("uxid", user);
+		}		
 	}
 
 	@Override

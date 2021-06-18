@@ -19,7 +19,7 @@ public class MakeCompressor extends BuildWinterwellProject {
 	
 	public MakeCompressor() {
 		super(new WinterwellProjectFinder().apply("winterwell.datalog"), "datalog.compressor");
-		setVersion("1.0.0"); // 22 Mar 2021
+		setVersion("1.1.0"); // 18 Jun 2021
 		setMainClass("com.winterwell.datalog.server.CompressDataLogIndexMain");
 	}	
 
