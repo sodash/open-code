@@ -26,6 +26,8 @@ public class GSheetsBuilder extends BuildWinterwellProject {
 		mdt.addDependency("com.google.oauth-client:google-oauth-client-jetty:1.31.5");
 		mdt.addDependency("com.google.apis:google-api-services-sheets:v4-rev612-1.25.0");
 		mdt.addDependency("com.google.http-client:google-http-client-jackson2:1.39.2");
+		// calendar support??
+		mdt.addDependency("com.google.apis:google-api-services-calendar:v3-rev20210429-1.31.0");
 		mdt.setIncSrc(true);
 		deps.add(mdt);
 		
