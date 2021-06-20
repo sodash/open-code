@@ -26,8 +26,14 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.Calendar.CalendarList;
 import com.google.api.services.calendar.Calendar.Calendars;
+import com.google.api.services.calendar.Calendar.Calendars.Get;
+import com.google.api.services.calendar.Calendar.Events.Insert;
+import com.google.api.services.calendar.Calendar.Events.Patch;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.api.services.calendar.model.ConferenceData;
+import com.google.api.services.calendar.model.CreateConferenceRequest;
+import com.google.api.services.calendar.model.Event;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
@@ -50,11 +56,14 @@ import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
 import com.google.api.services.sheets.v4.model.UpdateSheetPropertiesRequest;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.winterwell.utils.Printer;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.log.Log;
 import com.winterwell.web.app.Logins;
 
 /**
+ * See https://developers.google.com/calendar/api
+ * 
  * @testedby GCalClientTest
  * 
  * @author Google, daniel
@@ -120,7 +129,7 @@ public class GCalClient {
 		return cred;
 	}
 
-	private static Calendar getService() {
+	static Calendar getService() {
 		Log.i(LOGTAG, "getService...");
 		try {
 			final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -150,6 +159,59 @@ public class GCalClient {
 		int low = w % 26;
 		int high = (w / 26) - 1; // -1 'cos this isnt true base 26 -- there's no proper 0 letter
 		return getBase26(high) + getBase26(low);
+	}
+
+	/**
+	 * 
+	 * @param calendarId email or "primary"
+	 * @return
+	 */
+	public com.google.api.services.calendar.model.Calendar getCalendar(String calendarId) {
+		try {
+			Calendar service = getService();
+			com.google.api.services.calendar.model.Calendar c = service.calendars().get(calendarId).execute();
+			return c;
+		} catch (IOException ex) {
+			throw Utils.runtime(ex);
+		}
+	}
+
+	/**
+	 * 
+	 * @param calendarId Can be "primary"
+	 * @param event
+	 * @param sendNotifications
+	 * @param addVideoConference
+	 * @return
+	 */
+	public Event addEvent(String calendarId, Event event, boolean sendNotifications, boolean addVideoConference) {
+		try {			
+			Insert ereq = getService().events().insert(calendarId, event)
+					.setSendNotifications(sendNotifications);
+			// event!
+			Event event2 = ereq.execute();
+			// conference?
+			if (addVideoConference) {
+				// see https://developers.google.com/calendar/api/guides/create-events#conferencing
+				Event confPlease = new Event();
+				ConferenceData cd = confPlease.getConferenceData();
+				if (cd==null) {
+					cd = new ConferenceData();					
+				}
+				cd.setCreateRequest(
+						new CreateConferenceRequest().setRequestId(Utils.getNonce())						
+				);				
+				confPlease.setConferenceData(cd);
+				Patch patchreq = getService().events().patch(calendarId, event2.getId(), confPlease)
+						.setSendNotifications(sendNotifications);
+				Event presp = patchreq.setConferenceDataVersion(1).execute();
+				event2 = presp;
+			}
+			// insert!
+			return event2;
+		} catch (IOException e) {
+			throw Utils.runtime(e);
+		}
 	}
 	
 }
