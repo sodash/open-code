@@ -313,10 +313,16 @@ public abstract class BuildTask implements Closeable, IHasDesc, Runnable, IBuild
 		// fix desc if it wasn't before
 		String id = getDesc().getId();
 
+		// too deep?
+		BobConfig config = getConfig();
+		int activeTasks = config.depth + getDepth();
+		if (config.maxDepth > 0 && activeTasks > config.maxDepth ) {
+			skipFlag = true;
+			Log.d(LOGTAG, "Skip from maxDepth: "+config.maxDepth+" "+this+" depth: "+activeTasks);
+			return;
+		}
 		// skip repeat/recent runs?
 		// ...NB: no skip for the top level task
-		int activeTasks = getConfig().depth + getDepth();
-//				Bob.getSingleton().getBobCount() + ;
 		if (activeTasks!=0) {
 			if (skip()) {
 				skipFlag = true;

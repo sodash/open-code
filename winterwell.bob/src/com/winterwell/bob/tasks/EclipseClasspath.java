@@ -2,6 +2,7 @@ package com.winterwell.bob.tasks;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import com.winterwell.utils.web.WebUtils;
  * This relies on various assumptions about the workspace layout and specific files that may not be valid.
  *
  * @author Daniel
+ * @testedby {@link EclipseClasspathTest}
  */
 public class EclipseClasspath {
 
@@ -218,10 +220,14 @@ public class EclipseClasspath {
 	 * This can get confused by jars from Eclipse user-libraries :(
 	 */
 	public Set<File> getCollectedLibs() {
-		Set<File> libs = new HashSet();
-		Set<String> projects = new HashSet();
-		getCollectedLibs2(libs, projects, depsFor);
-		return libs;
+		try {
+			Set<File> libs = new HashSet();
+			Set<String> projects = new HashSet();
+			getCollectedLibs2(libs, projects, depsFor);
+			return libs;
+		} catch (Exception ex) {
+			throw Utils.runtime(ex);
+		}
 	}
 	
 	/**
@@ -238,18 +244,30 @@ public class EclipseClasspath {
 	 * @param libs
 	 * @param projects Avoid repeats
 	 * @param depsFor 
+	 * @throws IOException 
 	 */
-	private void getCollectedLibs2(Set<File> libs, Set<String> projects, ListMap<String, String> depsFor)
+	private void getCollectedLibs2(Set<File> libs, Set<String> projects, ListMap<String, String> depsFor) throws IOException
 	{
 		String pro = getProjectName();
 		List<File> libs2 = getReferencedLibraries();
+		for (File jfile : libs2) {
+			if ( ! jfile.isFile()) {
+				throw new IOException(this+ " Referenced jar "+jfile+" does not exist.");
+			}
+			libs.add(jfile);	
+		}
 		libs.addAll(libs2);
 		depsFor.put(pro, Containers.apply(libs2, File::getName));
 
 		// User libraries
 		for (String lib : getUserLibraries()) {
 			Set<File> userLibraryJars = getUserLibraryJars(lib);
-			libs.addAll(userLibraryJars);
+			for (File jfile : userLibraryJars) {
+				if ( ! jfile.isFile()) {
+					throw new IOException("UserLibraryJar "+jfile+" does not exist.");
+				}
+				libs.add(jfile);	
+			}			
 			depsFor.put(lib, Containers.apply(userLibraryJars, File::getName));
 		}
 

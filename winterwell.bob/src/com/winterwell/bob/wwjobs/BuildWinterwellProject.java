@@ -1,6 +1,7 @@
 package com.winterwell.bob.wwjobs;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -603,8 +604,9 @@ public class BuildWinterwellProject extends BuildTask {
 
 	/**
 	 * Find jars and move them into tmp-lib
+	 * @throws IOException 
 	 */
-	protected void collectJars(File libBuild) {
+	protected void collectJars(File libBuild) throws IOException {
 		EclipseClasspath ec = new EclipseClasspath(projectDir);
 		ec.setIncludeProjectJars(true);
 		Set<File> jars = ec.getCollectedLibs();
@@ -614,8 +616,11 @@ public class BuildWinterwellProject extends BuildTask {
 		libBuild.mkdirs();
 		assert libBuild.isDirectory();
 		// Ensure desired jars are present
-		for (File jar : jars) {
+		for (File jar : jars) {			
 			String jarName = jar.getName();
+			if ( ! jar.isFile()) {
+				throw new IOException("Jar file "+jar+" does not exist");
+			}
 			File localJar = new File(libBuild, jarName).getAbsoluteFile();
 			
 			// check versions and pick which one to keep?
