@@ -1,5 +1,6 @@
 package com.winterwell.utils.threads;
 
+import java.io.Closeable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
@@ -23,7 +24,7 @@ import com.winterwell.utils.time.TimeUtils;
  * @param <V>
  *            return type
  */
-public abstract class ATask<V> implements Callable<V>, IProgress {
+public abstract class ATask<V> implements Callable<V>, IProgress, Closeable {
 
 	/**
 	 * The enum ordering follows the lifecycle, so you can use &lt; to compare
@@ -173,7 +174,7 @@ public abstract class ATask<V> implements Callable<V>, IProgress {
 			return output;
 		} catch (Throwable e) {
 			status = QStatus.ERROR;
-			error = e;
+			setError(e);
 			if (runner != null) {
 				runner.report(this, e);
 			}
@@ -188,6 +189,14 @@ public abstract class ATask<V> implements Callable<V>, IProgress {
 		}
 	}
 
+	/**
+	 * @deprecated This is normally managed by #call()
+	 * @param error
+	 */
+	public void setError(Throwable error) {
+		this.error = error;
+	}
+	
 	/**
 	 * Only set on status=ERROR!
 	 * @return error or null
