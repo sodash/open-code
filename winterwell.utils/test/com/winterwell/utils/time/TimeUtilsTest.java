@@ -22,6 +22,8 @@ import com.winterwell.utils.containers.Pair;
 
 public class TimeUtilsTest {
 
+	
+	
 //	@Test
 	public void testScratch() {
 		SimpleDateFormat sdf = new SimpleDateFormat();
@@ -185,6 +187,17 @@ public class TimeUtilsTest {
 			Time p = TimeUtils.parseExperimental(t);
 			System.out.println(p);
 		}
+	}
+	
+	@Test
+	public void parseExperimental_month() {
+		Time jan = TimeUtils.parseExperimental("jan");
+		Time dec = TimeUtils.parseExperimental("dec");
+//		System.out.println(jan);
+//		System.out.println(dec);
+		Time now = new Time();
+		assert jan.equals(new Time(now.getYear(), 1, 1)) : jan;
+//		System.out.println(TimeUtils.getEndOfMonth(jan));
 	}
 	
 	@Test
