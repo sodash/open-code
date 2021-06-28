@@ -411,6 +411,7 @@ public class StrUtils {
 	 * @return
 	 */
 	public static String hash(String hashAlgorithm, String txt) {
+		if (txt==null) throw new NullPointerException("Nothing to hash");
 		// HACK: short = 6 letters of md5
 		if (SHORT_ALGORITHM.equals(hashAlgorithm)) {
 			String md5 = md5(txt);
@@ -677,6 +678,7 @@ public class StrUtils {
 	 * @see #sha1(String)
 	 */
 	public static String md5(String txt) {
+		if (txt==null) throw new NullPointerException("Nothing to hash");
 		return hash("MD5", txt);
 	}
 
