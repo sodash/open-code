@@ -180,9 +180,11 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 	/**
 	 * Overide to do a loop. This gets called repeatedly. Use {@link #stop()} to stop.
 	 * Any exceptions are caught, and the loop is restarted.
+	 * <p>
+	 * NB: This should always contains a Utils.sleep() command to stop it thrashing.
 	 */
 	protected void doMainLoop() throws Exception {
-		
+		Utils.sleep(20000); // loop on nothing e.g. to keep jetty alive
 	}
 
 	/**
