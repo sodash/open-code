@@ -451,6 +451,9 @@ public class CSVReader implements Iterable<String[]>, Iterator<String[]>, Closea
 		}	
 	}
 	
+	/**
+	 * @return null unless you use {@link #setHeaders(String[])}!
+	 */
 	public List<String> getHeaders() {
 		return Arrays.asList(headers);
 	}

@@ -341,13 +341,13 @@ public class SimpleJson {
 	/**
 	 * Convenience for get-map-(put-if-absent)
 	 * @param jobj
-	 * @param props
-	 * @return
+	 * @param key
+	 * @return jobj.key
 	 */
-	public static Map<String, Object> getCreate(Map<String, Object> jobj, String key) {
+	public static Map<String, Object> getCreate(Map jobj, String key) {
 		Object m = jobj.get(key);
 		if (m==null) {
-			m = new ArrayMap(); // hm... good for small map,s bad for larger ones. But this is a convenience method.
+			m = new ArrayMap(); // hm... good for small maps, bad for larger ones. But this is a convenience method.
 			jobj.put(key, m);
 		}
 		if (m instanceof Map) {
