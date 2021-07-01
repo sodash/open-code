@@ -38,7 +38,7 @@ import com.winterwell.web.HtmlTable;
  * 
  * @author daniel
  * @param <C1>
- *            type of the 1st column
+ *            type of the 1st column, usually String
  * @testedby  DataTableTest
  */
 public class DataTable<C1> extends Table<C1, Object[]> implements IHasHtml, IHasJson {
