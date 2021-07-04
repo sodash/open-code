@@ -1,6 +1,7 @@
 package com.winterwell.datalog;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -159,7 +160,19 @@ public class DataLogConfig extends DBOptions implements IInit, ISiteConfig {
 	public List<String> longterms = Arrays.asList(
 			("evt domain host country pub vert vertiser campaign lineitem "
 					+"cid via invalid mbl browser os currency uxid"
+					+" user" // (July 2021) e.g. for T4G user stats, no longer includes trk 
 					).split(" ")
 			);
-	
+
+	@Option(tokens="-removeLongterms,-removeLongTerm,-removeProperty",  description = "Remove from the default / otherwise set longterms. Use-case: custom compressions")
+	public List<String> removeLongterms;
+			
+	public List<String> getLongterms() {
+		if (removeLongterms != null) {
+			ArrayList<String> lts = new ArrayList(longterms);
+			lts.removeAll(removeLongterms);
+			return lts;
+		}
+		return longterms;
+	}
 }

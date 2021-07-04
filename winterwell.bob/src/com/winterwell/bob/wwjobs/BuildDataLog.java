@@ -13,11 +13,12 @@ public class BuildDataLog extends BuildWinterwellProject {
 
 	public BuildDataLog() {
 		super("winterwell.datalog");
-		setVersion("1.0.0-wwjobs"); // 22 Mar 2021
+		setVersion("1.1.1-deprecated-build"); // 4 July 2021
 	}	
 
 	@Override
 	public List<BuildTask> getDependencies() {
+		
 		return Arrays.asList(new BuildUtils(), new BuildWeb());
 	}
 

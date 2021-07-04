@@ -156,7 +156,9 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		// do Main once
 		doMain2();		
 		// loop? (does nothing but stay alive by default)
-		if (pleaseStop) return;
+		if (pleaseStop) {
+			return;
+		}
 		mainLoopThread = new MainLoopThread(this);
 		mainLoopThread.start();
 		// ready

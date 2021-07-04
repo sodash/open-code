@@ -106,6 +106,7 @@ public class CompressDataLogIndexMain extends AMain<CompressDataLogIndexConfig> 
 	
 	@Override
 	protected void doMain2() {		
+		pleaseStop = true; // no loop
 		// e.g. "scrubbed.datalog."+dataspace+"_" + MMMyy;
 		String sourceIndex = Containers.get(configRemainderArgs, 0);
 		if (Utils.isBlank(sourceIndex)) {
@@ -121,7 +122,7 @@ public class CompressDataLogIndexMain extends AMain<CompressDataLogIndexConfig> 
 		// TODO increase this list as our usage changes		
 		List<String> aggs = Arrays.asList(("amount dntn").split(" "));
 		// This list may need updating from time to time!
-		List<String> terms = getConfig().longterms;
+		List<String> terms = getConfig().getLongterms();
 
 		// create index and mapping
 		createIndexWithPropertiesMapping(destIndex, null, terms);				
@@ -194,22 +195,21 @@ public class CompressDataLogIndexMain extends AMain<CompressDataLogIndexConfig> 
 		TransformRequest trb3 = esc.prepareTransformDelete(jobId); 
 		trb3.setDebug(true);
 		IESResponse response3 = trb3.get();
-		Log.d("compress", response3);
+		Log.d(LOGTAG, "clean-up job "+response3);
 		
 		//add datalog.gl.all alias into the newly created index and remove it from original index
 		if (getConfig().noAliasSwap) {
-			Log.i("NO alias swap - the new index is not yet in use.");
+			Log.i("NO alias swap - the new index "+destIndex+" is not yet in use.");			
 		} else {
 			IndicesAliasesRequest iar = esc.admin().indices().prepareAliases();
 			iar.addAlias(destIndex, "datalog."+dataspace+".all");
 			iar.removeAlias(sourceIndex, "datalog."+dataspace+".all");
 			iar.get().check();
-			Log.i("Alias swap done! "+sourceIndex+" -> "+destIndex);
+			Log.i("Alias swap done! "+sourceIndex+" -> "+destIndex+" in datalog."+dataspace+".all");
 		}
 		Log.i("All done :) Enjoy your data");
 	}
-	
-	
+
 	/**
 	 * Can we share some code with 
 	 * ESStorage.registerDataspace() which does much the same??
