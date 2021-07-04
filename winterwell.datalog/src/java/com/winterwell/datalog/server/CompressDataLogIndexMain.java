@@ -129,7 +129,7 @@ public class CompressDataLogIndexMain extends AMain<CompressDataLogIndexConfig> 
 		ESConfig esConfig = esc.getConfig();
 		
 		// aggregate data
-		String jobId = "transform_"+sourceIndex;
+		String jobId = "transform_"+sourceIndex+"_to_"+destIndex;
 		
 		//safety mechanism -- make sure that the jobID doens't exist, if it does, delete it
 		try {
@@ -143,8 +143,8 @@ public class CompressDataLogIndexMain extends AMain<CompressDataLogIndexConfig> 
 		// create transform job
 		// specify source and destination and time interval
 		TransformRequest trb = esc.prepareTransform(jobId);
-		String version = esc.getESVersion();
-		VersionString vs = new VersionString(version);
+		String esVersion = esc.getESVersion();
+		VersionString vs = new VersionString(esVersion);
 		if (vs.geq("7.10.0")) {
 			Log.i("Using modern version of ES: more efficient transform!");
 			trb.setBody(sourceIndex, destIndex, aggs, terms, "24h");
@@ -157,11 +157,11 @@ public class CompressDataLogIndexMain extends AMain<CompressDataLogIndexConfig> 
 			SearchQuery sq = new SearchQuery(getConfig().filter);
 			BoolQueryBuilder fq = AppUtils.makeESFilterFromSearchQuery(sq, null, null);
 			trb.setQuery(fq);
-			Log.d("Added filter", getConfig().filter+" -> "+fq);
+			Log.d(LOGTAG, "Added filter "+getConfig().filter+" -> "+fq);
 		}
 		trb.setDebug(true);
 		IESResponse response = trb.get(); //might take a long time for complex body
-		Log.d("compress", response);
+		Log.d(LOGTAG, "compress job "+response);
 		
 		//after creating transform job, start it 
 		TransformRequest trb2 = esc.prepareTransformStart(jobId); 
