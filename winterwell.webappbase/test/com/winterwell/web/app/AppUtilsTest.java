@@ -35,6 +35,18 @@ import com.winterwell.web.data.XId;
 public class AppUtilsTest {
 
 	@Test
+	public void testMakeESFilterFromSearchQuery_regex() {
+		String q = "user:/.+@trk/"; // filter anon trk users
+		SearchQuery sq = new SearchQuery(q);
+		List ptre = sq.getParseTree();
+		BoolQueryBuilder esf = AppUtils.makeESFilterFromSearchQuery(sq, null, null);
+		Map esmap = (Map) esf.getUnderlyingMap().get("bool");
+		System.out.println(esmap);
+		System.out.println(esf);
+		assert esmap.toString().equals("{must=[{regexp={user={value=.+@trk}}}]}") : esmap.toString();
+	}
+	
+	@Test
 	public void testMakeESFilterFromSearchQuery_dueBefore() {
 		String q = "due:before:2020-01-01";
 		SearchQuery sq = new SearchQuery(q);

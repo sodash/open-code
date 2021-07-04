@@ -978,7 +978,6 @@ public abstract class CrudServlet<T> implements IServlet {
 	 */
 	public final SearchResponse doList2(String q, String prefix, KStatus status, String sort, int size, int from, Period period, WebRequest stateOrNull) {
 		// copied from SoGive SearchServlet
-		// TODO refactor to use makeESFilterFromSearchQuery
 		SearchRequest s = new SearchRequest(es);
 		/// which index? draft (which should include copies of published) by default
 		doList3_setIndex(status, s);
@@ -1071,7 +1070,10 @@ public abstract class CrudServlet<T> implements IServlet {
 	 * @param prefix
 	 * @param period
 	 * @param stateOrNull
-	 * @return can this be null?? best to guard against nulls 
+	 * @return can this be null?? best to guard against nulls
+	 * 
+	 * <p>
+	 * See AppUtils#makeESFilterFromSearchQuery(SearchQuery, Time, Time) which does the heavy lifting
 	 */
 	protected ESQueryBuilder doList3_ESquery(String q, String prefix, Period period, WebRequest stateOrNull) {
 		ESQueryBuilder qb = null;

@@ -1023,6 +1023,15 @@ public class AppUtils {
 			}
 			return kvFilter;
 		}
+		// regex?
+		if (val instanceof String) {
+			String sval = (String) val;
+			if (sval.startsWith("/") && sval.endsWith("/")) {
+				String regex = sval.substring(1, sval.length()-1);
+				ESQueryBuilder regexp = ESQueryBuilders.regexp(prop, regex);
+				return regexp;
+			}
+		}
 		// normal key=value case
 		kvFilter = ESQueryBuilders.termQuery(prop, val);
 		return kvFilter;		

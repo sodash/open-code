@@ -11,4 +11,7 @@ public class CompressDataLogIndexConfig extends DataLogConfig {
 	@Option(description="Normally unset. Set to switch off the alias swap, which would normally remove the old data from datalog.{dataspace}.all and swap in the compressed data.")
 	public boolean noAliasSwap;
 
+	@Option(description="Normally unset. A filter to only process some data. HACK setting `-user:/.+@trk/`")
+	public String filter;
+	
 }
