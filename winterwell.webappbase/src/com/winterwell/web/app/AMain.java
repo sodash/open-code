@@ -1,6 +1,7 @@
 package com.winterwell.web.app;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import com.winterwell.datalog.DataLog;
@@ -401,8 +402,13 @@ public abstract class AMain<ConfigType extends ISiteConfig> {
 		System.out.println(appName);
 		System.out.println("----------------------------------------");
 		System.out.println("");
-		ConfigBuilder cb = new ConfigBuilder(configType);
-		System.out.println(cb.getOptionsMessage(null));
+		try {
+			ConfigBuilder cb = new ConfigBuilder(configType.getDeclaredConstructor().newInstance());
+			System.out.println(cb.getOptionsMessage(null));
+		} catch (Exception e) {
+			System.err.println(e);
+		}
+
 	}
 	
 

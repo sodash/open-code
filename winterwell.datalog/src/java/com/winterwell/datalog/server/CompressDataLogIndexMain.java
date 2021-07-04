@@ -48,7 +48,7 @@ import com.winterwell.web.app.AMain;
  * @author Kai, Daniel
  *
  */
-public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
+public class CompressDataLogIndexMain extends AMain<CompressDataLogIndexConfig> {
 	
 //	public final static String ALIAS = "datalog.transformed.all";
 	
@@ -63,7 +63,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 	}
 
 	@Override
-	protected void init2(DataLogConfig config) {
+	protected void init2(CompressDataLogIndexConfig config) {
 		logFile = new LogFile(FileUtils.changeType(config.logFile, "compressor.txt"))
 				// keep 1 week of log files
 				.setLogRotation(TUnit.DAY.dt, 7);
@@ -84,7 +84,7 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 	private String dataspace = "gl";
 	
 	public CompressDataLogIndexMain() {
-		super("CompressDataLogIndex", DataLogConfig.class);
+		super("CompressDataLogIndex", CompressDataLogIndexConfig.class);
 	}
 	
 
@@ -93,21 +93,22 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		System.out.println(appName+" v"+version);
 		System.out.println("----------------------------------------");
 		System.out.println("");
-		ConfigBuilder cb = new ConfigBuilder(configType);
+		ConfigBuilder cb = new ConfigBuilder(new CompressDataLogIndexConfig());
 		System.out.println(cb.getOptionsMessage("source index, e.g. scrubbed.datalog.gl_jan21"));
 	}	
 	
-	static String version = "0.1.0"; 
+	static String version = "0.1.1"; 
 	
 	@Override
 	protected void doMain2() {		
 		// e.g. "scrubbed.datalog."+dataspace+"_" + MMMyy;
 		String sourceIndex = Containers.get(configRemainderArgs, 0);
 		if (Utils.isBlank(sourceIndex)) {
-			throw new IllegalArgumentException("Pass in a source index");
+			showHelp();
+			throw new IllegalArgumentException("Pass in a source index.");
 		}
 		ESHttpClient esc = Dep.get(ESHttpClient.class);
-		String destIndex = sourceIndex+"_compressed";
+		String destIndex = Utils.or(getConfig().destIndex, sourceIndex+"_compressed");
 		Log.i(LOGTAG, "Compress "+sourceIndex+" --> "+destIndex);
 
 		// specify some terms that we want to keep
@@ -184,10 +185,16 @@ public class CompressDataLogIndexMain extends AMain<DataLogConfig> {
 		Log.d("compress", response3);
 		
 		//add datalog.gl.all alias into the newly created index and remove it from original index
-		IndicesAliasesRequest iar = esc.admin().indices().prepareAliases();
-		iar.addAlias(destIndex, "datalog."+dataspace+".all");
-		iar.removeAlias(sourceIndex, "datalog."+dataspace+".all");
-		iar.get().check();
+		if (getConfig().noAliasSwap) {
+			Log.i("NO alias swap - the new index is not yet in use.");
+		} else {
+			IndicesAliasesRequest iar = esc.admin().indices().prepareAliases();
+			iar.addAlias(destIndex, "datalog."+dataspace+".all");
+			iar.removeAlias(sourceIndex, "datalog."+dataspace+".all");
+			iar.get().check();
+			Log.i("Alias swap done! "+sourceIndex+" -> "+destIndex);
+		}
+		Log.i("All done :) Enjoy your data");
 	}
 	
 	

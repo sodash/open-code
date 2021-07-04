@@ -155,6 +155,7 @@ public final class ArraySet<T> extends AbstractSet<T>
 	 * @return a List view of this ArraySet  
 	 */
 	public List<T> asList() {
+		// why not just return the `backing` list??
 		return new SetAsList();
 	}
 

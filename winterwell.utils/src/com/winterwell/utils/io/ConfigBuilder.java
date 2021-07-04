@@ -27,6 +27,7 @@ import com.winterwell.utils.StrUtils;
 import com.winterwell.utils.Utils;
 import com.winterwell.utils.WrappedException;
 import com.winterwell.utils.containers.ArrayMap;
+import com.winterwell.utils.containers.ArraySet;
 import com.winterwell.utils.containers.Containers;
 import com.winterwell.utils.log.Log;
 import com.winterwell.utils.time.Dt;
@@ -212,13 +213,15 @@ public class ConfigBuilder {
 	 * Create an ArgsParser which will set {@link Option} fields in the given
 	 * config object.
 	 * 
-	 * @param config
+	 * @param config A config object to setup. NOT the class. 
 	 */
 	public ConfigBuilder(Object config) {
 		assert config != null;
+		assert ! (config instanceof Class) : "Input an object, not the class"; 
 		this.config = config;
 		// Setup token->field map
-		parseConfigObject(config.getClass());
+		Class<? extends Object> k = config.getClass();
+		parseConfigObject(k);
 	}	
 	
 	private boolean checkField(Class<?> type) {
@@ -263,7 +266,8 @@ public class ConfigBuilder {
 			msg.append("usage: [options...] "+helpForPostOptionsArguments + StrUtils.LINEEND);
 		}
 		msg.append("Options:" + StrUtils.LINEEND);
-		HashSet<Field> options = new HashSet<Field>(token2field.values());
+		List<Field> options = new ArraySet<Field>(token2field.values()).asList();
+		Containers.sortBy(options, Field::getName);
 		for (Field f : options) {
 			Option arg = f.getAnnotation(Option.class);
 			String desc = arg.description();
@@ -571,6 +575,7 @@ public class ConfigBuilder {
 	 * @throws IllegalArgumentException
 	 */
 	 Map<String,Field> parseConfigObject(Class configClass) throws IllegalArgumentException {
+		 assert configClass != Class.class; // WTF?
 		 parseFlag = true;
 		 requiredArgs = new ArrayList();
 		 final HashMap classToken2field = new HashMap();

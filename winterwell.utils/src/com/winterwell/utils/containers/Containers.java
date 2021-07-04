@@ -2,6 +2,7 @@ package com.winterwell.utils.containers;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.AbstractList;
 import java.util.AbstractSet;
 import java.util.ArrayList;
@@ -2030,6 +2031,18 @@ public final class Containers  {
 	public static <K,V> Map<K, V> filterFalsy(Map<K, V> map) {
 		Map<K, V> newMap = applyToValues(v -> Utils.truthy(v)? v : null, map);
 		return newMap;
+	}
+
+
+	/**
+	 * Sort in place using values returned by a function. Example use-case: sort objects by their name.
+	 * @param <X>
+	 * @param list
+	 * @param getSortValue
+	 */
+	public static <X> void sortBy(List<X> list, IFn<X,?> getSortValue) {		
+		Comparator comp = (a,b) -> Containers.compare(getSortValue.apply((X)a), getSortValue.apply((X)b));
+		Collections.sort(list, comp);
 	}
 
 
