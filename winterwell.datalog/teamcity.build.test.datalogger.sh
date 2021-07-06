@@ -14,7 +14,7 @@
 ## Set the preferences according to your project's needs
 #####
 PROJECT_NAME='open-code' #This name will be used to create/or/refer-to the directory of the project in /home/winterwell/
-GIT_REPO_URL='github.com:/sodash/open-code' #
+GIT_REPO_URL='github.com:/good-loop/open-code' #
 PROJECT_USES_BOB='yes'  #yes or no :: If 'yes', then you must also supply the name of the service which is used to start,stop,or restart the jvm
 NAME_OF_SERVICE='lg' # This can be blank, but if your service uses a JVM, then you must put in the service name which is used to start,stop,or restart the JVM on the server.
 PROJECT_USES_NPM='no' # yes or no
