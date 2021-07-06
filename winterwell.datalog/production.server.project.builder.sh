@@ -35,7 +35,7 @@
 ####### Goal -- create a project building script (using git, bob, jerbil, maven, npm, and webpack as the tools)
 ## which uses very similar, if not, the exact same, functions as the teamcity builder template script.
 PROJECT_NAME='datalogger' #This is simply a human readable name
-GIT_REPO_URL='github.com:/sodash/open-code'
+GIT_REPO_URL='github.com:/good-loop/open-code'
 PROJECT_USES_BOB='yes'  #yes or no :: If 'yes', then you must also supply the name of the service which is used to start,stop,or restart the jvm
 NAME_OF_SERVICE='lg' # This can be blank, but if your service uses a JVM, then you must put in the service name which is used to start,stop,or restart the JVM on the server.
 PROJECT_USES_NPM='no' # yes or no
